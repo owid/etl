@@ -32,26 +32,26 @@ definitions:
   key_expenditure_source: |-
     <% if expenditure_source == "Mandatory private and voluntary private" %>
     Mandatory private and voluntary private social expenditure represents the total social expenditure provided by the private sector. This includes benefits provided by privately operated programmes that involve the redistribution of resources across households, as well as social support stipulated by legislation but operated through the private sector.
-    <% elif expenditure_source == "Public" %>
+    <%- elif expenditure_source == "Public" %>
     Public social expenditure is social spending with financial flows controlled by the general government, as social insurance and social assistance payments. This includes, for example, sickness benefits financed by compulsory employer and employee contributions (receipts) to social insurance funds.
-    <% elif expenditure_source == "Public and mandatory private" %>
+    <%- elif expenditure_source == "Public and mandatory private" %>
     Public and mandatory private social expenditure combines social spending with financial flows controlled by the general government, with social support stipulated by legislation but operated through the private sector.
-    <% elif expenditure_source == "Voluntary private" %>
+    <%- elif expenditure_source == "Voluntary private" %>
     Voluntary private social expenditure are benefits provided bt privately operated programmes that involve the redistribution of resources across households. This includes, for example, benefits provided by NGOs, and benefit coming from tax advantaged individual plans and collective (often employment-related) support arrangements, such as for example, pensions, childcare support, and employment-related health plans.
-    <% elif expenditure_source == "Mandatory private" %>
+    <%- elif expenditure_source == "Mandatory private" %>
     Mandatory private social expenditure is social support stipulated by legislation but operated through the private sector. This includes, for example, direct sickness payments by employers to their absent employees as legislated by public authorities, or benefits coming from mandatory contributions to private insurance funds.
-    <% elif expenditure_source == "Net public" %>
+    <%- elif expenditure_source == "Net public" %>
     Net public social expenditure includes public social expenditure accounting for the effect of the tax system by direct and indirect taxation and by tax breaks for social purposes. It represents the true budgetary effort made by the government in providing social support.
-    <% elif expenditure_source == "Net total" %>
+    <%- elif expenditure_source == "Net total" %>
     Net total social expenditure includes both public and private expenditure and accounts for the effect of the tax system by direct and indirect taxation and by tax breaks for social purposes.
-    <%- endif -%>
+    <%- endif %>
 
   key_spending_type: |-
-    <% if spending_type == "Total" %>
+    <%- if spending_type == "Total" %>
     Total spending represents both in cash and in kind social expenditure. "In cash" refers to the provision of benefits in the form of cash payments, while "in kind" refers to the provision of benefits in the form of goods and services.
-    <% elif spending_type == "In cash spending" %>
+    <%- elif spending_type == "In cash spending" %>
     In-cash spending refers to the provision of benefits in the form of cash payments.
-    <% elif spending_type == "In kind spending" %>
+    <%- elif spending_type == "In kind spending" %>
     In-kind spending refers to the provision of benefits in the form of goods and services.
     <%- endif -%>
 

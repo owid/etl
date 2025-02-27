@@ -91,9 +91,8 @@ def run(dest_dir: str) -> None:
     tb = tb.rename(columns=COLUMNS_TO_KEEP)
 
     # Map indicator codes to their descriptions and create a new column called programme_type_category
-    for code, mapping in PROGRAMME_TYPE_CODES.items():
-        tb.loc[tb["programme_type"] == code, "programme_type_category"] = mapping["category"]
-        tb.loc[tb["programme_type"] == code, "programme_type"] = mapping["new_name"]
+    tb["programme_type_category"] = tb["programme_type"].map(lambda x: PROGRAMME_TYPE_CODES[x]["category"])
+    tb["programme_type"] = tb["programme_type"].map(lambda x: PROGRAMME_TYPE_CODES[x]["new_name"])
 
     # Drop rows with missing values.
     tb = tb.dropna(subset=["value"])
