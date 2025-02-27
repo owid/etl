@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Project Tycho - Pertussis cases (1888-2017)
+    description: |-
+      Project Tycho datasets contain information from external sources of disease surveillance data, such as the United States Centers for Disease Control or the World Health Organization. Data from some sources were already in the public domain, whereas data from other sources were not public before inclusion in Project Tycho datasets. The Project Tycho team has obtained permission for redistribution of data that was not previously public, from agencies that collected and owned the data. All pre-compiled Project Tycho datasets contain count data that are identical to counts published in the original source and no counts have been modified in any way by the Project Tycho team. The Project Tycho team has curated datasets by adding new variables, such as standard identifiers for reported conditions, locations, and pathogens, and by re-representing reported information in a standard data format.
+    date_published: "2018-01-01"
+    # Citation
+    producer: Van Panhuis, Cross and Burke
+    citation_full: |-
+      Van Panhuis, W., Cross, A., & Burke, D. (2018). Counts of Pertussis reported in UNITED STATES OF AMERICA: 1888-2017 (2.0) [Data set]. Project Tycho. https://doi.org/10.25337/T7/ptycho.v2.0/US.27836007
+
+    # Files
+    url_main: https://zenodo.org/records/11452359
+    url_download: https://zenodo.org/records/11452359/files/US.27836007.zip?download=1
+    date_accessed: 2025-01-27
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://zenodo.org/records/11452430
+outs:
+  - md5: 54e990035304371fd5ec51727143c4a0
+    size: 2373882
+    path: pertussis_cases_state_level.zip

@@ -1091,3 +1091,13 @@ steps:
     - data://garden/demography/2025-01-23/us_state_population
   data://grapher/health/2025-02-27/diphtheria_cases_state_level:
     - data://garden/health/2025-02-27/diphtheria_cases_state_level
+
+  # Diphtheria cases - state level - Project Tycho
+  #
+  data://meadow/health/2025-02-27/pertussis_cases_state_level:
+    - snapshot://project_tycho/2025-02-27/pertussis_cases_state_level.zip
+  data://garden/health/2025-02-27/pertussis_cases_state_level:
+    - data://meadow/health/2025-02-27/pertussis_cases_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+  data://grapher/health/2025-02-27/pertussis_cases_state_level:
+    - data://garden/health/2025-02-27/pertussis_cases_state_level
