@@ -148,6 +148,9 @@ tables:
         presentation:
           title_public: Social expenditure per capita
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
+          faqs:
+            - fragment_id: poverty-international-dollars
+              gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
         display:
           name: Social expenditure per capita
           numDecimalPlaces: 0
