@@ -320,6 +320,7 @@ steps:
   #
   data://garden/lazard/2025-02-25/levelized_cost_of_energy:
     - data://meadow/lazard/2025-02-25/levelized_cost_of_energy
+    - data://garden/worldbank_wdi/2025-01-24/wdi
   #
   # Lazard - Levelized Cost of Energy+
   #

@@ -1,10 +1,13 @@
 definitions:
   common:
-    unit: 'current US$ per megawatt-hour'
+    unit: 'constant {BASE_DOLLAR_YEAR} US$ per megawatt-hour'
     short_unit: $/MWh
     presentation:
       topic_tags:
         - Energy
+      grapher_config:
+        note: |-
+          This data is expressed in constant {BASE_DOLLAR_YEAR} US$.
 
 dataset:
   update_period_days: 365
@@ -15,7 +18,7 @@ tables:
       nuclear:
         title: Levelized cost of energy for nuclear power
         description_short: |-
-          Levelized cost of energy (LCOE) for nuclear power. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours). It is not adjusted for inflation.
+          Levelized cost of energy (LCOE) for nuclear power. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
         display:
           name: Nuclear
         presentation:
@@ -23,7 +26,7 @@ tables:
       gas_peaking:
         title: Levelized cost of energy for gas peaking
         description_short: |-
-          Levelized cost of energy (LCOE) for gas peaking. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours). It is not adjusted for inflation.
+          Levelized cost of energy (LCOE) for gas peaking. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
         display:
           name: Gas peaking
         presentation:
@@ -31,7 +34,7 @@ tables:
       coal:
         title: Levelized cost of energy for coal
         description_short: |-
-          Levelized cost of energy (LCOE) for coal. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours). It is not adjusted for inflation.
+          Levelized cost of energy (LCOE) for coal. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
         display:
           name: Coal
         presentation:
@@ -39,7 +42,7 @@ tables:
       geothermal:
         title: Levelized cost of energy for geothermal power
         description_short: |-
-          Levelized cost of energy (LCOE) for geothermal power. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours). It is not adjusted for inflation.
+          Levelized cost of energy (LCOE) for geothermal power. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
         display:
           name: Geothermal
         presentation:
@@ -47,7 +50,7 @@ tables:
       gas_combined_cycle:
         title: Levelized cost of energy for gas combined cycle
         description_short: |-
-          Levelized cost of energy (LCOE) for gas combined cycle. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours). It is not adjusted for inflation.
+          Levelized cost of energy (LCOE) for gas combined cycle. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
         display:
           name: Gas combined cycle
         presentation:
@@ -55,7 +58,7 @@ tables:
       solar_pv:
         title: Levelized cost of energy for solar PV
         description_short: |-
-          Levelized cost of energy (LCOE) for solar PV. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours). It is not adjusted for inflation.
+          Levelized cost of energy (LCOE) for solar PV. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
         display:
           name: Solar PV
         presentation:
@@ -63,7 +66,7 @@ tables:
       wind_onshore:
         title: Levelized cost of energy for onshore wind
         description_short: |-
-          Levelized cost of energy (LCOE) for onshore wind. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours). It is not adjusted for inflation.
+          Levelized cost of energy (LCOE) for onshore wind. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
         display:
           name: Onshore wind
         presentation:
