@@ -1,4 +1,4 @@
-from etl import multidim
+from etl.collections import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -120,7 +120,6 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     multidim.upsert_multidim_data_page(
-        slug="mdd-energy-prices",
         config=config,
-        dependencies=paths.dependencies,
+        paths=paths,
     )

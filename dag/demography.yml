@@ -343,3 +343,11 @@ steps:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
   data://grapher/demography/2024-12-06/wittgenstein_human_capital:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/demography/2025-01-23/us_state_population:
+    - snapshot://demography/2025-01-23/us_state_population.csv
+  data://garden/demography/2025-01-23/us_state_population:
+    - data://meadow/demography/2025-01-23/us_state_population

@@ -3,7 +3,7 @@
 #
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import pytest
 import yaml
@@ -121,3 +121,17 @@ def test_hash():
     var_c = meta.VariableMeta(display={"d": {"a": 1, "b": 2, "c": 3}})
     assert var_a == var_b
     assert var_a != var_c
+
+
+def test_from_dict():
+    @dataclass
+    class X(meta.MetaBase):
+        a: int
+
+    @dataclass
+    class Y(meta.MetaBase):
+        x_list: Optional[List[X]] = None
+
+    # list of objects should be correctly loaded as that object
+    y = Y.from_dict({"x_list": [{"a": 1}]})
+    assert isinstance(y.x_list[0], X)
