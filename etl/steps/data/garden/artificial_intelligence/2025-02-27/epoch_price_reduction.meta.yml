@@ -31,5 +31,5 @@ tables:
         title: Math (harder)
         unit: "reduction in price per year"
       mmlu:
-        title: Language understanding
+        title: General language understanding
         unit: "reduction in price per year"
