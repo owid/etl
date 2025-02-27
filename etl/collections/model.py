@@ -76,10 +76,10 @@ class Indicator(MetaBase):
                 raise ValueError(f"Invalid catalog path: {value}")
         return super().__setattr__(name, value)
 
-    def expand_path(self, tables_by_name: Dict[str, List[Table]]) -> None:
+    def expand_path(self, tables_by_name: Dict[str, List[Table]]):
         # Do nothing if path is already complete
         if self.has_complete_path():
-            return
+            return self
 
         # If path is not complete, we need to expand it!
         table_name = self.catalogPath.split("#")[0]
@@ -100,6 +100,8 @@ class Indicator(MetaBase):
 
         # Build URI
         self.catalogPath = tb.m.dataset.uri + "/" + self.catalogPath
+
+        return self
 
 
 @pruned_json
@@ -156,6 +158,8 @@ class ViewIndicators(MetaBase):
             else:
                 dimension_val.expand_path(tables_by_name)
 
+        return self
+
 
 @pruned_json
 @dataclass
@@ -164,7 +168,7 @@ class View(MetaBase):
 
     dimensions: Dict[str, str]
     indicators: ViewIndicators
-    # NOTE: currently MetaBase.from_dict not loading Optional fields with appropriate class
+    # NOTE: Maybe worth putting as classes at some point?
     config: Optional[Any] = None
     metadata: Optional[Any] = None
 
@@ -177,6 +181,27 @@ class View(MetaBase):
     @property
     def metadata_is_needed(self) -> bool:
         return self.has_multiple_indicators and (self.metadata is None)
+
+    def expand_paths(self, tables_by_name: Dict[str, List[Table]]):
+        """Expand all indicator paths in the view.
+
+        Make sure that they are all complete paths. This includes indicators in view, but also those in config (if any).
+        """
+        # Expand paths in indicators
+        self.indicators.expand_paths(tables_by_name)
+
+        # Expand paths in config fields
+        if self.config is not None:
+            if "sortColumnSlug" in self.config:
+                indicator = Indicator(self.config["sortColumnSlug"]).expand_path(tables_by_name)
+                self.config["sortColumnSlug"] = indicator.catalogPath
+
+            if "map" in self.config:
+                if "columnSlug" in self.config["map"]:
+                    indicator = Indicator(self.config["map"]["columnSlug"]).expand_path(tables_by_name)
+                    self.config["map"]["columnSlug"] = indicator.catalogPath
+
+        return self
 
     # def indicators_in_view(self):
     #     """Get the list of indicators in use in a view.
