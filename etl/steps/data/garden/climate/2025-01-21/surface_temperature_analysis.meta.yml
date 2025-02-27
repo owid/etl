@@ -20,7 +20,7 @@ definitions:
     topic_tags:
     - Climate Change
     grapher_config:
-      note: Because observations start in 1880, the 1880–1900 period is used as the baseline for measuring temperature changes relative to pre-industrial times instead of the standard 1861–1890 period[recommended by climate research institutions](https://www.metoffice.gov.uk/hadobs/indicators/index.html#:~:text=The%201961%2D90%20period%20is,other%20parts%20of%20the%20world.).
+      note: Because observations start in 1880, the 1880–1900 period is used as the baseline for measuring temperature changes relative to pre-industrial times instead of the standard 1861–1890 period [recommended by climate research institutions](https://www.metoffice.gov.uk/hadobs/indicators/index.html#:~:text=The%201961%2D90%20period%20is,other%20parts%20of%20the%20world.).
 
 dataset:
   title: GISS surface temperature analysis
