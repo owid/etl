@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 31
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
+tables:
+  epoch_price_reduction:
+    variables:
+      gpqa_diamond:
+        title: Scientific questions
+        unit: "reduction in price per year"
+      humaneval:
+        title: Coding
+        unit: "reduction in price per year"
+      lmsys_chatbot_arena_elo:
+        title: Chatbot arena
+        unit: "reduction in price per year"
+      math_5:
+        title: Math (easier)
+        unit: "reduction in price per year"
+      math_500:
+        title: Math (harder)
+        unit: "reduction in price per year"
+      mmlu:
+        title: Language understanding
+        unit: "reduction in price per year"
