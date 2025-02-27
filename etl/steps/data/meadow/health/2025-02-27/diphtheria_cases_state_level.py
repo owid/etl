@@ -11,10 +11,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("polio_cases_state_level.zip")
+    snap = paths.load_snapshot("diphtheria_cases_state_level.zip")
 
     # Load data from snapshot.
-    tb = snap.read_in_archive(filename="US.398102009.csv", low_memory=False)
+    tb = snap.read_in_archive(filename="US.397428000.csv", low_memory=False)
 
     #
     # Process data.
