@@ -32,7 +32,11 @@ definitions:
     <%- endif %>
 
   short_spending_programme_type: |-
-    {definitions.short_spending_type} in <<programme_type_category.lower()>> programs (<<programme_type.lower()>>).
+    <% if programme_type_category == "All" or programme_type == "Total" %>
+    {definitions.short_spending_type} in <<programme_type_category.lower()>> programs.
+    <%- else %>
+    {definitions.short_spending_type} in <<programme_type_category.lower()>> programs (subcategory _<<programme_type>>_).
+    <%- endif %>
 
   key_social_expenditure: |-
     Social expenditure is defined as the provision of benefits and financial contributions to households and individuals in order to provide welfare support. These benefits and financial contributions can be provided by public or private institutions.
