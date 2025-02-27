@@ -32,7 +32,7 @@ definitions:
     <%- endif %>
 
   short_spending_programme_type: |-
-    {definitions.short_spending_type} in <<programme_type_category.lower()>> programs (<<programme_type>>).
+    {definitions.short_spending_type} in <<programme_type_category.lower()>> programs (<<programme_type.lower()>>).
 
   key_social_expenditure: |-
     Social expenditure is defined as the provision of benefits and financial contributions to households and individuals in order to provide welfare support. These benefits and financial contributions can be provided by public or private institutions.
@@ -56,7 +56,7 @@ definitions:
 
   key_spending_type: |-
     <%- if spending_type == "In-cash and in-kind spending" %>
-    Total spending represents both in cash and in kind social expenditure. "In cash" refers to the provision of benefits in the form of cash payments, while "in kind" refers to the provision of benefits in the form of goods and services.
+    Total spending represents both in-cash and in-kind social expenditure. "In cash" refers to the provision of benefits in the form of cash payments, while "in kind" refers to the provision of benefits in the form of goods and services.
     <%- elif spending_type == "In-cash spending" %>
     In-cash spending refers to the provision of benefits in the form of cash payments.
     <%- elif spending_type == "In-kind spending" %>
@@ -66,30 +66,35 @@ definitions:
   key_programme_type_category: |-
     <% if programme_type_category == "All" %>
     This indicator includes all social expenditure programs, which are old age, survivors, incapacity-related benefits, health, family, active labor market programs, unemployment, housing, and other social policy areas.
-    <%- elif programme_type_category == "Old age" %>
-    <<programme_type_category>> programs include social expenditure programs on old-age pensions.
+    <%- else %>
+    <<programme_type_category>> programs include social expenditure
+    <%- endif %>
+    <% if programme_type_category == "Old age" %>
+     on old-age pensions.
     <%- elif programme_type_category == "Survivors" %>
-    <<programme_type_category>> programs include social expenditure programs that provide the spouse or dependent of a deceased person with a benefit.
+     that provides the spouse or dependent of a deceased person with a benefit.
     <%- elif programme_type_category == "Incapacity related" %>
-    <<programme_type_category>> programs include social expenditure programs that cover complete or partial inability to work due to disability. The disability can be congenital or the result of an accident or illness.
+     that covers complete or partial inability to work due to disability. The disability can be congenital or the result of an accident or illness.
     <%- elif programme_type_category == "Health" %>
-    <<programme_type_category>> programs include social expenditure programs that provide health care services and benefits.
+     that provides health care services and benefits.
     <%- elif programme_type_category == "Family" %>
-    <<programme_type_category>> programs include social expenditure programs that support families (i.e., excluding one-person households). Benefits are often related to the cost associated with raising children or with the support of other dependents.
+     that supports families (i.e., excluding one-person households). Benefits are often related to the cost associated with raising children or with the support of other dependents.
     <%- elif programme_type_category == "Active labor market" %>
-    <<programme_type_category>> programs include social expenditure programs (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
+     (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
     <%- elif programme_type_category == "Unemployment" %>
-    <<programme_type_category>> programs include social expenditure programs that provide compensations for unemployment.
+     that provides compensations for unemployment.
     <%- elif programme_type_category == "Housing" %>
-    <<programme_type_category>> programs include social expenditure programs that provide rent subsidies and other benefits to help with housing costs.
+     that provides rent subsidies and other benefits to help with housing costs.
     <%- elif programme_type_category == "Other social policy" %>
-    <<programme_type_category>> programs include social expenditure programs that for various reasons do not fit into any defined category. It also includes expenditure related to immigrants, refugees, and indigenous people.
+     that for various reasons does not fit into any defined category. It also includes expenditure related to immigrants, refugees, and indigenous people.
     <%- elif programme_type_category == "Old age and survivors" %>
-    <<programme_type_category>> programs include social expenditure programs that provide benefits to both the elderly and the survivors of deceased persons.
+     that provides benefits to both the elderly and the survivors of deceased persons.
     <%- endif %>
 
   key_programme_type: |-
-    <% if programme_type == "Total" %>
+    <% if programme_type_category == "All" %>
+    {definitions.key_programme_type_category}
+    <%- elif programme_type == "Total" %>
     {definitions.key_programme_type_category} This indicator relates to the total spending in this category.
     <%- else %>
     {definitions.key_programme_type_category} This indicator relates to the subcategory _<<programme_type>>_.
