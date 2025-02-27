@@ -1,7 +1,7 @@
 definitions:
   common:
     description_short: |-
-        The deviation of the average sea surface temperature from the 1861-1890 mean, in degrees Celsius.
+        The deviation of the average sea surface temperature measured at a nominal depth of 20cm from the 1861-1890 mean, in degrees Celsius.
     description_key:
       - Temperature anomalies show how many degrees Celsius temperatures have changed compared to the 1861-1890 period. This baseline period is commonly used to highlight the changes in temperature since pre-industrial times, prior to major human impacts.
       - The data includes separate measurements for the Northern and Southern Hemispheres, which helps researchers analyze regional differences.
