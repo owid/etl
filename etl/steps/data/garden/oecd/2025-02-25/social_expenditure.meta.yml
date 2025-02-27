@@ -66,8 +66,8 @@ definitions:
     The category _Health_ includes social expenditure programs that provide health care services and benefits.
     <%- elif programme_type_category == "Family" %>
     The category _Family_ includes social expenditure programs that support families (i.e., excluding one-person households). Benefits are often related to the cost associated with raising children or with the support of other dependents.
-    <%- elif programme_type_category == "Active labour market programs" %>
-    The category _Active labour market programs_ (ALMPs) includes social expenditure (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
+    <%- elif programme_type_category == "Active labor market programs" %>
+    The category _Active labor market programs_ (ALMPs) includes social expenditure (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
     <%- elif programme_type_category == "Unemployment" %>
     The category _Unemployment_ includes social expenditure programs that provide compensations for unemployment.
     <%- elif programme_type_category == "Housing" %>
@@ -77,7 +77,7 @@ definitions:
     <%- elif programme_type_category == "Old age and survivors" %>
     The category _Old age and survivors_ includes social expenditure programs that provide benefits to both the elderly and the survivors of deceased persons.
     <%- elif programme_type_category == "Total" %>
-    This indicator includes all social expenditure programs, which are old age, survivors, incapacity-related benefits, health, family, active labour market programs, unemployment, housing, and other social policy areas.
+    This indicator includes all social expenditure programs, which are old age, survivors, incapacity-related benefits, health, family, active labor market programs, unemployment, housing, and other social policy areas.
     <%- endif %>
 
   key_programme_type: |-
