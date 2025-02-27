@@ -34,8 +34,8 @@ def run(dest_dir: str) -> None:
     # Switch from using 1961-1990 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times.
     # Calculate the adjustment factors based only on temperature_anomaly
     adjustment_factors = (
-        tb[tb["year"].between(1961, 1990)].groupby("location")["temperature_anomaly"].mean()
-        - tb[tb["year"].between(1861, 1890)].groupby("location")["temperature_anomaly"].mean()
+        tb[tb["year"].between(1961, 1990)].groupby("location")["sea_temperature_anomaly"].mean()
+        - tb[tb["year"].between(1861, 1890)].groupby("location")["sea_temperature_anomaly"].mean()
     )
     # Apply the temperature_anomaly adjustment factor
     # The adjustment factor is applied uniformly to the temperature anomalies and their confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1861–1890 baseline.
@@ -53,7 +53,6 @@ def run(dest_dir: str) -> None:
 
     # Create a date column (assume the middle of the month for each monthly data point).
     tb["date"] = tb["year"].astype(str) + "-" + tb["month"].astype(str).str.zfill(2) + "-15"
-    print(tb)
     # Remove unnecessary columns.
     tb = tb.drop(columns=["year", "month"], errors="raise")
 
