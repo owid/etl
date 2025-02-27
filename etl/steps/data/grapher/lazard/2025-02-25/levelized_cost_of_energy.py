@@ -14,7 +14,16 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("levelized_cost_of_energy")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("levelized_cost_of_energy", reset_index=False)
+    tb = ds_garden.read("levelized_cost_of_energy")
+
+    #
+    # Process data.
+    #
+    # Adjust to grapher notation.
+    tb = tb.rename(columns={"technology": "country"})
+
+    # Improve table format.
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

@@ -1,13 +1,8 @@
 definitions:
   common:
-    unit: 'constant {BASE_DOLLAR_YEAR} US$ per megawatt-hour'
-    short_unit: $/MWh
     presentation:
       topic_tags:
         - Energy
-      grapher_config:
-        note: |-
-          This data is expressed in constant {BASE_DOLLAR_YEAR} US$.
 
 dataset:
   update_period_days: 365
@@ -15,59 +10,19 @@ dataset:
 tables:
   levelized_cost_of_energy:
     variables:
-      nuclear:
-        title: Levelized cost of energy for nuclear power
+      lcoe:
+        title: Levelized cost of energy
         description_short: |-
-          Levelized cost of energy (LCOE) for nuclear power. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
-        display:
-          name: Nuclear
+          Electricity prices expressed as levelized cost of energy (LCOE), which includes the cost of building, maintaining, and operating a power plant, as well as ongoing fuel and operational expenses over its lifetime. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
+        unit: 'constant {BASE_DOLLAR_YEAR} US$ per megawatt-hour'
+        short_unit: $/MWh
         presentation:
-          title_public: Levelized cost of energy for nuclear power
-      gas_peaking:
-        title: Levelized cost of energy for gas peaking
+          grapher_config:
+            note: |-
+              This data is expressed in constant {BASE_DOLLAR_YEAR} US$.
+      lcoe_unadjusted:
+        title: Levelized cost of energy, not adjusted for inflation
         description_short: |-
-          Levelized cost of energy (LCOE) for gas peaking. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
-        display:
-          name: Gas peaking
-        presentation:
-          title_public: Levelized cost of energy for gas peaking
-      coal:
-        title: Levelized cost of energy for coal
-        description_short: |-
-          Levelized cost of energy (LCOE) for coal. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
-        display:
-          name: Coal
-        presentation:
-          title_public: Levelized cost of energy for coal
-      geothermal:
-        title: Levelized cost of energy for geothermal power
-        description_short: |-
-          Levelized cost of energy (LCOE) for geothermal power. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
-        display:
-          name: Geothermal
-        presentation:
-          title_public: Levelized cost of energy for geothermal power
-      gas_combined_cycle:
-        title: Levelized cost of energy for gas combined cycle
-        description_short: |-
-          Levelized cost of energy (LCOE) for gas combined cycle. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
-        display:
-          name: Gas combined cycle
-        presentation:
-          title_public: Levelized cost of energy for gas combined cycle
-      solar_pv:
-        title: Levelized cost of energy for solar PV
-        description_short: |-
-          Levelized cost of energy (LCOE) for solar PV. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
-        display:
-          name: Solar PV
-        presentation:
-          title_public: Levelized cost of energy for solar PV
-      wind_onshore:
-        title: Levelized cost of energy for onshore wind
-        description_short: |-
-          Levelized cost of energy (LCOE) for onshore wind. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), adjusted for inflation.
-        display:
-          name: Onshore wind
-        presentation:
-          title_public: Levelized cost of energy for onshore wind
+          Electricity prices expressed as levelized cost of energy (LCOE), which includes the cost of building, maintaining, and operating a power plant, as well as ongoing fuel and operational expenses over its lifetime. This data is expressed in US dollars per [megawatt-hour](#dod:watt-hours), not adjusted for inflation.
+        unit: 'current US$ per megawatt-hour'
+        short_unit: $/MWh

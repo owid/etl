@@ -62,14 +62,31 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Deflate prices.
-    tb = deflate_prices(tb=tb, tb_wdi=tb_wdi)
+    # Rename technologies.
+    tb = tb.rename(
+        columns={
+            "nuclear": "Nuclear",
+            "gas_peaking": "Gas peaking",
+            "coal": "Coal",
+            "geothermal": "Geothermal",
+            "gas_combined_cycle": "Gas combined cycle",
+            "solar_pv": "Solar photovoltaic",
+            "wind_onshore": "Onshore wind",
+        }
+    )
 
-    # Add a country column.
-    tb["country"] = "World"
+    # Create a new table of deflate prices.
+    tb_deflated = deflate_prices(tb=tb, tb_wdi=tb_wdi)
 
-    # Improve table format.
-    tb = tb.format(["country", "year"])
+    # Transpose tables.
+    tb_deflated = tb_deflated.melt(id_vars="year", var_name="technology", value_name="lcoe")
+    tb = tb.melt(id_vars="year", var_name="technology", value_name="lcoe_unadjusted")
+
+    # Combine tables.
+    tb = tb.merge(tb_deflated, on=["year", "technology"])
+
+    # Improve tables format.
+    tb = tb.format(["year", "technology"])
 
     #
     # Save outputs.
