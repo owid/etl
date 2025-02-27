@@ -20,7 +20,7 @@ meta:
     # License
     license:
       name: CC BY 4.0
-      url: https://zenodo.org/records/11452430
+      url: https://zenodo.org/records/11452424
 outs:
   - md5: f2a4a9b212adbbfc28da85231e640681
     size: 3031361
