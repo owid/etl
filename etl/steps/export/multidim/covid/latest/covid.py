@@ -1,5 +1,4 @@
 from etl.collections import multidim
-from etl.collections.base import Multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -37,14 +36,8 @@ def run(dest_dir: str) -> None:
         paths.log.info(fname)
         config = paths.load_mdim_config(fname)
 
-        mdim = Multidim.from_dict(config)
-        # multidim.upsert_multidim_data_page(
-        #     config=config,
-        #     paths=paths,
-        #     mdim_name=fname_to_mdim_name(fname),
-        # )
-        multidim.upsert_multidim_data_page_2(
-            mdim=mdim,
+        multidim.upsert_multidim_data_page(
+            config=config,
             paths=paths,
             mdim_name=fname_to_mdim_name(fname),
         )

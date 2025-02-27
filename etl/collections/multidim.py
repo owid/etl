@@ -19,9 +19,10 @@ from sqlalchemy.engine import Engine
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collections.base import Multidim
+from etl.collections.model import Multidim
 from etl.collections.utils import (
     expand_catalog_paths,
+    expand_catalog_paths_2,
     extract_catalog_path,
     get_indicators_in_view,
     get_tables_by_name_mapping,
@@ -183,38 +184,9 @@ def upsert_multidim_data_page(
     dependencies = paths.dependencies
     mdim_catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{mdim_name or paths.short_name}"
 
-    # Edit views
-    process_mdim_views(config, dependencies=dependencies)
-
-    # TODO: Possibly add other edits (to dimensions?)
-
-    # Upsert to DB
-    _upsert_multidim_data_page(mdim_catalog_path, config, owid_env)
-
-
-def upsert_multidim_data_page_2(
-    mdim: Multidim, paths: PathFinder, mdim_name: Optional[str] = None, owid_env: Optional[OWIDEnv] = None
-) -> None:
-    """Import MDIM config to DB.
-
-    Args:
-    -----
-
-    slug: str
-        Slug of the MDIM page. MDIM will be published at /slug
-    config: dict
-        MDIM configuration.
-    paths: PathFinder
-        Pass `paths = PathFinder(__file__)` from the script where this function is called.
-    mdim_name: str
-        Name of the MDIM page. Default is short_name from mdim catalog path.
-    owid_env: Optional[OWIDEnv]
-        Environment where to publish the MDIM page.
-    """
-    dependencies = paths.dependencies
-    mdim_catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{mdim_name or paths.short_name}"
-
+    mdim = Multidim.from_dict(config)
     config = mdim.to_dict()
+
     # Edit views
     process_mdim_views(config, dependencies=dependencies)
 
@@ -222,6 +194,31 @@ def upsert_multidim_data_page_2(
 
     # Upsert to DB
     _upsert_multidim_data_page(mdim_catalog_path, config, owid_env)
+
+
+def process_mdim_views_2(mdim: Multidim, dependencies: Set[str]):
+    """Process views in MDIM configuration.
+
+    This includes:
+        - Make sure that catalog paths for indicators are complete.
+        - TODO: Process views with multiple indicators to have adequate metadata
+    """
+    # Get table information by table name, and table URI
+    tables_by_name = get_tables_by_name_mapping(dependencies)
+    # tables_by_uri = get_tables_by_uri_mapping(tables_by_name)  # This is to be used when processing views with multiple indicators
+
+    # Go through all views and expand catalog paths
+    for view in mdim.views:
+        # Update indicators for each dimension, making sure they have the complete URI
+        expand_catalog_paths_2(view, tables_by_name=tables_by_name)
+
+        # Combine metadata in views which contain multiple indicators
+        if view.metadata_is_needed:  # Check if view "contains multiple indicators"
+            # TODO
+            # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
+            log.info(
+                f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view.dimensions}"
+            )
 
 
 def process_mdim_views(config: dict, dependencies: Set[str]):
