@@ -7,7 +7,6 @@ tags:
 
     Install the [YAML extension (by Red Hat)](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) for VS Code to get syntax highlighting and autocompletion for YAML files. This extension will validate your files and highlight any syntax errors.
 
-
 ## Creating YAML Files
 
 Metadata YAML files are typically stored within a garden step as `my_dataset.meta.yml`. Their content is applied **at the very end** of any ETL step. Therefore, YAML files have "the final word" on the metadata of any step. The conventional structure is as follows:
@@ -37,8 +36,8 @@ Multi-line strings are often sources of confusion. [YAML multiline](https://yaml
 
 In addition, using the "strip" chomping indicator, denoted with `-`, after `|` or `>` removes whitespaces at the beginning and end of the string. **This is almost always what you want.**
 
-
 ### Literal style `|`
+
 It is denoted with the `|` block style indicator. Line breaks in the YAML file are treated as line breaks.
 
 ```yaml
@@ -50,12 +49,12 @@ my_var_1:
     Third line after line break
 ```
 
-
 !!! note "Note"
 
     This implies that lines of text in the YAML file can become very long; to be able to read them on a text editor without needing to scroll left and right, use "Word wrap" (or ++option+z++ in VS Code on Mac).
 
 ### Folded style `>`
+
 It is denoted with the `>` block style indicator. Line breaks in the YAML file are treated like spaces; to create a line break, you need a double line break in the YAML file.
 
 ```yaml
@@ -74,11 +73,9 @@ my_var_1:
 
     This avoids having lines of text that are too long in the YAML file. However, if you want to rephrase a paragraph, you may need to manually rearrange the line breaks afterwards.
 
-
-
 ## Anchors & aliases
 
-[Anchors (&) and aliases (*)](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/) are a native YAML functionality and they can be used to reduce repetition.
+[Anchors (&) and aliases (\*)](https://support.atlassian.com/bitbucket-cloud/docs/yaml-anchors/) are a native YAML functionality and they can be used to reduce repetition.
 
 You can define anchors anywhere on the YAML file, but typically we define a special section called `definitions` at the very top of the file, and then use aliases to refer to these definitions.
 
@@ -105,6 +102,7 @@ tables:
           - *description_key_common
           - *third_line
 ```
+
 Note that the case of `description_key` is a bit special: You can use anchor/aliases for both the entire list of bullet points, and also individual points. We have implemented some logic so that the result is always a list of bullet points.
 
 ## Common fields for all indicators
@@ -172,10 +170,8 @@ tables:
       display:
         numDecimalPlaces: 1
 
-    variables:
-      ...
+    variables: ...
 ```
-
 
 ## Dynamic YAML
 
@@ -203,9 +199,7 @@ Even more complex metadata can be generated with [Jinja templates](https://jinja
 
     We use a slightly flavoured Jinja, where we use `<% if ... %>` and `<< var >>` instead of the defaults `{% if ... %}` and `{{ var }}`.
 
-
 Find below a more complex example with dimension `conflict_type`. In this example, we use Jinja combined with dynamic YAML. Note that the dimension values are available through variables with the same name.
-
 
 ```yaml
 definitions:
@@ -236,7 +230,7 @@ It's also possible to do the same with Jinja `macros`. Check out section below a
 ### Whitespaces
 
 Line breaks and whitespaces can be tricky when using Jinja templates. We use reasonable defaults and strip whitespaces, so in most cases you should be fine with using `<%` and `%>`, but in more complex cases, you might have to experiment with
-more fine grained [whitespace control](https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control) using tags `<%-` and `-%>`. This is most often used in if-else blocks like this
+more fine grained [whitespace control](https://jinja.palletsprojects.com/en/stable/templates/#whitespace-control) using tags `<%-` and `-%>`. This is most often used in if-else blocks like this (note the `-` after `<%` for all clauses except for the first one):
 
 ```yaml
 age: |-
@@ -247,6 +241,16 @@ age: |-
   <%- else %>
   ...
   <%- endif %>
+```
+
+An alternative to whitespace control is using the if statements in a single line, like this:
+
+```yaml
+age: |-
+  <% if age_group == "ALLAges" %>
+  ...<%- elif age_group == "Age-standardized" %>
+  ...<%- else %>
+  ...<%- endif %>
 ```
 
 ### Checking Metadata
