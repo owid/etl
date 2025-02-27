@@ -23,15 +23,15 @@ definitions:
       note: The period 1861–1890 is used as the baseline to measure temperature changes relative to pre-industrial times, [as recommended by climate research institutions](https://www.metoffice.gov.uk/hadobs/indicators/index.html#:~:text=The%201961%2D90%20period%20is,other%20parts%20of%20the%20world.).
 
 dataset:
-  title: Sea surface temperature
+  title: Sea surface temperature - annual
   update_period_days: 60
 
 tables:
   sea_surface_temperature:
     variables:
       sea_temperature_anomaly:
-        title: Monthly sea surface temperature anomalies
+        title: Annual sea surface temperature anomalies
       sea_temperature_anomaly_low:
-        title: Monthly sea surface temperature anomalies (lower bound)
+        title: Annual sea surface temperature anomalies (lower bound)
       sea_temperature_anomaly_high:
-        title: Monthly sea surface temperature anomalies (upper bound)
+        title: Annual sea surface temperature anomalies (upper bound)
