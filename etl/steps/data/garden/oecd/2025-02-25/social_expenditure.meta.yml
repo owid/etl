@@ -15,9 +15,12 @@ definitions:
 
   short_spending_programme_type: |-
     <% if spending_type == "Total" %>
-    Includes both in-cash and in-kind benefits in the program category <<programme_type_category>> (<<programme_type>>).<% elif spending_type == "In cash spending" %>
-    Includes only in-cash benefits in the program category <<programme_type_category>> (<<programme_type>>).<% elif spending_type == "In kind spending" %>
-    Includes only in-kind benefits in the program category <<programme_type_category>> (<<programme_type>>).<% endif %>
+    Includes both in-cash and in-kind benefits in the program category _<<programme_type_category>>_ (<<programme_type>>).
+    <%- elif spending_type == "In cash spending" %>
+    Includes only in-cash benefits in the program category _<<programme_type_category>>_ (<<programme_type>>).
+    <%- elif spending_type == "In kind spending" %>
+    Includes only in-kind benefits in the program category _<<programme_type_category>>_ (<<programme_type>>).
+    <%- endif %>
 
   key_social_expenditure: |-
     Social expenditure is defined as the provision of benefits and financial contributions to households and individuals in order to provide welfare support. These benefits and financial contributions can be provided by public or private institutions.
@@ -50,25 +53,25 @@ definitions:
 
   key_programme_type_category: |-
     <% if programme_type_category == "Old age" %>
-    The category "Old age" includes social expenditure programs on old-age pensions.
+    The category _Old age_ includes social expenditure programs on old-age pensions.
     <% elif programme_type_category == "Survivors" %>
-    The category "Survivors" includes social expenditure programs that provide the spouse or dependent of a deceased person with a benefit.
+    The category _Survivors_ includes social expenditure programs that provide the spouse or dependent of a deceased person with a benefit.
     <% elif programme_type_category == "Incapacity related" %>
-    The category "Incapacity-related benefits" includes social expenditure programs because of complete or partial inability to work due to disability. The disability can be congenital or the result of an accident or illness.
+    The category _Incapacity-related benefits_ includes social expenditure programs because of complete or partial inability to work due to disability. The disability can be congenital or the result of an accident or illness.
     <% elif programme_type_category == "Health" %>
-    The category "Health" includes social expenditure programs that provide health care services and benefits.
+    The category _Health_ includes social expenditure programs that provide health care services and benefits.
     <% elif programme_type_category == "Family" %>
-    The category "Family" includes social expenditure programs that support families (i.e., excluding one-person households). Benefits are often related to the cost associated with raising children or with the support of other dependents.
+    The category _Family_ includes social expenditure programs that support families (i.e., excluding one-person households). Benefits are often related to the cost associated with raising children or with the support of other dependents.
     <% elif programme_type_category == "Active labour market programs" %>
-    The category "Active labour market programs" (ALMPs) includes social expenditure (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
+    The category _Active labour market programs_ (ALMPs) includes social expenditure (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
     <% elif programme_type_category == "Unemployment" %>
-    The category "Unemployment" includes social expenditure programs that provide compensations for unemployment.
+    The category _Unemployment_ includes social expenditure programs that provide compensations for unemployment.
     <% elif programme_type_category == "Housing" %>
-    The category "Housing" includes social expenditure programs that provide rent subsidies and other benefits to help with housing costs.
+    The category _Housing_ includes social expenditure programs that provide rent subsidies and other benefits to help with housing costs.
     <% elif programme_type_category == "Other social policy areas" %>
-    The category "Other social policy areas" includes social expenditure programs that for various reasons do not fit into any defined category. It also includes expenditure related to immigrants, refugees, and indigenous people.
+    The category _Other social policy areas_ includes social expenditure programs that for various reasons do not fit into any defined category. It also includes expenditure related to immigrants, refugees, and indigenous people.
     <% elif programme_type_category == "Old age and survivors" %>
-    The category "Old age and survivors" includes social expenditure programs that provide benefits to both the elderly and the survivors of deceased persons.
+    The category _Old age and survivors_ includes social expenditure programs that provide benefits to both the elderly and the survivors of deceased persons.
     <% elif programme_type_category == "Total" %>
     This indicator includes all social expenditure programs, which are old age, survivors, incapacity-related benefits, health, family, active labour market programs, unemployment, housing, and other social policy areas.
     <%- endif -%>
