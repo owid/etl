@@ -8,24 +8,13 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
-# Columns to select from data, and how to rename them.
-COLUMNS = {
-    "year": "year",
-    "month": "month",
-    "location": "location",
-    "anomaly": "sea_temperature_anomaly",
-    "lower_bound_95pct_bias_uncertainty_range": "sea_temperature_anomaly_low",
-    "upper_bound_95pct_bias_uncertainty_range": "sea_temperature_anomaly_high",
-}
-
-
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset and read its main table.
-    ds_meadow = paths.load_dataset("sea_surface_temperature")
-    tb = ds_meadow.read("sea_surface_temperature")
+    # Load garden dataset and read its main table.
+    ds_garden = paths.load_dataset("sea_surface_temperature")
+    tb = ds_garden.read("sea_surface_temperature")
 
     #
     # Process data.
