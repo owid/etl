@@ -23,7 +23,7 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("sea_surface_temperature")
-    tb = ds_meadow["sea_surface_temperature"].reset_index()
+    tb = ds_meadow.read("sea_surface_temperature")
 
     #
     # Process data.

@@ -67,52 +67,55 @@ def run(dest_dir: str) -> None:
     #
     # Load GISS dataset surface temperature analysis, and read monthly data.
     ds_giss = paths.load_dataset("surface_temperature_analysis")
-    tb_giss = ds_giss["surface_temperature_analysis"].reset_index()
+    tb_giss = ds_giss.read("surface_temperature_analysis")
 
     # Load NSIDC dataset of sea ice index.
     ds_nsidc = paths.load_dataset("sea_ice_index")
-    tb_nsidc = ds_nsidc["sea_ice_index"].reset_index()
+    tb_nsidc = ds_nsidc.read("sea_ice_index")
 
     # Load Met Office dataset on sea surface temperature.
     ds_met_office = paths.load_dataset("sea_surface_temperature")
-    tb_met_office = ds_met_office["sea_surface_temperature"].reset_index()
+    tb_met_office = ds_met_office.read("sea_surface_temperature")
+
+    ds_met_office_annual = paths.load_dataset("sea_surface_temperature_annual")
+    tb_met_office_annual = ds_met_office_annual.read("sea_surface_temperature")
 
     # Load NOAA/NCIE dataset on ocean heat content.
     ds_ocean_heat = paths.load_dataset("ocean_heat_content", namespace="climate")
-    tb_ocean_heat_monthly = ds_ocean_heat["ocean_heat_content_monthly"].reset_index()
-    tb_ocean_heat_annual = ds_ocean_heat["ocean_heat_content_annual"].reset_index()
+    tb_ocean_heat_monthly = ds_ocean_heat.read("ocean_heat_content_monthly")
+    tb_ocean_heat_annual = ds_ocean_heat.read("ocean_heat_content_annual")
 
     # Load EPA's compilation of data on ocean heat content.
     ds_epa = paths.load_dataset("ocean_heat_content", namespace="epa")
-    tb_ocean_heat_annual_epa = ds_epa["ocean_heat_content"].reset_index()
+    tb_ocean_heat_annual_epa = ds_epa.read("ocean_heat_content")
 
     # Load ocean pH data from the School of Ocean and Earth Science and Technology.
     ds_ocean_ph = paths.load_dataset("ocean_ph_levels")
-    tb_ocean_ph = ds_ocean_ph["ocean_ph_levels"].reset_index()
+    tb_ocean_ph = ds_ocean_ph.read("ocean_ph_levels")
 
     # Load snow cover extent from Rutgers University Global Snow Lab.
     ds_snow = paths.load_dataset("snow_cover_extent")
-    tb_snow = ds_snow["snow_cover_extent"].reset_index()
+    tb_snow = ds_snow.read("snow_cover_extent")
 
     # Load ice sheet mass balance data from EPA.
     ds_ice_sheet = paths.load_dataset("ice_sheet_mass_balance")
-    tb_ice_sheet = ds_ice_sheet["ice_sheet_mass_balance"].reset_index()
+    tb_ice_sheet = ds_ice_sheet.read("ice_sheet_mass_balance")
 
     # Load annual data on mass balance of US glaciers from EPA.
     ds_us_glaciers = paths.load_dataset("mass_balance_us_glaciers")
-    tb_us_glaciers = ds_us_glaciers["mass_balance_us_glaciers"].reset_index()
+    tb_us_glaciers = ds_us_glaciers.read("mass_balance_us_glaciers")
 
     # Load monthly greenhouse gas concentration data from NOAA/GML.
     ds_gml = paths.load_dataset("ghg_concentration")
-    tb_gml = ds_gml["ghg_concentration"].reset_index()
+    tb_gml = ds_gml.read("ghg_concentration")
 
     # Load long-run yearly greenhouse gas concentration data.
     ds_ghg = paths.load_dataset("long_run_ghg_concentration")
-    tb_ghg = ds_ghg["long_run_ghg_concentration"].reset_index()
+    tb_ghg = ds_ghg.read("long_run_ghg_concentration")
 
     # Load global sea level.
     ds_sea_level = paths.load_dataset("global_sea_level")
-    tb_sea_level = ds_sea_level["global_sea_level"].reset_index()
+    tb_sea_level = ds_sea_level.read("global_sea_level")
 
     #
     # Process data.
@@ -150,7 +153,13 @@ def run(dest_dir: str) -> None:
 
     # Gather annual data from different tables.
     tb_annual = tb_ocean_heat_annual.copy()
-    for table in [arctic_sea_ice_extent, antarctic_sea_ice_extent, tb_ghg, tb_us_glaciers.astype({"year": int})]:
+    for table in [
+        tb_met_office_annual,
+        arctic_sea_ice_extent,
+        antarctic_sea_ice_extent,
+        tb_ghg,
+        tb_us_glaciers.astype({"year": int}),
+    ]:
         tb_annual = tb_annual.merge(
             table,
             how="outer",
