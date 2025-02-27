@@ -7,6 +7,8 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define the original base year of the deflator.
+BASE_DOLLAR_YEAR_ORIGINAL = 2015
 # Define the base year for the deflator.
 BASE_DOLLAR_YEAR = 2023
 # We use the WDI GDP deflator, but this is usually missing for the latest year.
@@ -29,6 +31,9 @@ def deflate_prices(tb: Table, tb_wdi: Table) -> Table:
 
     # Merge the deflator with the main table.
     tb = tb.merge(tb_deflator, on="year", how="left")
+
+    error = "Deflator base year has changed. Simply redefine BASE_DOLLAR_ORIGINAL."
+    assert tb[tb["year"] == BASE_DOLLAR_YEAR_ORIGINAL]["deflator"].item() == 100, error
 
     # Fill missing rows (caused by the deflator not having data for the latest year).
     error = f"Expected missing data in deflator for the years {set(DEFLATOR_MISSING_VALUES)}."
@@ -97,7 +102,7 @@ def run(dest_dir: str) -> None:
         tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
-        yaml_params={"BASE_DOLLAR_YEAR": BASE_DOLLAR_YEAR},
+        yaml_params={"BASE_DOLLAR_YEAR": BASE_DOLLAR_YEAR, "BASE_DOLLAR_YEAR_ORIGINAL": BASE_DOLLAR_YEAR_ORIGINAL},
     )
 
     # Save changes in the new garden dataset.
