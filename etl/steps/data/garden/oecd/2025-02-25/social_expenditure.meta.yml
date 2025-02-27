@@ -13,14 +13,17 @@ definitions:
   ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
   ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2015 prices.
 
-  short_spending_programme_type: |-
+  short_spending_type: |-
     <% if spending_type == "Total" %>
-    Includes both in-cash and in-kind benefits in the program category _<<programme_type_category>>_ (<<programme_type>>).
+    Includes both in-cash and in-kind benefits
     <%- elif spending_type == "In cash spending" %>
-    Includes only in-cash benefits in the program category _<<programme_type_category>>_ (<<programme_type>>).
+    Includes only in-cash benefits
     <%- elif spending_type == "In kind spending" %>
-    Includes only in-kind benefits in the program category _<<programme_type_category>>_ (<<programme_type>>).
+    Includes only in-kind benefits
     <%- endif %>
+
+  short_spending_programme_type: |-
+    {definitions.short_spending_type} in the program category _<<programme_type_category>>_ (<<programme_type>>).
 
   key_social_expenditure: |-
     Social expenditure is defined as the provision of benefits and financial contributions to households and individuals in order to provide welfare support. These benefits and financial contributions can be provided by public or private institutions.
@@ -54,27 +57,34 @@ definitions:
   key_programme_type_category: |-
     <% if programme_type_category == "Old age" %>
     The category _Old age_ includes social expenditure programs on old-age pensions.
-    <% elif programme_type_category == "Survivors" %>
+    <%- elif programme_type_category == "Survivors" %>
     The category _Survivors_ includes social expenditure programs that provide the spouse or dependent of a deceased person with a benefit.
-    <% elif programme_type_category == "Incapacity related" %>
+    <%- elif programme_type_category == "Incapacity related" %>
     The category _Incapacity-related benefits_ includes social expenditure programs because of complete or partial inability to work due to disability. The disability can be congenital or the result of an accident or illness.
-    <% elif programme_type_category == "Health" %>
+    <%- elif programme_type_category == "Health" %>
     The category _Health_ includes social expenditure programs that provide health care services and benefits.
-    <% elif programme_type_category == "Family" %>
+    <%- elif programme_type_category == "Family" %>
     The category _Family_ includes social expenditure programs that support families (i.e., excluding one-person households). Benefits are often related to the cost associated with raising children or with the support of other dependents.
-    <% elif programme_type_category == "Active labour market programs" %>
+    <%- elif programme_type_category == "Active labour market programs" %>
     The category _Active labour market programs_ (ALMPs) includes social expenditure (other than education) aimed at the improvement of the beneficiaries' prospects of finding employment or increase their earnings capacity.
-    <% elif programme_type_category == "Unemployment" %>
+    <%- elif programme_type_category == "Unemployment" %>
     The category _Unemployment_ includes social expenditure programs that provide compensations for unemployment.
-    <% elif programme_type_category == "Housing" %>
+    <%- elif programme_type_category == "Housing" %>
     The category _Housing_ includes social expenditure programs that provide rent subsidies and other benefits to help with housing costs.
-    <% elif programme_type_category == "Other social policy areas" %>
+    <%- elif programme_type_category == "Other social policy areas" %>
     The category _Other social policy areas_ includes social expenditure programs that for various reasons do not fit into any defined category. It also includes expenditure related to immigrants, refugees, and indigenous people.
-    <% elif programme_type_category == "Old age and survivors" %>
+    <%- elif programme_type_category == "Old age and survivors" %>
     The category _Old age and survivors_ includes social expenditure programs that provide benefits to both the elderly and the survivors of deceased persons.
-    <% elif programme_type_category == "Total" %>
+    <%- elif programme_type_category == "Total" %>
     This indicator includes all social expenditure programs, which are old age, survivors, incapacity-related benefits, health, family, active labour market programs, unemployment, housing, and other social policy areas.
-    <%- endif -%>
+    <%- endif %>
+
+  key_programme_type: |-
+    <% if programme_type == "Total" %>
+    {definitions.key_programme_type_category} This indicator relates to the total spending in this category.
+    <%- else %>
+    {definitions.key_programme_type_category} This indicator relates to the subcategory _<<programme_type>>_.
+    <%- endif %>
 
 
 # Learn more about the available fields:
@@ -95,6 +105,7 @@ tables:
           - "{definitions.key_social_expenditure}"
           - "{definitions.key_expenditure_source}"
           - "{definitions.key_spending_type}"
+          - "{definitions.key_programme_type}"
         presentation:
           title_public: Social expenditure as a share of GDP
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
@@ -112,6 +123,7 @@ tables:
           - "{definitions.key_social_expenditure}"
           - "{definitions.key_expenditure_source}"
           - "{definitions.key_spending_type}"
+          - "{definitions.key_programme_type}"
         presentation:
           title_public: Social expenditure as a share of government expenditure
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
@@ -129,6 +141,7 @@ tables:
           - "{definitions.key_social_expenditure}"
           - "{definitions.key_expenditure_source}"
           - "{definitions.key_spending_type}"
+          - "{definitions.key_programme_type}"
           - "{definitions.ppp_adjustment}"
           - "{definitions.ppp_prices}"
         presentation:
