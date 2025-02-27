@@ -25,7 +25,7 @@ def run(dest_dir: str) -> None:
     # Create a new table.
     #
     tb = tb[["bench", "threshold_model", "end_date", "price_reduction_factor_per_year"]]
-    tb["year"] = pd.to_datetime(tb["end_date"]).dt.year
+    tb["year"] = 2025
     tb["price_reduction_factor_per_year"] = tb["price_reduction_factor_per_year"].astype(float)
     tb = tb.drop(columns=["end_date"])
     tb = tb.format(["bench", "threshold_model", "year"])
