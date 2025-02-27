@@ -5,14 +5,13 @@ definitions:
     presentation:
       topic_tags:
         - Government Spending
-    description_key:
-      - "{definitions.key_social_expenditure}"
-      - "{definitions.key_expenditure_source}"
-      - "{definitions.key_spending_type}"
     description_from_producer: |-
       _Social expenditures_
 
       The provision by public and private institutions of benefits to, and financial contributions targeted at, households and individuals in order to provide support during circumstances which adversely affect their welfare, provided that the provision of the benefits and financial contributions constitutes neither a direct payment for a particular good or service nor an individual contract or transfer.
+
+  ppp_adjustment: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_prices: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2015 prices.
 
   short_spending_programme_type: |-
     <% if spending_type == "Total" %>
@@ -92,6 +91,10 @@ tables:
         unit: "% of GDP"
         short_unit: "%"
         description_short: "<<expenditure_source>> social expenditure divided by [gross domestic product](#dod:gdp), expressed as a percentage. {definitions.short_spending_programme_type}"
+        description_key:
+          - "{definitions.key_social_expenditure}"
+          - "{definitions.key_expenditure_source}"
+          - "{definitions.key_spending_type}"
         presentation:
           title_public: Social expenditure as a share of GDP
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
@@ -105,11 +108,15 @@ tables:
         unit: "% of government expenditure"
         short_unit: "%"
         description_short: "<<expenditure_source>> social expenditure divided by total government expenditure, expressed as a percentage. {definitions.short_spending_programme_type}"
+        description_key:
+          - "{definitions.key_social_expenditure}"
+          - "{definitions.key_expenditure_source}"
+          - "{definitions.key_spending_type}"
         presentation:
           title_public: Social expenditure as a share of government expenditure
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         display:
-          name: Testing variable
+          name: Social expenditure as a share of government expenditure
           numDecimalPlaces: 1
           tolerance: 5
 
@@ -117,12 +124,18 @@ tables:
         title: Social expenditure per capita - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         unit: "international-$ in 2015 prices"
         short_unit: "$"
-        description_short: "<<expenditure_source>> social expenditure divided by the population of the country. {definitions.short_spending_programme_type}"
+        description_short: "<<expenditure_source>> social expenditure divided by the population of the country. {definitions.short_spending_programme_type} {definitions.ppp}"
+        description_key:
+          - "{definitions.key_social_expenditure}"
+          - "{definitions.key_expenditure_source}"
+          - "{definitions.key_spending_type}"
+          - "{definitions.ppp_adjustment}"
+          - "{definitions.ppp_prices}"
         presentation:
           title_public: Social expenditure per capita
           title_variant: <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> (<<programme_type>>)
         display:
-          name: Testing variable
+          name: Social expenditure per capita
           numDecimalPlaces: 0
           tolerance: 5
 
