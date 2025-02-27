@@ -6,7 +6,7 @@ definitions:
       topic_tags:
         - Government Spending
     description_from_producer: |-
-      _Social expenditures_
+      _Social expenditures_ (from the [Guide to the OECD Social Expenditure Database](http://www.oecd.org/social/soc/SOCX_Manuel_2019.pdf)
 
       The provision by public and private institutions of benefits to, and financial contributions targeted at, households and individuals in order to provide support during circumstances which adversely affect their welfare, provided that the provision of the benefits and financial contributions constitutes neither a direct payment for a particular good or service nor an individual contract or transfer.
 
