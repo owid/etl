@@ -19,11 +19,10 @@ tables:
         processing_level: major
         description_processing: |-
           - Prices have been adjusted for inflation using the U.S. GDP deflator from the World Bank (World Development Indicators, [NY.GDP.DEFL.ZS](https://data.worldbank.org/indicator/NY.GDP.DEFL.ZS?locations=US)). To convert the original prices in current US$ to constant {BASE_DOLLAR_YEAR} US$, they were divided by the deflator value for {BASE_DOLLAR_YEAR_ORIGINAL} and then multiplied by the deflator value for {BASE_DOLLAR_YEAR}. Where World Bank data was unavailable, missing values were supplemented using the Gross Domestic Product: Implicit Price Deflator from the Federal Reserve Economic Data ([GDPDEF](https://fred.stlouisfed.org/series/GDPDEF)).
-
         presentation:
           grapher_config:
             note: |-
-              This data is expressed in constant {BASE_DOLLAR_YEAR} US$.
+              Data reflects unsubsidized costs, expressed in constant {BASE_DOLLAR_YEAR} US$.
       lcoe_unadjusted:
         title: Levelized cost of energy, not adjusted for inflation
         description_short: |-
@@ -31,3 +30,7 @@ tables:
         unit: 'current US$ per megawatt-hour'
         short_unit: $/MWh
         processing_level: minor
+        presentation:
+          grapher_config:
+            note: |-
+              Data reflects unsubsidized costs.
