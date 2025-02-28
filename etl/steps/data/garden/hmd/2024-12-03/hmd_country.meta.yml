@@ -91,7 +91,7 @@ tables:
           The highest average daily number of births, per million people, recorded in the given year.
         display:
           name: |-
-            Maximum birth rate, per day
+            Daily birth rate in the peak month
 
       month_max_lead_9months:
         title: Month ordinal with peak daily birth rate in 9 months
