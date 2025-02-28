@@ -36,14 +36,14 @@ def run(dest_dir: str) -> None:
     )
 
     tb_years = tb_years.drop(columns=["country"])
-    tb_years = tb_years.rename(columns={"gender": "country"})
+    tb_years = tb_years.rename(columns={"age_bracket": "country"})
 
     # Drop timeframe column
     tb = tb.drop(columns=["timeframe"])
 
     # format
     tb = tb.format(["country", "year", "who_category"])
-    tb_years = tb_years.format(["country", "year", "who_category", "age_bracket"])
+    tb_years = tb_years.format(["country", "year", "who_category", "gender"])
 
     #
     # Save outputs.

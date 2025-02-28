@@ -62,7 +62,7 @@ tables:
   atus_who_years:
     variables:
       t:
-        title: Time spent with other people over time - <<age_bracket>> - <<who_category>>
+        title: Time spent with other people over time - <<gender>> - <<who_category>>
         unit: "Hours"
         short_unit: "h"
         description_short: |-
