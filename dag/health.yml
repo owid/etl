@@ -35,11 +35,11 @@ steps:
     - data://meadow/who/latest/flunet
   data://meadow/who/latest/fluid:
     - snapshot://who/latest/fluid.csv
-  data://garden/who/latest/fluid:
-    - data://meadow/who/latest/fluid
-  data://explorers/who/latest/flu:
-    - data://garden/who/latest/fluid
-    - data://garden/who/latest/flunet
+  # data://garden/who/latest/fluid:
+  #   - data://meadow/who/latest/fluid
+  # data://explorers/who/latest/flu:
+  #   - data://garden/who/latest/fluid
+  #   - data://garden/who/latest/flunet
 
   # Flu vaccine policy - https://immunizationdata.who.int/pages/indicators-by-category/influenza.html?YEAR=
   data://meadow/who/2023-04-03/flu_vaccine_policy:
