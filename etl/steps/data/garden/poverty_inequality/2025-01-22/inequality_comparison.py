@@ -32,12 +32,15 @@ log = get_logger()
 INDICATORS_FOR_ANALYSIS = {
     "gini_pip_disposable_perCapita": "gini",
     "p90p100Share_pip_disposable_perCapita": "decile10_share",
+    "palmaRatio_pip_disposable_perCapita": "palma_ratio",
     "gini_wid_pretaxNational_perAdult": "p0p100_gini_pretax",
     "p99p100Share_wid_pretaxNational_perAdult": "p99p100_share_pretax",
     "p90p100Share_wid_pretaxNational_perAdult": "p90p100_share_pretax",
+    "palmaRatio_wid_pretaxNational_perAdult": "palma_ratio_pretax",
     # "gini_wid_posttaxNational_perAdult": "p0p100_gini_posttax_nat",
     # "p99p100Share_wid_posttaxNational_perAdult": "p99p100_share_posttax_nat",
     # "p90p100Share_wid_posttaxNational_perAdult": "p90p100_share_posttax_nat",
+    # "palmaRatio_wid_posttaxNational_perAdult": "palma_ratio_posttax_nat",
 }
 
 
