@@ -4,8 +4,8 @@ This step contains tooling that should moved to a more general module so that it
 
 import pandas as pd
 
+from etl.collections.explorers import expand_catalog_paths
 from etl.collections.utils import (
-    expand_catalog_paths,
     get_indicators_in_view,
     get_tables_by_name_mapping,
     records_to_dictionary,

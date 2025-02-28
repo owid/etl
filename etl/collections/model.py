@@ -203,43 +203,14 @@ class View(MetaBase):
 
         return self
 
-    # def indicators_in_view(self):
-    #     """Get the list of indicators in use in a view.
+    def all_indicators(self):
+        """Return all indicators in the view."""
+        indicators_main = self.indicators.to_records()
 
-    #     It returns the list as a list of records:
+        # Auxiliary
+        # indicators_aux = []
 
-    #     [
-    #         {
-    #             "path": "data://path/to/dataset#indicator",
-    #             "dimension": "y"
-    #         },
-    #         ...
-    #     ]
-
-    #     TODO: This is being called twice, maybe there is a way to just call it once. Maybe if it is an attribute of a class?
-    #     """
-    #     indicators_view = []
-    #     # Get indicators from dimensions
-    #     for dim in DIMENSIONS:
-    #         if dim in self.indicators:
-    #             indicator_raw = view["indicators"][dim]
-    #             if isinstance(indicator_raw, list):
-    #                 assert dim == "y", "Only `y` can come as a list"
-    #                 indicators_view += [
-    #                     {
-    #                         "path": extract_catalog_path(ind),
-    #                         "dimension": dim,
-    #                     }
-    #                     for ind in indicator_raw
-    #                 ]
-    #             else:
-    #                 indicators_view.append(
-    #                     {
-    #                         "path": extract_catalog_path(indicator_raw),
-    #                         "dimension": dim,
-    #                     }
-    #                 )
-    #     return indicators_view
+        # validation?
 
 
 @pruned_json
@@ -261,6 +232,17 @@ class Dimension(MetaBase):
     choices: Optional[List[DimensionChoice]] = None  # Only allowed to be None if checkbox
     presentation: Optional[Dict[str, Any]] = None
 
+    def __post_init__(self):
+        # Validate that choices are defined for checkbox type
+        if self.choices is None:
+            if (self.presentation is None) or (self.presentation["type"] != "checkbox"):
+                raise ValueError(f"Choices not found for dimension: {self.slug}")
+
+    @property
+    def choice_slugs(self):
+        if self.choices is not None:
+            return [choice.slug for choice in self.choices]
+
 
 @pruned_json
 @dataclass
@@ -269,6 +251,10 @@ class Collection(MetaBase):
 
     dimensions: List[Dimension]
     views: List[View]
+
+    def validate_views_with_dimensions(self):
+        """Validate that the dimension choices in all views are defined."""
+        dix = {dim.slug: dim.choice_slugs for dim in self.dimensions}
 
 
 @pruned_json

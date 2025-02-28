@@ -21,7 +21,6 @@ from structlog import get_logger
 from apps.chart_sync.admin_api import AdminAPI
 from etl.collections.model import Multidim
 from etl.collections.utils import (
-    expand_catalog_paths,
     extract_catalog_path,
     get_indicators_in_view,
     get_tables_by_name_mapping,
@@ -191,7 +190,7 @@ def upsert_multidim_data_page(
     # TODO: Possibly add other edits (to dimensions?)
 
     # Upsert to DB
-    _upsert_multidim_data_page(mdim_catalog_path, mdim.to_dict(), owid_env)
+    _upsert_multidim_data_page(mdim_catalog_path, mdim, owid_env)
 
 
 def process_mdim_views(mdim: Multidim, dependencies: Set[str]):
@@ -219,19 +218,19 @@ def process_mdim_views(mdim: Multidim, dependencies: Set[str]):
             )
 
 
-def _upsert_multidim_data_page(mdim_catalog_path: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
+def _upsert_multidim_data_page(mdim_catalog_path: str, mdim: Multidim, owid_env: Optional[OWIDEnv] = None) -> None:
     """Actual upsert to DB."""
     # Ensure we have an environment set
     if owid_env is None:
         owid_env = OWID_ENV
 
     # Validate config
-    validate_schema(config)
-    validate_multidim_config(config, owid_env.engine)
+    validate_schema(mdim.to_dict())
+    validate_multidim_config(mdim, owid_env.engine)
 
     # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
     # TODO: I think we could move this to the Grapher side.
-    config = replace_catalog_paths_with_ids(config)
+    config = replace_catalog_paths_with_ids(mdim.to_dict())
 
     # Upsert config via Admin API
     admin_api = AdminAPI(owid_env)
@@ -289,9 +288,9 @@ def validate_schema(config: dict) -> None:
         raise ValueError(f"Config validation error: {e.message}")  # type: ignore
 
 
-def validate_multidim_config(config: dict, engine: Engine) -> None:
+def validate_multidim_config(mdim: Multidim, engine: Engine) -> None:
     # Ensure that all views are in choices
-    for dim in config["dimensions"]:
+    for dim in mdim.dimensions:
         allowed_slugs = [choice["slug"] for choice in dim["choices"]]
 
         for view in config["views"]:

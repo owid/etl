@@ -15,7 +15,7 @@ MOBILITY_CONFIG_DEFAULT = {
     "addCountryMode": "change-country",
 }
 
-print(1)
+print(2)
 
 
 def run(dest_dir: str) -> None:
