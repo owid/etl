@@ -10,7 +10,7 @@ THINGS TO SOLVE:
 import json
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, TypeVar
+from typing import Any, Dict, List, Literal, Optional, TypeVar
 
 import fastjsonschema
 import yaml
@@ -252,30 +252,40 @@ class DimensionChoice(MetaBase):
 
 @pruned_json
 @dataclass
+class DimensionPresentation(MetaBase):
+    type: Literal["dropdown", "checkbox", "radio"]
+
+    def __post_init__(self):
+        # TODO: is there a cleaner way of validating this? Feels redundant with the Literal type specified above
+        UI_TYPE_ACCEPTED = ["dropdown", "checkbox", "radio"]
+        assert self.type in UI_TYPE_ACCEPTED, f"Invalid type: {self.type}. Accepted are {UI_TYPE_ACCEPTED}"
+
+
+@pruned_json
+@dataclass
 class Dimension(MetaBase):
     """MDIM/Explorer dimension configuration."""
 
     slug: str
     name: str
     choices: List[DimensionChoice]
-    # This is just for explorers at the moment!
-    presentation: Optional[Dict[str, Any]] = None
+    presentation: Optional[DimensionPresentation] = None
 
     @property
     def ui_type(self):
         default = "dropdown"
         if self.presentation is not None:
-            return self.presentation.get("type", default)
+            return self.presentation.type
         return default
-
-    @property
-    def ui_is_bool(self):
-        return self.ui_type in ["checkbox"]
 
     @property
     def choice_slugs(self):
         # if self.choices is not None:
         return [choice.slug for choice in self.choices]
+
+    @property
+    def ppt(self):
+        return self.presentation
 
 
 @pruned_json
@@ -285,6 +295,14 @@ class Collection(MetaBase):
 
     dimensions: List[Dimension]
     views: List[View]
+
+    @property
+    def v(self):
+        return self.views
+
+    @property
+    def d(self):
+        return self.dimensions
 
     def validate_views_with_dimensions(self):
         """Validate that the dimension choices in all views are defined."""
@@ -341,6 +359,32 @@ class Explorer(Collection):
     """Model for Explorer configuration."""
 
     config: Dict[str, str]
+
+    def display_config_names(self):
+        """Get display names for all dimensions and choices.
+
+        The structure of the output is:
+
+        {
+            dimension_slug: {
+                "widget_name": "...",
+                "choices": {
+                    choice_slug: choice_name,
+                    ...
+                }
+            },
+            ...
+        }
+
+        where `widget_name` is actually not displayed anywhere, but used as header name in explorer config.
+        """
+        mapping = {}
+        for dim in self.dimensions:
+            mapping[dim.slug] = {
+                "widget_name": f"{dim.name} {dim.ui_type.title()}",
+                "choices": {choice.slug: choice.name for choice in dim.choices},
+            }
+        return mapping
 
 
 @pruned_json

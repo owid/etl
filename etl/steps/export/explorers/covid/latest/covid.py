@@ -4,20 +4,15 @@ This step contains tooling that should moved to a more general module so that it
 
 import pandas as pd
 
-from etl.collections.explorers import expand_catalog_paths, get_indicators_in_view
+from etl.collections.model import Explorer
 from etl.collections.utils import (
     get_tables_by_name_mapping,
-    records_to_dictionary,
 )
 from etl.helpers import PathFinder, create_explorer
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-OPTION_TYPES = {
-    "dropdown": "Dropdown",
-    "checkbox": "Checkbox",
-}
 RELATED = {
     "deaths": {
         "text": "Since 8 March, we rely on data from the WHO for confirmed cases and deaths",
@@ -69,9 +64,9 @@ def run(dest_dir: str) -> None:
     # Load grapher config from YAML
     config = paths.load_explorer_config()
 
-    header = config["config"]
-    grapher_views = config["views"]
-    grapher_dimensions = config["dimensions"]
+    explorer = Explorer.from_dict(config)
+
+    header = explorer.config
 
     # Load necessary tables
     # ds = paths.load_dataset("cases_deaths")
@@ -88,38 +83,23 @@ def run(dest_dir: str) -> None:
     # 3. Obtain `df_grapher`: This is the final DataFrame that will be saved as the Explorer dataset. It is basically a different presentation of the config
 
     # 1. Prepare Dimension display dictionary
-    dimensions_display = records_to_dictionary(grapher_dimensions, key="slug")
-    for slug, values in dimensions_display.items():
-        # Sanity checks
-        assert "name" in values, f"name not found for dimension: {slug}!"
-        assert "presentation" in values, f"presentation not found for dimension: {slug}!"
-        assert "type" in values["presentation"], f"type not found for dimension: {slug}!"
-
-        # Index choices
-        if "choices" not in values:
-            assert values["presentation"]["type"] == "checkbox", f"Choices not found for dimension: {slug}!"
-        else:
-            values["choices"] = records_to_dictionary(values["choices"], key="slug")
-
-        # Widget name
-        values["widget_name"] = f"{values['name']} {values['presentation']['type'].title()}"
+    dimensions_display = explorer.display_config_names()
 
     # 2. Get table information by table name, and table URI
     tables_by_name = get_tables_by_name_mapping(paths.dependencies)
 
     # 3. Remix configuration to generate explorer-friendly graphers table.
     records = []
-    for view in grapher_views:
-        # Expand catalog paths
-        expand_catalog_paths(view, tables_by_name)
+    for view in explorer.views:
+        view.expand_paths(tables_by_name)
 
         # Build dimensions dictionary for a view
         dimensions = bake_dimensions_view(
             dimensions_display=dimensions_display,
-            view=view,
+            view=view.to_dict(),
         )
         # Get options and variable IDs
-        indicator_paths = get_indicators_in_view(view)
+        indicator_paths = view.indicators.to_records()
 
         # Build record
         record = {
@@ -212,7 +192,10 @@ def bake_dimensions_view(dimensions_display, view):
     Given is dimension_slug: choice_slug. We need to convert it to dimension_name: choice_name (using dimensions_display).
     """
     view_dimensions = {}
-    for slug_dim, slug_choice in view["dimensions"].items():
+    for slug_dim, slug_choice in view.dimensions.items():
+        # dim_name = f"{}"
+        # choice_name = ""
+
         if "choices" in dimensions_display[slug_dim]:
             view_dimensions[dimensions_display[slug_dim]["widget_name"]] = dimensions_display[slug_dim]["choices"][
                 slug_choice
