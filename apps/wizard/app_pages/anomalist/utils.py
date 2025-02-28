@@ -45,7 +45,7 @@ def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> Dict[int
 
 
 @st.cache_data(show_spinner=False)
-@st.spinner("Retrieving datasets...")
+@st.spinner("Retrieving datasets...", show_time=True)
 def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], Dict[int, int]]:
     t = time.time()
     # Get all datasets from DB.
