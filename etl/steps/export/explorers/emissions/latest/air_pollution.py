@@ -219,6 +219,7 @@ def run(dest_dir: str) -> None:
         "explorerTitle": "Air Pollution",
         "explorerSubtitle": "Explore historical emissions of air pollutants across the world.",
         "selection": ["China", "India", "United Kingdom", "United States", "World"],
+        "yScaleToggle": True,
         "isPublished": True,
     }
 

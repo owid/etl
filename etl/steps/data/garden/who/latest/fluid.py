@@ -85,9 +85,8 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     * Drop rows where reported cases = 0
     """
 
-    df = df.query("agegroup_code == 'All' & case_info.isin(['ILI', 'SARI', 'ARI','SARI_ICU' ,'SARI_DEATHS'])")
+    df = df.query("agegroup_code == 'ALL' & case_info.isin(['ILI', 'SARI', 'ARI','SARI_ICU' ,'SARI_DEATHS'])")
     df["date"] = pd.to_datetime(df["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
-
     # At time of creation the source type was not used in FluID, but it is used in FluNET to identify Sentinel sites
     assert df.origin_source.unique() == ["NOTDEFINED"]
 
