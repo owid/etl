@@ -13,27 +13,27 @@ tables:
   births_by_age:
     variables:
       births:
-        title: Number of births by mothers in their <<decadal_age.lower()>>
+        title: Number of births by mothers aged <<decadal_age>>
         unit: births
         description_processing: Values calculated by Our World in Data based on UN WPP data.
         display:
-          name: <<decadal_age>>
+          name: <<decadal_age>> years old
           numDecimalPlaces: 0
         presentation:
           title_public: |-
-            Births by mothers in their <<decadal_age.lower()>>
+            Births by mothers aged <<decadal_age>>
           grapher_config:
             note: "Values as of 1 July of the indicated year."
       share:
-        title: Share of births by mothers in their <<decadal_age.lower()>>
+        title: Share of births by mothers aged <<decadal_age>>
         unit: "%"
         short_unit: "%"
         description_processing: Values calculated by Our World in Data based on UN WPP data.
         display:
-          name: <<decadal_age>>
+          name: <<decadal_age>> years old
           numDecimalPlaces: 1
         presentation:
           title_public: |-
-            Share of births by mothers in their <<decadal_age.lower()>>
+            Share of births by mothers aged <<decadal_age>>
           grapher_config:
             note: "Values as of 1 July of the indicated year."
