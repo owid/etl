@@ -1,5 +1,12 @@
 definitions:
-  table: grapher/covid/latest/google_mobility/google_mobility
+  config_base: &config_base
+    subtitle: "This data shows how community movement in specific locations has changed relative to the period before the pandemic."
+    note: "It's not recommended to compare levels across countries; local differences in categories could be misleading."
+    originUrl: "ourworldindata.org/coronavirus"
+    minTime: "earliest"
+    maxTime: "latest"
+    hideAnnotationFieldsInTitle: { "time": True }
+    addCountryMode: "change-country"
 
 title:
   title: Mobility during COVID-19 pandemic
@@ -18,72 +25,35 @@ dimensions:
         description: "See all places"
       - slug: Grocery and pharmacy
         name: Grocery and pharmacy
-        description: null
+        description: Grocery markets, food warehouses, farmers markets, specialty food shops, drug stores, and pharmacies.
       - slug: Parks
         name: Parks
-        description: null
+        description: Local parks, national parks, public beaches, marinas, dog parks, plazas, and public gardens
       - slug: Residential
         name: Residential
-        description: null
+        description: Places of residence
       - slug: Retail and recreation
         name: Retail and recreation
-        description: null
+        description: Restaurants, cafes, shopping centers, theme parks, museums, libraries, and movie theaters
       - slug: Transit stations
         name: Transit stations
-        description: null
+        description: Public transport hubs such as subway, bus, and train stations
       - slug: Workplaces
         name: Workplaces
-        description: null
+        description: Places of work
 
 views:
   - dimensions:
       place: all
     indicators:
       y:
-        - "{definitions.table}#trend__place_grocery_and_pharmacy"
-        - "{definitions.table}#trend__place_parks"
-        - "{definitions.table}#trend__place_residential"
-        - "{definitions.table}#trend__place_retail_and_recreation"
-        - "{definitions.table}#trend__place_workplaces"
+        - "google_mobility#trend__place_grocery_and_pharmacy"
+        - "google_mobility#trend__place_parks"
+        - "google_mobility#trend__place_residential"
+        - "google_mobility#trend__place_retail_and_recreation"
+        - "google_mobility#trend__place_transit_stations"
+        - "google_mobility#trend__place_workplaces"
 
     config:
       title: "How did the number of visitors change since the beginning of the pandemic?"
-      subtitle: This data shows how community movement in specific locations has changed relative to the period before the pandemic.
-      note: It's not recommended to compare levels across countries; local differences in categories could be misleading.
-      originUrl: ourworldindata.org/coronavirus
-#   - dimensions:
-#       type: hospital
-#       metric: patients_per_capita
-#     indicators:
-#       y: "{definitions.table}#daily_occupancy_hosp_per_1m"
-#   - dimensions:
-#       type: hospital
-#       metric: admissions
-#     indicators:
-#       y: "{definitions.table}#weekly_admissions_hosp"
-#   - dimensions:
-#       type: hospital
-#       metric: admissions_per_capita
-#     indicators:
-#       y: "{definitions.table}#weekly_admissions_hosp_per_1m"
-
-#   - dimensions:
-#       type: icu
-#       metric: patients
-#     indicators:
-#       y: "{definitions.table}#daily_occupancy_icu"
-#   - dimensions:
-#       type: icu
-#       metric: patients_per_capita
-#     indicators:
-#       y: "{definitions.table}#daily_occupancy_icu_per_1m"
-#   - dimensions:
-#       type: icu
-#       metric: admissions
-#     indicators:
-#       y: "{definitions.table}#weekly_admissions_icu"
-#   - dimensions:
-#       type: icu
-#       metric: admissions_per_capita
-#     indicators:
-#       y: "{definitions.table}#weekly_admissions_icu_per_1m"
+      <<: *config_base

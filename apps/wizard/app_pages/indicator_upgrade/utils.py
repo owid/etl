@@ -17,7 +17,7 @@ from etl.match_variables import find_mapping_suggestions, preliminary_mapping
 log = get_logger()
 
 
-@st.spinner("Retrieving datasets...")
+@st.spinner("Retrieving datasets...", show_time=True)
 def get_datasets(archived: bool) -> pd.DataFrame:
     # Get steps_df and grapher_changes
     steps_df_grapher, grapher_changes = get_steps_df(archived=archived)

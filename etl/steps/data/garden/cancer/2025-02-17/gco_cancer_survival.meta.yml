@@ -1,0 +1,121 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Cancer
+      grapher_config:
+        note: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+
+    processing_level: minor
+  description_prod_incidence_mortality: &description_prod_incidence_mortality |-
+    Age-standardized cancer incidence and mortality rates (ASR) were computed for ages 25 years and older using the age-truncated World Standard Population and expressed as rates per 100 000 person-years (Segi, 1960).
+  description_prod_survival: &description_prod_survival |-
+    Net survival (patients’ survival as if cancer was the only cause of death) was calculated to estimate population-based cancer survival.
+
+    Age-standardization was carried out using international cancer survival standard weights (Corazziari et al., 2004). The cohort approach was used for 1995–1999, 2000–2004, and 2005–2009, and the period approach was used for 2010–2014 (Brenner and Gefeller, 1996).
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  gco_cancer_survival:
+    variables:
+      net_survival:
+        title: |-
+          <% if gender == 'All' %>
+          Net survival rates of patients with << cancer.lower() >> cancer after five years
+          <% elif gender != 'All' %>
+          Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after five years
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of patients still alive five years after the diagnosis, assuming cancer is the only cause of death.
+        description_key:
+          - The percentage of patients still alive at a certain time after diagnosis, assuming cancer is the only cause of death.
+          - Net survival estimates survival by removing the effect of other causes of death.
+          - It represents the theoretical survival of cancer patients if they could only die from cancer-related causes.
+          - This measure allows fair comparisons between groups with different probabilities of non-cancer death.
+          - Net survival rates that are age-standardized using the International Cancer Survival Standard (ICSS) weights.
+        description_from_producer: *description_prod_survival
+        presentation:
+          title_public: |-
+            <% if gender == 'All' %>
+            Net survival rates of patients with << cancer.lower() >> cancer after five years
+            <% elif gender != 'All' %>
+            Net survival rates of << gender.lower() >>  with << cancer.lower() >> cancer after five years
+            <%- endif -%>
+        display:
+          numDecimalPlaces: 0
+          name:  |-
+            <% if gender == 'All' %>
+            << cancer >> cancer
+            <% elif gender != 'All' %>
+            << cancer >> cancer among << gender.lower() >>
+            <%- endif -%>
+
+      incidence__asr:
+        title: |-
+          <% if gender == 'All' %>
+          Age-standardized incidence rates of << cancer.lower() >> cancer
+          <% elif gender != 'All' %>
+          Age-standardized incidence rates of << cancer.lower() >> cancer amongst << gender.lower() >>
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+        description_short: The probability of developing cancer in a given population in a given year.
+        description_key:
+          - Cancer incidence is the number of new cancer cases arising in a specified population over a given period of time (typically 1 year).
+          - It can be expressed as an absolute number of cases within the entire population per year or as a rate per 100,000 persons per year.
+          - Incidence information is collected routinely by cancer registries.
+          - Rates are age-standardized using the WHO World Standard Population.
+        description_from_producer: *description_prod_incidence_mortality
+        presentation:
+          title_public: |-
+            <% if gender == 'All' %>
+            Incidence rates of << cancer.lower() >> cancer
+            <% elif gender != 'All' %>
+            Incidence rates of << cancer.lower() >> cancer amongst << gender.lower() >>
+            <%- endif -%>
+        display:
+          numDecimalPlaces: 1
+          name:  |-
+            <% if gender == 'All' %>
+            << cancer >> cancer
+            <% elif gender != 'All' %>
+            << cancer >> cancer among << gender.lower() >>
+            <%- endif -%>
+      mortality__asr:
+        title: |-
+          <% if gender == 'All' %>
+          Age-standardized mortality rates of << cancer.lower() >> cancer
+          <% elif gender != 'All' %>
+          Age-standardized mortality rates of << cancer.lower() >> cancer amongst << gender.lower() >>
+          <%- endif -%>
+        unit: "%"
+        short_unit: "%"
+        description_short: The probability of dying from cancer in a given population in a given year.
+        description_key:
+          - Cancer mortality is the number of deaths due to cancer occurring in a specified population in a given year.
+          - It can be expressed as an absolute number of deaths within the entire population per year or as a rate per 100 000 persons per year.
+          - Mortality data are provided by national statistical offices.
+          - Rates are age-standardized using the World Standard Population.
+        description_from_producer: *description_prod_incidence_mortality
+        presentation:
+          title_public: |-
+            <% if gender == 'All' %>
+            Incidence rates of << cancer.lower() >> cancer
+            <% elif gender != 'All' %>
+            Incidence rates of << cancer.lower() >> cancer amongst << gender.lower() >>
+            <%- endif -%>
+        display:
+          numDecimalPlaces: 1
+          name:  |-
+            <% if gender == 'All' %>
+            << cancer >> cancer
+            <% elif gender != 'All' %>
+            << cancer >> cancer among << gender.lower() >>
+            <%- endif -%>

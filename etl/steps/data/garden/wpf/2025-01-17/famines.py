@@ -57,6 +57,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    # Exclude famines with less than 100,000 deaths (error in the spreadhsheet and should be excluded)
+    tb = tb[tb["wpf_authoritative_mortality_estimate"] >= 100000]
 
     # Add regions to the table.
     tb = add_regions(tb, ds_regions)

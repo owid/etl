@@ -54,6 +54,8 @@ NAN_VALUES = [
     "…",
 ]
 
+PRIORITY_OF_REGIONS = ["World Bank", "WHO", "UNICEF", "UN", "UN SDG"]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -69,7 +71,6 @@ def run(dest_dir: str) -> None:
 
         # Read table from meadow dataset.
         tb = ds_meadow[label]
-
         # Exclude archived indicators from garden
         if "_archived" in label or tb.m.title.endswith("(archived)"):
             continue
@@ -204,9 +205,31 @@ def check_overlapping_names(tb: Table) -> None:
         raise ValueError(f"index names are overlapping with column names: {overlapping_names}")
 
 
+def drop_excess_region_sources(tb: pd.DataFrame, priority_regions: list[str]) -> pd.DataFrame:
+    """
+    Drop specific region sources if there are more than two different sources for a given indicator,
+    in the order of preference given in `priority_regions`.
+    Keep rows where `region_source` is NaN.
+    """
+    if tb["region_source"].nunique(dropna=True) > 2:  # Only count non-NaN values
+        unique_sources = tb["region_source"].dropna().unique().tolist()
+
+        # Sort sources based on priority list
+        unique_sources.sort(key=lambda x: priority_regions.index(x) if x in priority_regions else float("inf"))
+
+        # Keep only the top 2 priority sources
+        sources_to_keep = unique_sources[:2]
+
+        # Filter the DataFrame but KEEP NaN values
+        tb = tb[tb["region_source"].isin(sources_to_keep) | tb["region_source"].isna()]
+
+    return tb
+
+
 def add_region_source_suffix(tb: Table) -> Table:
     """Add region source as suffix to region name, e.g. Africa (WHO)"""
     if "region_source" in tb.columns:
+        tb = drop_excess_region_sources(tb, PRIORITY_OF_REGIONS)
         ix = tb.region_source.notnull() & (tb.country != "World")
         if ix.any():
             tb["country"] = tb["country"].astype(str)

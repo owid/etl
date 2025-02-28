@@ -8,6 +8,7 @@ definitions:
     unit: ""
 dataset:
   update_period_days: 365
+  title: Global Tuberculosis Report - UN High Level Meeting Commitments
 tables:
   unhlm_commitments:
     variables:

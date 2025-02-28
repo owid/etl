@@ -1,5 +1,4 @@
-from etl import multidim
-from etl.db import get_engine
+from etl.collections import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -42,7 +41,6 @@ def run(dest_dir: str) -> None:
     )
 
     # Create special view for the stacked area chart of total consumer price by components.
-    table_name = paths.get_dependency_step_name("energy_prices").replace("data://", "")
     for source in ["electricity", "gas"]:
         price_components = [
             # The total price is (to a very good approximation) equivalent to the combination of "Energy and supply", "Network costs", and "Taxes, fees, levies, and charges".
@@ -76,11 +74,20 @@ def run(dest_dir: str) -> None:
                     'Some price components can be negative. For example, a negative "All other taxes" component may occur when governments introduce compensation measures during periods of high electricity prices to reduce costs for consumers.'
                 ]
                 if unit == "euro":
-                    subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are not adjusted for inflation or differences in living costs between countries."
+                    subtitle = "Prices are given in euros per [megawatt-hour](#dod:watt-hours). They are adjusted for inflation but not for differences in living costs between countries."
                     title_variant = None
+                    footnote = "This data is expressed in constant 2015 euros, deflated using the Harmonised Index of Consumer Prices."
                 else:
-                    subtitle = "Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). They are adjusted for differences in living costs between countries, but they are not adjusted for inflation."
+                    subtitle = "Prices are given in [purchasing power standard (PPS)](#dod:pps) per [megawatt-hour](#dod:watt-hours). This data is adjusted for inflation and differences in living costs between countries."
                     title_variant = "PPS"
+                    footnote = "PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices."
+
+                presentation = {
+                    "titlePublic": title,
+                }
+                if title_variant:
+                    presentation["titleVariant"] = title_variant
+
                 config["views"].append(
                     {
                         "dimensions": {
@@ -91,19 +98,20 @@ def run(dest_dir: str) -> None:
                             "unit": unit,
                         },
                         "indicators": {
-                            "y": [f"{table_name}/energy_prices_annual#{indicator}" for indicator in indicators],
+                            "y": [f"energy_prices_annual#{indicator}" for indicator in indicators],
                         },
                         "config": {
                             "chartTypes": ["StackedBar"],
                             "tab": "chart",
                             "title": title,
                             "subtitle": subtitle,
+                            "note": footnote,
                         },
                         # Currently, the stacked area chart uses multiple indicators, but the data page shows only the metadata of the first one. We need to override that metadata with the combination of the metadata of all indicators shown.
                         "metadata": {
                             "descriptionShort": subtitle,
                             "descriptionKey": description_keys,
-                            "presentation": {"titlePublic": title, "titleVariant": title_variant},
+                            "presentation": presentation,
                         },
                     },
                 )
@@ -111,4 +119,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    multidim.upsert_multidim_data_page(slug="mdd-energy-prices", config=config, engine=get_engine())
+    multidim.upsert_multidim_data_page(
+        config=config,
+        paths=paths,
+    )

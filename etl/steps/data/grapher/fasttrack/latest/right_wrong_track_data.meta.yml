@@ -1,0 +1,15 @@
+dataset:
+  title: DRAFT right-wrong-track-data
+  description: ''
+tables:
+  right_wrong_track_data:
+    variables:
+      right_track:
+        title: Right Track
+        unit: ''
+      wrong_track:
+        title: Wrong Track
+        unit: ''
+      dont_know:
+        title: Don't Know
+        unit: ''
