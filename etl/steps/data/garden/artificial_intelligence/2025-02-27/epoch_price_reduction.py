@@ -30,6 +30,7 @@ def run(dest_dir: str) -> None:
     tb_pivot.columns = [str(col) for col in tb_pivot.columns]
 
     tb_pivot = tb_pivot.rename(columns={"threshold_model": "country"})
+    print(tb_pivot)
 
     tb_pivot = tb_pivot.format(["country", "year"])
 

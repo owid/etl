@@ -2,6 +2,8 @@
 definitions:
   common:
     processing_level: minor
+    unit: "reduction in price per year"
+    short_unit: "x per year"
     presentation:
       topic_tags:
         - Artificial Intelligence
@@ -17,19 +19,13 @@ tables:
     variables:
       gpqa_diamond:
         title: Scientific questions
-        unit: "reduction in price per year"
       humaneval:
         title: Coding
-        unit: "reduction in price per year"
       lmsys_chatbot_arena_elo:
         title: Chatbot arena
-        unit: "reduction in price per year"
       math_5:
         title: Math (easier)
-        unit: "reduction in price per year"
       math_500:
         title: Math (harder)
-        unit: "reduction in price per year"
       mmlu:
         title: General language understanding
-        unit: "reduction in price per year"
