@@ -85,3 +85,53 @@ def expand_catalog_paths(view: Dict[Any, Any], tables_by_name: Dict[str, List[Ta
                 view["config"]["map"]["columnSlug"] = _expand_catalog_path(view["config"]["map"]["columnSlug"])
 
     return view
+
+
+def extract_catalog_path(indicator_raw):
+    "Indicator spec can come either as a plain string, or a dictionary."
+    if isinstance(indicator_raw, str):
+        return indicator_raw
+    elif isinstance(indicator_raw, dict):
+        assert "catalogPath" in indicator_raw
+        return indicator_raw["catalogPath"]
+    else:
+        raise ValueError(f"Unexpected indicator property type: {indicator_raw}")
+
+
+def get_indicators_in_view(view):
+    """Get the list of indicators in use in a view.
+
+    It returns the list as a list of records:
+
+    [
+        {
+            "path": "data://path/to/dataset#indicator",
+            "dimension": "y"
+        },
+        ...
+    ]
+
+    TODO: This is being called twice, maybe there is a way to just call it once. Maybe if it is an attribute of a class?
+    """
+    indicators_view = []
+    # Get indicators from dimensions
+    for dim in DIMENSIONS:
+        if dim in view["indicators"]:
+            indicator_raw = view["indicators"][dim]
+            if isinstance(indicator_raw, list):
+                assert dim == "y", "Only `y` can come as a list"
+                indicators_view += [
+                    {
+                        "path": extract_catalog_path(ind),
+                        "dimension": dim,
+                    }
+                    for ind in indicator_raw
+                ]
+            else:
+                indicators_view.append(
+                    {
+                        "path": extract_catalog_path(indicator_raw),
+                        "dimension": dim,
+                    }
+                )
+    return indicators_view

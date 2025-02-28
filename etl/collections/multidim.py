@@ -12,7 +12,6 @@ from typing import Any, Dict, List, Optional, Set, Union
 
 import fastjsonschema
 import pandas as pd
-import yaml
 from deprecated import deprecated
 from owid.catalog import Table
 from sqlalchemy.engine import Engine
@@ -21,8 +20,6 @@ from structlog import get_logger
 from apps.chart_sync.admin_api import AdminAPI
 from etl.collections.model import Multidim
 from etl.collections.utils import (
-    extract_catalog_path,
-    get_indicators_in_view,
     get_tables_by_name_mapping,
     records_to_dictionary,
 )
@@ -38,6 +35,7 @@ log = get_logger()
 DIMENSIONS = ["y", "x", "size", "color"]
 
 
+# TODO: Return List[Dimensions] and List[Views] instead of {"dimensions": [...], "views": [...]}
 def expand_config(
     tb: Table,
     indicator_name: Optional[str] = None,
@@ -225,7 +223,7 @@ def _upsert_multidim_data_page(mdim_catalog_path: str, mdim: Multidim, owid_env:
         owid_env = OWID_ENV
 
     # Validate config
-    validate_schema(mdim.to_dict())
+    mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
     validate_multidim_config(mdim, owid_env.engine)
 
     # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
@@ -290,64 +288,18 @@ def validate_schema(config: dict) -> None:
 
 def validate_multidim_config(mdim: Multidim, engine: Engine) -> None:
     # Ensure that all views are in choices
-    for dim in mdim.dimensions:
-        allowed_slugs = [choice["slug"] for choice in dim["choices"]]
-
-        for view in config["views"]:
-            for dim_name, dim_value in view["dimensions"].items():
-                if dim_name == dim["slug"] and dim_value not in allowed_slugs:
-                    raise ValueError(
-                        f"Slug `{dim_value}` does not exist in dimension `{dim_name}`. View:\n\n{yaml.dump(view)}"
-                    )
-
-    # Get all used indicators
-    indicators = []
-    for view in config["views"]:
-        # Get indicators from dimensions
-        indicators_view = get_indicators_in_view(view)
-        indicators_view = [ind["path"] for ind in indicators_view]
-        indicators_extra = []
-
-        # Get indicators from sortColumnSlug
-        if "config" in view:
-            if "sortColumnSlug" in view["config"]:
-                indicators_extra.append(extract_catalog_path(view["config"]["sortColumnSlug"]))
-
-        # Update indicators from map.columnSlug
-        if "config" in view:
-            if "map" in view["config"]:
-                if "columnSlug" in view["config"]["map"]:
-                    indicators_extra.append(extract_catalog_path(view["config"]["map"]["columnSlug"]))
-
-        # All indicators in `indicators_extra` should be in `indicators`! E.g. you can't sort by an indicator that is not in the chart!
-        ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
-        invalid_indicators = set(indicators_extra).difference(set(indicators_view))
-        if invalid_indicators:
-            raise ValueError(
-                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}"
-            )
-
-        indicators.extend(indicators_view)
-
-    # Make sure indicators are unique
-    indicators = list(set(indicators))
+    mdim.validate_views_with_dimensions()
 
     # Validate duplicate views
-    seen_dims = set()
-    for view in config["views"]:
-        dims = tuple(view["dimensions"].items())
-        if dims in seen_dims:
-            raise ValueError(f"Duplicate view:\n\n{yaml.dump(view['dimensions'])}")
-        seen_dims.add(dims)
+    mdim.check_duplicate_views()
 
-    # NOTE: this is allowed, some views might contain other views
-    # Check uniqueness
-    # inds = pd.Series(indicators)
-    # vc = inds.value_counts()
-    # if vc[vc > 1].any():
-    #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
+    # Check that all indicators in mdim exist
+    indicators = mdim.indicators_in_use()
+    validate_indicators_in_db(indicators, engine)
 
-    # Check that all indicators exist
+
+def validate_indicators_in_db(indicators, engine):
+    """Check that indicators are in DB!"""
     q = """
     select
         id,

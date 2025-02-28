@@ -7,10 +7,13 @@ THINGS TO SOLVE:
     - If an attribute is Optional, MetaBase.from_dict is not correctly loading it as the appropriate class when given.
 """
 
+import json
 import re
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, TypeVar
 
+import fastjsonschema
+import yaml
 from owid.catalog import Table
 from owid.catalog.meta import MetaBase
 
@@ -203,14 +206,40 @@ class View(MetaBase):
 
         return self
 
-    def all_indicators(self):
-        """Return all indicators in the view."""
-        indicators_main = self.indicators.to_records()
+    @property
+    def indicators_in_config(self):
+        indicators = []
+        if self.config is not None:
+            # Get indicators from sortColumnSlug
+            if "sortColumnSlug" in self.config:
+                indicators.append(self.config["sortColumnSlug"])
 
-        # Auxiliary
-        # indicators_aux = []
+            # Update indicators from map.columnSlug
+            if ("map" in self.config) and "columnSlug" in self.config["map"]:
+                indicators.append((self.config["map"]["columnSlug"]))
 
-        # validation?
+        return indicators
+
+    def indicators_used(self):
+        """Get a flatten list of all indicators used in the view.
+
+        In addition, it also validates that indicators used in config are also in the view.
+
+        NOTE: Use this method after expanding paths! Otherwise, it will not work as expected. E.g. view.expand_paths(tables_by_name).indicators_used()
+        """
+        # Validate indicators in view
+        indicators = self.indicators.to_records()
+        indicators = [ind["path"] for ind in indicators]
+
+        # All indicators in `indicators_extra` should be in `indicators`! E.g. you can't sort by an indicator that is not in the chart!
+        ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
+        invalid_indicators = set(self.indicators_in_config).difference(set(indicators))
+        if invalid_indicators:
+            raise ValueError(
+                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}"
+            )
+
+        return indicators
 
 
 @pruned_json
@@ -228,20 +257,25 @@ class Dimension(MetaBase):
 
     slug: str
     name: str
-    # NOTE: currently MetaBase.from_dict not loading Optional fields with appropriate class
-    choices: Optional[List[DimensionChoice]] = None  # Only allowed to be None if checkbox
+    choices: List[DimensionChoice]
+    # This is just for explorers at the moment!
     presentation: Optional[Dict[str, Any]] = None
 
-    def __post_init__(self):
-        # Validate that choices are defined for checkbox type
-        if self.choices is None:
-            if (self.presentation is None) or (self.presentation["type"] != "checkbox"):
-                raise ValueError(f"Choices not found for dimension: {self.slug}")
+    @property
+    def ui_type(self):
+        default = "dropdown"
+        if self.presentation is not None:
+            return self.presentation.get("type", default)
+        return default
+
+    @property
+    def ui_is_bool(self):
+        return self.ui_type in ["checkbox"]
 
     @property
     def choice_slugs(self):
-        if self.choices is not None:
-            return [choice.slug for choice in self.choices]
+        # if self.choices is not None:
+        return [choice.slug for choice in self.choices]
 
 
 @pruned_json
@@ -255,6 +289,50 @@ class Collection(MetaBase):
     def validate_views_with_dimensions(self):
         """Validate that the dimension choices in all views are defined."""
         dix = {dim.slug: dim.choice_slugs for dim in self.dimensions}
+
+        for view in self.views:
+            for slug, value in view.dimensions.items():
+                assert slug in dix, f"Dimension {slug} not found in dimensions! View: {self.to_dict()}"
+                assert value in dix[slug], f"Choice {value} not found for dimension {slug}! View: {self.to_dict()}"
+
+    def validate_schema(self, schema_path):
+        """Validate class against schema."""
+        with open(schema_path) as f:
+            schema = json.load(f)
+
+        validator = fastjsonschema.compile(schema)
+
+        try:
+            validator(self.to_dict())  # type: ignore
+        except fastjsonschema.JsonSchemaException as e:
+            raise ValueError(f"Config validation error: {e.message}")  # type: ignore
+
+    def indicators_in_use(self):
+        # Get all indicators used in all views
+        indicators = []
+        for view in self.views:
+            indicators.extend(view.indicators_used())
+
+        # Make sure indicators are unique
+        indicators = list(set(indicators))
+
+        return indicators
+
+    def check_duplicate_views(self):
+        """Check for duplicate views in the collection."""
+        seen_dims = set()
+        for view in self.views:
+            dims = tuple(view.dimensions.items())
+            if dims in seen_dims:
+                raise ValueError(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
+            seen_dims.add(dims)
+
+        # NOTE: this is allowed, some views might contain other views
+        # Check uniqueness
+        # inds = pd.Series(indicators)
+        # vc = inds.value_counts()
+        # if vc[vc > 1].any():
+        #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
 
 
 @pruned_json

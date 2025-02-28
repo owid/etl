@@ -112,6 +112,11 @@ dimensions:
       type: dropdown
   - slug: relative
     name: Relative to population
+    choices:
+      - slug: false
+        name: "True"
+      - slug: true
+        name: Per 100,000 people
     presentation:
       type: checkbox
 
