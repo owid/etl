@@ -121,26 +121,30 @@ tables:
 
       # Share (%)
       singleton_share:
-        title: Share of deliveries with single children
+        title: Singleton share
         unit: "%"
+        short_unit: "%"
         description_short: |-
-          The share of deliveries that are single deliveries, per 1,000 deliveries.
+          The number of deliveries that are single deliveries per 100 deliveries.
       multiple_share:
-        title: Share of deliveries with multiple children
+        title: Multiple delivery share
         unit: "%"
+        short_unit: "%"
         description_short: |-
-          The share of deliveries that are multiple deliveries (2 or more), per 1,000 deliveries.
+          The number of deliveries that are multiple deliveries (2 or more) per 100 deliveries.
       twinning_share:
-        title: Share of deliveries with twin children
+        title: Twinning delivery share
         unit: "%"
+        short_unit: "%"
         description_short: |-
-          The share of twin deliveries, per 1,000 deliveries.
+          The number of twin deliveries per 100 deliveries.
         description_key: *twins
       triplets_plus_share:
-        title: Share of deliveries with triplets or more children
+        title: Triplets+ delivery share
         unit: "%"
+        short_unit: "%"
         description_short: |-
-          The share of deliveries of triplets or more children, per 1,000 deliveries.
+          The number of deliveries of triplets or more children per 100 deliveries.
 
       # Ratios
       children_delivery_ratio:
