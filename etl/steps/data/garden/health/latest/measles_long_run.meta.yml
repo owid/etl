@@ -2,6 +2,7 @@ definitions:
   desc_update: Data for {year} is incomplete and was last updated on {update_date}.
 dataset:
   title: Long-run reported cases of measles in the United States
+  update_period_days: 7
 tables:
   measles_long_run:
     variables:
