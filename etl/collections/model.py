@@ -10,14 +10,14 @@ THINGS TO SOLVE:
 import json
 import re
 from dataclasses import dataclass
-from typing import Any, ClassVar, Dict, Generic, List, Optional, TypeGuard, TypeVar
+from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar
 
 import fastjsonschema
 import yaml
 from owid.catalog import Table
 from owid.catalog.meta import GrapherConfig, MetaBase
 
-DIMENSIONS = ["y", "x", "size", "color"]
+CHART_DIMENSIONS = ["y", "x", "size", "color"]
 T = TypeVar("T")
 REGEX_CATALOG_PATH = (
     r"^(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
@@ -124,7 +124,7 @@ class ViewIndicators(MetaBase):
         data = dict(d)
 
         # Coerce each dimension field (y, x, size, color) from [str, ...] -> [{'path': str}, ...]
-        for dim in DIMENSIONS:
+        for dim in CHART_DIMENSIONS:
             if dim in data:
                 if isinstance(data[dim], list):
                     data[dim] = [{"catalogPath": item} if isinstance(item, str) else item for item in data[dim]]
@@ -138,7 +138,7 @@ class ViewIndicators(MetaBase):
 
     def to_records(self) -> List[Dict[str, str]]:
         indicators = []
-        for dim in DIMENSIONS:
+        for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
             if dimension_val is None:
                 continue
@@ -151,7 +151,7 @@ class ViewIndicators(MetaBase):
 
     def expand_paths(self, tables_by_name: Dict[str, List[Table]]):
         """Expand the catalog paths of all indicators in the view."""
-        for dim in DIMENSIONS:
+        for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
             if dimension_val is None:
                 continue
@@ -326,16 +326,13 @@ class Dimension(MetaBase):
         return self.presentation
 
 
-TView = TypeVar("TView", bound=View)
-
-
 @pruned_json
 @dataclass
-class Collection(MetaBase, Generic[TView]):
+class Collection(MetaBase):
     """Overall MDIM/Explorer config"""
 
     dimensions: List[Dimension]
-    views: List[TView]
+    views: List[Any]
 
     @property
     def v(self):
@@ -396,9 +393,10 @@ class Collection(MetaBase, Generic[TView]):
 
 @pruned_json
 @dataclass
-class Explorer(Collection[ExplorerView]):
+class Explorer(Collection):
     """Model for Explorer configuration."""
 
+    views: List[ExplorerView]
     config: Dict[str, str]
 
     def display_config_names(self):
@@ -430,9 +428,10 @@ class Explorer(Collection[ExplorerView]):
 
 @pruned_json
 @dataclass
-class Multidim(Collection[MDIMView]):
+class Multidim(Collection):
     """Model for MDIM configuration."""
 
+    views: List[MDIMView]
     title: Dict[str, str]
     defaultSelection: List[str]
     topicTags: Optional[List[str]] = None
@@ -440,37 +439,37 @@ class Multidim(Collection[MDIMView]):
 
 
 # def main():
-import yaml
+# import yaml
 
-from etl.collections.utils import (
-    get_tables_by_name_mapping,
-)
+# from etl.collections.utils import (
+#     get_tables_by_name_mapping,
+# )
 
-f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases_tests.yml"
-with open(f_mdim) as istream:
-    cfg_mdim = yaml.safe_load(istream)
-mdim = Multidim.from_dict(cfg_mdim)
+# f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases_tests.yml"
+# with open(f_mdim) as istream:
+#     cfg_mdim = yaml.safe_load(istream)
+# mdim = Multidim.from_dict(cfg_mdim)
 
-dependencies = {
-    "data://grapher/covid/latest/hospital",
-    "data://grapher/covid/latest/vaccinations_global",
-    "data://grapher/covid/latest/vaccinations_manufacturer",
-    "data://grapher/covid/latest/testing",
-    "data://grapher/excess_mortality/latest/excess_mortality",
-    "data-private://grapher/excess_mortality/latest/excess_mortality_economist",
-    "data://grapher/covid/latest/xm_who",
-    "data://grapher/covid/latest/cases_deaths",
-    "data://grapher/covid/latest/covax",
-    "data://grapher/covid/latest/infections_model",
-    "data://grapher/covid/latest/google_mobility",
-    "data://grapher/regions/2023-01-01/regions",
-}
-tables_by_name = get_tables_by_name_mapping(dependencies)
+# dependencies = {
+#     "data://grapher/covid/latest/hospital",
+#     "data://grapher/covid/latest/vaccinations_global",
+#     "data://grapher/covid/latest/vaccinations_manufacturer",
+#     "data://grapher/covid/latest/testing",
+#     "data://grapher/excess_mortality/latest/excess_mortality",
+#     "data-private://grapher/excess_mortality/latest/excess_mortality_economist",
+#     "data://grapher/covid/latest/xm_who",
+#     "data://grapher/covid/latest/cases_deaths",
+#     "data://grapher/covid/latest/covax",
+#     "data://grapher/covid/latest/infections_model",
+#     "data://grapher/covid/latest/google_mobility",
+#     "data://grapher/regions/2023-01-01/regions",
+# }
+# tables_by_name = get_tables_by_name_mapping(dependencies)
 
-mdim.views[0].indicators.expand_paths(tables_by_name)
+# mdim.views[0].indicators.expand_paths(tables_by_name)
 
-f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
-with open(f_explorer) as istream:
-    cfg_explorer = yaml.safe_load(istream)
-explorer = Explorer.from_dict(cfg_explorer)
-# cfg.views[0].indicators.y
+# f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
+# with open(f_explorer) as istream:
+#     cfg_explorer = yaml.safe_load(istream)
+# explorer = Explorer.from_dict(cfg_explorer)
+# # cfg.views[0].indicators.y

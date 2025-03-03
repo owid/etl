@@ -5,26 +5,23 @@
 - We should try to keep explorers in mind, and see this tooling as something we may want to use for them, too.
 """
 
-import json
 from copy import deepcopy
 from itertools import product
 from typing import Any, Dict, List, Optional, Set, Union
 
-import fastjsonschema
 import pandas as pd
 from deprecated import deprecated
 from owid.catalog import Table
-from sqlalchemy.engine import Engine
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
+from etl.collections.common import validate_collection_config
 from etl.collections.model import Multidim
 from etl.collections.utils import (
     get_tables_by_name_mapping,
     records_to_dictionary,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
 from etl.helpers import PathFinder, map_indicator_path_to_id
 from etl.paths import SCHEMAS_DIR
@@ -32,7 +29,7 @@ from etl.paths import SCHEMAS_DIR
 # Initialize logger.
 log = get_logger()
 # Dimensions: These are the expected possible dimensions
-DIMENSIONS = ["y", "x", "size", "color"]
+CHART_DIMENSIONS = ["y", "x", "size", "color"]
 
 
 # TODO: Return List[Dimensions] and List[Views] instead of {"dimensions": [...], "views": [...]}
@@ -145,7 +142,7 @@ def expand_config(
     # Initiate expander object
     expander = MDIMConfigExpander(tb, indicator_name)
 
-    # EXPAND DIMENSIONS
+    # EXPAND CHART_DIMENSIONS
     config_partial["dimensions"] = expander.build_dimensions(
         dimensions=dimensions,
     )
@@ -180,10 +177,11 @@ def upsert_multidim_data_page(
     dependencies = paths.dependencies
     mdim_catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{mdim_name or paths.short_name}"
 
+    # Read config as structured object
     mdim = Multidim.from_dict(config)
 
     # Edit views
-    process_mdim_views(mdim, dependencies=dependencies)
+    process_views(mdim, dependencies=dependencies)
 
     # TODO: Possibly add other edits (to dimensions?)
 
@@ -191,7 +189,7 @@ def upsert_multidim_data_page(
     _upsert_multidim_data_page(mdim_catalog_path, mdim, owid_env)
 
 
-def process_mdim_views(mdim: Multidim, dependencies: Set[str]):
+def process_views(mdim: Multidim, dependencies: Set[str]):
     """Process views in MDIM configuration.
 
     This includes:
@@ -206,6 +204,8 @@ def process_mdim_views(mdim: Multidim, dependencies: Set[str]):
     for view in mdim.views:
         # Update indicators for each dimension, making sure they have the complete URI
         view.expand_paths(tables_by_name)
+
+        # TODO: Tweak view to inherit from common
 
         # Combine metadata in views which contain multiple indicators
         if view.metadata_is_needed:  # Check if view "contains multiple indicators"
@@ -224,7 +224,7 @@ def _upsert_multidim_data_page(mdim_catalog_path: str, mdim: Multidim, owid_env:
 
     # Validate config
     mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
-    validate_multidim_config(mdim, owid_env.engine)
+    validate_collection_config(mdim, owid_env.engine)
 
     # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
     # TODO: I think we could move this to the Grapher side.
@@ -271,46 +271,6 @@ def get_tables_by_uri_mapping(tables_by_name: Dict[str, List[Table]]) -> Dict[st
             uri = table.dataset.uri + "/" + table_name
             mapping[uri] = table
     return mapping
-
-
-def validate_schema(config: dict) -> None:
-    schema_path = SCHEMAS_DIR / "multidim-schema.json"
-    with open(schema_path) as f:
-        schema = json.load(f)
-
-    validator = fastjsonschema.compile(schema)
-
-    try:
-        validator(config)  # type: ignore
-    except fastjsonschema.JsonSchemaException as e:
-        raise ValueError(f"Config validation error: {e.message}")  # type: ignore
-
-
-def validate_multidim_config(mdim: Multidim, engine: Engine) -> None:
-    # Ensure that all views are in choices
-    mdim.validate_views_with_dimensions()
-
-    # Validate duplicate views
-    mdim.check_duplicate_views()
-
-    # Check that all indicators in mdim exist
-    indicators = mdim.indicators_in_use()
-    validate_indicators_in_db(indicators, engine)
-
-
-def validate_indicators_in_db(indicators, engine):
-    """Check that indicators are in DB!"""
-    q = """
-    select
-        id,
-        catalogPath
-    from variables
-    where catalogPath in %(indicators)s
-    """
-    df = read_sql(q, engine, params={"indicators": tuple(indicators)})
-    missing_indicators = set(indicators) - set(df["catalogPath"])
-    if missing_indicators:
-        raise ValueError(f"Missing indicators in DB: {missing_indicators}")
 
 
 def replace_catalog_paths_with_ids(config):

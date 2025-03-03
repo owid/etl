@@ -4,6 +4,7 @@ from typing import Dict, List, Set
 
 from owid.catalog import Dataset, Table
 
+from etl.db import read_sql
 from etl.paths import DATA_DIR
 
 
@@ -36,3 +37,18 @@ def get_tables_by_name_mapping(dependencies: Set[str]) -> Dict[str, List[Table]]
             tb_name_to_tb[table_name].append(ds.read(table_name, load_data=False))
 
     return tb_name_to_tb
+
+
+def validate_indicators_in_db(indicators, engine):
+    """Check that indicators are in DB!"""
+    q = """
+    select
+        id,
+        catalogPath
+    from variables
+    where catalogPath in %(indicators)s
+    """
+    df = read_sql(q, engine, params={"indicators": tuple(indicators)})
+    missing_indicators = set(indicators) - set(df["catalogPath"])
+    if missing_indicators:
+        raise ValueError(f"Missing indicators in DB: {missing_indicators}")
