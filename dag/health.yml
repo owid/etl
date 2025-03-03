@@ -982,13 +982,6 @@ steps:
   data://grapher/health/2025-02-13/vaccine_confidence:
     - data://garden/health/2025-02-13/vaccine_confidence
 
-  # CDC Measles Cases 1985-present - autoupdate
-  data://meadow/cdc/latest/measles_cases:
-    - snapshot://cdc/latest/measles_cases.json
-  data://garden/cdc/latest/measles_cases:
-    - data://meadow/cdc/latest/measles_cases
-
-  #
   # Historical measles data (1919-1984)
   #
   data://meadow/health/2025-02-19/measles_historical:
@@ -996,6 +989,13 @@ steps:
   data://garden/health/2025-02-19/measles_historical:
     - data://meadow/health/2025-02-19/measles_historical
 
+  # CDC Measles Cases 1985-present - autoupdate
+  data://meadow/cdc/latest/measles_cases:
+    - snapshot://cdc/latest/measles_cases.json
+  data://garden/cdc/latest/measles_cases:
+    - data://meadow/cdc/latest/measles_cases
+
+  #
   # Long-run measles data (auto-updated)
   data://garden/health/latest/measles_long_run:
     - data://garden/cdc/latest/measles_cases
