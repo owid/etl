@@ -204,3 +204,5 @@ steps:
     - snapshot-private://fasttrack/latest/replacement_fertility_basten_scherbov.csv
   data://grapher/fasttrack/latest/skaaning_democracy_di:
     - snapshot://fasttrack/latest/skaaning_democracy_di.csv
+  data://grapher/fasttrack/latest/pre_term_births_europe_usa:
+    - snapshot://fasttrack/latest/pre_term_births_europe_usa.csv

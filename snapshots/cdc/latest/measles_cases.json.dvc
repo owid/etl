@@ -22,6 +22,6 @@ meta:
       name: Public domain
       url: https://www.cdc.gov/other/agencymaterials.html
 outs:
-  - md5: 107b1ab1fd50778adaf371b82396792f
-    size: 10290
+  - md5: 01f709985cd04e11e7ceab8194bc89a2
+    size: 10296
     path: measles_cases.json

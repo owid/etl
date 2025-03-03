@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-#  update-wildfires.sh
+#  update-measles.sh
 #
-#  Update wildfires dataset data://garden/climate/latest/weekly_wildfires
+#  Update wildfires dataset data://garden/health/latest/measles_long_run
 #
 
 set -e

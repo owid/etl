@@ -178,7 +178,7 @@ def create_dataset(
     camel_to_snake: bool = False,
     long_to_wide: Optional[bool] = None,
     formats: List[FileFormat] = DEFAULT_FORMATS,
-    check_variables_metadata: bool = False,
+    check_variables_metadata: bool = True,
     run_grapher_checks: bool = True,
     yaml_params: Optional[Dict[str, Any]] = None,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
