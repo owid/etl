@@ -584,7 +584,15 @@ class DataStep(Step):
                 raise Exception(f'no run() method defined for module "{step_module}"')
 
             # data steps
-            step_module.run(self._dest_dir.as_posix())  # type: ignore
+            try:
+                # This should work when using the new run functions that don't require dest_dir as an argument.
+                step_module.run()
+            except TypeError as e:
+                # For backwards compatibility, execute the run function assuming it has dest_dir as an argument.
+                if "missing 1 required positional argument: 'dest_dir'" in str(e):
+                    step_module.run(self._dest_dir.as_posix())  # type: ignore
+                else:
+                    raise
 
     def _run_py(self) -> None:
         """

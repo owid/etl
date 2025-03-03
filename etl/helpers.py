@@ -799,6 +799,37 @@ class PathFinder:
     def load_explorer_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
         return self.load_config(filename, path)
 
+    def create_dataset(
+        self,
+        tables: Iterable[catalog.Table],
+        default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
+        underscore_table: bool = True,
+        camel_to_snake: bool = False,
+        long_to_wide: Optional[bool] = None,
+        formats: List[FileFormat] = DEFAULT_FORMATS,
+        check_variables_metadata: bool = True,
+        run_grapher_checks: bool = True,
+        yaml_params: Optional[Dict[str, Any]] = None,
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+        errors: Literal["ignore", "warn", "raise"] = "raise",
+        repack: bool = True,
+    ) -> catalog.Dataset:
+        return create_dataset(
+            dest_dir=self.f.relative_to(paths.STEP_DIR).with_suffix(""),
+            tables=tables,
+            default_metadata=default_metadata,
+            underscore_table=underscore_table,
+            camel_to_snake=camel_to_snake,
+            long_to_wide=long_to_wide,
+            formats=formats,
+            check_variables_metadata=check_variables_metadata,
+            run_grapher_checks=run_grapher_checks,
+            yaml_params=yaml_params,
+            if_origins_exist=if_origins_exist,
+            errors=errors,
+            repack=repack,
+        )
+
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
     regex = re.compile(pattern)
