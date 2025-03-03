@@ -1,6 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder, create_dataset, last_date_accessed
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -24,7 +24,6 @@ def run(dest_dir: str) -> None:
         tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_garden.metadata,
-        yaml_params={"year": last_date_accessed(tb)[-4:], "update_date": last_date_accessed(tb)},
     )
 
     # Save changes in the new grapher dataset.
