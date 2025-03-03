@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Literal, Optional, TypeVar
 import fastjsonschema
 import yaml
 from owid.catalog import Table
-from owid.catalog.meta import MetaBase
+from owid.catalog.meta import GrapherConfig, MetaBase
 
 DIMENSIONS = ["y", "x", "size", "color"]
 T = TypeVar("T")
@@ -172,7 +172,7 @@ class View(MetaBase):
     dimensions: Dict[str, str]
     indicators: ViewIndicators
     # NOTE: Maybe worth putting as classes at some point?
-    config: Optional[Any] = None
+    config: Optional[GrapherConfig] = None
     metadata: Optional[Any] = None
 
     @property
