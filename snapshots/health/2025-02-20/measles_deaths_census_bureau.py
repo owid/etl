@@ -13,9 +13,9 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Data for 1949
 DATA_1949 = pd.DataFrame(
     {
-        "country": ["United States"] * 14,
-        "year": [1922, 1923, 1926, 1927, 1928, 1929, 1931, 1932, 1933, 1934, 1935, 1936, 1937, 1949],
-        "deaths": [4012, 10450, 8607, 4433, 6146, 2923, 3576, 1941, 2813, 6986, 3907, 1267, 1501, 949],
+        "country": ["United States"] * 13,
+        "year": [1922, 1923, 1926, 1927, 1928, 1929, 1931, 1932, 1933, 1934, 1935, 1936, 1949],
+        "deaths": [4012, 10450, 8607, 4433, 6146, 2923, 3576, 1941, 2813, 6986, 3907, 1267, 949],
         "source": [
             "https://www.census.gov/library/publications/1925/compendia/statab/47ed.html",
             "https://www.census.gov/library/publications/1925/compendia/statab/47ed.html",
@@ -29,7 +29,6 @@ DATA_1949 = pd.DataFrame(
             "https://www.census.gov/library/publications/1936/compendia/statab/58ed.html",
             "https://www.census.gov/library/publications/1938/compendia/statab/59ed.html",
             "https://www.census.gov/library/publications/1939/compendia/statab/60ed.html",
-            "https://www.census.gov/library/publications/1940/compendia/statab/61ed.html",
             "https://www.census.gov/library/publications/1952/compendia/statab/73ed.html",
         ],
     }
