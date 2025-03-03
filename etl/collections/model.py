@@ -10,7 +10,7 @@ THINGS TO SOLVE:
 import json
 import re
 from dataclasses import dataclass
-from typing import Any, Dict, List, Literal, Optional, TypeVar
+from typing import Annotated, Any, ClassVar, Dict, List, Literal, Optional, TypeGuard, TypeVar
 
 import fastjsonschema
 import yaml
@@ -250,15 +250,31 @@ class DimensionChoice(MetaBase):
     description: Optional[str] = None
 
 
+@dataclass(frozen=True)
+class UITypes:
+    DROPDOWN: ClassVar[str] = "dropdown"
+    CHECKBOX: ClassVar[str] = "checkbox"
+    RADIO: ClassVar[str] = "radio"
+    TEXT_AREA: ClassVar[str] = "text_area"  # Adding a new type automatically works!
+
+    # Compute the list once at class definition time
+    ALL: ClassVar[List[str]] = [
+        value for key, value in vars().items() if not key.startswith("__") and isinstance(value, str)
+    ]
+
+    @classmethod
+    def is_valid(cls, value: str) -> TypeGuard[str]:
+        return value in cls.ALL
+
+
 @pruned_json
 @dataclass
 class DimensionPresentation(MetaBase):
-    type: Literal["dropdown", "checkbox", "radio"]
+    type: str
 
     def __post_init__(self):
-        # TODO: is there a cleaner way of validating this? Feels redundant with the Literal type specified above
-        UI_TYPE_ACCEPTED = ["dropdown", "checkbox", "radio"]
-        assert self.type in UI_TYPE_ACCEPTED, f"Invalid type: {self.type}. Accepted are {UI_TYPE_ACCEPTED}"
+        if not UITypes.is_valid(self.type):
+            raise ValueError(f"Invalid type: {self.type}. Accepted values: {UITypes.ALL}")
 
 
 @pruned_json
@@ -271,9 +287,19 @@ class Dimension(MetaBase):
     choices: List[DimensionChoice]
     presentation: Optional[DimensionPresentation] = None
 
+    def __post_init__(self):
+        """Validations."""
+
+        # If presentation is binary (checkbox), then choices must be exactly two (true, false)
+        if self.ui_type == UITypes.CHECKBOX:
+            if not set(self.choice_slugs) == {True, False}:
+                raise ValueError(
+                    f"Dimension choices for '{UITypes.CHECKBOX}' must have exactly two choices with slugs: ['True', 'False']. Instead, found {self.choice_slugs}"
+                )
+
     @property
     def ui_type(self):
-        default = "dropdown"
+        default = UITypes.DROPDOWN
         if self.presentation is not None:
             return self.presentation.type
         return default
