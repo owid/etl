@@ -3,6 +3,8 @@ This function creates the metadata for each variable in the WID dataset, from th
 If new variables are included in the dataset (from `wid` command in Stata) the dictionaries feeding metadata functions have to be updated (if not an error will show up)
 """
 
+from typing import List
+
 from owid.catalog import Table, VariableMeta, VariablePresentationMeta
 
 # Define PPP year
@@ -14,9 +16,14 @@ TOLERANCE = 5
 
 # This is text common to all variables
 
-ADDITIONAL_DESCRIPTION = [
+METHODOLOGY_DESCRIPTION = [
     "The data is estimated from a combination of household surveys, tax records and national accounts data. This combination can provide a more accurate picture of the incomes of the richest, which tend to be captured poorly in household survey data alone.",
     "These underlying data sources are not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/countries-with-regional-income-imputations-on-wid-world-world-inequality-lab-technical-note-2021-15/).",
+]
+
+METHODOLOGY_DESCRIPTION_WEALTH = [
+    "The data is constructed using the Mixed Income Capitalization-Survey (MICS) method, which combines capitalized income flows from tax data with survey-based estimates for assets that do not generate taxable income. This is done because wealth distributions are usually not directly available in administrative data, and because wealth surveys coverage is even more limited than for income.",
+    "Even with those considerations, the underlying data is not always available. For some countries, observations are extrapolated from data relating to other years, or are sometimes modeled based on data observed in other countries. For more information on this methodology, see this related [technical note](https://wid.world/document/global-wealth-inequality-on-wid-world-estimates-and-imputations-wid-world-technical-note-2023-11/).",
 ]
 
 POST_TAX_NATIONAL_DESCRIPTION = [
@@ -130,25 +137,25 @@ WELFARE_DICT = {
         "name": "Pretax",
         "type": "income",
         "verb": "received",
-        "description": "Income is ‘pre-tax’ — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.",
+        "description": 'Income is "pre-tax" — measured before taxes have been paid and most government benefits have been received. It is, however, measured after the operation of pension schemes, both private and public.',
     },
     "posttax_dis": {
         "name": "Post-tax disposable",
         "type": "income",
         "verb": "received",
-        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.",
+        "description": 'Income is "post-tax" — measured after taxes have been paid and most government benefits have been received, but does not include in-kind benefits and therefore does not add up to national income.',
     },
     "posttax_nat": {
         "name": "Post-tax national",
         "type": "income",
         "verb": "received",
-        "description": "Income is ‘post-tax’ — measured after taxes have been paid and most government benefits have been received.",
+        "description": 'Income is "post-tax" — measured after taxes have been paid and most government benefits have been received.',
     },
     "wealth": {
         "name": "Net national wealth",
         "type": "wealth",
         "verb": "owned",
-        "description": "This measure is related to net national wealth, which is the total value of non-financial and financial assets (housing, land, deposits, bonds, equities, etc.) held by households, minus their debts.",
+        "description": "This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities, etc.) held by households, minus their debts.",
     },
 }
 
@@ -348,20 +355,15 @@ def var_metadata_income(var, origins, wel, ext) -> VariableMeta:
     """
     This function assigns each of the metadata fields for the variables not depending on deciles
     """
-    # Add POST_TAX_NATIONAL_DESCRIPTION only for posttax_nat
-    if wel == "posttax_nat":
-        post_tax_national_description = POST_TAX_NATIONAL_DESCRIPTION
-    else:
-        post_tax_national_description = []
+    # Add descriptions depending on welfare variable
+    description_welfare_list = add_descriptions_depending_on_welfare(wel)
 
     # For monetary variables I include the PPP description
     if var == "p0p100_avg" or var == "median":
         meta = VariableMeta(
             title=f"{VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]]
-            + ADDITIONAL_DESCRIPTION
-            + post_tax_national_description,
+            description_key=[PPP_DESCRIPTION] + description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -374,7 +376,7 @@ def var_metadata_income(var, origins, wel, ext) -> VariableMeta:
         meta = VariableMeta(
             title=f"{VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION + post_tax_national_description,
+            description_key=description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -398,19 +400,14 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
     """
     This function assigns each of the metadata fields for the variables depending on deciles
     """
-    # Add POST_TAX_NATIONAL_DESCRIPTION only for posttax_nat
-    if wel == "posttax_nat":
-        post_tax_national_description = POST_TAX_NATIONAL_DESCRIPTION
-    else:
-        post_tax_national_description = []
+    # Add descriptions depending on welfare variable
+    description_welfare_list = add_descriptions_depending_on_welfare(wel)
 
     if var == "thr":
         meta = VariableMeta(
             title=f"{PCT_DICT[pct]['decile9']} - {VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]]
-            + ADDITIONAL_DESCRIPTION
-            + post_tax_national_description,
+            description_key=[PPP_DESCRIPTION] + description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -423,9 +420,7 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
         meta = VariableMeta(
             title=f"{PCT_DICT[pct]['decile10']} - {VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[PPP_DESCRIPTION, WELFARE_DICT[wel]["description"]]
-            + ADDITIONAL_DESCRIPTION
-            + post_tax_national_description,
+            description_key=[PPP_DESCRIPTION] + description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -439,7 +434,7 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
         meta = VariableMeta(
             title=f"{PCT_DICT[pct]['decile10']} - {VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT[var]["description"],
-            description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION + post_tax_national_description,
+            description_key=description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {EXTRAPOLATION_DICT[ext]['description']}""",
@@ -463,16 +458,13 @@ def var_metadata_income_relative(var, origins, wel, rel, ext) -> VariableMeta:
     """
     This function assigns each of the metadata fields for the variables depending on relative poverty lines
     """
-    # Add POST_TAX_NATIONAL_DESCRIPTION only for posttax_nat
-    if wel == "posttax_nat":
-        post_tax_national_description = POST_TAX_NATIONAL_DESCRIPTION
-    else:
-        post_tax_national_description = []
+    # Add descriptions depending on welfare variable
+    description_welfare_list = add_descriptions_depending_on_welfare(wel)
 
     meta = VariableMeta(
         title=f"{REL_DICT[rel]} - {VAR_DICT[var]['title']} ({WELFARE_DICT[wel]['name']}) ({EXTRAPOLATION_DICT[ext]['title']})",
         description_short=VAR_DICT[var]["description"],
-        description_key=[WELFARE_DICT[wel]["description"]] + ADDITIONAL_DESCRIPTION + post_tax_national_description,
+        description_key=description_welfare_list,
         description_processing=f"""{PROCESSING_DESCRIPTION}
 
 {RELATIVE_POVERTY_DESCRIPTION}
@@ -492,6 +484,23 @@ def var_metadata_income_relative(var, origins, wel, rel, ext) -> VariableMeta:
     meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
+
+
+def add_descriptions_depending_on_welfare(wel: str) -> List[str]:
+    """
+    Add different descriptions depending on the welfare variable (pretax, posttax_dis, posttax_nat, wealth)
+    """
+    # Add descriptions depending on welfare variable
+    if wel == "pretax" or wel == "posttax_dis":
+        description_welfare_list = [WELFARE_DICT[wel]["description"]] + METHODOLOGY_DESCRIPTION
+    elif wel == "posttax_nat":
+        description_welfare_list = (
+            [WELFARE_DICT[wel]["description"]] + METHODOLOGY_DESCRIPTION + POST_TAX_NATIONAL_DESCRIPTION
+        )
+    elif wel == "wealth":
+        description_welfare_list = [WELFARE_DICT[wel]["description"]] + METHODOLOGY_DESCRIPTION_WEALTH
+
+    return description_welfare_list
 
 
 ##############################################################################################################
@@ -564,7 +573,7 @@ def var_metadata_distribution(var: str, origins, ext: str) -> VariableMeta:
         meta = VariableMeta(
             title=f"Income or wealth {VAR_DICT_DISTRIBUTION[var]['title'].lower()} ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT_DISTRIBUTION[var]["description"],
-            description_key=WELFARE_DEFINITIONS + ADDITIONAL_DESCRIPTION,
+            description_key=WELFARE_DEFINITIONS + METHODOLOGY_DESCRIPTION,
             description_processing=f"{PROCESSING_DESCRIPTION_DISTRIBUTIONS} {EXTRAPOLATION_DICT[ext]['description']}",
             unit=VAR_DICT_DISTRIBUTION[var]["unit"],
             short_unit=VAR_DICT_DISTRIBUTION[var]["short_unit"],
@@ -576,7 +585,7 @@ def var_metadata_distribution(var: str, origins, ext: str) -> VariableMeta:
         meta = VariableMeta(
             title=f"{VAR_DICT_DISTRIBUTION[var]['title']} income or wealth ({EXTRAPOLATION_DICT[ext]['title']})",
             description_short=VAR_DICT_DISTRIBUTION[var]["description"],
-            description_key=[PPP_DESCRIPTION] + WELFARE_DEFINITIONS + ADDITIONAL_DESCRIPTION,
+            description_key=[PPP_DESCRIPTION] + WELFARE_DEFINITIONS + METHODOLOGY_DESCRIPTION,
             description_processing=f"{PROCESSING_DESCRIPTION_DISTRIBUTIONS} {EXTRAPOLATION_DICT[ext]['description']}",
             unit=VAR_DICT_DISTRIBUTION[var]["unit"],
             short_unit=VAR_DICT_DISTRIBUTION[var]["short_unit"],

@@ -2,6 +2,7 @@
 definitions:
   common:
     presentation:
+      attribution_short: World Inequality Database
       topic_tags:
         - Economic Inequality
       grapher_config:
