@@ -10,7 +10,7 @@ THINGS TO SOLVE:
 import json
 import re
 from dataclasses import dataclass
-from typing import Annotated, Any, ClassVar, Dict, List, Literal, Optional, TypeGuard, TypeVar
+from typing import Any, ClassVar, Dict, Generic, List, Optional, TypeGuard, TypeVar
 
 import fastjsonschema
 import yaml
@@ -242,6 +242,18 @@ class View(MetaBase):
         return indicators
 
 
+@dataclass
+class ExplorerView(View):
+    """https://github.com/owid/owid-grapher/blob/cb01ebb366d22f255b0acb791347981867225e8b/packages/%40ourworldindata/explorer/src/GrapherGrammar.ts"""
+
+    pass
+
+
+@dataclass
+class MDIMView(View):
+    pass
+
+
 @pruned_json
 @dataclass
 class DimensionChoice(MetaBase):
@@ -292,7 +304,7 @@ class Dimension(MetaBase):
 
         # If presentation is binary (checkbox), then choices must be exactly two (true, false)
         if self.ui_type == UITypes.CHECKBOX:
-            if not set(self.choice_slugs) == {True, False}:
+            if not set(self.choice_slugs) == {"True", "False"}:
                 raise ValueError(
                     f"Dimension choices for '{UITypes.CHECKBOX}' must have exactly two choices with slugs: ['True', 'False']. Instead, found {self.choice_slugs}"
                 )
@@ -314,13 +326,16 @@ class Dimension(MetaBase):
         return self.presentation
 
 
+TView = TypeVar("TView", bound=View)
+
+
 @pruned_json
 @dataclass
-class Collection(MetaBase):
+class Collection(MetaBase, Generic[TView]):
     """Overall MDIM/Explorer config"""
 
     dimensions: List[Dimension]
-    views: List[View]
+    views: List[TView]
 
     @property
     def v(self):
@@ -381,7 +396,7 @@ class Collection(MetaBase):
 
 @pruned_json
 @dataclass
-class Explorer(Collection):
+class Explorer(Collection[ExplorerView]):
     """Model for Explorer configuration."""
 
     config: Dict[str, str]
@@ -415,7 +430,7 @@ class Explorer(Collection):
 
 @pruned_json
 @dataclass
-class Multidim(Collection):
+class Multidim(Collection[MDIMView]):
     """Model for MDIM configuration."""
 
     title: Dict[str, str]
@@ -424,38 +439,38 @@ class Multidim(Collection):
     definitions: Optional[Any] = None
 
 
-# # def main():
-# import yaml
+# def main():
+import yaml
 
-# from etl.collections.utils import (
-#     get_tables_by_name_mapping,
-# )
+from etl.collections.utils import (
+    get_tables_by_name_mapping,
+)
 
-# f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases_tests.yml"
-# with open(f_mdim) as istream:
-#     cfg_mdim = yaml.safe_load(istream)
-# mdim = Multidim.from_dict(cfg_mdim)
+f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases_tests.yml"
+with open(f_mdim) as istream:
+    cfg_mdim = yaml.safe_load(istream)
+mdim = Multidim.from_dict(cfg_mdim)
 
-# dependencies = {
-#     "data://grapher/covid/latest/hospital",
-#     "data://grapher/covid/latest/vaccinations_global",
-#     "data://grapher/covid/latest/vaccinations_manufacturer",
-#     "data://grapher/covid/latest/testing",
-#     "data://grapher/excess_mortality/latest/excess_mortality",
-#     "data-private://grapher/excess_mortality/latest/excess_mortality_economist",
-#     "data://grapher/covid/latest/xm_who",
-#     "data://grapher/covid/latest/cases_deaths",
-#     "data://grapher/covid/latest/covax",
-#     "data://grapher/covid/latest/infections_model",
-#     "data://grapher/covid/latest/google_mobility",
-#     "data://grapher/regions/2023-01-01/regions",
-# }
-# tables_by_name = get_tables_by_name_mapping(dependencies)
+dependencies = {
+    "data://grapher/covid/latest/hospital",
+    "data://grapher/covid/latest/vaccinations_global",
+    "data://grapher/covid/latest/vaccinations_manufacturer",
+    "data://grapher/covid/latest/testing",
+    "data://grapher/excess_mortality/latest/excess_mortality",
+    "data-private://grapher/excess_mortality/latest/excess_mortality_economist",
+    "data://grapher/covid/latest/xm_who",
+    "data://grapher/covid/latest/cases_deaths",
+    "data://grapher/covid/latest/covax",
+    "data://grapher/covid/latest/infections_model",
+    "data://grapher/covid/latest/google_mobility",
+    "data://grapher/regions/2023-01-01/regions",
+}
+tables_by_name = get_tables_by_name_mapping(dependencies)
 
-# mdim.views[0].indicators.expand_paths(tables_by_name)
+mdim.views[0].indicators.expand_paths(tables_by_name)
 
-# f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
-# with open(f_explorer) as istream:
-#     cfg_explorer = yaml.safe_load(istream)
-# explorer = Explorer.from_dict(cfg_explorer)
-# # cfg.views[0].indicators.y
+f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
+with open(f_explorer) as istream:
+    cfg_explorer = yaml.safe_load(istream)
+explorer = Explorer.from_dict(cfg_explorer)
+# cfg.views[0].indicators.y

@@ -66,8 +66,6 @@ def run(dest_dir: str) -> None:
 
     explorer = Explorer.from_dict(config)
 
-    header = explorer.config
-
     # Load necessary tables
     # ds = paths.load_dataset("cases_deaths")
     # tb = ds.read("cases_deaths")
@@ -96,15 +94,14 @@ def run(dest_dir: str) -> None:
         # Build dimensions dictionary for a view
         dimensions = bake_dimensions_view(
             dimensions_display=dimensions_display,
-            view=view.to_dict(),
+            view=view,
         )
         # Get options and variable IDs
         indicator_paths = view.indicators.to_records()
 
         # Build record
-        record = {
-            **dimensions,
-        }
+        record = dimensions
+
         y = [v["path"] for v in indicator_paths if v["dimension"] == "y"]
         x = [v["path"] for v in indicator_paths if v["dimension"] == "x"]
         # size = [v["path"] for v in var_ids if v["dimension"] == "size"]
@@ -130,19 +127,19 @@ def run(dest_dir: str) -> None:
         fields_optional = [
             "title",
             "subtitle",
-            "type",
+            "type",  # NO
             "hasMapTab",
             "hideAnnotationFieldsInTitle",
             "sortBy",
             "sortColumnSlug",
             "hideTotalValueLabel",
             "selectedFacetStrategy",
-            "facetYDomain",
+            "facetYDomain",  # NO
             "timelineMinTime",
             "note",
-            "defaultView",
-            "relatedQuestionText",
-            "relatedQuestionUrl",
+            "defaultView",  # NO
+            "relatedQuestionText",  # NO
+            "relatedQuestionUrl",  # NO
             "tab",
         ]
         if "config" in view:
@@ -182,7 +179,11 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = create_explorer(dest_dir=dest_dir, config=header, df_graphers=df_grapher)
+    ds_explorer = create_explorer(
+        dest_dir=dest_dir,
+        config=explorer.config,
+        df_graphers=df_grapher,
+    )
     ds_explorer.save()
 
 
@@ -193,13 +194,6 @@ def bake_dimensions_view(dimensions_display, view):
     """
     view_dimensions = {}
     for slug_dim, slug_choice in view.dimensions.items():
-        # dim_name = f"{}"
-        # choice_name = ""
-
-        if "choices" in dimensions_display[slug_dim]:
-            view_dimensions[dimensions_display[slug_dim]["widget_name"]] = dimensions_display[slug_dim]["choices"][
-                slug_choice
-            ]["name"]
-        else:
-            view_dimensions[dimensions_display[slug_dim]["widget_name"]] = slug_choice
+        widget_name = dimensions_display[slug_dim]["widget_name"]
+        view_dimensions[widget_name] = dimensions_display[slug_dim]["choices"][str(slug_choice)]
     return view_dimensions

@@ -114,7 +114,7 @@ dimensions:
     name: Relative to population
     choices:
       - slug: false
-        name: "True"
+        name: "Total"
       - slug: true
         name: Per 100,000 people
     presentation:
