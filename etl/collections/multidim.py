@@ -205,7 +205,9 @@ def process_views(mdim: Multidim, dependencies: Set[str]):
         # Update indicators for each dimension, making sure they have the complete URI
         view.expand_paths(tables_by_name)
 
-        # TODO: Tweak view to inherit from common
+        # Combine metadata/config with definitions.common_views
+        if (mdim.definitions is not None) and (mdim.definitions.common_views is not None):
+            view.combine_with_common(mdim.definitions.common_views)
 
         # Combine metadata in views which contain multiple indicators
         if view.metadata_is_needed:  # Check if view "contains multiple indicators"

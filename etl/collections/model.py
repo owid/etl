@@ -13,9 +13,12 @@ from dataclasses import dataclass
 from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar
 
 import fastjsonschema
+import pandas as pd
 import yaml
 from owid.catalog import Table
 from owid.catalog.meta import GrapherConfig, MetaBase
+
+from etl.collections.utils import merge_common_metadata_by_dimension
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 T = TypeVar("T")
@@ -166,6 +169,42 @@ class ViewIndicators(MetaBase):
 
 @pruned_json
 @dataclass
+class CommonView(MetaBase):
+    dimensions: Optional[Dict[str, Any]] = None
+    config: Optional[Dict[str, Any]] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+    @property
+    def num_dimensions(self) -> int:
+        return len(self.dimensions) if self.dimensions is not None else 0
+
+
+@pruned_json
+@dataclass
+class Definitions(MetaBase):
+    common_views: Optional[List[CommonView]] = None
+
+    def __post_init__(self):
+        # Validate that there is no duplicate common view (based on dimensions)
+        if self.common_views is not None:
+            if not (
+                isinstance(self.common_views, list) and all(isinstance(view, CommonView) for view in self.common_views)
+            ):
+                raise TypeError("`common_views` must be a list!")
+
+            records = []
+            for view in self.common_views:
+                records.append(view.dimensions)
+
+            df = pd.DataFrame.from_records([r if r else {} for r in records])
+
+            if df.duplicated().any():
+                info = df[df.duplicated()].to_dict(orient="records")
+                raise ValueError(f"Duplicate common views found! {info}")
+
+
+@pruned_json
+@dataclass
 class View(MetaBase):
     """MDIM/Explorer view configuration."""
 
@@ -203,6 +242,19 @@ class View(MetaBase):
                 if "columnSlug" in self.config["map"]:
                     indicator = Indicator(self.config["map"]["columnSlug"]).expand_path(tables_by_name)
                     self.config["map"]["columnSlug"] = indicator.catalogPath
+
+        return self
+
+    def combine_with_common(self, common_views: List[CommonView]):
+        """Combine config and metadata fields in view with those specified by definitions.common_views."""
+        # Update config
+        new_config = merge_common_metadata_by_dimension(common_views, self.dimensions, self.config, "config")
+        if new_config:
+            self.config = new_config
+        # Update metadata
+        new_metadata = merge_common_metadata_by_dimension(common_views, self.dimensions, self.metadata, "metadata")
+        if new_metadata:
+            self.metadata = new_metadata
 
         return self
 
@@ -333,6 +385,7 @@ class Collection(MetaBase):
 
     dimensions: List[Dimension]
     views: List[Any]
+    definitions: Optional[Definitions]
 
     @property
     def v(self):
@@ -341,6 +394,12 @@ class Collection(MetaBase):
     @property
     def d(self):
         return self.dimensions
+
+    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
+        dix = super().to_dict(encode_json=encode_json)
+        if drop_definitions:
+            dix = {k: v for k, v in dix.items() if k != "definitions"}
+        return dix
 
     def validate_views_with_dimensions(self):
         """Validate that the dimension choices in all views are defined."""
@@ -435,7 +494,6 @@ class Multidim(Collection):
     title: Dict[str, str]
     defaultSelection: List[str]
     topicTags: Optional[List[str]] = None
-    definitions: Optional[Any] = None
 
 
 # def main():

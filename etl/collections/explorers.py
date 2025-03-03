@@ -45,7 +45,9 @@ def process_views(
         # Expand paths
         view.expand_paths(tables_by_name)
 
-        # TODO: Tweak view to inherit from common
+        # Combine metadata/config with definitions.common_views
+        if (explorer.definitions is not None) and (explorer.definitions.common_views is not None):
+            view.combine_with_common(explorer.definitions.common_views)
 
 
 def _create_explorer(dest_dir: str, explorer: Explorer, owid_env: Optional[OWIDEnv] = None):
@@ -57,6 +59,7 @@ def _create_explorer(dest_dir: str, explorer: Explorer, owid_env: Optional[OWIDE
     # TODO: explorer.validate_schema(SCHEMAS_DIR / "explorer-schema.json")
     validate_collection_config(explorer, owid_env.engine)
 
+    # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
     # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
     df_grapher = extract_explorer_views(explorer)
 

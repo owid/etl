@@ -1,10 +1,11 @@
 definitions:
-  config: &config
-    hideAnnotationFieldsInTitle:
-      entity: true
-      time: true
-      changeInPrefix: true
-    originUrl: ourworldindata.org/coronavirus
+  common_views:
+    - config:
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+        originUrl: ourworldindata.org/coronavirus
 
 title:
   title: COVID-19 hospitalizations
@@ -60,28 +61,24 @@ views:
       normalize: absolute
     indicators:
       y: "hospital#daily_occupancy_hosp"
-    config: *config
   - dimensions:
       type: hospital
       measure: patients
       normalize: per_capita
     indicators:
       y: "hospital#daily_occupancy_hosp_per_1m"
-    config: *config
   - dimensions:
       type: hospital
       measure: admissions
       normalize: absolute
     indicators:
       y: "hospital#weekly_admissions_hosp"
-    config: *config
   - dimensions:
       type: hospital
       measure: admissions
       normalize: per_capita
     indicators:
       y: "hospital#weekly_admissions_hosp_per_1m"
-    config: *config
 
   - dimensions:
       type: icu
@@ -89,25 +86,21 @@ views:
       normalize: absolute
     indicators:
       y: "hospital#daily_occupancy_icu"
-    config: *config
   - dimensions:
       type: icu
       measure: patients
       normalize: per_capita
     indicators:
       y: "hospital#daily_occupancy_icu_per_1m"
-    config: *config
   - dimensions:
       type: icu
       measure: admissions
       normalize: absolute
     indicators:
       y: "hospital#weekly_admissions_icu"
-    config: *config
   - dimensions:
       type: icu
       measure: admissions
       normalize: per_capita
     indicators:
       y: "hospital#weekly_admissions_icu_per_1m"
-    config: *config

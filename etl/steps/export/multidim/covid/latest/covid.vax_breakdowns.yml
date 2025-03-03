@@ -1,8 +1,9 @@
 definitions:
-  config: &config_base
-    originUrl: ourworldindata.org/coronavirus
-    hideAnnotationFieldsInTitle:
-      time: true
+  common_views:
+    - config:
+        originUrl: ourworldindata.org/coronavirus
+        hideAnnotationFieldsInTitle:
+          time: true
 
 title:
   title: COVID-19 vaccines
@@ -33,7 +34,6 @@ views:
     indicators:
       y: "vaccinations_global#total_vaccinations_per_hundred"
     config:
-      <<: *config_base
       addCountryMode: "disabled"
       selectedEntityNames:
         - High-income countries
@@ -64,7 +64,6 @@ views:
         - "vaccinations_manufacturer#total_vaccinations__vaccine_skycovione"
         - "vaccinations_manufacturer#total_vaccinations__vaccine_valneva"
     config:
-      <<: *config_base
       chartTypes: ["StackedArea"]
       selectedEntityNames:
         - European Union (27)
