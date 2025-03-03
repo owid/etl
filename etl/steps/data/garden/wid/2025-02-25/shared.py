@@ -155,7 +155,7 @@ WELFARE_DICT = {
         "name": "Net national wealth",
         "type": "wealth",
         "verb": "owned",
-        "description": "This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities, etc.) held by households, minus their debts.",
+        "description": "This measure is related to net national wealth, which is the total value of non-financial (housing, land) and financial assets (deposits, bonds, equities) held by households, minus their debts.",
     },
 }
 
