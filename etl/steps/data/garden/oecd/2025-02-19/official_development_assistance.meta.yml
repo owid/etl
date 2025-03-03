@@ -59,7 +59,8 @@ definitions:
     Official development assistance (ODA) is government-funded aid to target the economic development and welfare of poorer countries. This aid is composed of grants or "soft loans" (loans with low interest rates and long repayment terms). For more details about ODA, please refer to the [official OECD documentation](https://one.oecd.org/document/DCD/DAC/STAT(2023)9/FINAL/en/pdf).
 
   key_oda_target: A long-standing United Nations target is that developed countries should devote 0.7% of their GNI to ODA.
-  key_oda_list_of_countries: The [OECD Development Assistance Committee (DAC)](https://www.oecd.org/en/about/committees/development-assistance-committee.html) is the group of the largest providers of aid and maintains a list of territories where ODA can be provided. The countries and territories on this list consist of all low and middle income countries based on gross national income (GNI) per capita as published by the World Bank, with the exception of former G8 members, EU members, and countries with a firm date for entry into the EU. The list also includes all of the Least Developed Countries (LDCs) as defined by the United Nations. The list is updated every three years and is available in [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
+  key_oda_list_of_countries_donors: ODA is provided by [OECD Development Assistance Committee (DAC)](https://www.oecd.org/en/about/committees/development-assistance-committee.html) members, which are major aid donors in the OECD plus the European Union. ODA is also provided by non-DAC countries, countries outside the previous group following ODA directives (like Qatar, Saudi Arabia or Turkey).
+  key_oda_list_of_countries_recipients: The DAC maintains a list of territories and international organizations where ODA can be provided. The countries and territories on this list are all low and middle income countries as published by the World Bank and United Nations (except former G8 members, EU members, and confirmed future members). International organizations include multilateral agencies, international non-governmental organizations, networks and public-private partnerships. The lists are available in [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
 
   key_grant_equivalents: |-
     "[Grant equivalent](#dod:grant-equivalents)" is a methodology to estimate the value of loans compared to a grant. It is an estimate, at today’s value of money, of how much is being given away over the life of a financial transaction, compared with a transaction at market terms.
@@ -198,7 +199,8 @@ definitions:
     - "{definitions.key_oda_coverage_limits}"
     - "{definitions.key_net_disbursements}"
     - "{definitions.key_constant_usd}"
-    - "{definitions.key_oda_list_of_countries}"
+    - "{definitions.key_oda_list_of_countries_donors}"
+    - "{definitions.key_oda_list_of_countries_recipients}"
 
   description_key_private_grants: &description_key_private_grants
     - "{definitions.key_net_private_grants}"
@@ -211,7 +213,8 @@ definitions:
     - <% if donor == "Private donors" %>{definitions.key_net_disbursements}<% else %>{definitions.key_oda_coverage_limits}<% endif %>
     - <% if donor == "Private donors" %>{definitions.key_private_reporting}<% else %>{definitions.key_net_disbursements}<% endif %>
     - <% if donor == "Private donors" %>{definitions.key_constant_usd}<% else %>{definitions.key_constant_usd}<% endif %>
-    - <% if donor == "Private donors" %><% else %>{definitions.key_oda_list_of_countries}<% endif %>
+    - <% if donor == "Private donors" %><% else %>{definitions.key_oda_list_of_countries_donors}<% endif %>
+    - <% if donor == "Private donors" %><% else %>{definitions.key_oda_list_of_countries_recipients}<% endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -233,7 +236,8 @@ tables:
           - "{definitions.key_net_private_grants}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: |-
           {definitions.producer_oda}
 
@@ -352,7 +356,8 @@ tables:
           - "{definitions.key_gni}"
           - "{definitions.key_oda_target}"
           - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_share_gni}"
@@ -376,7 +381,8 @@ tables:
           - "{definitions.key_gni}"
           - "{definitions.key_oda_target}"
           - "{definitions.key_grant_equivalents}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_share_gni}"
@@ -402,7 +408,8 @@ tables:
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_official_estimate}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Foreign aid given as a share of national income
@@ -424,7 +431,8 @@ tables:
           - "{definitions.key_oda_bilateral}"
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Bilateral ODA by donor
@@ -444,7 +452,8 @@ tables:
           - "{definitions.key_oda}"
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Multilateral ODA by donor
@@ -466,7 +475,8 @@ tables:
           - "{definitions.key_oda_bilateral}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Bilateral ODA by donor
@@ -487,7 +497,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Multilateral ODA by donor
@@ -508,7 +519,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Foreign aid given
@@ -586,7 +598,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita}"
@@ -609,7 +622,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita}"
@@ -1226,7 +1240,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_gni}"
           - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Foreign aid received as a share of national income
@@ -1375,7 +1390,8 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
@@ -1501,7 +1517,8 @@ tables:
           - "{definitions.key_sector}"
           - "{definitions.key_commitments_sectors}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         processing_level: *processing_level_by_sector
         description_processing: "{definitions.processing_oda_by_sector}"
         presentation:
@@ -1522,7 +1539,8 @@ tables:
           - "{definitions.key_sector}"
           - "{definitions.key_commitments_sectors}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
         processing_level: *processing_level_by_sector
         description_processing: |-
           {definitions.processing_per_capita_2}
