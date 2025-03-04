@@ -13,7 +13,9 @@ import tempfile
 import time
 import warnings
 from collections import defaultdict
+from collections.abc import Generator
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
@@ -573,8 +575,6 @@ class DataStep(Step):
         does not have overhead from forking an extra process like _run_py and
         should be used with caution.
         """
-        from etl.helpers import isolated_env
-
         # path can be either in a module with __init__.py or a single .py file
         module_dir = self._search_path if self._search_path.is_dir() else self._search_path.parent
 
@@ -1189,3 +1189,33 @@ def _uses_old_schema(e: KeyError) -> bool:
     """Origins without `title` use old schema before rename. This can be removed once
     we recompute all datasets."""
     return e.args[0] == "title"
+
+
+@contextmanager
+def isolated_env(
+    working_dir: Path,
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
+) -> Generator[None, None, None]:
+    """Add given directory to pythonpath, run code in context, and
+    then remove from pythonpath and unimport modules imported in context.
+
+    Note that unimporting modules means they'll have to be imported again, but
+    it has minimal impact on performance (ms).
+
+    :param keep_modules: regex of modules to keep imported
+    """
+    # add module dir to pythonpath
+    sys.path.append(working_dir.as_posix())
+
+    # remember modules that were imported before
+    imported_modules = set(sys.modules.keys())
+
+    yield
+
+    # unimport modules imported during execution unless they match `keep_modules`
+    for module_name in set(sys.modules.keys()) - imported_modules:
+        if not re.search(keep_modules, module_name):
+            sys.modules.pop(module_name)
+
+    # remove module dir from pythonpath
+    sys.path.remove(working_dir.as_posix())
