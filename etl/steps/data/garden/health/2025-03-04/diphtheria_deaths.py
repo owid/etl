@@ -52,7 +52,7 @@ def run(dest_dir: str) -> None:
 
 def clean_who_mortality_data(tb: Table) -> Table:
     tb = tb[
-        (tb["cause"] == "Measles")
+        (tb["cause"] == "Diphtheria")
         & (tb["age_group"] == "all ages")
         & (tb["country"] == "United States")
         & (tb["sex"] == "Both sexes")
