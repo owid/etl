@@ -50,6 +50,7 @@ def get_data() -> pd.DataFrame:
     # Create a DataFrame
     df = pd.DataFrame(data, columns=headers)
     df.columns = ["year", "cases"]
+    df["country"] = "United States"
 
     return df
 

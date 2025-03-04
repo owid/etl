@@ -22,6 +22,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: e985cc5dffd596ac4866502b2666f6f6
-    size: 1411
+  - md5: 10e41594b99ffacbf90fb2e9517673ad
+    size: 2833
     path: pertussis_cases.csv
