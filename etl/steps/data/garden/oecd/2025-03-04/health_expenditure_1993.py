@@ -38,7 +38,7 @@ def run(dest_dir: str) -> None:
     tb = pr.merge(tb_gdp, tb_health_expenditure, on=["country", "year"])
 
     # Create the health_expenditure_share_gdp column, dividing health_expenditure by gdp.
-    tb["health_expenditure_share_gdp"] = tb["health_expenditure"] / tb["gdp"] * 100
+    tb["share_gdp"] = tb["health_expenditure"] / tb["gdp"] * 100
 
     # Drop gdp and health_expenditure columns.
     tb = tb.drop(columns=["gdp", "health_expenditure"])

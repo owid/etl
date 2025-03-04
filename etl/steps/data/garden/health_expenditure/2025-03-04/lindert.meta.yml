@@ -15,7 +15,7 @@ dataset:
 tables:
   lindert:
     variables:
-      health_expenditure_share_gdp:
+      share_gdp:
         title: Public health expenditure as a share of GDP
         unit: "% of GDP"
         short_unit: "%"

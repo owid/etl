@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Make the table long, with columns "country" and "year".
-    tb = tb.melt(id_vars=["country"], var_name="year", value_name="health_expenditure_share_gdp")
+    tb = tb.melt(id_vars=["country"], var_name="year", value_name="share_gdp")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tables = [tb.format(["country", "year"])]

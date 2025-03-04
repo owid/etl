@@ -13,9 +13,9 @@ dataset:
 
 
 tables:
-  health_expenditure_1993:
+  health_expenditure_omm:
     variables:
-      share_gdp:
+      health_expenditure_share_gdp:
         title: Public health expenditure as a share of GDP
         unit: "% of GDP"
         short_unit: "%"
