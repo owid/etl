@@ -4,7 +4,7 @@ import streamlit as st
 
 from apps.wizard.utils import WIZARD_DIR
 from etl.dag_utils import load_dag
-from etl.helpers import read_json_schema
+from etl.files import read_json_schema
 from etl.paths import DAG_DIR, SCHEMAS_DIR
 
 # Step icons

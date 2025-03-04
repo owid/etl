@@ -7,12 +7,9 @@ import re
 import time
 from functools import cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Literal, Optional, Union, cast
-from urllib.parse import urljoin
+from typing import Any, Dict, Iterable, List, Literal, Optional, Union
 
-import jsonref
 import pandas as pd
-import requests
 import structlog
 from jsonschema import validate
 from owid import catalog
@@ -33,10 +30,11 @@ from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
 from etl import paths
-from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
+from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.dag_utils import load_dag
 from etl.db import get_engine
 from etl.explorer import Explorer
+from etl.files import get_schema_from_url
 from etl.snapshot import Snapshot, SnapshotMeta
 
 log = structlog.get_logger()
@@ -784,18 +782,6 @@ def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
     return {dependency for dependency in dependencies if regex.match(dependency)}
 
 
-def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
-    """Read JSON schema with resolved references."""
-    path = Path(path)
-
-    # pathlib does not append trailing slashes, but jsonref needs that.
-    base_dir_url = path.parent.absolute().as_uri() + "/"
-    base_file_url = urljoin(base_dir_url, path.name)
-    with path.open("r") as f:
-        dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
-        return cast(Dict[str, Any], dix)
-
-
 def create_explorer(
     dest_dir: Union[str, Path],
     config: Dict[str, Any],
@@ -839,23 +825,6 @@ def map_indicator_path_to_id(catalog_path: str) -> str | int:
         db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
         assert db_indicator.id is not None
         return db_indicator.id
-
-
-@cache
-def get_schema_from_url(schema_url: str) -> dict:
-    """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
-
-    https://files.ourworldindata.org/schemas/grapher-schema.006.json
-
-    More details on available versions can be found
-    at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
-
-    Returns
-    -------
-    Dict[str, Any]
-        Schema of a chart configuration.
-    """
-    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()
 
 
 def last_date_accessed(tb: Table) -> str:
