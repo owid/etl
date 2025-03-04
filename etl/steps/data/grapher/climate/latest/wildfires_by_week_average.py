@@ -1,6 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder, create_dataset, last_date_accessed
+from etl.catalog_helpers import last_date_accessed
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
