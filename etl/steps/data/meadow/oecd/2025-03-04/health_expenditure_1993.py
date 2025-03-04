@@ -53,6 +53,10 @@ def rename_columns_and_make_long(tb: Table, short_name: str) -> Table:
     # Make the table long.
     tb = tb.melt(id_vars=["country"], var_name="year", value_name=short_name)
 
+    # The GDP data for Japan and Italy is in billions. We need to multiply it by 1000 to match the rest in millions.
+    if short_name == "gdp":
+        tb.loc[tb["country"].isin(["Japan", "Italy"]), "gdp"] *= 1000
+
     # Format and add short_name
     tb = tb.format(["country", "year"], short_name=short_name)
 
