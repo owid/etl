@@ -26,10 +26,9 @@ def run(dest_dir: str) -> None:
     tb = tb[["Date", "NEA-km", "NEA-140m", "NEA"]]
 
     # Sort conveniently.
-    # tb["Date"] = pd.to_datetime(tb["Date"])
     tb = tb.sort_values(by="Date", ascending=False)
 
-    # Create a year column.
+    # Add a year column.
     tb["year"] = tb["Date"].str[0:4].astype(int)
 
     # Filter out data from the current year, which is incomplete.
@@ -39,12 +38,12 @@ def run(dest_dir: str) -> None:
     # Keep only the latest record for each year.
     tb = tb.drop_duplicates(subset="year")
 
-    # Calculate additional columns
+    # Create additional indicators.
     tb["larger_than_1km"] = tb["NEA-km"]
     tb["between_140m_and_1km"] = tb["NEA-140m"] - tb["larger_than_1km"]
     tb["smaller_than_140m"] = tb["NEA"] - tb["larger_than_1km"] - tb["between_140m_and_1km"]
 
-    # Add a 'country' column.
+    # Add a country column.
     tb["country"] = "World"
 
     # Select only necessary columns.

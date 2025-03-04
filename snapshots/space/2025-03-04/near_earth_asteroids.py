@@ -1,4 +1,11 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+To get the data file:
+* Go to: https://cneos.jpl.nasa.gov/stats/totals.html
+* Select "Tab: Cumulative Totals"
+* Scroll down and click "CSV" under the table to download data file.
+
+"""
 
 from pathlib import Path
 
@@ -14,13 +21,10 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
-    # Create a new snapshot.
+    # Initialize a new snapshot.
     snap = Snapshot(f"space/{SNAPSHOT_VERSION}/near_earth_asteroids.csv")
 
-    # Copy local data file to snapshots data folder, add file to DVC and upload to S3.
-    # Source URL: https://cneos.jpl.nasa.gov/stats/totals.html
-    # Tab: Cumulative Totals
-    # Scroll down and click "CSV" under the table
+    # Save snapshot.
     snap.create_snapshot(filename=path_to_file, upload=upload)
 
 
