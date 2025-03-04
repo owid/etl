@@ -26,13 +26,10 @@ from owid.catalog.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
-from sqlalchemy.orm import Session
 
-import etl.grapher.model as gm
 from etl import paths
 from etl.config import DEFAULT_GRAPHER_SCHEMA
-from etl.dag_utils import load_dag
-from etl.db import get_engine
+from etl.dag_helpers import load_dag
 from etl.explorer import Explorer
 from etl.files import get_schema_from_url
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -812,19 +809,6 @@ def create_explorer(
         explorer.df_columns = df_columns
 
     return explorer
-
-
-def map_indicator_path_to_id(catalog_path: str) -> str | int:
-    # Check if given path is actually an ID
-    if str(catalog_path).isdigit():
-        return catalog_path
-
-    # Get ID, assuming given path is a catalog path
-    engine = get_engine()
-    with Session(engine) as session:
-        db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
-        assert db_indicator.id is not None
-        return db_indicator.id
 
 
 def last_date_accessed(tb: Table) -> str:
