@@ -36,7 +36,7 @@ def run(dest_dir: str) -> None:
         on=["country", "year"],
         how="left",
     )
-    tb["death_rate"] = tb["deaths"] / tb["population"] * 100000
+    tb["death_rate"] = tb["deaths"] / tb["population"] * 1000000
     tb = tb.drop(columns=["population", "source_x", "source_y", "world_pop_share"])
     tb = tb.format(["country", "year"])
 

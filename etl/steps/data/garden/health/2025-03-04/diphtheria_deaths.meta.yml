@@ -22,7 +22,7 @@ tables:
           numDecimalPlaces: 0
       death_rate:
         title: Diphtheria death rate
-        unit: deaths per 100,000 people
-        description_short: Reported number of [diphtheria](#dod:diphtheria) deaths in the United States per 100,000 people.
+        unit: deaths per million people
+        description_short: Reported number of [diphtheria](#dod:diphtheria) deaths in the United States per million people.
         display:
           numDecimalPlaces: 1
