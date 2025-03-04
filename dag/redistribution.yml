@@ -74,3 +74,11 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/cow/2024-07-26/national_material_capabilities:
     - data://garden/cow/2024-07-26/national_material_capabilities
+
+  #
+  # Government subsidies for health care 1880-1930 (Lindert, 1994)
+  #
+  data://meadow/health_expenditure/2025-03-04/lindert:
+    - snapshot://health_expenditure/2025-03-04/lindert.csv
+  data://garden/health_expenditure/2025-03-04/lindert:
+    - data://meadow/health_expenditure/2025-03-04/lindert

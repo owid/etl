@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Healthcare Spending
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  lindert:
+    variables:
+      health_expenditure_share_gdp:
+        title: Public health expenditure as a share of GDP
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: Public health expenditure divided bt gross domestic product, expressed as a percentage.
+        description_from_producer: Government subsidies for health care, 1880-1930, as percentage of national product at current prices.
+        processing_level: minor
+        presentation:
+          attribution_short: Lindert
+          title_public: Public health expenditure as a share of GDP
+          title_variant: Data between 1880-1930
+        display:
+          name: Public health expenditure as a share of GDP
+          numDecimalPlaces: 1
+          tolerance: 5
+
