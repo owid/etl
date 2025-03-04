@@ -10,7 +10,7 @@ THINGS TO SOLVE:
 import json
 import re
 from dataclasses import dataclass
-from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar
+from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
 
 import fastjsonschema
 import pandas as pd
@@ -25,6 +25,7 @@ T = TypeVar("T")
 REGEX_CATALOG_PATH = (
     r"^(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
 )
+ChoiceSlugType = Union[str, bool]
 
 
 def prune_dict(d: dict) -> dict:
@@ -208,11 +209,15 @@ class Definitions(MetaBase):
 class View(MetaBase):
     """MDIM/Explorer view configuration."""
 
-    dimensions: Dict[str, str]
+    dimensions: Dict[str, ChoiceSlugType]
     indicators: ViewIndicators
     # NOTE: Maybe worth putting as classes at some point?
     config: Optional[GrapherConfig] = None
     metadata: Optional[Any] = None
+
+    @property
+    def d(self):
+        return self.dimensions
 
     @property
     def has_multiple_indicators(self) -> bool:
@@ -272,7 +277,7 @@ class View(MetaBase):
 
         return indicators
 
-    def indicators_used(self):
+    def indicators_used(self, tolerate_extra_indicators: bool = False):
         """Get a flatten list of all indicators used in the view.
 
         In addition, it also validates that indicators used in config are also in the view.
@@ -286,10 +291,12 @@ class View(MetaBase):
         # All indicators in `indicators_extra` should be in `indicators`! E.g. you can't sort by an indicator that is not in the chart!
         ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
         invalid_indicators = set(self.indicators_in_config).difference(set(indicators))
-        if invalid_indicators:
+        if not tolerate_extra_indicators and invalid_indicators:
             raise ValueError(
-                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}"
+                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}. If this is expected, set `tolerate_extra_indicators=True`."
             )
+        elif invalid_indicators:
+            indicators = indicators + list(invalid_indicators)
 
         return indicators
 
@@ -309,7 +316,7 @@ class MDIMView(View):
 @pruned_json
 @dataclass
 class DimensionChoice(MetaBase):
-    slug: str
+    slug: ChoiceSlugType
     name: str
     description: Optional[str] = None
 
@@ -356,7 +363,7 @@ class Dimension(MetaBase):
 
         # If presentation is binary (checkbox), then choices must be exactly two (true, false)
         if self.ui_type == UITypes.CHECKBOX:
-            if not set(self.choice_slugs) == {"True", "False"}:
+            if not set(self.choice_slugs) == {True, False}:
                 raise ValueError(
                     f"Dimension choices for '{UITypes.CHECKBOX}' must have exactly two choices with slugs: ['True', 'False']. Instead, found {self.choice_slugs}"
                 )
@@ -408,7 +415,9 @@ class Collection(MetaBase):
         for view in self.views:
             for slug, value in view.dimensions.items():
                 assert slug in dix, f"Dimension {slug} not found in dimensions! View: {self.to_dict()}"
-                assert value in dix[slug], f"Choice {value} not found for dimension {slug}! View: {self.to_dict()}"
+                assert (
+                    value in dix[slug]
+                ), f"Choice {value} not found for dimension {slug}! View: {view.to_dict()}; Available choices: {dix[slug]}"
 
     def validate_schema(self, schema_path):
         """Validate class against schema."""
@@ -422,11 +431,11 @@ class Collection(MetaBase):
         except fastjsonschema.JsonSchemaException as e:
             raise ValueError(f"Config validation error: {e.message}")  # type: ignore
 
-    def indicators_in_use(self):
+    def indicators_in_use(self, tolerate_extra_indicators: bool = False):
         # Get all indicators used in all views
         indicators = []
         for view in self.views:
-            indicators.extend(view.indicators_used())
+            indicators.extend(view.indicators_used(tolerate_extra_indicators))
 
         # Make sure indicators are unique
         indicators = list(set(indicators))

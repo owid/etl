@@ -6,7 +6,7 @@ from etl.collections.model import Collection
 from etl.collections.utils import validate_indicators_in_db
 
 
-def validate_collection_config(collection: Collection, engine: Engine) -> None:
+def validate_collection_config(collection: Collection, engine: Engine, tolerate_extra_indicators: bool) -> None:
     """Fundamental validation of the configuration of a collection (explorer or MDIM):
 
     - Ensure that the views reference valid dimensions.
@@ -22,5 +22,5 @@ def validate_collection_config(collection: Collection, engine: Engine) -> None:
     collection.check_duplicate_views()
 
     # Check that all indicators in mdim exist
-    indicators = collection.indicators_in_use()
+    indicators = collection.indicators_in_use(tolerate_extra_indicators)
     validate_indicators_in_db(indicators, engine)

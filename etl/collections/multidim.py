@@ -156,7 +156,11 @@ def expand_config(
 
 
 def upsert_multidim_data_page(
-    config: dict, paths: PathFinder, mdim_name: Optional[str] = None, owid_env: Optional[OWIDEnv] = None
+    config: dict,
+    paths: PathFinder,
+    mdim_name: Optional[str] = None,
+    tolerate_extra_indicators: bool = False,
+    owid_env: Optional[OWIDEnv] = None,
 ) -> None:
     """Import MDIM config to DB.
 
@@ -186,7 +190,7 @@ def upsert_multidim_data_page(
     # TODO: Possibly add other edits (to dimensions?)
 
     # Upsert to DB
-    _upsert_multidim_data_page(mdim_catalog_path, mdim, owid_env)
+    _upsert_multidim_data_page(mdim_catalog_path, mdim, tolerate_extra_indicators, owid_env)
 
 
 def process_views(mdim: Multidim, dependencies: Set[str]):
@@ -218,7 +222,9 @@ def process_views(mdim: Multidim, dependencies: Set[str]):
             )
 
 
-def _upsert_multidim_data_page(mdim_catalog_path: str, mdim: Multidim, owid_env: Optional[OWIDEnv] = None) -> None:
+def _upsert_multidim_data_page(
+    mdim_catalog_path: str, mdim: Multidim, tolerate_extra_indicators: bool, owid_env: Optional[OWIDEnv] = None
+) -> None:
     """Actual upsert to DB."""
     # Ensure we have an environment set
     if owid_env is None:
@@ -226,7 +232,7 @@ def _upsert_multidim_data_page(mdim_catalog_path: str, mdim: Multidim, owid_env:
 
     # Validate config
     mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
-    validate_collection_config(mdim, owid_env.engine)
+    validate_collection_config(mdim, owid_env.engine, tolerate_extra_indicators)
 
     # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
     # TODO: I think we could move this to the Grapher side.

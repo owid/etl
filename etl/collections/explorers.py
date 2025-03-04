@@ -18,6 +18,7 @@ def create_explorer(
     config: dict,
     paths: PathFinder,
     owid_env: Optional[OWIDEnv] = None,
+    tolerate_extra_indicators: bool = False,
 ):
     """TODO: Replicate `etl.collections.multidim.upsert_mdim_data_page`."""
     # Read configuration as structured data
@@ -27,7 +28,7 @@ def create_explorer(
     process_views(explorer, paths.dependencies)
 
     # Create explorer (TODO: this should rather push to DB! As in with `etl.collections.multidim.upsert_mdim_data_page`)
-    return _create_explorer(dest_dir, explorer, owid_env)
+    return _create_explorer(dest_dir, explorer, tolerate_extra_indicators, owid_env)
 
 
 def process_views(
@@ -50,14 +51,19 @@ def process_views(
             view.combine_with_common(explorer.definitions.common_views)
 
 
-def _create_explorer(dest_dir: str, explorer: Explorer, owid_env: Optional[OWIDEnv] = None):
+def _create_explorer(
+    dest_dir: str,
+    explorer: Explorer,
+    tolerate_extra_indicators: bool,
+    owid_env: Optional[OWIDEnv] = None,
+):
     # Ensure we have an environment set
     if owid_env is None:
         owid_env = OWID_ENV
 
     # Validate config
     # TODO: explorer.validate_schema(SCHEMAS_DIR / "explorer-schema.json")
-    validate_collection_config(explorer, owid_env.engine)
+    validate_collection_config(explorer, owid_env.engine, tolerate_extra_indicators)
 
     # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
     # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
@@ -109,8 +115,8 @@ def extract_explorer_views(
 
         # Build record
         record = {
-            **dimensions,
             **indicators,
+            **dimensions,
             **config,
         }
 
@@ -130,7 +136,7 @@ def bake_dimensions_view(dimensions_display, view) -> Dict[str, str]:
     view_dimensions = {}
     for slug_dim, slug_choice in view.dimensions.items():
         widget_name = dimensions_display[slug_dim]["widget_name"]
-        view_dimensions[widget_name] = dimensions_display[slug_dim]["choices"][str(slug_choice)]
+        view_dimensions[widget_name] = dimensions_display[slug_dim]["choices"][slug_choice]
     return view_dimensions
 
 
@@ -142,6 +148,9 @@ def bake_indicators_view(view) -> Dict[str, List[str]]:
     indicators = defaultdict(list)
     for indicator in indicator_paths:
         for dim in CHART_DIMENSIONS:
+            if indicator["dimension"] == "y":
+                indicators[f"{dim}VariableIds"].append(indicator["path"])
+                break
             if indicator["dimension"] == dim:
                 indicators[f"{dim}VariableId"].append(indicator["path"])
                 break
