@@ -10,9 +10,8 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Union
 
 import pandas as pd
 import structlog
-from jsonschema import validate
 from owid import catalog
-from owid.catalog import CHANNEL, DatasetMeta, Table, warnings
+from owid.catalog import CHANNEL, DatasetMeta, Table
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
@@ -27,96 +26,15 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
-from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.dag_helpers import load_dag
 from etl.explorer import Explorer
-from etl.files import get_schema_from_url
+from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
 
 log = structlog.get_logger()
 
 
-# TODO: Move to etl.grapher.helpers
-def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
-    """Check that the table is in the correct format for Grapher."""
-    from etl.grapher import helpers as gh
-
-    assert ds.metadata.title, "Dataset must have a title."
-
-    for tab in ds:
-        if {"year", "country"} <= set(tab.all_columns):
-            if "year" in tab.columns:
-                year = tab["year"]
-            else:
-                year = tab.index.get_level_values("year")
-            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
-        elif {"date", "country"} <= set(tab.all_columns):
-            pass
-        else:
-            raise AssertionError("Table must have columns country and year or date.")
-
-        for col in tab:
-            if col in ("year", "country"):
-                continue
-            catalog.utils.validate_underscore(col)
-            assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
-            assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
-            assert (
-                tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
-            ), f"Column `{col}` must have either sources or origins"
-
-            _validate_description_key(tab[col].m.description_key, col)
-            _validate_ordinal_variables(tab, col)
-            _validate_grapher_config(tab, col)
-
-            # Data Page title uses the following fallback
-            # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
-            # the Table tab
-            # [title_public > display.name > title] - [title_variant] - [attribution_short]
-            # and chart heading
-            # [grapher_config.title > title_public > display.name > title] - [grapher_config.subtitle > description_short]
-            #
-            # Warn if display.name (which is used for legend) exists and there's no title_public set. This
-            # would override the indicator title in the Data Page.
-            display_name = (tab[col].m.display or {}).get("name")
-            title_public = getattr(tab[col].m.presentation, "title_public", None)
-            if warn_title_public and display_name and not title_public:
-                warnings.warn(
-                    f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
-                    warnings.DisplayNameWarning,
-                )
-
-
-def _validate_grapher_config(tab: Table, col: str) -> None:
-    """Validate grapher config against given schema or against the default schema."""
-    grapher_config = getattr(tab[col].m.presentation, "grapher_config", None)
-    if grapher_config:
-        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
-
-        # Load schema and remove properties that are not relevant for the validation
-        schema = get_schema_from_url(grapher_config["$schema"])
-        # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
-        schema["required"] = []
-
-        validate(grapher_config, schema)
-
-
-def _validate_description_key(description_key: list[str], col: str) -> None:
-    if description_key:
-        assert not all(
-            len(x) == 1 for x in description_key
-        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
-
-
-def _validate_ordinal_variables(tab: Table, col: str) -> None:
-    if tab[col].m.sort:
-        # Exclude NaN values, these will be dropped before inserting to the database.
-        vals = tab[col].dropna()
-
-        extra_values = set(vals) - set(vals.m.sort)
-        assert (
-            not extra_values
-        ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
+__all__ = ["grapher_checks"]
 
 
 def _set_metadata_from_dest_dir(ds: catalog.Dataset, dest_dir: Union[str, Path]) -> catalog.Dataset:
