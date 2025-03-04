@@ -1,4 +1,7 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+Adapted from Ed's original code.
+"""
 
 import owid.catalog.processing as pr
 

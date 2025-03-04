@@ -1,6 +1,6 @@
 """Script to create a snapshot of dataset.
 
-Adapted from Ed's original code.
+-Adapted from Ed's original code.
 
 NOTE: The date_published can be found in:
 https://www.unoosa.org/oosa/en/spaceobjectregister/index.html
@@ -9,6 +9,7 @@ See "Registration Submissions Update" right above the list of updates.
 """
 
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import click
@@ -21,18 +22,55 @@ from etl.snapshot import Snapshot
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
-# URL to fetch data from.
-URL = 'https://www.unoosa.org/oosa/osoindex/waxs-search.json?criteria={"filters":[],"startAt":0,"sortings":[{"fieldName":"object.launch.dateOfLaunch_s1","dir":"desc"}]}'
+# Base URL to fetch data.
+BASE_URL = 'https://www.unoosa.org/oosa/osoindex/waxs-search.json?criteria={"filters":[],"startAt":%d,"sortings":[{"fieldName":"object.launch.dateOfLaunch_s1","dir":"desc"}]}'
+
+# Maximum number of concurrent threads.
+MAX_WORKERS = 8
 
 
-def get_rows(offset):
-    url = URL.replace('"startAt":0', '"startAt":' + str(offset))
-    try:
-        data = requests.get(url).json()
-    except Exception:
-        time.sleep(10)
-        data = requests.get(url).json()
-    return pd.DataFrame.from_records([result["values"] for result in data["results"]])
+def get_rows(offset, session):
+    """Fetch data for a specific offset using a persistent session."""
+    url = BASE_URL % offset
+    retries = 3
+    for attempt in range(retries):
+        try:
+            response = session.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            return pd.DataFrame.from_records([result["values"] for result in data["results"]])
+        except requests.exceptions.RequestException:
+            if attempt < retries - 1:
+                time.sleep(2**attempt)
+            else:
+                return pd.DataFrame()
+
+
+def fetch_data_in_parallel():
+    # Create a session for faster, persistent requests.
+    with requests.Session() as session:
+        # Get total number of objects.
+        response = session.get(BASE_URL % 0, timeout=10)
+        response.raise_for_status()
+        n_objects = response.json()["found"]
+
+        # Generate list of offsets.
+        offsets = list(range(0, n_objects + 1, 15))
+
+        # Fetch data in parallel.
+        data_frames = []
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            future_to_offset = {executor.submit(get_rows, offset, session): offset for offset in offsets}
+            for future in tqdm(as_completed(future_to_offset), total=len(offsets), desc="Fetching data"):
+                data_frames.append(future.result())
+
+        # Combine all results.
+        data = pd.concat(data_frames, ignore_index=True)
+
+        # Ensure data integrity.
+        assert len(data) == n_objects, "Fetched data does not match the expected number of objects."
+
+    return data
 
 
 @click.command()
@@ -41,16 +79,8 @@ def main(upload: bool) -> None:
     # Initialize a new snapshot.
     snap = Snapshot(f"space/{SNAPSHOT_VERSION}/object_launches.csv")
 
-    # Get number of objects.
-    n_objects = requests.get(URL).json()["found"]
-
-    # Fetch data
-    data = []
-    for i in tqdm(range(0, n_objects + 1, 15)):
-        data.append(get_rows(i))
-    data = pd.concat(data)
-    error = "Fetched data does not match the expected number of objects."
-    assert len(data) == n_objects, error
+    # Fetch data.
+    data = fetch_data_in_parallel()
 
     # Save snapshot.
     snap.create_snapshot(data=data, upload=upload)

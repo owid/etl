@@ -13,3 +13,7 @@ meta:
     license:
       name: Copyright © United Nations
       url: https://www.unoosa.org/oosa/en/aboutus/terms-of-use.html
+outs:
+  - md5: cc8ae1f1a21d0e14ef591fd2ca439af5
+    size: 6378520
+    path: object_launches.csv
