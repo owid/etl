@@ -6,7 +6,7 @@ import structlog
 import yaml
 
 from etl import paths
-from etl.dag_utils import load_dag
+from etl.dag_helpers import load_dag
 
 log = structlog.get_logger()
 

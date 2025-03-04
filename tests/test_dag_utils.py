@@ -1,7 +1,7 @@
 import tempfile
 from pathlib import Path
 
-from etl.dag_utils import (
+from etl.dag_helpers import (
     get_comments_above_step_in_dag,
     remove_steps_from_dag_file,
     write_to_dag_file,

@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 from etl import paths
 from etl.command import _detect_strictness_level, _grapher_steps
-from etl.dag_utils import load_dag
+from etl.dag_helpers import load_dag
 from etl.steps import DataStep, Step, WaldenStep, compile_steps
 
 

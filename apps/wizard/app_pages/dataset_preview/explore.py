@@ -10,7 +10,7 @@ from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
 from apps.wizard.utils import metadata_export_basic, set_states
 from etl.config import ENV_IS_REMOTE
-from etl.dag_utils import load_dag
+from etl.dag_helpers import load_dag
 from etl.paths import DATA_DIR
 from etl.steps import extract_step_attributes, filter_to_subgraph
 

@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Set, Tuple, cast
 
 from owid.walden import Catalog
 
-from etl.dag_utils import load_dag
+from etl.dag_helpers import load_dag
 from etl.files import checksum_file
 from etl.paths import STEP_DIR
 from etl.scripts.faostat.shared import (

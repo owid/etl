@@ -13,7 +13,7 @@ from structlog import get_logger
 
 import etl.grapher.model as gm
 from apps.wizard.utils.cached import get_datasets_from_version_tracker
-from etl.dag_utils import load_dag
+from etl.dag_helpers import load_dag
 from etl.git_helpers import get_changed_files
 from etl.grapher.io import get_all_datasets
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEP_DIR

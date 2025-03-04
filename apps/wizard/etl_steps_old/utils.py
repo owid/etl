@@ -4,7 +4,7 @@ from typing import Any, List
 import streamlit as st
 
 from apps.wizard.utils import WIZARD_DIR
-from etl.dag_utils import load_dag
+from etl.dag_helpers import load_dag
 from etl.paths import DAG_DIR
 
 

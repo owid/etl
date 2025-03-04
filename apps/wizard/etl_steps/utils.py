@@ -3,7 +3,7 @@ import os
 import streamlit as st
 
 from apps.wizard.utils import WIZARD_DIR
-from etl.dag_utils import load_dag
+from etl.dag_helpers import load_dag
 from etl.files import read_json_schema
 from etl.paths import DAG_DIR, SCHEMAS_DIR
 
