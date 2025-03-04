@@ -3,7 +3,7 @@
 import json
 import tempfile
 import time
-from typing import Optional, Union
+from typing import Optional
 
 import requests
 import slack_sdk.errors as e
