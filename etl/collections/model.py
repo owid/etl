@@ -392,7 +392,6 @@ class Collection(MetaBase):
 
     dimensions: List[Dimension]
     views: List[Any]
-    definitions: Optional[Definitions]
 
     @property
     def v(self):
@@ -466,6 +465,7 @@ class Explorer(Collection):
 
     views: List[ExplorerView]
     config: Dict[str, str]
+    definitions: Optional[Definitions] = None
 
     def display_config_names(self):
         """Get display names for all dimensions and choices.
@@ -503,6 +503,7 @@ class Multidim(Collection):
     title: Dict[str, str]
     defaultSelection: List[str]
     topicTags: Optional[List[str]] = None
+    definitions: Optional[Definitions] = None
 
 
 # def main():
