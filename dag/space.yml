@@ -27,3 +27,18 @@ steps:
     - data://meadow/space/2024-08-16/space_track
   data://grapher/space/2024-08-16/space_track:
     - data://garden/space/2024-08-16/space_track
+  #
+  # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
+  #
+  data://meadow/space/2025-03-04/near_earth_asteroids:
+    - snapshot://space/2025-03-04/near_earth_asteroids.csv
+  #
+  # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
+  #
+  data://garden/space/2025-03-04/near_earth_asteroids:
+    - data://meadow/space/2025-03-04/near_earth_asteroids
+  #
+  # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
+  #
+  data://grapher/space/2025-03-04/near_earth_asteroids:
+    - data://garden/space/2025-03-04/near_earth_asteroids
