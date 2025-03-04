@@ -1,0 +1,34 @@
+{
+  "name": "run-until-cursor",
+  "displayName": "Run Until Cursor",
+  "description": "Executes lines inside `run()` up to the cursor in the Interactive Window.",
+  "version": "0.0.1",
+  "publisher": "owid",
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.runUntilCursor"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.runUntilCursor",
+        "title": "Run Until Cursor",
+        "category": "Python"
+      }
+    ]
+  },
+  "main": "./dist/extension.js",
+  "scripts": {
+    "compile": "node esbuild.config.js",
+    "watch": "node esbuild.config.js --watch"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.97.0",
+    "esbuild": "^0.19.2"
+  }
+}
