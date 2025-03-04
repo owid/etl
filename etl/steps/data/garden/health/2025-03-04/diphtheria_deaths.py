@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb_phr = ds_meadow_phr.read("diphtheria_deaths")
     tb_census = ds_meadow_census.read("diphtheria_deaths")
-    tb_who = ds_meadow_who.read("mortality_database_vaccine_preventable")
+    tb_who = ds_meadow_who.read("mortality_database_vaccine_preventable", reset_metadata="keep_origins")
     tb_who = clean_who_mortality_data(tb_who)
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
 
