@@ -1,7 +1,7 @@
 import re
 from collections import defaultdict
 from copy import deepcopy
-from typing import Dict, List, Set
+from typing import Any, Dict, List, Set
 
 from owid.catalog import Dataset, Table
 
@@ -55,7 +55,7 @@ def validate_indicators_in_db(indicators, engine):
         raise ValueError(f"Missing indicators in DB: {missing_indicators}")
 
 
-def merge_common_metadata_by_dimension(common_params, view_dimensions, view_params, field_name):
+def merge_common_metadata_by_dimension(common_params, view_dimensions: Dict[str, Any], view_params, field_name: str):
     """
     Merge metadata entries with dimension-based inheritance and deep merging.
     Resolves conflicts by specificity and raises an error for any unresolved conflicts.
