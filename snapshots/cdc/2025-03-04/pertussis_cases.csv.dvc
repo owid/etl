@@ -5,62 +5,23 @@ meta:
     # Data product / Snapshot
     title: Historical pertussis cases in the United States - Centers for Disease Control and Prevention
     description: |-
-      Data on historical pertussisa cases in the United States, compiled from a selection of sources from the US CDC.
+      Data on historical pertussisa cases in the United States from 1922 onwards, as reported by the Centers for Disease Control and Prevention. The data is sourced from the CDC's Summary of Notifiable Diseases, which is published annually.
 
-      Sources for each year are as follows:
-
-      * 1944-1993: [MMWR Summary of Notifiable Diseases, United States, 1993](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
-
-      * 1994: [MMWR, Summary of Notifiable Diseases, United States, 1994](https://www.cdc.gov/mmwr/preview/mmwrhtml/00039679.htm)
-
-      * 1995: [MMWR, Summary of Notifiable Diseases, United States, 1995](https://www.cdc.gov/mmwr/preview/mmwrhtml/00044418.htm)
-
-      * 1996: [MMWR, Summary of Notifiable Diseases, United States, 1996](https://www.cdc.gov/mmwr/preview/mmwrhtml/00050719.htm)
-
-      * 1997: [MMWR, Summary of Notifiable Diseases, United States, 1997](https://www.cdc.gov/mmwr/preview/mmwrhtml/00056071.htm)
-
-      * 1998: [MMWR, Summary of Notifiable Diseases, United States, 1998](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm4753a1.htm)
-
-      * 1999: [MMWR, Summary of Notifiable Diseases, United States, 1999](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm4853a1.htm)
-
-      * 2000: [MMWR, Summary of Notifiable Diseases, United States, 2000](https://www.jstor.org/stable/23310295)
-
-      * 2001-2006: [MMWR, Summary of Notifiable Diseases, United States, 2006](https://www.jstor.org/stable/23317332)
-
-      * 2007: [MMWR, Summary of Notifiable Diseases, United States, 2007](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5653a1.htm)
-
-      * 2008: [MMWR, Summary of Notifiable Diseases, United States, 2008](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5754a1.htm)
-
-      * 2009: [MMWR, Summary of Notifiable Diseases, United States, 2009](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm)
-
-      * 2010: [MMWR, Summary of Notifiable Diseases, United States, 2010](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5953a1.htm)
-
-      * 2011: [MMWR, Summary of Notifiable Diseases, United States, 2011](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6053a1.htm)
-
-      * 2012: [MMWR, Summary of Notifiable Diseases, United States, 2012](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6153a1.htm)
-
-      * 2013: [MMWR, Summary of Notifiable Diseases, United States, 2013](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6253a1.htm)
-
-      * 2014: [MMWR, Summary of Notifiable Diseases, United States, 2014](https://www.cdc.gov/mmwr/volumes/63/wr/mm6354a1.htm
-
-      * 2015: [MMWR, Summary of Notifiable Diseases, United States, 2015](https://www.cdc.gov/mmwr/volumes/64/wr/mm6453a1.htm)
-
-      * 2016-2022: National Notifiable Diseases Surveillance System Annual Summary - CDC WONDER
     date_published: "2023"
     # Citation
     producer: Centers for Disease Control and Prevention
     citation_full: |2-
 
-      Summary of Notifiable Diseases, Centers for Disease Control and Prevention, United States, (1993-2022).
+      Pertussis Cases by Year (1922-2022), Centers for Disease Control and Prevention, United States (2023).
 
     # Files
-    url_main: https://wonder.cdc.gov/nndss-annual-summary.html
+    url_main: https://www.cdc.gov/pertussis/php/surveillance/pertussis-cases-by-year.html
     date_accessed: 2025-03-04
 
     # License
     license:
       name: Public domain
 outs:
-  - md5: d9491c7a3303dafe5550026fca72f173
-    size: 5693
+  - md5: e985cc5dffd596ac4866502b2666f6f6
+    size: 1411
     path: pertussis_cases.csv
