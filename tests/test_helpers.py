@@ -5,7 +5,6 @@ from owid import catalog
 from etl import paths
 from etl.helpers import (
     PathFinder,
-    _validate_description_key,
     create_dataset,
 )
 
@@ -88,23 +87,3 @@ def test_PathFinder_with_private_steps():
     }
     assert pf.step == "data-private://garden/namespace/2023/name"
     assert pf.get_dependency_step_name("name") == "snapshot-private://namespace/2023/name"
-
-
-def test__validate_description_key():
-    # Test case 2: description_key with all single-character strings
-    description_key = ["a", "b", "c"]
-    col = "column2"
-    try:
-        _validate_description_key(description_key, col)
-    except AssertionError as e:
-        assert str(e) == f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
-    else:
-        assert False, "AssertionError not raised for description_key with all single-character strings"
-
-    # Test case 3: Valid description_key
-    description_key = ["key1", "key2", "key3"]
-    col = "column3"
-    try:
-        _validate_description_key(description_key, col)
-    except AssertionError:
-        assert False, f"AssertionError raised for valid description_key: {description_key}"
