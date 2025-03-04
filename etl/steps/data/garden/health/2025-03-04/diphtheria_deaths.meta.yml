@@ -12,7 +12,7 @@ dataset:
   title: Long-run deaths from diphtheria in the United States
 
 tables:
-  measles_deaths_long_run:
+  diphtheria_deaths:
     variables:
       deaths:
         title: Diphtheria deaths

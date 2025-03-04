@@ -28,7 +28,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    tb = pr.concat([tb_phr, tb_census, tb_who], short_name="diphtheria_deaths_long_run", ignore_index=True)
+    tb = pr.concat([tb_phr, tb_census, tb_who], short_name="diphtheria_deaths", ignore_index=True)
 
     tb = pr.merge(
         tb,
