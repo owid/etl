@@ -29,7 +29,7 @@ def run(dest_dir: str) -> None:
     )
     tb["case_rate"] = tb["cases"] / tb["population"] * 100000
 
-    tb = tb.drop(columns=["population", "source_x", "source_y", "world_pop_share"])
+    tb = tb.drop(columns=["population", "source", "world_pop_share"])
     tb = tb.format(["country", "year"])
 
     #
