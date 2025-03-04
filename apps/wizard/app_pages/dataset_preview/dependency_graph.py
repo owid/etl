@@ -9,7 +9,8 @@ from typing import Any, Dict, List, cast
 import streamlit as st
 from streamlit_agraph import Config, Edge, Node, agraph
 
-from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
+from etl.dag_helpers import load_dag
+from etl.steps import extract_step_attributes, filter_to_subgraph
 
 COLORS = {
     "snapshot": "#FC9090",

@@ -15,7 +15,7 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collections.common import validate_collection_config
+from etl.collections.common import map_indicator_path_to_id, validate_collection_config
 from etl.collections.model import Multidim
 from etl.collections.utils import (
     get_tables_by_name_mapping,
@@ -23,7 +23,7 @@ from etl.collections.utils import (
 )
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher.io import trim_long_variable_name
-from etl.helpers import PathFinder, map_indicator_path_to_id
+from etl.helpers import PathFinder
 from etl.paths import SCHEMAS_DIR
 
 # Initialize logger.
