@@ -64,7 +64,7 @@ unittest: .venv
 	@echo '==> Running unit tests'
 	.venv/bin/pytest -m "not integration" tests
 
-test: check-formatting check-linting check-typing unittest version-tracker
+test: check-formatting check-linting check-typing unittest install-extensions version-tracker
 
 test-integration: .venv
 	@echo '==> Running integration tests'
@@ -145,3 +145,20 @@ fasttrack: .venv
 wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	.venv/bin/etlwiz
+
+install-extensions:
+	@echo '==> Checking and installing required VS Code extensions'
+	@if command -v code > /dev/null; then \
+		EXTENSIONS="ms-toolsai.jupyter owid.run-until-cursor"; \
+		for EXT in $$EXTENSIONS; do \
+			if ! code --list-extensions | grep -q "$$EXT"; then \
+				if [ "$$EXT" = "owid.run-until-cursor" ]; then \
+					code --install-extension vscode_extensions/run-until-cursor/install/run-until-cursor-0.0.1.vsix; \
+				else \
+					code --install-extension $$EXT; \
+				fi; \
+			fi; \
+		done; \
+	else \
+		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
+	fi
