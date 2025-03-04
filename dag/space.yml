@@ -51,3 +51,18 @@ steps:
   #
   data://grapher/space/2025-03-04/exoplanets:
     - data://garden/space/2025-03-04/exoplanets
+  #
+  # United States Space Force - Number of objects in space
+  #
+  data://meadow/space/2025-03-04/space_track:
+    - snapshot://space/2025-03-04/space_track.csv
+  #
+  # United States Space Force - Number of objects in space
+  #
+  data://garden/space/2025-03-04/space_track:
+    - data://meadow/space/2025-03-04/space_track
+  #
+  # United States Space Force - Number of objects in space
+  #
+  data://grapher/space/2025-03-04/space_track:
+    - data://garden/space/2025-03-04/space_track
