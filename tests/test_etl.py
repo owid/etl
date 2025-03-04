@@ -12,7 +12,8 @@ from unittest.mock import patch
 
 from etl import paths
 from etl.command import _detect_strictness_level, _grapher_steps
-from etl.steps import DataStep, Step, WaldenStep, compile_steps, load_dag
+from etl.dag_utils import load_dag
+from etl.steps import DataStep, Step, WaldenStep, compile_steps
 
 
 def test_all_walden_deps_exist():

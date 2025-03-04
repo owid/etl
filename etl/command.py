@@ -25,13 +25,13 @@ import structlog
 from ipdb import launch_ipdb_on_exception
 
 from etl import config, files, paths
+from etl.dag_utils import load_dag
 from etl.steps import (
     DAG,
     DataStep,
     GrapherStep,
     Step,
     compile_steps,
-    load_dag,
     parse_step,
     select_dirty_steps,
 )

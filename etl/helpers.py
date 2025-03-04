@@ -34,10 +34,10 @@ from sqlalchemy.orm import Session
 import etl.grapher.model as gm
 from etl import paths
 from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
+from etl.dag_utils import load_dag
 from etl.db import get_engine
 from etl.explorer import Explorer
 from etl.snapshot import Snapshot, SnapshotMeta
-from etl.steps import load_dag
 
 log = structlog.get_logger()
 

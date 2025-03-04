@@ -20,8 +20,8 @@ from rich.panel import Panel
 from rich.syntax import Syntax
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
+from etl.dag_utils import load_dag
 from etl.files import yaml_dump
-from etl.steps import load_dag
 from etl.tempcompare import series_equals
 
 log = structlog.get_logger()

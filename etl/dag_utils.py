@@ -1,11 +1,13 @@
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Union
 
+import yaml
 from structlog import get_logger
 
 from etl import paths
 
 log = get_logger()
+Graph = Dict[str, Set[str]]
 
 
 def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
@@ -288,3 +290,45 @@ def create_dag_archive_file(dag_file_archive: Path) -> None:
     dag_file_archive_relative = dag_file_archive.relative_to(Path(paths.DAG_DIR).parent)
     with open(paths.DAG_ARCHIVE_FILE, "a") as file:
         file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")
+
+
+def load_dag(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> Graph:
+    return _load_dag(filename, {})
+
+
+def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
+    """
+    Recursive helper to 1) load a dag itself, and 2) load any sub-dags
+    included in the dag via 'include' statements
+    """
+    dag_yml = _load_dag_yaml(str(filename))
+    curr_dag = _parse_dag_yaml(dag_yml)
+
+    # make sure there are no fast-track steps in the DAG
+    if "fasttrack.yml" not in str(filename):
+        fast_track_steps = {step for step in curr_dag if "/fasttrack/" in step}
+        if fast_track_steps:
+            raise ValueError(f"Fast-track steps detected in DAG {filename}: {fast_track_steps}")
+
+    duplicate_steps = prev_dag.keys() & curr_dag.keys()
+    if duplicate_steps:
+        raise ValueError(f"Duplicate steps detected in DAG {filename}: {duplicate_steps}")
+
+    curr_dag.update(prev_dag)
+
+    for sub_dag_filename in dag_yml.get("include", []):
+        sub_dag = _load_dag(paths.BASE_DIR / sub_dag_filename, curr_dag)
+        curr_dag.update(sub_dag)
+
+    return curr_dag
+
+
+def _load_dag_yaml(filename: str) -> Dict[str, Any]:
+    with open(filename) as istream:
+        return yaml.safe_load(istream)
+
+
+def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
+    steps = dag["steps"] or {}
+
+    return {node: set(deps) if deps else set() for node, deps in steps.items()}

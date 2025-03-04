@@ -15,6 +15,7 @@ from typing import Dict, List, Optional, Set, Tuple, cast
 
 from owid.walden import Catalog
 
+from etl.dag_utils import load_dag
 from etl.files import checksum_file
 from etl.paths import STEP_DIR
 from etl.scripts.faostat.shared import (
@@ -31,7 +32,6 @@ from etl.scripts.faostat.shared import (
     log,
 )
 from etl.snapshot import snapshot_catalog
-from etl.steps import load_dag
 
 
 def get_channel_from_dag_line(dag_line: str) -> str:
