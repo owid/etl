@@ -20,12 +20,18 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"cdc/{SNAPSHOT_VERSION}/measles_cases.json")
     date = get_date_of_update()
-    # Update the metadata.
+    # Download data from source, add file to DVC and upload to S3.
+    # snap.create_snapshot(upload=upload)
+    snap = modify_metadata(snap, date)
+    # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
+    snap.dvc_add(upload=upload)
+
+
+def modify_metadata(snap: Snapshot, date: str) -> Snapshot:
     snap.metadata.origin.date_published = date  # type: ignore
     snap.metadata.origin.date_accessed = dt.date.today()  # type: ignore
-
-    # Download data from source, add file to DVC and upload to S3.
-    snap.create_snapshot(upload=upload)
+    snap.metadata.save()
+    return snap
 
 
 def get_date_of_update() -> str:
@@ -42,7 +48,6 @@ def get_date_of_update() -> str:
     date_element = div.find("p")
     if date_element:
         date_text = date_element.get_text(strip=True)
-        print(date_text)
         date_str = date_text.lower().replace("as of ", "").title()  # "February 6, 2025"
     else:
         print("Could not find the <p> tag in the target div.")
