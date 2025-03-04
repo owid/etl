@@ -1,0 +1,25 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Space Exploration & Satellites
+    processing_level: major
+    unit: exoplanets
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+
+tables:
+  exoplanets:
+    variables:
+      n_planets:
+        title: Number of exoplanets discovered
+        description_short: |-
+          Number of exoplanets discovered by different methods.
+      n_planets_cumulative:
+        title: Cumulative number of exoplanets discovered
+        description_short: |-
+          Cumulative number of exoplanets discovered by different methods.

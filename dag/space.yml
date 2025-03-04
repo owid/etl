@@ -43,3 +43,18 @@ steps:
   #
   data://grapher/space/2025-03-04/object_launches:
     - data://garden/space/2025-03-04/object_launches
+  #
+  # NASA - Exoplanets
+  #
+  data://meadow/space/2025-03-04/exoplanets:
+    - snapshot://space/2025-03-04/exoplanets.csv
+  #
+  # NASA - Exoplanets
+  #
+  data://garden/space/2025-03-04/exoplanets:
+    - data://meadow/space/2025-03-04/exoplanets
+  #
+  # NASA - Exoplanets
+  #
+  data://grapher/space/2025-03-04/exoplanets:
+    - data://garden/space/2025-03-04/exoplanets
