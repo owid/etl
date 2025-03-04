@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  pertussis_cases:
+    variables:
+      cases:
+        title: Pertussis cases
+        unit: cases
+        description_short: Reported number of [pertussis](#dod:pertussis) cases in the United States.
+        display:
+          numDecimalPlaces: 0
+      case_rate:
+        title: Pertussis rate
+        unit: cases per 100,000 people
+        description_short: Reported number of [pertussis](#dod:pertussis) deaths in the United States per million people.
+        display:
+          numDecimalPlaces: 1
