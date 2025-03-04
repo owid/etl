@@ -44,8 +44,8 @@ def get_data() -> pd.DataFrame:
         columns = row.find_all("td")
         if columns:
             year = row.find("th").text.strip()  # Year is in <th>
-            cases = columns[0].text.strip()  # Pertussis cases
-            data.append([year, cases])
+            cases = columns[0].text.strip().replace(",", "")  # Remove commas from numbers
+            data.append([year, int(cases)])
 
     # Create a DataFrame
     df = pd.DataFrame(data, columns=headers)
