@@ -14,8 +14,6 @@ from apps.wizard.app_pages.similar_charts.data import get_raw_charts
 from etl.config import OWID_ENV, SLACK_API_TOKEN
 from etl.slack_helpers import send_slack_message
 
-CHANNEL_NAME = "#lucas-playground"
-SLACK_USERNAME = "housekeeper"
 log = get_logger()
 
 
@@ -34,7 +32,8 @@ def send_slack_chart_review(channel_name: str, slack_username: str, icon_emoji: 
     # DEBUGGING:
     # 2582 (wordpress link), 1609 (no references), 5689 (explorer, no post), 4288 (explorer, wp post), 2093 (no explorer, post), 3475 (explorer, post), (explorer, post + wp)
     # chart = df[df.chart_id == 3475].iloc[0]
-    chart = df.iloc[0]
+    # chart = df.iloc[0]
+    log.info(f"Selected chart: {chart['chart_id']}, {chart['slug']}")
 
     # Get references
     refs = get_references(chart["chart_id"])
@@ -201,7 +200,7 @@ def _get_main_message_usage(chart, refs):
 
     This includes chart views, and references to chart (from explorers and posts).
     """
-    msg_chart_views = f"{chart['views_365d']} views last year"
+    msg_chart_views = f"{chart['views_365d']:.0f} views last year"
 
     num_posts = len(refs.get("postsGdocs", [])) + len(refs.get("postsWordpress", []))
     num_explorers = len(refs.get("explorers", []))
