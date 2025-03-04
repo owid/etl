@@ -1,5 +1,4 @@
 """Common operations performed on tables and variables."""
-from pandas import to_datetime
 
 from .tables import (
     ExcelFile,
@@ -23,6 +22,7 @@ from .tables import (
     read_rda_multiple,
     read_rds,
     read_stata,
+    to_datetime,
     to_numeric,
 )
 
