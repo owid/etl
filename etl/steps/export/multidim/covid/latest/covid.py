@@ -15,8 +15,6 @@ MOBILITY_CONFIG_DEFAULT = {
     "addCountryMode": "change-country",
 }
 
-print(2)
-
 
 def run(dest_dir: str) -> None:
     # PART 1: MDIMs entirely from YAML files
