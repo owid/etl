@@ -1,11 +1,12 @@
 definitions:
-  config: &config
-    tab: map
-    originUrl: ourworldindata.org/coronavirus
-    hideAnnotationFieldsInTitle:
-      entity: true
-      time: true
-      changeInPrefix: true
+  common_views:
+    - config:
+        tab: map
+        originUrl: ourworldindata.org/coronavirus
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
 
 title:
   title: COVID-19 confirmed cases
@@ -47,35 +48,29 @@ views:
       metric: absolute
     indicators:
       y: "cases_deaths#weekly_cases"
-    config: *config
   - dimensions:
       period: weekly
       metric: per_capita
     indicators:
       y: "cases_deaths#weekly_cases_per_million"
-    config: *config
   - dimensions:
       period: weekly
       metric: change
     indicators:
       y: "cases_deaths#weekly_pct_growth_cases"
-    config: *config
 
   - dimensions:
       period: biweekly
       metric: absolute
     indicators:
       y: "cases_deaths#biweekly_cases"
-    config: *config
   - dimensions:
       period: biweekly
       metric: per_capita
     indicators:
       y: "cases_deaths#biweekly_cases_per_million"
-    config: *config
   - dimensions:
       period: biweekly
       metric: change
     indicators:
       y: "cases_deaths#biweekly_pct_growth_cases"
-    config: *config

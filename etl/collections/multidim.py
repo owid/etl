@@ -5,29 +5,23 @@
 - We should try to keep explorers in mind, and see this tooling as something we may want to use for them, too.
 """
 
-import json
 from copy import deepcopy
 from itertools import product
 from typing import Any, Dict, List, Optional, Set, Union
 
-import fastjsonschema
 import pandas as pd
-import yaml
 from deprecated import deprecated
 from owid.catalog import Table
-from sqlalchemy.engine import Engine
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
+from etl.collections.common import validate_collection_config
+from etl.collections.model import Multidim
 from etl.collections.utils import (
-    expand_catalog_paths,
-    extract_catalog_path,
-    get_indicators_in_view,
     get_tables_by_name_mapping,
     records_to_dictionary,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.db import read_sql
 from etl.grapher.io import trim_long_variable_name
 from etl.helpers import PathFinder, map_indicator_path_to_id
 from etl.paths import SCHEMAS_DIR
@@ -35,9 +29,10 @@ from etl.paths import SCHEMAS_DIR
 # Initialize logger.
 log = get_logger()
 # Dimensions: These are the expected possible dimensions
-DIMENSIONS = ["y", "x", "size", "color"]
+CHART_DIMENSIONS = ["y", "x", "size", "color"]
 
 
+# TODO: Return List[Dimensions] and List[Views] instead of {"dimensions": [...], "views": [...]}
 def expand_config(
     tb: Table,
     indicator_name: Optional[str] = None,
@@ -147,7 +142,7 @@ def expand_config(
     # Initiate expander object
     expander = MDIMConfigExpander(tb, indicator_name)
 
-    # EXPAND DIMENSIONS
+    # EXPAND CHART_DIMENSIONS
     config_partial["dimensions"] = expander.build_dimensions(
         dimensions=dimensions,
     )
@@ -161,7 +156,11 @@ def expand_config(
 
 
 def upsert_multidim_data_page(
-    config: dict, paths: PathFinder, mdim_name: Optional[str] = None, owid_env: Optional[OWIDEnv] = None
+    config: dict,
+    paths: PathFinder,
+    mdim_name: Optional[str] = None,
+    tolerate_extra_indicators: bool = False,
+    owid_env: Optional[OWIDEnv] = None,
 ) -> None:
     """Import MDIM config to DB.
 
@@ -182,16 +181,19 @@ def upsert_multidim_data_page(
     dependencies = paths.dependencies
     mdim_catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{mdim_name or paths.short_name}"
 
+    # Read config as structured object
+    mdim = Multidim.from_dict(config)
+
     # Edit views
-    process_mdim_views(config, dependencies=dependencies)
+    process_views(mdim, dependencies=dependencies)
 
     # TODO: Possibly add other edits (to dimensions?)
 
     # Upsert to DB
-    _upsert_multidim_data_page(mdim_catalog_path, config, owid_env)
+    _upsert_multidim_data_page(mdim_catalog_path, mdim, tolerate_extra_indicators, owid_env)
 
 
-def process_mdim_views(config: dict, dependencies: Set[str]):
+def process_views(mdim: Multidim, dependencies: Set[str]):
     """Process views in MDIM configuration.
 
     This includes:
@@ -203,34 +205,38 @@ def process_mdim_views(config: dict, dependencies: Set[str]):
     # tables_by_uri = get_tables_by_uri_mapping(tables_by_name)  # This is to be used when processing views with multiple indicators
 
     # Go through all views and expand catalog paths
-    for view in config["views"]:
+    for view in mdim.views:
         # Update indicators for each dimension, making sure they have the complete URI
-        expand_catalog_paths(view, tables_by_name=tables_by_name)
+        view.expand_paths(tables_by_name)
+
+        # Combine metadata/config with definitions.common_views
+        if (mdim.definitions is not None) and (mdim.definitions.common_views is not None):
+            view.combine_with_common(mdim.definitions.common_views)
 
         # Combine metadata in views which contain multiple indicators
-        indicators = get_indicators_in_view(view)
-        if (len(indicators) > 1) and ("metadata" not in view):  # Check if view "contains multiple indicators"
+        if view.metadata_is_needed:  # Check if view "contains multiple indicators"
             # TODO
             # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
             log.info(
-                f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view['dimensions']}"
+                f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view.dimensions}"
             )
-            pass
 
 
-def _upsert_multidim_data_page(mdim_catalog_path: str, config: dict, owid_env: Optional[OWIDEnv] = None) -> None:
+def _upsert_multidim_data_page(
+    mdim_catalog_path: str, mdim: Multidim, tolerate_extra_indicators: bool, owid_env: Optional[OWIDEnv] = None
+) -> None:
     """Actual upsert to DB."""
     # Ensure we have an environment set
     if owid_env is None:
         owid_env = OWID_ENV
 
     # Validate config
-    validate_schema(config)
-    validate_multidim_config(config, owid_env.engine)
+    mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
+    validate_collection_config(mdim, owid_env.engine, tolerate_extra_indicators)
 
     # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
     # TODO: I think we could move this to the Grapher side.
-    config = replace_catalog_paths_with_ids(config)
+    config = replace_catalog_paths_with_ids(mdim.to_dict())
 
     # Upsert config via Admin API
     admin_api = AdminAPI(owid_env)
@@ -273,92 +279,6 @@ def get_tables_by_uri_mapping(tables_by_name: Dict[str, List[Table]]) -> Dict[st
             uri = table.dataset.uri + "/" + table_name
             mapping[uri] = table
     return mapping
-
-
-def validate_schema(config: dict) -> None:
-    schema_path = SCHEMAS_DIR / "multidim-schema.json"
-    with open(schema_path) as f:
-        schema = json.load(f)
-
-    validator = fastjsonschema.compile(schema)
-
-    try:
-        validator(config)  # type: ignore
-    except fastjsonschema.JsonSchemaException as e:
-        raise ValueError(f"Config validation error: {e.message}")  # type: ignore
-
-
-def validate_multidim_config(config: dict, engine: Engine) -> None:
-    # Ensure that all views are in choices
-    for dim in config["dimensions"]:
-        allowed_slugs = [choice["slug"] for choice in dim["choices"]]
-
-        for view in config["views"]:
-            for dim_name, dim_value in view["dimensions"].items():
-                if dim_name == dim["slug"] and dim_value not in allowed_slugs:
-                    raise ValueError(
-                        f"Slug `{dim_value}` does not exist in dimension `{dim_name}`. View:\n\n{yaml.dump(view)}"
-                    )
-
-    # Get all used indicators
-    indicators = []
-    for view in config["views"]:
-        # Get indicators from dimensions
-        indicators_view = get_indicators_in_view(view)
-        indicators_view = [ind["path"] for ind in indicators_view]
-        indicators_extra = []
-
-        # Get indicators from sortColumnSlug
-        if "config" in view:
-            if "sortColumnSlug" in view["config"]:
-                indicators_extra.append(extract_catalog_path(view["config"]["sortColumnSlug"]))
-
-        # Update indicators from map.columnSlug
-        if "config" in view:
-            if "map" in view["config"]:
-                if "columnSlug" in view["config"]["map"]:
-                    indicators_extra.append(extract_catalog_path(view["config"]["map"]["columnSlug"]))
-
-        # All indicators in `indicators_extra` should be in `indicators`! E.g. you can't sort by an indicator that is not in the chart!
-        ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
-        invalid_indicators = set(indicators_extra).difference(set(indicators_view))
-        if invalid_indicators:
-            raise ValueError(
-                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}"
-            )
-
-        indicators.extend(indicators_view)
-
-    # Make sure indicators are unique
-    indicators = list(set(indicators))
-
-    # Validate duplicate views
-    seen_dims = set()
-    for view in config["views"]:
-        dims = tuple(view["dimensions"].items())
-        if dims in seen_dims:
-            raise ValueError(f"Duplicate view:\n\n{yaml.dump(view['dimensions'])}")
-        seen_dims.add(dims)
-
-    # NOTE: this is allowed, some views might contain other views
-    # Check uniqueness
-    # inds = pd.Series(indicators)
-    # vc = inds.value_counts()
-    # if vc[vc > 1].any():
-    #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
-
-    # Check that all indicators exist
-    q = """
-    select
-        id,
-        catalogPath
-    from variables
-    where catalogPath in %(indicators)s
-    """
-    df = read_sql(q, engine, params={"indicators": tuple(indicators)})
-    missing_indicators = set(indicators) - set(df["catalogPath"])
-    if missing_indicators:
-        raise ValueError(f"Missing indicators in DB: {missing_indicators}")
 
 
 def replace_catalog_paths_with_ids(config):
