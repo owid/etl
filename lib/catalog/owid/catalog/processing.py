@@ -1,4 +1,5 @@
 """Common operations performed on tables and variables."""
+from pandas import to_datetime
 
 from .tables import (
     ExcelFile,
@@ -46,6 +47,7 @@ __all__ = [
     "read_rds",
     "read_df",
     "read_parquet",
+    "to_datetime",
     "to_numeric",
     "keep_metadata",
 ]
