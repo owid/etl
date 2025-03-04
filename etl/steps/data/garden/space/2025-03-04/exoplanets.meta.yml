@@ -19,7 +19,8 @@ tables:
         title: Number of exoplanets discovered
         description_short: |-
           Number of exoplanets discovered by different methods.
+          Number of planets discovered outside the Solar System, broken down by their first identification method: [transit](#dod:exoplanet_transit), [radial velocity](#dod:exoplanet_radial_velocity), [microlensing](#dod:exoplanet_microlensing), or other.
       n_planets_cumulative:
         title: Cumulative number of exoplanets discovered
         description_short: |-
-          Cumulative number of exoplanets discovered by different methods.
+          Cumulative number of planets discovered outside the Solar System, broken down by their first identification method: [transit](#dod:exoplanet_transit), [radial velocity](#dod:exoplanet_radial_velocity), [microlensing](#dod:exoplanet_microlensing), or other.
