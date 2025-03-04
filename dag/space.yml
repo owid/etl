@@ -1,11 +1,4 @@
 steps:
-  # Exoplanets (NASA)
-  data://meadow/space/2024-08-16/exoplanets:
-    - snapshot://space/2024-08-16/exoplanets.csv
-  data://garden/space/2024-08-16/exoplanets:
-    - data://meadow/space/2024-08-16/exoplanets
-  data://grapher/space/2024-08-16/exoplanets:
-    - data://garden/space/2024-08-16/exoplanets
   # Number of objects in space (United States Space Force)
   data://meadow/space/2024-08-16/space_track:
     - snapshot://space/2024-08-16/space_track.csv
