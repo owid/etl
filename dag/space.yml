@@ -1,11 +1,4 @@
 steps:
-  # Online Index of Objects Launched into Outer Space
-  data://meadow/space/2024-01-04/object_launches:
-    - snapshot://space/2024-01-04/object_launches.csv
-  data://garden/space/2024-01-04/object_launches:
-    - data://meadow/space/2024-01-04/object_launches
-  data://grapher/space/2024-01-04/object_launches:
-    - data://garden/space/2024-01-04/object_launches
   # Exoplanets (NASA)
   data://meadow/space/2024-08-16/exoplanets:
     - snapshot://space/2024-08-16/exoplanets.csv
