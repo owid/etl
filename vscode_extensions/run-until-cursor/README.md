@@ -26,4 +26,4 @@ npm run compile
 vsce package
 code --install-extension run-until-cursor-0.0.1.vsix
 ```
-(or whatever the version is, specified in `package.json`).
+(or whatever the version is, specified in `package.json`). Then, from VSCode, `cmd+shift+p` and select "Developer: Reload Window".
