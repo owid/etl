@@ -37,7 +37,7 @@ def run(dest_dir: str) -> None:
         how="left",
     )
     tb["death_rate"] = tb["deaths"] / tb["population"] * 100000
-    tb = tb.drop(columns=["population", "source", "world_pop_share"])
+    tb = tb.drop(columns=["population", "source_x", "source_y", "world_pop_share"])
     tb = tb.format(["country", "year"])
 
     #
@@ -59,8 +59,6 @@ def clean_who_mortality_data(tb: Table) -> Table:
     ]  # type: ignore
     tb = tb.drop(
         columns=[
-            "country",
-            "year",
             "sex",
             "age_group",
             "cause",

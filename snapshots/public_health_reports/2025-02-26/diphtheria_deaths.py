@@ -18,7 +18,7 @@ DATA_CDC = pd.DataFrame(
             1939,
             1940,
         ],
-        "cases": [2615, 2560, 2022, 1457],
+        "deaths": [2615, 2560, 2022, 1457],
         "source": [
             "https://stacks.cdc.gov/view/cdc/69651/cdc_69651_DS1.pdf",
             "https://www.jstor.org/stable/4583204",

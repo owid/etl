@@ -50,6 +50,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: 397cde857283950dcd2f7c2a1f5d4631
-    size: 723
+  - md5: 1b34629bb630430453d9ffb5413ed17d
+    size: 724
     path: diphtheria_deaths.csv

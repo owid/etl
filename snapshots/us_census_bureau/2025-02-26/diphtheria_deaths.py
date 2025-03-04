@@ -13,7 +13,7 @@ DATA_CDC = pd.DataFrame(
     {
         "country": ["United States"] * 7,
         "year": [1943, 1944, 1945, 1946, 1947, 1948, 1949],
-        "cases": [1196, 1145, 1598, 1259, 799, 634, 574],
+        "deaths": [1196, 1145, 1598, 1259, 799, 634, 574],
         "source": [
             "https://www.census.gov/library/publications/1945/compendia/statab/66ed.html",
             "https://www.census.gov/library/publications/1946/compendia/statab/67ed.html",
