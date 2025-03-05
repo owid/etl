@@ -30,7 +30,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def main(path_to_file: str, upload: bool) -> None:
     # Initialize a new snapshot.
-    snap = Snapshot(f"space/{SNAPSHOT_VERSION}/space_track.csv")
+    snap = Snapshot(f"space/{SNAPSHOT_VERSION}/objects_in_space.csv")
 
     # Save snapshot.
     snap.create_snapshot(upload=upload, filename=path_to_file)

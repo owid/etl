@@ -11,7 +11,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("space_track")
+    ds_garden = paths.load_dataset("objects_in_space")
 
     # Read table from garden dataset.
     tb = ds_garden.read("non_debris_objects_by_orbit")

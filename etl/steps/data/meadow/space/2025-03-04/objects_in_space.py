@@ -11,7 +11,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("space_track.csv")
+    snap = paths.load_snapshot("objects_in_space.csv")
 
     # Load data from snapshot.
     tb = snap.read()

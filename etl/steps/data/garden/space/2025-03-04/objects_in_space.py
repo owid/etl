@@ -112,10 +112,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("space_track")
+    ds_meadow = paths.load_dataset("objects_in_space")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("space_track", reset_index=False)
+    tb = ds_meadow.read("objects_in_space", reset_index=False)
 
     #
     # Process data.

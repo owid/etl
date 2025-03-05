@@ -14,7 +14,8 @@ meta:
   license:
     name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
     url: https://www.space-track.org/documentation#/odr
+
 outs:
   - md5: e45cb1499568e3ea8f4c1cb2a4b1e7ed
     size: 35711565
-    path: space_track.csv
+    path: objects_in_space.csv
