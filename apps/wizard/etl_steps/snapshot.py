@@ -1,6 +1,5 @@
 """Snapshot phase."""
 
-import os
 import subprocess
 import traceback
 from pathlib import Path
@@ -34,8 +33,8 @@ FIELD_TYPES_SELECT = ["origin.license.name"]
 CURRENT_DIR = Path(__file__).parent
 # Accepted schema categories
 ACCEPTED_CATEGORIES = ["dataset", "citation", "files", "license"]
-# Available namespaces
-OPTIONS_NAMESPACES = sorted(os.listdir(SNAPSHOTS_DIR))
+# Available namespaces (ignore hidden files)
+OPTIONS_NAMESPACES = sorted(f.name for f in SNAPSHOTS_DIR.glob("[!.]*"))
 # FIELDS FROM OTHER STEPS
 st.session_state["step_name"] = "snapshot"
 APP_STATE = utils.AppState()
