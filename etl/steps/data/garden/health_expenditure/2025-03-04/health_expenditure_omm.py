@@ -126,8 +126,6 @@ def create_estimations_from_growth(tb: Table, reference_var_suffix: str, to_adju
     # Rename the estimated variables without the suffix
     tb["share_gdp"] = tb[f"share_gdp{to_adjust_var_suffix}"].astype("Float64").fillna(tb["share_gdp_estimated"])
 
-    tb.to_csv("tb.csv")
-
     # Keep only new variables
     if "share_gdp" not in columns_list:
         columns_list.append("share_gdp")
