@@ -20,3 +20,10 @@ steps:
     - data://meadow/space/2024-08-16/exoplanets
   data://grapher/space/2024-08-16/exoplanets:
     - data://garden/space/2024-08-16/exoplanets
+  # Number of objects in space (United States Space Force)
+  data://meadow/space/2024-08-16/space_track:
+    - snapshot://space/2024-08-16/space_track.csv
+  data://garden/space/2024-08-16/space_track:
+    - data://meadow/space/2024-08-16/space_track
+  data://grapher/space/2024-08-16/space_track:
+    - data://garden/space/2024-08-16/space_track
