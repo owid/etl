@@ -59,9 +59,8 @@ def run(dest_dir: str) -> None:
         tb=tb, reference_year=YEAR_OECD_OECD93, reference_var_suffix="_oecd_1993", to_adjust_var_suffix="_oecd"
     )
 
-    tb = create_estimations_from_growth(
-        tb=tb, reference_year=YEAR_OECD93_LINDERT, reference_var_suffix="_lindert", to_adjust_var_suffix=""
-    )
+    # Fill data from Lindert where there is no data in share_gdp
+    tb["share_gdp"] = tb["share_gdp"].fillna(tb["share_gdp_lindert"])
 
     # Keep only the necessary columns
     tb = tb[["country", "year", "share_gdp"]]

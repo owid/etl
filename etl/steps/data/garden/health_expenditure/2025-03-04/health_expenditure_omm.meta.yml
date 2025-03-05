@@ -9,6 +9,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: Health expenditure in the long run
   update_period_days: 365
 
 
@@ -21,11 +22,13 @@ tables:
         short_unit: "%"
         description_short: Public health expenditure divided bt gross domestic product, expressed as a percentage.
         description_key:
-          - "This indicator combines three different datasets: Lindert (1994), OECD (1993), and the OECD Health Expenditure and Financing Database. We combine them by using the implicit growth rate from the older series, so we can extend the series back to 1880."
+          - "This indicator combines three different datasets: Lindert (1994), OECD (1993), and the OECD Health Expenditure and Financing Database. We combine the two OECD datasets by using the implicit growth rate from the older series, so we can extend the series back to 1960. We also use the data from Lindert (1994) to extend the series to 1880."
         description_from_producer: ""
         processing_level: major
         description_processing: |-
-          The data presented here from 1970 onwards is from the OECD Health Expenditure and Financing Database (Government/compulsory schemes). We constructed the data before 1970 using the 1970 OECD Health Expenditure and Financing Database observation and applying the growth rates implied by the OECD (1993) data. These steps are necessary because the data in these years is not exactly the same for the three datasets due to changes in definitions and measurement, though the trends are consistent.
+          The data presented here from 1970 onwards is from the OECD Health Expenditure and Financing Database (Government/compulsory schemes). We constructed the data between 1960 and 1970 using the 1970 OECD Health Expenditure and Financing Database observation and applying the growth rates implied by the OECD (1993) data. These steps are necessary because the data in these years is not exactly the same for the two datasets due to changes in definitions and measurement, though the trends are consistent for common years (1970-1991).
+
+          We don't transform the data from Lindert (1994), the values are the same as in the original source.
         presentation:
           attribution_short: Lindert, OECD
           title_public: Public health expenditure as a share of GDP
