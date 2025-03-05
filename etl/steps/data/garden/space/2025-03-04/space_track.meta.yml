@@ -3,6 +3,9 @@ definitions:
     presentation:
       topic_tags:
         - Space Exploration & Satellites
+      grapher_config:
+        note: |-
+          "[Low Earth orbit](#dod:low_earth_orbit) is defined by a point of closest approach to Earth below 2,000 kilometers. Debris are assigned to the launch date of the original object from which they were separated."
     processing_level: major
     unit: objects
     short_unit: ""
@@ -20,6 +23,9 @@ tables:
         title: Number of tracked objects in lower Earth orbit
         description_short: |-
           Objects are subtracted from the time series after they have reentered the Earth's atmosphere. Not all objects are tracked: in 2021, the European Space Agency estimated there were more than 130 million space debris objects larger than 1 millimeter.
+        description_key:
+          - "[Low Earth orbit](#dod:low_earth_orbit) is defined by a point of closest approach to Earth below 2,000 kilometers."
+          - Debris are assigned to the launch date of the original object from which they were separated.
   non_debris_objects_by_orbit:
     title: Number of non-debris objects in space by orbit
     variables:
@@ -27,3 +33,8 @@ tables:
         title: Payloads and rocket bodies in space, by orbit
         description_short: |-
           Debris from launches or collisions is not counted. Objects are subtracted from the time series after they have reentered the Earth's atmosphere.
+        description_key:
+          - "[Low Earth orbit](#dod:low_earth_orbit) is defined here by a closest approach to Earth below 2,000 kilometers."
+          - "[Medium Earth orbit](#dod:medium_earth_orbit) is between 2,000 and 35,586 kilometers."
+          - "[Geostationary orbit](#dod:geostationary_orbit) is between 35,586 and 35,986 kilometers."
+          - "[High Earth orbit](#dod:high_earth_orbit) is above 35,986 kilometers."
