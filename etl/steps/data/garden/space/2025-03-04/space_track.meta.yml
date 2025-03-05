@@ -14,12 +14,14 @@ dataset:
 
 tables:
   lower_earth_objects_by_type:
+    title: Number of lower Earth objects in space by type
     variables:
       n_objects:
         title: Number of tracked objects in lower Earth orbit
         description_short: |-
           Objects are subtracted from the time series after they have reentered the Earth's atmosphere. Not all objects are tracked: in 2021, the European Space Agency estimated there were more than 130 million space debris objects larger than 1 millimeter.
   non_debris_objects_by_orbit:
+    title: Number of non-debris objects in space by orbit
     variables:
       n_objects:
         title: Payloads and rocket bodies in space, by orbit
