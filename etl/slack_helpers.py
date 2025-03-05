@@ -116,7 +116,7 @@ def upload_image(
     # Ensure everything is uploaded before continuing
     time.sleep(seconds_wait)
 
-    return None
+    return upload_response
 
 
 def format_slack_message(method, url, status_code, req_body, res_body):
