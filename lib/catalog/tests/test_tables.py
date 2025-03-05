@@ -804,6 +804,8 @@ def test_pivot(table_1, sources, origins) -> None:
     tb = tables.pivot(table_1, columns=["country", "year"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.pivot(columns=["country", "year"]))
+    # Remove dimensions to make them equal
+    tb[("a", "Spain", 2020)].m.dimensions = None
     assert tb[("a", "Spain", 2020)].metadata == table_1["a"].metadata
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
@@ -812,6 +814,8 @@ def test_pivot(table_1, sources, origins) -> None:
     tb = tables.pivot(table_1, index="country", columns=["year"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.pivot(index="country", columns=["year"]))
+    # Remove dimensions to make them equal
+    tb[("a", 2020)].m.dimensions = None
     assert tb[("a", 2020)].metadata == table_1["a"].metadata
     # Now check that table metadata is identical.
     assert tb.metadata == table_1.metadata
@@ -831,6 +835,9 @@ def test_pivot(table_1, sources, origins) -> None:
     tb = tables.pivot(table_1, index="country", columns=["year"], values=["a"])
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.pivot(index="country", columns=["year"], values=["a"]))
+    # Remove dimensions to make them equal
+    tb[("a", 2020)].m.dimensions = None
+    tb[("a", 2021)].m.dimensions = None
     assert tb[("a", 2020)].metadata == table_1["a"].metadata
     assert tb[("a", 2021)].metadata == table_1["a"].metadata
     # Now check that table metadata is identical.
@@ -840,6 +847,9 @@ def test_pivot(table_1, sources, origins) -> None:
     tb = tables.pivot(table_1, index="country", columns=["year"], values=["a"], join_column_levels_with="_")
     # Check that the result is identical to using the table method.
     assert tb.equals_table(table_1.pivot(index="country", columns=["year"], values=["a"], join_column_levels_with="_"))
+    # Remove dimensions to make them equal
+    for col in ["a_2020", "a_2021"]:
+        tb[col].m.dimensions = None
     assert tb["a_2020"].metadata == table_1["a"].metadata
     assert tb["a_2021"].metadata == table_1["a"].metadata
     assert tb["country"].metadata == table_1["country"].metadata
