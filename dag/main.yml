@@ -335,14 +335,6 @@ steps:
   data://grapher/un/2023-10-30/un_members:
     - data://garden/un/2023-10-30/un_members
 
-  # UNU-WIDER Government Revenue Dataset
-  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
-    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
-  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
-    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
-  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
-    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
-
   # World Bank - Worldwide Bureaucracy Indicators
   data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
     - snapshot://wb/2023-11-21/worldwide_bureaucracy_indicators.csv
@@ -520,14 +512,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
-
-  # Public Finances in Modern History dataset (IMF)
-  data://meadow/imf/2024-06-12/public_finances_modern_history:
-    - snapshot://imf/2024-06-12/public_finances_modern_history.xlsx
-  data://garden/imf/2024-06-12/public_finances_modern_history:
-    - data://meadow/imf/2024-06-12/public_finances_modern_history
-  data://grapher/imf/2024-06-12/public_finances_modern_history:
-    - data://garden/imf/2024-06-12/public_finances_modern_history
 
   # Same-Sex Marriage Around the World from Pew Research Center
   data://meadow/pew/2024-06-03/same_sex_marriage:
@@ -774,3 +758,4 @@ include:
   - dag/equality.yml
   - dag/families.yml
   - dag/technology.yml
+  - dag/redistribution.yml

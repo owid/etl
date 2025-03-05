@@ -929,6 +929,28 @@ steps:
     - data://meadow/who/2025-01-17/mortality_database_vaccine_preventable
   data://grapher/who/2025-01-17/mortality_database_vaccine_preventable:
     - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+
+  #
+  # US Long-run measles
+  #
+  data://meadow/health/2025-01-22/measles_state_level:
+    - snapshot://health/2025-01-22/measles_state_level.zip
+  data://garden/health/2025-01-22/measles_state_level:
+    - data://meadow/health/2025-01-22/measles_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+    - data://garden/demography/2024-07-15/population
+    - snapshot://fasttrack/latest/cdc_measles.csv
+    - data://garden/cdc/2025-01-26/measles_state_level
+  data://grapher/health/2025-01-22/measles_state_level:
+    - data://garden/health/2025-01-22/measles_state_level
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/cdc/2025-01-26/measles_state_level:
+    - snapshot://cdc/2025-01-26/measles_state_level.txt
+  data://garden/cdc/2025-01-26/measles_state_level:
+    - data://meadow/cdc/2025-01-26/measles_state_level
   #
   # WHO Vaccine Safety
   #
@@ -960,13 +982,6 @@ steps:
   data://grapher/health/2025-02-13/vaccine_confidence:
     - data://garden/health/2025-02-13/vaccine_confidence
 
-  # CDC Measles Cases 1985-present - autoupdate
-  data://meadow/cdc/latest/measles_cases:
-    - snapshot://cdc/latest/measles_cases.json
-  data://garden/cdc/latest/measles_cases:
-    - data://meadow/cdc/latest/measles_cases
-
-  #
   # Historical measles data (1919-1984)
   #
   data://meadow/health/2025-02-19/measles_historical:
@@ -974,6 +989,13 @@ steps:
   data://garden/health/2025-02-19/measles_historical:
     - data://meadow/health/2025-02-19/measles_historical
 
+  # CDC Measles Cases 1985-present - autoupdate
+  data://meadow/cdc/latest/measles_cases:
+    - snapshot://cdc/latest/measles_cases.json
+  data://garden/cdc/latest/measles_cases:
+    - data://meadow/cdc/latest/measles_cases
+
+  #
   # Long-run measles data (auto-updated)
   data://garden/health/latest/measles_long_run:
     - data://garden/cdc/latest/measles_cases
@@ -1040,10 +1062,81 @@ steps:
   data://grapher/health/2025-02-25/diphtheria_cases:
     - data://garden/health/2025-02-25/diphtheria_cases
 
-  # OECD Health Expenditure and Financing Database
-  data://meadow/oecd/2025-02-25/health_expenditure:
-    - snapshot://oecd/2025-02-25/health_expenditure.csv
-  data://garden/oecd/2025-02-25/health_expenditure:
-    - data://meadow/oecd/2025-02-25/health_expenditure
-  data://grapher/oecd/2025-02-25/health_expenditure:
-    - data://garden/oecd/2025-02-25/health_expenditure
+  #
+  # Polio cases - state level - Project Tycho
+  #
+  data://meadow/health/2025-02-26/polio_cases_state_level:
+    - snapshot://project_tycho/2025-02-26/polio_cases_state_level.zip
+  data://garden/health/2025-02-26/polio_cases_state_level:
+    - data://meadow/health/2025-02-26/polio_cases_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+  data://grapher/health/2025-02-26/polio_cases_state_level:
+    - data://garden/health/2025-02-26/polio_cases_state_level
+
+  #
+  # Diphtheria cases - state level - Project Tycho
+  #
+  data://meadow/health/2025-02-27/diphtheria_cases_state_level:
+    - snapshot://project_tycho/2025-02-27/diphtheria_cases_state_level.zip
+  data://garden/health/2025-02-27/diphtheria_cases_state_level:
+    - data://meadow/health/2025-02-27/diphtheria_cases_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+  data://grapher/health/2025-02-27/diphtheria_cases_state_level:
+    - data://garden/health/2025-02-27/diphtheria_cases_state_level
+
+  # Pertussis cases - state level - Project Tycho
+  #
+  data://meadow/health/2025-02-27/pertussis_cases_state_level:
+    - snapshot://project_tycho/2025-02-27/pertussis_cases_state_level.zip
+  data://garden/health/2025-02-27/pertussis_cases_state_level:
+    - data://meadow/health/2025-02-27/pertussis_cases_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+  data://grapher/health/2025-02-27/pertussis_cases_state_level:
+    - data://garden/health/2025-02-27/pertussis_cases_state_level
+
+  # Typhoid fever cases - state level - Project Tycho
+  #
+  data://meadow/health/2025-02-27/typhoid_fever_cases_state_level:
+    - snapshot://project_tycho/2025-02-27/typhoid_fever_cases_state_level.zip
+  data://garden/health/2025-02-27/typhoid_fever_cases_state_level:
+    - data://meadow/health/2025-02-27/typhoid_fever_cases_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+  data://grapher/health/2025-02-27/typhoid_fever_cases_state_level:
+    - data://garden/health/2025-02-27/typhoid_fever_cases_state_level
+
+    # Tetanus cases - state level - Project Tycho
+  #
+  data://meadow/health/2025-02-27/tetanus_cases_state_level:
+    - snapshot://project_tycho/2025-02-27/tetanus_cases_state_level.zip
+  data://garden/health/2025-02-27/tetanus_cases_state_level:
+    - data://meadow/health/2025-02-27/tetanus_cases_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+  data://grapher/health/2025-02-27/tetanus_cases_state_level:
+    - data://garden/health/2025-02-27/tetanus_cases_state_level
+
+  #
+  # US Public Health Reports - Diphtheria deaths
+  #
+  data://garden/public_health_reports/2025-03-04/diphtheria_deaths:
+    - data://meadow/public_health_reports/2025-03-04/diphtheria_deaths
+  data://meadow/public_health_reports/2025-03-04/diphtheria_deaths:
+    - snapshot://public_health_reports/2025-02-26/diphtheria_deaths.csv
+
+    #
+  # US Census Bureau - Diphtheria deaths
+  #
+  data://garden/us_census_bureau/2025-03-04/diphtheria_deaths:
+    - data://meadow/us_census_bureau/2025-03-04/diphtheria_deaths
+  data://meadow/us_census_bureau/2025-03-04/diphtheria_deaths:
+    - snapshot://us_census_bureau/2025-02-26/diphtheria_deaths.csv
+
+  #
+  # US diphtheria deaths - long run combined sources
+  #
+  data://garden/health/2025-03-04/diphtheria_deaths:
+    - data://garden/public_health_reports/2025-03-04/diphtheria_deaths
+    - data://garden/us_census_bureau/2025-03-04/diphtheria_deaths
+    - data://garden/demography/2024-07-15/population
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+  data://grapher/health/2025-03-04/diphtheria_deaths:
+    - data://garden/health/2025-03-04/diphtheria_deaths

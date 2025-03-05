@@ -62,7 +62,7 @@ def get_charts() -> list[data.Chart]:
 
 
 @log_time
-@st_cache_data("Loading coviews...", show_spinner=True, show_time=True)
+@st_cache_data(custom_text="Loading coviews...", show_spinner=True, show_time=True)
 def get_coviews() -> pd.Series:
     """Return a Series with the number of coviewed sessions for each chart over the last 365 days."""
     return data.get_coviews_sessions(after_date=str(dt.date.today() - dt.timedelta(days=365)), min_sessions=3)

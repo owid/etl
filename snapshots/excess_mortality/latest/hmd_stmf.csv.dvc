@@ -13,7 +13,7 @@ meta:
       HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
     url: https://www.mortality.org/Data/STMF
     source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
-    date_accessed: 2025-02-26
+    date_accessed: 2025-03-05
     publication_date: 2025-02-24
     publication_year: 2025
     published_by: |-

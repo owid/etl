@@ -5,7 +5,7 @@ from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -140,67 +140,67 @@ SECTOR_MAPPING = {
 
 # Subsector titles to use in the processing description.
 SUBSECTOR_TITLES = {
-    "1A1a_Electricity-autoproducer": "Electricity production (autoproducer) (1A1a)",
-    "1A1a_Electricity-public": "Electricity production (public) (1A1a)",
-    "1A1a_Heat-production": "Heat production (1A1a)",
-    "1A1bc_Other-transformation": "Other energy transformation (1A1bc)",
-    "1B1_Fugitive-solid-fuels": "Fugitive emissions from solid fuels (1B1)",
-    "1B2_Fugitive-petr": "Fugitive emissions from petroleum (1B2)",
-    "1B2d_Fugitive-other-energy": "Fugitive emissions from other energy sources (1B2d)",
-    "7A_Fossil-fuel-fires": "Fossil fuel fires (7A)",
-    "1B2b_Fugitive-NG-distr": "Fugitive emissions from natural gas distribution (1B2b)",
-    "1B2b_Fugitive-NG-prod": "Fugitive emissions from natural gas production (1B2b)",
-    "1A5_Other-unspecified": "Other fuel use (unspecified) (1A5)",
-    "1A2a_Ind-Comb-Iron-steel": "Industrial combustion - Iron and steel (1A2a)",
-    "1A2b_Ind-Comb-Non-ferrous-metals": "Industrial combustion - Non-ferrous metals (1A2b)",
-    "1A2c_Ind-Comb-Chemicals": "Industrial combustion - Chemicals (1A2c)",
-    "1A2d_Ind-Comb-Pulp-paper": "Industrial combustion - Pulp and paper (1A2d)",
-    "1A2e_Ind-Comb-Food-tobacco": "Industrial combustion - Food and tobacco (1A2e)",
-    "1A2f_Ind-Comb-Non-metalic-minerals": "Industrial combustion - Non-metallic minerals (1A2f)",
-    "1A2g_Ind-Comb-Construction": "Industrial combustion - Construction (1A2g)",
-    "1A2g_Ind-Comb-machinery": "Industrial combustion - Machinery (1A2g)",
-    "1A2g_Ind-Comb-mining-quarying": "Industrial combustion - Mining and quarrying (1A2g)",
-    "1A2g_Ind-Comb-other": "Industrial combustion - Other (1A2g)",
-    "1A2g_Ind-Comb-textile-leather": "Industrial combustion - Textile and leather (1A2g)",
-    "1A2g_Ind-Comb-transpequip": "Industrial combustion - Transport equipment (1A2g)",
-    "1A2g_Ind-Comb-wood-products": "Industrial combustion - Wood products (1A2g)",
-    "2A1_Cement-production": "Cement production (2A1)",
-    "2A2_Lime-production": "Lime production (2A2)",
-    "2Ax_Other-minerals": "Other mineral production (2Ax)",
-    "2B_Chemical-industry": "Chemical industry (2B)",
-    "2C1_Iron-steel-alloy-prod": "Iron and steel alloy production (2C1)",
-    "2C3_Aluminum-production": "Aluminum production (2C3)",
-    "2C4_Non-Ferrous-other-metals": "Other non-ferrous metal production (2C4)",
-    "2H_Pulp-and-paper-food-beverage-wood": "Pulp and paper, food, beverage, and wood processing (2H)",
-    "2B2_Chemicals-Nitric-acid": "Nitric acid production (2B2)",
-    "2B3_Chemicals-Adipic-acid": "Adipic acid production (2B3)",
-    "2D_Degreasing-Cleaning": "Degreasing and cleaning (2D)",
-    "2D_Paint-application": "Paint application (2D)",
-    "2D_Chemical-products-manufacture-processing": "Chemical products manufacture and processing (2D)",
-    "2D_Other-product-use": "Other product use (2D)",
-    "1A3b_Road": "Road transportation (1A3b)",
-    "1A3c_Rail": "Rail transportation (1A3c)",
-    "1A3dii_Domestic-navigation": "Domestic navigation (1A3dii)",
-    "1A3eii_Other-transp": "Other transport (1A3eii)",
-    "5A_Solid-waste-disposal": "Solid waste disposal (5A)",
-    "5C_Waste-combustion": "Waste combustion (5C)",
-    "5D_Wastewater-handling": "Wastewater handling (5D)",
-    "5E_Other-waste-handling": "Other waste handling (5E)",
-    "6A_Other-in-total": "Other waste sources (6A)",
-    "6B_Other-not-in-total": "Unspecified waste sources (6B)",
-    "3B_Manure-management": "Manure management (3B)",
-    "3D_Rice-Cultivation": "Rice cultivation (3D)",
-    "3D_Soil-emissions": "Soil emissions (3D)",
-    "3E_Enteric-fermentation": "Enteric fermentation (3E)",
-    "3I_Agriculture-other": "Other agricultural emissions (3I)",
-    "7BC_Indirect-N2O-non-agricultural-N": "Indirect N₂O emissions (non-agricultural sources) (7BC)",
-    "1A4c_Agriculture-forestry-fishing": "Fuel use in agriculture, forestry, and fishing (1A4c)",
-    "1A4a_Commercial-institutional": "Commercial and institutional buildings (1A4a)",
-    "1A4b_Residential": "Residential buildings (1A4b)",
-    "1A3ai_International-aviation": "International aviation (1A3ai)",
-    "1A3aii_Domestic-aviation": "Domestic aviation (1A3aii)",
-    "1A3di_International-shipping": "International shipping (1A3di)",
-    "1A3di_Oil_Tanker_Loading": "Oil tanker loading (1A3di)",
+    "1A1a_Electricity-autoproducer": "electricity production (autoproducer) (1A1a)",
+    "1A1a_Electricity-public": "electricity production (public) (1A1a)",
+    "1A1a_Heat-production": "heat production (1A1a)",
+    "1A1bc_Other-transformation": "other energy transformation (1A1bc)",
+    "1B1_Fugitive-solid-fuels": "fugitive emissions from solid fuels (1B1)",
+    "1B2_Fugitive-petr": "fugitive emissions from petroleum (1B2)",
+    "1B2d_Fugitive-other-energy": "fugitive emissions from other energy sources (1B2d)",
+    "7A_Fossil-fuel-fires": "fossil fuel fires (7A)",
+    "1B2b_Fugitive-NG-distr": "fugitive emissions from natural gas distribution (1B2b)",
+    "1B2b_Fugitive-NG-prod": "fugitive emissions from natural gas production (1B2b)",
+    "1A5_Other-unspecified": "other fuel use (unspecified) (1A5)",
+    "1A2a_Ind-Comb-Iron-steel": "industrial combustion (iron and steel) (1A2a)",
+    "1A2b_Ind-Comb-Non-ferrous-metals": "industrial combustion (non-ferrous metals) (1A2b)",
+    "1A2c_Ind-Comb-Chemicals": "industrial combustion (chemicals) (1A2c)",
+    "1A2d_Ind-Comb-Pulp-paper": "industrial combustion (pulp and paper) (1A2d)",
+    "1A2e_Ind-Comb-Food-tobacco": "industrial combustion (food and tobacco) (1A2e)",
+    "1A2f_Ind-Comb-Non-metalic-minerals": "industrial combustion (non-metallic minerals) (1A2f)",
+    "1A2g_Ind-Comb-Construction": "industrial combustion (construction) (1A2g)",
+    "1A2g_Ind-Comb-machinery": "industrial combustion (machinery) (1A2g)",
+    "1A2g_Ind-Comb-mining-quarying": "industrial combustion (mining and quarrying) (1A2g)",
+    "1A2g_Ind-Comb-other": "industrial combustion (other) (1A2g)",
+    "1A2g_Ind-Comb-textile-leather": "industrial combustion (textile and leather) (1A2g)",
+    "1A2g_Ind-Comb-transpequip": "industrial combustion (transport equipment) (1A2g)",
+    "1A2g_Ind-Comb-wood-products": "industrial combustion (wood products) (1A2g)",
+    "2A1_Cement-production": "cement production (2A1)",
+    "2A2_Lime-production": "lime production (2A2)",
+    "2Ax_Other-minerals": "other mineral production (2Ax)",
+    "2B_Chemical-industry": "chemical industry (2B)",
+    "2C1_Iron-steel-alloy-prod": "iron and steel alloy production (2C1)",
+    "2C3_Aluminum-production": "aluminum production (2C3)",
+    "2C4_Non-Ferrous-other-metals": "other non-ferrous metal production (2C4)",
+    "2H_Pulp-and-paper-food-beverage-wood": "pulp and paper, food, beverage, and wood processing (2H)",
+    "2B2_Chemicals-Nitric-acid": "nitric acid production (2B2)",
+    "2B3_Chemicals-Adipic-acid": "adipic acid production (2B3)",
+    "2D_Degreasing-Cleaning": "degreasing and cleaning (2D)",
+    "2D_Paint-application": "paint application (2D)",
+    "2D_Chemical-products-manufacture-processing": "chemical products manufacture and processing (2D)",
+    "2D_Other-product-use": "other product use (2D)",
+    "1A3b_Road": "road transportation (1A3b)",
+    "1A3c_Rail": "rail transportation (1A3c)",
+    "1A3dii_Domestic-navigation": "domestic navigation (1A3dii)",
+    "1A3eii_Other-transp": "other transport (1A3eii)",
+    "5A_Solid-waste-disposal": "solid waste disposal (5A)",
+    "5C_Waste-combustion": "waste combustion (5C)",
+    "5D_Wastewater-handling": "wastewater handling (5D)",
+    "5E_Other-waste-handling": "other waste handling (5E)",
+    "6A_Other-in-total": "other waste sources (6A)",
+    "6B_Other-not-in-total": "unspecified waste sources (6B)",
+    "3B_Manure-management": "manure management (3B)",
+    "3D_Rice-Cultivation": "rice cultivation (3D)",
+    "3D_Soil-emissions": "soil emissions (3D)",
+    "3E_Enteric-fermentation": "enteric fermentation (3E)",
+    "3I_Agriculture-other": "other agricultural emissions (3I)",
+    "7BC_Indirect-N2O-non-agricultural-N": "indirect N₂O emissions (non-agricultural sources) (7BC)",
+    "1A4c_Agriculture-forestry-fishing": "fuel use in agriculture, forestry, and fishing (1A4c)",
+    "1A4a_Commercial-institutional": "commercial and institutional buildings (1A4a)",
+    "1A4b_Residential": "residential buildings (1A4b)",
+    "1A3ai_International-aviation": "international aviation (1A3ai)",
+    "1A3aii_Domestic-aviation": "domestic aviation (1A3aii)",
+    "1A3di_International-shipping": "international shipping (1A3di)",
+    "1A3di_Oil_Tanker_Loading": "oil tanker loading (1A3di)",
 }
 
 # Subsectors expected in the bunkers table.
@@ -572,7 +572,7 @@ def remap_table_categories(tb: Table) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -730,7 +730,7 @@ def run(dest_dir: str) -> None:
 
     # Add a processing description where the sectorial mapping is specified.
     mapping_codes = "\n".join(
-        f"* {sector}: " + ", ".join(sorted(SUBSECTOR_TITLES[subsector] for subsector in subsectors)) + "."
+        f"* {sector}: " + "; ".join(sorted(SUBSECTOR_TITLES[subsector] for subsector in subsectors)) + "."
         for sector, subsectors in sorted(SECTOR_MAPPING.items())
     )
     description_processing = (
@@ -742,10 +742,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    # Initialize a new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
-    # Save changes in the new garden dataset.
+    # Save garden dataset.
     ds_garden.save()

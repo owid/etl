@@ -11,7 +11,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff
 from apps.wizard.app_pages.chart_diff.utils import SOURCE
 from apps.wizard.utils import as_list, as_valid_json
-from etl.helpers import get_schema_from_url
+from etl.files import get_schema_from_url
 from etl.indicator_upgrade.schema import validate_chart_config_and_set_defaults
 
 log = structlog.get_logger()

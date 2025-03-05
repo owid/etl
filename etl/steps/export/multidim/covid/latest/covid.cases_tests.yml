@@ -1,52 +1,53 @@
 definitions:
-  config_base: &config_base
-    chartTypes: ["ScatterPlot"]
-    minTime: "latest"
-    note: ""
-    subtitle: 7-day rolling average. Comparisons across countries are affected by
-      differences in testing policies and reporting methods.
-    # No details in title
-    hideAnnotationFieldsInTitle:
-      entity: true
-      time: true
-      changeInPrefix: true
-    # Log
-    yAxis:
-      scaleType: log
-      canChangeScaleType: true
-      min: 0
-    xAxis:
-      scaleType: log
-      canChangeScaleType: true
-    comparisonLines:
-      - label: Positive rate = 100%
-        yEquals: x
-      - label: 50%
-        yEquals: 2*x
-      - label: 20%
-        yEquals: 5*x
-      - label: 10%
-        yEquals: 10*x
-      - label: 5%
-        yEquals: 20*x
-      - label: 2%
-        yEquals: 50*x
-      - label: 1%
-        yEquals: 100*x
-      - label: 0.5%
-        yEquals: 200*x
-      - label: 0.2%
-        yEquals: 500*x
-      - label: 0.1%
-        yEquals: 1000*x
-      - label: 0.02%
-        yEquals: 5000*x
-    # Related Q
-    relatedQuestions:
-      - url: https://ourworldindata.org/covid-testing-data-archived
-        text: Data on tests is no longer updated since June 2022
-    # Origin URL
-    originUrl: ourworldindata.org/coronavirus
+  common_views:
+    - config:
+        chartTypes: ["ScatterPlot"]
+        minTime: "latest"
+        note: ""
+        subtitle: 7-day rolling average. Comparisons across countries are affected by
+          differences in testing policies and reporting methods.
+        # No details in title
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+        # Log
+        yAxis:
+          scaleType: log
+          canChangeScaleType: true
+          min: 0
+        xAxis:
+          scaleType: log
+          canChangeScaleType: true
+        comparisonLines:
+          - label: Positive rate = 100%
+            yEquals: x
+          - label: 50%
+            yEquals: 2*x
+          - label: 20%
+            yEquals: 5*x
+          - label: 10%
+            yEquals: 10*x
+          - label: 5%
+            yEquals: 20*x
+          - label: 2%
+            yEquals: 50*x
+          - label: 1%
+            yEquals: 100*x
+          - label: 0.5%
+            yEquals: 200*x
+          - label: 0.2%
+            yEquals: 500*x
+          - label: 0.1%
+            yEquals: 1000*x
+          - label: 0.02%
+            yEquals: 5000*x
+        # Related Q
+        relatedQuestions:
+          - url: https://ourworldindata.org/covid-testing-data-archived
+            text: Data on tests is no longer updated since June 2022
+        # Origin URL
+        originUrl: ourworldindata.org/coronavirus
 
 title:
   title: "COVID-19: Tests and confirmed cases"
@@ -80,7 +81,6 @@ views:
           name: Daily new confirmed cases due to COVID-19
       color: regions#owid_region
     config:
-      <<: *config_base
       title: "COVID-19: Daily tests vs. daily new confirmed cases"
 
   - dimensions:
@@ -97,10 +97,9 @@ views:
           name: Daily confirmed cases per million people
       color: regions#owid_region
     config:
-      <<: *config_base
       title: "COVID-19: Daily tests vs. daily new confirmed cases per million people"
       selectedEntityNames: []
-      excludedEntities:
-        - 97
-        - 201
-        - 21
+      excludedEntityNames:
+        - Armenia
+        - Peru
+        - Ecuador

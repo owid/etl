@@ -1,0 +1,6 @@
+tables:
+  family_database:
+    variables:
+      proportion__pct__of_children__aged_0_17__living_with_a_single_parent:
+        presentation:
+          title_public: Share of children living with a single parent

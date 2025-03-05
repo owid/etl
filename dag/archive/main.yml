@@ -422,3 +422,5 @@ include:
   - dag/archive/urbanization.yml
   - dag/archive/education.yml
   - dag/archive/biodiversity.yml
+  - dag/archive/space.yml
+  - dag/archive/survey.yml

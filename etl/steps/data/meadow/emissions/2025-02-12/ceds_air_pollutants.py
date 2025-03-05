@@ -5,7 +5,7 @@ import zipfile
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
@@ -28,7 +28,7 @@ def read_data_from_snapshot(snap: Snapshot) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -49,13 +49,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
-        tables=tables,
-        check_variables_metadata=True,
-        default_metadata=snap_detailed.metadata,
-    )
+    # Initialize a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap_detailed.metadata)
 
-    # Save changes in the new meadow dataset.
+    # Save meadow dataset.
     ds_meadow.save()

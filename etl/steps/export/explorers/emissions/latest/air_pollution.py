@@ -4,7 +4,7 @@ import pandas as pd
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_explorer
+from etl.helpers import PathFinder
 
 # Initialize log.
 log = get_logger()
@@ -36,7 +36,7 @@ POLLUTANT_NAME = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -219,6 +219,7 @@ def run(dest_dir: str) -> None:
         "explorerTitle": "Air Pollution",
         "explorerSubtitle": "Explore historical emissions of air pollutants across the world.",
         "selection": ["China", "India", "United Kingdom", "United States", "World"],
+        "yScaleToggle": True,
         "isPublished": True,
     }
 
@@ -226,5 +227,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+    ds_explorer = paths.create_explorer(config=config, df_graphers=df_graphers)
     ds_explorer.save()
