@@ -64,3 +64,18 @@ steps:
   #
   data://grapher/space/2025-03-04/non_debris_objects_by_orbit:
     - data://garden/space/2025-03-04/objects_in_space
+  #
+  # Gravitational Wave Open Science Center - Gravitational wave events
+  #
+  data://meadow/space/2025-03-04/gravitational_wave_events:
+    - snapshot://space/2025-03-04/gravitational_wave_events.csv
+  #
+  # Gravitational Wave Open Science Center - Gravitational wave events
+  #
+  data://garden/space/2025-03-04/gravitational_wave_events:
+    - data://meadow/space/2025-03-04/gravitational_wave_events
+  #
+  # Gravitational Wave Open Science Center - Gravitational wave events
+  #
+  data://grapher/space/2025-03-04/gravitational_wave_events:
+    - data://garden/space/2025-03-04/gravitational_wave_events
