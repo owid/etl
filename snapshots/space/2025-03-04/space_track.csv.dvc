@@ -1,13 +1,10 @@
 meta:
-  # TODO: Update fields (and move part of the description somewhere else, regarding orbits).
   origin:
     title: Number of objects in space
     description: |-
       This dataset is extracted from Space-Track.org, a website maintained by the 18th Space Defense Squadron of the United States Space Force.
 
-      The original data includes information on more than 50,000 space objects tracked over time, including their launch date and decay date (if they have reentered the Earth's atmosphere).
-
-      In our charts, low Earth orbit is defined by a periapsis altitude below 2,000 kilometers; medium Earth orbit between 2,000 and 35,586 kilometers; geostationary orbit between 35,586 and 35,986 kilometers; high Earth orbit above 35,986 kilometers.
+      The original data includes information on thousands of space objects tracked over time, including their launch date and decay date (if they have reentered the Earth's atmosphere).
     producer: United States Space Force
     date_published: '2025-04-03'
     date_accessed: '2025-04-03'
@@ -15,9 +12,8 @@ meta:
       United States Space Force - Number of objects in space (2025). 18th Space Defense Squadron.
     url_main: https://www.space-track.org/
   license:
-    # TODO: Decide license.
-    name: Space-Track.org User Agreement
-    url: https://www.space-track.org/documentation#user_agree
+    name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
+    url: https://www.space-track.org/documentation#/odr
 outs:
   - md5: e45cb1499568e3ea8f4c1cb2a4b1e7ed
     size: 35711565
