@@ -79,3 +79,18 @@ steps:
   #
   data://grapher/space/2025-03-04/gravitational_wave_events:
     - data://garden/space/2025-03-04/gravitational_wave_events
+  #
+  # Center for Strategic and International Studies: International Astronaut Database
+  #
+  data://meadow/space/2025-03-04/international_astronaut_database:
+    - snapshot://space/2025-03-04/international_astronaut_database.csv
+  #
+  # Center for Strategic and International Studies: International Astronaut Database
+  #
+  # data://garden/space/2025-03-04/international_astronaut_database:
+  #   - data://meadow/space/2025-03-04/international_astronaut_database
+  # #
+  # # Center for Strategic and International Studies: International Astronaut Database
+  # #
+  # data://grapher/space/2025-03-04/international_astronaut_database:
+  #   - data://garden/space/2025-03-04/international_astronaut_database
