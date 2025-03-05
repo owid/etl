@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from jsonschema import Draft202012Validator, validate, validators
 from structlog import get_logger
 
-from etl.helpers import get_schema_from_url
+from etl.files import get_schema_from_url
 
 # Logger
 log = get_logger()

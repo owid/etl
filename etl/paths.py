@@ -1,3 +1,7 @@
+#
+# NOTE: There should not be any etl dependency in this module.
+#
+
 import os
 from pathlib import Path
 

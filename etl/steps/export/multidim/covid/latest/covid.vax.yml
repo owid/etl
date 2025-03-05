@@ -1,10 +1,11 @@
 definitions:
-  config: &config
-    hideAnnotationFieldsInTitle:
-      entity: true
-      time: true
-      changeInPrefix: true
-    originUrl: ourworldindata.org/coronavirus
+  common_views:
+    - config:
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+        originUrl: ourworldindata.org/coronavirus
 
 title:
   title: COVID-19 vaccines administered
@@ -48,22 +49,18 @@ views:
       normalize: absolute
     indicators:
       y: "vaccinations_global#total_vaccinations"
-    config: *config
   - dimensions:
       indicator: total
       normalize: per_capita
     indicators:
       y: "vaccinations_global#total_vaccinations_per_hundred"
-    config: *config
   - dimensions:
       indicator: booster
       normalize: absolute
     indicators:
       y: "vaccinations_global#total_boosters"
-    config: *config
   - dimensions:
       indicator: booster
       normalize: per_capita
     indicators:
       y: "vaccinations_global#total_boosters_per_hundred"
-    config: *config
