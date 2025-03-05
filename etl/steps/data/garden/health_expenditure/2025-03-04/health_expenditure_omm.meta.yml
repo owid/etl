@@ -26,7 +26,7 @@ tables:
         description_from_producer: ""
         processing_level: major
         description_processing: |-
-          The data presented here from 1970 onwards is from the OECD Health Expenditure and Financing Database (Government/compulsory schemes). We constructed the data between 1960 and 1970 using the 1970 OECD Health Expenditure and Financing Database observation and applying the growth rates implied by the OECD (1993) data. These steps are necessary because the data in these years is not exactly the same for the two datasets due to changes in definitions and measurement, though the trends are consistent for common years (1970-1991).
+          We extrapolated the data available from the OECD Health Expenditure and Financing Database (Government/compulsory schemes) using the earliest available observation from this dataset and applying the growth rates implied by the OECD (1993) data to obtain a series starting in 1960. These steps are necessary because the data in these years is not exactly the same for the two datasets due to changes in definitions and measurement, though the trends are consistent for common years (1970-1991).
 
           We don't transform the data from Lindert (1994), the values are the same as in the original source.
         presentation:
