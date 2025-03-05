@@ -6,7 +6,8 @@ from typing import Optional
 
 import rich_click as click
 
-from etl.steps import filter_to_subgraph, load_dag
+from etl.dag_helpers import load_dag
+from etl.steps import filter_to_subgraph
 
 
 @click.command(name="graphviz")

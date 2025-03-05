@@ -13,19 +13,20 @@ import tempfile
 import time
 import warnings
 from collections import defaultdict
+from collections.abc import Generator
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, Union, cast
+from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, cast
 from urllib.parse import urlparse
 
 import fasteners
 import pandas as pd
 import requests
 import structlog
-import yaml
 from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.catalogs import OWID_CATALOG_URI
@@ -149,42 +150,6 @@ def traverse(graph: Graph, nodes: Set[str]) -> Graph:
         to_visit = to_visit.union(reachable[node])
 
     return dict(reachable)
-
-
-def load_dag(filename: Union[str, Path] = paths.DEFAULT_DAG_FILE) -> Graph:
-    return _load_dag(filename, {})
-
-
-def _load_dag(filename: Union[str, Path], prev_dag: Dict[str, Any]):
-    """
-    Recursive helper to 1) load a dag itself, and 2) load any sub-dags
-    included in the dag via 'include' statements
-    """
-    dag_yml = _load_dag_yaml(str(filename))
-    curr_dag = _parse_dag_yaml(dag_yml)
-
-    # make sure there are no fast-track steps in the DAG
-    if "fasttrack.yml" not in str(filename):
-        fast_track_steps = {step for step in curr_dag if "/fasttrack/" in step}
-        if fast_track_steps:
-            raise ValueError(f"Fast-track steps detected in DAG {filename}: {fast_track_steps}")
-
-    duplicate_steps = prev_dag.keys() & curr_dag.keys()
-    if duplicate_steps:
-        raise ValueError(f"Duplicate steps detected in DAG {filename}: {duplicate_steps}")
-
-    curr_dag.update(prev_dag)
-
-    for sub_dag_filename in dag_yml.get("include", []):
-        sub_dag = _load_dag(paths.BASE_DIR / sub_dag_filename, curr_dag)
-        curr_dag.update(sub_dag)
-
-    return curr_dag
-
-
-def _load_dag_yaml(filename: str) -> Dict[str, Any]:
-    with open(filename) as istream:
-        return yaml.safe_load(istream)
 
 
 def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
@@ -573,8 +538,6 @@ class DataStep(Step):
         does not have overhead from forking an extra process like _run_py and
         should be used with caution.
         """
-        from etl.helpers import isolated_env
-
         # path can be either in a module with __init__.py or a single .py file
         module_dir = self._search_path if self._search_path.is_dir() else self._search_path.parent
 
@@ -584,7 +547,15 @@ class DataStep(Step):
                 raise Exception(f'no run() method defined for module "{step_module}"')
 
             # data steps
-            step_module.run(self._dest_dir.as_posix())  # type: ignore
+            try:
+                # This should work when using the new run functions that don't require dest_dir as an argument.
+                step_module.run()
+            except TypeError as e:
+                # For backwards compatibility, execute the run function assuming it has dest_dir as an argument.
+                if "missing 1 required positional argument: 'dest_dir'" in str(e):
+                    step_module.run(self._dest_dir.as_posix())  # type: ignore
+                else:
+                    raise
 
     def _run_py(self) -> None:
         """
@@ -1189,3 +1160,33 @@ def _uses_old_schema(e: KeyError) -> bool:
     """Origins without `title` use old schema before rename. This can be removed once
     we recompute all datasets."""
     return e.args[0] == "title"
+
+
+@contextmanager
+def isolated_env(
+    working_dir: Path,
+    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
+) -> Generator[None, None, None]:
+    """Add given directory to pythonpath, run code in context, and
+    then remove from pythonpath and unimport modules imported in context.
+
+    Note that unimporting modules means they'll have to be imported again, but
+    it has minimal impact on performance (ms).
+
+    :param keep_modules: regex of modules to keep imported
+    """
+    # add module dir to pythonpath
+    sys.path.append(working_dir.as_posix())
+
+    # remember modules that were imported before
+    imported_modules = set(sys.modules.keys())
+
+    yield
+
+    # unimport modules imported during execution unless they match `keep_modules`
+    for module_name in set(sys.modules.keys()) - imported_modules:
+        if not re.search(keep_modules, module_name):
+            sys.modules.pop(module_name)
+
+    # remove module dir from pythonpath
+    sys.path.remove(working_dir.as_posix())

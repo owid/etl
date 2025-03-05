@@ -3,7 +3,8 @@
 import pandas as pd
 from owid.catalog import processing as pr
 
-from etl.helpers import PathFinder, create_dataset, last_date_published
+from etl.catalog_helpers import last_date_published
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

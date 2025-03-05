@@ -1,5 +1,5 @@
 #
-#  config.py
+#  NOTE: only allowed etl-dependency is etl.paths.
 #
 
 """

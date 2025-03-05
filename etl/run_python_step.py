@@ -53,7 +53,15 @@ def _import_and_run(step_type: str, path: str, dest_dir: str) -> None:
         raise Exception(f'no run() method defined for module "{module}"')
 
     # run the step itself
-    module.run(dest_dir)
+    try:
+        # This should work when using the new run functions that don't require dest_dir as an argument.
+        module.run()
+    except TypeError as e:
+        # For backwards compatibility, execute the run function assuming it has dest_dir as an argument.
+        if "missing 1 required positional argument: 'dest_dir'" in str(e):
+            module.run(dest_dir)
+        else:
+            raise
 
 
 if __name__ == "__main__":

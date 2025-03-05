@@ -268,3 +268,23 @@ def test_long_to_wide():
     assert wide["deaths__age_10_18"].m.title == "Deaths - Age: 10-18"
     assert wide["deaths__age_19_25"].m.title == "Deaths - Age: 19-25"
     assert wide["deaths__age_26_30"].m.title == "Deaths - Age: 26-30"
+
+
+def test__validate_description_key():
+    # Test case 2: description_key with all single-character strings
+    description_key = ["a", "b", "c"]
+    col = "column2"
+    try:
+        gh._validate_description_key(description_key, col)
+    except AssertionError as e:
+        assert str(e) == f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+    else:
+        assert False, "AssertionError not raised for description_key with all single-character strings"
+
+    # Test case 3: Valid description_key
+    description_key = ["key1", "key2", "key3"]
+    col = "column3"
+    try:
+        gh._validate_description_key(description_key, col)
+    except AssertionError:
+        assert False, f"AssertionError raised for valid description_key: {description_key}"
