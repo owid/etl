@@ -1,21 +1,21 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Tuple, cast
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.tables import concat
-from shared import (
+
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
+from etl.steps.data.garden.democracy.shared import (
     add_population_in_dummies,
     add_regions_and_global_aggregates,
     expand_observations,
     from_wide_to_long,
     make_table_with_dummies,
 )
-
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -30,10 +30,10 @@ REGIONS = {
 }
 # Year range
 YEAR_MIN = 2006
-YEAR_MAX = 2023
+YEAR_MAX = 2025
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["eiu"].reset_index()
+    tb = ds_meadow.read("eiu")
 
     #
     # Process data.
@@ -54,12 +54,12 @@ def run(dest_dir: str) -> None:
     )
 
     # Remove years with interpolated data (2007 and 2009 are interpolated by Gapminder)
-    tb = tb[~tb["year"].isin([2007, 2009])]
+    tb = tb.loc[~tb["year"].isin([2007, 2009])]
 
     # Drop rank column
     tb = tb.drop(columns=["rank_eiu"])
-    tb = cast(Table, tb)
 
+    # Add regime identifier
     tb = add_regime_identifier(tb)
 
     ##################################################
@@ -67,7 +67,7 @@ def run(dest_dir: str) -> None:
     # Get country-count-related data: country-averages, number of countries, ...
     tb_num_countries, tb_avg_countries = get_country_data(tb, ds_regions)
 
-    # Get population-related data: population-weighed averages, people livin in ...
+    # Get population-related data: population-weighed averages, people living in ...
     tb_num_people, tb_avg_w_countries = get_population_data(tb, ds_regions, ds_population)
     ##################################################
 
@@ -85,8 +85,10 @@ def run(dest_dir: str) -> None:
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    ds_garden = paths.create_dataset(
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
@@ -142,7 +144,6 @@ def get_country_data(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
             "regime_eiu": "Int64",
         }
     )
-    tb_num = cast(Table, tb_num)
 
     # Define columns on which we will estimate (i) "number of countries" and (ii) "number of people living in ..."
     indicators = [
@@ -212,7 +213,6 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
             "regime_eiu": "Int64",
         }
     )
-    tb_ppl = cast(Table, tb_ppl)
 
     indicators = [
         {
