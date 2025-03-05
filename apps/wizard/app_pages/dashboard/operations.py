@@ -68,7 +68,7 @@ def render_action_update():
             st.error("The update command is not available in production. Update steps locally or in staging.")
             st.stop()
         else:
-            with st.spinner("Executing step updater..."):
+            with st.spinner("Executing step updater...", show_time=True):
                 # TODO: It would be better to directly use StepUpdater instead of a subprocess.
                 command = (
                     "etl update "
@@ -132,7 +132,7 @@ def render_action_execute(steps_df: pd.DataFrame):
                 st.error("Running the ETL is not available in production. Run them locally or in staging.")
                 st.stop()
             else:
-                with st.spinner("Executing ETL..."):
+                with st.spinner("Executing ETL...", show_time=True):
                     command = _define_command_to_execute_snapshots_and_etl_steps(
                         steps_df=steps_df,
                         dry_run=dry_run_etl,
@@ -181,7 +181,7 @@ def render_action_archive():
             st.error("Archiving is not available in production. Run them locally or in staging.")
             st.stop()
         else:
-            with st.spinner("Archiving steps..."):
+            with st.spinner("Archiving steps...", show_time=True):
                 command = "etl archive " + " ".join(st.session_state.selected_steps) + " --non-interactive"
                 if dry_run_archive:
                     command += " --dry-run"
