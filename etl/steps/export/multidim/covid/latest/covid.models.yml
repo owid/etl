@@ -4,11 +4,12 @@ definitions:
     display:
       name: Confirmed cases, 7-day average
       color: "#000000"
-  config: &config_base
-    subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
-    originUrl: ourworldindata.org/covid-models
-    hideAnnotationFieldsInTitle:
-      time: true
+  common_views:
+    - config:
+      subtitle: Estimates of the true number of infections. The "upper" and "lower" lines show the bounds of a 95% uncertainty interval. For comparison, confirmed cases are infections that have been confirmed with a test.
+      originUrl: ourworldindata.org/covid-models
+      hideAnnotationFieldsInTitle:
+        time: true
 
 title:
   title: Daily new estimated COVID-19 infections
@@ -53,7 +54,6 @@ views:
         - *confirmed_infections
 
     config:
-      <<: *config_base
       title: "Daily new estimated COVID-19 infections from the ICL model"
       note: This chart shows the model estimates dated 25 December 2022.
 
@@ -76,7 +76,6 @@ views:
         - *confirmed_infections
 
     config:
-      <<: *config_base
       title: "Daily new estimated COVID-19 infections from the IHME model"
       note: This chart shows the model estimates dated 16 December 2022.
 
@@ -97,7 +96,6 @@ views:
         - *confirmed_infections
 
     config:
-      <<: *config_base
       title: "Daily new estimated COVID-19 infections from the LSHTM model"
       note: This chart shows the model estimates dated 25 August 2020.
 
@@ -118,6 +116,5 @@ views:
         - *confirmed_infections
 
     config:
-      <<: *config_base
       title: "Daily new estimated COVID-19 infections from the YYG model"
       note: This chart shows the model estimates dated 4 October 2020. YYG announced that this is the final model update.

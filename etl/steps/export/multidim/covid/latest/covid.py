@@ -41,7 +41,6 @@ def run(dest_dir: str) -> None:
             paths=paths,
             mdim_name=fname_to_mdim_name(fname),
         )
-
     # PART 2: MDIMs hybridly generated (mix of YAML file + data)
     ds = paths.load_dataset("google_mobility")
     tb = ds.read("google_mobility")

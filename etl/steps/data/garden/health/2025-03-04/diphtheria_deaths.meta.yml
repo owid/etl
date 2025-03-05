@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Long-run deaths from diphtheria in the United States
+
+tables:
+  diphtheria_deaths:
+    variables:
+      deaths:
+        title: Diphtheria deaths
+        unit: deaths
+        description_short: Reported number of [diphtheria](#dod:diphtheria) deaths in the United States.
+        display:
+          numDecimalPlaces: 0
+      death_rate:
+        title: Diphtheria death rate
+        unit: deaths per million people
+        description_short: Reported number of [diphtheria](#dod:diphtheria) deaths in the United States per million people.
+        display:
+          numDecimalPlaces: 1

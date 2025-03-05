@@ -15,7 +15,7 @@ DATA_1919_1940 = pd.DataFrame(
     {
         "country": ["United States"] * 8,
         "year": [1919, 1921, 1924, 1925, 1937, 1938, 1939, 1940],
-        "deaths": [12992, 3370, 8370, 2309, 1395, 3227, 1171, 681],
+        "deaths": [12992, 3829, 8370, 2309, 1395, 3227, 1171, 681],
         "source": [
             "https://www.jstor.org/stable/4575902",
             "https://www.jstor.org/stable/4576538",
