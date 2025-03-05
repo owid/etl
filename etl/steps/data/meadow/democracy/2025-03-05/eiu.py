@@ -2,27 +2,26 @@
 
 from owid.catalog.tables import Table, concat
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
-
-    # Retieve data from Gapminder
+    # Retrieve data from Gapminder
     snap = paths.load_snapshot("eiu_gapminder.csv")
     tb_gm = snap.read(safe_types=False)
 
     # Retrieve data from EIU (single year reports)
     shortnames = [
-        # "eiu_gapminder",
         "eiu_2021",
         "eiu_2022",
         "eiu_2023",
+        "eiu_2024",
     ]
     tbs = []
     for name in shortnames:
@@ -31,18 +30,9 @@ def run(dest_dir: str) -> None:
         tbs.append(tb)
 
     # Correct data by Gapminder
-    ## Gapminder multiplies all values by ten.
-    cols = [
-        "democracy_eiu",
-        "elect_freefair_eiu",
-        "funct_gov_eiu",
-        "pol_part_eiu",
-        "dem_culture_eiu",
-        "civlib_eiu",
-    ]
-    tb_gm[cols] = tb_gm[cols] / 10
+    tb_gm = scale_indicators_gm(tb_gm)
 
-    ## Add missing data
+    ## Add missing data in Gapminder
     tb_gm = add_datapoints(tb_gm)
 
     # Concatenate all tables.
@@ -52,14 +42,19 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Rename country column
     tb = tb.rename(
         columns={
             "country_name": "country",
         }
     )
 
+    # Drop rows if country is NA
+    tb = tb.dropna(subset=["country"])
+
+    # Fix type of rank
     tb["rank_eiu"] = tb["rank_eiu"].str.replace("=", "")
-    tb["rank_eiu"] = tb["rank_eiu"].astype("float")
+    tb["rank_eiu"] = tb["rank_eiu"].astype("UInt16")
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["country", "year"])
@@ -68,10 +63,29 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(
+        tables=[tb],
+        check_variables_metadata=True,
+        default_metadata=snap.metadata,
+    )
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
+
+
+def scale_indicators_gm(tb):
+    """Gapminder multiplies all values by ten."""
+    cols = [
+        "democracy_eiu",
+        "elect_freefair_eiu",
+        "funct_gov_eiu",
+        "pol_part_eiu",
+        "dem_culture_eiu",
+        "civlib_eiu",
+    ]
+    tb[cols] = tb[cols] / 10
+
+    return tb
 
 
 def add_datapoints(tb: Table) -> Table:
