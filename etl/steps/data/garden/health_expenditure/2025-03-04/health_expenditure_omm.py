@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import Table, warnings
+from owid.catalog import Table
 
 from etl.helpers import PathFinder, create_dataset
 
@@ -9,7 +9,6 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 # Define constants: variables to process and references years where merge is done.
-VAR_LIST = ["gdp", "gdp_per_capita"]
 YEAR_OECD_OECD93 = 1970
 YEAR_OECD93_LINDERT = 1960
 
@@ -40,6 +39,11 @@ def run(dest_dir: str) -> None:
     # Save the countries available in the OECD dataset
     countries_oecd = list(tb_oecd["country"].unique())
 
+    # For tb_oecd_1993, only keep data between YEAR_OECD93_LINDERT and YEAR_OECD_OECD93
+    tb_oecd_1993 = tb_oecd_1993[
+        (tb_oecd_1993["year"] >= YEAR_OECD93_LINDERT) & (tb_oecd_1993["year"] <= YEAR_OECD_OECD93)
+    ].reset_index(drop=True)
+
     # Merge the three tables
     tb = pr.merge(tb_oecd, tb_oecd_1993, on=["country", "year"], how="outer", suffixes=("", "_oecd_1993"))
     tb = pr.merge(tb, tb_lindert, on=["country", "year"], how="outer", suffixes=("", "_lindert"))
@@ -50,15 +54,25 @@ def run(dest_dir: str) -> None:
     # Keep only countries available in the OECD dataset
     tb = tb[tb["country"].isin(countries_oecd)].reset_index(drop=True)
 
-    print(tb)
+    # Merge the three series, by applying the growth retroactively
+    tb = create_estimations_from_growth(
+        tb=tb, reference_year=YEAR_OECD_OECD93, reference_var_suffix="_oecd_1993", to_adjust_var_suffix="_oecd"
+    )
 
-    tb = tb.format(["country", "year"])
+    tb = create_estimations_from_growth(
+        tb=tb, reference_year=YEAR_OECD93_LINDERT, reference_var_suffix="_lindert", to_adjust_var_suffix=""
+    )
+
+    # Keep only the necessary columns
+    tb = tb[["country", "year", "share_gdp"]]
+
+    tb = tb.format(["country", "year"], short_name="health_expenditure_omm")
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=ds_oecd.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -86,26 +100,33 @@ def create_estimations_from_growth(
     tb : Table
         Table with the adjusted variables.
     """
-    with warnings.ignore_warnings([warnings.DifferentValuesWarning]):
-        # Get value from the reference variable in the reference year
-        reference_value = tb.loc[tb["year"] == reference_year, f"{var}{reference_var_suffix}"].iloc[0]
 
-        # The scalar is the previous value divided by the reference variable. This is the growth that will be applied retroactively to the variable to be adjusted.
-        tb[f"{var}_scalar"] = tb[f"{var}{reference_var_suffix}"] / reference_value
+    # Save the original columns
+    columns_list = list(tb.columns)
 
-        # Get value to be adjusted in the reference year
-        to_adjust_value = tb.loc[tb["year"] == reference_year, f"{var}{to_adjust_var_suffix}"].iloc[0]
+    # Get value from the reference variable in the reference year
+    tb["reference_value"] = tb.groupby("country")[f"share_gdp{reference_var_suffix}"].transform(
+        lambda x: x.loc[tb["year"] == reference_year].iloc[0] if not x.loc[tb["year"] == reference_year].empty else None
+    )
 
-        # The estimated values are the division between the reference value and the scalars. This is the variable to be adjusted effectively adjusted by the growth of the reference variable.
-        tb[f"{var}_estimated"] = to_adjust_value * tb[f"{var}_scalar"]
+    # The scalar is the previous value divided by the reference variable. This is the growth that will be applied retroactively to the variable to be adjusted.
+    tb["share_gdp_scalar"] = tb[f"share_gdp{reference_var_suffix}"] / tb["reference_value"]
 
-        # Rename the estimated variables without the suffix
-        tb[f"{var}"] = tb[f"{var}{to_adjust_var_suffix}"].astype("Float64").fillna(tb[f"{var}_estimated"])
+    # Get value to be adjusted in the reference year
+    tb["to_adjust_value"] = tb.groupby("country")[f"share_gdp{to_adjust_var_suffix}"].transform(
+        lambda x: x.loc[tb["year"] == reference_year].iloc[0] if not x.loc[tb["year"] == reference_year].empty else None
+    )
 
-    # Specify "World" entity for each row
-    tb["country"] = "World"
+    # The estimated values are the division between the reference value and the scalars. This is the variable to be adjusted effectively adjusted by the growth of the reference variable.
+    tb["share_gdp_estimated"] = tb["to_adjust_value"] * tb["share_gdp_scalar"]
+
+    # Rename the estimated variables without the suffix
+    tb["share_gdp"] = tb[f"share_gdp{to_adjust_var_suffix}"].astype("Float64").fillna(tb["share_gdp_estimated"])
 
     # Keep only new variables
-    tb = tb[["country", "year"] + var_list]
+    if "share_gdp" not in columns_list:
+        columns_list.append("share_gdp")
+
+    tb = tb[columns_list]
 
     return tb

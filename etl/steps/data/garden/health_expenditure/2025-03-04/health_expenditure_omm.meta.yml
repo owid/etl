@@ -15,17 +15,21 @@ dataset:
 tables:
   health_expenditure_omm:
     variables:
-      health_expenditure_share_gdp:
+      share_gdp:
         title: Public health expenditure as a share of GDP
         unit: "% of GDP"
         short_unit: "%"
         description_short: Public health expenditure divided bt gross domestic product, expressed as a percentage.
+        description_key:
+          - "This indicator combines three different datasets: Lindert (1994), OECD (1993), and the OECD Health Expenditure and Financing Database. We combine them by using the implicit growth rate from the older series, so we can extend the series back to 1880."
+        description_from_producer: ""
         processing_level: major
-        description_processing: We calculated this indicator by dividing estimates of public expenditure on health by GDP, expressed as a percentage.
+        description_processing: |-
+          The data presented here from 1970 onwards is from the OECD Health Expenditure and Financing Database (Government/compulsory schemes). We constructed the data before 1970 using the 1970 OECD Health Expenditure and Financing Database observation and applying the growth rates implied by the OECD (1993) data. These steps are necessary because the data in these years is not exactly the same for the three datasets due to changes in definitions and measurement, though the trends are consistent.
         presentation:
-          attribution_short: OECD
+          attribution_short: Lindert, OECD
           title_public: Public health expenditure as a share of GDP
-          title_variant: Data between 1960-1991
+          title_variant: Historical data
         display:
           name: Public health expenditure as a share of GDP
           numDecimalPlaces: 1

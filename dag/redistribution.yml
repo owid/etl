@@ -48,6 +48,8 @@ steps:
     - data://garden/oecd/2025-02-25/health_expenditure
     - data://garden/oecd/2025-03-04/health_expenditure_1993
     - data://garden/health_expenditure/2025-03-04/lindert
+  data://grapher/health_expenditure/2025-03-04/health_expenditure_omm:
+    - data://garden/health_expenditure/2025-03-04/health_expenditure_omm
 
   #
   # Government subsidies for health care 1880-1930 (Lindert, 1994)
