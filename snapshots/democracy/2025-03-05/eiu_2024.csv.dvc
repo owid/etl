@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Democracy Index 2024: What's wrong with representative democracy?"
+    description: |-
+      The Economist Intelligence Unit's Democracy Index provides a snapshot of the state of democracy in 165 independent states and two territories. This covers almost the entire population of the world and the vast majority of the world's states (microstates are excluded). Scored on a 0-10 scale, the Democracy Index is based on five categories: electoral process and pluralism, functioning of government, political participation, political culture, and civil liberties. Based on its scores on a range of indicators within these categories, each country is classified as one of four types of regime: "full democracy", "flawed democracy", "hybrid regime" or "authoritarian regime".
+
+      This edition of the Democracy Index examines the state of global democracy in 2024. The focus of this year's report is why representative democracy is not working for large numbers of citizens around the world. There is a growing consensus that the democratic model developed over the past century is in trouble, but there is less clarity about why people are so disenchanted with their democracies. In 2024, when countries inhabited by more than half of the global population went to the polls, popular disaffection with the performance of government was expressed in an anti-incumbent backlash and rising support for populist insurgents.
+    date_published: "2025-02-27"
+    # Citation
+    producer: Economist Intelligence Unit
+    citation_full: |-
+      Economist Intelligence Unit. (2025, February 27). Democracy Index 2024: What's wrong with representative democracy? Retrieved from Economist Group.
+
+    # Files
+    url_main: https://www.eiu.com/n/campaigns/democracy-index-2024/
+    date_accessed: 2025-03-05
+
+    # License
+    license:
+      name: The Economist Intelligence Unit Limited
+      url: https://www.eiu.com/n/terms/
+outs:
+  - md5: 0c518b869c0f2aca57ec6f65b45351bb
+    size: 7005
+    path: eiu_2024.csv
