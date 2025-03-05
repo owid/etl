@@ -31,6 +31,9 @@ REGIONS = {
 # Year range
 YEAR_MIN = 2006
 YEAR_MAX = 2025
+# Years with interpolated values
+## Gapminder interpolates 2007 and 2009. We rather drop datapoints for these years.
+YEAR_INTERPOLATED = [2007, 2009]
 
 
 def run() -> None:
@@ -54,7 +57,7 @@ def run() -> None:
     )
 
     # Remove years with interpolated data (2007 and 2009 are interpolated by Gapminder)
-    tb = tb.loc[~tb["year"].isin([2007, 2009])]
+    tb = tb.loc[~tb["year"].isin(YEAR_INTERPOLATED)]
 
     # Drop rank column
     tb = tb.drop(columns=["rank_eiu"])
@@ -292,6 +295,6 @@ def expand_observations_without_duplicates(tb: Table, ds_regions: Dataset) -> Ta
     tb_exp = expand_observations(tb, countries)
 
     # Limit years
-    tb_exp = tb_exp.loc[tb_exp["year"].isin(range(YEAR_MIN, YEAR_MAX + 1, 2))]
+    tb_exp = tb_exp.loc[~tb_exp["year"].isin(YEAR_INTERPOLATED)]
 
     return tb_exp
