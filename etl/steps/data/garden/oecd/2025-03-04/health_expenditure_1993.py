@@ -34,6 +34,9 @@ def run(dest_dir: str) -> None:
         warn_on_unused_countries=False,
     )
 
+    # The GDP data for Japan and Italy is in billions. We need to multiply it by 1000 to match the rest in millions.
+    tb_gdp.loc[tb_gdp["country"].isin(["Japan", "Italy"]), "gdp"] *= 1000
+
     # Merge both tables
     tb = pr.merge(tb_gdp, tb_health_expenditure, on=["country", "year"])
 
