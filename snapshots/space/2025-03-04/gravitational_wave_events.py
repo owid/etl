@@ -1,4 +1,9 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+
+NOTE: The publication date can be set as the date of the latest publication in:
+https://zenodo.org/communities/ligo-virgo-kagra/records?q=&f=allversions%3Atrue&l=list&p=1&s=10&sort=newest
+
+"""
 
 from pathlib import Path
 
