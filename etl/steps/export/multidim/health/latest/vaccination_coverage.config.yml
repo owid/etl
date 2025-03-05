@@ -1,0 +1,56 @@
+title:
+  title: Vaccination coverage
+  titleVariant: by vaccine and metric
+defaultSelection:
+  - World
+  - Europe
+  - Asia
+dimensions:
+  - name: Cause of death
+    slug: cause
+    choices:
+      - description: See all causes side by side
+        name: Side-by-side comparison of causes
+        slug: Side-by-side comparison of causes
+      - description: Aggregate of all causes
+        name: All causes
+        slug: All causes
+      # Additional causes will be added programmatically.
+  - name: Age group
+    slug: age
+    choices:
+      - description: null
+        name: 15-49 years
+        slug: 15-49 years
+      - description: null
+        name: 5-14 years
+        slug: 5-14 years
+      - description: null
+        name: 50-69 years
+        slug: 50-69 years
+      - description: null
+        name: 70+ years
+        slug: 70+ years
+      - description: null
+        name: <5 years
+        slug: <5 years
+      - description: null
+        name: All ages
+        slug: All ages
+      - description: null
+        name: Age-standardized
+        slug: Age-standardized
+  - name: Metric
+    slug: metric
+    choices:
+      - description: null
+        name: Number
+        slug: Number
+      - description: null
+        name: Percent
+        slug: Percent
+      - description: null
+        name: Rate
+        slug: Rate
+
+views: []
