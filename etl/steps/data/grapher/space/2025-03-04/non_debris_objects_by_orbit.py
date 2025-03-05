@@ -14,13 +14,13 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("space_track")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("space_track")
+    tb = ds_garden.read("non_debris_objects_by_orbit")
 
     #
     # Process data.
     #
     # Adapt column names to grapher.
-    tb = tb.rename(columns={"entity": "country"}, errors="raise")
+    tb = tb.rename(columns={"orbit": "country"}, errors="raise")
 
     # Improve table format.
     tb = tb.format(["country", "year"])

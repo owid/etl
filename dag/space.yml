@@ -62,7 +62,12 @@ steps:
   data://garden/space/2025-03-04/space_track:
     - data://meadow/space/2025-03-04/space_track
   #
-  # United States Space Force - Number of objects in space
+  # United States Space Force - Number of lower Earth objects in space by type
   #
-  data://grapher/space/2025-03-04/space_track:
+  data://grapher/space/2025-03-04/lower_earth_objects_by_type:
+    - data://garden/space/2025-03-04/space_track
+  #
+  # United States Space Force - Number of non-debris objects in space by orbit
+  #
+  data://grapher/space/2025-03-04/non_debris_objects_by_orbit:
     - data://garden/space/2025-03-04/space_track

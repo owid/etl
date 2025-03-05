@@ -1,8 +1,27 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Space Exploration & Satellites
+    processing_level: major
+    unit: objects
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+
 tables:
-  space_track:
+  lower_earth_objects_by_type:
     variables:
-      objects:
-        title: Objects in space
-        unit: objects
-        display:
-          numDecimalPlaces: 0
+      n_objects:
+        title: Number of tracked objects in lower Earth orbit
+        description_short: |-
+          Objects are subtracted from the time series after they have reentered the Earth's atmosphere. Not all objects are tracked: in 2021, the European Space Agency estimated there were more than 130 million space debris objects larger than 1 millimeter.
+  non_debris_objects_by_orbit:
+    variables:
+      n_objects:
+        title: Payloads and rocket bodies in space, by orbit
+        description_short: |-
+          Debris from launches or collisions is not counted. Objects are subtracted from the time series after they have reentered the Earth's atmosphere.
