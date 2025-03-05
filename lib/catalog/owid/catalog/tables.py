@@ -185,6 +185,12 @@ class Table(pd.DataFrame):
         # Add processing log to the metadata of each variable in the table.
         table = update_processing_logs_when_loading_or_creating_table(table=table)
 
+        # Fill dimensions from additional_info for compatibility
+        for col in table.columns:
+            dims = (table[col].m.additional_info or {}).get("dimensions")
+            if dims:
+                update_variable_dimensions(table[col], dims)
+
         if cls.DEBUG:
             table.check_metadata()
 
@@ -2200,3 +2206,17 @@ def keep_metadata(func: Callable[..., Union[pd.DataFrame, pd.Series]]) -> Callab
 
 
 to_numeric = keep_metadata(pd.to_numeric)
+
+
+def update_variable_dimensions(variable, dimensions_data: Dict[str, Any]) -> None:
+    """
+    Update a variable's dimensions metadata.
+
+    Args:
+        variable: The variable to update with dimension information
+        dimensions_data: Dictionary containing dimension information
+    """
+    if dimensions_data:
+        variable.m.original_short_name = dimensions_data.get("originalShortName")
+        variable.m.original_title = dimensions_data.get("originalName")
+        variable.m.dimensions = {f["name"]: f["value"] for f in dimensions_data.get("filters", [])}

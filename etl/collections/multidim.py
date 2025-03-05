@@ -452,9 +452,9 @@ class MDIMConfigExpander:
             if dims:
                 assert tb[col].m.original_short_name, "Missing metadata.original_short_name for dimensions!"
                 row = {
-                    "short_name": col,
                     # TODO: how is this useful? can we live without it? can it be None?
                     "indicator": tb[col].m.original_short_name,
+                    "short_name": col,
                 }
                 # Add dimensional info
                 row = {**row, **dims}
