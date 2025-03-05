@@ -3,54 +3,52 @@ title:
   titleVariant: by vaccine and metric
 defaultSelection:
   - World
-  - Europe
-  - Asia
 dimensions:
-  - name: Cause of death
-    slug: cause
-    choices:
-      - description: See all causes side by side
-        name: Side-by-side comparison of causes
-        slug: Side-by-side comparison of causes
-      - description: Aggregate of all causes
-        name: All causes
-        slug: All causes
-      # Additional causes will be added programmatically.
-  - name: Age group
-    slug: age
-    choices:
-      - description: null
-        name: 15-49 years
-        slug: 15-49 years
-      - description: null
-        name: 5-14 years
-        slug: 5-14 years
-      - description: null
-        name: 50-69 years
-        slug: 50-69 years
-      - description: null
-        name: 70+ years
-        slug: 70+ years
-      - description: null
-        name: <5 years
-        slug: <5 years
-      - description: null
-        name: All ages
-        slug: All ages
-      - description: null
-        name: Age-standardized
-        slug: Age-standardized
   - name: Metric
     slug: metric
     choices:
-      - description: null
-        name: Number
-        slug: Number
-      - description: null
-        name: Percent
-        slug: Percent
-      - description: null
-        name: Rate
-        slug: Rate
+      - slug: "coverage"
+        name: "Coverage"
+      - slug: "unvaccinated_one_year_olds"
+        name: "Unvaccinated one-year-olds"
+      - slug: "unvaccinated_newborns"
+        name: "Unvaccinated newborns"
+  - name: Antigen
+    slug: antigen
+    choices:
+      - slug: "bcg"
+        name: "Bacille Calmette-Guérin (BCG)"
+      - slug: "dtpcv1"
+        name: "Diphtheria, tetanus, and pertussis (DTP) vaccine, first dose"
+      - slug: "dtpcv3"
+        name: "Diphtheria, tetanus, and pertussis (DTP) vaccine, third dose"
+      - slug: "hepb3"
+        name: "Hepatitis B (HepB) vaccine, third dose"
+      - slug: "hepb_bd"
+        name: "Hepatitis B (HepB) vaccine, birth dose"
+      - slug: "hib3"
+        name: "Haemophilus influenzae type b (Hib) vaccine, third dose"
+      - slug: "ipv1"
+        name: "Inactivated polio vaccine (IPV), first dose"
+      - slug: "ipv2"
+        name: "Inactivated polio vaccine (IPV), second dose"
+      - slug: "mcv1"
+        name: "Measles-containing vaccine, first dose"
+      - slug: "mcv2"
+        name: "Measles-containing vaccine, second dose"
+      - slug: "mcv2x2"
+        name: "Measles-containing vaccine, second dose (two-year-olds)"
+      - slug: "mena_c"
+        name: "Meningococcal conjugate vaccine (MenA), last dose"
+      - slug: "pcv3"
+        name: "Pneumococcal conjugate vaccine (PCV), third dose"
+      - slug: "pol3"
+        name: "Polio vaccine, third dose"
+      - slug: "rcv1"
+        name: "Rubella-containing vaccine, first dose"
+      - slug: "rotac"
+        name: "Rotavirus vaccine, last dose"
+      - slug: "yf"
+        name: "Yellow fever vaccine"
 
 views: []

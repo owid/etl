@@ -12,23 +12,23 @@ def run(dest_dir: str) -> None:
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_coverage")
-    tb = ds.read("vaccination_coverage", load_data=False)
+    tb = ds.read("vaccination_coverage", load_data=True)
 
-    # Get all combinations of dimensions
-    config_new = multidim.expand_config(tb, dimensions=["cause", "age", "metric"])
-
-    config["dimensions"][0]["choices"] += [
-        c for c in config_new["dimensions"][0]["choices"] if c["slug"] != "All causes"
-    ]
-
-    # Group age and metric views under "Side-by-side comparison of causes"
-    grouped_views = multidim.group_views(config_new["views"], by=["age", "metric"])
-    for view in grouped_views:
-        view["dimensions"]["cause"] = "Side-by-side comparison of causes"
-
-    # Add views to config
-    config["views"] += config_new["views"]
-    config["views"] += grouped_views
+    config["views"] = multidim.generate_views_for_dimensions(
+        dimensions=config["dimensions"],
+        tables=[tb],
+        dimensions_order_in_slug=("metric", "antigen"),
+        warn_on_missing_combinations=False,
+        additional_config={
+            "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+            "chartTypes": ["LineChart"],
+            "hasMapTab": True,
+            "tab": "map",
+            "map": {
+                "colorScale": {"baseColorScheme": "YlGbBu"},
+            },
+        },
+    )
 
     multidim.upsert_multidim_data_page(
         config=config,
