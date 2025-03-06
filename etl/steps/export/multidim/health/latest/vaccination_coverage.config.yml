@@ -137,3 +137,68 @@ views:
       antigen: yf
     indicators:
       y: "vaccination_coverage#coverage__antigen_yfv"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: dtpcv1
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_dtpcv1"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: dtpcv3
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_dtpcv3"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: hepb3
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_hepb3"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: hib3
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_hib3"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: ipv1
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_ipv1"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: ipv2
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_ipv2"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: mcv1
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_mcv1"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: mena_c
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_mena_c"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: pcv3
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_pcv3"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: pol3
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_pol3"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: rcv1
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_rcv1"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: rotac
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_rotac"
+  - dimensions:
+      metric: unvaccinated_one_year_olds
+      antigen: yfv
+    indicators:
+      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_yfv"
