@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical pertussis cases in the United States Census Bureau
+    title: Historical pertussis deaths in the United States Census Bureau
     description: |-
-      Data on historical pertussis cases in the United States, compiled from a selection of sources from the US Census Bureau.
+      Data on historical pertussis deaths in the United States, compiled from a selection of sources from the US Census Bureau.
 
       Sources for each year are as follows:
 
