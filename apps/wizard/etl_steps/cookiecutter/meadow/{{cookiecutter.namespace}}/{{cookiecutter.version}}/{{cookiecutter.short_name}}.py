@@ -1,13 +1,13 @@
 """Load a snapshot and create a meadow dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
 {% if (_cookiecutter.snapshot_names_with_extension | length) == 1 %}
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
+    # Improve tables format.
     tables = [
         tb.format(["country", "year"])
     ]
@@ -28,19 +28,14 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
-        tables=tables,
-        check_variables_metadata=True,
-        default_metadata=snap.metadata,
-    )
+    # Initialize a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap.metadata)
 
-    # Save changes in the new meadow dataset.
+    # Save meadow dataset.
     ds_meadow.save()
 
 {%- else %}
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -56,20 +51,18 @@ def run(dest_dir: str) -> None:
         #
         # Process data.
         #
-        # TODO
-
-        # Format
+        # Improve table format.
         tb = tb.format(["country", "year"])
 
-        # Append to main list
+        # Append current table to list of tables.
         tables.append(tb)
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=tables)
+    # Initialize a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=tables)
 
-    # Save changes in the new meadow dataset.
+    # Save meadow dataset.
     ds_meadow.save()
 {%- endif -%}

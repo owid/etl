@@ -1144,3 +1144,13 @@ steps:
   # Multi-dim indicators - vaccination coverage
   export://multidim/health/latest/vaccination_coverage:
     - data://grapher/who/2024-12-10/vaccination_coverage
+  #
+  # US Pertussis cases - CDC
+  #
+  data://meadow/cdc/2025-03-04/pertussis_cases:
+    - snapshot://cdc/2025-03-04/pertussis_cases.csv
+  data://garden/cdc/2025-03-04/pertussis_cases:
+    - data://meadow/cdc/2025-03-04/pertussis_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-04/pertussis_cases:
+    - data://garden/cdc/2025-03-04/pertussis_cases
