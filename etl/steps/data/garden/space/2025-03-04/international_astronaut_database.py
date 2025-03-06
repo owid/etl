@@ -1,14 +1,58 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import json
 import re
 
 import owid.catalog.processing as pr
+from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+
+def harmonize_country_names(tb, tb_regions):
+    # Start by applying the normal country harmonization (where, e.g. "Soviet Union" is mapped to "USSR").
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+
+    # Now handle historical regions specifically.
+    # * "Czechoslovakia" split into "Czechia" and "Slovakia", but so far only Slovakia has an entry.
+    error = "We are mapping Czechoslovakia to Slovakia, but Czechia now has an entry. Decide how to handle."
+    assert tb[tb["country"] == "Czechia"].empty, error
+
+    # * "East Germany" reunified with West Germany (not in the data), so we can map it to "Germany".
+    error = "West Germany was not expected to appear in the data."
+    assert "West Germany" not in set(tb["country"]), error
+
+    # * "Soviet Union" split into "Russia", "Ukraine", and "Kazakhstan" (and other countries not in the data).
+    ussr_successors = tb_regions[
+        tb_regions["code"].isin(json.loads(tb_regions[tb_regions["name"] == "USSR"]["successors"].item()))
+    ]["name"].tolist()
+    error = "USSR successors have changed in the data. Decide how to handle."
+    assert set(ussr_successors) & set(tb["country"]) == set(["Russia", "Ukraine", "Kazakhstan"]), error
+    error = "Expected Russia to account for more than 95% of entries in the data."
+    assert (
+        len(tb[tb["country"].isin(["Russia"])]) / len(tb[tb["country"].isin(["Kazakhstan", "Ukraine", "Russia"])]) * 100
+        > 95
+    ), error
+
+    # NOTE: If any of the previous assertions fail, rethink the mapping.
+    historical_regions_mapping = {
+        "Czechoslovakia": "Slovakia",
+        "East Germany": "Germany",
+        "USSR": "Russia",
+    }
+    tb["country"] = map_series(
+        tb["country"],
+        mapping=historical_regions_mapping,
+        warn_on_missing_mappings=False,
+        warn_on_unused_mappings=True,
+        show_full_warning=True,
+    )
+
+    return tb
 
 
 def run() -> None:
@@ -21,6 +65,12 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("international_astronaut_database")
 
+    # Load regions dataset (used for sanity checks).
+    ds_regions = paths.load_dataset("regions")
+
+    # Read table from regions dataset.
+    tb_regions = ds_regions.read("regions")
+
     #
     # Process data.
     #
@@ -30,6 +80,10 @@ def run() -> None:
     assert (tb["year"].str.len() == tb["total_flights"]).all(), error
     tb = tb.explode("year").reset_index(drop=True)
     tb = tb.sort_values(["country", "year", "name"]).reset_index(drop=True)
+
+    # Harmonize country names.
+    # TODO: Ensure all curves go from the minimum year to the maximum one, filling gaps.
+    tb = harmonize_country_names(tb=tb, tb_regions=tb_regions)
 
     # Calculate the number of annual launches per country-year (regardless of the astronaut).
     tb_annual_launches = (
@@ -66,9 +120,6 @@ def run() -> None:
 
     # Add a column for the cumulative number of new astronauts per country over the years.
     tb["n_cumulative_new_astronauts"] = tb.groupby("country")["n_new_astronauts"].cumsum()
-
-    # Harmonize country names.
-    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Improve table format.
     tb = tb.format(["country", "year"])

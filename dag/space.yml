@@ -89,6 +89,7 @@ steps:
   #
   data://garden/space/2025-03-04/international_astronaut_database:
     - data://meadow/space/2025-03-04/international_astronaut_database
+    - data://garden/regions/2023-01-01/regions
   #
   # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
   #

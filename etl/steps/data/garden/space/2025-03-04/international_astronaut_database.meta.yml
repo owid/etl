@@ -4,6 +4,8 @@ definitions:
       topic_tags:
         - Space Exploration & Satellites
     processing_level: major
+    description_processing: |-
+     - We have mapped values for Czechoslovakia to Slovakia (there was no entry for Czechia in the data), East Germany to Germany (there was no entry for West Germany), and USSR to Russia (Russia accounts for over 95% of entries in the data among all other USSR successors).
     display:
       numDecimalPlaces: 0
   footnote_each_visit_counted: &footnote-each-visit-counted |-
