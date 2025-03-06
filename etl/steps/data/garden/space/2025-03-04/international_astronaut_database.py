@@ -1,5 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import re
+
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -20,10 +24,51 @@ def run() -> None:
     #
     # Process data.
     #
-    # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    # Column "flights" contains years in parentheses. Extract them and explode each year in a different row.
+    tb["year"] = [re.findall(r"\((\d{4})\)", flights) for flights in tb["flights"]]
+    error = "Mismatch between 'total_flights' and number of years found in 'flights' column."
+    assert (tb["year"].str.len() == tb["total_flights"]).all(), error
+    tb = tb.explode("year").reset_index(drop=True)
+    tb = tb.sort_values(["country", "year", "name"]).reset_index(drop=True)
+
+    # Calculate the number of annual launches per country-year (regardless of the astronaut).
+    tb_annual_launches = (
+        tb.groupby(["country", "year"], as_index=False).agg({"name": "count"}).rename(columns={"name": "n_launches"})
     )
+
+    # Calculate the number of astronauts launched for the first time per country-year.
+    tb_n_first_launches = (
+        tb.drop_duplicates(subset=["country", "name"])
+        .groupby(["country", "year"], as_index=False)
+        .agg({"name": "nunique"})
+        .rename(columns={"name": "n_new_astronauts"})
+    )
+
+    # Combine the two tables.
+    tb = tb_annual_launches.merge(tb_n_first_launches, on=["country", "year"], how="left")
+    # Fill with 0 on years where no new astronaut was launched.
+    tb["n_new_astronauts"] = tb["n_new_astronauts"].fillna(0).astype(int)
+
+    # Add global totals for various columns.
+    tb = pr.concat(
+        [
+            tb,
+            tb.groupby("year", as_index=False)
+            .agg({"n_launches": "sum", "n_new_astronauts": "sum"})
+            .assign(**{"country": "World"}),
+        ],
+        ignore_index=True,
+    )
+
+    # Add a column for the cumulative number of launches per country over the years.
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
+    tb["n_cumulative_launches"] = tb.groupby("country")["n_launches"].cumsum()
+
+    # Add a column for the cumulative number of new astronauts per country over the years.
+    tb["n_cumulative_new_astronauts"] = tb.groupby("country")["n_new_astronauts"].cumsum()
+
+    # Harmonize country names.
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Improve table format.
     tb = tb.format(["country", "year"])

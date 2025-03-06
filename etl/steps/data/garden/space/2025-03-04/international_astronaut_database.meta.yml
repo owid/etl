@@ -1,58 +1,52 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_key:
+      - The definition of astronaut is not universally agreed upon among space launch providers. This data includes all individuals who have flown to outer space.
+      - Outer space is defined here as an altitude of 100 kilometers or higher, following the World Air Sports Federation (FAI) definition, an international standard for aeronautics and astronautics records.
+      - The data includes astronauts who died during space-bound missions, such as those aboard STS-51-L.
+      - This data does not include individuals who flew below 100 kilometers or first-time astronauts who died in non-space-bound missions without having previously been to space.
     presentation:
       topic_tags:
         - Space Exploration & Satellites
+    processing_level: major
+    display:
+      numDecimalPlaces: 0
+  footnote_each_visit_counted: &footnote-each-visit-counted |-
+    For individuals who went to space multiple times in the same year, each visit is counted. Country-level data is assigned according to the individual's nationality.
+  footnote_first_visit_counted: &footnote-first-visit-counted |-
+    For individuals who went to space multiple times, only the first visit is counted. Country-level data is assigned according to the individual's nationality.
 
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 364
-
 
 tables:
   international_astronaut_database:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
-
+      n_launches:
+        title: Annual number of human visits to space
+        unit: visits
+        short_unit: ""
+        presentation:
+          grapher_config:
+            note: *footnote-each-visit-counted
+      n_cumulative_launches:
+        title: Cumulative number of human visits to space
+        unit: visits
+        short_unit: ""
+        presentation:
+          grapher_config:
+            note: *footnote-each-visit-counted
+      n_new_astronauts:
+        title: Number of new astronauts who have been to space
+        unit: people
+        short_unit: ""
+        presentation:
+          grapher_config:
+            note: *footnote-first-visit-counted
+      n_cumulative_new_astronauts:
+        title: Cumulative number of people who have been to space
+        unit: people
+        short_unit: ""
+        presentation:
+          grapher_config:
+            note: *footnote-first-visit-counted
