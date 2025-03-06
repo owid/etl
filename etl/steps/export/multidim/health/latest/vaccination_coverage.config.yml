@@ -1,9 +1,17 @@
 title:
   title: Vaccination coverage
   titleVariant: by vaccine and metric
+
 defaultSelection:
   - World
 dimensions:
+  - name: Metric
+    slug: metric
+    choices:
+      - slug: "coverage"
+        name: "Coverage"
+      - slug: "unvaccinated_one_year_olds"
+        name: "Unvaccinated one-year-olds"
   - name: Antigen
     slug: antigen
     choices:
