@@ -4,14 +4,10 @@ meta:
   origin:
     # Data product / Snapshot
     title: History of the NASA Budget
-    # TODO: Move elsewhere in the garden metadata.
-    # description: |-
-    #   NASA's budget categorizations have changed throughout the agency's history.
-    #   All adjustments for inflation are made using the GDP Chained Price Index published by the US Office of Management and Budget.
     date_published: "2022-09-01"
 
     # Citation
-    producer: Center for Strategic and International Studies
+    producer: CSIS Aerospace Security Project
     citation_full: |-
       Center for Strategic and International Studies (CSIS), The Aerospace Security Project - History of the NASA Budget (2022).
     attribution_short: CSIS

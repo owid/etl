@@ -87,13 +87,13 @@ steps:
   #
   # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
   #
-  # data://garden/space/2025-03-04/international_astronaut_database:
-  #   - data://meadow/space/2025-03-04/international_astronaut_database
-  # #
-  # # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
-  # #
-  # data://grapher/space/2025-03-04/international_astronaut_database:
-  #   - data://garden/space/2025-03-04/international_astronaut_database
+  data://garden/space/2025-03-04/international_astronaut_database:
+    - data://meadow/space/2025-03-04/international_astronaut_database
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
+  #
+  data://grapher/space/2025-03-04/international_astronaut_database:
+    - data://garden/space/2025-03-04/international_astronaut_database
   #
   # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
   #
