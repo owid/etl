@@ -7,6 +7,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
+# etlr multidim
 def run(dest_dir: str) -> None:
     # engine = get_engine()
     # Load configuration from adjacent yaml file.
@@ -24,7 +25,7 @@ def run(dest_dir: str) -> None:
         config_dimensions=config_new["dimensions"],
         config_dimensions_yaml=config.get("dimensions", {}),
     )
-    config["views"] = config.get("views", []) + config_new["views"]
+    config["views"] = config_new["views"]
 
     # 4: Upsert to DB
     multidim.upsert_multidim_data_page(
