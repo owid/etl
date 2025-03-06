@@ -41,6 +41,32 @@ steps:
   data://grapher/oecd/2025-02-25/health_expenditure:
     - data://garden/oecd/2025-02-25/health_expenditure
 
+  #
+  # Health expenditure as a share of GDP (OMM)
+  #
+  data://garden/health_expenditure/2025-03-04/health_expenditure_omm:
+    - data://garden/oecd/2025-02-25/health_expenditure
+    - data://garden/oecd/2025-03-04/health_expenditure_1993
+    - data://garden/health_expenditure/2025-03-04/lindert
+  data://grapher/health_expenditure/2025-03-04/health_expenditure_omm:
+    - data://garden/health_expenditure/2025-03-04/health_expenditure_omm
+
+  #
+  # Government subsidies for health care 1880-1930 (Lindert, 1994)
+  #
+  data://meadow/health_expenditure/2025-03-04/lindert:
+    - snapshot://health_expenditure/2025-03-04/lindert.csv
+  data://garden/health_expenditure/2025-03-04/lindert:
+    - data://meadow/health_expenditure/2025-03-04/lindert
+
+  #
+  # OECD health expenditure (1960-1991) (1993)
+  #
+  data://meadow/oecd/2025-03-04/health_expenditure_1993:
+    - snapshot://oecd/2025-03-04/health_expenditure_1993.xlsx
+  data://garden/oecd/2025-03-04/health_expenditure_1993:
+    - data://meadow/oecd/2025-03-04/health_expenditure_1993
+
   ############################################################
   # MILITARY
   ############################################################
