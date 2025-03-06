@@ -3,13 +3,11 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical diphtheria cases in the United States Census Bureau
+    title: Historical pertussis deaths in the United States Census Bureau
     description: |-
-      Data on historical diphtheria cases in the United States, compiled from a selection of sources from the US Census Bureau.
+      Data on historical pertussis deaths in the United States, compiled from a selection of sources from the US Census Bureau.
 
       Sources for each year are as follows:
-
-      * 1943: [US Census Bureau “Statistical Abstract of the United States: 1945”](https://www.census.gov/library/publications/1945/compendia/statab/66ed.html)
 
       * 1944: [US Census Bureau “Statistical Abstract of the United States: 1946”](https://www.census.gov/library/publications/1946/compendia/statab/67ed.html)
 
@@ -21,15 +19,11 @@ meta:
 
       * 1948: [US Census Bureau “Statistical Abstract of the United States: 1950”](https://www.census.gov/library/publications/1950/compendia/statab/71ed.html)
 
-      * 1949: [US Census Bureau “Statistical Abstract of the United States: 1952”](https://www.census.gov/library/publications/1952/compendia/statab/73ed.html)
-
-    date_published: "2023"
+    date_published: "1948"
 
     # Citation
     producer: Centers for Disease Control and Prevention
     citation_full: |-
-      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1945.
-
       US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1946.
 
       US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1947.
@@ -40,16 +34,14 @@ meta:
 
       US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1950.
 
-      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1952.
-
     # Files
-    url_main: https://www.census.gov/library/publications/1952/compendia/statab/73ed.html
+    url_main: https://www.census.gov/library/publications/1950/compendia/statab/71ed.html
     date_accessed: 2025-02-25
 
     # License
     license:
       name: Public domain
 outs:
-  - md5: 1b34629bb630430453d9ffb5413ed17d
-    size: 724
-    path: diphtheria_deaths.csv
+  - md5: 159cd99b6e84469e8b2da84736dade47
+    size: 527
+    path: pertussis_deaths.csv
