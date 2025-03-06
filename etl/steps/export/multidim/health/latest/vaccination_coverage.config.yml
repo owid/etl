@@ -197,8 +197,3 @@ views:
       antigen: rotac
     indicators:
       y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_rotac"
-  - dimensions:
-      metric: unvaccinated_one_year_olds
-      antigen: yfv
-    indicators:
-      y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_yfv"
