@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("international_astronaut_database")
+    ds_garden = paths.load_dataset("cost_of_space_launches")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("international_astronaut_database", reset_index=False)
+    tb = ds_garden.read("cost_of_space_launches", reset_index=False)
 
     #
     # Save outputs.

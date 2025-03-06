@@ -12,10 +12,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("international_astronaut_database")
+    ds_meadow = paths.load_dataset("cost_of_space_launches")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("international_astronaut_database")
+    tb = ds_meadow.read("cost_of_space_launches")
 
     #
     # Process data.
