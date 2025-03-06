@@ -51,4 +51,89 @@ dimensions:
       - slug: "yf"
         name: "Yellow fever vaccine"
 
-views: []
+views:
+  - dimensions:
+      metric: coverage
+      antigen: bcg
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_bcg"
+  - dimensions:
+      metric: coverage
+      antigen: dtpcv1
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_dtpcv1"
+  - dimensions:
+      metric: coverage
+      antigen: dtpcv3
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_dtpcv3"
+  - dimensions:
+      metric: coverage
+      antigen: hepb3
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_hepb3"
+  - dimensions:
+      metric: coverage
+      antigen: hepb_bd
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_hepb_bd"
+  - dimensions:
+      metric: coverage
+      antigen: hib3
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_hib3"
+  - dimensions:
+      metric: coverage
+      antigen: ipv1
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_ipv1"
+  - dimensions:
+      metric: coverage
+      antigen: ipv2
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_ipv2"
+  - dimensions:
+      metric: coverage
+      antigen: mcv1
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_mcv1"
+  - dimensions:
+      metric: coverage
+      antigen: mcv2
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_mcv2"
+  - dimensions:
+      metric: coverage
+      antigen: mcv2x2
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_mcv2x2"
+  - dimensions:
+      metric: coverage
+      antigen: mena_c
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_mena_c"
+  - dimensions:
+      metric: coverage
+      antigen: pcv3
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_pcv3"
+  - dimensions:
+      metric: coverage
+      antigen: pol3
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_pol3"
+  - dimensions:
+      metric: coverage
+      antigen: rcv1
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_rcv1"
+  - dimensions:
+      metric: coverage
+      antigen: rotac
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_rotac"
+  - dimensions:
+      metric: coverage
+      antigen: yf
+    indicators:
+      y: "vaccination_coverage#coverage__antigen_yf"
