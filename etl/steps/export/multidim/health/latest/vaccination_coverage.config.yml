@@ -1,6 +1,7 @@
 title:
   title: Vaccination coverage
   titleVariant: by vaccine and metric
+
 defaultSelection:
   - World
 dimensions:
