@@ -24,7 +24,7 @@ from etl.paths import EXPLORERS_DIR
 log = get_logger()
 
 
-class Explorer:
+class ExplorerTSV:
     """Explorer object that lets us parse an explorer file, create a new one, modify its content, and write a tsv file.
 
     NOTE: For now, this class is only adapted to indicator-based explorers!
@@ -170,7 +170,7 @@ class Explorer:
         cls,
         path: str,
         name: Optional[str] = None,
-    ) -> "Explorer":
+    ) -> "ExplorerTSV":
         """Load explorer config from a given path (tsv or csv)."""
 
         if not (path.endswith("csv") or path.endswith("tsv")):
@@ -188,7 +188,7 @@ class Explorer:
             raise ValueError(f"Unknown path '{path}'!")
 
     @classmethod
-    def from_owid_content(cls, name: str) -> "Explorer":
+    def from_owid_content(cls, name: str) -> "ExplorerTSV":
         """Load explorer config from a file in owid-content directory.
 
         NOTE: owid-content should be at the same level as etl.
