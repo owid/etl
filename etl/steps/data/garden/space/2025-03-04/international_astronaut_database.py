@@ -4,6 +4,8 @@ import json
 import re
 
 import owid.catalog.processing as pr
+import pandas as pd
+from owid.catalog import Table
 from owid.datautils.dataframes import map_series
 
 from etl.data_helpers import geo
@@ -55,6 +57,24 @@ def harmonize_country_names(tb, tb_regions):
     return tb
 
 
+def fill_missing_country_years(tb):
+    # Ensure all curves span from the minimum year to the maximum year in the data, filling gaps with zeros.
+    tb_all_country_years = (
+        pd.MultiIndex.from_product(
+            [tb["country"].unique(), range(tb["year"].min(), tb["year"].max() + 1)], names=["country", "year"]
+        )
+        .to_frame()
+        .reset_index(drop=True)
+    )
+    tb = (
+        tb.merge(Table(tb_all_country_years), on=["country", "year"], how="right")
+        .fillna(0)
+        .astype({"n_launches": int, "n_new_astronauts": int})
+    )
+
+    return tb
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -78,11 +98,10 @@ def run() -> None:
     tb["year"] = [re.findall(r"\((\d{4})\)", flights) for flights in tb["flights"]]
     error = "Mismatch between 'total_flights' and number of years found in 'flights' column."
     assert (tb["year"].str.len() == tb["total_flights"]).all(), error
-    tb = tb.explode("year").reset_index(drop=True)
+    tb = tb.explode("year").reset_index(drop=True).astype({"year": int})
     tb = tb.sort_values(["country", "year", "name"]).reset_index(drop=True)
 
     # Harmonize country names.
-    # TODO: Ensure all curves go from the minimum year to the maximum one, filling gaps.
     tb = harmonize_country_names(tb=tb, tb_regions=tb_regions)
 
     # Calculate the number of annual launches per country-year (regardless of the astronaut).
@@ -102,6 +121,9 @@ def run() -> None:
     tb = tb_annual_launches.merge(tb_n_first_launches, on=["country", "year"], how="left")
     # Fill with 0 on years where no new astronaut was launched.
     tb["n_new_astronauts"] = tb["n_new_astronauts"].fillna(0).astype(int)
+
+    # Ensure all curves span from the minimum year to the maximum year in the data, filling gaps with zeros.
+    tb = fill_missing_country_years(tb=tb)
 
     # Add global totals for various columns.
     tb = pr.concat(
