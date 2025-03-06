@@ -4,15 +4,6 @@ title:
 defaultSelection:
   - World
 dimensions:
-  - name: Metric
-    slug: metric
-    choices:
-      - slug: "coverage"
-        name: "Coverage"
-      - slug: "unvaccinated_one_year_olds"
-        name: "Unvaccinated one-year-olds"
-      - slug: "unvaccinated_newborns"
-        name: "Unvaccinated newborns"
   - name: Antigen
     slug: antigen
     choices:
@@ -48,7 +39,7 @@ dimensions:
         name: "Rubella-containing vaccine, first dose"
       - slug: "ROTAC"
         name: "Rotavirus vaccine, last dose"
-      - slug: "YF"
+      - slug: "YFV"
         name: "Yellow fever vaccine"
 
 views:
