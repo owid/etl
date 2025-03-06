@@ -7,7 +7,7 @@ paths = PathFinder(__file__)
 
 
 def run(dest_dir: str) -> None:
-    engine = get_engine()
+    # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 
@@ -15,6 +15,7 @@ def run(dest_dir: str) -> None:
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_coverage")
     tb = ds.read("vaccination_coverage", load_data=True)
+
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(tb, indicator_name="coverage", dimensions=["antigen"])
     # 3: Combine both sources (basically dimensions and views)
@@ -26,10 +27,9 @@ def run(dest_dir: str) -> None:
 
     # 4: Upsert to DB
     multidim.upsert_multidim_data_page(
-        "mdd-vaccination-who",
-        config,
-        engine,
-        paths.dependencies,
+        mdim_name="mdd-vaccination-who",
+        config=config,
+        paths=paths,
     )
 
 
