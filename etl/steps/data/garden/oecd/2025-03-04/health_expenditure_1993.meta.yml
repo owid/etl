@@ -9,7 +9,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  update_period_days: 365
+  update_period_days: 0
 
 
 tables:
@@ -19,7 +19,7 @@ tables:
         title: Public health expenditure as a share of GDP
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Public health expenditure divided bt gross domestic product, expressed as a percentage.
+        description_short: Public health expenditure divided by gross domestic product, expressed as a percentage.
         processing_level: major
         description_processing: We calculated this indicator by dividing estimates of public expenditure on health by GDP, expressed as a percentage.
         presentation:
