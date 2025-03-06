@@ -136,4 +136,4 @@ views:
       metric: coverage
       antigen: yf
     indicators:
-      y: "vaccination_coverage#coverage__antigen_yf"
+      y: "vaccination_coverage#coverage__antigen_yfv"
