@@ -1,0 +1,23 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Space Exploration & Satellites
+
+dataset:
+  update_period_days: 364
+
+tables:
+  nasa_budget:
+    variables:
+      budget:
+        title: Annual budget of NASA
+        description_short: |-
+          This data is expressed in US dollars, adjusted for inflation.
+        unit: constant 2020 US$
+        short_unit: $
+        presentation:
+          grapher_config:
+            note: |-
+              This data is expressed in constant 2020 US$.
+        processing_level: minor

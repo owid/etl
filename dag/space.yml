@@ -80,17 +80,47 @@ steps:
   data://grapher/space/2025-03-04/gravitational_wave_events:
     - data://garden/space/2025-03-04/gravitational_wave_events
   #
-  # Center for Strategic and International Studies: International Astronaut Database
+  # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
   #
   data://meadow/space/2025-03-04/international_astronaut_database:
     - snapshot://space/2025-03-04/international_astronaut_database.csv
   #
-  # Center for Strategic and International Studies: International Astronaut Database
+  # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
   #
   # data://garden/space/2025-03-04/international_astronaut_database:
   #   - data://meadow/space/2025-03-04/international_astronaut_database
   # #
-  # # Center for Strategic and International Studies: International Astronaut Database
+  # # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
   # #
   # data://grapher/space/2025-03-04/international_astronaut_database:
   #   - data://garden/space/2025-03-04/international_astronaut_database
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
+  #
+  data://meadow/space/2025-03-04/cost_of_space_launches:
+    - snapshot://space/2025-03-04/cost_of_space_launches.csv
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
+  #
+  data://garden/space/2025-03-04/cost_of_space_launches:
+    - data://meadow/space/2025-03-04/cost_of_space_launches
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
+  #
+  data://grapher/space/2025-03-04/cost_of_space_launches:
+    - data://garden/space/2025-03-04/cost_of_space_launches
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
+  #
+  data://meadow/space/2025-03-04/nasa_budget:
+    - snapshot://space/2025-03-04/nasa_budget.csv
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
+  #
+  data://garden/space/2025-03-04/nasa_budget:
+    - data://meadow/space/2025-03-04/nasa_budget
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
+  #
+  data://grapher/space/2025-03-04/nasa_budget:
+    - data://garden/space/2025-03-04/nasa_budget
