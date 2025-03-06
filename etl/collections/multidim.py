@@ -343,9 +343,9 @@ def replace_catalog_paths_with_ids(config):
 ####################################################################################################
 class MDIMConfigExpander:
     def __init__(self, tb: Table, indicators_slug: str, indicator_names: Optional[Union[str, List[str]]] = None):
+        self.indicators_slug = indicators_slug
         self.build_df_dims(tb, indicator_names)
         self.short_name = tb.m.short_name
-        self.indicators_slug = indicators_slug
 
     @property
     def dimension_names(self):
