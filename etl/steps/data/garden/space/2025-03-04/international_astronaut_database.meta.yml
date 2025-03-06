@@ -1,10 +1,5 @@
 definitions:
   common:
-    description_key:
-      - The definition of astronaut is not universally agreed upon among space launch providers. This data includes all individuals who have flown to outer space.
-      - Outer space is defined here as an altitude of 100 kilometers or higher, following the World Air Sports Federation (FAI) definition, an international standard for aeronautics and astronautics records.
-      - The data includes astronauts who died during space-bound missions, such as those aboard STS-51-L.
-      - This data does not include individuals who flew below 100 kilometers or first-time astronauts who died in non-space-bound missions without having previously been to space.
     presentation:
       topic_tags:
         - Space Exploration & Satellites
@@ -15,6 +10,11 @@ definitions:
     For individuals who went to space multiple times in the same year, each visit is counted. Country-level data is assigned according to the individual's nationality.
   footnote_first_visit_counted: &footnote-first-visit-counted |-
     For individuals who went to space multiple times, only the first visit is counted. Country-level data is assigned according to the individual's nationality.
+  description_key_common: &description-key-common
+    - The definition of astronaut is not universally agreed upon among space launch providers. This data includes all individuals who have flown to outer space.
+    - Outer space is defined here as an altitude of 100 kilometers or higher, following the World Air Sports Federation (FAI) definition, an international standard for aeronautics and astronautics records.
+    - The data includes astronauts who died during space-bound missions, such as those aboard STS-51-L.
+    - This data does not include individuals who flew below 100 kilometers or first-time astronauts who died in non-space-bound missions without having previously been to space.
 
 dataset:
   update_period_days: 364
@@ -29,6 +29,9 @@ tables:
         presentation:
           grapher_config:
             note: *footnote-each-visit-counted
+        description_key:
+          - *description-key-common
+          - *footnote-each-visit-counted
       n_cumulative_launches:
         title: Cumulative number of human visits to space
         unit: visits
@@ -36,6 +39,9 @@ tables:
         presentation:
           grapher_config:
             note: *footnote-each-visit-counted
+        description_key:
+          - *description-key-common
+          - *footnote-each-visit-counted
       n_new_astronauts:
         title: Number of new astronauts who have been to space
         unit: people
@@ -43,6 +49,9 @@ tables:
         presentation:
           grapher_config:
             note: *footnote-first-visit-counted
+        description_key:
+          - *description-key-common
+          - *footnote-first-visit-counted
       n_cumulative_new_astronauts:
         title: Cumulative number of people who have been to space
         unit: people
@@ -50,3 +59,6 @@ tables:
         presentation:
           grapher_config:
             note: *footnote-first-visit-counted
+        description_key:
+          - *description-key-common
+          - *footnote-first-visit-counted
