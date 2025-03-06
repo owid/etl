@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -20,13 +19,8 @@ def run() -> None:
     #
     # Process data.
     #
-    # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
-
     # Improve table format.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["vehicle", "first_launch_year"])
 
     #
     # Save outputs.
