@@ -1,6 +1,7 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: major
     presentation:
       topic_tags:
         - Time Use
@@ -60,7 +61,7 @@ tables:
         description_processing: |-
           - {definitions.processing.notes}
           - Data for 2020 is excluded, since the American Time Use Survey was not conducted during the period March 18, 2020 to May 9, 2020. Therefore data collected for 2020 is not representative of the entire year.
-          - 'The visual presentation and data processing has been adapted from Lindberg (2017). You can find the original script here : https://gist.github.com/halhen/d969234077c9b70df4c4b8dd902bea38.'
+          - The visual presentation and data processing has been adapted from Lindberg (2017). You can find the original script here: https://gist.github.com/halhen/d969234077c9b70df4c4b8dd902bea38.
         display:
           name: With <<who_category>>
 
