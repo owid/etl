@@ -17,6 +17,7 @@ import pandas as pd
 from dataclasses_json import DataClassJsonMixin
 from typing_extensions import Self
 
+from . import jinja
 from .processing_log import ProcessingLog
 from .utils import dataclass_from_dict, hash_any, pruned_json
 
@@ -275,6 +276,24 @@ class VariableMeta(MetaBase):
              <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">variable meta</p>
              {}
         """.format(getattr(self, "_name", None), to_html(record))
+
+    def render(self, dim_dict: Dict[str, Any]) -> "VariableMeta":
+        """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
+
+        Usage:
+            from owid.catalog import Dataset
+            from etl import paths
+
+            ds = Dataset(paths.DATA_DIR / "garden/emissions/2025-02-12/ceds_air_pollutants")
+            tb = ds['ceds_air_pollutants']
+            tb.emissions.m.render({'pollutant': 'CO', 'sector': 'Transport'})
+        """
+        return jinja._expand_jinja(self.copy(), dim_dict)
+
+    def copy(self, deep=True) -> Self:
+        m = super().copy(deep)
+        m._name = getattr(self, "_name", None)  # type: ignore
+        return m
 
 
 @pruned_json
