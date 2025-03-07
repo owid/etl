@@ -127,7 +127,6 @@ def development_over_time_for_age_groups(tb_agg, gender="all"):
     # age starts with 15, 80/85 is topcoded
     age_brackets = [(15, 29), (30, 44), (45, 59), (60, 85)]
 
-
     tbs = []
 
     if gender == "female":
