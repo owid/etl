@@ -14,9 +14,11 @@ definitions:
     notes: |-
       Data points have been weighted to make them more representative of the population with the survey weights provided by ATUS in the original data.
     atus_survey: This data is based on the American Time Use Survey (ATUS), which is conducted by the U.S. Bureau of Labor Statistics. This is an annual, cross-sectional survey that measures how people spend their time and who they spend it with.
+    question: The question is phrased as "Who was with in the room with you?" or "Who accompanied you?”. If people are on a phone or video call, they are not counted as being with someone, unless someone else is in the room with them.
     categories: 'We have combined some categories for presentation purposes: "children" include related and household children under 18, grandchildren and other related children under 18, "friends" include roommates or lodgers and "partner" includes spouses, boy-/girlfriends, and co-habiting partners.'
     multiple_people: Time spent with multiple people can be counted more than once (e.g., attending a party with friends and partner counts toward both "friends" and "partner").
     other: The "Other" category includes all other relationships not covered by the other categories, such as neighbors, customers or non-related, non-household children.
+
 
 
 
@@ -47,6 +49,7 @@ tables:
           <%- endif -%>
         description_key:
           - '{definitions.processing.atus_survey}'
+          - '{definitions.processing.question}'
           - We pool the ATUS data from 2010 to 2023 and then calculate averages for each age group.
           - '{definitions.processing.categories}'
           - '{definitions.processing.multiple_people}'
@@ -68,11 +71,12 @@ tables:
         unit: "Hours"
         short_unit: "h"
         description_short: |-
-          Average time Americans spend with <<who_category.lower()>>. This data is measured in hours per day and based on averages from surveys in the United States between 2010 and 2023.
+          Average time Americans spend with <<who_category.lower()>>. This data is measured in hours per day and based on annual averages from surveys in the United States between 2010 and 2023.
         description_processing: |-
           - {definitions.processing.notes}
         description_key:
           - '{definitions.processing.atus_survey}'
+          - '{definitions.processing.question}'
           - '{definitions.processing.categories}'
           - '{definitions.processing.multiple_people}'
           - '{definitions.processing.other}'
