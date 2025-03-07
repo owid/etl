@@ -10,7 +10,7 @@
       "**/*.meta.yml",
       "**/*.meta.override.yml"
     ],
-    "schemas/multidim-schema.json": "export/multidim/**/*.yml",
+    "schemas/multidim-schema.json": "export/multidim/**/*.yml"
   },
   "[python]": {
     "editor.formatOnSave": true,
@@ -50,5 +50,9 @@
     {
       "file": ".copilot-commit-message-instructions.md"
     }
-  ]
+  ],
+
+  // Settings for the "Run Until Cursor" extension
+  "runUntilCursor.execDelay": 100,    // Delay before executing code (default: 100ms)
+  "runUntilCursor.cursorDelay": 500   // Delay before moving the cursor into run() (default: 500ms)
 }
