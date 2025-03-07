@@ -7,18 +7,21 @@
   "engines": {
     "vscode": "^1.97.0"
   },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:extension.runUntilCursor"
-  ],
+  "categories": ["Other"],
+  "activationEvents": ["onCommand:extension.runUntilCursor"],
   "contributes": {
     "commands": [
       {
         "command": "extension.runUntilCursor",
         "title": "Run Until Cursor",
         "category": "Python"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "extension.runUntilCursor",
+        "key": "cmd+enter",
+        "when": "editorTextFocus && editorLangId == python"
       }
     ]
   },
