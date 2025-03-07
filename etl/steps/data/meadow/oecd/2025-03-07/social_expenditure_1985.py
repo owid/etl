@@ -42,7 +42,7 @@ def run() -> None:
     tb = tb.drop(columns=["level_0"])
 
     # Fill missing rows in year with the first non-missing value
-    tb["year"] = tb["year"].bfill()
+    tb["year"] = tb["year"].ffill()
 
     # Drop the country value Unnamed: 0_level_0
     tb = tb[tb["country"] != "Unnamed: 0_level_0"].reset_index(drop=True)

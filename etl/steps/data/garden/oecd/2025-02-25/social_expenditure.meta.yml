@@ -114,7 +114,7 @@ dataset:
 tables:
   social_expenditure:
     variables:
-      share_of_gdp:
+      share_gdp:
         title: Social expenditure as a share of GDP - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> programs (<<programme_type>>)
         unit: "% of GDP"
         short_unit: "%"
@@ -131,7 +131,7 @@ tables:
           numDecimalPlaces: 1
           tolerance: 5
 
-      share_of_gov_expenditure:
+      share_gov_expenditure:
         title: Social expenditure as a share of government expenditure - <<expenditure_source>> - <<spending_type>> - <<programme_type_category>> programs (<<programme_type>>)
         unit: "% of government expenditure"
         short_unit: "%"
