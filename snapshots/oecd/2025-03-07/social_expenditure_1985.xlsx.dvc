@@ -23,6 +23,6 @@ meta:
       url: https://archive.org/details/socialexpenditur0000unse
 
 outs:
-  - md5: f034bfc467959fad5f948a067a189306
-    size: 102838
+  - md5: d0581e9ff1f0875683cc4485fcbba056
+    size: 110821
     path: social_expenditure_1985.xlsx

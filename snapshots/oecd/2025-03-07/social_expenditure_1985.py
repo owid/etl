@@ -1,4 +1,14 @@
-"""Script to create a snapshot of dataset."""
+"""
+Script to create a snapshot of dataset.
+
+The file was extracted from the tables in Annex C - OECD social expenditure statistics in the book available in the Internet Archive:
+https://archive.org/details/socialexpenditur0000unse
+
+I uploaded the data available in the "OECD 1985 original" sheet in the Google Sheets:
+https://docs.google.com/spreadsheets/d/112vwOK9WIAc0s-yfeLUvjhC-cVP1swPR/edit?gid=498003109#gid=498003109
+
+That table didn't include the complete data for Finland and Sweden, so I added the data from the book.
+"""
 
 from pathlib import Path
 
