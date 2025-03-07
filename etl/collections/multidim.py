@@ -323,6 +323,7 @@ class MDIMConfigExpander:
     def __init__(self, tb: Table, indicator_name: Optional[str] = None):
         self.build_df_dims(tb, indicator_name)
         self.short_name = tb.m.short_name
+        self.tb_dims = tb.m.dimensions
 
     @property
     def dimension_names(self):
@@ -334,9 +335,15 @@ class MDIMConfigExpander:
     ):
         """Create the specs for each dimension."""
         # Support dimension is None
-        ## If dimensions is None, use a list with all dimension names (in no particular order)
         if dimensions is None:
-            dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
+            # If table defines dimensions, use them
+            if self.tb_dims:
+                dimensions = [d.slug for d in self.tb_dims]
+            else:
+                # If dimensions is None, use a list with all dimension names (in no particular order)
+                dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
+        else:
+            log.warning("It's recommended to set dimensions in Table metadata.")
 
         # Support dimensions if it is a list/dict
         config_dimensions = []
@@ -385,9 +392,16 @@ class MDIMConfigExpander:
                 ]
 
                 # Build dimension
+                if self.tb_dims:
+                    # Use full name from table if available
+                    dim_name = next(d.name for d in self.tb_dims if d.slug == dim)
+                else:
+                    # Otherwise use slug
+                    dim_name = dim
+
                 dimension = {
                     "slug": dim,
-                    "name": dim,
+                    "name": dim_name,
                     "choices": choices,
                 }
 

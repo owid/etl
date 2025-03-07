@@ -3,6 +3,7 @@
 #
 
 import json
+import time
 import types
 from collections import defaultdict
 from functools import wraps
@@ -302,7 +303,13 @@ class Table(pd.DataFrame):
         if repack:
             # use smaller data types wherever possible
             # NOTE: this can be slow for large dataframes
+            t = time.time()
             df = repack_frame(df)
+            if time.time() - t > 5:
+                log.warning(
+                    "repacking took a long time, consider adding create_dataset(..., repack=False)",
+                    time=time.time() - t,
+                )
 
         df.to_feather(path, compression=compression, **kwargs)
 
