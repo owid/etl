@@ -11,7 +11,7 @@ dimensions:
         name: "Share of children vaccinated"
       - slug: "unvaccinated_one_year_olds"
         name: "Unvaccinated one-year-olds"
-  - name: Antigen
+  - name: Vaccination
     slug: antigen
     choices:
       - slug: "BCG"
