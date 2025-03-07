@@ -26,7 +26,7 @@ def run() -> None:
         },
         errors="raise",
     )
-    tb["year"] = tb.year.str[0:4]
+    tb["year"] = tb["year"].str[0:4]
 
     # Add the number of launches for each country and year (and add metadata to the new column).
     tb = tb.groupby(["country", "year"], as_index=False).size().rename(columns={"size": "annual_launches"})
