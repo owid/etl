@@ -14,14 +14,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("vaccination_coverage")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("vaccination_coverage", reset_index=True)
-    tb_infants = ds_garden.read("number_of_one_year_olds", reset_index=True)
-    tb_newborns = ds_garden.read("number_of_newborns", reset_index=True)
-
-    tb = tb.merge(tb_infants, on=["country", "year", "antigen"], how="left")
-    tb = tb.merge(tb_newborns, on=["country", "year", "antigen"], how="left")
-    tb = tb.format(["country", "year", "antigen"])
-    #
+    tb = ds_garden.read("vaccination_coverage", reset_index=False)  #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.

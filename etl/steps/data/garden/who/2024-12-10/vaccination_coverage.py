@@ -52,11 +52,12 @@ def run(dest_dir: str) -> None:
     tb = clean_data(tb)
     # Add denominator column
     tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
-    tb = tb.drop(columns=["denominator"])
     # Calculate the number of one-year-olds vaccinated for each antigen.
     tb_one_year_olds = calculate_one_year_olds_vaccinated(tb, ds_population)
     tb_newborns = calculate_newborns_vaccinated(tb, ds_population)
     tb_number = pr.concat([tb_one_year_olds, tb_newborns], short_name="numbers")
+    tb = tb.drop(columns=["denominator"])
+
     tb = pr.merge(tb, tb_number, on=["country", "year", "antigen"], how="left")
 
     tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
