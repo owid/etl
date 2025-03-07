@@ -206,3 +206,5 @@ steps:
     - snapshot://fasttrack/latest/skaaning_democracy_di.csv
   data://grapher/fasttrack/latest/pre_term_births_europe_usa:
     - snapshot://fasttrack/latest/pre_term_births_europe_usa.csv
+  data://grapher/fasttrack/latest/indonor_oda_costs_oecd:
+    - snapshot://fasttrack/latest/indonor_oda_costs_oecd.csv
