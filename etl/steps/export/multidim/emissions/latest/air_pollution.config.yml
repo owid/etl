@@ -7,5 +7,6 @@ defaultSelection:
   - United Kingdom
   - China
   - India
+# Both will be filled programmatically.
 dimensions: []
 views: []
