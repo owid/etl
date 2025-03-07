@@ -117,6 +117,25 @@ tables:
           - "{definitions.antigen_description_key}"
         unit: "%"
         short_unit: "%"
+        presentation:
+          grapher_config:
+            selectedEntityNames:
+              - World
+            hasMapTab: true
+            colorScale:
+              baseColorScheme: "YlGnBu"
+              equalSizeBins: true
+              binningStrategy: "manual"
+              customNumericColorsActive: false
+              colorSchemeInvert: false
+              binningStrategyBinCount: 5
+              customNumericValues:
+                - 0
+                - 20
+                - 40
+                - 60
+                - 80
+                - 100
       vaccinated:
         title: Number of {definitions.antigen_age_group} vaccinated with {definitions.antigen_description}
         description_short: The number of {definitions.antigen_age_group} who recieved {definitions.antigen_description} in a given year.
