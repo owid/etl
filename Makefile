@@ -64,7 +64,7 @@ unittest: .venv
 	@echo '==> Running unit tests'
 	.venv/bin/pytest -m "not integration" tests
 
-test: check-formatting check-linting check-typing unittest install-vscode-extensions version-tracker
+test: check-formatting check-linting check-typing unittest version-tracker
 
 test-integration: .venv
 	@echo '==> Running integration tests'
