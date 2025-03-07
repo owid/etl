@@ -1,7 +1,6 @@
 title:
   title: Vaccination coverage
   titleVariant: by vaccine and metric
-
 defaultSelection:
   - World
 dimensions:
@@ -9,191 +8,45 @@ dimensions:
     slug: metric
     choices:
       - slug: "coverage"
-        name: "Coverage"
+        name: "Share of children vaccinated"
       - slug: "unvaccinated_one_year_olds"
         name: "Unvaccinated one-year-olds"
   - name: Antigen
     slug: antigen
     choices:
       - slug: "BCG"
-        name: "Bacille Calmette-Guérin (BCG)"
+        name: "Tuberculosis vaccine - Bacille Calmette-Guérin (BCG)"
       - slug: "DTPCV1"
-        name: "Diphtheria, tetanus, and pertussis (DTP) vaccine, first dose"
+        name: "Diphtheria, tetanus, and pertussis vaccine (first dose)"
       - slug: "DTPCV3"
-        name: "Diphtheria, tetanus, and pertussis (DTP) vaccine, third dose"
+        name: "Diphtheria, tetanus, and pertussis vaccine (third dose)"
       - slug: "HEPB3"
-        name: "Hepatitis B (HepB) vaccine, third dose"
+        name: "Hepatitis B vaccine (third dose)"
       - slug: "HEPB_BD"
-        name: "Hepatitis B (HepB) vaccine, birth dose"
+        name: "Hepatitis B vaccine (birth dose)"
       - slug: "HIB3"
-        name: "Haemophilus influenzae type b (Hib) vaccine, third dose"
+        name: "Haemophilus influenzae type b vaccine (third dose)"
       - slug: "IPV1"
-        name: "Inactivated polio vaccine (IPV), first dose"
+        name: "Inactivated polio vaccine (IPV) (first dose)"
       - slug: "IPV2"
-        name: "Inactivated polio vaccine (IPV), second dose"
+        name: "Inactivated polio vaccine (IPV) (second dose)"
       - slug: "MCV1"
-        name: "Measles-containing vaccine, first dose"
+        name: "Measles vaccine (first dose)"
       - slug: "MCV2"
-        name: "Measles-containing vaccine, second dose"
+        name: "Measles vaccine (second dose)"
       - slug: "MCV2X2"
-        name: "Measles-containing vaccine, second dose (two-year-olds)"
+        name: "Measles vaccine (second dose; two-year-olds)"
       - slug: "MENA_C"
-        name: "Meningococcal conjugate vaccine (MenA), last dose"
+        name: "Meningococcal conjugate vaccine (last dose)"
       - slug: "PCV3"
-        name: "Pneumococcal conjugate vaccine (PCV), third dose"
+        name: "Pneumococcal conjugate vaccine (third dose)"
       - slug: "POL3"
-        name: "Polio vaccine, third dose"
+        name: "Polio vaccine (third dose)"
       - slug: "RCV1"
-        name: "Rubella-containing vaccine, first dose"
+        name: "Rubella vaccine (first dose)"
       - slug: "ROTAC"
-        name: "Rotavirus vaccine, last dose"
+        name: "Rotavirus vaccine (last dose)"
       - slug: "YFV"
         name: "Yellow fever vaccine"
 
-views:
-  []
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: BCG
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_bcg"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: DTPCV1
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_dtpcv1"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: DTPCV3
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_dtpcv3"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: HEPB3
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_hepb3"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: HEPB_BD
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_hepb_bd"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: HIB3
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_hib3"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: IPV1
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_ipv1"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: IPV2
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_ipv2"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: MCV1
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_mcv1"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: MCV2
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_mcv2"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: MCV2X2
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_mcv2x2"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: MENA_C
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_mena_c"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: PCV3
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_pcv3"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: POL3
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_pol3"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: RCV1
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_rcv1"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: ROTAC
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_rotac"
-  # - dimensions:
-  #     metric: coverage
-  #     antigen: YF
-  #   indicators:
-  #     y: "vaccination_coverage#coverage__antigen_yfv"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: DTPCV1
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_dtpcv1"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: DTPCV3
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_dtpcv3"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: HEPB3
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_hepb3"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: HIB3
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_hib3"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: IPV1
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_ipv1"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: IPV2
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_ipv2"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: MCV1
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_mcv1"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: MENA_C
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_mena_c"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: PCV3
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_pcv3"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: POL3
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_pol3"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: RCV1
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_rcv1"
-  # - dimensions:
-  #     metric: unvaccinated_one_year_olds
-  #     antigen: ROTAC
-  #   indicators:
-  #     y: "vaccination_coverage#unvaccinated_one_year_olds__antigen_rotac"
+views: []
