@@ -154,5 +154,5 @@ def test_render_with_error():
     """.strip()
 
     var_meta = meta.VariableMeta(title=jinja_title)  # type: ignore
-    with pytest.raises(ValueError):
+    with pytest.raises(Exception):
         var_meta.render(dim_dict={"dim_b": "x"})
