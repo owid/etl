@@ -29,6 +29,14 @@ steps:
   data://grapher/oecd/2025-02-25/social_expenditure:
     - data://garden/oecd/2025-02-25/social_expenditure
 
+  #
+  # Social transfers 1880-1930 (Lindert, 1994)
+  #
+  data://meadow/social_expenditure/2025-03-07/lindert:
+    - snapshot://social_expenditure/2025-03-07/lindert.csv
+  data://garden/social_expenditure/2025-03-07/lindert:
+    - data://meadow/social_expenditure/2025-03-07/lindert
+
   ############################################################
   # HEALTH
   ############################################################
