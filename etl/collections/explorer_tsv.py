@@ -1,4 +1,6 @@
 """
+This module contains logic to map new explorer config to old one. It was designed with indicator-based explorers in mind.
+
 TODO:
     - Why float in colorScaleNumericBins
     - Test without columns
