@@ -108,3 +108,9 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/cow/2024-07-26/national_material_capabilities:
     - data://garden/cow/2024-07-26/national_material_capabilities
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/oecd/2025-03-07/social_expenditure_1985:
+    - snapshot://oecd/2025-03-07/social_expenditure_1985.xlsx

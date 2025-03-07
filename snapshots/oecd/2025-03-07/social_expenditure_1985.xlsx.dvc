@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Social Expenditure 1960-1990: Problems of Growth and Control"
+    description: |-
+      After the OECD Conference on Social Policies in the 1980s, held in October 1980, and in light of the discussion of budgetary issues by the Economic Policy Committee, a Group of Experts on the Growth and Control of Social Expenditure met at the OECD in October 1983 under the auspices of the Manpower and Social Affairs Committee. The Chairman of the Group, Mr. R. Maldague of the Belgian Planning Commission, presented a report on the meeting to the 60th Session of the MSA Committee in December 1983. The Committee then recommended that the Secretariat prepare a report on social expenditure. After review by members of the Committee in July 1984, this report is published on the responsibility of the Secretary-General.
+    date_published: "1985"
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (1985). Social Expenditure 1960-1990: Problems of Growth and Control. OECD Social Policy Studies.
+
+    # Files
+    url_main: https://archive.org/details/socialexpenditur0000unse
+    date_accessed: 2025-03-07
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://archive.org/details/socialexpenditur0000unse
+
+outs:
+  - md5: f034bfc467959fad5f948a067a189306
+    size: 102838
+    path: social_expenditure_1985.xlsx
