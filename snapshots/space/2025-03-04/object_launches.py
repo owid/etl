@@ -1,7 +1,5 @@
 """Script to create a snapshot of dataset.
 
--Adapted from Ed's original code.
-
 NOTE: The date_published can be found in:
 https://www.unoosa.org/oosa/en/spaceobjectregister/index.html
 See "Registration Submissions Update" right above the list of updates.
