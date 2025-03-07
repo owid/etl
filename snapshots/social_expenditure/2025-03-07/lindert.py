@@ -1,17 +1,10 @@
 """
 Script to create a snapshot of dataset.
 
-The file was extracted from Table 1A in the paper available in ScienceDirect:
-https://www.sciencedirect.com/science/article/abs/pii/S0014498384710011
+The file was extracted from Table 1.2 in this book:
+https://www.cambridge.org/core/books/growing-public/EAF17EB3BDFB5A6568930DBEC2CD1218
 
-If you can't access the paper, you can download the file from the following link:
-https://drive.google.com/file/d/1YFlIC-on7oWiDhgdETUD9PSVE-BTaySn/view
-
-The file was saved as a csv file by using a screenshot and processing it via ChatGPT"
-    `Can you convert this table into a csv file?`
-
-I only corrected the values where "zero" was written as 0. "zero" is described as "public spending was zero, but we lack data on a key independent variable".
-
+The table was replicated manually into a CSV file.
 """
 
 from pathlib import Path

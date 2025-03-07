@@ -14,7 +14,7 @@ def run() -> None:
     snap = paths.load_snapshot("lindert.csv")
 
     # Load data from snapshot.
-    tb = snap.read(na_values=["ns", "+", "(+)"])
+    tb = snap.read()
 
     #
     # Process data.
