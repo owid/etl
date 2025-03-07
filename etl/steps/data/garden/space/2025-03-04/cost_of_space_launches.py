@@ -11,10 +11,16 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("near_earth_asteroids")
+    ds_meadow = paths.load_dataset("cost_of_space_launches")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("near_earth_asteroids", reset_index=False)
+    tb = ds_meadow.read("cost_of_space_launches")
+
+    #
+    # Process data.
+    #
+    # Improve table format.
+    tb = tb.format(["vehicle", "first_launch_year"])
 
     #
     # Save outputs.

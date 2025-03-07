@@ -11,16 +11,25 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("near_earth_asteroids")
+    ds_garden = paths.load_dataset("objects_in_space")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("near_earth_asteroids", reset_index=False)
+    tb = ds_garden.read("lower_earth_objects_by_type")
+
+    #
+    # Process data.
+    #
+    # Adapt column names to grapher.
+    tb = tb.rename(columns={"object_type": "country"}, errors="raise")
+
+    # Improve table format.
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=[tb])
 
     # Save grapher dataset.
     ds_grapher.save()

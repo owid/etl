@@ -62,8 +62,6 @@ steps:
     - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
   data://grapher/fasttrack/latest/under_five_mortality_lmics:
     - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
-  data://grapher/fasttrack/2023-09-29/un_space_objects:
-    - snapshot://fasttrack/2023-09-29/un_space_objects.csv
   data://grapher/fasttrack/2023-10-05/great_pacific_garbage_lebreton:
     - snapshot://fasttrack/2023-10-05/great_pacific_garbage_lebreton.csv
   data-private://grapher/fasttrack/latest/owid_donations:

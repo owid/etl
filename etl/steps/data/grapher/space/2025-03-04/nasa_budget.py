@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("near_earth_asteroids")
+    ds_garden = paths.load_dataset("nasa_budget")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("near_earth_asteroids", reset_index=False)
+    tb = ds_garden.read("nasa_budget", reset_index=False)
 
     #
     # Save outputs.

@@ -23,8 +23,8 @@ tables:
           - "When an object is marked by the source as launched by a country on behalf of another one, the launch is attributed to the latter country."
           - "When a launch is made jointly by several countries, it is recorded in each of these countries' time series but only once in the 'World' series."
         description_processing: |-
-          - We fetch the data from the source by iterating through all objects in the online index.
-          - When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
+          - We scrape the data from the source by iterating through all objects in the online index.
+          - We harmonize the names of countries. When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
           - We aggregate launches by country and year. When a launch is made jointly by several countries, it is recorded in each of these countries' time series.
           - We calculate the total number of launches globally. This is available as 'World' in the data. When a launch is made jointly by several countries, it is only recorded once in the 'World' series.
           - We also calculate the cumulative number of launches over time.
@@ -41,8 +41,8 @@ tables:
           - "When an object is marked by the source as launched by a country on behalf of another one, the launch is attributed to the latter country."
           - "When a launch is made jointly by several countries, it is recorded in each of these countries' time series but only once in the 'World' series."
         description_processing: |-
-          - We fetch the data from the source by iterating through all objects in the online index.
-          - When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
+          - We scrape the data from the source by iterating through all objects in the online index.
+          - We harmonize the names of countries. When an object is marked by the source as launched by a country on behalf of another one, we attribute the launch to the latter country.
           - We aggregate launches by country and year. When a launch is made jointly by several countries, it is recorded in each of these countries' time series.
           - We calculate the total number of launches globally. This is available as 'World' in the data. When a launch is made jointly by several countries, it is only recorded once in the 'World' series.
           - We also calculate the cumulative number of launches over time.

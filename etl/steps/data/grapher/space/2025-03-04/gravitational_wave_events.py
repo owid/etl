@@ -11,10 +11,16 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("near_earth_asteroids")
+    ds_garden = paths.load_dataset("gravitational_wave_events")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("near_earth_asteroids", reset_index=False)
+    tb = ds_garden.read("gravitational_wave_events", reset_index=False)
+
+    #
+    # Process data.
+    #
+    # Add a country column, to adapt to grapher.
+    tb["country"] = "World"
 
     #
     # Save outputs.

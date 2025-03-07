@@ -1,0 +1,34 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Space Exploration & Satellites
+
+dataset:
+  update_period_days: 364
+
+tables:
+  cost_of_space_launches:
+    variables:
+      cost_per_kg:
+        title: Launch cost per kilogram of payload
+        unit: constant 2021 US$ per kilogram
+        short_unit: $/kg
+        description_short: |-
+          Cost to launch one kilogram of payload mass to [low Earth orbit](#dod:low_earth_orbit) as part of a dedicated launch. This data is adjusted for inflation.
+        description_key:
+          - Small vehicles carry up to 2,000 kg to [low Earth orbit](#dod:low_earth_orbit).
+          - Medium vehicles carry between 2,000 and 20,000 kg.
+          - Heavy vehicles carry more than 20,000 kg.
+        presentation:
+          grapher_config:
+            note: |-
+              Small vehicles carry up to 2,000 kg to [low Earth orbit](#dod:low_earth_orbit), medium ones between 2,000 and 20,000 kg, and heavy ones more than 20,000 kg. This data is expressed in constant 2021 US$.
+        processing_level: minor
+        display:
+          numDecimalPlaces: 0
+      launch_class:
+        title: Launch vehicle class
+        unit: ""
+        short_unit: ""
+

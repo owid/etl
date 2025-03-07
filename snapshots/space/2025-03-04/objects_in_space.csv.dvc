@@ -1,0 +1,21 @@
+meta:
+  origin:
+    title: Number of objects in space
+    description: |-
+      This dataset is extracted from Space-Track.org, a website maintained by the 18th Space Defense Squadron of the United States Space Force.
+
+      The original data includes information on thousands of space objects tracked over time, including their launch date and decay date (if they have reentered the Earth's atmosphere).
+    producer: United States Space Force
+    date_published: '2025-04-03'
+    date_accessed: '2025-04-03'
+    citation_full: |-
+      United States Space Force - Number of objects in space (2025). 18th Space Defense Squadron.
+    url_main: https://www.space-track.org/
+  license:
+    name: USSPACECOM Basic SSA Data, redistribution allowed with attribution
+    url: https://www.space-track.org/documentation#/odr
+
+outs:
+  - md5: e45cb1499568e3ea8f4c1cb2a4b1e7ed
+    size: 35711565
+    path: objects_in_space.csv
