@@ -171,6 +171,163 @@ def tsv_to_records(block: List[str], slug: str, start: int) -> List[dict]:
     return records
 
 
-# path = Path("/home/lucas/repos/owid-content/explorers/monkeypox.explorer.tsv")
-# name = Path(path.stem).stem
-# explorer_json = parse_explorer(name, path)
+################ WIP
+
+# Read and parse all config
+explorers = {}
+explorer_dir = Path("/home/lucas/repos/owid-content/explorers/")
+explorers_path = explorer_dir.glob("*.explorer.tsv")
+explorers_path = sorted(list(explorers_path))
+for path in explorers_path:
+    name = Path(path.stem).stem
+    print(name)
+    explorer_json = parse_explorer(name, path)
+    explorers[name] = explorer_json
+
+# Filter and keep public ones
+explorers = {k: v for k, v in explorers.items() if v["isPublished"] == "true"}
+
+
+class ExplorerMigration:
+    def __init__(self, explorer: Dict[str, Any], slug: str):
+        self.slug = slug
+        self.explorer = explorer
+        self.config = self.extract_config()
+        self.grapher_block, self.table_columns_block = self.get_blocks()
+        self.types = self.get_explorer_types()
+        self._sanity_checks()
+
+    def extract_config(self):
+        config = {}
+        for key, value in self.explorer.items():
+            if (key not in {"_version", "blocks"}) and not key.startswith("#"):
+                config[key] = value
+        return config
+
+    def get_blocks(self):
+        """Get grapher and table/columns blocks."""
+        # Get blocks
+        blocks = self.explorer.get("blocks", [])
+        if not blocks:
+            raise ValueError(f"{self.slug}: No blocks found")
+
+        # Get grapher and tables_columns block
+        grapher_block = None
+        table_columns_block = []
+        for block in blocks:
+            if block["type"] == "graphers":
+                if grapher_block is None:
+                    grapher_block = block
+                else:
+                    raise ValueError("Multiple graphers block found")
+            elif block["type"] in {"table", "columns"}:
+                table_columns_block.append(block)
+            else:
+                raise ValueError(f"{self.slug}: Unknown block type: {block['type']}")
+
+        return grapher_block, table_columns_block
+
+    def get_explorer_types(self):
+        """Get types of the explorer.
+
+        It is typically either CSV, Indicator or Grapher. But occasionally it can be a hybrid of these. Example: Grapher and CSV.
+        """
+        # Inspect record to detect explorer type
+        assert self.grapher_block is not None, "No grapher block found"
+        cols = pd.DataFrame(self.grapher_block["block"]).columns
+
+        explorer_types = []
+        if "grapherId" in cols:
+            explorer_types.append("grapher")
+        if ("yVariableIds" in cols) or ("xVariableId" in cols):
+            explorer_types.append("indicator")
+        elif len(self.table_columns_block) > 0:
+            explorer_types.append("csv")
+
+        return set(explorer_types)
+
+    def _sanity_checks(self):
+        """Sanity check that the explorer configuration makes sense."""
+        # Grapher block
+        if self.grapher_block is None:
+            raise ValueError(f"{self.slug}: No grapher block found")
+        # Table/columns block
+        ## 1) If no table/column is given, it must be indicator- or grapher-based
+        if len(self.table_columns_block) == 0:
+            if self.types != {"indicator"} and self.types != {"grapher"}:
+                raise ValueError(f"{self.slug}: You must provide a table or columns block for CSV-based explorers")
+        else:
+            ## 2) table/columns is not accepted for grapher-based
+            if self.types == {"grapher"}:
+                raise ValueError(f"{self.slug}: table/column block not expected for grapher-based explorers")
+            ## 3) length of table/columns must be an even number, at least 2, except for indicator-based
+            elif self.types != {"indicator"}:
+                # 3.1) table/columns must be of length 2 at least
+                if len(self.table_columns_block) < 2:
+                    raise ValueError(f"{self.slug}: Table/columns block must be of length 2 at least")
+                # 3.2) table/columns must be of length 2n
+                if len(self.table_columns_block) % 2 != 0:
+                    raise ValueError(f"{self.slug}: Table/columns block must be of length 2n")
+
+    def obtain_display_settings(self):
+        """Build dictionary like:
+
+        {"uri": display settings}
+        """
+        if self.types == {"csv"}:
+            print("WIP")
+            # Iterate
+            display_settings = {}
+            table_slugs = {}
+            for current, nxt in zip(self.table_columns_block, self.table_columns_block[1:]):
+                assert current["type"] == "table"
+                assert nxt["type"] == "columns"
+                assert len(current["args"]) == 2
+                table_slugs[current["args"][1]] = current["args"][0]
+
+                for indicator in nxt["block"]:
+                    uri = f"{current['args'][0]}/{indicator['slug']}"
+                    _display_settings = {k: v for k, v in indicator.items() if k != "slug"}
+                    display_settings[uri] = _display_settings
+            return display_settings
+        elif self.types == {"indicator"}:
+            print("Easily supported")
+        else:
+            print("Not supported")
+
+
+import pandas as pd
+
+analysis = []
+types_rename = {
+    "grapher": "G",
+    "indicator": "I",
+    "csv": "C",
+}
+for name, explorer in explorers.items():
+    migration = ExplorerMigration(explorer, name)
+    # print(migration.grapher_block["args"])
+    analysis.append(
+        {
+            "name": name,
+            "types": migration.types,
+        }
+    )
+
+df = pd.DataFrame(analysis).sort_values("name")
+"""Things to do:
+
+- [x] Detect the type of explorer (csv, grapher, indicator)
+    - if grapher: can't migrate
+    - if indicator: go ahead
+    - if csv: all tables, should have catalog URLs; otherwise can't migrate
+- [ ] All but blocks, goes into `config`, except for comments
+- [ ] Check:
+    - blocks:
+        - [x] Should exist
+        - [x] length 1 allowed for indicator/grapher - based
+        - [x] length 2 allowed for indicator - based
+        - [x] Otherwise, must be of length 2n+1
+- [ ] Columns
+- [ ] Graph
+"""
