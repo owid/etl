@@ -48,3 +48,8 @@ This creates a new .vsix file for the new version.
 ## Install an extension
 
 Press `cmd+shift+p` and select "Extensions: Install from VSIX". Select the `*.vsix` file of the extension you want to install. Restart VSCode to ensure the new version is installed (although it may not be necessary).
+
+Alternatively, from the command line, go to the root folder of the extension code and run:
+```
+code --install-extension [name-of-the-extension-with-version].vsix
+```

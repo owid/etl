@@ -1,0 +1,26 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Space Exploration & Satellites
+    processing_level: minor
+
+dataset:
+  update_period_days: 364
+
+
+tables:
+  gravitational_wave_events:
+    variables:
+      n_events:
+        title: Number of gravitational wave events detected
+        unit: events
+        short_unit: ""
+        description_short: |-
+          Number of [gravitational wave](#dod:gravitational_waves) observations confidently detected by the world's largest gravitational wave interferometers: LIGO (United States), Virgo (Italy), and KAGRA (Japan).
+      n_events_cumulative:
+        title: Cumulative number of gravitational wave events detected
+        description_short: |-
+          Cumulative number of [gravitational wave](#dod:gravitational_waves) observations confidently detected by the world's largest gravitational wave interferometers: LIGO (United States), Virgo (Italy), and KAGRA (Japan).
+        unit: events
+        short_unit: ""
