@@ -23,6 +23,7 @@ dependencies = [
     "rdata==0.9",
     "owid-datautils",
     "owid-repack",
+    "jinja2>=3.1.6",
 ]
 
 [tool.uv]
