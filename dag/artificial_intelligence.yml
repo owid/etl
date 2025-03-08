@@ -1,5 +1,13 @@
 steps:
 ###########  UPDATED MONTHLY #############################################################################
+#  Test
+  data://meadow/artificial_intelligence/2025-02-27/epoch_price_reduction:
+    - snapshot://artificial_intelligence/2025-02-27/epoch_price_reduction.csv
+  data://garden/artificial_intelligence/2025-02-27/epoch_price_reduction:
+    - data://meadow/artificial_intelligence/2025-02-27/epoch_price_reduction
+  data://grapher/artificial_intelligence/2025-02-27/epoch_price_reduction:
+    - data://garden/artificial_intelligence/2025-02-27/epoch_price_reduction
+
   # Main EPOCH dataset
   data://meadow/artificial_intelligence/2025-02-04/epoch:
     - snapshot://artificial_intelligence/2025-02-04/epoch.csv
