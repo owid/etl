@@ -206,3 +206,5 @@ steps:
     - snapshot://fasttrack/latest/pre_term_births_europe_usa.csv
   data://grapher/fasttrack/latest/indonor_oda_costs_oecd:
     - snapshot://fasttrack/latest/indonor_oda_costs_oecd.csv
+  data://grapher/fasttrack/latest/aiddata_china_fasttrack__sheet1:
+    - snapshot://fasttrack/latest/aiddata_china_fasttrack__sheet1.csv
