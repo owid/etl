@@ -212,3 +212,5 @@ steps:
     - snapshot://fasttrack/latest/aiddata_china_fasttrack_2014_2021__sheet1.csv
   data://grapher/fasttrack/latest/graduation_aid_returns_table__sheet1:
     - snapshot://fasttrack/latest/graduation_aid_returns_table__sheet1.csv
+  data://grapher/fasttrack/latest/graduation_aid_returns_table:
+    - snapshot://fasttrack/latest/graduation_aid_returns_table.csv
