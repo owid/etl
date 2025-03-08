@@ -28,4 +28,4 @@ def test_calculate_checksum_metadata():
     meta = _get_metadata()
     df = _get_data()
 
-    assert db.calculate_checksum_metadata(meta, df) == "-4368982562562216097"
+    assert db.calculate_checksum_metadata(meta, df) == "-1532881929668971636"
