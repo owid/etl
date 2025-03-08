@@ -43,7 +43,7 @@ def run(dest_dir: str) -> None:
         )
     # PART 2: MDIMs hybridly generated (mix of YAML file + data)
     ds = paths.load_dataset("google_mobility")
-    tb = ds.read("google_mobility")
+    tb = ds.read("google_mobility", load_data=False)
 
     # Simple multidim
     config = paths.load_mdim_config("covid.mobility.yml")
