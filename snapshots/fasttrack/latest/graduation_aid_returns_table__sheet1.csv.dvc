@@ -11,6 +11,6 @@ meta:
   name: DRAFT graduation_aid_returns_table - Sheet1
   description: ''
 outs:
-  - md5: e0af7d5614917df9fc179caeb5686a63
-    size: 301
+  - md5: 699242646b8afb12e8d265aa6f6935c9
+    size: 267
     path: graduation_aid_returns_table__sheet1.csv
