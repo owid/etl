@@ -58,7 +58,7 @@ def get_grapher_changes(files_changed: Dict[str, Dict[str, str]], steps_df: pd.D
         # Obtain old version
         ## This could happen with non-etl step files, like "shared.py". Ignore them
         if len(candidate) == 0:
-            log.error("No candidate in steps_df was found! Working with old datasets (non-ETL)?")
+            log.error(f"No candidate in steps_df was found for: {file_path}")
         ## Unknown error.
         elif len(candidate) > 1:
             log.error(f"Could not identify a step matching file {file_path}")
