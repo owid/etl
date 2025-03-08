@@ -7,8 +7,8 @@ meta:
     attribution_short: CDC
     url_main: https://www.cdc.gov/measles/data-research/
     url_download: https://www.cdc.gov/wcms/vizdata/measles/MeaslesCasesYear.json
-    date_accessed: 2025-03-07
-    date_published: '2025-02-27'
+    date_accessed: 2025-03-08
+    date_published: '2025-03-06'
     license:
       name: Public domain
       url: https://www.cdc.gov/other/agencymaterials.html
