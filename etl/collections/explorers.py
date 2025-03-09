@@ -67,7 +67,13 @@ def _create_explorer(
 
     # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
     # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
-    df_grapher = extract_explorer_views(explorer)
+    df_grapher = extract_explorers_graphers(explorer)
+
+    # TODO: extract config. Useful if we standardize the configuration structure.
+    # config = extract_explorers_config(explorer)
+
+    # TODO: extract columns. To be extracted from `display` in each indicator?
+    # df_columns = extract_explorers_columns(explorer)
 
     # Create explorer
     ds = create_explorer_main(
@@ -79,7 +85,7 @@ def _create_explorer(
     return ds
 
 
-def extract_explorer_views(
+def extract_explorers_graphers(
     explorer: Explorer,
 ) -> pd.DataFrame:
     """
