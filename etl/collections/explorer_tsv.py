@@ -29,7 +29,7 @@ log = get_logger()
 class ExplorerTSV:
     """Explorer object that lets us parse an explorer file, create a new one, modify its content, and write a tsv file.
 
-    NOTE: For now, this class is only adapted to indicator-based explorers!
+    NOTE: This class only works for indicator-based explorers!
 
     You can modify four fields of the explorer config:
 

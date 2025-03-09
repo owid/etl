@@ -1,9 +1,13 @@
 """Migrate old explorer config to new one."""
 
+import re
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
+import pandas as pd
+from owid.catalog.utils import underscore
 from structlog import get_logger
 
 log = get_logger()
@@ -36,6 +40,7 @@ FLAGS = {
     "yAxisMin",
     "ySlugs",
 }
+PATTERN_CSV = r"https://catalog\.ourworldindata\.org/(?P<group>[^/]+/[^/]+/[^/]+/[^/]+/[^/]+)\.csv"
 
 
 @dataclass
@@ -83,7 +88,7 @@ def parse_line_by_line(explorer_file, slug) -> List[Statement]:
         lines = f.readlines()
 
     # skip empty lines and comments
-    lines = [l for l in lines if l.strip() or l.startswith("##")]
+    lines = [line for line in lines if line.strip() or line.startswith("##")]
 
     data = []
     i = 0
@@ -171,27 +176,11 @@ def tsv_to_records(block: List[str], slug: str, start: int) -> List[dict]:
     return records
 
 
-################ WIP
-
-# Read and parse all config
-explorers = {}
-explorer_dir = Path("/home/lucas/repos/owid-content/explorers/")
-explorers_path = explorer_dir.glob("*.explorer.tsv")
-explorers_path = sorted(list(explorers_path))
-for path in explorers_path:
-    name = Path(path.stem).stem
-    print(name)
-    explorer_json = parse_explorer(name, path)
-    explorers[name] = explorer_json
-
-# Filter and keep public ones
-explorers = {k: v for k, v in explorers.items() if v["isPublished"] == "true"}
-
-
 class ExplorerMigration:
-    def __init__(self, explorer: Dict[str, Any], slug: str):
+    def __init__(self, explorer_as_json: Dict[str, Any], slug: str):
+        """Parse DB"""
         self.slug = slug
-        self.explorer = explorer
+        self.explorer_as_json = explorer_as_json
         self.config = self.extract_config()
         self.grapher_block, self.table_columns_block = self.get_blocks()
         self.types = self.get_explorer_types()
@@ -199,15 +188,15 @@ class ExplorerMigration:
 
     def extract_config(self):
         config = {}
-        for key, value in self.explorer.items():
+        for key, value in self.explorer_as_json.items():
             if (key not in {"_version", "blocks"}) and not key.startswith("#"):
                 config[key] = value
         return config
 
-    def get_blocks(self):
+    def get_blocks(self) -> Tuple[Any, List[Any]]:
         """Get grapher and table/columns blocks."""
         # Get blocks
-        blocks = self.explorer.get("blocks", [])
+        blocks = self.explorer_as_json.get("blocks", [])
         if not blocks:
             raise ValueError(f"{self.slug}: No blocks found")
 
@@ -251,6 +240,15 @@ class ExplorerMigration:
         # Grapher block
         if self.grapher_block is None:
             raise ValueError(f"{self.slug}: No grapher block found")
+
+        # Check required columns
+        if self.types == {"csv"}:
+            columns = pd.DataFrame(self.grapher_block["block"]).columns
+            if "tableSlug" not in columns:
+                raise ValueError(f"{self.slug}: tableSlug not found in grapher block")
+            if "tableSlugs" in columns:
+                raise ValueError(f"{self.slug}: tableSlugs not supported at the moment. Please report!")
+
         # Table/columns block
         ## 1) If no table/column is given, it must be indicator- or grapher-based
         if len(self.table_columns_block) == 0:
@@ -260,61 +258,269 @@ class ExplorerMigration:
             ## 2) table/columns is not accepted for grapher-based
             if self.types == {"grapher"}:
                 raise ValueError(f"{self.slug}: table/column block not expected for grapher-based explorers")
-            ## 3) length of table/columns must be an even number, at least 2, except for indicator-based
-            elif self.types != {"indicator"}:
-                # 3.1) table/columns must be of length 2 at least
-                if len(self.table_columns_block) < 2:
-                    raise ValueError(f"{self.slug}: Table/columns block must be of length 2 at least")
-                # 3.2) table/columns must be of length 2n
-                if len(self.table_columns_block) % 2 != 0:
-                    raise ValueError(f"{self.slug}: Table/columns block must be of length 2n")
+            # ## 3) length of table/columns must be an even number, at least 2, except for indicator-based
+            # elif self.types != {"indicator"}:
+            #     # 3.1) table/columns must be of length 2 at least
+            #     if len(self.table_columns_block) < 2:
+            #         raise ValueError(f"{self.slug}: Table/columns block must be of length 2 at least")
+            #     # 3.2) table/columns must be of length 2n
+            #     if len(self.table_columns_block) % 2 != 0:
+            #         raise ValueError(f"{self.slug}: Table/columns block must be of length 2n")
 
-    def obtain_display_settings(self):
+    def run_csv(self):
         """Build dictionary like:
 
         {"uri": display settings}
         """
-        if self.types == {"csv"}:
-            print("WIP")
-            # Iterate
-            display_settings = {}
-            table_slugs = {}
-            for current, nxt in zip(self.table_columns_block, self.table_columns_block[1:]):
-                assert current["type"] == "table"
-                assert nxt["type"] == "columns"
-                assert len(current["args"]) == 2
-                table_slugs[current["args"][1]] = current["args"][0]
+        # Iterate over all blocks
+        display_settings = {}
+        table_slugs = {}
 
-                for indicator in nxt["block"]:
-                    uri = f"{current['args'][0]}/{indicator['slug']}"
+        # Get table information
+        for block in self.table_columns_block:
+            if block["type"] == "table":
+                # Sanity checks
+                assert len(block["args"]) == 2
+
+                # Relevant information about table
+                table_uri = _extract_table_uri(block["args"][0])
+                table_slug = block["args"][1]
+
+                # Save table slug to URI mapping
+                table_slugs[table_slug] = table_uri
+
+        # Get columns information
+        for block in self.table_columns_block:
+            if block["type"] == "columns":
+                # Sanity checks
+                assert (
+                    len(block["args"]) == 1
+                ), f"columns is expected to have only one argument. Instead got: {block['args']}"
+
+                # Get table URI
+                table_slug = block["args"][0]
+                table_uri = table_slugs[table_slug]
+
+                for indicator in block["block"]:
+                    indicator_uri = f"{table_uri}#{indicator['slug']}"
                     _display_settings = {k: v for k, v in indicator.items() if k != "slug"}
-                    display_settings[uri] = _display_settings
-            return display_settings
-        elif self.types == {"indicator"}:
-            print("Easily supported")
-        else:
-            print("Not supported")
+                    display_settings[indicator_uri] = _display_settings
 
+        # return display_settings
 
-import pandas as pd
+        # Get graphers information
+        dimension_slug_to_raw_name = {}
+        dimensions = []
+        df = pd.DataFrame(self.grapher_block["block"])
+        for column in df.columns:
+            if column.endswith(" Dropdown"):
+                ui_type = "dropdown"
+            elif column.endswith(" Radio"):
+                ui_type = "radio"
+            elif column.endswith(" Checkbox"):
+                ui_type = "checkbox"
+            else:
+                continue
 
-analysis = []
-types_rename = {
-    "grapher": "G",
-    "indicator": "I",
-    "csv": "C",
-}
-for name, explorer in explorers.items():
-    migration = ExplorerMigration(explorer, name)
-    # print(migration.grapher_block["args"])
-    analysis.append(
-        {
-            "name": name,
-            "types": migration.types,
+            # Get name, then underscore it for slug
+            dim_name = " ".join(column.split()[:-1])
+            dim_slug = underscore(str(dim_name))
+            # Get choices
+            choices = []
+            for choice_name in df[column].unique():
+                choice_slug = underscore(str(choice_name))
+                choices.append(
+                    {
+                        "slug": choice_slug,
+                        "name": choice_name,
+                    }
+                )
+            # Build dimension element
+            dimensions.append(
+                {
+                    "slug": dim_slug,
+                    "name": dim_name,
+                    "choices": choices,
+                    "presentation": {
+                        "type": ui_type,
+                    },
+                }
+            )
+
+            # For reference
+            dimension_slug_to_raw_name[dim_slug] = column
+
+        # Get views
+        views = []
+
+        def _bake_indicator(table_slug, indicator_slug):
+            indicator_uri = f"{table_slugs[table_slug]}#{indicator_slug}"
+            indicator = {
+                "catalogPath": indicator_uri,
+            }
+            if indicator_uri in display_settings:
+                indicator["display"] = display_settings[indicator_uri]
+
+            return indicator
+
+        for block in self.grapher_block["block"]:
+            # Get indicators
+            table_slug = block["tableSlug"]
+            indicators = defaultdict(list)
+            if "ySlugs" in block:
+                y_slugs = block["ySlugs"].split()
+                for y in y_slugs:
+                    indicator = _bake_indicator(table_slug, y)
+                    indicators["y"].append(indicator)
+            if "xSlug" in block:
+                slugs = block["xSlug"].split()
+                assert len(slugs) == 1
+                indicator = _bake_indicator(table_slug, slugs[0])
+                indicators["x"].append(indicator)
+            if "colorSlug" in block:
+                slugs = block["colorSlug"].split()
+                assert len(slugs) == 1
+                indicator = _bake_indicator(table_slug, slugs[0])
+                indicators["color"].append(indicator)
+            if "sizeSlug" in block:
+                slugs = block["sizeSlug"].split()
+                assert len(slugs) == 1
+                indicator = _bake_indicator(table_slug, slugs[0])
+                indicators["size"].append(indicator)
+
+            indicators = dict(indicators)
+
+            # Get dimensions
+            dimensions_view = {}
+            for dim in dimensions:
+                raw_name = dimension_slug_to_raw_name[dim["slug"]]
+                if raw_name not in block:
+                    dimensions_view[dim["slug"]] = None
+                else:
+                    dimensions_view[dim["slug"]] = underscore(block[raw_name])
+
+            # Get config (remainder)
+            config = {
+                k: v
+                for k, v in block.items()
+                if k
+                not in {
+                    "tableSlug",
+                    "ySlugs",
+                    "xSlug",
+                    "colorSlug",
+                    "sizeSlug",
+                }
+            }
+
+            views.append(
+                {
+                    "indicators": indicators,
+                    "dimensions": dimensions_view,
+                    "config": config,
+                }
+            )
+
+        return {
+            "config": self.config,
+            "views": views,
+            "dimensions": dimensions,
         }
-    )
 
-df = pd.DataFrame(analysis).sort_values("name")
+    def run(self):
+        if self.types == {"csv"}:
+            return self.run_csv()
+        elif self.types == {"indicator"}:
+            raise NotSupportedException("Not supported. Soon will be.")
+        else:
+            raise NotSupportedException("Not supported")
+
+
+class NotSupportedException(Exception):
+    pass
+
+
+class TableURLNotInCataloException(Exception):
+    pass
+
+
+def _extract_table_uri(catalog_url: str):
+    match = re.fullmatch(PATTERN_CSV, catalog_url)
+
+    if match:
+        extracted_fragment = match.group("group")
+    else:
+        raise TableURLNotInCataloException(f"{catalog_url}")
+
+    return f"{extracted_fragment}"
+
+
+def migrate_csv_explorer(explorer_path: Union[Path, str]):
+    """Local path to explorer."""
+    if isinstance(explorer_path, str):
+        explorer_path = Path(explorer_path)
+    name = Path(explorer_path.stem).stem
+    explorer_json = parse_explorer(name, explorer_path)
+    migration = ExplorerMigration(explorer_json, name)
+
+    if migration.types != {"csv"}:
+        raise ValueError(f"{name}: Not a CSV explorer")
+
+    config = migration.run()
+
+    return config
+
+
+################ WIP
+# 1/ Actual migration example
+# import yaml
+
+# config = migrate_csv_explorer("/home/lucas/repos/owid-content/explorers/monkeypox.explorer.tsv")
+# print(yaml.dump(config))
+
+# path_new = ""
+# with open(path_new):
+#     yaml.dump(config, default_flow_style=False, sort_keys=False, width=float("inf"))
+
+# 2/ Read all explorers, more raw experimenting
+# import pandas as pd
+
+# # Read and parse all config
+# explorers = {}
+# explorer_dir = Path("/home/lucas/repos/owid-content/explorers/")
+# explorers_path = explorer_dir.glob("*.explorer.tsv")
+# explorers_path = sorted(list(explorers_path))
+# for path in explorers_path:
+#     name = Path(path.stem).stem
+#     print(name)
+#     explorer_json = parse_explorer(name, path)
+#     explorers[name] = explorer_json
+
+# Filter and keep public ones
+# explorers = {k: v for k, v in explorers.items() if v["isPublished"] == "true"}
+
+
+# analysis = []
+# types_rename = {
+#     "grapher": "G",
+#     "indicator": "I",
+#     "csv": "C",
+# }
+# settings = []
+# for name, explorer in explorers.items():
+#     if name in {"global-food"}:
+#         continue
+#     migration = ExplorerMigration(explorer, name)
+#     try:
+#         settings_ = migration.run()
+#     except TableURLNotInCataloException as e:
+#         print(f"{name}: {e}")
+#     except NotSupportedException as e:
+#         print(f"{name}: {e}")
+#     else:
+#         settings.append(settings_)
+
+# df = pd.DataFrame(analysis).sort_values("name")
 """Things to do:
 
 - [x] Detect the type of explorer (csv, grapher, indicator)
