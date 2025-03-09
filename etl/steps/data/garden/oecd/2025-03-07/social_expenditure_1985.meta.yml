@@ -1,0 +1,36 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Government Spending
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+
+tables:
+  social_expenditure_1985:
+    variables:
+      share_gdp:
+        title: Public social expenditure as a share of GDP
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: Public social expenditure divided by gross domestic product, expressed as a percentage.
+        processing_level: major
+        description_processing: |-
+          We calculated this indicator by subtracting education expenditure from the total social expenditure published by OECD (1985), and divided by GDP.
+
+          We do this to ensure that the indicator uses the same definition of social expenditure as the OECD Social Expenditure Database (SOCX).
+        presentation:
+          attribution_short: OECD
+          title_public: Public social expenditure as a share of GDP
+          title_variant: Data between 1960-1981
+        display:
+          name: Public social expenditure as a share of GDP
+          numDecimalPlaces: 1
+          tolerance: 5
+
