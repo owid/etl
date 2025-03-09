@@ -456,7 +456,13 @@ def _extract_table_uri(catalog_url: str):
 
 
 def migrate_csv_explorer(explorer_path: Union[Path, str]):
-    """Local path to explorer."""
+    """Migrate the TSV-based config of a CSV-based explorer to the new format.
+
+    Note:
+        - Only works for CSV-based explorers which use ETL data (i.e. have a catalog URL for all tables)
+        - The output config is not fully functional yet. It might use a catalog path from a table that is not in Grapher (e.g. an 'explorer' table). Modify it so it points to a table in Grapher.
+
+    Local path to explorer."""
     if isinstance(explorer_path, str):
         explorer_path = Path(explorer_path)
     name = Path(explorer_path.stem).stem
