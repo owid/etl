@@ -502,7 +502,7 @@ class Multidim(Collection):
     views: List[MDIMView]
     title: Dict[str, str]
     defaultSelection: List[str]
-    topicTags: Optional[List[str]] = None
+    topic_tags: Optional[List[str]] = None
     definitions: Optional[Definitions] = None
 
 

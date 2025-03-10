@@ -53,7 +53,7 @@ title:
   title: "COVID-19: Tests and confirmed cases"
   titleVariant: "Number of daily tests vs. daily new confirmed cases"
 defaultSelection: []
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

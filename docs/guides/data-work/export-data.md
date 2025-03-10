@@ -37,7 +37,7 @@ title:
   titleVariant: "by energy source"
 defaultSelection:
   - "European Union (27)"
-topicTags:
+topic_tags:
   - "Energy"
 dimensions:
   - slug: "frequency"

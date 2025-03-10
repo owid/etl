@@ -3,7 +3,7 @@ title:
   titleVariant: "European electricity and gas"
 defaultSelection:
   - "European Union (27)"
-topicTags:
+topic_tags:
   - "Energy"
 dimensions:
   - slug: "source"

@@ -121,6 +121,11 @@ class AdminAPI(object):
         return js
 
     def put_mdim_config(self, mdim_catalog_path: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
+        # Convert certain fields from snake_case to camelCase
+        # NOTE: we don't have validation in Admin API, so we need to make sure the keys are correct
+        if "topic_tags" in mdim_config:
+            mdim_config["topicTags"] = mdim_config.pop("topic_tags")
+
         # Retry in case we're restarting Admin on staging server
         resp = requests_with_retry().put(
             self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}",
