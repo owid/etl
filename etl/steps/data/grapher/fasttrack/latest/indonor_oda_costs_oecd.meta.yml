@@ -1,0 +1,48 @@
+dataset:
+  title: Indonor foreign aid costs (OECD)
+  description: ''
+  licenses:
+    - {}
+tables:
+  indonor_oda_costs_oecd:
+    variables:
+      oda_spent_indonor:
+        title: In-donor costs
+        unit: $
+        short_unit: $
+        description: The amount of net official development assistance (ODA) spent within donor countries.
+      oda_spent_overseas:
+        title: Spent overseas
+        unit: $
+        short_unit: $
+        description: The amount of net official development assistance (ODA) spent in recipient countries.
+      share_oda_development_awareness:
+        title: Development awareness
+        unit: '%'
+        short_unit: '%'
+        description: The share of net official development assistance (ODA) spent on development awareness in donor countries.
+      share_oda_scholarships:
+        title: Scholarships
+        unit: '%'
+        short_unit: '%'
+        description: The share of net official development assistance (ODA) spent on student scholarships in donor countries.
+      share_oda_admin:
+        title: Administrative
+        unit: '%'
+        short_unit: '%'
+        description: The share of net official development assistance (ODA) spent on administrative costs in donor countries.
+      share_oda_refugees:
+        title: Refugees
+        unit: '%'
+        short_unit: '%'
+        description: The share of net official development assistance (ODA) spent on hosting refugees in donor countries.
+      share_oda_indonor:
+        title: In-donor
+        unit: '%'
+        short_unit: '%'
+        description: The share of net official development assistance (ODA) spent within donor countries.
+      share_oda_overseas:
+        title: Overseas
+        unit: '%'
+        short_unit: '%'
+        description: The share of net official development assistance (ODA) spent in recipient countries.

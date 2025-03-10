@@ -8,8 +8,8 @@ paths = PathFinder(__file__)
 
 # Define indicator columns and their new names.
 INDICATOR_COLUMNS = {
-    "Percentage of GDP": "share_of_gdp",
-    "Percentage of general government expenditure": "share_of_gov_expenditure",
+    "Percentage of GDP": "share_gdp",
+    "Percentage of general government expenditure": "share_gov_expenditure",
     "US dollars per person, PPP converted": "usd_per_person_ppp",
 }
 

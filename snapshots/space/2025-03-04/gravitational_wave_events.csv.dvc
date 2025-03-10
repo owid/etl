@@ -1,0 +1,34 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Graviational wave events
+    description: |-
+      The Gravitational Wave Open Science Center (GWOSC) provides public access to gravitational-wave data.
+    date_published: "2024-05-23"
+
+    # Citation
+    producer: Gravitational Wave Open Science Center
+    citation_full: |-
+      Gravitational Wave Open Science Center - Event List (2025).
+      - R. Abbott et al. (LIGO Scientific Collaboration, Virgo Collaboration and KAGRA Collaboration), "Open data from the third observing run of LIGO, Virgo, KAGRA and GEO", [ApJS 267 29 (2023)](https://doi.org/10.3847/1538-4365/acdc9f).
+      - R. Abbott et al. (LIGO Scientific Collaboration and Virgo Collaboration), "Open data from the first and second observing runs of Advanced LIGO and Advanced Virgo", [SoftwareX 13 (2021) 100658](https://doi.org/10.1016/j.softx.2021.100658).
+
+      This research has made use of data or software obtained from the Gravitational Wave Open Science Center (gwosc.org), a service of the LIGO Scientific Collaboration, the Virgo Collaboration, and KAGRA. This material is based upon work supported by NSF's LIGO Laboratory which is a major facility fully funded by the National Science Foundation, as well as the Science and Technology Facilities Council (STFC) of the United Kingdom, the Max-Planck-Society (MPS), and the State of Niedersachsen/Germany for support of the construction of Advanced LIGO and construction and operation of the GEO600 detector. Additional support for Advanced LIGO was provided by the Australian Research Council. Virgo is funded, through the European Gravitational Observatory (EGO), by the French Centre National de Recherche Scientifique (CNRS), the Italian Istituto Nazionale di Fisica Nucleare (INFN) and the Dutch Nikhef, with contributions by institutions from Belgium, Germany, Greece, Hungary, Ireland, Japan, Monaco, Poland, Portugal, Spain. KAGRA is supported by Ministry of Education, Culture, Sports, Science and Technology (MEXT), Japan Society for the Promotion of Science (JSPS) in Japan; National Research Foundation (NRF) and Ministry of Science and ICT (MSIT) in Korea; Academia Sinica (AS) and National Science and Technology Council (NSTC) in Taiwan.
+    attribution_short: GWOSC
+
+    # Files
+    url_main: https://gwosc.org/eventapi/html/allevents/
+    url_download: https://gwosc.org/eventapi/csv/allevents/
+    date_accessed: 2025-03-04
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://gwosc.org/eventapi/html/allevents/
+
+outs:
+  - md5: 3176909be80dfd3ac55d7c439b8ccce3
+    size: 50808
+    path: gravitational_wave_events.csv

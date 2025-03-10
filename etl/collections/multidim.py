@@ -108,7 +108,7 @@ def expand_config(
     EXAMPLES
     --------
 
-    EXAMPLE 1: There is only one indicator, we want to expand all dimensions and their values
+    EXAMPLE 1: There are various indicators with dimensions, we want to expand all their dimensions and their values
 
     ```python
     config = expand_config(tb=tb)
@@ -119,7 +119,7 @@ def expand_config(
     ```python
     config = expand_config(
         tb=tb,
-        indicator_name="deaths",
+        indicator_name=["deaths"],
         dimensions=[
             "sex",
             "age",
@@ -127,12 +127,12 @@ def expand_config(
         ]
     )
 
-    EXAMPLE 3: Same as Example 2, but for 'cause' we only want to use values 'aids' and 'cancer', in this order.
+    EXAMPLE 3: Same as Example 2, but (i) we also consider indicator 'cases', and (ii) for 'cause' we only want to use values 'aids' and 'cancer', in this order.
 
     ```python
     config = expand_config(
         tb=tb,
-        indicator_name="deaths",
+        indicator_name=["deaths", "cases"],
         dimensions={
             "sex": "*",
             "age": "*",
@@ -151,15 +151,16 @@ def expand_config(
         indicator_names=indicator_names,
     )
 
-    # Combine indicator information with dimensions
-    if dimensions is None:
-        dimensions = {dim: "*" for dim in expander.dimension_names}
-    elif isinstance(dimensions, list):
-        dimensions = {dim: "*" for dim in dimensions}
-    dimensions = {
-        indicators_slug: expander.indicator_names,
-        **{k: v for k, v in dimensions.items() if k != indicators_slug},
-    }
+    # Combine indicator information with dimensions (only when multiple indicators are given)
+    if len(expander.indicator_names) > 1:
+        if dimensions is None:
+            dimensions = {dim: "*" for dim in expander.dimension_names}
+        elif isinstance(dimensions, list):
+            dimensions = {dim: "*" for dim in dimensions}
+        dimensions = {
+            indicators_slug: expander.indicator_names,
+            **{k: v for k, v in dimensions.items() if k != indicators_slug},
+        }
 
     # EXPAND CHART_DIMENSIONS
     config_partial["dimensions"] = expander.build_dimensions(
@@ -464,8 +465,12 @@ class MDIMConfigExpander:
         # SANITY CHECKS
         self.indicator_names = self._sanity_checks_df_dims(indicator_names, df_dims)
 
-        # Keep dimensions only for relevant indicator
+        # Keep dimensions only for relevant indicators
         self.df_dims = df_dims.loc[df_dims[self.indicators_slug].isin(self.indicator_names)]
+
+        # Drop indicator column if indicator_names is of length 1
+        if len(self.indicator_names) == 1:
+            self.df_dims = self.df_dims.drop(columns=["indicator"])
 
         # Final checks
         assert all(
