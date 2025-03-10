@@ -10,7 +10,7 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, Tuple, TypedDict, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, TypedDict, TypeVar, Union
 
 import mistune
 import pandas as pd
@@ -194,21 +194,6 @@ class VariablePresentationMeta(MetaBase):
 
     # List of google doc ids + fragment id
     faqs: List[FaqLink] = field(default_factory=list)
-
-
-# TODO: should I keep it or not?
-@dataclass(frozen=True)
-class Dimensions:
-    """Encapsulates dimensions in an immutable, hashable structure."""
-
-    items: Tuple[Tuple[str, Any], ...]
-
-    @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "Dimensions":
-        return cls(items=tuple(sorted(d.items())))
-
-    def to_dict(self) -> Dict[str, Any]:
-        return dict(self.items)
 
 
 @pruned_json
