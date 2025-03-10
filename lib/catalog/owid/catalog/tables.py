@@ -672,15 +672,16 @@ class Table(pd.DataFrame):
         """Fix type signature of reset_index."""
         t = super().reset_index(level=level, inplace=inplace, **kwargs)  # type: ignore
 
-        # drop dimensions
-        # TODO: make this work for reset_index with subset of levels
-        self.metadata.dimensions = None
-
         if inplace:
+            # TODO: make this work for reset_index with subset of levels
+            # drop dimensions
+            self.metadata.dimensions = None
             return None
         else:
             # preserve metadata in _fields, calling reset_index() on a table drops it
             t._fields = self._fields
+            # drop dimensions
+            t.metadata.dimensions = None
             return t  # type: ignore
 
     def astype(self, *args, **kwargs) -> "Table":

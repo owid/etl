@@ -266,11 +266,16 @@ def assert_tables_eq(lhs: Table, rhs: Table) -> None:
 
 
 def mock_table() -> Table:
-    t: Table = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]}).set_index("country")  # type: ignore
+    t: Table = Table({"gdp": [100, 102, 104], "country": ["AU", "SE", "CH"]})
+
     t.metadata = mock(TableMeta)
     t.metadata.primary_key = ["country"]
     for col in t.all_columns:
         t._fields[col] = mock(VariableMeta)
+        if col == "country":
+            t._fields[col].title = "country"
+
+    t = t.set_index("country")  # type: ignore
 
     return t
 

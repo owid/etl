@@ -422,6 +422,22 @@ class TableMeta(MetaBase):
     # table dimensions
     dimensions: Optional[List[TableDimension]] = None
 
+    def __eq__(self, other: object) -> bool:
+        """Compare two TableMeta objects for equality, ignoring the dimensions attribute."""
+
+        if not isinstance(other, TableMeta):
+            return False
+
+        # Create shallow copies of the attribute dictionaries
+        self_attrs = self.__dict__.copy()
+        other_attrs = other.__dict__.copy()
+
+        # Remove the dimensions attribute from both dictionaries before comparing
+        self_attrs.pop("dimensions", None)
+        other_attrs.pop("dimensions", None)
+
+        return self_attrs == other_attrs
+
     @property
     def checked_name(self) -> str:
         if not self.short_name:
