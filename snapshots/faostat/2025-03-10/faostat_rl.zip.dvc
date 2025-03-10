@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Land, Inputs and Sustainability: Land Use'
+    description: |-
+      The FAOSTAT Land Use domain contains data on forty-four categories of land use, irrigation and agricultural practices and five indicators relevant to monitor agriculture, forestry and fisheries activities at national, regional and global level. Data are available by country and year, with global coverage and annual updates.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Land, Inputs and Sustainability: Land Use (2024).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/RL
+    url_download: https://bulks-faostat.fao.org/production/Inputs_LandUse_E_All_Data_(Normalized).zip
+    date_accessed: '2025-03-10'
+    date_published: '2024-08-19'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 2f94c60e55658e2629824de1222c494c
+    size: 2827544
+    path: faostat_rl.zip
