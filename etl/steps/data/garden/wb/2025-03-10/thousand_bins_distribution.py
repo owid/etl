@@ -32,16 +32,18 @@ def run(dest_dir: str) -> None:
 
     #
     # Process data.
+    #
+
     # Rename columns, regions and multiply pop by 1,000,000.
-    tb = rename_columns_regions_and_multiply_pop(tb, REGIONS_MAPPING)
+    tb = rename_columns_regions_and_multiply_pop(tb=tb, regions_mapping=REGIONS_MAPPING)
 
     # Assert that there are no negative values for avg and that avg data is monotonically increasing by each quantile.
-    tb = sanity_checks(tb)
+    tb = sanity_checks(tb=tb)
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.format(["country", "year", "region", "quantile"])
+    tb = tb.format(["pipvintage", "country", "year", "region", "quantile"])
 
     #
     # Save outputs.
@@ -58,10 +60,12 @@ def run(dest_dir: str) -> None:
 def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) -> Table:
     """Rename columns, regions and multiply pop by 1,000,000."""
     # Rename columns
-    tb = tb.rename(columns={"code": "country", "region_code": "region", "obs": "quantile", "welf": "avg"})
+    tb = tb.rename(columns={"region_pip": "region", "welf": "avg"})
 
     # Rename region column with REGIONS_MAPPING. Assert that all regions are mapped.
-    assert set(tb["region"].unique()) == set(REGIONS_MAPPING.keys()), "There are undefined regions"
+    assert set(tb["region"].unique()) == set(
+        REGIONS_MAPPING.keys()
+    ), f"There are undefined regions: {set(tb['region'].unique()) - set(REGIONS_MAPPING.keys())}"
     tb["region"] = tb["region"].map(REGIONS_MAPPING)
 
     # Multiply pop by 1,000,000
