@@ -23,12 +23,12 @@ def run(dest_dir: str) -> None:
     # Rename anniversary_year values
     tb["anniversary_year"] = tb["anniversary_year"].replace(
         {
-            "5": "After 5 years",
-            "10": "After 10 years",
-            "20": "After 20 years",
-            "30": "After 30 years",
-            "40": "After 40 years",
-            "50": "After 50 years",
+            "5": "< 5 years",
+            "10": "< 10 years",
+            "20": "< 20 years",
+            "30": "< 30 years",
+            "40": "< 40 years",
+            "50": "< 50 years",
         }
     )
     tb = tb.rename(columns={"anniversary_year": "country"})
