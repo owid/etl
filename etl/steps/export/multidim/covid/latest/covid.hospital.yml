@@ -9,8 +9,8 @@ definitions:
 
 title:
   title: COVID-19 hospitalizations
-  titleVariant: ""
-defaultSelection:
+  title_variant: ""
+default_selection:
   - Belgium
   - Canada
   - France
@@ -20,7 +20,7 @@ defaultSelection:
   - Spain
   - United Kingdom
   - United States
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

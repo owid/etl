@@ -11,10 +11,10 @@ definitions:
 
 title:
   title: Mobility during COVID-19 pandemic
-  titleVariant: by place
-defaultSelection:
+  title_variant: by place
+default_selection:
   - United Kingdom
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

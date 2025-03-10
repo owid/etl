@@ -23,8 +23,8 @@ definitions:
 
 title:
   title: Vaccine doses donated to COVAX
-  titleVariant: "COVID-19 vaccine doses that were donated to COVAX by countries"
-defaultSelection:
+  title_variant: "COVID-19 vaccine doses that were donated to COVAX by countries"
+default_selection:
   - France
   - Spain
   - Sweden
@@ -53,7 +53,7 @@ defaultSelection:
   - Mexico
   - Greece
   - European Union (27)
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

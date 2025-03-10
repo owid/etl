@@ -13,10 +13,10 @@ definitions:
 
 title:
   title: Daily new estimated COVID-19 infections
-  titleVariant: "by model"
-defaultSelection:
+  title_variant: "by model"
+default_selection:
   - United States
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

@@ -18,22 +18,23 @@
                 "title": {
                     "type": "string"
                 },
-                "titleVariant": {
+                "title_variant": {
                     "type": "string"
                 }
             },
             "required": [
                 "title",
-                "titleVariant"
-            ]
+                "title_variant"
+            ],
+            "additionalProperties": false
         },
-        "defaultSelection": {
+        "default_selection": {
             "type": "array",
             "items": {
                 "type": "string"
             }
         },
-        "topicTags": {
+        "topic_tags": {
             "type": "array",
             "items": {
                 "type": "string"
@@ -91,6 +92,7 @@
             "type": "array",
             "items": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                     "dimensions": {
                         "type": "object",
@@ -347,7 +349,7 @@
     },
     "required": [
         "title",
-        "defaultSelection",
+        "default_selection",
         "dimensions",
         "views"
     ],
@@ -383,212 +385,7 @@
             ]
         },
         "metadata": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "descriptionShort": {
-                    "type": "string"
-                },
-                "descriptionFromProducer": {
-                    "type": "string"
-                },
-                "descriptionKey": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "descriptionProcessing": {
-                    "type": "string"
-                },
-                "unit": {
-                    "type": "string"
-                },
-                "shortUnit": {
-                    "type": "string"
-                },
-                "datasetName": {
-                    "type": "string"
-                },
-                "datasetId": {
-                    "type": "number"
-                },
-                "coverage": {
-                    "type": "string"
-                },
-                "nonRedistributable": {
-                    "type": "boolean"
-                },
-                "source": {
-                    "type": "object",
-                    "properties": {
-                        "id": {
-                            "type": "number"
-                        },
-                        "name": {
-                            "type": "string"
-                        },
-                        "dataPublishedBy": {
-                            "type": "string"
-                        },
-                        "dataPublisherSource": {
-                            "type": "string"
-                        },
-                        "link": {
-                            "type": "string"
-                        },
-                        "retrievedDate": {
-                            "type": "string"
-                        },
-                        "additionalInfo": {
-                            "type": "string"
-                        }
-                    }
-                },
-                "origins": {
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "number"
-                            },
-                            "title": {
-                                "type": "string"
-                            },
-                            "titleSnapshot": {
-                                "type": "string"
-                            },
-                            "attribution": {
-                                "type": "string"
-                            },
-                            "attributionShort": {
-                                "type": "string"
-                            },
-                            "versionProducer": {
-                                "type": "string"
-                            },
-                            "license": {
-                                "$ref": "#/$defs/license"
-                            },
-                            "descriptionSnapshot": {
-                                "type": "string"
-                            },
-                            "description": {
-                                "type": "string"
-                            },
-                            "producer": {
-                                "type": "string"
-                            },
-                            "citationFull": {
-                                "type": "string"
-                            },
-                            "urlMain": {
-                                "type": "string"
-                            },
-                            "urlDownload": {
-                                "type": "string"
-                            },
-                            "dateAccessed": {
-                                "type": "string"
-                            },
-                            "datePublished": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                },
-                "schemaVersion": {
-                    "type": "number"
-                },
-                "processingLevel": {
-                    "type": "string",
-                    "enum": [
-                        "minor",
-                        "major"
-                    ]
-                },
-                "presentation": {
-                    "type": "object",
-                    "properties": {
-                        "titlePublic": {
-                            "type": "string"
-                        },
-                        "titleVariant": {
-                            "type": "string"
-                        },
-                        "attributionShort": {
-                            "type": "string"
-                        },
-                        "attribution": {
-                            "type": "string"
-                        },
-                        "topicTagsLinks": {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        "faqs": {
-                            "type": "array",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "gdocId": {
-                                        "type": "string"
-                                    },
-                                    "fragmentId": {
-                                        "type": "string"
-                                    }
-                                },
-                                "required": [
-                                    "gdocId",
-                                    "fragmentId"
-                                ]
-                            }
-                        }
-                    }
-                },
-                "shortName": {
-                    "type": "string"
-                },
-                "timespan": {
-                    "type": "string"
-                },
-                "catalogPath": {
-                    "type": "string"
-                },
-                "license": {
-                    "$ref": "#/$defs/license"
-                },
-                "updatePeriodDays": {
-                    "type": "number"
-                },
-                "datasetVersion": {
-                    "type": "string"
-                },
-                "licenses": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/$defs/license"
-                    }
-                },
-                "type": {
-                    "type": "string",
-                    "enum": [
-                        "string",
-                        "float",
-                        "int",
-                        "mixed",
-                        "ordinal"
-                    ]
-                }
-            }
+            "$ref": "dataset-schema.json#/properties/tables/additionalProperties/properties/variables/additionalProperties"
         }
     }
 }

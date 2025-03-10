@@ -14,10 +14,10 @@ definitions:
           time: true
 title:
   title: Estimated cumulative excess deaths during COVID-19
-  titleVariant: "by model"
-defaultSelection:
+  title_variant: "by model"
+default_selection:
   - World
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

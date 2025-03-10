@@ -1,7 +1,7 @@
 import re
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Optional, Set
 
 from owid.catalog import Dataset, Table
 
@@ -273,3 +273,37 @@ def merge_common_metadata_by_dimension(common_params, view_dimensions: Dict[str,
         raise ValueError("Unresolved conflicts for keys: " + "; ".join(messages))
 
     return final_result
+
+
+# Pre-compile the regex pattern for performance.
+_pattern = re.compile(r"_([a-z])")
+
+
+def snake_to_camel(s: str) -> str:
+    # Use the compiled pattern to substitute underscores with the uppercase letter.
+    return _pattern.sub(lambda match: match.group(1).upper(), s)
+
+
+def camelize(obj: Any, exclude_keys: Optional[Set[str]] = None) -> Any:
+    """
+    Recursively converts dictionary keys from snake_case to camelCase, unless the key is in exclude_keys.
+
+    Parameters:
+        obj: The object (dict, list, or other) to process.
+        exclude_keys: An optional iterable of keys that should not be converted (including nested values).
+    """
+    exclude_keys = exclude_keys or set()
+
+    if isinstance(obj, dict):
+        new_obj: dict[Any, Any] = {}
+        for key, value in obj.items():
+            # Leave the key unchanged if it's in the exclusion list
+            if key in exclude_keys:
+                new_obj[key] = value
+            else:
+                new_obj[snake_to_camel(key)] = camelize(value, exclude_keys)
+        return new_obj
+    elif isinstance(obj, list):
+        return [camelize(item, exclude_keys) for item in obj]
+    else:
+        return obj
