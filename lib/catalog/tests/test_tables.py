@@ -377,7 +377,16 @@ def test_set_index_keeps_metadata() -> None:
     tb["b"].metadata.title = "B"
 
     tb_new = tb.set_index(["a"])
+
+    # dimension has been added to metadata
+    assert tb_new.m.dimensions
+    assert len(tb_new.m.dimensions) == 1
+    assert tb_new.m.dimensions[0] == {"name": "A", "slug": "a"}
+
     tb_new = tb_new.reset_index()
+
+    # dimension has been dropped
+    assert not tb_new.m.dimensions
 
     # metadata should be preserved
     assert tb_new["a"].metadata.title == "A"

@@ -10,7 +10,7 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, Tuple, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, Tuple, TypedDict, TypeVar, Union
 
 import mistune
 import pandas as pd
@@ -401,12 +401,10 @@ class DatasetMeta(MetaBase):
         return f"{self.channel}/{self.namespace}/{self.version}/{self.short_name}"
 
 
-@pruned_json
-@dataclass(eq=False)
-class TableDimension(MetaBase):
+class TableDimension(TypedDict):
     name: str
     slug: str
-    description: Optional[str] = None
+    description: Optional[str]
 
 
 @pruned_json

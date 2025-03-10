@@ -40,15 +40,7 @@ from owid.repack import repack_frame
 
 from . import processing_log as pl
 from . import utils, variables, warnings
-from .meta import (
-    SOURCE_EXISTS_OPTIONS,
-    DatasetMeta,
-    License,
-    Origin,
-    Source,
-    TableMeta,
-    VariableMeta,
-)
+from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
 from .variables import Variable
 
 log = structlog.get_logger()
@@ -650,14 +642,22 @@ class Table(pd.DataFrame):
         if isinstance(keys, str):
             keys = [keys]
 
+        # create metadata dimensions
+        for col in keys:
+            # TODO: make this work with append=True
+            dimensions = [{"name": self[col].title or key, "slug": key} for key in keys]
+
         if kwargs.get("inplace"):
             super().set_index(keys, **kwargs)
-            self.metadata.primary_key = keys
-            return None
+            t = self
+            to_return = None
         else:
             t = super().set_index(keys, **kwargs)
-            t.metadata.primary_key = keys
-            return cast(Table, t)
+            to_return = cast(Table, t)
+
+        t.metadata.primary_key = keys
+        t.metadata.dimensions = dimensions  # type: ignore
+        return to_return
 
     @overload
     def reset_index(self, level=None, *, inplace: Literal[True], **kwargs) -> None: ...
@@ -671,6 +671,11 @@ class Table(pd.DataFrame):
     def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Optional["Table"]:  # type: ignore
         """Fix type signature of reset_index."""
         t = super().reset_index(level=level, inplace=inplace, **kwargs)  # type: ignore
+
+        # drop dimensions
+        # TODO: make this work for reset_index with subset of levels
+        self.metadata.dimensions = None
+
         if inplace:
             return None
         else:

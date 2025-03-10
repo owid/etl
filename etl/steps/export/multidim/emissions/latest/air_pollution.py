@@ -2,8 +2,6 @@
 This mdim was created as a proof of concept. It can be deleted if not used.
 """
 
-from owid.catalog.meta import TableDimension
-
 from etl.collections import multidim
 from etl.helpers import PathFinder
 
@@ -22,7 +20,7 @@ def run() -> None:
     # TODO: if expand_config worked for multiple indicators, then this would be unnecessary
     #   it's implemented by Lucas at the moment
     assert table.m.dimensions
-    table.m.dimensions.append(TableDimension(name="Per capita", slug="per_capita"))
+    table.m.dimensions.append({"name": "Per capita", "slug": "per_capita"})
 
     # Add dimensions to columns
     for _, v in table.items():
