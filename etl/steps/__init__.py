@@ -4,6 +4,7 @@
 #
 import graphlib
 import hashlib
+import inspect
 import json
 import os
 import re
@@ -345,6 +346,17 @@ class Step(Protocol):
         raise NotImplementedError()
 
 
+def run_module_run(module, dest_dir: str) -> None:
+    """Ensure module has run() and execute it with dest_dir if applicable."""
+    if not hasattr(module, "run"):
+        raise Exception(f'no run() method defined for module "{module}"')
+    sig = inspect.signature(module.run)
+    if "dest_dir" in sig.parameters:
+        module.run(dest_dir)
+    else:
+        module.run()
+
+
 @dataclass
 class DataStep(Step):
     """
@@ -543,19 +555,7 @@ class DataStep(Step):
 
         with isolated_env(module_dir):
             step_module = import_module(self._search_path.relative_to(paths.BASE_DIR).as_posix().replace("/", "."))
-            if not hasattr(step_module, "run"):
-                raise Exception(f'no run() method defined for module "{step_module}"')
-
-            # data steps
-            try:
-                # This should work when using the new run functions that don't require dest_dir as an argument.
-                step_module.run()
-            except TypeError as e:
-                # For backwards compatibility, execute the run function assuming it has dest_dir as an argument.
-                if "missing 1 required positional argument: 'dest_dir'" in str(e):
-                    step_module.run(self._dest_dir.as_posix())  # type: ignore
-                else:
-                    raise
+            run_module_run(step_module, self._dest_dir.as_posix())
 
     def _run_py(self) -> None:
         """
