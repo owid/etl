@@ -221,7 +221,6 @@ steps:
     - data://garden/climate/2025-01-21/sea_surface_temperature
     - data://garden/climate/2025-01-21/surface_temperature_analysis
     - data://garden/epa/2024-04-17/mass_balance_us_glaciers
-    - data://garden/climate/2025-01-21/sea_surface_temperature_annual
   #
   # Various sources - Climate change impacts (monthly).
   #
