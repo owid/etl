@@ -22,7 +22,7 @@ def main(upload: bool) -> None:
     snap = modify_metadata(snap, date)
     # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
     # snap.dvc_add(upload=upload)
-    snap.create_snapshot(upload=upload)
+    snap.dvc_add(upload=upload)
 
 
 def modify_metadata(snap: Snapshot, date: str) -> Snapshot:
@@ -36,7 +36,7 @@ def get_date_of_update() -> str:
     """
     Get the date of the latest update for yearly measles from the CDC website - https://www.cdc.gov/measles/data-research/
     """
-    df = pd.read_csv("https://raw.githubusercontent.com/spoonerf/test/refs/heads/main/test_cases2.csv")
+    df = pd.read_csv("https://raw.githubusercontent.com/spoonerf/test/refs/heads/main/test_cases.csv")
     date = df["date"][0]
     return date
 

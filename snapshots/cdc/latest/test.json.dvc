@@ -6,13 +6,13 @@ meta:
     citation_full: Measles Cases and Outbreaks (2025). Centers for Disease Control and Prevention (CDC).
     attribution_short: CDC
     url_main: https://www.cdc.gov/measles/data-research/
-    url_download: https://raw.githubusercontent.com/spoonerf/test/refs/heads/main/test_cases2.csv
+    url_download: https://raw.githubusercontent.com/spoonerf/test/refs/heads/main/test_cases.csv
     date_accessed: 2025-03-10
-    date_published: '2024-03-02'
+    date_published: '2025-12-12'
     license:
       name: Public domain
       url: https://www.cdc.gov/other/agencymaterials.html
 outs:
-  - md5: 010745ab91b7dcd112c275ef6d5e30ec
-    size: 42
+  - md5: 8475640a6a58a95d297de1c52c060471
+    size: 58
     path: test.json
