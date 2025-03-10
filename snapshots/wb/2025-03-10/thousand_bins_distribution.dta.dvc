@@ -18,3 +18,7 @@ meta:
     license:
       name: CC BY 3.0 IGO DEED
       url: https://datacatalog.worldbank.org/search/dataset/0064304/1000-Binned-Global-Distribution
+outs:
+  - md5: 88d85212ead3d97eb948cf4b69949d24
+    size: 564632738
+    path: thousand_bins_distribution.dta
