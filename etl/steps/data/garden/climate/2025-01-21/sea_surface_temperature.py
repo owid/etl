@@ -54,6 +54,27 @@ def run(dest_dir: str) -> None:
     # Create a date column (assume the middle of the month for each monthly data point).
     tb["date"] = tb["year"].astype(str) + "-" + tb["month"].astype(str).str.zfill(2) + "-15"
     # Remove unnecessary columns.
+
+    # Compute annual averages
+    tb_annual = tb.groupby(["year", "location"], as_index=False).agg(
+        {
+            "sea_temperature_anomaly": "mean",
+            "sea_temperature_anomaly_low": "mean",
+            "sea_temperature_anomaly_high": "mean",
+        }
+    )
+    tb_annual = tb_annual.rename(
+        columns={
+            "sea_temperature_anomaly": "sea_temperature_anomaly_annual",
+            "sea_temperature_anomaly_low": "sea_temperature_anomaly_annual_low",
+            "sea_temperature_anomaly_high": "sea_temperature_anomaly_annual_high",
+        },
+        errors="raise",
+    )
+
+    # Set an appropriate index and sort conveniently.
+    tb_annual = tb_annual.format(["location", "year"], short_name="sea_surface_temperature_annual")
+
     tb = tb.drop(columns=["year", "month"], errors="raise")
 
     # Set an appropriate index and sort conveniently.
@@ -63,5 +84,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the combined table.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = create_dataset(dest_dir, tables=[tb, tb_annual], check_variables_metadata=True)
     ds_garden.save()

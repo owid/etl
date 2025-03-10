@@ -76,9 +76,7 @@ def run(dest_dir: str) -> None:
     # Load Met Office dataset on sea surface temperature.
     ds_met_office = paths.load_dataset("sea_surface_temperature")
     tb_met_office = ds_met_office.read("sea_surface_temperature")
-
-    ds_met_office_annual = paths.load_dataset("sea_surface_temperature_annual")
-    tb_met_office_annual = ds_met_office_annual.read("sea_surface_temperature")
+    tb_met_office_annual = tb_met_office.read("sea_surface_temperature_annual")
 
     # Load NOAA/NCIE dataset on ocean heat content.
     ds_ocean_heat = paths.load_dataset("ocean_heat_content", namespace="climate")
