@@ -1,3 +1,49 @@
+definitions:
+  config_1: &config1
+    relatedQuestionText: Since 8 March, we rely on data from the WHO for confirmed cases and deaths
+    relatedQuestionUrl: https://ourworldindata.org/covid-jhu-who
+  config_2: &config2
+    relatedQuestionText: What is the COVID-19 Stringency Index?
+    relatedQuestionUrl: https://ourworldindata.org/metrics-explained-covid19-stringency-index
+  config_3: &config3
+    relatedQuestionText: "Data on tests is no longer updated since June 2022"
+    relatedQuestionUrl: "https://ourworldindata.org/covid-testing-data-archived"
+
+  common_views:
+    - config:
+        hideAnnotationFieldsInTitle: true
+        hasMapTab: true
+    - dimensions:
+        metric: deaths
+      config: *config1
+    - dimensions:
+        metric: cases
+      config: *config1
+    - dimensions:
+        metric: cases_deaths
+      config: *config1
+    - dimensions:
+        metric: cfr
+      config: *config1
+    - dimensions:
+        metric: r
+      config: *config1
+    - dimensions:
+        metric: stringency_index
+      config: *config2
+    - dimensions:
+        metric: tests
+      config: *config3
+    - dimensions:
+        metric: tests_cases
+      config: *config3
+    - dimensions:
+        metric: tests_pos
+      config: *config3
+    - dimensions:
+        metric: cases_tests_pos_r
+      config: *config3
+
 config:
   explorerTitle: "COVID-19"
   explorerSubtitle: "Explore global data on COVID-19."
@@ -98,7 +144,7 @@ dimensions:
         name: Cumulative (last 12 months)
       - slug: 7d_avg
         name: 7-day rolling average
-      - slug: week_ch
+      - slug: weekly_ch
         name: Weekly change
       - slug: biweekly_ch
         name: Biweekly change
@@ -112,6 +158,11 @@ dimensions:
       type: dropdown
   - slug: relative
     name: Relative to population
+    choices:
+      - slug: false
+        name: "Total"
+      - slug: true
+        name: Per 100,000 people
     presentation:
       type: checkbox
 
@@ -126,10 +177,10 @@ views:
       relative: false
     indicators:
       y:
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot
-        - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top
-        - cases_deaths#total_deaths
+        - catalogPath: excess_mortality_economist#cumulative_estimated_daily_excess_deaths
+        - catalogPath: excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot
+        - catalogPath: excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top
+        - catalogPath: cases_deaths#total_deaths
     config:
       title: Estimated cumulative excess deaths during COVID-19
       subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown.
@@ -333,7 +384,7 @@ views:
       y: cases_deaths#weekly_pct_growth_deaths
     dimensions:
       metric: deaths
-      interval: week_ch
+      interval: weekly_ch
       relative: false
   # Biweekly
   - indicators:
@@ -352,7 +403,7 @@ views:
       y: cases_deaths#biweekly_pct_growth_deaths
     dimensions:
       metric: deaths
-      interval: biweekly
+      interval: biweekly_ch
       relative: false
 
   #######################
@@ -412,7 +463,7 @@ views:
       y: cases_deaths#weekly_cases_per_million
   - dimensions:
       metric: cases
-      interval: weekly
+      interval: weekly_ch
       relative: false
     indicators:
       y: cases_deaths#weekly_pct_growth_cases
@@ -555,7 +606,7 @@ views:
   # CFR
   #######################
   - indicators:
-      y: cases_deaths/cases_deaths#cfr
+      y: cases_deaths#cfr
     dimensions:
       metric: cfr
       interval: cum
@@ -651,7 +702,7 @@ views:
       interval: cum
       relative: false
     indicators:
-      y: vaccinations_global/vaccinations_global#total_boosters
+      y: vaccinations_global#total_boosters
 
   - dimensions:
       metric: boosters
@@ -783,7 +834,7 @@ views:
       y:
         - vaccinations_global#total_vaccinations_per_hundred
         - cases_deaths#new_cases_per_million_7_day_avg_right
-        - grapher/covid/latest/hospital/hospital#daily_occupancy_icu_per_1m
+        - hospital#daily_occupancy_icu_per_1m
         - cases_deaths#new_deaths_per_million_7_day_avg_right
     dimensions:
       metric: vax_cases_icu_deaths

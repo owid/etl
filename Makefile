@@ -145,3 +145,32 @@ fasttrack: .venv
 wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	.venv/bin/etlwiz
+
+# If VSCode exists, install a list of published extensions (defined in EXTENSIONS) and a list of custom extensions (defined in CUSTOM_EXTENSIONS).
+# Custom extensions are expected to be in the vscode_extensions folder, with a subfolder for each extension containing a folder install/ with a VSIX file.
+# The latest VSIX file in each install/ folder will be installed.
+install-vscode-extensions:
+	@echo '==> Checking and installing required VS Code extensions'
+	@if command -v code > /dev/null; then \
+		EXTENSIONS="ms-toolsai.jupyter"; \
+		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step"; \
+		EXTENSIONS_PATH="vscode_extensions"; \
+		for EXT in $$EXTENSIONS; do \
+			if ! code --list-extensions | grep -q "$$EXT"; then \
+				code --install-extension $$EXT; \
+			fi; \
+		done; \
+		for EXT in $$CUSTOM_EXTENSIONS; do \
+			if ! code --list-extensions | grep -q "owid.$$EXT"; then \
+				VSIX_FILE=$$(ls -v $$EXTENSIONS_PATH/$$EXT/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
+				if [ -n "$$VSIX_FILE" ]; then \
+					echo "Installing owid.$$EXT from $$VSIX_FILE"; \
+					code --install-extension "$$VSIX_FILE"; \
+				else \
+					echo "⚠️ No VSIX file found for owid.$$EXT. Skipping."; \
+				fi; \
+			fi; \
+		done; \
+	else \
+		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
+	fi

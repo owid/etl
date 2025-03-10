@@ -5,13 +5,13 @@ definitions:
       display:
         name: "Confirmed deaths"
         color: "#000000"
-
-  config: &config_base
-    title: "Estimated cumulative excess deaths during COVID-19"
-    subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
-    originUrl: ourworldindata.org/coronavirus
-    hideAnnotationFieldsInTitle:
-      time: true
+  common_views:
+    - config:
+        title: "Estimated cumulative excess deaths during COVID-19"
+        subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
+        originUrl: ourworldindata.org/coronavirus
+        hideAnnotationFieldsInTitle:
+          time: true
 title:
   title: Estimated cumulative excess deaths during COVID-19
   titleVariant: "by model"
@@ -76,8 +76,6 @@ views:
             color: "#AABBDA"
         - *confirmed
 
-    config: *config_base
-
   # The Economist
   - dimensions:
       model: econ
@@ -97,8 +95,6 @@ views:
             name: "95% CI bottom"
             color: "#DAAE9E"
         - *confirmed
-
-    config: *config_base
 
   # The Economist (100k)
   - dimensions:
@@ -123,8 +119,6 @@ views:
             name: "Confirmed deaths"
             color: "#000000"
 
-    config: *config_base
-
   # WHO
   - dimensions:
       model: who
@@ -144,8 +138,6 @@ views:
             name: "Low estimate"
             color: "#AABBDA"
         - *confirmed
-
-    config: *config_base
 
   # # IHME
   # - dimensions:

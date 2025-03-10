@@ -3,6 +3,7 @@
   "displayName": "Find Latest ETL Step",
   "description": "Find the latest ETL step given a step short name",
   "version": "0.0.2",
+  "publisher": "owid",
   "engines": {
     "vscode": "^1.93.0"
   },

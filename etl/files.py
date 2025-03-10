@@ -1,5 +1,5 @@
 #
-#  files.py
+#  NOTE: the only allowed dependencies are etl.config, etl.paths
 #
 
 import hashlib
@@ -10,17 +10,22 @@ import re
 import subprocess
 import time
 from collections import OrderedDict
+from functools import cache
 from pathlib import Path
 from threading import Lock
-from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union, overload
+from typing import Any, Dict, Generator, List, Optional, Set, TextIO, Union, cast, overload
+from urllib.parse import urljoin
 
+import jsonref
 import pandas as pd
+import requests
 import ruamel.yaml
 import structlog
 import yaml
 from ruamel.yaml import YAML
 from yaml.dumper import Dumper
 
+from etl.config import TLS_VERIFY
 from etl.paths import BASE_DIR
 
 log = structlog.get_logger()
@@ -386,3 +391,32 @@ def run_command_on_server(
         return result.stdout
     except subprocess.CalledProcessError as e:
         raise RuntimeError(f"Failed to execute command on {ssh_target}:\n{e.stderr}") from e
+
+
+def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
+    """Read JSON schema with resolved references."""
+    path = Path(path)
+
+    # pathlib does not append trailing slashes, but jsonref needs that.
+    base_dir_url = path.parent.absolute().as_uri() + "/"
+    base_file_url = urljoin(base_dir_url, path.name)
+    with path.open("r") as f:
+        dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
+        return cast(Dict[str, Any], dix)
+
+
+@cache
+def get_schema_from_url(schema_url: str) -> dict:
+    """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
+
+    https://files.ourworldindata.org/schemas/grapher-schema.006.json
+
+    More details on available versions can be found
+    at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema
+
+    Returns
+    -------
+    Dict[str, Any]
+        Schema of a chart configuration.
+    """
+    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()

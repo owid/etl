@@ -9,21 +9,26 @@ import requests
 import slack_sdk.errors as e
 from slack_sdk import WebClient
 from slack_sdk.web.slack_response import SlackResponse
+from structlog import get_logger
 
 from etl import config
 
 slack_client = WebClient(token=config.SLACK_API_TOKEN)
-SECONDS_UPLOAD_WAIT = 5
+SECONDS_UPLOAD_WAIT = 10
+log = get_logger()
 
 
 def send_slack_message(
     channel: str, message: str, image_url: Optional[str] = None, image_path: Optional[str] = None, **kwargs
 ) -> SlackResponse:
-    """Send `message` to Slack channel `channel`."""
+    """Send `message` to Slack channel `channel`.
+
+    If there is an error with the image upload, the message will be sent without the image.
+    """
     # Send message + image
     if image_url or image_path:
         img_response = upload_image(image_url=image_url, image_path=image_path)
-        if img_response.get("file", {}).get("url_private"):
+        if img_response and (img_response.get("file", {}).get("url_private")):
             blocks = [
                 {
                     "type": "section",
@@ -74,7 +79,7 @@ def send_slack_message(
 
 def upload_image(
     image_url: Optional[str] = None, image_path: Optional[str] = None, seconds_wait: int = SECONDS_UPLOAD_WAIT, **kwargs
-) -> SlackResponse:
+) -> Optional[SlackResponse]:
     """Upload image to Slack.
 
     This way we obtain a Slack URL that we can add to future messageds (in blocks).
@@ -88,10 +93,10 @@ def upload_image(
             if response.status_code == 200:
                 for chunk in response.iter_content(1024):  # Download in chunks
                     temp_file.write(chunk)
-                print(f"File downloaded successfully to {temp_file.name}")
+                log.info(f"File downloaded successfully to {temp_file.name}")
             else:
-                print(f"Failed to download file. Status code: {response.status_code}")
-                exit(1)
+                log.info(f"Failed to download file. Status code: {response.status_code}")
+                return
 
             # Step 2: Upload the file to Slack
         upload_response = slack_client.files_upload_v2(
@@ -105,7 +110,8 @@ def upload_image(
         )
 
     if not upload_response["ok"]:
-        print("Error uploading file:", upload_response["error"])
+        log.info("Error uploading file:", upload_response["error"])
+        return
 
     # Ensure everything is uploaded before continuing
     time.sleep(seconds_wait)

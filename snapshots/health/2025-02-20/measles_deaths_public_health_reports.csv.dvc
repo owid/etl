@@ -54,6 +54,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: cd3cddecad699645b8382175c85fa1c0
+  - md5: dd7b7e940cd4a857323502dfbb88e081
     size: 534
     path: measles_deaths_public_health_reports.csv

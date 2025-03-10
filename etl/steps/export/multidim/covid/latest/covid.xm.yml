@@ -1,10 +1,11 @@
 definitions:
-  config: &config
-    hideAnnotationFieldsInTitle:
-      entity: true
-      time: true
-      changeInPrefix: true
-    originUrl: ourworldindata.org/coronavirus
+  common_views:
+    - config:
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+        originUrl: ourworldindata.org/coronavirus
 
 title:
   title: "Excess mortality"
@@ -38,14 +39,11 @@ views:
       normalize: absolute
     indicators:
       y: "excess_mortality#cum_excess_proj_all_ages"
-    config: *config
   - dimensions:
       normalize: per_capita
     indicators:
       y: "excess_mortality#cum_excess_per_million_proj_all_ages"
-    config: *config
   - dimensions:
       normalize: percentage
     indicators:
       y: "excess_mortality#cum_p_proj_all_ages"
-    config: *config

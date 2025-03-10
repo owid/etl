@@ -9,7 +9,7 @@ import structlog
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
-from etl.helpers import (
+from etl.dag_helpers import (
     create_dag_archive_file,
     get_comments_above_step_in_dag,
     remove_steps_from_dag_file,

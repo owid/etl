@@ -1,6 +1,7 @@
 """Generate aggregated table for total yearly and cumulative number of notable AI systems in each category of researcher affiliation."""
 
-from etl.helpers import PathFinder, create_dataset, last_date_accessed
+from etl.catalog_helpers import last_date_accessed
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

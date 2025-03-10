@@ -1,14 +1,25 @@
+definitions:
+  desc_update: Data for {year} is incomplete and was last updated on {update_date}.
 dataset:
   title: Long-run reported cases of measles in the United States
+  update_period_days: 7
 tables:
   measles_long_run:
     variables:
       cases:
-        title: Reported measles cases (updated weekly)
-        unit: cases
+        description_short: Reported number of measles cases. {definitions.desc_update}
+        display:
+          entityAnnotationsMap: "United States: Data for {year} is incomplete"
+        presentation:
+          attribution: Public Health Reports (1919-1925); US Census Bureau (1945); Centers for Disease Control and Prevention (1994; {year})
       case_rate:
         title: Reported measles case rate (updated weekly)
         unit: cases per 100,000 people
+        description_short: Reported number of measles cases in the United States per 100,000 people. {definitions.desc_update}
+        display:
+          entityAnnotationsMap: "United States: Data for {year} is incomplete"
+        presentation:
+          attribution: Public Health Reports (1919-1925); US Census Bureau (1945); Centers for Disease Control and Prevention (1994; {year})
       cases_static:
         title: Reported measles cases
         description_short: Reported number of measles cases in the United States.

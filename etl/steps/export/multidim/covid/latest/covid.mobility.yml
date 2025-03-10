@@ -1,12 +1,13 @@
 definitions:
-  config_base: &config_base
-    subtitle: "This data shows how community movement in specific locations has changed relative to the period before the pandemic."
-    note: "It's not recommended to compare levels across countries; local differences in categories could be misleading."
-    originUrl: "ourworldindata.org/coronavirus"
-    minTime: "earliest"
-    maxTime: "latest"
-    hideAnnotationFieldsInTitle: { "time": True }
-    addCountryMode: "change-country"
+  common_views:
+    - config: &config_base
+        subtitle: "This data shows how community movement in specific locations has changed relative to the period before the pandemic."
+        note: "It's not recommended to compare levels across countries; local differences in categories could be misleading."
+        originUrl: "ourworldindata.org/coronavirus"
+        minTime: "earliest"
+        maxTime: "latest"
+        hideAnnotationFieldsInTitle: { "time": True }
+        addCountryMode: "change-country"
 
 title:
   title: Mobility during COVID-19 pandemic
@@ -56,4 +57,3 @@ views:
 
     config:
       title: "How did the number of visitors change since the beginning of the pandemic?"
-      <<: *config_base

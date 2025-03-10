@@ -982,13 +982,6 @@ steps:
   data://grapher/health/2025-02-13/vaccine_confidence:
     - data://garden/health/2025-02-13/vaccine_confidence
 
-  # CDC Measles Cases 1985-present - autoupdate
-  data://meadow/cdc/latest/measles_cases:
-    - snapshot://cdc/latest/measles_cases.json
-  data://garden/cdc/latest/measles_cases:
-    - data://meadow/cdc/latest/measles_cases
-
-  #
   # Historical measles data (1919-1984)
   #
   data://meadow/health/2025-02-19/measles_historical:
@@ -996,6 +989,13 @@ steps:
   data://garden/health/2025-02-19/measles_historical:
     - data://meadow/health/2025-02-19/measles_historical
 
+  # CDC Measles Cases 1985-present - autoupdate
+  data://meadow/cdc/latest/measles_cases:
+    - snapshot://cdc/latest/measles_cases.json
+  data://garden/cdc/latest/measles_cases:
+    - data://meadow/cdc/latest/measles_cases
+
+  #
   # Long-run measles data (auto-updated)
   data://garden/health/latest/measles_long_run:
     - data://garden/cdc/latest/measles_cases
@@ -1113,3 +1113,59 @@ steps:
     - data://garden/demography/2025-01-23/us_state_population
   data://grapher/health/2025-02-27/tetanus_cases_state_level:
     - data://garden/health/2025-02-27/tetanus_cases_state_level
+
+  #
+  # US Public Health Reports - Diphtheria deaths
+  #
+  data://garden/public_health_reports/2025-03-04/diphtheria_deaths:
+    - data://meadow/public_health_reports/2025-03-04/diphtheria_deaths
+  data://meadow/public_health_reports/2025-03-04/diphtheria_deaths:
+    - snapshot://public_health_reports/2025-02-26/diphtheria_deaths.csv
+
+    #
+  # US Census Bureau - Diphtheria deaths
+  #
+  data://garden/us_census_bureau/2025-03-04/diphtheria_deaths:
+    - data://meadow/us_census_bureau/2025-03-04/diphtheria_deaths
+  data://meadow/us_census_bureau/2025-03-04/diphtheria_deaths:
+    - snapshot://us_census_bureau/2025-02-26/diphtheria_deaths.csv
+
+  #
+  # US diphtheria deaths - long run combined sources
+  #
+  data://garden/health/2025-03-04/diphtheria_deaths:
+    - data://garden/public_health_reports/2025-03-04/diphtheria_deaths
+    - data://garden/us_census_bureau/2025-03-04/diphtheria_deaths
+    - data://garden/demography/2024-07-15/population
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+  data://grapher/health/2025-03-04/diphtheria_deaths:
+    - data://garden/health/2025-03-04/diphtheria_deaths
+
+  #
+  # US Pertussis cases - CDC
+  #
+  data://meadow/cdc/2025-03-04/pertussis_cases:
+    - snapshot://cdc/2025-03-04/pertussis_cases.csv
+  data://garden/cdc/2025-03-04/pertussis_cases:
+    - data://meadow/cdc/2025-03-04/pertussis_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-04/pertussis_cases:
+    - data://garden/cdc/2025-03-04/pertussis_cases
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/us_census_bureau/2025-03-06/pertussis_deaths:
+    - snapshot://us_census_bureau/2025-03-06/pertussis_deaths.csv
+  data://garden/us_census_bureau/2025-03-06/pertussis_deaths:
+    - data://meadow/us_census_bureau/2025-03-06/pertussis_deaths
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://garden/health/2025-03-06/pertussis_deaths:
+    - data://garden/us_census_bureau/2025-03-06/pertussis_deaths
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-03-06/pertussis_deaths:
+    - data://garden/health/2025-03-06/pertussis_deaths

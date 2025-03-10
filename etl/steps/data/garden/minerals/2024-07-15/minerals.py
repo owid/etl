@@ -752,7 +752,7 @@ def run(dest_dir: str) -> None:
     # NOTE: Titles, units and descriptions generated with the above function will be overwritten by the content of the
     #  accompanying meta.yaml file.
     #  To regenerate that yaml file, execute the following lines and manually copy the content in the meta.yaml file.
-    # from etl.helpers import print_tables_metadata_template
+    # from etl.interactive import print_tables_metadata_template
     # print_tables_metadata_template([tb], fields=["title", "unit", "short_unit", "description_short", "presentation.title_public"])
 
     # Discard some columns, since they are not as critical, and add too much complexity to the explorer.
