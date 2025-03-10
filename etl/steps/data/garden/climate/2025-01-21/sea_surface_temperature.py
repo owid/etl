@@ -66,8 +66,8 @@ def run(dest_dir: str) -> None:
     tb_annual = tb_annual.rename(
         columns={
             "sea_temperature_anomaly": "sea_temperature_anomaly_annual",
-            "sea_temperature_anomaly_low": "sea_temperature_anomaly_annual_low",
-            "sea_temperature_anomaly_high": "sea_temperature_anomaly_annual_high",
+            "sea_temperature_anomaly_low": "sea_temperature_anomaly_low_annual",
+            "sea_temperature_anomaly_high": "sea_temperature_anomaly_high_annual",
         },
         errors="raise",
     )
