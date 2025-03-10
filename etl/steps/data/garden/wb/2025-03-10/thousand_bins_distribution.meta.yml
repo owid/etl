@@ -36,8 +36,8 @@ tables:
           - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
         description_from_producer: |-
           Average daily household per capita welfare values of each bin in 2017 PPP USD. Values are based on [lineup methodology](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html) in PIP.
-        description_processing: |-
-          We transformed negative average income values to zero.
+        # description_processing: |-
+        #   We transformed negative average income values to zero.
 
       pop:
         title: Population
