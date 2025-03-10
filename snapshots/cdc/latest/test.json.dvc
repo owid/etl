@@ -13,6 +13,6 @@ meta:
       name: Public domain
       url: https://www.cdc.gov/other/agencymaterials.html
 outs:
-  - md5: 8475640a6a58a95d297de1c52c060471
-    size: 58
+  - md5: 757f4a09d8fcdda4f0d2708d697a7d25
+    size: 80
     path: test.json
