@@ -55,7 +55,7 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-07-12/un_wpp_full:
     - data://garden/un/2024-07-12/un_wpp
-  export://explorers/un/2025-03-10/un_wpp:
+  export://explorers/un/latest/un_wpp:
     - data://grapher/un/2024-07-12/un_wpp
 
   # UN WPP (2022)
