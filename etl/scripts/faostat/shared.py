@@ -121,8 +121,9 @@ ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str, str]]] = {
     "meadow": [],
     "garden": [
         (NAMESPACE, "garden", f"{NAMESPACE}_metadata"),
-        ("owid", "garden", "key_indicators"),
-        ("wb", "garden", "wb_income"),
+        ("demography", "garden", "population"),
+        ("regions", "garden", "regions"),
+        ("wb", "garden", "income_groups"),
     ],
     "grapher": [],
 }
