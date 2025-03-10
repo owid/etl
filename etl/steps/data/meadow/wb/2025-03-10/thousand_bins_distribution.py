@@ -20,7 +20,19 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["year", "code", "region_code", "obs"])
+    tb = tb.format(
+        [
+            "pipvintage",
+            "country",
+            "year",
+            "inPIP",
+            "region_pip",
+            "quantile",
+        ]
+    )
+
+    # Remove code column
+    tb = tb.drop(columns=["code"])
 
     #
     # Save outputs.
