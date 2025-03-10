@@ -126,6 +126,9 @@ class AdminAPI(object):
         if "topic_tags" in mdim_config:
             mdim_config["topicTags"] = mdim_config.pop("topic_tags")
 
+        if "default_selection" in mdim_config:
+            mdim_config["defaultSelection"] = mdim_config.pop("default_selection")
+
         title = mdim_config["title"]
         if "title_variant" in title:
             title["titleVariant"] = title.pop("title_variant")

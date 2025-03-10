@@ -385,6 +385,7 @@
         },
         "metadata": {
             "type": "object",
+            "additionalProperties": false,
             "properties": {
                 "name": {
                     "type": "string"
@@ -392,37 +393,37 @@
                 "description": {
                     "type": "string"
                 },
-                "descriptionShort": {
+                "description_short": {
                     "type": "string"
                 },
-                "descriptionFromProducer": {
+                "description_from_producer": {
                     "type": "string"
                 },
-                "descriptionKey": {
+                "description_key": {
                     "type": "array",
                     "items": {
                         "type": "string"
                     }
                 },
-                "descriptionProcessing": {
+                "description_processing": {
                     "type": "string"
                 },
                 "unit": {
                     "type": "string"
                 },
-                "shortUnit": {
+                "short_unit": {
                     "type": "string"
                 },
-                "datasetName": {
+                "dataset_name": {
                     "type": "string"
                 },
-                "datasetId": {
+                "dataset_id": {
                     "type": "number"
                 },
                 "coverage": {
                     "type": "string"
                 },
-                "nonRedistributable": {
+                "non_redistributable": {
                     "type": "boolean"
                 },
                 "source": {
@@ -516,6 +517,7 @@
                 },
                 "presentation": {
                     "type": "object",
+                    "additionalProperties": false,
                     "properties": {
                         "title_public": {
                             "type": "string"

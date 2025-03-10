@@ -109,8 +109,8 @@ def run(dest_dir: str) -> None:
                         },
                         # Currently, the stacked area chart uses multiple indicators, but the data page shows only the metadata of the first one. We need to override that metadata with the combination of the metadata of all indicators shown.
                         "metadata": {
-                            "descriptionShort": subtitle,
-                            "descriptionKey": description_keys,
+                            "description_short": subtitle,
+                            "description_key": description_keys,
                             "presentation": presentation,
                         },
                     },
