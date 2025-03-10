@@ -8,7 +8,7 @@ definitions:
 title:
   title: COVID-19 vaccines
   title_variant: "breakdowns"
-defaultSelection:
+default_selection:
   - High-income countries
   - Upper-middle-income countries
   - Lower-middle-income countries

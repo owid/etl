@@ -10,7 +10,7 @@ definitions:
 title:
   title: COVID-19 hospitalizations
   title_variant: ""
-defaultSelection:
+default_selection:
   - Belgium
   - Canada
   - France

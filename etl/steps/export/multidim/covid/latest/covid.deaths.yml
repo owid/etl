@@ -11,7 +11,7 @@ definitions:
 title:
   title: COVID-19 confirmed deaths
   title_variant: ""
-defaultSelection:
+default_selection:
   - World
   - Europe
   - Asia

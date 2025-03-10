@@ -28,7 +28,7 @@
             ],
             "additionalProperties": false
         },
-        "defaultSelection": {
+        "default_selection": {
             "type": "array",
             "items": {
                 "type": "string"
@@ -348,7 +348,7 @@
     },
     "required": [
         "title",
-        "defaultSelection",
+        "default_selection",
         "dimensions",
         "views"
     ],

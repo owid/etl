@@ -35,7 +35,7 @@ Multi-dimensional indicators are powered by a configuration that is typically cr
 title:
   title: "Energy prices"
   title_variant: "by energy source"
-defaultSelection:
+default_selection:
   - "European Union (27)"
 topic_tags:
   - "Energy"
