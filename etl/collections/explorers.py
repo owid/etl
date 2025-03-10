@@ -19,6 +19,7 @@ def create_explorer(
     paths: PathFinder,
     owid_env: Optional[OWIDEnv] = None,
     tolerate_extra_indicators: bool = False,
+    explorer_name: Optional[str] = None,
 ):
     """TODO: Replicate `etl.collections.multidim.upsert_mdim_data_page`."""
     # Read configuration as structured data
@@ -28,7 +29,13 @@ def create_explorer(
     process_views(explorer, paths.dependencies)
 
     # Create explorer (TODO: this should rather push to DB! As in with `etl.collections.multidim.upsert_mdim_data_page`)
-    return _create_explorer(dest_dir, explorer, tolerate_extra_indicators, owid_env)
+    return _create_explorer(
+        dest_dir=dest_dir,
+        explorer=explorer,
+        tolerate_extra_indicators=tolerate_extra_indicators,
+        explorer_name=explorer_name,
+        owid_env=owid_env,
+    )
 
 
 def process_views(
@@ -55,6 +62,7 @@ def _create_explorer(
     dest_dir: str,
     explorer: Explorer,
     tolerate_extra_indicators: bool,
+    explorer_name: Optional[str] = None,
     owid_env: Optional[OWIDEnv] = None,
 ):
     # Ensure we have an environment set
@@ -74,6 +82,7 @@ def _create_explorer(
         dest_dir=dest_dir,
         config=explorer.config,
         df_graphers=df_grapher,
+        explorer_name=explorer_name,
     )
 
     return ds
