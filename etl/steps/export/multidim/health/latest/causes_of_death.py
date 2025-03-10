@@ -17,11 +17,14 @@ def run(dest_dir: str) -> None:
     config_new = multidim.expand_config(table)
 
     # Fill choices from TableMeta and VariableMeta dimensions info
-    config["dimensions"][0]["choices"] += [
-        c for c in config_new["dimensions"][0]["choices"] if c["slug"] != "All causes"
-    ]
-    for k in (1, 2):
-        config["dimensions"][k]["choices"] = config_new["dimensions"][k]["choices"]
+    for dims in config["dimensions"]:
+        # Find matching dimension in new config
+        new_dims = next(d for d in config_new["dimensions"] if d["slug"] == dims["slug"])
+
+        if dims["slug"] == "cause":
+            dims["choices"] += [c for c in new_dims["choices"] if c["slug"] != "All causes"]
+        else:
+            dims["choices"] = new_dims["choices"]
 
     # Group age and metric views under "Side-by-side comparison of causes"
     grouped_views = multidim.group_views(config_new["views"], by=["age", "metric"])
