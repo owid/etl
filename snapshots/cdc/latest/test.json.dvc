@@ -8,11 +8,11 @@ meta:
     url_main: https://www.cdc.gov/measles/data-research/
     url_download: https://raw.githubusercontent.com/spoonerf/test/refs/heads/main/test_cases.csv
     date_accessed: 2025-03-10
-    date_published: '2029-12-25'
+    date_published: '2031-12-25'
     license:
       name: Public domain
       url: https://www.cdc.gov/other/agencymaterials.html
 outs:
-  - md5: b96f8c9e06ac14c560011568ee3e6ed7
-    size: 150
+  - md5: 68d152991d89c11c616a787e778ecbde
+    size: 171
     path: test.json
