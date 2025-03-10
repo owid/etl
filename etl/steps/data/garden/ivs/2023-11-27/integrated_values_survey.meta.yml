@@ -2,6 +2,7 @@
 definitions:
   common:
     presentation:
+      title_variant: Integrated Values Surveys
       topic_tags:
         - Trust
     processing_level: major
@@ -4083,8 +4084,6 @@ tables:
         display:
           name: "Neighbors being homosexuals: Mentioned"
           <<: *common-display
-        presentation:
-          title_public: "Neighbors being homosexuals: Mentioned"
       dont_know_neighbors_homosexuals:
         title: "Neighbors being homosexuals: Don't know"
         description_short: '% of respondents replying "don''t know" when asked "On this list are various groups of people. Could you please mention any that you would not like to have as neighbors?", when the group was "Homosexuals".'
