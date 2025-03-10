@@ -259,9 +259,7 @@ The most straightforward way to check your metadata is in Admin, although that m
 
 ```python
 import etl.grapher.helpers as gh
-dim_dict = {
-  "age_group": "YEARS0-4", "sex": "Male", "cause": "Drug use disorders"
-}
+dim_dict = {"age_group": "YEARS0-4", "sex": "Male", "cause": "Drug use disorders"}
 d = gh.render_yaml_file("ghe.meta.yml", dim_dict=dim_dict)
 d["tables"]["ghe"]["variables"]["death_count"]
 ```
@@ -270,15 +268,11 @@ An alternative is examining `VariableMeta`
 
 ```python
 from owid.catalog import Dataset
-import etl.grapher.helpers as gh
 from etl import paths
 
-tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
-
-# Sample a random row to get the dimension values
-dim_dict = dict(zip(tb.index.names, tb.sample(1).index[0]))
-
-gh.render_variable_meta(tb.death_count.m, dim_dict=dim_dict)
+ds = Dataset(paths.DATA_DIR / "garden/emissions/2025-02-12/ceds_air_pollutants")
+tb = ds['ceds_air_pollutants']
+tb.emissions.m.render({'pollutant': 'CO', 'sector': 'Transport'})
 ```
 
 ### Jinja Macros
