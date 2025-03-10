@@ -48,14 +48,14 @@ def run(dest_dir: str) -> None:
     # Extract year from date column
     tb["year"] = tb["date"].dt.year
 
-    # Switch from using 1951-198 0 to using 1861-1890 as our baseline to better show how temperatures have changed since pre-industrial times.
+    # Switch from using 1951-1980 to using 1880-1900 as our baseline to better show how temperatures have changed since pre-industrial times.
     # Calculate the adjustment factors based only on temperature_anomaly
     adjustment_factors = (
         tb[tb["year"].between(1951, 1980)].groupby("location")["temperature_anomaly"].mean()
         - tb[tb["year"].between(1880, 1900)].groupby("location")["temperature_anomaly"].mean()
     )
     # Apply the temperature_anomaly adjustment factor
-    # The adjustment factor is applied uniformly to the temperature anomalies and their confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1861–1890 baseline.
+    # The adjustment factor is applied uniformly to the temperature anomalies and their confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1880–1900 baseline.
     for region in adjustment_factors.index:
         tb.loc[tb["location"] == region, "temperature_anomaly"] += adjustment_factors[region]
 
