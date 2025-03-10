@@ -9,7 +9,7 @@ definitions:
 
 title:
   title: COVID-19 vaccines administered
-  titleVariant: ""
+  title_variant: ""
 defaultSelection:
   - Belgium
   - Canada

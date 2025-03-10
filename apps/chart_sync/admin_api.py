@@ -126,6 +126,10 @@ class AdminAPI(object):
         if "topic_tags" in mdim_config:
             mdim_config["topicTags"] = mdim_config.pop("topic_tags")
 
+        title = mdim_config["title"]
+        if "title_variant" in title:
+            title["titleVariant"] = title.pop("title_variant")
+
         # Retry in case we're restarting Admin on staging server
         resp = requests_with_retry().put(
             self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}",

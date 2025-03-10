@@ -18,14 +18,15 @@
                 "title": {
                     "type": "string"
                 },
-                "titleVariant": {
+                "title_variant": {
                     "type": "string"
                 }
             },
             "required": [
                 "title",
-                "titleVariant"
-            ]
+                "title_variant"
+            ],
+            "additionalProperties": false
         },
         "defaultSelection": {
             "type": "array",
@@ -467,7 +468,7 @@
                             "attribution": {
                                 "type": "string"
                             },
-                            "attributionShort": {
+                            "attribution_short": {
                                 "type": "string"
                             },
                             "versionProducer": {
@@ -516,13 +517,13 @@
                 "presentation": {
                     "type": "object",
                     "properties": {
-                        "titlePublic": {
+                        "title_public": {
                             "type": "string"
                         },
-                        "titleVariant": {
+                        "title_variant": {
                             "type": "string"
                         },
-                        "attributionShort": {
+                        "attribution_short": {
                             "type": "string"
                         },
                         "attribution": {

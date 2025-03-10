@@ -9,7 +9,7 @@ definitions:
 
 title:
   title: "Excess mortality"
-  titleVariant: "Cumulative deaths from all causes compared to projection based on previous years"
+  title_variant: "Cumulative deaths from all causes compared to projection based on previous years"
 defaultSelection:
   - Russia
   - United States

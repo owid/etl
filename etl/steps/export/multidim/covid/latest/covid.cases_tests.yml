@@ -51,7 +51,7 @@ definitions:
 
 title:
   title: "COVID-19: Tests and confirmed cases"
-  titleVariant: "Number of daily tests vs. daily new confirmed cases"
+  title_variant: "Number of daily tests vs. daily new confirmed cases"
 defaultSelection: []
 topic_tags:
   - COVID-19

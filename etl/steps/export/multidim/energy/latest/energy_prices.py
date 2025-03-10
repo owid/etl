@@ -83,10 +83,10 @@ def run(dest_dir: str) -> None:
                     footnote = "PPS have been adjusted for inflation, expressed in 2015 prices, using the Harmonised Index of Consumer Prices."
 
                 presentation = {
-                    "titlePublic": title,
+                    "title_public": title,
                 }
                 if title_variant:
-                    presentation["titleVariant"] = title_variant
+                    presentation["title_variant"] = title_variant
 
                 config["views"].append(
                     {

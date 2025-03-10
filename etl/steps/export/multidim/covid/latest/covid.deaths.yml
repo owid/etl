@@ -10,7 +10,7 @@ definitions:
 
 title:
   title: COVID-19 confirmed deaths
-  titleVariant: ""
+  title_variant: ""
 defaultSelection:
   - World
   - Europe
