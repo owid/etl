@@ -92,6 +92,7 @@
             "type": "array",
             "items": {
                 "type": "object",
+                "additionalProperties": false,
                 "properties": {
                     "dimensions": {
                         "type": "object",
@@ -343,7 +344,7 @@
         },
         "metadata": {
             "description": "Override metadata for all views.",
-            "$ref": "dataset-schema.json#/properties/tables/additionalProperties/properties/variables"
+            "$ref": "#/$defs/metadata"
         }
     },
     "required": [
@@ -382,6 +383,9 @@
                 "name",
                 "url"
             ]
+        },
+        "metadata": {
+            "$ref": "dataset-schema.json#/properties/tables/additionalProperties/properties/variables/additionalProperties"
         }
     }
 }
