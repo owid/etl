@@ -653,16 +653,19 @@ def create_explorer(
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,
     df_columns: Optional[pd.DataFrame] = None,
+    explorer_name: Optional[str] = None,
 ) -> Explorer:
     # Extract information about this step from dest_dir.
     channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
 
     # If the name of the explorer is specified in config, take that, otherwise use the step's short_name.
     # NOTE: This is the expected name of the explorer tsv file.
-    if "name" in config:
-        explorer_name = config["name"]
-    else:
-        explorer_name = short_name
+    if explorer_name is None:
+        if "name" in config:
+            explorer_name = config["name"]
+        else:
+            explorer_name = short_name
+    assert isinstance(explorer_name, str)
 
     # Initialize explorer.
     explorer = Explorer.from_owid_content(explorer_name)

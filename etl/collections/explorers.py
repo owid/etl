@@ -3,7 +3,7 @@ from typing import Dict, List, Optional, Set
 
 import pandas as pd
 
-from etl.collections.common import validate_collection_config
+from etl.collections.common import expand_config, validate_collection_config
 from etl.collections.model import CHART_DIMENSIONS, Explorer
 from etl.collections.utils import (
     get_tables_by_name_mapping,
@@ -12,6 +12,8 @@ from etl.config import OWID_ENV, OWIDEnv
 from etl.helpers import PathFinder
 from etl.helpers import create_explorer as create_explorer_main
 
+__all__ = ["expand_config"]
+
 
 def create_explorer(
     dest_dir: str,
@@ -19,6 +21,7 @@ def create_explorer(
     paths: PathFinder,
     owid_env: Optional[OWIDEnv] = None,
     tolerate_extra_indicators: bool = False,
+    explorer_name: Optional[str] = None,
 ):
     """TODO: Replicate `etl.collections.multidim.upsert_mdim_data_page`."""
     # Read configuration as structured data
@@ -28,7 +31,13 @@ def create_explorer(
     process_views(explorer, paths.dependencies)
 
     # Create explorer (TODO: this should rather push to DB! As in with `etl.collections.multidim.upsert_mdim_data_page`)
-    return _create_explorer(dest_dir, explorer, tolerate_extra_indicators, owid_env)
+    return _create_explorer(
+        dest_dir=dest_dir,
+        explorer=explorer,
+        tolerate_extra_indicators=tolerate_extra_indicators,
+        explorer_name=explorer_name,
+        owid_env=owid_env,
+    )
 
 
 def process_views(
@@ -55,6 +64,7 @@ def _create_explorer(
     dest_dir: str,
     explorer: Explorer,
     tolerate_extra_indicators: bool,
+    explorer_name: Optional[str] = None,
     owid_env: Optional[OWIDEnv] = None,
 ):
     # Ensure we have an environment set
@@ -74,6 +84,7 @@ def _create_explorer(
         dest_dir=dest_dir,
         config=explorer.config,
         df_graphers=df_grapher,
+        explorer_name=explorer_name,
     )
 
     return ds
@@ -125,6 +136,24 @@ def extract_explorer_views(
 
     # Build DataFrame with records
     df_grapher = pd.DataFrame.from_records(records)
+
+    # Order views
+    ## Order rows
+    for _, properties in dimensions_display.items():
+        column = properties["widget_name"]
+        choices_ordered = list(properties["choices"].values())
+        # Check if all DataFrame values exist in the predefined lists
+        if not set(df_grapher[column]).issubset(set(choices_ordered)):
+            raise ValueError(f"Column `{column}` contains values not present in `choices_ordered`.")
+
+        # Convert columns to categorical with the specified order
+        df_grapher[column] = pd.Categorical(df_grapher[column], categories=choices_ordered, ordered=True)
+    df_grapher = df_grapher.sort_values(by=[d["widget_name"] for _, d in dimensions_display.items()])
+
+    ## Order columns
+    cols_widgets = [d["widget_name"] for _, d in dimensions_display.items()]
+    df_grapher = df_grapher[cols_widgets + [col for col in df_grapher.columns if col not in cols_widgets]]
+
     return df_grapher
 
 

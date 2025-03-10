@@ -370,10 +370,9 @@ class Dimension(MetaBase):
 
     @property
     def ui_type(self):
-        default = UITypes.DROPDOWN
         if self.presentation is not None:
             return self.presentation.type
-        return default
+        return UITypes.DROPDOWN
 
     @property
     def choice_slugs(self):
