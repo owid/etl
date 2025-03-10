@@ -167,6 +167,11 @@ def expand_config(
         dimensions=dimensions,
     )
 
+    # Filter of dimensions
+    dimension_choices = {}
+    for dim in config_partial["dimensions"]:
+        dimension_choices[dim["slug"]] = [choice["slug"] for choice in dim["choices"]]
+
     # EXPAND VIEWS
     config_partial["views"] = expander.build_views(
         common_view_config=common_view_config,
@@ -348,6 +353,9 @@ class MDIMConfigExpander:
         self.build_df_dims(tb, indicator_names)
         self.short_name = tb.m.short_name
 
+        #
+        self.__dimension_filter = None
+
     @property
     def dimension_names(self):
         return [col for col in self.df_dims.columns if col not in ["short_name"]]
@@ -420,10 +428,22 @@ class MDIMConfigExpander:
 
         return config_dimensions
 
-    def build_views(self, common_view_config):
+    def build_views(
+        self,
+        dimension_choices: Optional[Dict[str, List[str]]] = None,
+        common_view_config: Optional[Dict[str, Any]] = None,
+    ):
         """Generate one view for each indicator in the table."""
+        df_dims_filt = self.df_dims.copy()
+
+        # Keep only relevant dimensions
+        if dimension_choices is not None:
+            for dim_name, choices in dimension_choices.items():
+                df_dims_filt = df_dims_filt[df_dims_filt[dim_name].isin(choices)]
+
+        # Filter to only relevant dimensions
         config_views = []
-        for _, indicator in self.df_dims.iterrows():
+        for _, indicator in df_dims_filt.iterrows():
             view = {
                 "dimensions": {dim_name: indicator[dim_name] for dim_name in self.dimension_names},
                 "indicators": {
