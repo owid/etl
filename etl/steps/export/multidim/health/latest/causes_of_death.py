@@ -14,11 +14,17 @@ def run(dest_dir: str) -> None:
     table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths", load_data=False)
 
     # Get all combinations of dimensions
-    config_new = multidim.expand_config(table, dimensions=["cause", "age", "metric"])
+    config_new = multidim.expand_config(table)
 
-    config["dimensions"][0]["choices"] += [
-        c for c in config_new["dimensions"][0]["choices"] if c["slug"] != "All causes"
-    ]
+    # Fill choices from TableMeta and VariableMeta dimensions info
+    for dims in config["dimensions"]:
+        # Find matching dimension in new config
+        new_dims = next(d for d in config_new["dimensions"] if d["slug"] == dims["slug"])
+
+        if dims["slug"] == "cause":
+            dims["choices"] += [c for c in new_dims["choices"] if c["slug"] != "All causes"]
+        else:
+            dims["choices"] = new_dims["choices"]
 
     # Group age and metric views under "Side-by-side comparison of causes"
     grouped_views = multidim.group_views(config_new["views"], by=["age", "metric"])

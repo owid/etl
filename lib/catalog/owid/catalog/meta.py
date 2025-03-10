@@ -10,7 +10,7 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, TypedDict, TypeVar, Union
 
 import mistune
 import pandas as pd
@@ -256,6 +256,14 @@ class VariableMeta(MetaBase):
     # List of categories for ordinal type indicators
     sort: List[str] = field(default_factory=list)
 
+    # Dimensions
+    # Dictionary of dimensions
+    dimensions: Optional[Dict[str, Any]] = None
+    # Original short name and title of the indicator before flattening
+    original_short_name: Optional[str] = None
+    # TODO: it's possible that we might not need `original_title` at all
+    original_title: Optional[str] = None
+
     @property
     def schema_version(self) -> int:
         """Schema version is used to easily understand everywhere what metadata standard was used
@@ -378,6 +386,12 @@ class DatasetMeta(MetaBase):
         return f"{self.channel}/{self.namespace}/{self.version}/{self.short_name}"
 
 
+class TableDimension(TypedDict):
+    name: str
+    slug: str
+    description: Optional[str]
+
+
 @pruned_json
 @dataclass(eq=False)
 class TableMeta(MetaBase):
@@ -389,6 +403,25 @@ class TableMeta(MetaBase):
     # a reference back to the dataset
     dataset: Optional[DatasetMeta] = field(compare=False, default=None)
     primary_key: List[str] = field(default_factory=list)
+
+    # table dimensions
+    dimensions: Optional[List[TableDimension]] = None
+
+    # def __eq__(self, other: object) -> bool:
+    #     """Compare two TableMeta objects for equality, ignoring the dimensions attribute."""
+
+    #     if not isinstance(other, TableMeta):
+    #         return False
+
+    #     # Create shallow copies of the attribute dictionaries
+    #     self_attrs = self.__dict__.copy()
+    #     other_attrs = other.__dict__.copy()
+
+    #     # Remove the dimensions attribute from both dictionaries before comparing
+    #     self_attrs.pop("dimensions", None)
+    #     other_attrs.pop("dimensions", None)
+
+    #     return self_attrs == other_attrs
 
     @property
     def checked_name(self) -> str:

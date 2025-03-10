@@ -41,6 +41,26 @@ def run(dest_dir: str) -> None:
     )
     tb_ember_annual = tb_ember_annual.rename(columns={"price": "annual_electricity_all_wholesale_euro"}, errors="raise")
 
+    # Add dimensions
+    tb_ember_monthly.monthly_electricity_all_wholesale_euro.m.dimensions = {
+        "consumer_type": "All",
+        "price_component_or_level": "Wholesale",
+        "source": "Electricity",
+    }
+    tb_ember_annual.annual_electricity_all_wholesale_euro.m.dimensions = {
+        "consumer_type": "All",
+        "price_component_or_level": "Wholesale",
+        "source": "Electricity",
+    }
+
+    # Check that all columns in all tables have dimensions
+    for table in [tb_eurostat_euro, tb_eurostat_pps, tb_ember_annual]:
+        for column in table.columns:
+            if column not in ["country", "year"]:
+                assert (
+                    table[column].metadata.dimensions is not None
+                ), f"Column {column} in table {table.m.short_name} has no dimensions."
+
     # Create a combined annual table.
     tb_annual = pr.multi_merge(
         tables=[tb_eurostat_euro, tb_eurostat_pps, tb_ember_annual], on=["country", "year"], how="outer"
@@ -57,15 +77,29 @@ def run(dest_dir: str) -> None:
         if "pps" in column:
             assert tb_annual[column].metadata.description_processing is None
             tb_annual[column].metadata.description_processing = description_processing_pps
+
+            # Add dimension
+            tb_annual[column].m.dimensions["unit"] = "pps"
+
         elif "euro" in column:
             assert tb_annual[column].metadata.description_processing is None
             tb_annual[column].metadata.description_processing = description_processing_euros
+
+            # Add dimension
+            tb_annual[column].m.dimensions["unit"] = "euro"
+
     # Add combined description processing for wholesale prices.
     tb_annual["annual_electricity_all_wholesale_euro"].metadata.description_processing = tb_ember_annual[
         "annual_electricity_all_wholesale_euro"
     ].metadata.description_processing
     ####################################################################################################################
     tb_annual = tb_annual.format(short_name="energy_prices_annual")
+
+    # Add frequency dimensions
+    tb_ember_monthly["monthly_electricity_all_wholesale_euro"].m.dimensions["frequency"] = "monthly"
+
+    for col in tb_annual.columns:
+        tb_annual[col].m.dimensions["frequency"] = "annual"
 
     # Create a combined monthly table.
     # For now, only Ember has monthly data.

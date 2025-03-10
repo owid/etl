@@ -59,6 +59,12 @@ dataset:
 
 tables:
   ceds_air_pollutants:
+    dimensions:
+      - slug: pollutant
+        name: Pollutant
+      - slug: sector
+        name: Sector
+
     variables:
       emissions:
         title: |-

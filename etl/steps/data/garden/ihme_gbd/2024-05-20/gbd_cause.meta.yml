@@ -16,6 +16,13 @@ dataset:
   non_redistributable: true
 tables:
   gbd_cause_deaths:
+    dimensions:
+      - name: Cause of death
+        slug: cause
+      - name: Age group
+        slug: age
+      - name: Metric
+        slug: metric
     variables:
       value:
         title: |-
