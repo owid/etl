@@ -32,7 +32,7 @@ steps:
   # Copernicus Climate Change Service - Surface temperature.
   #
   data://meadow/climate/2025-01-07/surface_temperature:
-  - snapshot://climate/2025-02-07/surface_temperature.zip
+  - snapshot://climate/2025-03-07/surface_temperature.zip
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2025-01-07/surface_temperature:
     - data://meadow/climate/2025-01-07/surface_temperature
@@ -269,7 +269,7 @@ steps:
   # Equatorial Pacific Sea Surface Temperatures (SST) data - El Niño or La Niña
   #
   data://meadow/climate/2025-02-12/sst:
-    - snapshot://climate/2025-02-12/sst.csv
+    - snapshot://climate/2025-03-07/sst.csv
   data://garden/climate/2025-02-12/sst:
     - data://meadow/climate/2025-02-12/sst
   data://grapher/climate/2025-02-12/sst:
