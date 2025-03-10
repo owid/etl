@@ -1,0 +1,316 @@
+definitions:
+  others:
+    display_1: &display1
+      sourceName: World Health Organization
+      sourceLink: https://xmart-api-public.who.int/MPX/V_MPX_VALIDATED_DAILY
+      additionalInfo: |-
+        Data on mpox is collated by the [World Health Organization](https://extranet.who.int/publicemergency/) since 2022, and is updated as new information is reported.\n\nWe fetch the latest version of the WHO data every hour, keep records up to the previous day, apply some transformations (7-day averages, per-capita adjustments, etc.), and produce a transformed version of the data, [available on GitHub](https://github.com/owid/monkeypox). This transformed data powers our Mpox Data Explorer on Our World in Data.
+      colorScaleNumericMinValue: "0"
+      colorScaleScheme: OrRd
+    display2: &display2
+      sourceName: Global.health
+      sourceLink: https://africacdc.org/resources/?wpv_aux_current_post_id=217&wpv_view_count=549&wpv-resource-type=ebs-weekly-reports
+      additionalInfo: |-
+        Data on suspected cases of mpox are manually compiled from reports from Africa Centres for Disease Control and Prevention (CDC).
+      colorScaleScheme: OrRd
+  common_views:
+    - config:
+        hideAnnotationFieldsInTitle: "true"
+        yScaleToggle: "true"
+    - dimensions:
+        metric: confirmed_deaths
+      config:
+        subtitle: Laboratory testing for mpox is limited in many countries and figures shown here only include deaths where mpox has been laboratory-confirmed.
+        note: |-
+          The WHO defines an mpox death as any death of a person with probable or confirmed mpox unless the death is attributed to trauma.
+    - dimensions:
+        metric: confirmed_cases
+      config:
+        subtitle: Laboratory testing for mpox is limited in many countries and figures shown here only include laboratory-confirmed cases.
+
+config:
+  explorerTitle: Mpox
+  explorerSubtitle: Explore the data produced by the World Health Organization and Africa CDC on mpox (monkeypox).
+  selection:
+    - Democratic Republic of Congo
+    - Burundi
+    - Uganda
+    - Central African Republic
+  isPublished: "true"
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/05/Monkeypox-Data-Explorer.png
+  hideAlertBanner: "true"
+  yAxisMin: "0"
+  hasMapTab: "true"
+  pickerColumnSlugs:
+    - location total_confirmed_by_confirmation total_confirmed_by_confirmation_per_million
+  downloadDataLink: https://catalog.ourworldindata.org/explorers/who/latest/monkeypox/monkeypox.csv
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: confirmed_cases
+        name: Confirmed cases
+      - slug: confirmed_and_suspected_cases
+        name: Confirmed and suspected cases
+      - slug: confirmed_deaths
+        name: Confirmed deaths
+    presentation:
+      type: radio
+  - slug: frequency
+    name: Frequency
+    choices:
+      - slug: _7_day_average
+        name: 7-day average
+      - slug: cumulative
+        name: Cumulative
+      - slug: daily
+        name: Daily
+    presentation:
+      type: radio
+  - slug: relative_to_population
+    name: Relative to population
+    choices:
+      - slug: false
+        name: "false"
+      - slug: true
+        name: "true"
+    presentation:
+      type: checkbox
+
+views:
+  - dimensions:
+      metric: confirmed_cases
+      frequency: _7_day_average
+      relative_to_population: false
+    indicators:
+      y:
+        - catalogPath: monkeypox#new_cases_smoothed
+          display:
+            name: Daily cases
+            type: Ratio
+            tolerance: "7"
+            colorScaleNumericBins: 1;2;5;10;20;50;100;200;500;1000
+            <<: *display1
+    config:
+      title: "Mpox: Daily confirmed cases"
+      subtitle: |-
+        7-day rolling average. Laboratory testing for mpox is limited in many countries and figures shown here only include laboratory-confirmed cases.
+      type: LineChart
+      tab: map
+  - dimensions:
+      metric: confirmed_cases
+      frequency: cumulative
+      relative_to_population: false
+    indicators:
+      y:
+        - catalogPath: monkeypox#total_cases
+          display:
+            name: Total confirmed cases
+            type: Integer
+            tolerance: "30"
+            colorScaleNumericBins: 100;200;500;1000;2000;5000;10000;20000;50000
+            <<: *display1
+    config:
+      title: "Mpox: Cumulative confirmed cases"
+      type: LineChart
+  - dimensions:
+      metric: confirmed_cases
+      frequency: daily
+      relative_to_population: false
+    indicators:
+      y:
+        - catalogPath: monkeypox#new_cases
+          display:
+            name: Daily cases
+            type: Integer
+            colorScaleNumericBins: 1;2;5;10;20;50;100;200;500;1000
+            <<: *display1
+    config:
+      title: "Mpox: Daily confirmed cases"
+      type: StackedBar
+  - dimensions:
+      metric: confirmed_cases
+      frequency: cumulative
+      relative_to_population: true
+    indicators:
+      y:
+        - catalogPath: monkeypox#total_cases_per_million
+          display:
+            name: Total cases per 1M
+            type: Ratio
+            tolerance: "30"
+            colorScaleNumericBins: 1;2;5;10;20;50;100;200;500
+            <<: *display1
+    config:
+      title: "Mpox: Cumulative confirmed cases per million people"
+      type: LineChart
+  - dimensions:
+      metric: confirmed_cases
+      frequency: _7_day_average
+      relative_to_population: true
+    indicators:
+      y:
+        - catalogPath: monkeypox#new_cases_smoothed_per_million
+          display:
+            name: Daily cases per 1M
+            type: Ratio
+            tolerance: "7"
+            colorScaleNumericBins: 0.02;0.05;0.1;0.2;0.5;1;2;5;10;20
+            <<: *display1
+    config:
+      title: "Mpox: Daily confirmed cases per million people"
+      subtitle: |-
+        7-day rolling average. Laboratory testing for mpox is limited in many countries and figures shown here only include laboratory-confirmed cases.
+      type: LineChart
+  - dimensions:
+      metric: confirmed_cases
+      frequency: daily
+      relative_to_population: true
+    indicators:
+      y:
+        - catalogPath: monkeypox#new_cases_per_million
+          display:
+            name: Daily cases per 1M
+            type: Ratio
+            colorScaleNumericBins: 0.02;0.05;0.1;0.2;0.5;1;2;5;10;20
+            <<: *display1
+    config:
+      title: "Mpox: Daily confirmed cases per million people"
+      type: StackedBar
+
+  - dimensions:
+      metric: confirmed_and_suspected_cases
+      frequency: cumulative
+      relative_to_population: false
+    indicators:
+      y:
+        - catalogPath: monkeypox#total_cases
+          display:
+            name: Total confirmed cases
+            type: Integer
+            tolerance: "30"
+            colorScaleNumericBins: 100;200;500;1000;2000;5000;10000;20000;50000
+            <<: *display1
+        - catalogPath: monkeypox#suspected_cases_cumulative
+          display:
+            name: Total suspected cases
+            type: Integer
+            tolerance: "30"
+            colorScaleNumericBins: 1;2;5;10;20;50;100
+            <<: *display2
+    config:
+      title: "Mpox: Cumulative confirmed and suspected cases"
+      subtitle: |-
+        Confirmed cases are those that have been verified through laboratory testing. Suspected cases are those where mpox is likely based on an individual's initial clinical signs and symptoms, but the diagnosis has not yet been confirmed through laboratory testing.
+      type: LineChart
+      selectedFacetStrategy: entity
+      hasMapTab: "false"
+      minTime: "1433"
+      facetYDomain: independent
+      note: As of November 2024, suspected cases are no longer being reported.
+
+  - dimensions:
+      metric: confirmed_deaths
+      frequency: _7_day_average
+      relative_to_population: false
+    indicators:
+      y:
+        - catalogPath: monkeypox#new_deaths_smoothed
+          display:
+            name: Daily deaths
+            type: Ratio
+            tolerance: "7"
+            colorScaleNumericBins: 0.1;0.2;0.5;1
+            annotationsColumnSlug: annotation
+            <<: *display1
+    config:
+      title: "Mpox: Daily confirmed deaths"
+      subtitle: |-
+        7-day rolling average. Laboratory testing for mpox is limited in many countries and figures shown here only include deaths where mpox has been laboratory-confirmed.
+      type: LineChart
+  - dimensions:
+      metric: confirmed_deaths
+      frequency: cumulative
+      relative_to_population: false
+    indicators:
+      y:
+        - catalogPath: monkeypox#total_deaths
+          display:
+            name: Total deaths
+            type: Integer
+            tolerance: "30"
+            colorScaleNumericBins: 1;2;5;10;20;50;100
+            annotationsColumnSlug: annotation
+            <<: *display1
+    config:
+      title: "Mpox: Cumulative confirmed deaths"
+      type: LineChart
+  - dimensions:
+      metric: confirmed_deaths
+      frequency: daily
+      relative_to_population: false
+    indicators:
+      y:
+        - catalogPath: monkeypox#new_deaths
+          display:
+            name: Daily deaths
+            type: Integer
+            colorScaleNumericBins: 0.01;0.02;0.05;0.1;0.2;0.5;1
+            annotationsColumnSlug: annotation
+            <<: *display1
+    config:
+      title: "Mpox: Daily confirmed deaths"
+      type: StackedBar
+  - dimensions:
+      metric: confirmed_deaths
+      frequency: cumulative
+      relative_to_population: true
+    indicators:
+      y:
+        - catalogPath: monkeypox#total_deaths_per_million
+          display:
+            name: Total deaths per 1M
+            type: Ratio
+            tolerance: "30"
+            colorScaleNumericBins: 0.01;0.02;0.05;0.1;0.2;0.5;1
+            annotationsColumnSlug: annotation
+            <<: *display1
+    config:
+      title: "Mpox: Cumulative confirmed deaths per million people"
+      type: LineChart
+  - dimensions:
+      metric: confirmed_deaths
+      frequency: _7_day_average
+      relative_to_population: true
+    indicators:
+      y:
+        - catalogPath: monkeypox#new_deaths_smoothed_per_million
+          display:
+            name: Daily deaths per 1M
+            type: Ratio
+            tolerance: "7"
+            colorScaleNumericBins: 0.01;0.02;0.05;0.1;0.2;0.5;1
+            annotationsColumnSlug: annotation
+            <<: *display1
+    config:
+      title: "Mpox: Daily confirmed deaths per million people"
+      subtitle: |-
+        7-day rolling average. Laboratory testing for mpox is limited in many countries and figures shown here only include deaths where mpox has been laboratory-confirmed.
+      type: LineChart
+  - dimensions:
+      metric: confirmed_deaths
+      frequency: daily
+      relative_to_population: true
+    indicators:
+      y:
+        - catalogPath: monkeypox#new_deaths_per_million
+          display:
+            name: Daily deaths per 1M
+            type: Ratio
+            colorScaleNumericBins: 0.01;0.02;0.05;0.1;0.2;0.5;1
+            annotationsColumnSlug: annotation
+            <<: *display1
+    config:
+      title: "Mpox: Daily confirmed deaths per million people"
+      type: StackedBar
