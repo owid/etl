@@ -1,8 +1,28 @@
 definitions:
   common:
-    presentation:
-      topic_tags:
-      - Climate Change
+    description_short: |-
+        Deviation of the average land-sea surface temperature from the 1880-1900 mean, in degrees Celsius.
+    description_key:
+      - Temperature anomalies show how many degrees Celsius temperatures have changed compared to the 1880-1900 period.
+      - While a 1861–1890 baseline period is commonly used to highlight the changes in temperature since pre-industrial times, here we use 1880–1900 instead, as monthly data on temperature anomalies in this dataset is only available from 1880.
+      - Temperature averages and anomalies are calculated over all land and ocean surfaces.
+      - The data includes separate measurements for the Northern and Southern Hemispheres, which helps researchers analyze regional differences.
+      - This data is based on the GISS method which estimates temperatures in areas without data by using information from nearby locations within 1200 kilometers. This is especially useful in the Arctic and Antarctic, where measurements are sparse.
+      - Despite different approaches, GISS and other methods show similar global temperature trends.
+    description_processing: |-
+      - We switch from using 1951-1980 to using 1880-1900 as our baseline to better show how temperatures have changed since pre-industrial times.
+      - For each region, we calculate the mean temperature anomalies for 1951-1980 and for 1880-1900. The difference between these two means serves as the adjustment factor.
+      - This factor is applied uniformly to both the temperature anomalies and the confidence intervals to ensure that both the central values and the associated uncertainty bounds are correctly shifted relative to the new 1880-1900 baseline.
+    processing_level: major
+    unit: degrees Celsius
+    short_unit: °C
+    display:
+      numDecimalPlaces: 1
+  presentation:
+    topic_tags:
+    - Climate Change
+    grapher_config:
+      note: Because observations start in 1880, the 1880–1900 period is used as the baseline for measuring temperature changes relative to pre-industrial times instead of the commonly used 1861–1890 period [recommended by climate research institutions](https://www.metoffice.gov.uk/hadobs/indicators/index.html#:~:text=The%201961%2D90%20period%20is,other%20parts%20of%20the%20world.).
 
 dataset:
   title: GISS surface temperature analysis
@@ -12,9 +32,5 @@ tables:
   surface_temperature_analysis:
     variables:
       temperature_anomaly:
-        title: "Global warming: monthly temperature anomaly"
-        description_short: |-
-          Combined land-surface air and sea-surface water temperature anomaly, given as the deviation from the 1951-1980 mean, in degrees Celsius.
-        unit: °C
-        short_unit: °C
-        processing_level: minor
+        title: "Global warming: monthly temperature anomalies"
+
