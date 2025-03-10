@@ -22,7 +22,7 @@ def run(dest_dir: str) -> None:
     tb_phr = ds_meadow_phr.read("diphtheria_deaths")
     tb_census = ds_meadow_census.read("diphtheria_deaths")
     tb_who = ds_meadow_who.read("mortality_database_vaccine_preventable", reset_metadata="keep_origins")
-    tb_who = clean_who_mortality_data(tb_who)
+    tb_who = clean_who_mortality_data(tb_who, cause="Diphtheria")
     tb_pop = ds_population.read("population", reset_metadata="keep_origins")
 
     # Process data.
@@ -50,13 +50,14 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def clean_who_mortality_data(tb: Table) -> Table:
+def clean_who_mortality_data(tb: Table, cause: str) -> Table:
     tb = tb[
-        (tb["cause"] == "Diphtheria")
+        (tb["cause"] == cause)
         & (tb["age_group"] == "all ages")
         & (tb["country"] == "United States")
         & (tb["sex"] == "Both sexes")
     ]  # type: ignore
+    assert tb.shape[0] > 1
     tb = tb.drop(
         columns=[
             "sex",
@@ -68,6 +69,7 @@ def clean_who_mortality_data(tb: Table) -> Table:
             "death_rate_per_100_000_population",
         ]
     )
+
     tb = tb.rename(columns={"number": "deaths"})
 
     return tb

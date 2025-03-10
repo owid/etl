@@ -181,53 +181,53 @@ definitions:
 
     Voluntary insurance may reimburse cost-sharing by the patient. This case should be treated similarly to the case when voluntary insurance reimburses the bill of a service not covered by compulsory insurance. The payment is considered expenditure by the voluntary insurance. Consequently, the part of cost-sharing reimbursed by voluntary insurance should be accounted as expenditure by voluntary insurance, and should not be considered as OOP payment by the households. This treatment ensures that a proper picture of financial protection is provided. It should, however, be noted that the characteristics of the coverage by the government scheme or insurance determine the household cost-sharing, which is a component of household out-of-pocket payment (OOP). The full cost of the services or goods concerned accounts for its two payer components: the third-party payer and the OOP. As the full costs of the services or goods concerned are also important information, the following memorandum items are included in the classification: government schemes and compulsory contributory health insurance schemes, together with cost-sharing (HF.1+HF.3.2.1); and Voluntary health insurance schemes, together with cost-sharing (HF.2+HF.3.2.2).
 
-  description_short: |-
+  key_financing_scheme: |-
     <% if financing_scheme == "Government/compulsory schemes" %>
-    Includes government schemes, social health insurance, compulsory private insurance and compulsory medical saving accounts.
+    This data includes government schemes, social health insurance, compulsory private insurance and compulsory medical saving accounts.
 
-    <% elif financing_scheme == "Government schemes" %>
-    Includes schemes defined by law or by the government, with a separate budget set for the programme, and where a government unit has overall responsibility for it.
+    <%- elif financing_scheme == "Government schemes" %>
+    This data includes schemes defined by law or by the government, with a separate budget set for the programme, and where a government unit has overall responsibility for it.
 
-    <% elif financing_scheme == "Compulsory contributory health insurance schemes" %>
-    Includes financing arrangements to ensure access to health care for specific population groups through mandatory participation and eligibility based on the payment of health insurance contributions by or on behalf of the individuals concerned.
+    <%- elif financing_scheme == "Compulsory contributory health insurance schemes" %>
+    This data includes financing arrangements to ensure access to health care for specific population groups through mandatory participation and eligibility based on the payment of health insurance contributions by or on behalf of the individuals concerned.
 
-    <% elif financing_scheme == "Social health insurance schemes" %>
-    Includes financing arrangements that ensure access to health care based on a payment of a non-risk-related contribution by or on behalf of the eligible person.
+    <%- elif financing_scheme == "Social health insurance schemes" %>
+    This data includes financing arrangements that ensure access to health care based on a payment of a non-risk-related contribution by or on behalf of the eligible person.
 
-    <% elif financing_scheme == "Compulsory private insurance schemes" %>
-    Includes financing arrangements under which all residents (or a large group of the population) are obliged to take out health insurance with a health insurance company or health insurance fund.
+    <%- elif financing_scheme == "Compulsory private insurance schemes" %>
+    This data includes financing arrangements under which all residents (or a large group of the population) are obliged to take out health insurance with a health insurance company or health insurance fund.
 
-    <% elif financing_scheme == "Voluntary schemes/household out-of-pocket payments" %>
-    Includes domestic pre-paid financing schemes under which the access to health services is at the discretion of private actors, or where direct payment is made at the time of the purchase of goods or use of services.
+    <%- elif financing_scheme == "Voluntary schemes/household out-of-pocket payments" %>
+    This data includes domestic pre-paid financing schemes under which the access to health services is at the discretion of private actors, or where direct payment is made at the time of the purchase of goods or use of services.
 
-    <% elif financing_scheme == "Voluntary health care payment schemes" %>
-    Includes domestic pre-paid financing schemes under which the access to health services is at the discretion of private actors.
+    <%- elif financing_scheme == "Voluntary health care payment schemes" %>
+    This data includes domestic pre-paid financing schemes under which the access to health services is at the discretion of private actors.
 
-    <% elif financing_scheme == "Voluntary health insurance schemes" %>
-    Includes financing arrangements based upon the purchase of a health insurance policy, which is not made compulsory by government.
+    <%- elif financing_scheme == "Voluntary health insurance schemes" %>
+    This data includes financing arrangements based upon the purchase of a health insurance policy, which is not made compulsory by government.
 
-    <% elif financing_scheme == "NPISH financing schemes" %>
-    Includes non-compulsory financing arrangements and programmes with non-contributory benefit entitlement that are based on donations from the general public, the government or corporations.
+    <%- elif financing_scheme == "NPISH financing schemes" %>
+    This data includes non-compulsory financing arrangements and programmes with non-contributory benefit entitlement that are based on donations from the general public, the government or corporations.
 
-    <% elif financing_scheme == "Enterprise financing schemes" %>
-    Includes primarily arrangements where enterprises directly provide or finance health services for their employees, without the involvement of an insurance-type scheme.
+    <%- elif financing_scheme == "Enterprise financing schemes" %>
+    This data includes primarily arrangements where enterprises directly provide or finance health services for their employees, without the involvement of an insurance-type scheme.
 
-    <% elif financing_scheme == "Household out-of-pocket payments" %>
-    Includes financing schemes under which direct payment is made at the time of the purchase of goods or use of services.
+    <%- elif financing_scheme == "Household out-of-pocket payments" %>
+    This data includes financing schemes under which direct payment is made at the time of the purchase of goods or use of services.
 
-    <% elif financing_scheme == "Out-of-pocket excluding cost-sharing" %>
-    Includes financing schemes under which direct payment is made at the time of the purchase of goods or use of services, but excludes the share of the costs of the given services covered by the scheme.
+    <%- elif financing_scheme == "Out-of-pocket excluding cost-sharing" %>
+    This data includes financing schemes under which direct payment is made at the time of the purchase of goods or use of services, but excludes the share of the costs of the given services covered by the scheme.
 
-    <% elif financing_scheme == "Cost-sharing with third-party payers" %>
-    Includes the share of the cost of health care services covered by the scheme.
+    <%- elif financing_scheme == "Cost-sharing with third-party payers" %>
+    This data includes the share of the cost of health care services covered by the scheme.
 
-    <% elif financing_scheme == "Rest of the world financing schemes (non-resident)" %>
-    Includes financial arrangements involving institutional units that are resident abroad, but who collect, pool resources and purchase health care goods and services on behalf of residents, without transiting their funds through a resident scheme.
+    <%- elif financing_scheme == "Rest of the world financing schemes (non-resident)" %>
+    This data includes financial arrangements involving institutional units that are resident abroad, but who collect, pool resources and purchase health care goods and services on behalf of residents, without transiting their funds through a resident scheme.
 
-    <% elif financing_scheme == "Total" %>
-    Includes all health care financing schemes: government, compulsory contributory insurance, voluntary insurance, household out-of-pocket payments, and rest of the world financing schemes.
+    <%- elif financing_scheme == "Total" %>
+    This data includes all health care financing schemes: government, compulsory contributory insurance, voluntary insurance, household out-of-pocket payments, and rest of the world financing schemes.
 
-    <%- endif -%>
+    <%- endif %>
 
 
 # Learn more about the available fields:
@@ -245,7 +245,9 @@ tables:
     variables:
       share_expenditure:
         title: Health expenditure (as a share of total expenditure) - <<financing_scheme>>
-        description_short: Health expenditure in <<financing_scheme.lower()>> divided by the total health expenditure, expressed as a percentage. {definitions.description_short}
+        description_short: Health expenditure in <<financing_scheme.lower()>> divided by the total health expenditure, expressed as a percentage.
+        description_key:
+          - "{definitions.key_financing_scheme}"
         unit: '%'
         short_unit: '%'
         display:
@@ -257,7 +259,7 @@ tables:
 
       share_gdp:
         title: Health expenditure (as a share of GDP) - <<financing_scheme>>
-        description_short: Health expenditure in <<financing_scheme.lower()>> divided by gross domestic product, expressed as a percentage. {definitions.description_short}
+        description_short: Health expenditure in <<financing_scheme.lower()>> divided by gross domestic product, expressed as a percentage.
         unit: '% of GDP'
         short_unit: '%'
         display:
@@ -269,7 +271,7 @@ tables:
 
       ppp_dollars_per_capita:
         title: Health expenditure per capita - <<financing_scheme>>
-        description_short: Health expenditure in <<financing_scheme.lower()>> divided by population. {definitions.description_short}
+        description_short: Health expenditure in <<financing_scheme.lower()>> divided by population.
         description_key:
           - The data is measured in international-$ at 2015 prices – this adjusts for inflation and for differences in the cost of living between countries.
         unit: international-$ in 2015 prices
@@ -283,7 +285,7 @@ tables:
 
       ppp_dollars:
         title: Health expenditure - <<financing_scheme>>
-        description_short: Health expenditure in <<financing_scheme.lower()>>. {definitions.description_short}
+        description_short: Health expenditure in <<financing_scheme.lower()>>.
         description_key:
           - The data is measured in international-$ at 2015 prices – this adjusts for inflation and for differences in the cost of living between countries.
         unit: international-$ in 2015 prices

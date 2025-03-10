@@ -1142,3 +1142,32 @@ steps:
     - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
   data://grapher/health/2025-03-04/diphtheria_deaths:
     - data://garden/health/2025-03-04/diphtheria_deaths
+
+  #
+  # US Pertussis cases - CDC
+  #
+  data://meadow/cdc/2025-03-04/pertussis_cases:
+    - snapshot://cdc/2025-03-04/pertussis_cases.csv
+  data://garden/cdc/2025-03-04/pertussis_cases:
+    - data://meadow/cdc/2025-03-04/pertussis_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-04/pertussis_cases:
+    - data://garden/cdc/2025-03-04/pertussis_cases
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/us_census_bureau/2025-03-06/pertussis_deaths:
+    - snapshot://us_census_bureau/2025-03-06/pertussis_deaths.csv
+  data://garden/us_census_bureau/2025-03-06/pertussis_deaths:
+    - data://meadow/us_census_bureau/2025-03-06/pertussis_deaths
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://garden/health/2025-03-06/pertussis_deaths:
+    - data://garden/us_census_bureau/2025-03-06/pertussis_deaths
+    - data://garden/who/2025-01-17/mortality_database_vaccine_preventable
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-03-06/pertussis_deaths:
+    - data://garden/health/2025-03-06/pertussis_deaths

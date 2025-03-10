@@ -2218,6 +2218,7 @@ def keep_metadata(func: Callable[..., Union[pd.DataFrame, pd.Series]]) -> Callab
     return wrapper
 
 
+to_datetime = keep_metadata(pd.to_datetime)
 to_numeric = keep_metadata(pd.to_numeric)
 
 
