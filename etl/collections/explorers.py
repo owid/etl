@@ -76,10 +76,12 @@ def _create_explorer(
     # df_columns = extract_explorers_columns(explorer)
 
     # Create explorer
+    df_columns = pd.DataFrame()
     ds = create_explorer_main(
         dest_dir=dest_dir,
         config=explorer.config,
         df_graphers=df_grapher,
+        df_columns=df_columns,
     )
 
     return ds

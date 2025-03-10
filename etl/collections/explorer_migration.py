@@ -327,8 +327,15 @@ class ExplorerMigration:
             dim_slug = underscore(str(dim_name))
             # Get choices
             choices = []
-            for choice_name in df[column].unique():
-                choice_slug = underscore(str(choice_name))
+            choices_raw = df[column].unique()
+            if ui_type == "checkbox":
+                assert len(choices_raw) == 2, f"{self.slug}: Checkbox must have 2 choices"
+            for choice_name in choices_raw:
+                if ui_type != "checkbox":
+                    choice_slug = underscore(str(choice_name))
+                else:
+                    choice_slug = choice_name == "true"
+
                 choices.append(
                     {
                         "slug": choice_slug,
@@ -397,7 +404,11 @@ class ExplorerMigration:
                 if raw_name not in block:
                     dimensions_view[dim["slug"]] = None
                 else:
-                    dimensions_view[dim["slug"]] = underscore(block[raw_name])
+                    choice_slug = underscore(block[raw_name])
+                    if dim["presentation"]["type"] == "checkbox":
+                        dimensions_view[dim["slug"]] = choice_slug == "true"
+                    else:
+                        dimensions_view[dim["slug"]] = choice_slug
 
             # Get config (remainder)
             config = {
@@ -410,21 +421,22 @@ class ExplorerMigration:
                     "xSlug",
                     "colorSlug",
                     "sizeSlug",
+                    *dimension_slug_to_raw_name.values(),
                 }
             }
 
             views.append(
                 {
-                    "indicators": indicators,
                     "dimensions": dimensions_view,
+                    "indicators": indicators,
                     "config": config,
                 }
             )
 
         return {
             "config": self.config,
-            "views": views,
             "dimensions": dimensions,
+            "views": views,
         }
 
     def run(self):
@@ -479,14 +491,18 @@ def migrate_csv_explorer(explorer_path: Union[Path, str]):
 
 ################ WIP
 # 1/ Actual migration example
-# import yaml
+import yaml
 
-# config = migrate_csv_explorer("/home/lucas/repos/owid-content/explorers/monkeypox.explorer.tsv")
+from etl.files import yaml_dump
+
+config = migrate_csv_explorer("/home/lucas/repos/owid-content/explorers/monkeypox.explorer.tsv")
 # print(yaml.dump(config))
+with open("/home/lucas/repos/etl/etl/steps/export/explorers/who/latest/monkeypox2.config.yml", "w") as f:
+    yaml_dump(config, f)
 
 # path_new = ""
-# with open(path_new):
-#     yaml.dump(config, default_flow_style=False, sort_keys=False, width=float("inf"))
+# with open(path_new, "w"):
+#     yaml.safe_dump(config, default_flow_style=False, sort_keys=False, width=float("inf"))
 
 # 2/ Read all explorers, more raw experimenting
 # import pandas as pd
