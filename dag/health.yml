@@ -1142,8 +1142,8 @@ steps:
     - data://garden/health/2025-03-04/diphtheria_deaths
 
   # Multi-dim indicators - vaccination coverage
-  export://multidim/health/latest/vaccination_coverage:
-    - data://grapher/who/2024-12-10/vaccination_coverage
+  #export://multidim/health/latest/vaccination_coverage:
+  #  - data://grapher/who/2024-12-10/vaccination_coverage
   #
   # US Pertussis cases - CDC
   #
