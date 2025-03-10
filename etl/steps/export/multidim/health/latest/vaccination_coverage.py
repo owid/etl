@@ -19,7 +19,7 @@ def run(dest_dir: str) -> None:
     tb = ds.read("vaccination_coverage", load_data=False)
 
     # 2: Bake config automatically from table
-    config_new = multidim.expand_config(tb, indicator_name="coverage", dimensions=["antigen"])
+    config_new = multidim.expand_config(tb, indicator_names=["coverage"], dimensions=["antigen"])
     # 3: Combine both sources (basically dimensions and views)
     config["dimensions"] = multidim.combine_config_dimensions(
         config_dimensions=config_new["dimensions"],
