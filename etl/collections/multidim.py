@@ -323,7 +323,8 @@ class MDIMConfigExpander:
     def __init__(self, tb: Table, indicator_name: Optional[str] = None):
         self.build_df_dims(tb, indicator_name)
         self.short_name = tb.m.short_name
-        self.tb_dims = tb.m.dimensions
+        # Get table dimensions from metadata if available, exclude country and year
+        self.tb_dims = [d for d in (tb.m.dimensions or []) if d["slug"] not in ("country", "year")]
 
     @property
     def dimension_names(self):
@@ -626,6 +627,7 @@ def _check_intersection_iters(
     # Sanity check 3: Items shouldn't cover unexpected items (more than needed!)
     items_unexpected = set(items_given) - set(items_expected)
     if check_unexpected and items_unexpected:
+        __import__("ipdb").set_trace()
         raise ValueError(
             f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`!"
         )
