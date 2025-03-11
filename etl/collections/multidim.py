@@ -365,7 +365,8 @@ class MDIMConfigExpander:
                 # If dimensions is None, use a list with all dimension names (in no particular order)
                 dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
         else:
-            log.warning("It's recommended to set dimensions in Table metadata.")
+            # log.warning("It's recommended to set dimensions in Table metadata.")
+            pass
 
         # Support dimensions if it is a list/dict
         config_dimensions = []
@@ -502,9 +503,9 @@ class MDIMConfigExpander:
                     "short_name": col,
                 }
                 # Add dimensional info
-                for k, v in dims.items():
-                    if k in {self.indicators_slug, "short_name"}:
-                        raise ValueError(f"Dimension name `{k}` is reserved. Please use another one!")
+                for name in dims.keys():
+                    if name in {self.indicators_slug, "short_name"}:
+                        raise ValueError(f"Dimension name `{name}` is reserved. Please use another one!")
 
                 row = {**row, **dims}
 
@@ -666,7 +667,6 @@ def _check_intersection_iters(
     # Sanity check 3: Items shouldn't cover unexpected items (more than needed!)
     items_unexpected = set(items_given) - set(items_expected)
     if check_unexpected and items_unexpected:
-        __import__("ipdb").set_trace()
         raise ValueError(
             f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`!"
         )

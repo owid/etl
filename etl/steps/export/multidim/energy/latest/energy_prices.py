@@ -154,7 +154,7 @@ def create_stacked_component_views(tb_annual: DataFrame) -> List[Dict[str, Any]]
     return component_views
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     """
     Main function to process energy price data and create multidimensional data views.
     """
@@ -190,14 +190,14 @@ def run(dest_dir: str) -> None:
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
     annual_config = multidim.expand_config(
         tb_annual.loc[:, use_cols_annual],
-        indicator_name="price",
+        indicator_names=["price"],
         dimensions=dimensions,
         common_view_config=common_view_config,
     )
 
     monthly_config = multidim.expand_config(
         tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
-        indicator_name="price",
+        indicator_names=["price"],
         dimensions=dimensions,
         common_view_config=common_view_config,
     )
