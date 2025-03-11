@@ -790,67 +790,6 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
         return tb_fixed
 
 
-class MalaysiaHighMilkConsumption(DataAnomaly):
-    description = (  # type: ignore
-        "Malaysia's milk consumption from 2010 onwards is unreasonably high. "
-        "Its per capita consumption is significantly larger than any other country. "
-        "We therefore remove Malaysia's milk consumption (total and per capita) from 2010 on."
-    )
-
-    affected_item_codes = [
-        "00002848",
-    ]
-    affected_element_codes = [
-        "0645pc",
-        "000645",
-    ]
-    affected_countries = [
-        "Malaysia",
-    ]
-
-    def check(self, tb):
-        # Check that the data in 2010 is more than 10 times larger than in 2009.
-        for element_code in self.affected_element_codes:
-            value_before = tb.loc[
-                (tb["country"].isin(self.affected_countries))
-                & (tb["item_code"].isin(self.affected_item_codes))
-                & (tb["element_code"] == element_code)
-                & (tb["year"] == 2009),
-                "value",
-            ]
-            value_after = tb.loc[
-                (tb["country"].isin(self.affected_countries))
-                & (tb["item_code"].isin(self.affected_item_codes))
-                & (tb["element_code"] == element_code)
-                & (tb["year"] == 2010),
-                "value",
-            ]
-            assert len(value_after) == len(value_before) == 1, "Unexpected error in 'MalaysiaHighMilkConsumption'."
-            assert value_after.item() > (10 * value_before.item())
-
-    def inspect(self, tb):
-        log.info("The anomaly causes: " "\n* Milk consumption in Malaysia is unreasonably high after 2010.")
-        for element_code in self.affected_element_codes:
-            selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
-            tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
-            title = _split_long_title(self.description + f"Element code {element_code}")
-            fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
-            fig.show()
-
-    def fix(self, tb):
-        indexes_to_drop = tb[
-            (
-                (tb["country"].isin(self.affected_countries))
-                & (tb["item_code"].isin(self.affected_item_codes))
-                & (tb["element_code"].isin(self.affected_element_codes))
-                & (tb["year"] >= 2010)
-            )
-        ].index
-        tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
-
-        return tb_fixed
-
-
 detected_anomalies = {
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
@@ -864,9 +803,7 @@ detected_anomalies = {
         OtherTropicalFruitYieldSouthAmericaAnomaly,
         UnstableNumberOfPoultryBirdsInEurope,
     ],
-    "faostat_fbsc": [
-        MalaysiaHighMilkConsumption,
-    ],
+    "faostat_fbsc": [],
 }
 
 
