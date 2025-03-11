@@ -346,7 +346,7 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     return tb_combined
 
 
-def add_yield_to_aggregate_regions(data: Table) -> Table:
+def add_yield_to_aggregate_regions(tb: Table) -> Table:
     """Add yield (production / area harvested) to data for aggregate regions (i.e. continents and income groups).
 
     This data is not included in aggregate regions because it cannot be aggregated by simply summing the contribution of
@@ -374,13 +374,13 @@ def add_yield_to_aggregate_regions(data: Table) -> Table:
     # Element code of production, area harvested, and yield.
     production_element_code = "005510"
     area_element_code = "005312"
-    yield_element_code = "005419"
+    yield_element_code = "005412"
 
     # Check that indeed regions do not contain any data for yield.
-    assert data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == yield_element_code)].empty
+    assert tb[(tb["country"].isin(REGIONS_TO_ADD)) & (tb["element_code"] == yield_element_code)].empty
 
     # Gather all fields that should stay the same.
-    additional_fields = data[data["element_code"] == yield_element_code][
+    additional_fields = tb[tb["element_code"] == yield_element_code][
         [
             "element",
             "element_description",
@@ -393,10 +393,10 @@ def add_yield_to_aggregate_regions(data: Table) -> Table:
     assert len(additional_fields) == 1
 
     # Create a table of production of regions.
-    data_production = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == production_element_code)]
+    data_production = tb[(tb["country"].isin(REGIONS_TO_ADD)) & (tb["element_code"] == production_element_code)]
 
     # Create a table of area of regions.
-    data_area = data[(data["country"].isin(REGIONS_TO_ADD)) & (data["element_code"] == area_element_code)]
+    data_area = tb[(tb["country"].isin(REGIONS_TO_ADD)) & (tb["element_code"] == area_element_code)]
 
     # Merge the two tables and create the new yield variable.
     merge_cols = [
@@ -436,9 +436,9 @@ def add_yield_to_aggregate_regions(data: Table) -> Table:
     # Replace all other fields from the corresponding fields in yield (tonnes per hectare) variable.
     for field in additional_fields.columns:
         combined[field] = additional_fields[field].item()
-    assert set(data.columns) == set(combined.columns)
+    assert set(tb.columns) == set(combined.columns)
     combined_data = (
-        pr.concat([data, combined], ignore_index=True)
+        pr.concat([tb, combined], ignore_index=True)
         .reset_index(drop=True)
         .astype(
             {
