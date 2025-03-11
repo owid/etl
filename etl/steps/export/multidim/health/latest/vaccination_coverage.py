@@ -21,7 +21,7 @@ def run(dest_dir: str) -> None:
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
         tb,
-        indicator_names=["coverage", "unvaccinated_one_year_olds"],
+        indicator_names=["coverage", "unvaccinated", "vaccinated"],
         dimensions=["antigen"],
         indicators_slug="metric",
     )
