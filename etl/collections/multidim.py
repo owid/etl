@@ -344,8 +344,8 @@ class MDIMConfigExpander:
         self.indicators_slug = indicators_slug
         self.build_df_dims(tb, indicator_names)
         self.short_name = tb.m.short_name
-        # Get table dimensions from metadata if available, exclude country and year
-        self.tb_dims = [d for d in (tb.m.dimensions or []) if d["slug"] not in ("country", "year")]
+        # Get table dimensions from metadata if available, exclude country, year, and date
+        self.tb_dims = [d for d in (tb.m.dimensions or []) if d["slug"] not in ("country", "year", "date")]
 
     @property
     def dimension_names(self):
