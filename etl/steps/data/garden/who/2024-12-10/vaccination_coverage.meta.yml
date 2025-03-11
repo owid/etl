@@ -126,7 +126,6 @@ tables:
                 baseColorScheme: "YlGnBu"
                 binningStrategy: "manual"
                 customNumericValues:
-                  - 0
                   - 20
                   - 40
                   - 60
