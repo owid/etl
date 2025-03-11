@@ -14,7 +14,7 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collections.common import map_indicator_path_to_id, validate_collection_config
+from etl.collections.common import map_indicator_path_to_id
 from etl.collections.model import Collection, Definitions, MDIMView, pruned_json
 from etl.collections.utils import (
     get_tables_by_name_mapping,
