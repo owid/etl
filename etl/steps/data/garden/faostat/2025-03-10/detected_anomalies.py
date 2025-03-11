@@ -135,7 +135,7 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
     affected_element_codes = [
         "005312",
         "5312pc",
-        "005419",
+        "005412",
     ]
     affected_years = [
         1984,
@@ -177,7 +177,7 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
             "The anomaly causes: "
             "\n* A dip in area harvested of spinach in that year (element code 005312). "
             "\n* In terms of per capita area (element code 005312pc), the dip is not as visible. "
-            "\n* A big increase in yield (element code 005419) for that year."
+            "\n* A big increase in yield (element code 005412) for that year."
         )
         for element_code in self.affected_element_codes:
             selection = (
@@ -207,15 +207,16 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
 class EggYieldNorthernEuropeAnomaly(DataAnomaly):
     description = (  # type: ignore
         "The amount of eggs produced per bird for Northern Europe (FAO) is unreasonably high before 1973, with values "
-        "between 50kg and 115kg, while from 1973 on it has more reasonable values, below 20kg. "
+        "between 857 and 1961, while from 1973 on it has more reasonable values, below 241. "
+        "Note that Lesotho also has a peak, which will be tackled separately. "
         "Therefore, we remove all values for Northern Europe (FAO) between 1961 and 1972."
     )
 
     affected_item_codes = [
-        "00001783",
+        "00001062",
     ]
     affected_element_codes = [
-        "005410",
+        "005413",
     ]
     affected_years = [
         1961,
@@ -244,7 +245,7 @@ class EggYieldNorthernEuropeAnomaly(DataAnomaly):
                 & (tb["element_code"].isin(self.affected_element_codes))
                 & (tb["year"].isin(self.affected_years))
             ]["value"]
-            > 40
+            > 850
         ).all()
         assert (
             tb[
@@ -253,7 +254,74 @@ class EggYieldNorthernEuropeAnomaly(DataAnomaly):
                 & (tb["element_code"].isin(self.affected_element_codes))
                 & ~(tb["year"].isin(self.affected_years))
             ]["value"]
-            < 40
+            < 365
+        ).all()
+
+    def inspect(self, tb):
+        log.info(
+            "The anomaly causes: "
+            "\n* The egg yield of Northern Europe (FAO) before 1973 much higher than any other year."
+        )
+        for element_code in self.affected_element_codes:
+            selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
+            tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
+            title = _split_long_title(self.description + f"Element code {element_code}")
+            fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
+            fig.show()
+
+    def fix(self, tb):
+        indexes_to_drop = tb[
+            (
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
+            )
+        ].index
+        tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
+
+        return tb_fixed
+
+
+class EggYieldLesothoAnomaly(DataAnomaly):
+    description = (  # type: ignore
+        "The amount of eggs produced per bird for Lesotho is unreasonably high in 2018, with a value "
+        "of 2094 eggs per hen. "
+        "Therefore, we remove this value for Lesotho in 2018."
+    )
+
+    affected_item_codes = [
+        "00001062",
+    ]
+    affected_element_codes = [
+        "005413",
+    ]
+    affected_years = [
+        2018,
+    ]
+    affected_countries = [
+        "Lesotho",
+    ]
+
+    def check(self, tb):
+        # Check that the data on that year is indeed higher than expected, and significantly lower on other years.
+        assert (
+            tb[
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
+            ]["value"]
+            > 2000
+        ).all()
+        assert (
+            tb[
+                (tb["country"].isin(self.affected_countries))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & ~(tb["year"].isin(self.affected_years))
+            ]["value"]
+            < 365
         ).all()
 
     def inspect(self, tb):
@@ -297,7 +365,7 @@ class TeaProductionAnomaly(DataAnomaly):
     affected_element_codes = [
         "005510",  # Production.
         "5510pc",  # Per capita production.
-        "005419",  # Yield.
+        "005412",  # Yield.
     ]
     # Countries affected by the anomaly.
     # NOTE: All countries will be removed (since some of them are the main contributors to tea production), but these
@@ -456,7 +524,7 @@ class FruitYieldAnomaly(HighYieldAnomaly):
     ]
     affected_element_codes = [
         # Element code for "Yield".
-        "005419",
+        "005412",
     ]
     affected_years = [
         1961,
@@ -504,7 +572,7 @@ class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
     ]
     affected_element_codes = [
         # Element code for "Yield".
-        "005419",
+        "005412",
     ]
     affected_years = [
         1961,
@@ -539,7 +607,8 @@ class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
 class LocustBeansYieldAnomaly(HighYieldAnomaly):
     description = (  # type: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
-        "This happens to item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)'. "
+        "This happens to item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)' and "
+        "'Lower-middle-income countries'."
         "Therefore, we remove these possibly spurious values."
     )
 
@@ -549,7 +618,7 @@ class LocustBeansYieldAnomaly(HighYieldAnomaly):
     ]
     affected_element_codes = [
         # Element code for "Yield".
-        "005419",
+        "005412",
     ]
     affected_years = [
         1961,
@@ -579,6 +648,7 @@ class LocustBeansYieldAnomaly(HighYieldAnomaly):
     ]
     affected_countries = [
         "Net Food Importing Developing Countries (FAO)",
+        "Lower-middle-income countries",
     ]
 
 
@@ -595,7 +665,7 @@ class WalnutsYieldAnomaly(HighYieldAnomaly):
     ]
     affected_element_codes = [
         # Element code for "Yield".
-        "005419",
+        "005412",
     ]
     affected_years = [
         1961,
@@ -632,6 +702,7 @@ class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
     description = (  # type: ignore
         "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
         "This happens to item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. "
+        "A similar anomaly for South America is tackled separately. "
         "Therefore, we remove these possibly spurious values."
     )
 
@@ -641,7 +712,7 @@ class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
     ]
     affected_element_codes = [
         # Element code for "Yield".
-        "005419",
+        "005412",
     ]
     affected_years = [
         1961,
@@ -679,7 +750,7 @@ class OtherTropicalFruitYieldSouthAmericaAnomaly(HighYieldAnomaly):
     ]
     affected_element_codes = [
         # Element code for "Yield".
-        "005419",
+        "005412",
     ]
     affected_years = [
         1961,
@@ -794,6 +865,7 @@ detected_anomalies = {
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
         EggYieldNorthernEuropeAnomaly,
+        EggYieldLesothoAnomaly,
         TeaProductionAnomaly,
         FruitYieldAnomaly,
         FruitYieldNetherlandsAnomaly,
