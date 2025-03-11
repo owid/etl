@@ -127,30 +127,45 @@ tables:
         description_short:  *desc_short_total
         unit: tonnes
         short_unit: t
+        display:
+          name: "2019"
 
       _2020_total_emissions:
         title: Total CO₂ emissions from aviation in 2020
         description_short:  *desc_short_total
         unit: tonnes
         short_unit: t
+        display:
+          name: "2020"
 
       _2021_total_emissions:
         title: Total CO₂ emissions from aviation in 2021
         description_short:  *desc_short_total
         unit: tonnes
         short_unit: t
+        display:
+          name: "2021"
+
       _2022_total_emissions:
         title: Total CO₂ emissions from aviation in 2022
         description_short:  *desc_short_total
         unit: tonnes
         short_unit: t
+        display:
+          name: "2022"
+
       _2023_total_emissions:
         title: Total CO₂ emissions from aviation in 2023
         description_short:  *desc_short_total
         unit: tonnes
         short_unit: t
+        display:
+          name: "2023"
+
       _2024_total_emissions:
         title: Total CO₂ emissions from aviation in 2024
         description_short:  *desc_short_total
         unit: tonnes
         short_unit: t
+        display:
+          name: "2024"
