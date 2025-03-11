@@ -16,7 +16,7 @@ def run(dest_dir: str) -> None:
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_coverage")
-    tb = ds.read("vaccination_coverage", load_data=True)
+    tb = ds.read("vaccination_coverage", load_data=False)
 
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
