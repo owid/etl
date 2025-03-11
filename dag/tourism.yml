@@ -34,7 +34,7 @@ steps:
 
 # OECD CO2 emissions from air transport
   data://meadow/oecd/2024-12-30/co2_air_transport:
-    - snapshot://oecd/2024-12-30/co2_air_transport.csv
+    - snapshot://oecd/2025-03-11/co2_air_transport.csv
   data://garden/oecd/2024-12-30/co2_air_transport:
     - data://meadow/oecd/2024-12-30/co2_air_transport
     - data://garden/tourism/2024-08-17/unwto
