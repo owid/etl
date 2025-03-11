@@ -31,7 +31,5 @@ def run(dest_dir: str) -> None:
     config["views"] += config_new["views"]
     config["views"] += grouped_views
 
-    multidim.upsert_multidim_data_page(
-        config=config,
-        paths=paths,
-    )
+    mdim = paths.create_mdim(config=config)
+    mdim.save()
