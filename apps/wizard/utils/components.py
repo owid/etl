@@ -1,6 +1,7 @@
 import hashlib
 import json
 import random
+import urllib.parse
 from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
@@ -143,6 +144,41 @@ def grapher_chart_from_url(chart_url: str, height=600):
             allow="web-share; clipboard-write"></iframe>
     """
     return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
+
+
+def explorer_chart(
+    base_url: str, explorer_slug: str, view: dict, height: int = 600, default_display: Optional[str] = None
+):
+    # First HTML definition with parameters
+    url = f"{base_url}/{explorer_slug}"
+
+    params = {
+        # "Metric": "Confirmed cases",
+        # "Frequency": "7-day average",
+        # "Relative to population": "false",
+        # "country": "COD~BDI~UGA~CAF",
+        "hideControls": "true",
+        **view,
+    }
+    if default_display is not None:
+        dd = default_display.lower()
+        if dd in ["map", "table", "chart"]:
+            params["tab"] = dd
+
+    query_string = "?" + urllib.parse.urlencode(params)
+
+    # NOTE: this would create 2 iframes, the redirect below creates just one
+    # HTML = f"""
+    # <iframe src="{url}{query_string}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;" allow="web-share; clipboard-write"></iframe>
+    # """
+
+    HTML = f"""
+    <!-- Redirect to the external URL -->
+    <meta http-equiv="refresh" content="0; url={url}{query_string}">
+    """
+
+    # Render the HTML
+    return st.components.v1.html(HTML, height=height)
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -437,13 +473,16 @@ def st_toast_success(message: str) -> None:
     st.toast(f"✅ :green[{message}]")
 
 
-def update_query_params(key):
+def update_query_params(key: str, side_effect: Optional[Callable[[], None]] = None):
     def _update_query_params():
         value = st.session_state[key]
         if value is not None:
             st.query_params.update({key: value})
         else:
             st.query_params.pop(key, None)
+
+        if side_effect is not None:
+            side_effect()
 
     return _update_query_params
 
@@ -468,10 +507,10 @@ def url_persist(component: Any) -> Any:
 
     def _persist(*args, **kwargs):
         assert "key" in kwargs, "key should be passed to persist"
-        # TODO: we could wrap on_change too to make it work
-        assert "on_change" not in kwargs, "on_change should not be passed to persist"
 
         key = kwargs["key"]
+
+        on_change = kwargs.pop("on_change", None)
 
         # Get default from `value` field
         default = kwargs.pop("value", None)
@@ -499,7 +538,7 @@ def url_persist(component: Any) -> Any:
             elif st.session_state[key] == default:
                 remove_query_params(key)
 
-        kwargs["on_change"] = update_query_params(key)
+        kwargs["on_change"] = update_query_params(key, side_effect=on_change)
 
         return component(*args, **kwargs)
 
