@@ -531,24 +531,20 @@ def harmonize_countries(tb: Table, countries_metadata: Table) -> Table:
 
     """
     tb = tb.copy()
+
+    # Sanity check.
+    error = "Country names found in data, but not in countries_metadata."
+    assert set(tb["fao_country"]) <= set(countries_metadata["fao_country"]), error
+
     # Add harmonized country names (from countries metadata) to data.
     tb = tb.merge(
-        countries_metadata[["area_code", "fao_country", "country"]].rename(
-            columns={"fao_country": "fao_country_check"}
-        ),
-        on="area_code",
+        countries_metadata[["area_code", "fao_country", "country"]],
+        on=["area_code", "fao_country"],
         how="left",
     )
 
     # area_code should always be an int
     tb["area_code"] = tb["area_code"].astype(int)
-
-    # Sanity check.
-    country_mismatch = tb[(tb["fao_country"].astype(str) != tb["fao_country_check"])]
-    if len(country_mismatch) > 0:
-        faulty_mapping = country_mismatch.set_index("fao_country").to_dict()["fao_country_check"]
-        log.warning(f"Mismatch between fao_country in data and in metadata: {faulty_mapping}")
-    tb = tb.drop(columns="fao_country_check")
 
     # Remove unmapped countries.
     tb = tb[tb["country"].notnull()].reset_index(drop=True)

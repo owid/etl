@@ -1069,8 +1069,8 @@ def run(dest_dir: str) -> None:
     datasets_table = create_table(tb=tb_datasets, short_name="datasets", index_cols=["dataset"])
     items_table = create_table(tb=tb_items, short_name="items", index_cols=["dataset", "item_code"])
     elements_table = create_table(tb=tb_elements, short_name="elements", index_cols=["dataset", "element_code"])
-    # NOTE: Since FAO country names sometimes appears in slightly different ways (e.g. "Low income economies" and "Low-income economies"), set fao_country as the index of the countries table.
-    countries_table = create_table(tb=tb_countries, short_name="countries", index_cols=["fao_country"])
+    # NOTE: Since FAO country names sometimes appears in slightly different ways (e.g. "Low income economies" and "Low-income economies"), we cannot set area_code as unique index of the countries table, and need to include fao_country as well.
+    countries_table = create_table(tb=tb_countries, short_name="countries", index_cols=["area_code", "fao_country"])
     amendments_table = Table(value_amendments, short_name="amendments").set_index(
         ["dataset", "spurious_value"], verify_integrity=True
     )
