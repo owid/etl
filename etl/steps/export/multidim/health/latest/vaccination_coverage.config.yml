@@ -1,0 +1,52 @@
+title:
+  title: Vaccination coverage
+  titleVariant: by vaccine and metric
+defaultSelection:
+  - World
+dimensions:
+  - name: Metric
+    slug: metric
+    choices:
+      - slug: "coverage"
+        name: "Share of children vaccinated"
+      - slug: "unvaccinated_one_year_olds"
+        name: "Unvaccinated one-year-olds"
+  - name: Vaccination
+    slug: antigen
+    choices:
+      - slug: "BCG"
+        name: "Tuberculosis vaccine - Bacille Calmette-Guérin (BCG)"
+      - slug: "DTPCV1"
+        name: "Diphtheria, tetanus, and pertussis vaccine (first dose)"
+      - slug: "DTPCV3"
+        name: "Diphtheria, tetanus, and pertussis vaccine (third dose)"
+      - slug: "HEPB3"
+        name: "Hepatitis B vaccine (third dose)"
+      - slug: "HEPB_BD"
+        name: "Hepatitis B vaccine (birth dose)"
+      - slug: "HIB3"
+        name: "Haemophilus influenzae type b vaccine (third dose)"
+      - slug: "IPV1"
+        name: "Inactivated polio vaccine (IPV) (first dose)"
+      - slug: "IPV2"
+        name: "Inactivated polio vaccine (IPV) (second dose)"
+      - slug: "MCV1"
+        name: "Measles vaccine (first dose)"
+      - slug: "MCV2"
+        name: "Measles vaccine (second dose)"
+      - slug: "MCV2X2"
+        name: "Measles vaccine (second dose; two-year-olds)"
+      - slug: "MENA_C"
+        name: "Meningococcal conjugate vaccine (last dose)"
+      - slug: "PCV3"
+        name: "Pneumococcal conjugate vaccine (third dose)"
+      - slug: "POL3"
+        name: "Polio vaccine (third dose)"
+      - slug: "RCV1"
+        name: "Rubella vaccine (first dose)"
+      - slug: "ROTAC"
+        name: "Rotavirus vaccine (last dose)"
+      - slug: "YFV"
+        name: "Yellow fever vaccine"
+
+views: []

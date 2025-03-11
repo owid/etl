@@ -164,7 +164,18 @@ class Snapshot:
             files.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
-        """Add file to DVC and upload to S3."""
+        """Add a file to DVC and upload it to S3.
+
+        This method only handles uploading the file. Ensure that the file is in the correct location,
+        usually by calling:
+
+        ```
+        snap.download_from_source()
+        snap.dvc_add(upload=upload)
+        ```
+
+        It is recommended to use `snap.create_snapshot`, which handles all of these steps.
+        """
         if not upload:
             log.warn("Skipping upload", snapshot=self.uri)
             return
@@ -190,7 +201,9 @@ class Snapshot:
         data: Optional[Union[Table, pd.DataFrame]] = None,
         upload: bool = False,
     ) -> None:
-        """Create a new snapshot from a local file, or from data in memory, or from a download link."""
+        """Create a new snapshot from a local file, or from data in memory, or from a download link.
+        Then upload it to S3. This is the recommended way to create a snapshot.
+        """
         if (filename is not None) or (data is not None):
             # Create snapshot from either a local file or from data in memory.
             add_snapshot(uri=self.uri, filename=filename, dataframe=data, upload=upload)
