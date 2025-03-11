@@ -56,6 +56,7 @@ def expand_config(
     dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
     common_view_config: Optional[Dict[str, Any]] = None,
     indicators_slug: str = INDICATORS_SLUG,
+    indicator_as_dimension: bool = False,
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
@@ -164,10 +165,11 @@ def expand_config(
         tb=tb,
         indicators_slug=indicators_slug,
         indicator_names=indicator_names,
+        indicator_as_dimension=indicator_as_dimension,
     )
 
     # Combine indicator information with dimensions (only when multiple indicators are given)
-    if len(expander.indicator_names) > 1:
+    if (len(expander.indicator_names) > 1) or (indicator_as_dimension):
         if dimensions is None:
             dimensions = {dim: "*" for dim in expander.dimension_names}
         elif isinstance(dimensions, list):
@@ -200,13 +202,17 @@ def expand_config(
 # Config auto-expander: Expand configuration from a table. This config is partial!
 ####################################################################################################
 class CollectionConfigExpander:
-    def __init__(self, tb: Table, indicators_slug: str, indicator_names: Optional[Union[str, List[str]]] = None):
+    def __init__(
+        self,
+        tb: Table,
+        indicators_slug: str,
+        indicator_names: Optional[Union[str, List[str]]] = None,
+        indicator_as_dimension: bool = False,
+    ):
         self.indicators_slug = indicators_slug
+        self.indicator_as_dimension = indicator_as_dimension
         self.build_df_dims(tb, indicator_names)
         self.short_name = tb.m.short_name
-
-        #
-        self.__dimension_filter = None
 
     @property
     def dimension_names(self):
@@ -341,8 +347,8 @@ class CollectionConfigExpander:
         self.df_dims = df_dims.loc[df_dims[self.indicators_slug].isin(self.indicator_names)]
 
         # Drop indicator column if indicator_names is of length 1
-        if len(self.indicator_names) == 1:
-            self.df_dims = self.df_dims.drop(columns=["indicator"])
+        if (len(self.indicator_names) == 1) & (not self.indicator_as_dimension):
+            self.df_dims = self.df_dims.drop(columns=[self.indicators_slug])
 
         # Final checks
         assert all(
