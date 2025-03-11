@@ -30,7 +30,7 @@ tables:
         title: Global average temperature anomaly relative to 1861-1890
         short_unit: °C
         unit: degrees Celsius
-        description_short: The deviation of a specific year's average land-sea surface temperature from the 1861-1890 mean, in degrees Celsius.
+        description_short: TThe difference in average land-sea surface temperature compared to the 1861-1890 mean, in degrees Celsius.
 
       upper_limit:
         title: Upper bound of the annual temperature anomaly (95% confidence interval)

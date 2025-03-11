@@ -26,7 +26,7 @@ tables:
     variables:
       sea_temperature_anomaly:
         title: Monthly sea surface temperature anomalies
-        description_short: The deviation of the average sea surface temperature measured at a nominal depth of 20cm from the 1861-1890 mean, in degrees Celsius.
+        description_short: The difference of average sea surface temperatures compared to the mean from 1861-1890, in degrees Celcius. This is measured at a depth of 20 centimeters.
         description_key:
         - Temperature anomalies show how many degrees Celsius temperatures have changed compared to the 1861-1890 period. This baseline period is commonly used to highlight the changes in temperature since pre-industrial times, prior to major human impacts.
         - The data includes separate measurements for the Northern and Southern Hemispheres, which helps researchers analyze regional differences.
