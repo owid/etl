@@ -2,6 +2,8 @@
 This mdim was created as a proof of concept. It can be deleted if not used.
 """
 
+from owid.catalog.meta import TableDimension
+
 from etl.collections import multidim
 from etl.helpers import PathFinder
 
@@ -16,20 +18,15 @@ def run() -> None:
     # Load (flattened) table from grapher channel with dimension metadata
     table = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)
 
-    # Add per-capita dimension
-    # TODO: if expand_config worked for multiple indicators, then this would be unnecessary
-    #   it's implemented by Lucas at the moment
-    assert table.m.dimensions
-    table.m.dimensions.append({"name": "Per capita", "slug": "per_capita"})
-
-    # Add dimensions to columns
-    for _, v in table.items():
-        if v.m.original_short_name == "emissions_per_capita":
-            v.m.dimensions["per_capita"] = "True"
-            # change indicator short name
-            v.m.original_short_name = "emissions"
-        elif v.m.original_short_name == "emissions":
-            v.m.dimensions["per_capita"] = "False"
+    # Use the updated function with mapping from original_short_name to configuration values.
+    add_dimension(
+        table,
+        dimension={"name": "Per capita", "slug": "per_capita"},
+        mapping={
+            "emissions_per_capita": {"new_short_name": "emissions", "value": "True"},
+            "emissions": {"value": "False"},
+        },
+    )
 
     # Update config with dimensions and views
     config.update(multidim.expand_config(table))
@@ -43,3 +40,21 @@ def run() -> None:
         config=config,
         paths=paths,
     )
+
+
+def add_dimension(table, dimension: TableDimension, mapping: dict) -> None:
+    """Adds a dimension and updates column metadata.
+
+    The mapping is a dict where each key is an original short name and its value is a dict.
+    The value dict can contain:
+      - 'new_short_name': Optional new short name.
+      - 'value': The value value to set for the dimension.
+    """
+    table.m.dimensions.append(dimension)
+    for _, v in table.items():
+        key = v.m.original_short_name
+        if key in mapping:
+            config = mapping[key]
+            v.m.dimensions[dimension["slug"]] = config["value"]
+            if "new_short_name" in config:
+                v.m.original_short_name = config["new_short_name"]
