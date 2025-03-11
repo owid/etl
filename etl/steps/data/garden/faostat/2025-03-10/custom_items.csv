@@ -253,6 +253,7 @@ faostat_fbsc,00002655,Wine,,"Default composition: 564 Wine, 565 Vermouths & simi
 faostat_qcl,00000564,Wine,,"Wines of fresh grapes of all qualities, including sparkling, fortified and dessert wines (Unofficial definition)",
 faostat_qcl,00000137,Yams,,"Yams This subclass includes: -  yams, tubers from vines of the genus Dioscorea D. batatas D. trifida D. alata D. bulbifera D. rotunda D. cayenensis D. exculenta D. dumetorum This subclass does not include: -  sweet potatoes, cf. 01530",
 faostat_fbsc,00002535,Yams,,Default composition: 137 Yams,
+faostat_qcl,00000671,"MatÃ© leaves",Maté leaves,,
 faostat_qv,00000671,"MatÃ© leaves",Maté leaves,,
 faostat_scl,00000671,"MatÃ© leaves",Maté leaves,,
 faostat_scl,00000672,"Extracts, essences and concentrates of tea or mate, and preparations with a basis thereof or with a basis of tea or matÃ©","Extracts, essences and concentrates of tea or mate, and preparations with a basis thereof or with a basis of tea or maté",,
