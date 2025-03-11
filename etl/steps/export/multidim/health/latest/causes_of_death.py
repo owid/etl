@@ -5,7 +5,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 

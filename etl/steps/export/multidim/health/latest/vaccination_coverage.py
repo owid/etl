@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 
 # etlr multidim
-def run(dest_dir: str) -> None:
+def run() -> None:
     # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()

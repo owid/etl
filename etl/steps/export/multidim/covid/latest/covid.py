@@ -16,7 +16,7 @@ MOBILITY_CONFIG_DEFAULT = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # PART 1: MDIMs entirely from YAML files
     # Load MDIM configurations from YAML files
     filenames = [
