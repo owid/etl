@@ -1,26 +1,15 @@
 import json
-import random  # Add import for random selection
-import re
-import urllib.parse
+import random
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
-import streamlit.components.v1 as components
-from sqlalchemy.engine.base import Engine
-from sqlalchemy.orm import Session
-
-# from st_copy_to_clipboard import st_copy_to_clipboard
 from structlog import get_logger
 
-from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_grapher
-from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
-from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
-from apps.wizard.utils import set_states
-from apps.wizard.utils.components import Pagination, explorer_chart, grapher_chart, url_persist
+from apps.wizard.app_pages.chart_diff.utils import get_engines
+from apps.wizard.utils.components import explorer_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
-from etl.grapher import model as gm
 
 log = get_logger()
 
@@ -55,25 +44,27 @@ def _show_options():
             )
 
 
-def _explorer_options(slug: str):
+def _fetch_explorer_views(slug: str) -> list[dict]:
     """
-    return a list of options for the explorer, e.g.
+    Return a list of views for the explorer, e.g.
 
-    [{'Metric': 'Confirmed cases',
-    'Frequency': '7-day average',
-    'Relative to population': 'false'}]
+    [{
+        'Metric': 'Confirmed cases',
+        'Frequency': '7-day average',
+        'Relative to population': 'false'
+    }]
     """
     engine = get_engine()
 
-    # TODO: use params instead of string interpolation
-    q = f"""
-    select config from explorers where slug = '{slug}';
+    q = """
+    select config from explorers where slug = %(slug)s;
     """
-    df = pd.read_sql(q, engine)
-    # TODO: if we have zero or more than one rows, raise an error
+    df = pd.read_sql(q, engine, params={"slug": slug})
+    if len(df) != 1:
+        raise ValueError(f"Expected exactly one explorer with slug '{slug}', got {len(df)}.")
     config = json.loads(df.iloc[0].config)
 
-    options = []
+    views = []
     for block in config["blocks"]:
         for view in block.get("block", []) or []:
             dims = {}
@@ -82,9 +73,29 @@ def _explorer_options(slug: str):
                     if k.endswith(comp):
                         dims[k.replace(comp, "").strip()] = v
             if dims:
-                options.append(dims)
+                views.append(dims)
 
-    return options
+    return views
+
+
+def _fetch_explorer_slugs() -> list[str]:
+    """Fetch all published explorer slugs."""
+    q = """
+    select slug from explorers where isPublished = 1 order by updatedAt desc
+    """
+    return read_sql(q)["slug"].tolist()
+
+
+def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
+    # Extract all unique dimensions across views
+    all_dimensions = {}
+    for view in explorer_views:
+        for dim, val in view.items():
+            if dim not in all_dimensions:
+                all_dimensions[dim] = set()
+            all_dimensions[dim].add(val)
+    # Convert sets to lists for selectboxes
+    return {dim: sorted(list(values)) for dim, values in all_dimensions.items()}
 
 
 def main():
@@ -97,33 +108,20 @@ def main():
 
     _show_options()
 
-    # Fetch available explorers
-    q = """
-    select slug from explorers where isPublished = 1 order by updatedAt desc
-    """
-    available_explorers = read_sql(q)["slug"].tolist()
+    explorer_slugs = _fetch_explorer_slugs()
 
     # Select explorer to compare
     explorer_slug = url_persist(st.selectbox)(
         "Select Explorer",
         key="explorer",
-        options=available_explorers,
+        options=explorer_slugs,
         # cleanup query params on explorer change
         on_change=st.query_params.clear,
     )
 
-    explorer_views = _explorer_options(explorer_slug)
+    explorer_views = _fetch_explorer_views(explorer_slug)
 
-    # Extract all unique dimensions across views
-    all_dimensions = {}
-    for view in explorer_views:
-        for dim, val in view.items():
-            if dim not in all_dimensions:
-                all_dimensions[dim] = set()
-            all_dimensions[dim].add(val)
-
-    # Convert sets to lists for selectboxes
-    all_dimensions = {dim: sorted(list(values)) for dim, values in all_dimensions.items()}
+    all_dimensions = _extract_all_dimensions(explorer_views)
 
     st.subheader("Select Explorer View Options")
 
