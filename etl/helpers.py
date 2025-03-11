@@ -646,7 +646,16 @@ class PathFinder:
         )
 
     def create_mdim(self, config, mdim_name: Optional[str] = None) -> Multidim:
-        """Create a Multidim object."""
+        """Create a Multidim object.
+
+        Args:
+        -----
+
+        config: dict
+            MDIM configuration.
+        mdim_name: str
+            Name of the MDIM page. Default is short_name from mdim catalog path.
+        """
         mdim_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}"
 
         # Create Multidim
