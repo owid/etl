@@ -1,7 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import re
-from typing import Dict
+from typing import Tuple
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -763,7 +763,7 @@ def select_and_prepare_relevant_data(tb: Table) -> Table:
     return tb
 
 
-def prepare_wide_tables(tb: Table) -> Dict[str, Table]:
+def prepare_wide_tables(tb: Table) -> Tuple[Table, Table, Table, Table]:
     # Table for average prices (in euros) of gas and electricity prices of household and non-household consumers.
     tb_prices_euro = tb[tb["dataset_code"].isin(DATASET_CODES_PRICES)].pivot(
         index=["country", "date"],

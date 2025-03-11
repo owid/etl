@@ -22,6 +22,7 @@ from .tables import (
     read_rda_multiple,
     read_rds,
     read_stata,
+    to_datetime,
     to_numeric,
 )
 
@@ -46,6 +47,7 @@ __all__ = [
     "read_rds",
     "read_df",
     "read_parquet",
+    "to_datetime",
     "to_numeric",
     "keep_metadata",
 ]

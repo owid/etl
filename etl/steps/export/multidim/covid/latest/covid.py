@@ -16,7 +16,7 @@ MOBILITY_CONFIG_DEFAULT = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # PART 1: MDIMs entirely from YAML files
     # Load MDIM configurations from YAML files
     filenames = [
@@ -36,14 +36,12 @@ def run(dest_dir: str) -> None:
         paths.log.info(fname)
         config = paths.load_mdim_config(fname)
 
-        multidim.upsert_multidim_data_page(
-            config=config,
-            paths=paths,
-            mdim_name=fname_to_mdim_name(fname),
-        )
+        mdim = paths.create_mdim(config, mdim_name=fname_to_mdim_name(fname))
+        mdim.save()
+
     # PART 2: MDIMs hybridly generated (mix of YAML file + data)
     ds = paths.load_dataset("google_mobility")
-    tb = ds.read("google_mobility")
+    tb = ds.read("google_mobility", load_data=False)
 
     # Simple multidim
     config = paths.load_mdim_config("covid.mobility.yml")
@@ -67,11 +65,12 @@ def run(dest_dir: str) -> None:
     # multidim.adjust_mdim_views(config, paths.dependencies_by_table_name)
 
     # Upsert to DB
-    multidim.upsert_multidim_data_page(
+    mdim = paths.create_mdim(
         config=config,
-        paths=paths,
         mdim_name=fname_to_mdim_name("covid.mobility.yml"),
     )
+
+    mdim.save()
 
 
 def fname_to_mdim_name(fname: str) -> str:

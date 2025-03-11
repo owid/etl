@@ -73,3 +73,5 @@ steps:
     - snapshot://fasttrack/latest/air_pollution_ceds.csv
   data://grapher/fasttrack/latest/air_pollution_ceds_by_sector:
     - snapshot://fasttrack/latest/air_pollution_ceds_by_sector.csv
+  data://grapher/fasttrack/2023-09-29/un_space_objects:
+    - snapshot://fasttrack/2023-09-29/un_space_objects.csv

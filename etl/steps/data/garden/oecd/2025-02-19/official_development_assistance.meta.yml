@@ -56,21 +56,36 @@ definitions:
   short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation.
 
   key_oda: |-
-    Official development assistance (ODA) eligibility criteria are based on (i) country eligibility, (ii) concessionality, and (iii) the promotion of the economic development and welfare of developing countries as the main objective. This means that (i) only countries and territories included in the list of ODA recipients are eligible to receive this assistance, (ii) lending is defined by minimum requirements according to the income category of the recipient country, and (iii) reporting rules have been implemented to define what is "primarily developmental". For more details about ODA, please refer to the [official OECD documentation](https://one.oecd.org/document/DCD/DAC/STAT(2023)9/FINAL/en/pdf).
+    Official development assistance (ODA) is aid given to countries and territories on the OECD Development Assistance Committee (DAC) list of recipients and multilateral development institutions. To qualify as ODA, the aid has to serve the economic development and welfare of recipient countries and be either a grant or a loan with favorable terms.
+
+  key_oda_list_of_countries_recipients: DAC country recipients are all low- and middle-income countries as defined by the World Bank, or least-developed countries as defined by the United Nations. All recipients are listed on [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
+
+  key_oda_list_of_countries_donors: Most ODA is provided by [DAC members](https://www.oecd.org/en/about/committees/development-assistance-committee.html), which are major aid donors in the OECD plus the European Union. However, some non-DAC countries, such as Turkey or Saudi Arabia, also give aid that follows ODA guidelines.
+
+  key_oda_coverage_limits: |-
+    ODA does not include military aid, except for the cost of using armed forces to deliver humanitarian aid. It also excludes spending on peacekeeping unless it is closely related to development.
+
+  key_net_disbursements_base: |-
+    is reported as net disbursements. This refers to aid ultimately given and is different from commitments, which is only aid that has been pledged. These are net amounts because any money coming in (like loan repayments or interest) has been subtracted from money going out (like new grants or loans).
+  key_grant_equivalents_base: |-
+     is reported as [grant-equivalent](#dod:grant-equivalents) disbursements. They better estimate how favorable a loan is and the extent to which it constitutes a grant.
+
+  key_net_disbursements: |-
+    The data {definitions.key_net_disbursements_base}
+  key_grant_equivalents: |-
+    The data {definitions.key_grant_equivalents_base}
+
+  key_net_disbursements_official: |-
+    Before 2018, ODA {definitions.key_net_disbursements_base}
+  key_grant_equivalents_official: |-
+    Since 2018, ODA {definitions.key_grant_equivalents_base}
 
   key_oda_target: A long-standing United Nations target is that developed countries should devote 0.7% of their GNI to ODA.
-  key_oda_list_of_countries: The [OECD Development Assistance Committee (DAC)](https://www.oecd.org/en/about/committees/development-assistance-committee.html) maintains a list of territories where ODA can be provided. The countries and territories on the DAC list of ODA recipients consist of all low and middle income countries based on gross national income (GNI) per capita as published by the World Bank, with the exception of former G8 members, EU members, and countries with a firm date for entry into the EU. The list also includes all of the Least Developed Countries (LDCs) as defined by the United Nations. The list is updated every three years and is available in [the OECD website](https://www.oecd.org/en/topics/sub-issues/oda-eligibility-and-conditions/dac-list-of-oda-recipients.html).
 
-  key_grant_equivalents: |-
-    "[Grant equivalent](#dod:grant-equivalents)" is a methodology to estimate the value of loans compared to a grant. It is an estimate, at today’s value of money, of how much is being given away over the life of a financial transaction, compared with a transaction at market terms.
-  key_net_disbursements: |-
-    Disbursements refer to money actually given/received, which can differ from what was originally pledged. These are also net disbursements: grants and loans are valued in the same way by recording the flows of cash that were granted, or the face value of loans that were lent to developing countries, deducting any loan repayments. The method does not reflect actual efforts by donor countries, given that grants and loans themselves represent different efforts from donors. From 2018, headline figures from the OECD are based on the [grant-equivalent methodology](#dod:grant-equivalents), which is a more accurate reflection of the effort made by donor countries.
-  key_official_estimate: |-
-    Official estimates of ODA combine net disbursements in data until 2017 with grant equivalents from 2018 onwards.
   key_commitments_sectors: |-
     Aid by sector is presented as commitment or gross disbursement data. Commitments refer to money pledged, and may be different from how much and how it is ultimately given/received. Gross disbursements measure total new flows given/received before repayments are deducted. Net disbursements are not used because there is no evidence that the source of financing to reimburse loans in a sector is actually the sector itself.
 
-  key_gni: This indicator is divided by the gross national income (GNI) of the country. The GNI measures the total income earned by residents of a country, including income earned abroad.
+  key_gni: The indicator is here divided by the country’s gross national income (GNI). GNI is a measure of the total income earned by residents of a country or region each year. It is calculated as GDP plus net income received from abroad, plus taxes (minus subsidies) on production.
 
   key_oof: This indicator includes grants to developing countries for representational or essentially commercial purposes; official bilateral transactions intended to promote development, but having a grant element of less than 25%; and, official bilateral transactions, whatever their grant element, that are primarily export-facilitating in purpose.
   key_officially_supported_export_credits_1: Governments provide officially supported export credits through Export Credit Agencies (ECAs) in support of national exporters competing for overseas sales. ECAs can be government institutions or private companies that operate on behalf of governments.
@@ -90,9 +105,6 @@ definitions:
 
   key_capital_subscriptions_deposits: |-
     Capital subscriptions are payments to multilateral agencies in the form of notes and similar instruments, unconditionally encashable at any time by the recipient institutions. They are assimilated to grants in DAC statistics.
-
-  key_oda_coverage_limits: |-
-    Official development assistance does not include military aid, except for the cost of using armed forces to deliver humanitarian aid. It also excludes most peacekeeping expenditures, except for those closely related to development. Nuclear energy is included only if it is for civilian purposes, and cultural programs are eligible only if they build the cultural capacities of recipient countries.
 
   key_sector: |-
     <% if sector == "Humanitarian aid" %>
@@ -195,27 +207,30 @@ definitions:
 
   description_key_oda_net_disbursements: &description_key_oda_net_disbursements
     - "{definitions.key_oda}"
-    - "{definitions.key_net_disbursements}"
+    - "{definitions.key_oda_list_of_countries_recipients}"
+    - "{definitions.key_oda_list_of_countries_donors}"
     - "{definitions.key_oda_coverage_limits}"
+    - "{definitions.key_net_disbursements}"
     - "{definitions.key_constant_usd}"
-    - "{definitions.key_oda_list_of_countries}"
 
   description_key_private_grants: &description_key_private_grants
     - "{definitions.key_net_private_grants}"
-    - "{definitions.key_private_reporting}"
     - "{definitions.key_net_disbursements}"
+    - "{definitions.key_private_reporting}"
     - "{definitions.key_constant_usd}"
 
   description_key_by_donor: &description_key_by_donor
     - <% if donor == "Private donors" %>{definitions.key_net_private_grants}<% else %>{definitions.key_oda}<% endif %>
-    - <% if donor == "Private donors" %>{definitions.key_private_reporting}<% else %>{definitions.key_net_disbursements}<% endif %>
-    - <% if donor == "Private donors" %>{definitions.key_net_disbursements}<% else %>{definitions.key_oda_coverage_limits}<% endif %>
-    - <% if donor == "Private donors" %>{definitions.key_constant_usd}<% else %>{definitions.key_constant_usd}<% endif %>
-    - <% if donor == "Private donors" %><% else %>{definitions.key_oda_list_of_countries}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_net_disbursements}<% else %>{definitions.key_oda_list_of_countries_recipients}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_private_reporting}<% else %>{definitions.key_oda_list_of_countries_donors}<% endif %>
+    - <% if donor == "Private donors" %>{definitions.key_constant_usd}<% else %>{definitions.key_oda_coverage_limits}<% endif %>
+    - <% if donor == "Private donors" %><% else %>{definitions.key_net_disbursements}<% endif %>
+    - <% if donor == "Private donors" %><% else %>{definitions.key_constant_usd}<% endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: OECD Official Development Assistance (ODA)
   update_period_days: 365
 
 tables:
@@ -229,11 +244,12 @@ tables:
         description_short: "{definitions.short_oda} {definitions.short_net_private_grants} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_net_private_grants}"
           - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: |-
           {definitions.producer_oda}
 
@@ -348,11 +364,12 @@ tables:
         description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. {definitions.short_net_disbursements}
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_gni}"
           - "{definitions.key_oda_target}"
-          - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_coverage_limits}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_share_gni}"
@@ -372,11 +389,12 @@ tables:
         description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. {definitions.short_grant_equivalents}
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_gni}"
           - "{definitions.key_oda_target}"
-          - "{definitions.key_grant_equivalents}"
-          - "{definitions.key_oda_coverage_limits}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_share_gni}"
@@ -396,13 +414,13 @@ tables:
         description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. This is the official estimate that combines net disbursements with grant equivalents from 2018.
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements_official}"
+          - "{definitions.key_grant_equivalents_official}"
           - "{definitions.key_gni}"
           - "{definitions.key_oda_target}"
-          - "{definitions.key_net_disbursements}"
-          - "{definitions.key_grant_equivalents}"
-          - "{definitions.key_official_estimate}"
-          - "{definitions.key_oda_coverage_limits}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Foreign aid given as a share of national income
@@ -420,11 +438,12 @@ tables:
         description_short: "{definitions.short_oda_bilateral} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_oda_bilateral}"
           - "{definitions.key_grant_equivalents}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Bilateral ODA by donor
@@ -442,9 +461,11 @@ tables:
         description_short: "{definitions.short_oda_multilateral} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Multilateral ODA by donor
@@ -462,11 +483,12 @@ tables:
         description_short: "{definitions.short_oda_bilateral} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_oda_bilateral}"
           - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Bilateral ODA by donor
@@ -484,10 +506,11 @@ tables:
         description_short: "{definitions.short_oda_multilateral} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Multilateral ODA by donor
@@ -505,10 +528,11 @@ tables:
         description_short: "{definitions.short_oda} {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Foreign aid given
@@ -583,10 +607,11 @@ tables:
         description_short: Official development assistance (ODA) divided by population. {definitions.short_net_disbursements} {definitions.short_constant_usd}
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita}"
@@ -606,10 +631,11 @@ tables:
         description_short: Official development assistance (ODA) divided by population. {definitions.short_grant_equivalents} {definitions.short_constant_usd}
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita}"
@@ -629,8 +655,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents budget support. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Budget support
@@ -647,8 +673,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents bilateral core contributions & pooled programmes & funds. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Bilateral core contributions & pooled programmes & funds
@@ -665,8 +691,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents project-type interventions. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Project-type interventions
@@ -683,8 +709,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents experts and other technical assistance. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Experts and other technical assistance
@@ -701,8 +727,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents scholarships and student costs in donor countries. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Scholarships and student costs in donor countries
@@ -719,8 +745,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents debt relief. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Debt relief
@@ -737,8 +763,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents administrative costs not included elsewhere. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Administrative costs not included elsewhere
@@ -755,8 +781,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents other in-donor expenditures. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Other in-donor expenditures
@@ -773,8 +799,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents development awareness. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Development awareness
@@ -791,8 +817,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents refugees in donor countries. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Refugees in donor countries
@@ -809,8 +835,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents recoveries on bilateral ODA grants / negative commitments. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
@@ -827,8 +853,8 @@ tables:
       #   description_short: "[Official development assistance](#dod:oda) component that represents other loans repayments. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
       #   description_key:
       #     - "{definitions.key_oda}"
-      #     - "{definitions.key_grant_equivalents}"
       #     - "{definitions.key_oda_coverage_limits}"
+      #     - "{definitions.key_grant_equivalents}"
       #     - "{definitions.key_constant_usd}"
       #   presentation:
       #     title_public: "ODA by donor - Other loans repayments"
@@ -845,8 +871,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents private sector instruments. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_grant_equivalents}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: "ODA by donor - Private sector instruments"
@@ -863,8 +889,8 @@ tables:
       #   description_short: "[Official development assistance](#dod:oda) component that represents other ODA not assigned to the above categories (historical series). {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
       #   description_key:
       #     - "{definitions.key_oda}"
-      #     - "{definitions.key_grant_equivalents}"
       #     - "{definitions.key_oda_coverage_limits}"
+      #     - "{definitions.key_grant_equivalents}"
       #     - "{definitions.key_constant_usd}"
       #   presentation:
       #     title_public: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
@@ -881,8 +907,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents budget support. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Budget support
@@ -899,8 +925,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents bilateral core contributions & pooled programmes & funds. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Bilateral core contributions & pooled programmes & funds
@@ -917,8 +943,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents project-type interventions. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Project-type interventions
@@ -935,8 +961,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents experts and other technical assistance. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Experts and other technical assistance
@@ -953,8 +979,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents scholarships and student costs in donor countries. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Scholarships and student costs in donor countries
@@ -971,8 +997,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents debt relief. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Debt relief
@@ -989,8 +1015,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents administrative costs not included elsewhere. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Administrative costs not included elsewhere
@@ -1007,8 +1033,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents other in-donor expenditures. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Other in-donor expenditures
@@ -1025,8 +1051,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents development awareness. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Development awareness
@@ -1043,8 +1069,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents refugees in donor countries. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: ODA by donor - Refugees in donor countries
@@ -1061,8 +1087,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents recoveries on bilateral ODA grants / negative commitments. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments"
@@ -1079,8 +1105,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents other loans repayments. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: "ODA by donor - Other loans repayments"
@@ -1097,8 +1123,8 @@ tables:
       #   description_short: "[Official development assistance](#dod:oda) component that represents private sector instruments. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
       #   description_key:
       #     - "{definitions.key_oda}"
-      #     - "{definitions.key_net_disbursements}"
       #     - "{definitions.key_oda_coverage_limits}"
+      #     - "{definitions.key_net_disbursements}"
       #     - "{definitions.key_constant_usd}"
       #   presentation:
       #     title_public: "ODA by donor - Private sector instruments"
@@ -1115,8 +1141,8 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents other ODA not assigned to the above categories (historical series). {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
@@ -1134,8 +1160,10 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents grants. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Grants by donor
@@ -1152,8 +1180,10 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents loans. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Loans by donor
@@ -1170,9 +1200,11 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents capital subscriptions (deposits). {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_capital_subscriptions_deposits}"
           - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Capital subscriptions (deposits) by donor
@@ -1189,8 +1221,10 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents recoveries on grants. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Recoveries on grants by donor
@@ -1223,10 +1257,11 @@ tables:
         description_short: Official development assistance (ODA) divided by gross national income, expressed as a percentage. {definitions.short_net_disbursements}
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_gni}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
-          - "{definitions.key_oda_list_of_countries}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_gni}"
         description_from_producer: "{definitions.producer_oda}"
         presentation:
           title_public: Foreign aid received as a share of national income
@@ -1243,8 +1278,10 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents grants. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Grants by recipient
@@ -1261,8 +1298,10 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents loans. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Loans by recipient
@@ -1279,9 +1318,11 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents capital subscriptions (deposits). {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_capital_subscriptions_deposits}"
           - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Capital subscriptions (deposits) by recipient
@@ -1298,8 +1339,10 @@ tables:
         description_short: "[Official development assistance](#dod:oda) component that represents recoveries on grants. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Recoveries on grants by recipient
@@ -1315,8 +1358,11 @@ tables:
         short_unit: "$"
         description_short: "[Official development assistance](#dod:oda) provided for humanitarian purposes. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Humanitarian aid by recipient
@@ -1332,9 +1378,12 @@ tables:
         short_unit: "$"
         description_short: "{definitions.short_food_aid} {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_food_aid}"
           - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_food_aid}"
         presentation:
@@ -1351,8 +1400,11 @@ tables:
         short_unit: "$"
         description_short: "[Official development assistance](#dod:oda) provided for technical cooperation. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         presentation:
           title_public: Technical cooperation by recipient
@@ -1369,10 +1421,11 @@ tables:
         description_short: Official development assistance (ODA) divided by population. {definitions.short_net_disbursements} {definitions.short_constant_usd}
         description_key:
           - "{definitions.key_oda}"
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         description_from_producer: "{definitions.producer_oda}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
@@ -1390,8 +1443,11 @@ tables:
         short_unit: "$"
         description_short: "[Official development assistance](#dod:oda) going to grants, divided by population. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
@@ -1409,8 +1465,11 @@ tables:
         short_unit: "$"
         description_short: "[Official development assistance](#dod:oda) going to loans, divided by population. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
@@ -1428,8 +1487,11 @@ tables:
         short_unit: "$"
         description_short: "[Official development assistance](#dod:oda) provided for humanitarian purposes, divided by population. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
@@ -1447,9 +1509,12 @@ tables:
         short_unit: "$"
         description_short: "{definitions.short_food_aid} divided by population. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_food_aid}"
           - "{definitions.key_net_disbursements}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
         description_from_producer: "{definitions.producer_food_aid}"
         processing_level: major
@@ -1468,8 +1533,11 @@ tables:
         short_unit: "$"
         description_short: "[Official development assistance](#dod:oda) provided for technical cooperation, divided by population. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
         description_key:
-          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
           - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
           - "{definitions.key_constant_usd}"
         processing_level: major
         description_processing: "{definitions.processing_per_capita_2}"
@@ -1489,11 +1557,12 @@ tables:
         description_short: "[Official development assistance](#dod:oda) given that is <<sector.lower()>>. {definitions.short_commitments_sectors} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_sector}"
           - "{definitions.key_commitments_sectors}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         processing_level: *processing_level_by_sector
         description_processing: "{definitions.processing_oda_by_sector}"
         presentation:
@@ -1510,11 +1579,12 @@ tables:
         description_short: "[Official development assistance](#dod:oda) given that is <<sector.lower()>>, divided by population. {definitions.short_commitments_sectors} {definitions.short_constant_usd}"
         description_key:
           - "{definitions.key_oda}"
+          - "{definitions.key_oda_list_of_countries_recipients}"
+          - "{definitions.key_oda_list_of_countries_donors}"
+          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_sector}"
           - "{definitions.key_commitments_sectors}"
-          - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_constant_usd}"
-          - "{definitions.key_oda_list_of_countries}"
         processing_level: *processing_level_by_sector
         description_processing: |-
           {definitions.processing_per_capita_2}

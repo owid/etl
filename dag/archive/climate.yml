@@ -832,6 +832,8 @@ steps:
     - data://garden/climate/2023-12-20/surface_temperature
   data://grapher/climate/2023-12-20/surface_global_monthly_anomaly_all_countries:
     - data://garden/climate/2023-12-20/surface_temperature
+  data://grapher/climate/2025-01-07/surface_global_monthly_anomaly:
+    - data://garden/climate/2025-01-07/surface_temperature
   #
   # GISS - Surface temperature analysis.
   #
@@ -976,3 +978,15 @@ steps:
   #
   data://grapher/climate/2024-11-18/climate_change_impacts_monthly:
     - data://garden/climate/2024-11-18/climate_change_impacts
+  #
+  # GISS - Surface temperature analysis.
+  #
+  data://meadow/climate/2025-01-21/surface_temperature_analysis:
+    - snapshot://climate/2025-01-21/surface_temperature_analysis_northern_hemisphere.csv
+    - snapshot://climate/2025-01-21/surface_temperature_analysis_world.csv
+    - snapshot://climate/2025-01-21/surface_temperature_analysis_southern_hemisphere.csv
+  #
+  # GISS - Surface temperature analysis.
+  #
+  data://garden/climate/2025-01-21/surface_temperature_analysis:
+    - data://meadow/climate/2025-01-21/surface_temperature_analysis

@@ -1,0 +1,12 @@
+dataset:
+  title: DRAFT housing-prices-eurostat-Q4-2023 - Sheet1
+  description: ''
+tables:
+  housing_prices_eurostat_q4_2023__sheet1:
+    variables:
+      housing_price_index__2015__100:
+        title: Housing price index (2015 = 100)
+        unit: ''
+      average_increase_in_housing_prices_since_2015:
+        title: Average increase in housing prices since 2015
+        unit: ''

@@ -366,6 +366,10 @@ class VariableRolling:
         return func
 
 
+def _hash_dict(d):
+    return hash(json.dumps(d, sort_keys=True))
+
+
 def _get_metadata_value_from_variables_if_all_identical(
     variables: List[Variable],
     field: str,
@@ -380,9 +384,19 @@ def _get_metadata_value_from_variables_if_all_identical(
         return None
 
     # Get unique values from list, ignoring Nones.
-    unique_values = set(
-        [getattr(variable.metadata, field) for variable in variables if getattr(variable.metadata, field) is not None]
-    )
+    if field == "dimensions":
+        # TODO: we could make a special object from dimensions and make it hashable
+        unique_values = [
+            variable.metadata.dimensions for variable in variables if variable.metadata.dimensions is not None
+        ]
+        unique_hashes = {_hash_dict(dims) for dims in unique_values}
+        if len(unique_hashes) == 1:
+            unique_values = unique_values[:1]
+    else:
+        unique_values = {
+            getattr(variable.metadata, field) for variable in variables if getattr(variable.metadata, field) is not None
+        }
+
     if len(unique_values) == 1:
         combined_value = unique_values.pop()
     else:
@@ -560,6 +574,9 @@ def combine_variables_metadata(
     metadata.sort = combine_variables_sort(variables=variables_only)
     metadata.license = _get_metadata_value_from_variables_if_all_identical(
         variables=variables_only, field="license", operation=operation, warn_if_different=True
+    )
+    metadata.dimensions = _get_metadata_value_from_variables_if_all_identical(
+        variables=variables_only, field="dimensions", operation=operation, warn_if_different=True
     )
 
     if pl.enabled():

@@ -9,23 +9,23 @@ from etl.collections.utils import (
     get_tables_by_name_mapping,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.helpers import PathFinder
+from etl.explorer import Explorer as ExplorerOld
 from etl.helpers import create_explorer as create_explorer_main
 
 
 def create_explorer(
     dest_dir: str,
     config: dict,
-    paths: PathFinder,
+    dependencies: Set[str],
     owid_env: Optional[OWIDEnv] = None,
     tolerate_extra_indicators: bool = False,
-):
+) -> ExplorerOld:
     """TODO: Replicate `etl.collections.multidim.upsert_mdim_data_page`."""
     # Read configuration as structured data
     explorer = Explorer.from_dict(config)
 
     # Edit views
-    process_views(explorer, paths.dependencies)
+    process_views(explorer, dependencies)
 
     # Create explorer (TODO: this should rather push to DB! As in with `etl.collections.multidim.upsert_mdim_data_page`)
     return _create_explorer(dest_dir, explorer, tolerate_extra_indicators, owid_env)

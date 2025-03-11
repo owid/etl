@@ -62,8 +62,6 @@ steps:
     - snapshot://fasttrack/latest/global_maternal_offspring_loss.csv
   data://grapher/fasttrack/latest/under_five_mortality_lmics:
     - snapshot://fasttrack/latest/under_five_mortality_lmics.csv
-  data://grapher/fasttrack/2023-09-29/un_space_objects:
-    - snapshot://fasttrack/2023-09-29/un_space_objects.csv
   data://grapher/fasttrack/2023-10-05/great_pacific_garbage_lebreton:
     - snapshot://fasttrack/2023-10-05/great_pacific_garbage_lebreton.csv
   data-private://grapher/fasttrack/latest/owid_donations:
@@ -208,3 +206,17 @@ steps:
     - snapshot://fasttrack/latest/pre_term_births_europe_usa.csv
   data://grapher/fasttrack/latest/indonor_oda_costs_oecd:
     - snapshot://fasttrack/latest/indonor_oda_costs_oecd.csv
+  data://grapher/fasttrack/latest/aiddata_china_fasttrack__sheet1:
+    - snapshot://fasttrack/latest/aiddata_china_fasttrack__sheet1.csv
+  data://grapher/fasttrack/latest/aiddata_china_fasttrack_2014_2021__sheet1:
+    - snapshot://fasttrack/latest/aiddata_china_fasttrack_2014_2021__sheet1.csv
+  data://grapher/fasttrack/latest/graduation_aid_returns_table__sheet1:
+    - snapshot://fasttrack/latest/graduation_aid_returns_table__sheet1.csv
+  data://grapher/fasttrack/latest/graduation_aid_returns_table:
+    - snapshot://fasttrack/latest/graduation_aid_returns_table.csv
+  data://grapher/fasttrack/latest/graduation_aid_returns_table_march__sheet1:
+    - snapshot://fasttrack/latest/graduation_aid_returns_table_march__sheet1.csv
+  data://grapher/fasttrack/latest/graduation_returns_table__sheet1:
+    - snapshot://fasttrack/latest/graduation_returns_table__sheet1.csv
+  data://grapher/fasttrack/latest/housing_prices_eurostat_q4_2023__sheet1:
+    - snapshot://fasttrack/latest/housing_prices_eurostat_q4_2023__sheet1.csv
