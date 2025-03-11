@@ -139,7 +139,8 @@ tables:
       vaccinated:
         title: Number of {definitions.antigen_age_group} vaccinated with {definitions.antigen_description}
         description_short: The number of {definitions.antigen_age_group} who recieved {definitions.antigen_description} in a given year.
-        unit: "one-year-olds"
+        unit: |-
+          {definitions.antigen_age_group}
         description_key:
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
@@ -150,7 +151,8 @@ tables:
       unvaccinated:
         title: Number of {definitions.antigen_age_group} who have not received {definitions.antigen_description}
         description_short: The number of {definitions.antigen_age_group}who have not received {definitions.antigen_description} in a given year.
-        unit: "unvaccinated one-year-olds"
+        unit: |-
+          {definitions.antigen_age_group}
         description_key:
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
