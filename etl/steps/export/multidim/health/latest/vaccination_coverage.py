@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 
 # etlr multidim
-def run(dest_dir: str) -> None:
+def run() -> None:
     # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
@@ -16,12 +16,12 @@ def run(dest_dir: str) -> None:
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_coverage")
-    tb = ds.read("vaccination_coverage", load_data=True)
+    tb = ds.read("vaccination_coverage", load_data=False)
 
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
         tb,
-        indicator_names=["coverage", "unvaccinated_one_year_olds"],
+        indicator_names=["coverage", "unvaccinated", "vaccinated"],
         dimensions=["antigen"],
         indicators_slug="metric",
     )
@@ -33,8 +33,8 @@ def run(dest_dir: str) -> None:
     config["views"] = config_new["views"]
 
     # 4: Upsert to DB
-    multidim.upsert_multidim_data_page(
-        mdim_name="mdd-vaccination-who",
+    mdim = paths.create_mdim(
         config=config,
-        paths=paths,
+        mdim_name="mdd-vaccination-who",
     )
+    mdim.save()

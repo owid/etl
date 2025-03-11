@@ -58,9 +58,16 @@ def pruned_json(cls: T) -> T:
     return cls
 
 
+class MDIMBase(MetaBase):
+    def save_file(self, filename: Union[str, Path]) -> None:
+        filename = Path(filename).as_posix()
+        with open(filename, "w") as ostream:
+            json.dump(self.to_dict(), ostream, indent=2, default=str)
+
+
 @pruned_json
 @dataclass
-class Indicator(MetaBase):
+class Indicator(MDIMBase):
     catalogPath: str
     display: Optional[Dict[str, Any]] = None
 
@@ -115,7 +122,7 @@ class Indicator(MetaBase):
 
 @pruned_json
 @dataclass
-class ViewIndicators(MetaBase):
+class ViewIndicators(MDIMBase):
     """Indicators in a MDIM/Explorer view."""
 
     y: Optional[List[Indicator]] = None
@@ -172,7 +179,7 @@ class ViewIndicators(MetaBase):
 
 @pruned_json
 @dataclass
-class CommonView(MetaBase):
+class CommonView(MDIMBase):
     dimensions: Optional[Dict[str, Any]] = None
     config: Optional[Dict[str, Any]] = None
     metadata: Optional[Dict[str, Any]] = None
@@ -184,7 +191,7 @@ class CommonView(MetaBase):
 
 @pruned_json
 @dataclass
-class Definitions(MetaBase):
+class Definitions(MDIMBase):
     common_views: Optional[List[CommonView]] = None
 
     def __post_init__(self):
@@ -208,7 +215,7 @@ class Definitions(MetaBase):
 
 @pruned_json
 @dataclass
-class View(MetaBase):
+class View(MDIMBase):
     """MDIM/Explorer view configuration."""
 
     dimensions: Dict[str, ChoiceSlugType]
@@ -317,7 +324,7 @@ class MDIMView(View):
 
 @pruned_json
 @dataclass
-class DimensionChoice(MetaBase):
+class DimensionChoice(MDIMBase):
     slug: ChoiceSlugType
     name: str
     description: Optional[str] = None
@@ -342,7 +349,7 @@ class UITypes:
 
 @pruned_json
 @dataclass
-class DimensionPresentation(MetaBase):
+class DimensionPresentation(MDIMBase):
     type: str
 
     def __post_init__(self):
@@ -352,7 +359,7 @@ class DimensionPresentation(MetaBase):
 
 @pruned_json
 @dataclass
-class Dimension(MetaBase):
+class Dimension(MDIMBase):
     """MDIM/Explorer dimension configuration."""
 
     slug: str
@@ -389,7 +396,7 @@ class Dimension(MetaBase):
 
 @pruned_json
 @dataclass
-class Collection(MetaBase):
+class Collection(MDIMBase):
     """Overall MDIM/Explorer config"""
 
     dimensions: List[Dimension]
@@ -402,6 +409,9 @@ class Collection(MetaBase):
     @property
     def d(self):
         return self.dimensions
+
+    def save(self):  # type: ignore[override]
+        raise NotImplementedError("This method should be implemented in the children class")
 
     def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)
