@@ -150,13 +150,6 @@ steps:
     - snapshot://climate/2025-01-21/ocean_heat_content_monthly_world_2000m.csv
     - snapshot://climate/2025-01-21/ocean_heat_content_monthly_world_700m.csv
   #
-  # GISS - Surface temperature analysis.
-  #
-  data://meadow/climate/2025-01-21/surface_temperature_analysis:
-    - snapshot://climate/2025-01-21/surface_temperature_analysis_northern_hemisphere.csv
-    - snapshot://climate/2025-01-21/surface_temperature_analysis_world.csv
-    - snapshot://climate/2025-01-21/surface_temperature_analysis_southern_hemisphere.csv
-  #
   # Met Office Hadley Centre - Sea surface temperature.
   #
   data://meadow/climate/2025-01-21/sea_surface_temperature:
@@ -189,11 +182,6 @@ steps:
   data://garden/climate/2025-01-21/ocean_heat_content:
     - data://meadow/climate/2025-01-21/ocean_heat_content
   #
-  # GISS - Surface temperature analysis.
-  #
-  data://garden/climate/2025-01-21/surface_temperature_analysis:
-    - data://meadow/climate/2025-01-21/surface_temperature_analysis
-  #
   # Met Office Hadley Centre - Sea surface temperature.
   #
   data://garden/climate/2025-01-21/sea_surface_temperature:
@@ -219,7 +207,6 @@ steps:
     - data://garden/climate/2025-01-21/snow_cover_extent
     - data://garden/climate/2025-01-21/sea_ice_index
     - data://garden/climate/2025-01-21/sea_surface_temperature
-    - data://garden/climate/2025-01-21/surface_temperature_analysis
     - data://garden/epa/2024-04-17/mass_balance_us_glaciers
   #
   # Various sources - Climate change impacts (monthly).

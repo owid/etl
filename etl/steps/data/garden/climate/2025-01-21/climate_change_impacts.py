@@ -65,10 +65,6 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    # Load GISS dataset surface temperature analysis, and read monthly data.
-    ds_giss = paths.load_dataset("surface_temperature_analysis")
-    tb_giss = ds_giss.read("surface_temperature_analysis")
-
     # Load NSIDC dataset of sea ice index.
     ds_nsidc = paths.load_dataset("sea_ice_index")
     tb_nsidc = ds_nsidc.read("sea_ice_index")
@@ -127,12 +123,11 @@ def run(dest_dir: str) -> None:
     )
 
     # Gather monthly data from different tables.
-    tb_monthly = tb_giss.astype({"date": str}).copy()
+    tb_monthly = tb_nsidc.astype({"date": str}).copy()
     # NOTE: The values in tb_ocean_ph are monthly, but the dates are not consistently on the middle of the month.
     #  Instead, they are on different days of the month. When merging with other tables, this will create many nans.
     #  We could reindex linearly, but it's not a big deal.
     for table in [
-        tb_nsidc,
         tb_met_office,
         tb_ocean_heat_monthly,
         tb_ocean_ph,
