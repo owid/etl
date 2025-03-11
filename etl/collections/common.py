@@ -1,6 +1,6 @@
 """Common tooling for MDIMs/Explorers."""
 
-from typing import Any, Dict, List, Optional, Set, Union
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 from owid.catalog import Table
