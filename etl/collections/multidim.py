@@ -425,7 +425,10 @@ class MDIMConfigExpander:
                 # Build dimension
                 if self.tb_dims:
                     # Use full name from table if available
-                    dim_name = next(d["name"] for d in self.tb_dims if d["slug"] == dim)
+                    try:
+                        dim_name = next(d["name"] for d in self.tb_dims if d["slug"] == dim)
+                    except StopIteration:
+                        dim_name = dim
                 else:
                     # Otherwise use slug
                     dim_name = dim
