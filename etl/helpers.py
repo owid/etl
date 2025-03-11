@@ -26,8 +26,9 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
-from etl.collections.explorers import Explorer as ExplorerV2
-from etl.collections.explorers import create_explorer as create_explorer_v2
+
+# from etl.collections.explorers import create_explorer as create_explorer_v2
+from etl.collections.multidim import Multidim, create_mdim
 from etl.dag_helpers import load_dag
 from etl.explorer import Explorer
 from etl.grapher.helpers import grapher_checks
@@ -644,17 +645,26 @@ class PathFinder:
             df_columns=df_columns,
         )
 
-    def create_mdim(self):
-        pass
+    def create_mdim(self, config, mdim_name: Optional[str] = None) -> Multidim:
+        """Create a Multidim object."""
+        mdim_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}"
 
-    def create_explorer_v2(self, config, explorer_name: str, tolerate_extra_indicators: bool = False) -> Explorer:
-        return create_explorer_v2(
-            dest_dir=str(self.dest_dir),
-            config=config,
-            dependencies=self.dependencies,
-            tolerate_extra_indicators=tolerate_extra_indicators,
-            # explorer_name=explorer_name,
-        )
+        # Create Multidim
+        mdim = create_mdim(config, self.dependencies)
+
+        # Add catalog path to object
+        mdim.catalog_path = mdim_catalog_path
+
+        return mdim
+
+    # def create_explorer_v2(self, config, explorer_name: str, tolerate_extra_indicators: bool = False) -> Explorer:
+    #     return create_explorer_v2(
+    #         dest_dir=str(self.dest_dir),
+    #         config=config,
+    #         dependencies=self.dependencies,
+    #         tolerate_extra_indicators=tolerate_extra_indicators,
+    #         # explorer_name=explorer_name,
+    #     )
 
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:

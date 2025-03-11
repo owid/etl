@@ -6,6 +6,7 @@
 """
 
 from copy import deepcopy
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Set, Union
 
 import pandas as pd
@@ -14,13 +15,13 @@ from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.collections.common import map_indicator_path_to_id, validate_collection_config
-from etl.collections.model import Multidim
+from etl.collections.model import Collection, Definitions, MDIMView, pruned_json
 from etl.collections.utils import (
     get_tables_by_name_mapping,
     records_to_dictionary,
+    validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.helpers import PathFinder
 from etl.paths import SCHEMAS_DIR
 
 # Initialize logger.
@@ -29,6 +30,72 @@ log = get_logger()
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 # Base
 INDICATORS_SLUG = "indicator"
+
+
+# mdim = Multidim.load_yaml("/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.models.yml")
+@pruned_json
+@dataclass
+class Multidim(Collection):
+    """Model for MDIM configuration."""
+
+    views: List[MDIMView]
+    title: Dict[str, str]
+    defaultSelection: List[str]
+    topicTags: Optional[List[str]] = None
+    definitions: Optional[Definitions] = None
+
+    # Internal use. For save() method.
+    _catalog_path: Optional[str] = None
+
+    @property
+    def catalog_path(self) -> Optional[str]:
+        return self._catalog_path
+
+    @catalog_path.setter
+    def catalog_path(self, value: Optional[str]) -> None:
+        self._catalog_path = value
+
+    def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
+
+        if self.catalog_path is None:
+            raise ValueError("Catalog path is not set. Please set it before saving.")
+
+        # Check that all indicators in mdim exist
+        indicators = self.indicators_in_use(tolerate_extra_indicators)
+        validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
+        # TODO: I think we could move this to the Grapher side.
+        config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # Upsert config via Admin API
+        admin_api = AdminAPI(owid_env)
+        admin_api.put_mdim_config(self.catalog_path, config)
+
+
+def create_mdim(
+    config: dict,
+    dependencies: Set[str],
+) -> Multidim:
+    # Read config as structured object
+    mdim = Multidim.from_dict(config)
+
+    # Edit views
+    process_views(mdim, dependencies=dependencies)
+
+    # Validate config
+    mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
+
+    # Ensure that all views are in choices
+    mdim.validate_views_with_dimensions()
+
+    # Validate duplicate views
+    mdim.check_duplicate_views()
+
+    return mdim
 
 
 # TODO: Return List[Dimensions] and List[Views] instead of {"dimensions": [...], "views": [...]}
@@ -174,7 +241,7 @@ def expand_config(
 
 def upsert_multidim_data_page(
     config: dict,
-    paths: PathFinder,
+    paths,
     mdim_name: Optional[str] = None,
     tolerate_extra_indicators: bool = False,
     owid_env: Optional[OWIDEnv] = None,
