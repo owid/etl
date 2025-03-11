@@ -25,6 +25,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["country"])
     tb = tb.rename(columns={"age": "year", "gender": "country"})
 
+    # Use age_bracket for country to work in grapher
     tb_years["age_bracket"] = tb_years["age_bracket"].replace(
         {
             "all": "All ages",

@@ -1,4 +1,5 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+You can download the data file manually at https://www.bls.gov/tus/datafiles/atussum-0323.zip or https://www.bls.gov/tus/data/datafiles-0323.htm and upload them here. Trying an automatic download via script results in a 403 - forbidden error."""
 
 from pathlib import Path
 
