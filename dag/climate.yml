@@ -40,8 +40,6 @@ steps:
     - data://garden/climate/2025-01-07/surface_temperature
   data://grapher/climate/2025-01-07/surface_temperature_monthly:
     - data://garden/climate/2025-01-07/surface_temperature
-  data://grapher/climate/2025-01-07/surface_global_monthly_anomaly:
-    - data://garden/climate/2025-01-07/surface_temperature
   data://grapher/climate/2025-01-07/surface_temperature:
     - data://garden/climate/2025-01-07/surface_temperature
   data://grapher/climate/2025-01-07/surface_temperature_annual_average:
