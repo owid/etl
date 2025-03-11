@@ -148,6 +148,19 @@ def test_render():
     assert rendered_meta.title == "Title X"
 
 
+def test_render_description_key():
+    jinja_description_key = [
+        "<% if dim_a == 'x' %> Desc x <% endif %>  ",
+        "<% if dim_a == 'y' %>  Desc y <% endif %>",
+        "Desc z",
+    ]
+
+    var_meta = meta.VariableMeta(description_key=jinja_description_key)  # type: ignore
+    rendered_meta = var_meta.render(dim_dict={"dim_a": "x"})
+    assert isinstance(rendered_meta, meta.VariableMeta)
+    assert rendered_meta.description_key == ["Desc x", "Desc z"]
+
+
 def test_render_with_error():
     jinja_title = """
     <% if dim_a == "x" %>Title X<% elif dim_a == "y" %>Title Y<% else %>Default Title<% endif %>

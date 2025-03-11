@@ -277,8 +277,11 @@ class VariableMeta(MetaBase):
              {}
         """.format(getattr(self, "_name", None), to_html(record))
 
-    def render(self, dim_dict: Dict[str, Any]) -> "VariableMeta":
+    def render(self, dim_dict: Dict[str, Any], remove_dods: bool = False) -> "VariableMeta":
         """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
+
+        :param dim_dict: dictionary of dimensions to render
+        :param remove_dods: remove references to details on demand from a text
 
         Usage:
             from owid.catalog import Dataset
@@ -288,7 +291,13 @@ class VariableMeta(MetaBase):
             tb = ds['ceds_air_pollutants']
             tb.emissions.m.render({'pollutant': 'CO', 'sector': 'Transport'})
         """
-        return jinja._expand_jinja(self.copy(), dim_dict)
+        meta = jinja._expand_jinja(self.copy(), dim_dict, remove_dods=remove_dods)
+
+        # Prune empty description keys
+        if meta.description_key:
+            meta.description_key = [x for x in meta.description_key if x]
+
+        return meta
 
     def copy(self, deep=True) -> Self:
         m = super().copy(deep)
