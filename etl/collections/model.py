@@ -7,16 +7,21 @@ THINGS TO SOLVE:
     - If an attribute is Optional, MetaBase.from_dict is not correctly loading it as the appropriate class when given.
 """
 
+import dataclasses
 import json
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
 
 import fastjsonschema
 import pandas as pd
 import yaml
+from dataclasses_json import DataClassJsonMixin
 from owid.catalog import Table
-from owid.catalog.meta import GrapherConfig, MetaBase
+from owid.catalog.meta import GrapherConfig, _deepcopy_dataclass
+from owid.catalog.utils import dataclass_from_dict, hash_any
+from typing_extensions import Self
 
 from etl.collections.utils import merge_common_metadata_by_dimension
 
@@ -54,6 +59,58 @@ def pruned_json(cls: T) -> T:
     cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
 
     return cls
+
+
+class MetaBase(DataClassJsonMixin):
+    """Very similar to owid.catalog.meta.MetaBase.
+
+    - Method `save` has been renamed to `save_file` so that children can implement a method called `save` (with different arguments and use case)
+    """
+
+    def __hash__(self):
+        """Hash that uniquely identifies an object (without needing frozen dataclass)."""
+        return hash_any(self)
+
+    def __eq__(self, other: Self) -> bool:  # type: ignore
+        if not isinstance(other, self.__class__):
+            return False
+        return self.__hash__() == other.__hash__()
+
+    def to_dict(self, encode_json: bool = False) -> Dict[str, Any]:  # type: ignore
+        return super().to_dict(encode_json=encode_json)
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> T:  # type: ignore
+        # NOTE: this is much faster than using dataclasses_json
+        return dataclass_from_dict(cls, d)  # type: ignore
+
+    def update(self, **kwargs: Dict[str, Any]) -> None:
+        """Update object with new values."""
+        for key, value in kwargs.items():
+            if value is not None:
+                setattr(self, key, value)
+
+    def copy(self, deep=True) -> Self:
+        """Return a copy of the object."""
+        if not deep:
+            return dataclasses.replace(self)  # type: ignore
+        else:
+            return _deepcopy_dataclass(self)
+
+    def save_file(self, filename: Union[str, Path]) -> None:
+        filename = Path(filename).as_posix()
+        with open(filename, "w") as ostream:
+            json.dump(self.to_dict(), ostream, indent=2, default=str)
+
+    @classmethod
+    def load(cls, filename: str) -> Self:
+        with open(filename) as istream:
+            return cls.from_dict(json.load(istream))
+
+    @classmethod
+    def load_yaml(cls, filename: str) -> Self:
+        with open(filename) as istream:
+            return cls.from_dict(yaml.safe_load(istream))
 
 
 @pruned_json
@@ -401,6 +458,9 @@ class Collection(MetaBase):
     def d(self):
         return self.dimensions
 
+    def save(self):
+        raise NotImplementedError("This method should be implemented in the children class")
+
     def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)
         if drop_definitions:
@@ -492,18 +552,6 @@ class Explorer(Collection):
                 "choices": {choice.slug: choice.name for choice in dim.choices},
             }
         return mapping
-
-
-@pruned_json
-@dataclass
-class Multidim(Collection):
-    """Model for MDIM configuration."""
-
-    views: List[MDIMView]
-    title: Dict[str, str]
-    defaultSelection: List[str]
-    topicTags: Optional[List[str]] = None
-    definitions: Optional[Definitions] = None
 
 
 # def main():
