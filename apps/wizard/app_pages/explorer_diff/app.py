@@ -104,12 +104,10 @@ def main():
     available_explorers = read_sql(q)["slug"].tolist()
 
     # Select explorer to compare
-    # TODO: make it persistent
     explorer_slug = url_persist(st.selectbox)(
         "Select Explorer",
         key="explorer",
         options=available_explorers,
-        index=available_explorers.index("monkeypox"),
         # cleanup query params on explorer change
         on_change=st.query_params.clear,
     )
@@ -173,6 +171,7 @@ def main():
 
     with col2:
         st.subheader("Staging Explorer")
+        assert OWID_ENV.site
         explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
 
 

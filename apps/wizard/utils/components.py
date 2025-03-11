@@ -167,18 +167,13 @@ def explorer_chart(
 
     query_string = "?" + urllib.parse.urlencode(params)
 
-    # NOTE: this would create 2 iframes, the redirect below creates just one
-    # HTML = f"""
-    # <iframe src="{url}{query_string}" loading="lazy" style="width: 100%; height: 600px; border: 0px none;" allow="web-share; clipboard-write"></iframe>
-    # """
-
     HTML = f"""
     <!-- Redirect to the external URL -->
     <meta http-equiv="refresh" content="0; url={url}{query_string}">
     """
 
     # Render the HTML
-    return st.components.v1.html(HTML, height=height)
+    return st.components.v1.html(HTML, height=height)  # type: ignore
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
