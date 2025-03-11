@@ -55,9 +55,9 @@ definitions:
     <% if antigen == "BCG" %>
     one dose of the Bacille Calmette-Guérin (BCG) vaccine
     <%- elif antigen == "DTPCV1" %>
-    one dose of combined diphtheria, tetanus toxoid and pertussis- containing vaccine (DTP1)
+    one dose of combined diphtheria, tetanus toxoid and pertussis-containing vaccine (DTP1)
     <%- elif antigen == "DTPCV3" %>
-    three doses of combined diphtheria, tetanus toxoid and pertussis- containing vaccine (DTP3)
+    three doses of combined diphtheria, tetanus toxoid and pertussis-containing vaccine (DTP3)
     <%- elif antigen == "MCV1" %>
     their first dose of measles-containing vaccine (MCV1)
     <%- elif antigen == "POL3" %>
@@ -119,23 +119,19 @@ tables:
         short_unit: "%"
         presentation:
           grapher_config:
-            selectedEntityNames:
-              - World
-            hasMapTab: true
-            colorScale:
-              baseColorScheme: "YlGnBu"
-              equalSizeBins: true
-              binningStrategy: "manual"
-              customNumericColorsActive: false
-              colorSchemeInvert: false
-              binningStrategyBinCount: 5
-              customNumericValues:
-                - 0
-                - 20
-                - 40
-                - 60
-                - 80
-                - 100
+            originUrl: https://ourworldindata.org/vaccination
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: "YlGnBu"
+                binningStrategy: "manual"
+                customNumericValues:
+                  - 0
+                  - 20
+                  - 40
+                  - 60
+                  - 80
+                  - 100
       vaccinated:
         title: Number of {definitions.antigen_age_group} vaccinated with {definitions.antigen_description}
         description_short: The number of {definitions.antigen_age_group} who recieved {definitions.antigen_description} in a given year.
