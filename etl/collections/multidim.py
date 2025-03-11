@@ -41,8 +41,8 @@ class Multidim(Collection):
 
     views: List[MDIMView]
     title: Dict[str, str]
-    defaultSelection: List[str]
-    topicTags: Optional[List[str]] = None
+    default_selection: List[str]
+    topic_tags: Optional[List[str]] = None
     definitions: Optional[Definitions] = None
 
     # Internal use. For save() method.
@@ -71,6 +71,9 @@ class Multidim(Collection):
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # Convert config from snake_case to camelCase
+        config = camelize(config, exclude_keys={"dimensions"})
 
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
@@ -267,30 +270,6 @@ def process_views(mdim: Multidim, dependencies: Set[str]):
             log.info(
                 f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view.dimensions}"
             )
-
-
-def _upsert_multidim_data_page(
-    mdim_catalog_path: str, mdim: Multidim, tolerate_extra_indicators: bool, owid_env: Optional[OWIDEnv] = None
-) -> None:
-    """Actual upsert to DB."""
-    # Ensure we have an environment set
-    if owid_env is None:
-        owid_env = OWID_ENV
-
-    # Validate config
-    mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
-    validate_collection_config(mdim, owid_env.engine, tolerate_extra_indicators)
-
-    # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
-    # TODO: I think we could move this to the Grapher side.
-    config = replace_catalog_paths_with_ids(mdim.to_dict())
-
-    # Convert config from snake_case to camelCase
-    config = camelize(config, exclude_keys={"dimensions"})
-
-    # Upsert config via Admin API
-    admin_api = AdminAPI(owid_env)
-    admin_api.put_mdim_config(mdim_catalog_path, config)
 
 
 def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: Dict[str, Table]):
