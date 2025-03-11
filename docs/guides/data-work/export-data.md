@@ -71,7 +71,7 @@ views:
 
 ```
 
-The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collections.multidim.generate_views_for_dimensions`).
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collections.multidim.expand_config`).
 
 You can also combine manually defined views with generated ones. See the `etl.collections.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
 
@@ -96,11 +96,9 @@ def run(dest_dir: str) -> None:
     config = paths.load_mdim_config()
 
     # Create views.
-    config["views"] = multidim.generate_views_for_dimensions(
-        dimensions=config["dimensions"],
-        tables=[tb_annual, tb_monthly],
-        dimensions_order_in_slug=("frequency", "source", "unit"),
-        warn_on_missing_combinations=False,
+    config["views"] = multidim.expand_config(
+        tb_annual,
+        dimensions=["frequency", "source", "unit"],
         additional_config={"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"},
     )
 

@@ -10,12 +10,12 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, TypedDict, TypeVar, Union
 
 import mistune
 import pandas as pd
 from dataclasses_json import DataClassJsonMixin
-from typing_extensions import Self
+from typing_extensions import NotRequired, Required, Self
 
 from . import jinja
 from .processing_log import ProcessingLog
@@ -257,6 +257,14 @@ class VariableMeta(MetaBase):
     # List of categories for ordinal type indicators
     sort: List[str] = field(default_factory=list)
 
+    # Dimensions
+    # Dictionary of dimensions
+    dimensions: Optional[Dict[str, Any]] = None
+    # Original short name and title of the indicator before flattening
+    original_short_name: Optional[str] = None
+    # TODO: it's possible that we might not need `original_title` at all
+    original_title: Optional[str] = None
+
     @property
     def schema_version(self) -> int:
         """Schema version is used to easily understand everywhere what metadata standard was used
@@ -406,6 +414,12 @@ class DatasetMeta(MetaBase):
         return f"{self.channel}/{self.namespace}/{self.version}/{self.short_name}"
 
 
+class TableDimension(TypedDict):
+    name: Required[str]
+    slug: Required[str]
+    description: NotRequired[Optional[str]]
+
+
 @pruned_json
 @dataclass(eq=False)
 class TableMeta(MetaBase):
@@ -417,6 +431,9 @@ class TableMeta(MetaBase):
     # a reference back to the dataset
     dataset: Optional[DatasetMeta] = field(compare=False, default=None)
     primary_key: List[str] = field(default_factory=list)
+
+    # table dimensions
+    dimensions: Optional[List[TableDimension]] = None
 
     @property
     def checked_name(self) -> str:
