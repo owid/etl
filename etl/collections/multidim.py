@@ -17,6 +17,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.collections.common import map_indicator_path_to_id
 from etl.collections.model import Collection, Definitions, MDIMView, pruned_json
 from etl.collections.utils import (
+    camelize,
     get_tables_by_name_mapping,
     records_to_dictionary,
     validate_indicators_in_db,
@@ -40,8 +41,8 @@ class Multidim(Collection):
 
     views: List[MDIMView]
     title: Dict[str, str]
-    defaultSelection: List[str]
-    topicTags: Optional[List[str]] = None
+    default_selection: List[str]
+    topic_tags: Optional[List[str]] = None
     definitions: Optional[Definitions] = None
 
     # Internal use. For save() method.
@@ -70,6 +71,9 @@ class Multidim(Collection):
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # Convert config from snake_case to camelCase
+        config = camelize(config, exclude_keys={"dimensions"})
 
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)

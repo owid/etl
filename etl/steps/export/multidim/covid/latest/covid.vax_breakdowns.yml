@@ -7,14 +7,14 @@ definitions:
 
 title:
   title: COVID-19 vaccines
-  titleVariant: "breakdowns"
-defaultSelection:
+  title_variant: "breakdowns"
+default_selection:
   - High-income countries
   - Upper-middle-income countries
   - Lower-middle-income countries
   - Low-income countries
 
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

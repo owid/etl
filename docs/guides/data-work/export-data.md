@@ -34,10 +34,10 @@ Multi-dimensional indicators are powered by a configuration that is typically cr
 ```yaml title="etl/steps/export/multidim/energy/latest/energy_prices.yaml"
 title:
   title: "Energy prices"
-  titleVariant: "by energy source"
-defaultSelection:
+  title_variant: "by energy source"
+default_selection:
   - "European Union (27)"
-topicTags:
+topic_tags:
   - "Energy"
 dimensions:
   - slug: "frequency"

@@ -20,6 +20,7 @@ from owid.catalog import Table
 from owid.catalog.meta import GrapherConfig, MetaBase
 
 from etl.collections.utils import merge_common_metadata_by_dimension
+from etl.paths import SCHEMAS_DIR
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 T = TypeVar("T")
@@ -432,9 +433,30 @@ class Collection(MDIMBase):
     def validate_schema(self, schema_path):
         """Validate class against schema."""
         with open(schema_path) as f:
-            schema = json.load(f)
+            s = f.read()
 
-        validator = fastjsonschema.compile(schema)
+            # Add "file://" prefix to "dataset-schema.json#"
+            # This is needed to activate file handler below. Unfortunately, fastjsonschema does not
+            # support file references out of the box
+            s = s.replace("dataset-schema.json#", "file://dataset-schema.json#")
+
+            schema = json.loads(s)
+
+        # file handler for file:// URIs
+        def file_handler(uri):
+            # Remove 'file://' prefix and build local path relative to the schema file
+            local_file = SCHEMAS_DIR / Path(uri.replace("file://", "")).name
+            with local_file.open() as f:
+                return json.load(f)
+
+        # Pass custom format for date validation
+        # NOTE: we use fastjsonschema because schema uses multiple $ref to an external schema.
+        #   python-jsonschema doesn't cache external resources and is extremely slow. It should be
+        #   possible to speed it up by pre-loading schema and inserting it dynamically if
+        #   fastjsonschema becomes hard to maintain.
+        validator = fastjsonschema.compile(
+            schema, handlers={"file": file_handler}, formats={"date": r"^\d{4}-\d{2}-\d{2}$"}
+        )
 
         try:
             validator(self.to_dict())  # type: ignore
@@ -503,6 +525,18 @@ class Explorer(Collection):
                 "choices": {choice.slug: choice.name for choice in dim.choices},
             }
         return mapping
+
+
+@pruned_json
+@dataclass
+class Multidim(Collection):
+    """Model for MDIM configuration."""
+
+    views: List[MDIMView]
+    title: Dict[str, str]
+    default_selection: List[str]
+    topic_tags: Optional[List[str]] = None
+    definitions: Optional[Definitions] = None
 
 
 # def main():

@@ -117,10 +117,10 @@ def create_stacked_component_views(tb_annual: DataFrame) -> List[Dict[str, Any]]
                 # Create title and presentation settings
                 title = f"{source.capitalize()} price components for {consumer.replace('_', '-')} consumers"
                 presentation = {
-                    "titlePublic": title,
+                    "title_public": title,
                 }
                 if title_variant:
-                    presentation["titleVariant"] = title_variant
+                    presentation["title_variant"] = title_variant
 
                 # Add the complete view configuration
                 component_views.append(
@@ -144,8 +144,8 @@ def create_stacked_component_views(tb_annual: DataFrame) -> List[Dict[str, Any]]
                         },
                         # Currently, the stacked area chart uses multiple indicators, but the data page shows only the metadata of the first one. We need to override that metadata with the combination of the metadata of all indicators shown.
                         "metadata": {
-                            "descriptionShort": subtitle,
-                            "descriptionKey": description_keys,
+                            "description_short": subtitle,
+                            "description_key": description_keys,
                             "presentation": presentation,
                         },
                     }

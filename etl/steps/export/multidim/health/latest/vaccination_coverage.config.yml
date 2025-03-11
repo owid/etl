@@ -1,7 +1,7 @@
 title:
   title: Vaccination coverage
-  titleVariant: by vaccine and metric
-defaultSelection:
+  title_variant: by vaccine and metric
+default_selection:
   - World
 dimensions:
   - name: Metric
