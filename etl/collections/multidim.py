@@ -27,20 +27,23 @@ from etl.paths import SCHEMAS_DIR
 log = get_logger()
 # Dimensions: These are the expected possible dimensions
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
+# Base
+INDICATORS_SLUG = "indicator"
 
 
 # TODO: Return List[Dimensions] and List[Views] instead of {"dimensions": [...], "views": [...]}
 def expand_config(
     tb: Table,
-    indicator_name: Optional[str] = None,
+    indicator_names: Optional[Union[str, List[str]]] = None,
     dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
     common_view_config: Optional[Dict[str, Any]] = None,
+    indicators_slug: str = INDICATORS_SLUG,
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
-    This method returns the configuration generated from the table `tb`. It assumes that it only has one indicator, unless `indicator_name` is provided. It will expand all dimensions and their values, unless `dimensions` is provided.
+    This method returns the configuration generated from the table `tb`. You can select a subset of indicators with argument `indicator_names`, otherwise all indicators will be expanded.
 
-    To tweak which dimensions or dimension values are expanded use argument `dimensions`.
+    Also, it will expand all dimensions and their values, unless `dimensions` is provided. To tweak which dimensions or dimension values are expanded use argument `dimensions` (see below).
 
     There is also the option to add a common configuration for all views using `common_view_config`. In the future, it'd be nice to support more view-specific configurations. For now, if that's what you want, consider tweaking the output partial config or working on the input indicator metadata (e.g. tweak `grapher_config.title`).
 
@@ -76,7 +79,7 @@ def expand_config(
     -----------
     tb : Table
         Table with the data, including the indicator and its dimensions. The columns in the table are assumed to contain dimensional information. This can be checked in `tb[col].metadata.additional_info["dimensions"]`.
-    indicator_name : str | None
+    indicator_names : str | None
         Name of the indicator to use. This is the actual indicator name, and not the indicator-dimension composite name. If None, it assumes there is only one indicator (and will use it), otherwise it will fail.
     dimensions : None | List[str] | Dict[str, List[str] | str]
         This parameter accepts three types:
@@ -88,7 +91,7 @@ def expand_config(
                 - If any dimension is missing from the list, this function will raise an error.
                 - The order of the dimension values in each dropdown will be arbitrary.
             - Dict[str, str | List[str]]:
-                - Keys represent the dimensions, and values are the set of values to consider for each dimension (use '*' to use all of them).
+                - Keys represent the dimensions, and values are the set of choices to consider for each dimension (use '*' to use all of them).
                 - The order of dropdowns in the MDIM page will follow the order of the dictionary.
                 - If any dimension is missing from the dictionary keys, this function will raise an error.
                 - The order of dimension values in the MDIM page dropdowns will follow that from each dictionary value (unless '*' is uses, which will be arbitrary).
@@ -96,12 +99,13 @@ def expand_config(
     common_view_config : Dict[str, Any] | None
         Additional config fields to add to each view, e.g.
         {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
-
+    indicators_slug: str
+        Name of the slug for the indicator. Default is 'indicator'.
 
     EXAMPLES
     --------
 
-    EXAMPLE 1: There is only one indicator, we want to expand all dimensions and their values
+    EXAMPLE 1: There are various indicators with dimensions, we want to expand all their dimensions and their values
 
     ```python
     config = expand_config(tb=tb)
@@ -112,7 +116,7 @@ def expand_config(
     ```python
     config = expand_config(
         tb=tb,
-        indicator_name="deaths",
+        indicator_name=["deaths"],
         dimensions=[
             "sex",
             "age",
@@ -120,12 +124,12 @@ def expand_config(
         ]
     )
 
-    EXAMPLE 3: Same as Example 2, but for 'cause' we only want to use values 'aids' and 'cancer', in this order.
+    EXAMPLE 3: Same as Example 2, but (i) we also consider indicator 'cases', and (ii) for 'cause' we only want to use values 'aids' and 'cancer', in this order.
 
     ```python
     config = expand_config(
         tb=tb,
-        indicator_name="deaths",
+        indicator_name=["deaths", "cases"],
         dimensions={
             "sex": "*",
             "age": "*",
@@ -133,11 +137,27 @@ def expand_config(
         }
     )
     """
+
     # Partial configuration
     config_partial = {}
 
     # Initiate expander object
-    expander = MDIMConfigExpander(tb, indicator_name)
+    expander = MDIMConfigExpander(
+        tb=tb,
+        indicators_slug=indicators_slug,
+        indicator_names=indicator_names,
+    )
+
+    # Combine indicator information with dimensions (only when multiple indicators are given)
+    if len(expander.indicator_names) > 1:
+        if dimensions is None:
+            dimensions = {dim: "*" for dim in expander.dimension_names}
+        elif isinstance(dimensions, list):
+            dimensions = {dim: "*" for dim in dimensions}
+        dimensions = {
+            indicators_slug: expander.indicator_names,
+            **{k: v for k, v in dimensions.items() if k != indicators_slug},
+        }
 
     # EXPAND CHART_DIMENSIONS
     config_partial["dimensions"] = expander.build_dimensions(
@@ -320,15 +340,16 @@ def replace_catalog_paths_with_ids(config):
 # Config auto-expander: Expand configuration from a table. This config is partial!
 ####################################################################################################
 class MDIMConfigExpander:
-    def __init__(self, tb: Table, indicator_name: Optional[str] = None):
-        self.build_df_dims(tb, indicator_name)
+    def __init__(self, tb: Table, indicators_slug: str, indicator_names: Optional[Union[str, List[str]]] = None):
+        self.indicators_slug = indicators_slug
+        self.build_df_dims(tb, indicator_names)
         self.short_name = tb.m.short_name
         # Get table dimensions from metadata if available, exclude country and year
         self.tb_dims = [d for d in (tb.m.dimensions or []) if d["slug"] not in ("country", "year")]
 
     @property
     def dimension_names(self):
-        return [col for col in self.df_dims.columns if col not in ["indicator", "short_name"]]
+        return [col for col in self.df_dims.columns if col not in ["short_name"]]
 
     def build_dimensions(
         self,
@@ -427,7 +448,7 @@ class MDIMConfigExpander:
 
         return config_views
 
-    def build_df_dims(self, tb, indicator_name):
+    def build_df_dims(self, tb: Table, indicator_names: Optional[Union[str, List[str]]]):
         """Build dataframe with dimensional information from table tb.
 
         It contains the following columns:
@@ -449,14 +470,24 @@ class MDIMConfigExpander:
         """
         df_dims = self._build_df_dims(tb)
 
-        # SANITY CHECKS
-        self.indicator_name = self._sanity_checks_df_dims(indicator_name, df_dims)
+        # Ensure that indicator_name is a list, if any value is given
+        if isinstance(indicator_names, str):
+            indicator_names = [indicator_names]
 
-        # Keep dimensions only for relevant indicator
-        self.df_dims = df_dims.loc[df_dims["indicator"] == self.indicator_name].drop(columns=["indicator"])
+        # SANITY CHECKS
+        self.indicator_names = self._sanity_checks_df_dims(indicator_names, df_dims)
+
+        # Keep dimensions only for relevant indicators
+        self.df_dims = df_dims.loc[df_dims[self.indicators_slug].isin(self.indicator_names)]
+
+        # Drop indicator column if indicator_names is of length 1
+        if len(self.indicator_names) == 1:
+            self.df_dims = self.df_dims.drop(columns=["indicator"])
 
         # Final checks
-        assert isinstance(self.indicator_name, str), "Indicator name should be a string!"
+        assert all(
+            isinstance(indicator_name, str) for indicator_name in self.indicator_names
+        ), "Class attribute indicator_names should be a list of string!"
         assert not self.df_dims.empty, "df_dims can't be empty!"
 
     def _build_df_dims(self, tb):
@@ -467,11 +498,14 @@ class MDIMConfigExpander:
             if dims:
                 assert tb[col].m.original_short_name, "Missing metadata.original_short_name for dimensions!"
                 row = {
-                    # TODO: how is this useful? can we live without it? can it be None?
-                    "indicator": tb[col].m.original_short_name,
+                    self.indicators_slug: tb[col].m.original_short_name,
                     "short_name": col,
                 }
                 # Add dimensional info
+                for k, v in dims.items():
+                    if k in {self.indicators_slug, "short_name"}:
+                        raise ValueError(f"Dimension name `{k}` is reserved. Please use another one!")
+
                 row = {**row, **dims}
 
                 # Add entry to records
@@ -481,35 +515,36 @@ class MDIMConfigExpander:
         df_dims = pd.DataFrame(records)
 
         # Re-order columns
-        cols_dims = [col for col in df_dims.columns if col not in ["indicator", "short_name"]]
-        df_dims = df_dims[["indicator"] + sorted(cols_dims) + ["short_name"]]
+        cols_dims = [col for col in df_dims.columns if col not in [self.indicators_slug, "short_name"]]
+        df_dims = df_dims[[self.indicators_slug] + sorted(cols_dims) + ["short_name"]]
         return df_dims
 
-    def _sanity_checks_df_dims(self, indicator_name, df_dims):
+    def _sanity_checks_df_dims(self, indicator_names: Optional[List[str]], df_dims: pd.DataFrame):
         """Sanity checks of df_dims."""
         # List with names of indicators and dimensions
-        indicator_names = list(df_dims["indicator"].unique())
+        indicator_names_available = list(df_dims[self.indicators_slug].unique())
 
         # If no indicator name is provided, there should only be one in the table!
-        if indicator_name is None:
-            if len(indicator_names) != 1:
+        if indicator_names is None:
+            if len(indicator_names_available) != 1:
                 raise ValueError(
-                    f"There are multiple indicators {indicator_names}, but no `indicator_name` was provided."
+                    f"There are multiple indicators {indicator_names}, but no `indicator_name` was provided. Please specify at least one!"
                 )
             # If only one indicator available, set it as the indicator name
-            indicator_name = indicator_names[0]
-        # If indicator name is given, make sure it is present in the table!
-        if indicator_name not in indicator_names:
+            return indicator_names_available
+        # Check that given indicator_names are available (i.e. are present in indicator_names_available)
+        indicator_names_unknown = set(indicator_names).difference(set(indicator_names_available))
+        if indicator_names_unknown:
             raise ValueError(
-                f"Indicator `{indicator_name}` not found in the table. Available are: {', '.join(indicator_names)}"
+                f"Indicators `{', '.join(indicator_names_unknown)}` not found in the table. Available are: {', '.join(indicator_names_available)}"
             )
 
-        return indicator_name
+        return indicator_names
 
 
 def combine_config_dimensions(
-    config_dimensions: Dict[str, Any],
-    config_dimensions_yaml: Dict[str, Any],
+    config_dimensions: List[Dict[str, Any]],
+    config_dimensions_yaml: List[Dict[str, Any]],
     choices_top: bool = False,
     dimensions_top: bool = False,
 ):
@@ -527,10 +562,14 @@ def combine_config_dimensions(
 
     Arguments
     ---------
-        config_dimensions: Generated by expander.build_dimensions.
-        config_dimensions_yaml: From the YAML file.
-        choices_top: Set to True to place the choices from config_dimensions first.
-        dimensions_top: Set to True to place the dimensions from config_dimensions first.
+    config_dimensions: List[Dict[str, Any]]
+        Generated by expander.build_dimensions.
+    config_dimensions_yaml:  List[Dict[str, Any]]
+        From the YAML file.
+    choices_top: bool
+        Set to True to place the choices from `config_dimensions` first.
+    dimensions_top: bool
+        Set to True to place the dimensions from `config_dimensions` first.
 
     TODO:
 
@@ -590,9 +629,9 @@ def combine_config_dimensions(
             missing_dims.append(dim)
 
         if dimensions_top:
-            config_dimensions_combined = missing_dims + config_dimensions_combined
-        else:
             config_dimensions_combined += missing_dims
+        else:
+            config_dimensions_combined = missing_dims + config_dimensions_combined
 
     return config_dimensions_combined
 

@@ -1066,7 +1066,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cdsapi", specifier = ">=0.7.0" },
+    { name = "cdsapi", specifier = ">=0.7.4" },
     { name = "cfgrib", specifier = ">=0.9.15.0" },
     { name = "click", specifier = ">=8.0.1" },
     { name = "deprecated", specifier = ">=1.2.14" },

@@ -32,7 +32,9 @@ tables:
         unit: "per 1,000 people"
         description_short: Number of divorces during a given year per 1,000 people.
         description_from_producer: The crude divorce rate is defined as the number of divorces during a given year per 1,000 people.
-
+        display:
+            entityAnnotationsMap: |-
+              Ireland: Legalized divorce in 1996
       marriage_rate:
         title: Crude marriage rate (marriages per 1,000 people)
         unit: "per 1,000 people"
