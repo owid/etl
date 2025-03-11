@@ -508,8 +508,8 @@ class MDIMConfigExpander:
 
 
 def combine_config_dimensions(
-    config_dimensions,
-    config_dimensions_yaml,
+    config_dimensions: Dict[str, Any],
+    config_dimensions_yaml: Dict[str, Any],
     choices_top: bool = False,
     dimensions_top: bool = False,
 ):
