@@ -1,7 +1,34 @@
+"""
+- [x] population
+- [ ] population broad age groups
+- [x] population change
+- [ ] population growth rate
+- [ ] natural population growth rate
+- [x] population density
+- [ ] Fertility rate
+- [ ] Births
+- [ ] Birth rate
+- [ ] Deaths
+- [ ] Death rate
+- [ ] Number of child deaths
+- [ ] Child mortality rate
+- [ ] Number of infants deaths
+- [ ] Infant mortality rate
+- [ ] Life expectancy
+- [ ] Age structure
+- [x] Dependency ratio
+- [ ] Median age
+- [ ] Net migration
+- [ ] Net migration rate
+- [ ] Sex ratio
+
+total done: 4/22
+"""
+
 from etl.collections.explorers import create_explorer, expand_config
 from etl.collections.multidim import combine_config_dimensions
-from etl.files import yaml_dump
 
+# from etl.files import yaml_dump
 # from etl.db import get_engine
 from etl.helpers import PathFinder
 
@@ -20,7 +47,7 @@ AGES_BASIC = (
     + [f"{i}-{i+9}" for i in range(20, 100, 10)]
     + ["100+"]
 )
-AGES_NAME = {age: f"{age.replace('-', '–')} year" if age != "1" else "1 year" for age in AGES_BASIC}
+AGES_NAME = {age: f"{age.replace('-', '–')} years" if age != "1" else "1 year" for age in AGES_BASIC}
 
 
 # etlr multidim
@@ -32,20 +59,20 @@ def run(dest_dir: str) -> None:
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("un_wpp")
-    tb = ds.read("population", load_data=False)
 
-    # 2: Bake config automatically from table
+    # 1) POPULATION
+    tb = ds.read("population", load_data=False)
+    # Bake config automatically from table
     config_new = expand_config(
-        tb,
-        indicator_names=["population", "population_density"],
+        tb=tb,
+        indicator_names=["population", "population_change", "population_density"],
         dimensions={
             "age": ["all", "0", "0-4", "0-14", "0-24"] + AGES_BASIC,
             "sex": "*",
             "variant": ["estimates"],
         },
     )
-
-    # 3: Combine
+    # Combine & bake dimensions
     config["dimensions"] = combine_config_dimensions(
         config_dimensions=config_new["dimensions"],
         config_dimensions_yaml=config["dimensions"],
@@ -55,12 +82,72 @@ def run(dest_dir: str) -> None:
             for choice in dim["choices"]:
                 if choice["slug"] in AGES_NAME:
                     choice["name"] = AGES_NAME[choice["slug"]]
-
+    # Add views
     config["views"] = config_new["views"]
 
-    # TMP
-    with open("/home/lucas/repos/etl/etl/steps/export/explorers/un/latest/un_wpp2.config.yml", "w") as f:
-        yaml_dump(config, f)
+    # 2) DEPENDENCY RATIO
+    tb_dep = ds.read("dependency_ratio", load_data=False)
+
+    config_new = expand_config(
+        tb=tb_dep,
+        indicator_names=["dependency_ratio"],
+        dimensions={
+            "age": "*",
+            "sex": "*",
+            "variant": ["estimates"],
+        },
+        indicator_as_dimension=True,
+    )
+
+    config["dimensions"] = combine_config_dimensions(
+        config_dimensions=config_new["dimensions"],
+        config_dimensions_yaml=config["dimensions"],
+    )
+    config["views"] += config_new["views"]
+
+    # 3) SEX RATIO
+    tb_sr = ds.read("sex_ratio", load_data=False)
+
+    config_new = expand_config(
+        tb=tb_sr,
+        indicator_names=["sex_ratio"],
+        dimensions={
+            "age": "*",
+            "sex": "*",
+            "variant": ["estimates"],
+        },
+        indicator_as_dimension=True,
+    )
+
+    config["dimensions"] = combine_config_dimensions(
+        config_dimensions=config_new["dimensions"],
+        config_dimensions_yaml=config["dimensions"],
+    )
+    config["views"] += config_new["views"]
+
+    # 2) DEPENDENCY RATIO
+    # tb_dep = ds.read("dependency_ratio", load_data=False)
+
+    # config_new = expand_config(
+    #     tb=tb_dep,
+    #     indicator_names=["dependency_ratio"],
+    #     dimensions={
+    #         "age": "*",
+    #         "sex": "*",
+    #         "variant": ["estimates"],
+    #     },
+    #     indicator_as_dimension=True,
+    # )
+
+    # config["dimensions"] = combine_config_dimensions(
+    #     config_dimensions=config_new["dimensions"],
+    #     config_dimensions_yaml=config["dimensions"],
+    # )
+    # config["views"] += config_new["views"]
+
+    # DEBUGGING
+    # with open("/home/lucas/repos/etl/etl/steps/export/explorers/un/latest/un_wpp2.config.yml", "w") as f:
+    #     yaml_dump(config, f)
 
     # Export
     # Create explorer

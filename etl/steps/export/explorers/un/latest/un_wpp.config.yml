@@ -13,8 +13,14 @@ dimensions:
     choices:
       - slug: population
         name: Population
+      - slug: population_change
+        name: Annual population change
       - slug: population_density
         name: Population density
+      - slug: dependency_ratio
+        name: Dependency ratio
+      - slug: sex_ratio
+        name: Sex ratio
 
   - slug: sex
     name: Sex
@@ -47,6 +53,15 @@ dimensions:
         description: null
       - slug: 0-24
         name: Under 25 years
+        description: null
+      - slug: "total"
+        name: Total dependency ratio
+        description: null
+      - slug: "youth"
+        name: Youth dependency ratio
+        description: null
+      - slug: "old"
+        name: Old-age dependency ratio
         description: null
 
   - slug: variant
