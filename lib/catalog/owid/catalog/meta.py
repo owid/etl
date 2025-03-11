@@ -17,6 +17,7 @@ import pandas as pd
 from dataclasses_json import DataClassJsonMixin
 from typing_extensions import NotRequired, Required, Self
 
+from . import jinja
 from .processing_log import ProcessingLog
 from .utils import dataclass_from_dict, hash_any, pruned_json
 
@@ -283,6 +284,33 @@ class VariableMeta(MetaBase):
              <p style="font-variant: small-caps; font-family: sans-serif; font-size: 1.5em; color: grey; margin-top: -0.2em; margin-bottom: 0.2em">variable meta</p>
              {}
         """.format(getattr(self, "_name", None), to_html(record))
+
+    def render(self, dim_dict: Dict[str, Any], remove_dods: bool = False) -> "VariableMeta":
+        """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
+
+        :param dim_dict: dictionary of dimensions to render
+        :param remove_dods: remove references to details on demand from a text
+
+        Usage:
+            from owid.catalog import Dataset
+            from etl import paths
+
+            ds = Dataset(paths.DATA_DIR / "garden/emissions/2025-02-12/ceds_air_pollutants")
+            tb = ds['ceds_air_pollutants']
+            tb.emissions.m.render({'pollutant': 'CO', 'sector': 'Transport'})
+        """
+        meta = jinja._expand_jinja(self.copy(), dim_dict, remove_dods=remove_dods)
+
+        # Prune empty description keys
+        if meta.description_key:
+            meta.description_key = [x for x in meta.description_key if x]
+
+        return meta
+
+    def copy(self, deep=True) -> Self:
+        m = super().copy(deep)
+        m._name = getattr(self, "_name", None)  # type: ignore
+        return m
 
 
 @pruned_json
