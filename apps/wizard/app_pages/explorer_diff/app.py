@@ -103,10 +103,6 @@ def main():
     """
     available_explorers = read_sql(q)["slug"].tolist()
 
-    def _cleanup_query_params():
-        print("cleaning query params!!!")
-        st.query_params.clear()
-
     # Select explorer to compare
     # TODO: make it persistent
     explorer_slug = url_persist(st.selectbox)(
@@ -114,7 +110,8 @@ def main():
         key="explorer",
         options=available_explorers,
         index=available_explorers.index("monkeypox"),
-        on_change=_cleanup_query_params,
+        # cleanup query params on explorer change
+        on_change=st.query_params.clear,
     )
 
     explorer_views = _explorer_options(explorer_slug)
