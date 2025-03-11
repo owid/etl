@@ -468,42 +468,6 @@ class Collection(MDIMBase):
         #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
 
 
-@pruned_json
-@dataclass
-class Explorer(Collection):
-    """Model for Explorer configuration."""
-
-    views: List[ExplorerView]
-    config: Dict[str, str]
-    definitions: Optional[Definitions] = None
-
-    def display_config_names(self):
-        """Get display names for all dimensions and choices.
-
-        The structure of the output is:
-
-        {
-            dimension_slug: {
-                "widget_name": "...",
-                "choices": {
-                    choice_slug: choice_name,
-                    ...
-                }
-            },
-            ...
-        }
-
-        where `widget_name` is actually not displayed anywhere, but used as header name in explorer config.
-        """
-        mapping = {}
-        for dim in self.dimensions:
-            mapping[dim.slug] = {
-                "widget_name": f"{dim.name} {dim.ui_type.title()}",
-                "choices": {choice.slug: choice.name for choice in dim.choices},
-            }
-        return mapping
-
-
 # def main():
 # import yaml
 

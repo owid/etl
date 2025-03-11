@@ -3,7 +3,7 @@
 import pandas as pd
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_explorer
+from etl.helpers import PathFinder, create_explorer_legacy
 
 # Initialize log.
 log = get_logger()
@@ -168,7 +168,7 @@ def run(dest_dir: str) -> None:
     # To begin with, create linear map brackets between 0% and 100% for "share" columns.
     # NOTE: This should be executed only the first time, to have something to start with. Then comment this code, and
     #  continue improving map brackets using the Map Bracketer tool.
-    # NOTE: When running these lines, add df_columns as an argument in create_explorer.
+    # NOTE: When running these lines, add df_columns as an argument in create_explorer_legacy.
     # share_columns = sorted(
     #     set(
     #         sum(
@@ -190,5 +190,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+    ds_explorer = create_explorer_legacy(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
     ds_explorer.save()
