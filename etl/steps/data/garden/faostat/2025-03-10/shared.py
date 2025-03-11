@@ -87,6 +87,30 @@ ELEMENT_AMENDMENTS = {
             "new_fao_element": "Food supply quantity (kg/capita/yr)",
             "new_fao_unit": "kg",
         },
+        {
+            "element_code": "005911",
+            "fao_element": "Export Quantity",
+            "fao_unit": "1000 t",
+            "new_element_code": "005911",
+            "new_fao_element": "Export quantity",
+            "new_fao_unit": "1000 t",
+        },
+        {
+            "element_code": "005611",
+            "fao_element": "Import Quantity",
+            "fao_unit": "1000 t",
+            "new_element_code": "005611",
+            "new_fao_element": "Import quantity",
+            "new_fao_unit": "1000 t",
+        },
+        {
+            "element_code": "000645",
+            "fao_element": "Food supply quantity (kg/capita/yr)",
+            "fao_unit": "kg",
+            "new_element_code": "000645",
+            "new_fao_element": "Food supply quantity (kg/capita/yr)",
+            "new_fao_unit": "kg/cap",
+        },
     ],
 }
 # Ideally, all elements of fbsh should be in fbs (although fbs may contain additional elements).
