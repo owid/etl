@@ -1,34 +1,100 @@
 from collections import defaultdict
+from dataclasses import dataclass
 from typing import Dict, List, Optional, Set
 
 import pandas as pd
 
 from etl.collections.common import validate_collection_config
-from etl.collections.model import CHART_DIMENSIONS, Explorer
+from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
 from etl.collections.utils import (
     get_tables_by_name_mapping,
+    validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.explorer import Explorer as ExplorerOld
-from etl.helpers import create_explorer as create_explorer_main
+from etl.helpers import create_explorer_legacy
+
+
+@pruned_json
+@dataclass
+class Explorer(Collection):
+    """Model for Explorer configuration."""
+
+    views: List[ExplorerView]
+    config: Dict[str, str]
+    definitions: Optional[Definitions] = None
+
+    def display_config_names(self):
+        """Get display names for all dimensions and choices.
+
+        The structure of the output is:
+
+        {
+            dimension_slug: {
+                "widget_name": "...",
+                "choices": {
+                    choice_slug: choice_name,
+                    ...
+                }
+            },
+            ...
+        }
+
+        where `widget_name` is actually not displayed anywhere, but used as header name in explorer config.
+        """
+        mapping = {}
+        for dim in self.dimensions:
+            mapping[dim.slug] = {
+                "widget_name": f"{dim.name} {dim.ui_type.title()}",
+                "choices": {choice.slug: choice.name for choice in dim.choices},
+            }
+        return mapping
+
+    def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
+
+        # Check that all indicators in mdim exist
+        indicators = self.indicators_in_use(tolerate_extra_indicators)
+        validate_indicators_in_db(indicators, owid_env.engine)
+
+        # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
+        # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
+        df_grapher = extract_explorer_views(self)
+
+        # Create explorer
+        ds = create_explorer_legacy(
+            dest_dir=dest_dir,
+            config=self.config,
+            df_graphers=df_grapher,
+        )
+
+        ds.save()
 
 
 def create_explorer(
-    dest_dir: str,
     config: dict,
     dependencies: Set[str],
-    owid_env: Optional[OWIDEnv] = None,
-    tolerate_extra_indicators: bool = False,
-) -> ExplorerOld:
-    """TODO: Replicate `etl.collections.multidim.upsert_mdim_data_page`."""
+) -> Explorer:
+    """Create an explorer object."""
     # Read configuration as structured data
     explorer = Explorer.from_dict(config)
 
     # Edit views
     process_views(explorer, dependencies)
 
+    # Validate config
+    # explorer.validate_schema(SCHEMAS_DIR / "explorer-schema.json")
+
+    # Ensure that all views are in choices
+    explorer.validate_views_with_dimensions()
+
+    # Validate duplicate views
+    explorer.check_duplicate_views()
+
     # Create explorer (TODO: this should rather push to DB! As in with `etl.collections.multidim.upsert_mdim_data_page`)
-    return _create_explorer(dest_dir, explorer, tolerate_extra_indicators, owid_env)
+    # return _create_explorer(dest_dir, explorer, tolerate_extra_indicators, owid_env)
+    return explorer
 
 
 def process_views(
@@ -70,7 +136,7 @@ def _create_explorer(
     df_grapher = extract_explorer_views(explorer)
 
     # Create explorer
-    ds = create_explorer_main(
+    ds = create_explorer_legacy(
         dest_dir=dest_dir,
         config=explorer.config,
         df_graphers=df_grapher,

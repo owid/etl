@@ -26,6 +26,7 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
+from etl.collections.explorers import Explorer, create_explorer
 
 # from etl.collections.explorers import create_explorer as create_explorer_v2
 from etl.collections.multidim import Multidim, create_mdim
@@ -667,14 +668,17 @@ class PathFinder:
 
         return mdim
 
-    # def create_explorer_v2(self, config, explorer_name: str, tolerate_extra_indicators: bool = False) -> Explorer:
-    #     return create_explorer_v2(
-    #         dest_dir=str(self.dest_dir),
-    #         config=config,
-    #         dependencies=self.dependencies,
-    #         tolerate_extra_indicators=tolerate_extra_indicators,
-    #         # explorer_name=explorer_name,
-    #     )
+    def create_explorer(self, config, explorer_name: str, tolerate_extra_indicators: bool = False) -> Explorer:
+        # Extract information about this step from dest_dir.
+        channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
+
+        return create_explorer_v2(
+            dest_dir=str(self.dest_dir),
+            config=config,
+            dependencies=self.dependencies,
+            tolerate_extra_indicators=tolerate_extra_indicators,
+            # explorer_name=explorer_name,
+        )
 
 
 def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
