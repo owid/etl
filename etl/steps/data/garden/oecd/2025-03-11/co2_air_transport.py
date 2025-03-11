@@ -50,20 +50,17 @@ def run(dest_dir: str) -> None:
     tb_annual = add_inbound_outbound_tour(tb_annual, tb_tourism)
 
     tb_monthly = process_monthly_data(tb)
-    emissions_columns = [col for col in tb_monthly.columns if col not in ("country", "year", "population")]
 
     # Generate per capital co2 emissions data and add it do the dataframe and convert to kg
-    for col in emissions_columns:
+    for col in ["TER_DOM_m", "TER_INT_m"]:
         tb_monthly[f"per_capita_{col}"] = (tb_monthly[col] * 1000) / tb_annual["population"]
 
     tb = pr.merge(tb_annual, tb_monthly, on=["year", "country"], how="outer")
-
     tb = tb[tb["year"] != 2025]
     tb = tb.drop(["population"], axis=1)
     tb["total_monthly_emissions"] = tb["TER_INT_m"] + tb["TER_DOM_m"]
 
     tb = geo.add_regions_to_table(tb=tb, ds_regions=ds_regions, regions=REGIONS, frac_allowed_nans_per_year=0.9)
-
     tb = tb.format(["country", "year"])
 
     #
@@ -93,6 +90,7 @@ def process_annual_data(tb):
 def process_monthly_data(tb):
     tb = tb[tb["frequency_of_observation"] == "Monthly"]
     tb = tb.drop(["frequency_of_observation"], axis=1)
+
     # Remove rows with NaN values in 'year' or 'month'
     tb = tb.dropna(subset=["month"])
 
@@ -103,12 +101,28 @@ def process_monthly_data(tb):
 
     # Calculate the number of days since 2019
     tb["days_since_2019"] = (tb["date"] - pd.to_datetime("2019-01-01")).dt.days
-    tb = tb.drop(["month", "year", "date"], axis=1)
-    tb = tb.rename(columns={"days_since_2019": "year"})
 
     # Pivot the table for monthly data
-    tb = tb.pivot(values="value", index=["country", "year"], columns=["emissions_source"])
-    tb = tb.reset_index()
+    tb_monthly = tb.pivot(values="value", index=["country", "days_since_2019"], columns=["emissions_source"])
+    tb_monthly = tb_monthly.reset_index()
+    tb_monthly = tb_monthly.rename(columns={"days_since_2019": "year"})
+
+    # Add the total monthly emissions with a year as a column
+    tb_by_month = tb.copy()
+
+    tb_by_month = tb_by_month.pivot(
+        values="value", index=["country", "month", "year"], columns=["emissions_source"]
+    ).reset_index()
+
+    # Calculate the total monthly emissions
+    tb_by_month["emissions_by_month"] = tb_by_month["TER_DOM_m"] + tb_by_month["TER_INT_m"]
+    tb_by_month = tb_by_month.pivot(values="emissions_by_month", index=["country", "month"], columns=["year"])
+    tb_by_month = tb_by_month.rename(columns=lambda col: str(col) + "_total_emissions")
+
+    tb_by_month = tb_by_month.reset_index()
+    tb_by_month = tb_by_month.rename(columns={"month": "year"})
+
+    tb = pr.merge(tb_monthly, tb_by_month, on=["year", "country"], how="outer")
 
     return tb
 
