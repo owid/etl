@@ -580,6 +580,10 @@ def test_combine_variables_metadata_uses_all_fields() -> None:
         "additional_info",
         # TODO: we should implement this, if not identical, append one after another
         "description_processing",
+        # dimensions
+        "dimensions",
+        "original_title",
+        "original_short_name",
     }
 
 

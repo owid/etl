@@ -297,7 +297,7 @@ def _matches_include_exclude(chart: gm.Chart, session: Session, include: Optiona
 def _prune_chart_config(config: Dict[str, Any]) -> Dict[str, Any]:
     config = copy.deepcopy(config)
     config = {k: v for k, v in config.items() if k not in ("version",)}
-    for dim in config["dimensions"]:
+    for dim in config.get("dimensions", []):
         dim.pop("variableId", None)
     return config
 

@@ -6,23 +6,22 @@
 """
 
 from copy import deepcopy
-from itertools import product
-from typing import Any, Dict, List, Optional, Set
+from dataclasses import dataclass
+from typing import Any, Dict, List, Optional, Set, Union
 
-from deprecated import deprecated
+import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collections.common import expand_config, map_indicator_path_to_id, validate_collection_config
-from etl.collections.model import Multidim
+from etl.collections.common import _check_intersection_iters, expand_config, map_indicator_path_to_id
+from etl.collections.model import Collection, Definitions, MDIMView, pruned_json
 from etl.collections.utils import (
     get_tables_by_name_mapping,
     records_to_dictionary,
+    validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.grapher.io import trim_long_variable_name
-from etl.helpers import PathFinder
 from etl.paths import SCHEMAS_DIR
 
 # Initialize logger.
@@ -34,42 +33,70 @@ CHART_DIMENSIONS = ["y", "x", "size", "color"]
 __all__ = ["expand_config"]
 
 
-def upsert_multidim_data_page(
+# mdim = Multidim.load_yaml("/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.models.yml")
+@pruned_json
+@dataclass
+class Multidim(Collection):
+    """Model for MDIM configuration."""
+
+    views: List[MDIMView]
+    title: Dict[str, str]
+    defaultSelection: List[str]
+    topicTags: Optional[List[str]] = None
+    definitions: Optional[Definitions] = None
+
+    # Internal use. For save() method.
+    _catalog_path: Optional[str] = None
+
+    @property
+    def catalog_path(self) -> Optional[str]:
+        return self._catalog_path
+
+    @catalog_path.setter
+    def catalog_path(self, value: Optional[str]) -> None:
+        self._catalog_path = value
+
+    def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
+
+        if self.catalog_path is None:
+            raise ValueError("Catalog path is not set. Please set it before saving.")
+
+        # Check that all indicators in mdim exist
+        indicators = self.indicators_in_use(tolerate_extra_indicators)
+        validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
+        # TODO: I think we could move this to the Grapher side.
+        config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # Upsert config via Admin API
+        admin_api = AdminAPI(owid_env)
+        admin_api.put_mdim_config(self.catalog_path, config)
+
+
+def create_mdim(
     config: dict,
-    paths: PathFinder,
-    mdim_name: Optional[str] = None,
-    tolerate_extra_indicators: bool = False,
-    owid_env: Optional[OWIDEnv] = None,
-) -> None:
-    """Import MDIM config to DB.
-
-    Args:
-    -----
-
-    slug: str
-        Slug of the MDIM page. MDIM will be published at /slug
-    config: dict
-        MDIM configuration.
-    paths: PathFinder
-        Pass `paths = PathFinder(__file__)` from the script where this function is called.
-    mdim_name: str
-        Name of the MDIM page. Default is short_name from mdim catalog path.
-    owid_env: Optional[OWIDEnv]
-        Environment where to publish the MDIM page.
-    """
-    dependencies = paths.dependencies
-    mdim_catalog_path = f"{paths.namespace}/{paths.version}/{paths.short_name}#{mdim_name or paths.short_name}"
-
+    dependencies: Set[str],
+) -> Multidim:
     # Read config as structured object
     mdim = Multidim.from_dict(config)
 
     # Edit views
     process_views(mdim, dependencies=dependencies)
 
-    # TODO: Possibly add other edits (to dimensions?)
+    # Validate config
+    mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
 
-    # Upsert to DB
-    _upsert_multidim_data_page(mdim_catalog_path, mdim, tolerate_extra_indicators, owid_env)
+    # Ensure that all views are in choices
+    mdim.validate_views_with_dimensions()
+
+    # Validate duplicate views
+    mdim.check_duplicate_views()
+
+    return mdim
 
 
 def process_views(mdim: Multidim, dependencies: Set[str]):
@@ -101,27 +128,6 @@ def process_views(mdim: Multidim, dependencies: Set[str]):
             )
 
 
-def _upsert_multidim_data_page(
-    mdim_catalog_path: str, mdim: Multidim, tolerate_extra_indicators: bool, owid_env: Optional[OWIDEnv] = None
-) -> None:
-    """Actual upsert to DB."""
-    # Ensure we have an environment set
-    if owid_env is None:
-        owid_env = OWID_ENV
-
-    # Validate config
-    mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
-    validate_collection_config(mdim, owid_env.engine, tolerate_extra_indicators)
-
-    # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
-    # TODO: I think we could move this to the Grapher side.
-    config = replace_catalog_paths_with_ids(mdim.to_dict())
-
-    # Upsert config via Admin API
-    admin_api = AdminAPI(owid_env)
-    admin_api.put_mdim_config(mdim_catalog_path, config)
-
-
 def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: Dict[str, Table]):
     """TODO: Combine the metadata from the indicators in the view.
 
@@ -147,7 +153,7 @@ def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: D
     tables_by_uri : Dict[str, Table]
         Mapping of table URIs to table objects.
     """
-    pass
+    raise NotImplementedError("This function is not yet implemented.")
 
 
 def get_tables_by_uri_mapping(tables_by_name: Dict[str, List[Table]]) -> Dict[str, Table]:
@@ -196,6 +202,216 @@ def replace_catalog_paths_with_ids(config):
                         )
 
     return config
+
+
+####################################################################################################
+# Config auto-expander: Expand configuration from a table. This config is partial!
+####################################################################################################
+class MDIMConfigExpander:
+    def __init__(self, tb: Table, indicators_slug: str, indicator_names: Optional[Union[str, List[str]]] = None):
+        self.indicators_slug = indicators_slug
+        self.build_df_dims(tb, indicator_names)
+        self.short_name = tb.m.short_name
+        # Get table dimensions from metadata if available, exclude country, year, and date
+        self.tb_dims = [d for d in (tb.m.dimensions or []) if d["slug"] not in ("country", "year", "date")]
+
+    @property
+    def dimension_names(self):
+        return [col for col in self.df_dims.columns if col not in ["short_name"]]
+
+    def build_dimensions(
+        self,
+        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
+    ):
+        """Create the specs for each dimension."""
+        # Support dimension is None
+        if dimensions is None:
+            # If table defines dimensions, use them
+            if self.tb_dims:
+                dimensions = [d["slug"] for d in self.tb_dims]
+            else:
+                # If dimensions is None, use a list with all dimension names (in no particular order)
+                dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
+        else:
+            # log.warning("It's recommended to set dimensions in Table metadata.")
+            pass
+
+        # Support dimensions if it is a list/dict
+        config_dimensions = []
+        if isinstance(dimensions, (list, dict)):
+            # Sanity check: All dimension names should be present in the list or dictionary
+            _check_intersection_iters(
+                self.dimension_names,
+                dimensions,
+                key_name="dimensions",
+            )
+
+            # Add dimension entry and add it to dimensions
+            for dim in dimensions:
+                dim_values_available = list(self.df_dims[dim].unique())
+
+                # If list, we don't care about dimension value order
+                if isinstance(dimensions, list):
+                    dim_values = dim_values_available
+                # If dictionary, let's use the order (unless '*' is used)!
+                else:
+                    dim_values = dimensions[dim]
+                    if dim_values == "*":
+                        dim_values = dim_values_available
+                    elif not isinstance(dim_values, list):
+                        # Sanity check: besides exceptions above (where we allow dim_values to be a string initially), dim_values should be a list
+                        raise ValueError(
+                            f"Unexpected value for dimension `{dim}`. Please review `dimensions`: '{dim_values}'!"
+                        )
+
+                # Sanity check: values in dim_values are expected
+                _check_intersection_iters(
+                    dim_values_available,
+                    dim_values,
+                    key_name=f"dimension={dim}",
+                    check_missing=False,
+                )
+
+                # Build choices for given dimension
+                choices = [
+                    {
+                        "slug": val,
+                        "name": val,
+                        "description": None,
+                    }
+                    for val in dim_values
+                ]
+
+                # Build dimension
+                if self.tb_dims:
+                    # Use full name from table if available
+                    try:
+                        dim_name = next(d["name"] for d in self.tb_dims if d["slug"] == dim)
+                    except StopIteration:
+                        dim_name = dim
+                else:
+                    # Otherwise use slug
+                    dim_name = dim
+
+                dimension = {
+                    "slug": dim,
+                    "name": dim_name,
+                    "choices": choices,
+                }
+
+                # Add dimension to config
+                config_dimensions.append(dimension)
+
+        return config_dimensions
+
+    def build_views(self, common_view_config):
+        """Generate one view for each indicator in the table."""
+        config_views = []
+        for _, indicator in self.df_dims.iterrows():
+            view = {
+                "dimensions": {dim_name: indicator[dim_name] for dim_name in self.dimension_names},
+                "indicators": {
+                    "y": f"{self.short_name}#{indicator.short_name}",  # TODO: Add support for (i) support "x", "color", "size"; (ii) display settings
+                },
+            }
+            if common_view_config:
+                view["config"] = common_view_config
+            config_views.append(view)
+
+        return config_views
+
+    def build_df_dims(self, tb: Table, indicator_names: Optional[Union[str, List[str]]]):
+        """Build dataframe with dimensional information from table tb.
+
+        It contains the following columns:
+            - indicator: Values in this column refer to an 'actual' indicator.
+            - dimension1Name: Values in this column provide the dimension value for dimension1Name. E.g. '10-20' in case dimension1Name is 'age'.
+            - dimensionXName: Same as dimension1Name. There can be several...
+            ...
+            - short_name: Name of the column in the original table.
+
+        Example:
+
+        indicator	place	                short_name
+        trend	    Grocery and pharmacy	trend__place_grocery_and_pharmacy
+        trend	    Parks	                trend__place_parks
+        trend	    Residential	            trend__place_residential
+        trend	    Retail and recreation	trend__place_retail_and_recreation
+        trend	    Transit stations	    trend__place_transit_stations
+        trend	    Workplaces	            trend__place_workplaces
+        """
+        df_dims = self._build_df_dims(tb)
+
+        # Ensure that indicator_name is a list, if any value is given
+        if isinstance(indicator_names, str):
+            indicator_names = [indicator_names]
+
+        # SANITY CHECKS
+        self.indicator_names = self._sanity_checks_df_dims(indicator_names, df_dims)
+
+        # Keep dimensions only for relevant indicators
+        self.df_dims = df_dims.loc[df_dims[self.indicators_slug].isin(self.indicator_names)]
+
+        # Drop indicator column if indicator_names is of length 1
+        if len(self.indicator_names) == 1:
+            self.df_dims = self.df_dims.drop(columns=["indicator"])
+
+        # Final checks
+        assert all(
+            isinstance(indicator_name, str) for indicator_name in self.indicator_names
+        ), "Class attribute indicator_names should be a list of string!"
+        assert not self.df_dims.empty, "df_dims can't be empty!"
+
+    def _build_df_dims(self, tb):
+        """Build dataframe with dimensional information from table tb."""
+        records = []
+        for col in tb.columns:
+            dims = tb[col].m.dimensions
+            if dims:
+                assert tb[col].m.original_short_name, "Missing metadata.original_short_name for dimensions!"
+                row = {
+                    self.indicators_slug: tb[col].m.original_short_name,
+                    "short_name": col,
+                }
+                # Add dimensional info
+                for name in dims.keys():
+                    if name in {self.indicators_slug, "short_name"}:
+                        raise ValueError(f"Dimension name `{name}` is reserved. Please use another one!")
+
+                row = {**row, **dims}
+
+                # Add entry to records
+                records.append(row)
+
+        # Build dataframe with dimensional information
+        df_dims = pd.DataFrame(records)
+
+        # Re-order columns
+        cols_dims = [col for col in df_dims.columns if col not in [self.indicators_slug, "short_name"]]
+        df_dims = df_dims[[self.indicators_slug] + sorted(cols_dims) + ["short_name"]]
+        return df_dims
+
+    def _sanity_checks_df_dims(self, indicator_names: Optional[List[str]], df_dims: pd.DataFrame):
+        """Sanity checks of df_dims."""
+        # List with names of indicators and dimensions
+        indicator_names_available = list(df_dims[self.indicators_slug].unique())
+
+        # If no indicator name is provided, there should only be one in the table!
+        if indicator_names is None:
+            if len(indicator_names_available) != 1:
+                raise ValueError(
+                    f"There are multiple indicators {indicator_names}, but no `indicator_name` was provided. Please specify at least one!"
+                )
+            # If only one indicator available, set it as the indicator name
+            return indicator_names_available
+        # Check that given indicator_names are available (i.e. are present in indicator_names_available)
+        indicator_names_unknown = set(indicator_names).difference(set(indicator_names_available))
+        if indicator_names_unknown:
+            raise ValueError(
+                f"Indicators `{', '.join(indicator_names_unknown)}` not found in the table. Available are: {', '.join(indicator_names_available)}"
+            )
+
+        return indicator_names
 
 
 def combine_config_dimensions(
@@ -318,110 +534,6 @@ def _order(config_yaml, config_combined):
     )
 
     return config_sort + config_others
-
-
-####################################################################################################
-# DEPRECATED FUNCTIONS
-####################################################################################################
-@deprecated("This function relies on specific column naming convention. Use `expand_config` instead.")
-def generate_views_for_dimensions(
-    dimensions, tables, dimensions_order_in_slug=None, additional_config=None, warn_on_missing_combinations=True
-):
-    """Generate individual views for all possible combinations of dimensions in a list of flattened tables.
-
-    Parameters
-    ----------
-    dimensions : List[Dict[str, Any]]
-        Dimensions, as given in the configuration of the multidim step, e.g.
-        [
-            {'slug': 'frequency', 'name': 'Frequency', 'choices': [{'slug': 'annual','name': 'Annual'}, {'slug': 'monthly', 'name': 'Monthly'}]},
-            {'slug': 'source', 'name': 'Energy source', 'choices': [{'slug': 'electricity', 'name': 'Electricity'}, {'slug': 'gas', 'name': 'Gas'}]},
-            ...
-        ]
-    tables : List[Table]
-        Tables whose indicator views will be generated.
-    dimensions_order_in_slug : Tuple[str], optional
-        Dimension names, as they appear in "dimensions", and in the order in which they are spelled out in indicator names. For example, if indicator names are, e.g. annual_electricity_euros, then dimensions_order_in_slug would be ("frequency", "source", "unit").
-    additional_config : _type_, optional
-        Additional config fields to add to each view, e.g.
-        {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
-    warn_on_missing_combinations : bool, optional
-        True to warn if any combination of dimensions is not found among the indicators in the given tables.
-
-    Returns
-    -------
-    results : List[Dict[str, Any]]
-        Views configuration, e.g.
-        [
-            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'euro'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_euro'},
-            {'dimensions': {'frequency': 'annual', 'source': 'electricity', 'unit': 'pps'}, 'indicators': {'y': 'grapher/energy/2024-11-20/energy_prices/energy_prices_annual#annual_electricity_household_total_price_including_taxes_pps'},
-            ...
-        ]
-
-    """
-    # Extract all choices for each dimension as (slug, choice_slug) pairs.
-    choices = {dim["slug"]: [choice["slug"] for choice in dim["choices"]] for dim in dimensions}
-    dimension_slugs_in_config = set(choices.keys())
-
-    # Sanity check for dimensions_order_in_slug.
-    if dimensions_order_in_slug:
-        dimension_slugs_in_order = set(dimensions_order_in_slug)
-
-        # Check if any slug in the order is missing from the config.
-        missing_slugs = dimension_slugs_in_order - dimension_slugs_in_config
-        if missing_slugs:
-            raise ValueError(
-                f"The following dimensions are in 'dimensions_order_in_slug' but not in the config: {missing_slugs}"
-            )
-
-        # Check if any slug in the config is missing from the order.
-        extra_slugs = dimension_slugs_in_config - dimension_slugs_in_order
-        if extra_slugs:
-            log.warning(
-                f"The following dimensions are in the config but not in 'dimensions_order_in_slug': {extra_slugs}"
-            )
-
-        # Reorder choices to match the specified order.
-        choices = {dim: choices[dim] for dim in dimensions_order_in_slug if dim in choices}
-
-    # Generate all combinations of the choices.
-    all_combinations = list(product(*choices.values()))
-
-    # Create the views.
-    results = []
-    for combination in all_combinations:
-        # Map dimension slugs to the chosen values.
-        dimension_mapping = {dim_slug: choice for dim_slug, choice in zip(choices.keys(), combination)}
-        slug_combination = "_".join(combination)
-
-        # Find relevant tables for the current combination.
-        relevant_table = []
-        for table in tables:
-            if slug_combination in table:
-                relevant_table.append(table)
-
-        # Handle missing or multiple table matches.
-        if len(relevant_table) == 0:
-            if warn_on_missing_combinations:
-                log.warning(f"Combination {slug_combination} not found in tables")
-            continue
-        elif len(relevant_table) > 1:
-            log.warning(f"Combination {slug_combination} found in multiple tables: {relevant_table}")
-
-        # Construct the indicator path.
-        indicator_path = f"{relevant_table[0].metadata.dataset.uri}/{relevant_table[0].metadata.short_name}#{trim_long_variable_name(slug_combination)}"
-        indicators = {
-            "y": indicator_path,
-        }
-        # Append the combination to results.
-        results.append({"dimensions": dimension_mapping, "indicators": indicators})
-
-    if additional_config:
-        # Include additional fields in all results.
-        for result in results:
-            result.update({"config": additional_config})
-
-    return results
 
 
 def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:

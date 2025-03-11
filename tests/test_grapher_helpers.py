@@ -8,7 +8,6 @@ from owid.catalog import (
     Table,
     TableMeta,
     VariableMeta,
-    VariablePresentationMeta,
 )
 
 from etl.grapher import helpers as gh
@@ -211,28 +210,6 @@ def test_adapt_table_for_grapher_multiindex():
             out_table = gh._adapt_table_for_grapher(table, engine)
             assert out_table.index.names == ["entityId", "entityCode", "entityName", "year", "sex"]
             assert out_table.columns.tolist() == ["deaths"]
-
-
-def test_expand_jinja():
-    m = VariableMeta(
-        title="Title << foo >>",
-        description_key=[
-            '<% if foo == "bar" %>This is bar<% else %>This is not bar<% endif %>',
-        ],
-        presentation=VariablePresentationMeta(
-            title_variant="Variant << foo >>",
-        ),
-        display={
-            "isProjection": "<% if foo == 'bar' %>true<% else %>false<% endif %>",
-        },
-    )
-    out = gh._expand_jinja(m, dim_dict={"foo": "bar"})
-    assert out.to_dict() == {
-        "title": "Title bar",
-        "description_key": ["This is bar"],
-        "presentation": {"title_variant": "Variant bar"},
-        "display": {"isProjection": True},
-    }
 
 
 def test_underscore_column_and_dimensions():

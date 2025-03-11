@@ -57,6 +57,9 @@ def mock(_type: type) -> Any:
         return random.choice(_MOCK_STRINGS).lower()
 
     elif getattr(_type, "_name", None) == "List":
+        if _type.__args__[0].__name__ == "TableDimension":
+            return None
+
         # e.g. List[int]
         return [mock(_type.__args__[0]) for i in range(random.randint(1, 4))]  # type: ignore
 
