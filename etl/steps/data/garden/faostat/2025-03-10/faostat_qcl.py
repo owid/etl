@@ -64,10 +64,12 @@ MEAT_TOTAL_ITEM_CODES = [
     # "00001083",  # 'Other birds',
 ]
 
-# List of element codes for "Producing or slaughtered animals" (they have different items assigned).
-SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
+# Element codes for "Producing or slaughtered animals" (they have different items assigned) and their FAO units.
+SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS = {"005320": "An", "005321": "1000 An"}
 # For the resulting table, we arbitrarily assign the first of those codes.
-SLAUGHTERED_ANIMALS_ELEMENT_CODE = SLAUGHTERED_ANIMALS_ELEMENT_CODES[0]
+SLAUGHTERED_ANIMALS_ELEMENT_CODE = list(SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS)[0]
+# For the resulting table, we arbitrarily assign the first of those FAO units.
+SLAUGHTERED_ANIMALS_FAO_UNIT_SHORT_NAME = list(SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS.values())[0]
 # Item code for 'Meat, total'.
 TOTAL_MEAT_ITEM_CODE = "00001765"
 # OWID item name for total meat.
@@ -187,14 +189,23 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
 
     # Check that there are two element codes for the same element (they have different items assigned).
     error = "Element codes for 'Producing or slaughtered animals' may have changed."
-    assert (
-        tb[(tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT) & ~(tb["element_code"].str.contains("pc"))]["element_code"]
-        .unique()
-        .tolist()
-        == SLAUGHTERED_ANIMALS_ELEMENT_CODES
-    ), error
+    assert tb[(tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT) & ~(tb["element_code"].str.contains("pc"))][
+        "element_code"
+    ].unique().tolist() == list(SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS), error
 
-    # Check that they use the same unit.
+    # Check that the original FAO units of those two elements are as expected.
+    error = "FAO units for 'Producing or slaughtered animals' may have changed."
+    assert (
+        tb[tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS)][
+            ["element_code", "fao_unit_short_name"]
+        ]
+        .drop_duplicates()
+        .set_index("element_code")
+        .to_dict()["fao_unit_short_name"]
+        == SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS
+    )
+
+    # Check that the harmonized units of those two elements are as expected.
     error = "Unit for element 'Producing or slaughtered animals' may have changed."
     assert set(tb[(tb["element"] == SLAUGHTERED_ANIMALS_ELEMENT)]["unit"]) == set(["animals"]), error
 
@@ -204,7 +215,7 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     # Check that the items assigned to each the two element codes do not overlap.
     error = "Element codes for 'Producing or slaughtered animals' have overlapping items."
     items_for_different_elements = (
-        tb[(tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES))]
+        tb[(tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS))]
         .groupby("element_code", observed=True)
         .agg({"item_code": lambda x: list(x.unique())})
         .to_dict()["item_code"]
@@ -246,9 +257,9 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     ).reset_index()
 
     # Get element description for selected element code (so far it's always been an empty string).
-    _slaughtered_animals_element_description = tb[tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)][
-        "element_description"
-    ].unique()
+    _slaughtered_animals_element_description = tb[
+        tb["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS)
+    ]["element_description"].unique()
     assert len(_slaughtered_animals_element_description) == 1
     slaughtered_animals_element_description = _slaughtered_animals_element_description[0]
 
@@ -262,11 +273,6 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     assert len(_total_meat_fao_item) == 1
     total_meat_fao_item = _total_meat_fao_item[0]
 
-    # Get FAO unit for selected item code.
-    _total_meat_fao_unit = tb[tb["item_code"] == TOTAL_MEAT_ITEM_CODE]["fao_unit_short_name"].unique()
-    assert len(_total_meat_fao_unit) == 1
-    total_meat_fao_unit = _total_meat_fao_unit[0]
-
     # Manually include the rest of columns.
     animals["element"] = SLAUGHTERED_ANIMALS_ELEMENT
     animals["element_description"] = slaughtered_animals_element_description
@@ -278,7 +284,7 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     animals["item"] = TOTAL_MEAT_ITEM
     animals["item_description"] = total_meat_item_description
     animals["fao_item"] = total_meat_fao_item
-    animals["fao_unit_short_name"] = total_meat_fao_unit
+    animals["fao_unit_short_name"] = SLAUGHTERED_ANIMALS_FAO_UNIT_SHORT_NAME
 
     log.info(f"Adding {len(animals)} rows with the total number of slaughtered animals for meat.")
 
