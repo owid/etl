@@ -632,13 +632,14 @@ class PathFinder:
             repack=repack,
         )
 
-    def create_explorer(
+    def create_explorer_legacy(
         self,
         config: Dict[str, Any],
         df_graphers: pd.DataFrame,
         df_columns: Optional[pd.DataFrame] = None,
     ) -> Explorer:
-        return create_explorer(
+        """Create an Explorer using legacy configuration."""
+        return create_explorer_legacy(
             dest_dir=self.dest_dir,
             config=config,
             df_graphers=df_graphers,
@@ -681,12 +682,19 @@ def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
     return {dependency for dependency in dependencies if regex.match(dependency)}
 
 
-def create_explorer(
+def create_explorer_legacy(
     dest_dir: Union[str, Path],
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,
     df_columns: Optional[pd.DataFrame] = None,
 ) -> Explorer:
+    """This function is used to create an Explorer object using the legacy configuration.
+
+    To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
+    """
+    log.warning(
+        "This function is operative, but relies on legacy configuration. To use latest tools, consider migrating your explorer to use MDIM-based configuration."
+    )
     # Extract information about this step from dest_dir.
     channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
 
