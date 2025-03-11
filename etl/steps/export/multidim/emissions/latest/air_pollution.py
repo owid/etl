@@ -35,11 +35,9 @@ def run() -> None:
     # TODO: should sorting be part of dimension metadata in garden channel?
     config["dimensions"][0]["choices"] = sorted(config["dimensions"][0]["choices"], key=lambda x: x["name"])
 
-    # Upsert mdim config to DB
-    multidim.upsert_multidim_data_page(
-        config=config,
-        paths=paths,
-    )
+    # Create MDIM and upsert its config to DB
+    mdim = paths.create_mdim(config=config)
+    mdim.save()
 
 
 def add_dimension(table, dimension: TableDimension, mapping: dict) -> None:

@@ -41,7 +41,7 @@ def run(dest_dir: str) -> None:
     ds_explorer = create_explorer(
         dest_dir=dest_dir,
         config=config,
-        paths=paths,
+        dependencies=paths.dependencies,
         tolerate_extra_indicators=True,
     )
 

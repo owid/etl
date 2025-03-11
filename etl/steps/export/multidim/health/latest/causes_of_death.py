@@ -5,7 +5,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 
@@ -31,7 +31,5 @@ def run(dest_dir: str) -> None:
     config["views"] += config_new["views"]
     config["views"] += grouped_views
 
-    multidim.upsert_multidim_data_page(
-        config=config,
-        paths=paths,
-    )
+    mdim = paths.create_mdim(config=config)
+    mdim.save()

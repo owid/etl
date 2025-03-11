@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 
 # etlr multidim
-def run(dest_dir: str) -> None:
+def run() -> None:
     # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
@@ -33,8 +33,8 @@ def run(dest_dir: str) -> None:
     config["views"] = config_new["views"]
 
     # 4: Upsert to DB
-    multidim.upsert_multidim_data_page(
-        mdim_name="mdd-vaccination-who",
+    mdim = paths.create_mdim(
         config=config,
-        paths=paths,
+        mdim_name="mdd-vaccination-who",
     )
+    mdim.save()

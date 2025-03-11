@@ -105,7 +105,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    multidim.upsert_multidim_data_page(config=config, paths=paths)
+    mdim = paths.create_mdim(config=config)
+    mdim.save()
 
 ```
 
