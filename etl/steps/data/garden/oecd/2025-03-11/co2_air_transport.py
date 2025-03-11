@@ -107,6 +107,7 @@ def process_monthly_data(tb):
     tb_monthly = tb_monthly.reset_index()
     tb_monthly = tb_monthly.rename(columns={"days_since_2019": "year"})
 
+    # Add the total monthly emissions with a year as a column
     tb_by_month = tb.copy()
 
     tb_by_month = tb_by_month.pivot(
