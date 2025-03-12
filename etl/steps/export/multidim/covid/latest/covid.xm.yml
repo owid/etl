@@ -9,15 +9,15 @@ definitions:
 
 title:
   title: "Excess mortality"
-  titleVariant: "Cumulative deaths from all causes compared to projection based on previous years"
-defaultSelection:
+  title_variant: "Cumulative deaths from all causes compared to projection based on previous years"
+default_selection:
   - Russia
   - United States
   - Brazil
   - Mexico
   - Iran
   - Peru
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

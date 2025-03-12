@@ -1,9 +1,9 @@
 title:
   title: "Energy prices"
-  titleVariant: "European electricity and gas"
-defaultSelection:
+  title_variant: "European electricity and gas"
+default_selection:
   - "European Union (27)"
-topicTags:
+topic_tags:
   - "Energy"
 dimensions:
   - slug: "source"
