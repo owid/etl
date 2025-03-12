@@ -3,7 +3,6 @@
 This step contains tooling that should moved to a more general module so that it can be easily used by other explorer steps!
 """
 
-from etl.collections.explorer import create_explorer
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -18,11 +17,8 @@ def run(dest_dir: str) -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    ds_explorer = create_explorer(
-        dest_dir=dest_dir,
+    ds_explorer = paths.create_explorer(
         config=config,
-        paths=paths,
-        tolerate_extra_indicators=True,
     )
 
-    ds_explorer.save()
+    ds_explorer.save(tolerate_extra_indicators=True)
