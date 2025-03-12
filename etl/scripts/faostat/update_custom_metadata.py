@@ -10,23 +10,75 @@ significant change in the data.
 """
 
 import argparse
+import difflib
 
 import pandas as pd
 from owid.catalog import Dataset
 from shared import INCLUDED_DATASETS_CODES, VERSION  # type: ignore[reportMissingImports]
+from structlog import get_logger
+from tqdm import tqdm
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
 
+# Initialize logger.
+log = get_logger()
+
 
 def _display_differences_and_wait(old: str, new: str, message: str) -> None:
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    RESET = "\033[0m"
+
     tqdm.write("\n" + "------------" * 10)
     tqdm.write(message)
     tqdm.write("------------" * 10)
-    tqdm.write(f"\n{old}")
-    tqdm.write("\n->")
-    tqdm.write(f"\n{new}")
-    input("\nEnter to move on.")
+
+    old_sentences = [s + "." if not s.endswith(".") else s for s in old.split(". ")]
+    new_sentences = [s + "." if not s.endswith(".") else s for s in new.split(". ")]
+
+    matcher = difflib.SequenceMatcher(None, old_sentences, new_sentences)
+    first_change = True
+
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "replace":
+            for old_sentence, new_sentence in zip(old_sentences[i1:i2], new_sentences[j1:j2]):
+                if not first_change:
+                    tqdm.write("")
+                first_change = False
+                word_matcher = difflib.SequenceMatcher(None, old_sentence.split(), new_sentence.split())
+                highlighted_old = ""
+                highlighted_new = ""
+
+                for word_tag, w1, w2, w3, w4 in word_matcher.get_opcodes():
+                    if word_tag == "replace":
+                        highlighted_old += RED + " ".join(old_sentence.split()[w1:w2]) + RESET + " "
+                        highlighted_new += GREEN + " ".join(new_sentence.split()[w3:w4]) + RESET + " "
+                    elif word_tag == "delete":
+                        highlighted_old += RED + " ".join(old_sentence.split()[w1:w2]) + RESET + " "
+                    elif word_tag == "insert":
+                        highlighted_new += GREEN + " ".join(new_sentence.split()[w3:w4]) + RESET + " "
+                    elif word_tag == "equal":
+                        highlighted_old += " ".join(old_sentence.split()[w1:w2]) + " "
+                        highlighted_new += " ".join(new_sentence.split()[w3:w4]) + " "
+
+                tqdm.write("- " + highlighted_old.strip())
+                tqdm.write("+ " + highlighted_new.strip() + "\n")
+        elif tag == "delete":
+            if not first_change:
+                tqdm.write("")
+            first_change = False
+            for old_sentence in old_sentences[i1:i2]:
+                tqdm.write(RED + "- " + old_sentence + RESET + "\n")
+        elif tag == "insert":
+            if not first_change:
+                tqdm.write("")
+            first_change = False
+            for new_sentence in new_sentences[j1:j2]:
+                tqdm.write(GREEN + "+ " + new_sentence + RESET + "\n")
+        elif tag == "equal":
+            for sentence in old_sentences[i1:i2]:
+                tqdm.write("  " + sentence)
 
 
 def update_custom_datasets_file(interactive=False, version=VERSION, read_only=False):
@@ -47,6 +99,10 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
         Updated dataframe of custom datasets.
 
     """
+    RED = "\033[91m"
+    GREEN = "\033[92m"
+    RESET = "\033[0m"
+
     if interactive:
         tqdm.write("\nChecking for changes in FAO dataset titles and descriptions.")
 
@@ -80,15 +136,24 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
                 # This may be a new dataset that didn't exist in the previous version.
                 old = ""
 
-            # For faostat_fa, the new description is empty (while the old wasn't).
-            # For consistency, we will change it too, while keeping the old custom dataset description.
-
-            # If old and new are not identical (or if they are not both nan) update custom_datasets.
-            if (old != new) and not (pd.isna(new) and pd.isna(old)):
+            # Normalize whitespace for comparison.
+            _old = old.replace("\n", " ").replace("  ", " ")
+            _new = new.replace("\n", " ").replace("  ", " ")
+            if (_old != _new) and not (pd.isna(new) and pd.isna(old)):
                 if interactive:
                     _display_differences_and_wait(
-                        old=old, new=new, message=f"Old and new FAO dataset {field} for {dataset_short_name}:"
+                        old=_old, new=_new, message=f"Old and new FAO dataset {field} for {dataset_short_name}:"
                     )
+                    choice = input("Type 'y' and enter to update this change or just enter to skip: ").strip().lower()
+                    if choice != "y":
+                        continue
+
+                    # Print full old and new paragraphs after accepting
+                    tqdm.write("\n" + RED + "Old:" + RESET)
+                    tqdm.write(RED + old + RESET)
+                    tqdm.write("\n" + GREEN + "New:" + RESET)
+                    tqdm.write(GREEN + new + RESET + "\n")
+                    input("Press enter to continue...")
 
                 # Update FAO field.
                 custom_datasets_updated.loc[dataset_short_name, f"fao_dataset_{field}"] = new
@@ -100,14 +165,25 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
     custom_datasets_updated = custom_datasets_updated.sort_index()
 
     if interactive and not CHANGES_FOUND:
-        tqdm.write("\nNo changes found.")
+        tqdm.write("\nNo changes found or accepted.")
 
     if CHANGES_FOUND and not read_only:
         if interactive:
-            input(f"Press enter to overwrite file: {custom_datasets_file}")
-
-        # Update custom datasets file.
-        custom_datasets_updated.sort_index().to_csv(custom_datasets_file)
+            while True:
+                choice = (
+                    input(
+                        f"Type 'y' and enter to overwrite file {custom_datasets_file} or type 'n' to ignore changes: "
+                    )
+                    .strip()
+                    .lower()
+                )
+                if choice == "y":
+                    # Update custom datasets file.
+                    custom_datasets_updated.sort_index().to_csv(custom_datasets_file)
+                    break
+                elif choice == "n":
+                    tqdm.write("File not updated.")
+                    break
 
     return custom_datasets_updated
 
@@ -156,7 +232,13 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
     # Go one by one on the datasets for which at least one custom element or unit was defined.
     for dataset_short_name in tqdm(custom_elements.index.get_level_values(0).unique()):
         for element_code in tqdm(custom_elements.loc[dataset_short_name].index.get_level_values(0).unique()):
-            new_metadata = fao_new_metadata["elements"].loc[dataset_short_name, element_code].fillna("")
+            try:
+                new_metadata = fao_new_metadata["elements"].loc[dataset_short_name, element_code].fillna("")
+            except KeyError:
+                log.error(
+                    f"Element code {element_code} (for dataset {dataset_short_name}) in custom elements and units file was not found in new faostat_metadata. Remove it from the custom file or replace it with another element code."
+                )
+                continue
             old_metadata = custom_elements.loc[dataset_short_name, element_code].fillna("")
             for field in ["fao_element", "fao_element_description", "fao_unit", "fao_unit_short_name"]:
                 new = new_metadata[field]
@@ -172,7 +254,7 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
                         )
 
                     # Update FAO field.
-                    custom_elements_updated.loc[dataset_short_name, element_code][field] = new
+                    custom_elements_updated.loc[(dataset_short_name, element_code), field] = new
 
                     # There was at least one change.
                     CHANGES_FOUND = True
@@ -277,7 +359,7 @@ def update_custom_items_file(interactive=False, version=VERSION, read_only=False
                     )
 
                 # Update FAO field.
-                custom_items_updated.loc[dataset_short_name, item_code][field] = new
+                custom_items_updated.loc[(dataset_short_name, item_code), field] = new
 
                 # There was at least one change.
                 CHANGES_FOUND = True
