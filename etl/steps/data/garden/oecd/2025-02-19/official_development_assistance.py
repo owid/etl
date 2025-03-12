@@ -629,11 +629,11 @@ def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: List[str]) 
 
     for subcomponent in subcomponent_list:
         tb[f"{subcomponent}_net_disbursements_share_oda"] = (
-            tb[f"{subcomponent}_net_disbursements"] / tb["oda_bilateral_2_net_disbursements"] * 100
+            tb[f"{subcomponent}_net_disbursements"] / tb["i_oda_net_disbursements"] * 100
         )
 
         tb[f"{subcomponent}_grant_equivalents_share_oda"] = (
-            tb[f"{subcomponent}_grant_equivalents"] / tb["oda_bilateral_grant_equivalents"] * 100
+            tb[f"{subcomponent}_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
         )
 
     return tb
