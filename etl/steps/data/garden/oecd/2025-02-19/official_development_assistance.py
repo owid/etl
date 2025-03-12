@@ -241,6 +241,16 @@ def run(dest_dir: str) -> None:
 
     tb_dac1 = combine_net_and_grant_equivalents(tb=tb_dac1)
 
+    tb_dac1 = add_oda_components_as_share_of_oda(
+        tb=tb_dac1,
+        subcomponent_list=[
+            "i_a_5_scholarships_student_costs_donor_countries",
+            "i_a_7_administrative_costs_not_included_elsewhere",
+            "i_a_8_1_development_awareness",
+            "i_a_8_2_refugees_in_donor_countries",
+        ],
+    )
+
     tb = add_donor_data_from_recipient_dataset(tb_donor=tb_dac1, tb_recipient=tb_dac2a)
 
     tb = add_recipient_dataset(tb=tb, tb_recipient=tb_dac2a)
@@ -608,5 +618,22 @@ def combine_net_and_grant_equivalents(tb: Table) -> Table:
 
     # Fill with net disbursements before 2018
     tb.loc[tb["year"] < 2018, "oda_official_estimate_share_gni"] = tb["i_oda_net_disbursements_share_gni"]
+
+    return tb
+
+
+def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: List[str]) -> Table:
+    """
+    Divide some of the ODA components by the total ODA to get the share of each component.
+    """
+
+    for subcomponent in subcomponent_list:
+        tb[f"{subcomponent}_net_disbursements_share_oda"] = (
+            tb[f"{subcomponent}_net_disbursements"] / tb["i_oda_net_disbursements"] * 100
+        )
+
+        tb[f"{subcomponent}_grant_equivalents_share_oda"] = (
+            tb[f"{subcomponent}_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
+        )
 
     return tb
