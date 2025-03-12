@@ -16,7 +16,6 @@ import pandas as pd
 from owid.catalog import Dataset
 from shared import INCLUDED_DATASETS_CODES, VERSION  # type: ignore[reportMissingImports]
 from structlog import get_logger
-from tqdm import tqdm
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
@@ -48,23 +47,26 @@ def _display_differences_and_wait(old: str, new: str, message: str) -> None:
                     tqdm.write("")
                 first_change = False
                 word_matcher = difflib.SequenceMatcher(None, old_sentence.split(), new_sentence.split())
-                highlighted_old = ""
-                highlighted_new = ""
+                highlighted_old = []
+                highlighted_new = []
 
                 for word_tag, w1, w2, w3, w4 in word_matcher.get_opcodes():
-                    if word_tag == "replace":
-                        highlighted_old += RED + " ".join(old_sentence.split()[w1:w2]) + RESET + " "
-                        highlighted_new += GREEN + " ".join(new_sentence.split()[w3:w4]) + RESET + " "
-                    elif word_tag == "delete":
-                        highlighted_old += RED + " ".join(old_sentence.split()[w1:w2]) + RESET + " "
-                    elif word_tag == "insert":
-                        highlighted_new += GREEN + " ".join(new_sentence.split()[w3:w4]) + RESET + " "
-                    elif word_tag == "equal":
-                        highlighted_old += " ".join(old_sentence.split()[w1:w2]) + " "
-                        highlighted_new += " ".join(new_sentence.split()[w3:w4]) + " "
+                    old_segment = " ".join(old_sentence.split()[w1:w2])
+                    new_segment = " ".join(new_sentence.split()[w3:w4])
 
-                tqdm.write("- " + highlighted_old.strip())
-                tqdm.write("+ " + highlighted_new.strip() + "\n")
+                    if word_tag == "replace":
+                        highlighted_old.append(RED + old_segment + RESET)
+                        highlighted_new.append(GREEN + new_segment + RESET)
+                    elif word_tag == "delete":
+                        highlighted_old.append(RED + old_segment + RESET)
+                    elif word_tag == "insert":
+                        highlighted_new.append(GREEN + new_segment + RESET)
+                    elif word_tag == "equal":
+                        highlighted_old.append(old_segment)
+                        highlighted_new.append(new_segment)
+
+                tqdm.write("- " + " ".join(highlighted_old))
+                tqdm.write("+ " + " ".join(highlighted_new) + "\n")
         elif tag == "delete":
             if not first_change:
                 tqdm.write("")
@@ -300,7 +302,7 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
 def update_custom_items_file(interactive=False, version=VERSION, read_only=False):
     """Update custom_items.csv file of a specific version of the garden steps.
 
-    NOTE: This function is structuraly very similar to update_custom_elements_and_units_file.
+    NOTE: This function is structurally very similar to update_custom_elements_and_units_file.
     They could be merged into one to avoid redundant code.
 
     Parameters
@@ -379,6 +381,11 @@ def update_custom_items_file(interactive=False, version=VERSION, read_only=False
                         new=new,
                         message=f"Old and new {field} for {dataset_short_name} with code {item_code}:",
                     )
+                    choice = input("\nType 'y' and enter to update this change or just enter to skip: ").strip().lower()
+                    if choice != "y":
+                        continue
+
+                    _display_confirmed_changes(old, new)
 
                 # Update FAO field.
                 custom_items_updated.loc[(dataset_short_name, item_code), field] = new
@@ -386,18 +393,27 @@ def update_custom_items_file(interactive=False, version=VERSION, read_only=False
                 # There was at least one change.
                 CHANGES_FOUND = True
 
-    # Sort custom item conveniently.
+    # Sort custom items conveniently.
     custom_items_updated = custom_items_updated.sort_values(["fao_item"])
 
     if interactive and not CHANGES_FOUND:
-        tqdm.write("\nNo changes found.")
+        tqdm.write("\nNo changes found or accepted.")
 
     if CHANGES_FOUND and not read_only:
         if interactive:
-            input(f"Press enter to overwrite file: {custom_items_file}")
-
-        # Update custom items file.
-        custom_items_updated.to_csv(custom_items_file)
+            while True:
+                choice = (
+                    input(f"Type 'y' and enter to overwrite file {custom_items_file} or type 'n' to ignore changes: ")
+                    .strip()
+                    .lower()
+                )
+                if choice == "y":
+                    # Update custom items file.
+                    custom_items_updated.to_csv(custom_items_file)
+                    break
+                elif choice == "n":
+                    tqdm.write("File not updated.")
+                    break
 
     return custom_items_updated
 
