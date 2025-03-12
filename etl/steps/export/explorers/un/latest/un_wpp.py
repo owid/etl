@@ -51,7 +51,7 @@ AGES_NAME = {age: f"{age.replace('-', '–')} years" if age != "1" else "1 year"
 
 
 # etlr multidim
-def run(dest_dir: str) -> None:
+def run() -> None:
     # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_explorer_config()
@@ -151,15 +151,12 @@ def run(dest_dir: str) -> None:
 
     # Export
     # Create explorer
-    ds_explorer = create_explorer(
-        dest_dir=str(paths.dest_dir),
+    ds_explorer = paths.create_explorer(
         config=config,
-        paths=paths,
-        tolerate_extra_indicators=True,
         explorer_name="population-and-demography",
     )
 
-    ds_explorer.save()
+    ds_explorer.save(tolerate_extra_indicators=True)
 
     # config_mdim = {
     #     "title": {
