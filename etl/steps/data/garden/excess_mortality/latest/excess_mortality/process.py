@@ -16,7 +16,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 # Maximum year
-YEAR_MAX = 2024
+YEAR_MAX = 2025
 
 
 def process_df(df: pd.DataFrame) -> pd.DataFrame:
