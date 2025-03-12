@@ -636,8 +636,8 @@ steps:
     - data://garden/who/latest/monkeypox
   data://grapher/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
-  export://explorers/who/latest/monkeypox:
-    - data://grapher/who/latest/monkeypox
+  # export://explorers/who/latest/monkeypox:
+  #   - data://grapher/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
   # Mpox - Global.health
