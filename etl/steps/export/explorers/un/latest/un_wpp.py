@@ -126,8 +126,8 @@ def run() -> None:
     explorer.save(tolerate_extra_indicators=True)
 
     # Translate into mdim
-    # mdim = explorer_to_mdim(explorer, "population-and-demography")
-    # mdim.save()
+    mdim = explorer_to_mdim(explorer, "population-and-demography")
+    mdim.save()
 
 
 def explorer_to_mdim(explorer: Explorer, mdim_name: str):
