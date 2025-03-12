@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Set
 import pandas as pd
 
 from etl.collections.common import expand_config
-from etl.collections.explorer_legacy import create_explorer_legacy
+from etl.collections.explorer_legacy import _create_explorer_legacy
 from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
 from etl.collections.utils import (
     get_tables_by_name_mapping,
@@ -31,7 +31,8 @@ class Explorer(Collection):
         return self._catalog_path
 
     @catalog_path.setter
-    def catalog_path(self, value: Optional[str]) -> None:
+    def catalog_path(self, value: str) -> None:
+        assert "#" in value, "Catalog path should be in the format `path#name`."
         self._catalog_path = value
 
     def display_config_names(self):
@@ -60,10 +61,20 @@ class Explorer(Collection):
             }
         return mapping
 
+    def _explorer_name(self):
+        if self.catalog_path is None:
+            raise ValueError("Catalog path is not set. Please set it before saving.")
+
+        _, name = self.catalog_path.split("#")
+        return name
+
     def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
+
+        if self.catalog_path is None:
+            raise ValueError("Catalog path is not set. Please set it before saving.")
 
         # Check that all indicators in mdim exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
@@ -73,14 +84,16 @@ class Explorer(Collection):
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
         df_grapher = extract_explorers_graphers(self)
 
-        # Create explorer
-        ds = create_explorer_legacy(
-            dest_dir=dest_dir,  # TODO: Fix
+        # Transform to legacy format
+        # TODO: this part is responsible for interacting with owid-content. Instead, it should be replaced with DB-interaction code, as with MDIMs.
+        explorer_legacy = _create_explorer_legacy(
+            explorer_path=self.catalog_path,
+            explorer_name=self._explorer_name(),
             config=self.config,
             df_graphers=df_grapher,
         )
 
-        ds.save()
+        explorer_legacy.save()
 
 
 __all__ = ["expand_config"]
