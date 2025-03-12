@@ -68,7 +68,7 @@ def expand_config(
 
     NOTE
     ----
-    1) For more details, refer to class MDIMConfigExpander.
+    1) For more details, refer to class CollectionConfigExpander.
 
     2) This function generates PARTIAL configuration, you need to then combine it with the config loaded from a YAML file. You can do this combination as you consider. Currently this is mostly manual, but we can look into improving this space:
 
@@ -213,6 +213,8 @@ class CollectionConfigExpander:
         self.indicator_as_dimension = indicator_as_dimension
         self.build_df_dims(tb, indicator_names)
         self.short_name = tb.m.short_name
+        # Get table dimensions from metadata if available, exclude country, year, and date
+        self.tb_dims = [d for d in (tb.m.dimensions or []) if d["slug"] not in ("country", "year", "date")]
 
     @property
     def dimension_names(self):
@@ -226,7 +228,15 @@ class CollectionConfigExpander:
         # Support dimension is None
         ## If dimensions is None, use a list with all dimension names (in no particular order)
         if dimensions is None:
-            dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
+            # If table defines dimensions, use them
+            if self.tb_dims:
+                dimensions = [d["slug"] for d in self.tb_dims]
+            else:
+                # If dimensions is None, use a list with all dimension names (in no particular order)
+                dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
+        else:
+            # log.warning("It's recommended to set dimensions in Table metadata.")
+            pass
 
         # Support dimensions if it is a list/dict
         config_dimensions = []
@@ -275,9 +285,20 @@ class CollectionConfigExpander:
                 ]
 
                 # Build dimension
+                if self.tb_dims:
+                    # Use full name from table if available
+                    try:
+                        dim_name = next(d["name"] for d in self.tb_dims if d["slug"] == dim)
+                    except StopIteration:
+                        dim_name = dim
+                else:
+                    # Otherwise use slug
+                    dim_name = dim
+
+                # Build dimension
                 dimension = {
                     "slug": dim,
-                    "name": dim,
+                    "name": dim_name,
                     "choices": choices,
                 }
 
@@ -360,21 +381,19 @@ class CollectionConfigExpander:
         """Build dataframe with dimensional information from table tb."""
         records = []
         for col in tb.columns:
-            if tb[col].metadata.additional_info and ("dimensions" in tb[col].metadata.additional_info):
-                dims = tb[col].metadata.additional_info["dimensions"]
-
-                assert "originalShortName" in dims, "Missing indicator name in dimensions metadata!"
+            dims = tb[col].m.dimensions
+            if dims:
+                assert tb[col].m.original_short_name, "Missing metadata.original_short_name for dimensions!"
                 row = {
-                    self.indicators_slug: dims["originalShortName"],
+                    self.indicators_slug: tb[col].m.original_short_name,
                     "short_name": col,
                 }
                 # Add dimensional info
-                assert "filters" in dims, "Missing filters in dimensions metadata!"
-                filters = dims["filters"]
-                for f in filters:
-                    if f["name"] in {self.indicators_slug, "short_name"}:
-                        raise ValueError(f"Dimension name `{f['name']}` is reserved. Please use another one!")
-                    row[f["name"]] = f["value"]
+                for name in dims.keys():
+                    if name in {self.indicators_slug, "short_name"}:
+                        raise ValueError(f"Dimension name `{name}` is reserved. Please use another one!")
+
+                row = {**row, **dims}
 
                 # Add entry to records
                 records.append(row)
