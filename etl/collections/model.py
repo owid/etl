@@ -379,9 +379,9 @@ class Dimension(MDIMBase):
 
     @property
     def ui_type(self):
-        if self.presentation is not None:
-            return self.presentation.type
-        return UITypes.DROPDOWN
+        if self.presentation is None:
+            return UITypes.DROPDOWN
+        return self.presentation.type
 
     @property
     def choice_slugs(self):
