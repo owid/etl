@@ -598,7 +598,10 @@ class PathFinder:
         return self.load_config(filename, path)
 
     def load_explorer_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
-        return self.load_config(filename, path)
+        config = self.load_config(filename, path)
+        # Check that it can be loaded as an Explorer object.
+        explorer = Explorer.from_dict(config)
+        return explorer.to_dict()
 
     def create_dataset(
         self,
