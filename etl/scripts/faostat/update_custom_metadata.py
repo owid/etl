@@ -24,12 +24,13 @@ from etl.paths import DATA_DIR, STEP_DIR
 # Initialize logger.
 log = get_logger()
 
+# ANSI color codes.
+RED = "\033[91m"
+GREEN = "\033[92m"
+RESET = "\033[0m"
+
 
 def _display_differences_and_wait(old: str, new: str, message: str) -> None:
-    RED = "\033[91m"
-    GREEN = "\033[92m"
-    RESET = "\033[0m"
-
     tqdm.write("\n" + "------------" * 10)
     tqdm.write(message)
     tqdm.write("------------" * 10)
@@ -81,6 +82,15 @@ def _display_differences_and_wait(old: str, new: str, message: str) -> None:
                 tqdm.write("  " + sentence)
 
 
+def _display_confirmed_changes(old, new):
+    # Print full old and new paragraphs after accepting
+    tqdm.write("\n" + RED + "Old:" + RESET)
+    tqdm.write(RED + old + RESET)
+    tqdm.write("\n" + GREEN + "New:" + RESET)
+    tqdm.write(GREEN + new + RESET + "\n")
+    input("\nPress enter to continue...")
+
+
 def update_custom_datasets_file(interactive=False, version=VERSION, read_only=False):
     """Update custom_datasets.csv file of a specific version of the garden steps.
 
@@ -99,10 +109,6 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
         Updated dataframe of custom datasets.
 
     """
-    RED = "\033[91m"
-    GREEN = "\033[92m"
-    RESET = "\033[0m"
-
     if interactive:
         tqdm.write("\nChecking for changes in FAO dataset titles and descriptions.")
 
@@ -148,12 +154,7 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
                     if choice != "y":
                         continue
 
-                    # Print full old and new paragraphs after accepting
-                    tqdm.write("\n" + RED + "Old:" + RESET)
-                    tqdm.write(RED + old + RESET)
-                    tqdm.write("\n" + GREEN + "New:" + RESET)
-                    tqdm.write(GREEN + new + RESET + "\n")
-                    input("Press enter to continue...")
+                    _display_confirmed_changes(old, new)
 
                 # Update FAO field.
                 custom_datasets_updated.loc[dataset_short_name, f"fao_dataset_{field}"] = new
@@ -252,6 +253,13 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
                             new=new,
                             message=f"Old and new {field} for {dataset_short_name} with element code {element_code}:",
                         )
+                        choice = (
+                            input("\nType 'y' and enter to update this change or just enter to skip: ").strip().lower()
+                        )
+                        if choice != "y":
+                            continue
+
+                        _display_confirmed_changes(old, new)
 
                     # Update FAO field.
                     custom_elements_updated.loc[(dataset_short_name, element_code), field] = new
@@ -263,14 +271,28 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
     custom_elements_updated = custom_elements_updated.sort_values(["fao_element"])
 
     if interactive and not CHANGES_FOUND:
-        tqdm.write("\nNo changes found.")
+        tqdm.write("\nNo changes found or accepted.")
 
     if CHANGES_FOUND and not read_only:
         if interactive:
-            input(f"Press enter to overwrite file: {custom_elements_file}")
-
-        # Update custom elements file.
-        custom_elements_updated.to_csv(custom_elements_file)
+            while True:
+                choice = (
+                    input(
+                        f"Type 'y' and enter to overwrite file {custom_elements_file} or type 'n' to ignore changes: "
+                    )
+                    .strip()
+                    .lower()
+                )
+                if choice == "y":
+                    # Update custom elements file.
+                    custom_elements_updated.to_csv(custom_elements_file)
+                    tqdm.write(
+                        "Consider updating the 'owid_unit_factor' (and possibly other fields) if units have changed."
+                    )
+                    break
+                elif choice == "n":
+                    tqdm.write("File not updated.")
+                    break
 
     return custom_elements_updated
 
