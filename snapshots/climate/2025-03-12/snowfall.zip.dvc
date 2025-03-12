@@ -1,0 +1,20 @@
+meta:
+  origin:
+    title_snapshot: ERA5-Land monthly averaged data from 1950 to present - Snowcover
+    title: ERA5-Land monthly averaged data from 1950 to present
+    description: |-
+      ERA5-Land is a reanalysis dataset providing a consistent view of the evolution of land variables over several decades at an enhanced resolution compared to ERA5. ERA5-Land has been produced by replaying the land component of the ECMWF ERA5 climate reanalysis. Reanalysis combines model data with observations from across the world into a globally complete and consistent dataset using the laws of physics. Reanalysis produces data that goes several decades back in time, providing an accurate description of the climate of the past.
+
+      ERA5-Land provides a consistent view of the water and energy cycles at surface level during several decades. It contains a detailed record from 1950 onwards, with a temporal resolution of 1 hour. The native spatial resolution of the ERA5-Land reanalysis dataset is 9km on a reduced Gaussian grid (TCo1279). The data in the CDS has been regridded to a regular lat-lon grid of 0.1x0.1 degrees.
+
+      The data presented here is a post-processed subset of the full ERA5-Land dataset. Monthly-mean averages have been pre-calculated to facilitate many applications requiring easy and fast access to the data, when sub-monthly fields are not required.
+    producer: Contains modified Copernicus Climate Change Service information
+    version_producer: 2
+    citation_full: |-
+      Muñoz Sabater, J. (2019): ERA5-Land monthly averaged data from 1950 to present. Copernicus Climate Change Service (C3S) Climate Data Store (CDS). DOI: 10.24381/cds.68d2bb30 (Accessed on 12-03-2025)
+    url_main: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-land-monthly-means?tab=overview
+    date_accessed: 2025-03-12
+    date_published: 2025-03-06
+    license:
+      name: Copernicus License
+      url: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview

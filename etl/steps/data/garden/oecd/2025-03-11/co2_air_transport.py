@@ -129,7 +129,7 @@ def process_monthly_data(tb):
 
 def add_inbound_outbound_tour(tb, tb_tourism):
     just_inb_ratio = tb_tourism[["country", "year", "inbound_outbound_tourism"]]
-    tb = pr.merge(tb, just_inb_ratio, on=["year", "country"])
+    tb = pr.merge(tb, just_inb_ratio, on=["year", "country"], how="left")
 
     # Calculate the interaction between TER_INT_a and inb_outb_tour
     tb["int_inb_out_per_capita"] = tb["per_capita_TER_INT_a"] / tb["inbound_outbound_tourism"]
