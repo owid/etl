@@ -55,7 +55,7 @@ def expand_config(
     indicator_names: Optional[Union[str, List[str]]] = None,
     dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
     common_view_config: Optional[Dict[str, Any]] = None,
-    indicators_slug: str = INDICATORS_SLUG,
+    indicators_slug: Optional[str] = None,
     indicator_as_dimension: bool = False,
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
@@ -156,6 +156,8 @@ def expand_config(
         }
     )
     """
+    if indicators_slug is None:
+        indicators_slug = INDICATORS_SLUG
 
     # Partial configuration
     config_partial = {}
