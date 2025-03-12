@@ -301,7 +301,7 @@ class Snapshot:
         # Return temporary directory
         return temp_dir
 
-    def read_in_archive(self, filename: str, file_extension: Optional[str] = None, *args, **kwargs) -> Table:
+    def read_in_archive(self, filename: str, set_file_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read data from file inside a zip/tar archive.
 
         If the relevant data file is within a zip/tar archive, this method will read this file and return it as a table.
@@ -309,10 +309,11 @@ class Snapshot:
         To do so, this method first unzips/untars the archive to a temporary directory, and then reads the file. Note that the file should have a supported extension (see `read` method).
         """
         with self.extract_to_tempdir() as tmpdir:
-            if file_extension is None:
+            if set_file_extension is None:
                 new_extension = filename.split(".")[-1]
             else:
-                new_extension = file_extension
+                new_extension = set_file_extension
+
             # Read
             tb = read_table_from_snapshot(
                 *args,
