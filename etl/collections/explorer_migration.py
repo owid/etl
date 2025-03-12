@@ -491,14 +491,14 @@ def migrate_csv_explorer(explorer_path: Union[Path, str]):
 
 ################ WIP
 # 1/ Actual migration example
-import yaml
+# import yaml
 
-from etl.files import yaml_dump
+# from etl.files import yaml_dump
 
-config = migrate_csv_explorer("/home/lucas/repos/owid-content/explorers/monkeypox.explorer.tsv")
-# print(yaml.dump(config))
-with open("/home/lucas/repos/etl/etl/steps/export/explorers/who/latest/monkeypox2.config.yml", "w") as f:
-    yaml_dump(config, f)
+# config = migrate_csv_explorer("/home/lucas/repos/owid-content/explorers/monkeypox.explorer.tsv")
+# # print(yaml.dump(config))
+# with open("/home/lucas/repos/etl/etl/steps/export/explorers/who/latest/monkeypox2.config.yml", "w") as f:
+#     yaml_dump(config, f)
 
 # path_new = ""
 # with open(path_new, "w"):

@@ -6,7 +6,7 @@ import pandas as pd
 from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
 
 from etl.collections.explorer_legacy import ExplorerLegacy
-from etl.helpers import PathFinder, create_explorer_legacy
+from etl.helpers import PathFinder
 from etl.paths import EXPLORERS_DIR
 
 # Get paths and naming conventions for current step.
@@ -141,9 +141,7 @@ def run(dest_dir: str) -> None:
     df_columns["colorScaleEqualSizeBins"] = True
 
     # Save outputs.
-    ds_explorer = create_explorer_legacy(
-        dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns
-    )
+    ds_explorer = paths.create_explorer_legacy(config=config, df_graphers=df_graphers, df_columns=df_columns)
     ds_explorer.save()
 
 

@@ -4,14 +4,14 @@ from typing import Dict, List, Optional, Set
 
 import pandas as pd
 
-from etl.collections.common import expand_config, validate_collection_config
+from etl.collections.common import expand_config
+from etl.collections.explorer_legacy import create_explorer_legacy
 from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
 from etl.collections.utils import (
     get_tables_by_name_mapping,
     validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.helpers import create_explorer_legacy
 
 
 @pruned_json
@@ -22,6 +22,17 @@ class Explorer(Collection):
     views: List[ExplorerView]
     config: Dict[str, str]
     definitions: Optional[Definitions] = None
+
+    # Internal use. For save() method.
+    _catalog_path: Optional[str] = None
+
+    @property
+    def catalog_path(self) -> Optional[str]:
+        return self._catalog_path
+
+    @catalog_path.setter
+    def catalog_path(self, value: Optional[str]) -> None:
+        self._catalog_path = value
 
     def display_config_names(self):
         """Get display names for all dimensions and choices.
@@ -116,42 +127,6 @@ def process_views(
         # Combine metadata/config with definitions.common_views
         if (explorer.definitions is not None) and (explorer.definitions.common_views is not None):
             view.combine_with_common(explorer.definitions.common_views)
-
-
-def _create_explorer(
-    dest_dir: str,
-    explorer: Explorer,
-    tolerate_extra_indicators: bool,
-    explorer_name: Optional[str] = None,
-    owid_env: Optional[OWIDEnv] = None,
-):
-    # Ensure we have an environment set
-    if owid_env is None:
-        owid_env = OWID_ENV
-
-    # Validate config
-    # TODO: explorer.validate_schema(SCHEMAS_DIR / "explorer-schema.json")
-    validate_collection_config(explorer, owid_env.engine, tolerate_extra_indicators)
-
-    # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
-    # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
-    df_grapher = extract_explorers_graphers(explorer)
-
-    # TODO: extract config. Useful if we standardize the configuration structure.
-    # config = extract_explorers_config(explorer)
-
-    # TODO: extract columns. To be extracted from `display` in each indicator?
-    # df_columns = extract_explorers_columns(explorer)
-
-    # Create explorer
-    ds = create_explorer_legacy(
-        dest_dir=dest_dir,
-        config=explorer.config,
-        df_graphers=df_grapher,
-        explorer_name=explorer_name,
-    )
-
-    return ds
 
 
 def extract_explorers_graphers(
