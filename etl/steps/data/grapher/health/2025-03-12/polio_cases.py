@@ -16,9 +16,6 @@ def run() -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("polio_cases", reset_index=False)
 
-    #
-    # Save outputs.
-    #
     # Initialize a new grapher dataset.
     ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
 

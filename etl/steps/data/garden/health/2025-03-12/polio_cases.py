@@ -2,7 +2,6 @@
 
 from owid.catalog import processing as pr
 
-from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -32,7 +31,7 @@ def run() -> None:
     tb = tb.drop(columns=["population", "_merge", "source", "world_pop_share"])
 
     # Improve table format.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(["country", "year"], short_name="polio_cases")
 
     #
     # Save outputs.
