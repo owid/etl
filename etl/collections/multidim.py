@@ -53,7 +53,8 @@ class Multidim(Collection):
         return self._catalog_path
 
     @catalog_path.setter
-    def catalog_path(self, value: Optional[str]) -> None:
+    def catalog_path(self, value: str) -> None:
+        assert "#" in value, "Catalog path should be in the format `path#name`."
         self._catalog_path = value
 
     def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
