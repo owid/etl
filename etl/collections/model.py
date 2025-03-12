@@ -27,7 +27,6 @@ T = TypeVar("T")
 REGEX_CATALOG_PATH = (
     r"^(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
 )
-ChoiceSlugType = Union[str, bool]
 
 
 def prune_dict(d: dict) -> dict:
@@ -218,7 +217,7 @@ class Definitions(MDIMBase):
 class View(MDIMBase):
     """MDIM/Explorer view configuration."""
 
-    dimensions: Dict[str, ChoiceSlugType]
+    dimensions: Dict[str, str | bool]
     indicators: ViewIndicators
     # NOTE: Maybe worth putting as classes at some point?
     config: Optional[GrapherConfig] = None
@@ -325,7 +324,7 @@ class MDIMView(View):
 @pruned_json
 @dataclass
 class DimensionChoice(MDIMBase):
-    slug: ChoiceSlugType
+    slug: str | bool
     name: str
     description: Optional[str] = None
 
