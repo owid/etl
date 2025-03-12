@@ -9,7 +9,6 @@ from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
-# Data for 1937 - 2022 (except 1938-43 inclusive as that's from the census bureau)
 DATA_CDC = pd.DataFrame(
     {
         "country": ["United States"] * 73,

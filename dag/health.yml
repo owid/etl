@@ -1172,21 +1172,32 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-03-06/pertussis_deaths:
     - data://garden/health/2025-03-06/pertussis_deaths
-  
+
   #
   # TODO: add step name (just something recognizable)
   #
   data://meadow/public_health_reports/2025-03-12/polio_cases:
     - snapshot://public_health_reports/2025-03-12/polio_cases.csv
-  
+
   #
   # TODO: add step name (just something recognizable)
   #
   data://meadow/us_census_bureau/2025-03-12/polio_cases:
-    - snapshot://public_health_reports/2025-03-12/polio_cases.csv
-  
+    - snapshot://us_census_bureau/2025-03-12/polio_cases.csv
+
   #
   # TODO: add step name (just something recognizable)
   #
   data://meadow/cdc/2025-03-12/polio_cases:
-    - snapshot://public_health_reports/2025-03-12/polio_cases.csv
+    - snapshot://cdc/2025-03-12/polio_cases.csv
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://garden/health/2025-03-12/polio_cases:
+    - data://meadow/cdc/2025-03-12/polio_cases
+    - data://meadow/us_census_bureau/2025-03-12/polio_cases
+    - data://meadow/public_health_reports/2025-03-12/polio_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-03-12/polio_cases:
+    - data://garden/health/2025-03-12/polio_cases
