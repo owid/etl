@@ -65,7 +65,7 @@ dimensions:
         description: null
 
   - slug: variant
-    name: Projection secnario
+    name: Projection scenario
     choices:
       - slug: estimates
         name: None
