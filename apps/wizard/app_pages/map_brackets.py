@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from structlog import get_logger
 
 from apps.wizard.utils.components import grapher_chart
-from etl.collections.explorer_tsv import ExplorerTSV
+from etl.collections.explorer_legacy import ExplorerLegacy
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
 from etl.grapher.model import Entity, Variable
@@ -759,7 +759,7 @@ def map_bracketer_interactive(mb: MapBracketer) -> None:
     mb.update_chart_config()
 
 
-def update_explorer_file(mb: MapBracketer, explorer: ExplorerTSV) -> None:
+def update_explorer_file(mb: MapBracketer, explorer: ExplorerLegacy) -> None:
     index = get_index_of_var(mb, explorer)
 
     # If custom brackets have been defined, update explorer.
@@ -951,7 +951,7 @@ elif use_type == USE_TYPE_EXPLORERS:
 
         # Load and parse explorer content.
         path = str((Path(EXPLORERS_DIR) / explorer_name).with_suffix(".explorer.tsv"))
-        explorer = ExplorerTSV.from_file(path=path)
+        explorer = ExplorerLegacy.from_file(path=path)
 
         # Gather all variable ids of indicators with a map tab. In yVariableIds there can be variable ids or etl paths, so be careful going forward
         variable_ids = list(

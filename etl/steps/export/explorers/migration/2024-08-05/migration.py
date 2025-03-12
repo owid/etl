@@ -5,7 +5,7 @@ from pathlib import Path
 import pandas as pd
 from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
 
-from etl.collections.explorer_tsv import ExplorerTSV
+from etl.collections.explorer_legacy import ExplorerLegacy
 from etl.helpers import PathFinder, create_explorer_legacy
 from etl.paths import EXPLORERS_DIR
 
@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     if USE_EXISTING_MAP_BRACKETS:
         expl_path = (Path(EXPLORERS_DIR) / paths.short_name).with_suffix(".explorer.tsv")
         if expl_path.exists():
-            old_explorer = ExplorerTSV.from_owid_content(paths.short_name)
+            old_explorer = ExplorerLegacy.from_owid_content(paths.short_name)
             df_columns = old_explorer.df_columns
             for _, row in df_columns.iterrows():
                 var_title = row["slug"]
