@@ -99,6 +99,7 @@ def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
 
 
 def main():
+    st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
     st.title(
         ":material/difference: Explorer Diff",
         help=f"""

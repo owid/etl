@@ -527,18 +527,6 @@ class Explorer(Collection):
         return mapping
 
 
-@pruned_json
-@dataclass
-class Multidim(Collection):
-    """Model for MDIM configuration."""
-
-    views: List[MDIMView]
-    title: Dict[str, str]
-    default_selection: List[str]
-    topic_tags: Optional[List[str]] = None
-    definitions: Optional[Definitions] = None
-
-
 # def main():
 # import yaml
 
