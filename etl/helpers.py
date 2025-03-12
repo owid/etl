@@ -665,8 +665,16 @@ class PathFinder:
 
         return mdim
 
-    def create_explorer(self, config, explorer_name: str) -> Explorer:
-        """Create an Explorer object."""
+    def create_explorer(self, config, explorer_name: Optional[str] = None) -> Explorer:
+        """Create an Explorer object.
+
+        Args:
+        -----
+        config: Dict[str, Any]
+            Configuration of the explorer.
+        explorer_name: str
+            Name of the explorer. If none is provided, it will use the short_name from the explorer catalog path.
+        """
         # Create Explorer object
         explorer = create_explorer(
             config=config,
