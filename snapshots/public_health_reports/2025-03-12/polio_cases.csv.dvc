@@ -1,0 +1,63 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical diphtheria cases in the United States - Public Health Reports
+    description: |-
+      Data on historical diphtheria cases in the United States, compiled from a selection of sources from the United States - Public Health Reports.
+
+      Sources for each year are as follows:
+
+      * 1910-11: [Public Health Reports Vol. 27, No. 16 “Poliomyelitis in the United States, 1910 and 1911"](https://www.jstor.org/stable/4567726?seq=4)
+
+      * 1913: [Public Health Reports Vol. 29, No. 28 “The Notifiable Diseases: Their Prevalence by States during 1913”](https://www.jstor.org/stable/4570998?seq=12)
+
+      * 1914: [Public Health Reports Vol. 39, No. 36 “The Notifiable Diseases: Reported Prevalence during 1914 by States”](https://www.jstor.org/stable/4572751?seq=7)
+
+      * 1915-1937: [Public Health Reports Vol. 54, No. 21 “Prevalence of Poliomyelitis in the United States in 1938”](https://www.jstor.org/stable/4582892?seq=1)
+
+      * 1938: [Public Health Reports Vol. 55, No. 10 “Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases"](https://www.jstor.org/stable/4583204?seq=1)
+
+      * 1939: [Public Health Reports, Vol. 56, No. 7 - Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1941)](https://www.jstor.org/stable/4583620)
+
+      * 1940: [Public Health Reports, Vol. 57, No. 7 - Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1942)](https://www.jstor.org/stable/4584013)
+
+      * 1942-1947: [Public Health Reports Vol. 63, No. 13 - Incidence of Poliomyelitis in 1947](https://www.jstor.org/stable/4586491)
+
+      * 1948-1951: [Public Health Reports Vol. 67, No. 6 - Poliomyelitis in the United States, 1951](https://www.jstor.org/stable/4588131)
+
+    date_published: "1942-02-13"
+
+    # Citation
+    producer: Public Health Reports
+    citation_full: |-
+      Public Health Reports Vol. 27, No. 16 “Poliomyelitis in the United States, 1910 and 1911"
+
+      Public Health Reports Vol. 29, No. 28 “The Notifiable Diseases: Their Prevalence by States during 1913”
+
+      Public Health Reports Vol. 39, No. 36 “The Notifiable Diseases: Reported Prevalence during 1914 by States”
+
+      Public Health Reports Vol. 54, No. 21 “Prevalence of Poliomyelitis in the United States in 1938”
+
+      Public Health Reports Vol. 55, No. 10 “Notifiable Diseases in the United States, 1938: Morbidity and Mortality Summaries for Certain Important Communicable Diseases"
+
+      Public Health Reports, Vol. 56, No. 7 - Notifiable Diseases in the United States, 1939: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1941)
+
+      Public Health Reports, Vol. 57, No. 7 - Notifiable Diseases in the United States, 1940: Morbidity and Mortality Summaries for Certain Important Communicable Diseases (1942)
+
+      Public Health Reports Vol. 63, No. 13 - Incidence of Poliomyelitis in 1947
+
+      Public Health Reports Vol. 67, No. 6 - Poliomyelitis in the United States, 1951
+
+    # Files
+    url_main: https://www.jstor.org/stable/4588131
+    date_accessed: 2025-03-12
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 0243202f66b58abd704b86a5dddbda02
+    size: 2524
+    path: polio_cases.csv
