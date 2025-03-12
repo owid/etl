@@ -301,18 +301,20 @@ class Snapshot:
         # Return temporary directory
         return temp_dir
 
-    def read_in_archive(self, filename: str, set_file_extension: Optional[str] = None, *args, **kwargs) -> Table:
+    def read_in_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read data from file inside a zip/tar archive.
 
         If the relevant data file is within a zip/tar archive, this method will read this file and return it as a table.
 
         To do so, this method first unzips/untars the archive to a temporary directory, and then reads the file. Note that the file should have a supported extension (see `read` method).
+
+        The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
         """
         with self.extract_to_tempdir() as tmpdir:
-            if set_file_extension is None:
+            if force_extension is None:
                 new_extension = filename.split(".")[-1]
             else:
-                new_extension = set_file_extension
+                new_extension = force_extension
 
             # Read
             tb = read_table_from_snapshot(
@@ -350,18 +352,20 @@ class Snapshot:
             temp_dir.cleanup()
             self._unarchived_dir = None
 
-    def read_from_archive(self, filename: str, file_extension: Optional[str] = None, *args, **kwargs) -> Table:
+    def read_from_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read a file in an archive.
 
         Use this function within a context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
+
+        The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
         """
         if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
             raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
 
-        if file_extension is None:
+        if force_extension is None:
             new_extension = filename.split(".")[-1]
         else:
-            new_extension = file_extension
+            new_extension = force_extension
 
         tb = read_table_from_snapshot(
             *args,
