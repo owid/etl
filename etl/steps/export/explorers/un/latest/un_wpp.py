@@ -25,7 +25,7 @@
 total done: 4/22
 """
 
-from etl.collections.explorers import create_explorer, expand_config
+from etl.collections.explorer import create_explorer, expand_config
 from etl.collections.multidim import combine_config_dimensions
 
 # from etl.files import yaml_dump

@@ -26,10 +26,10 @@ from owid.walden import Catalog as WaldenCatalog
 from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
+from etl.collections.explorer import Explorer, create_explorer
 from etl.collections.explorer_legacy import ExplorerLegacy
-from etl.collections.explorers import Explorer, create_explorer
 
-# from etl.collections.explorers import create_explorer as create_explorer_v2
+# from etl.collections.explorer import create_explorer as create_explorer_v2
 from etl.collections.multidim import Multidim, create_mdim
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks

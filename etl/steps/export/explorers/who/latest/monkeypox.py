@@ -3,7 +3,7 @@
 This step contains tooling that should moved to a more general module so that it can be easily used by other explorer steps!
 """
 
-from etl.collections.explorers import create_explorer
+from etl.collections.explorer import create_explorer
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.

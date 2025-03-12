@@ -23,7 +23,7 @@ This step contains tooling that should moved to a more general module so that it
         ]
 """
 
-from etl.collections.explorers import create_explorer
+from etl.collections.explorer import create_explorer
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
