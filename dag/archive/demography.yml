@@ -133,3 +133,6 @@ steps:
     - data://meadow/demography/2023-04-07/population_education_wittgenstein
   data://grapher/demography/2023-04-07/population_education_wittgenstein:
     - data://garden/demography/2023-04-07/population_education_wittgenstein
+
+  data://explorers/un/2022/un_wpp:
+    - data://garden/un/2022-07-11/un_wpp
