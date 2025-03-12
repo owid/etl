@@ -4,7 +4,7 @@ from io import StringIO
 
 import streamlit as st
 
-from etl.explorer import Explorer
+from etl.collections.explorer_tsv import ExplorerTSV
 
 # PAGE CONFIG
 st.set_page_config(
@@ -32,7 +32,7 @@ with st.container(border=True):
         else:
             sep = "\t"
 
-        explorer = Explorer.from_raw_string(string_data, sep=sep)
+        explorer = ExplorerTSV.from_raw_string(string_data, sep=sep)
 
         # explorer.convert_ids_to_etl_paths()
 
