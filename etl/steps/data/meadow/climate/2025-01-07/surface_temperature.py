@@ -139,6 +139,43 @@ def run(dest_dir: str) -> None:
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
+    temp_continent = {}
+
+    # Define bounding boxes for continents
+    bounding_boxes = {
+        "Asia": {"xmin": 26, "ymin": -10, "xmax": 180, "ymax": 81},
+        "Africa": {"xmin": -25, "ymin": -35, "xmax": 55, "ymax": 37},
+        "North America": {"xmin": -170, "ymin": 5, "xmax": -52, "ymax": 83},
+        "South America": {"xmin": -82, "ymin": -56, "xmax": -35, "ymax": 13},
+        "Antarctica": {"xmin": -180, "ymin": -90, "xmax": 180, "ymax": -60},
+        "Europe": {"xmin": -25, "ymin": 35, "xmax": 45, "ymax": 71},
+        "Oceania": {"xmin": 110, "ymin": -50, "xmax": 180, "ymax": 10},
+    }
+    # Iterate over continents and compute average temperature
+    for continent, bbox in bounding_boxes.items():
+        try:
+            # Clip data to the continent's bounding box
+            clip = da.rio.clip_box(minx=bbox["xmin"], miny=bbox["ymin"], maxx=bbox["xmax"], maxy=bbox["ymax"])
+
+            # Calculate weights based on latitude
+            weights = np.cos(np.deg2rad(clip.latitude))
+            weights.name = "weights"
+
+            # Apply weights and compute weighted mean temperature
+            clim_month_weighted = clip.weighted(weights)
+            continent_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
+
+            # Store result
+            temp_continent[continent] = continent_weighted_mean
+
+            # Clean up memory
+            del clip, weights, clim_month_weighted
+
+        except Exception as e:
+            print(f"Failed to extract temperature data for {continent}: {e}")
+
+    # Combine country and continent temperature data
+    temp_country.update(temp_continent)
     # Define the start and end dates
     da["time"] = xr.DataArray(pd.to_datetime(da["time"].values), dims=da["valid_time"].dims)
 
