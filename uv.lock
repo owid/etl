@@ -655,6 +655,15 @@ wheels = [
 ]
 
 [[package]]
+name = "commentjson"
+version = "0.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "lark-parser" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c0/76/c4aa9e408dbacee3f4de8e6c5417e5f55de7e62fb5a50300e1233a2c9cb5/commentjson-0.9.0.tar.gz", hash = "sha256:42f9f231d97d93aff3286a4dc0de39bfd91ae823d1d9eba9fa901fe0c7113dd4", size = 8653 }
+
+[[package]]
 name = "contourpy"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1035,6 +1044,7 @@ wizard = [
 dev = [
     { name = "argh" },
     { name = "boto3-stubs", extra = ["s3"] },
+    { name = "commentjson" },
     { name = "cookiecutter" },
     { name = "gspread" },
     { name = "hydra-core" },
@@ -1155,6 +1165,7 @@ provides-extras = ["api", "wizard"]
 dev = [
     { name = "argh", specifier = ">=0.31.3" },
     { name = "boto3-stubs", extras = ["s3"], specifier = ">=1.34.154" },
+    { name = "commentjson", specifier = ">=0.9.0" },
     { name = "cookiecutter", specifier = ">=2.6.0" },
     { name = "gspread", specifier = ">=5.12.4" },
     { name = "hydra-core", specifier = ">=1.3.2" },
@@ -2585,6 +2596,12 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/43/f8/7259f18c77adca88d5f64f9a522792e178b2691f3748817a8750c2d216ef/kiwisolver-1.4.8-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c07b29089b7ba090b6f1a669f1411f27221c3662b3a1b7010e67b59bb5a6f10b", size = 80279 },
     { url = "https://files.pythonhosted.org/packages/3a/1d/50ad811d1c5dae091e4cf046beba925bcae0a610e79ae4c538f996f63ed5/kiwisolver-1.4.8-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:65ea09a5a3faadd59c2ce96dc7bf0f364986a315949dc6374f04396b0d60e09b", size = 71762 },
 ]
+
+[[package]]
+name = "lark-parser"
+version = "0.7.8"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/b8/aa7d6cf2d5efdd2fcd85cf39b33584fe12a0f7086ed451176ceb7fb510eb/lark-parser-0.7.8.tar.gz", hash = "sha256:26215ebb157e6fb2ee74319aa4445b9f3b7e456e26be215ce19fdaaa901c20a4", size = 276204 }
 
 [[package]]
 name = "line-profiler"

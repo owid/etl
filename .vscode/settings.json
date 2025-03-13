@@ -36,12 +36,6 @@
     "**/docs/api/*.md",
     "**/docs/architecture/*.md"
   ],
-  "files.exclude": {
-    "**/dataset_*_config.json": true,
-    "**/dataset_*_values.json": true,
-    "**/dataset_*.json.dvc": true,
-    "**/dataset_*.feather.dvc": true
-  },
   "yaml.format.printWidth": 999,
   "ruff.path": [
     ".venv/bin/ruff"
