@@ -80,3 +80,22 @@ tables:
           title_public: Annual average ocean heat content for the 0-2000 meters layer, according to MRI/JMA
   climate_change_impacts_monthly:
     title: Climate Change Impacts - Monthly
+    variables:
+      sea_level_church_and_white_2011:
+        title: Global sea level according to Church and White (2011)
+        display:
+          name: Church and White
+        presentation:
+          title_public: Global sea level according to Church and White (2011)
+      sea_level_uhslc:
+        title: Global sea level according to UHSLC
+        display:
+          name: University of Hawaii
+        presentation:
+          title_public: Global sea level according to UHSLC
+      sea_level_average:
+        title: Global sea level as an average of Church and White (2011) and UHSLC data
+        display:
+          name: Average
+        presentation:
+          title_public: Global sea level as an average of Church and White (2011) and UHSLC data
