@@ -9,3 +9,7 @@ meta:
   license_name: Creative Commons BY 4.0
   description: |
     National Accounts data in current and constant national prices and exchange rate and population data for Penn World Table.
+outs:
+  - md5: 4a5b758413ce255d97a87acbffed2df6
+    size: 3091270
+    path: penn_world_table_national_accounts.xlsx
