@@ -125,9 +125,9 @@ definitions:
 
   key_constant_usd: The data is measured in constant {definitions.inflation_year} US$ – this adjusts for inflation.
 
-  key_indonor: "This data considers these subcategories of ODA: scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries"
+  key_indonor: "In-donor aid considers these subcategories of ODA: scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries"
 
-  key_overseas: "This data considers the total ODA given by the donor country to other countries and multilateral organizations, minus the ODA given in-donor (scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries)."
+  key_overseas: "Overseas aid considers the total ODA given by the donor country to other countries and multilateral organizations, minus the in-donor ODA (scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries)."
 
   producer_oda: |-
     _[From OECD's indicator explainer](https://www.oecd.org/en/data/indicators/net-oda.html)_
