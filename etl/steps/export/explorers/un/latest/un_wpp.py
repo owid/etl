@@ -33,6 +33,7 @@ from owid.catalog import Table
 from etl.collections.explorer import Explorer, expand_config
 from etl.collections.model import Dimension, DimensionChoice
 from etl.collections.multidim import combine_config_dimensions
+from etl.collections.utils import has_duplicate_table_names
 
 # from etl.files import yaml_dump
 # from etl.db import get_engine
@@ -67,6 +68,7 @@ AGES_SR = {
 def run() -> None:
     # Load dataset
     ds = paths.load_dataset("un_wpp")
+    ds_full = paths.load_dataset("un_wpp_full")
 
     # 1) Population
     config = paths.load_explorer_config()
@@ -81,6 +83,20 @@ def run() -> None:
             "variant": ["estimates"],
         },
         choice_renames={"age": AGES_POP},
+        explorer_name="population-and-demography",
+    )
+
+    explorer_pop_full = create_explorer(
+        tb=ds_full.read("population", load_data=False),
+        config_yaml=config,
+        indicator_names=["population", "population_change", "population_density"],
+        dimensions={
+            "age": ["all", "0", "0-4", "0-14", "0-24"] + AGES_POP_LIST,
+            "sex": "*",
+            "variant": ["medium", "high", "low"],
+        },
+        choice_renames={"age": AGES_POP},
+        explorer_name="population-and-demography",
     )
 
     # 2) DEPENDENCY RATIO
@@ -116,7 +132,8 @@ def run() -> None:
 
     # Export
     # Combine explorers
-    explorers = [explorer_pop, explorer_dep, explorer_sr]
+    # TODO: falla si tenemos POP_FULL junto con SR!
+    explorers = [explorer_pop, explorer_pop_full, explorer_dep, explorer_sr]
     explorer = combine_explorers(
         explorers=explorers,
         explorer_name="population-and-demography",
@@ -158,11 +175,21 @@ def create_explorer(
     indicator_as_dimension: bool = False,
     explorer_name: Optional[str] = None,
     choice_renames: Optional[Dict[str, Dict[str, str]]] = None,
+    catalog_path_full: bool = False,
 ) -> Explorer:
     """Experimental."""
     from copy import deepcopy
 
     config = deepcopy(config_yaml)
+
+    # Check if there are collisions between table names
+    # TODO: We should do this at indicator level. Default to 'table' for all indicators, except when there is a collision, then go to 'dataset', otherwise go to 'full'
+    expand_path_mode = "table"
+    if catalog_path_full:
+        expand_path_mode = "full"
+    elif has_duplicate_table_names(paths.dependencies):
+        expand_path_mode = "dataset"
+    print(expand_path_mode)
 
     # Bake config automatically from table
     config_new = expand_config(
@@ -172,6 +199,7 @@ def create_explorer(
         common_view_config=common_view_config,
         indicators_slug=indicators_slug,
         indicator_as_dimension=indicator_as_dimension,
+        expand_path_mode=expand_path_mode,
     )
     # Combine & bake dimensions
     config["dimensions"] = combine_config_dimensions(

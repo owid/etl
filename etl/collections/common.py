@@ -1,6 +1,6 @@
 """Common tooling for MDIMs/Explorers."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import pandas as pd
 from owid.catalog import Table
@@ -57,6 +57,7 @@ def expand_config(
     common_view_config: Optional[Dict[str, Any]] = None,
     indicators_slug: Optional[str] = None,
     indicator_as_dimension: bool = False,
+    expand_path_mode: Literal["table", "dataset", "full"] = "table",
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
@@ -168,6 +169,7 @@ def expand_config(
         indicators_slug=indicators_slug,
         indicator_names=indicator_names,
         indicator_as_dimension=indicator_as_dimension,
+        expand_path_mode=expand_path_mode,
     )
 
     # Combine indicator information with dimensions (only when multiple indicators are given)
@@ -210,17 +212,34 @@ class CollectionConfigExpander:
         indicators_slug: str,
         indicator_names: Optional[Union[str, List[str]]] = None,
         indicator_as_dimension: bool = False,
+        expand_path_mode: Literal["table", "dataset", "full"] = "table",
     ):
         self.indicators_slug = indicators_slug
         self.indicator_as_dimension = indicator_as_dimension
         self.build_df_dims(tb, indicator_names)
-        self.short_name = tb.m.short_name
+        self.tb = tb
         # Get table dimensions from metadata if available, exclude country, year, and date
         self.tb_dims = [d for d in (tb.m.dimensions or []) if d["slug"] not in ("country", "year", "date")]
+        # Indicator expand mode
+        self.expand_path_mode = expand_path_mode
 
     @property
     def dimension_names(self):
         return [col for col in self.df_dims.columns if col not in ["short_name"]]
+
+    @property
+    def table_name(self):
+        return self.tb.m.short_name
+
+    @property
+    def dataset_name(self):
+        assert self.tb.m.dataset is not None, "Can't get dataset name without dataset in table's metadata!"
+        return self.tb.m.dataset.short_name
+
+    @property
+    def dataset_uri(self):
+        assert self.tb.m.dataset is not None, "Can't get table URI without dataset in table's metadata!"
+        return self.tb.m.dataset.uri
 
     def build_dimensions(
         self,
@@ -328,7 +347,9 @@ class CollectionConfigExpander:
             view = {
                 "dimensions": {dim_name: indicator[dim_name] for dim_name in self.dimension_names},
                 "indicators": {
-                    "y": f"{self.short_name}#{indicator.short_name}",  # TODO: Add support for (i) support "x", "color", "size"; (ii) display settings
+                    "y": self._expand_indicator_path(
+                        indicator.short_name
+                    ),  # TODO: Add support for (i) support "x", "color", "size"; (ii) display settings
                 },
             }
             if common_view_config:
@@ -336,6 +357,17 @@ class CollectionConfigExpander:
             config_views.append(view)
 
         return config_views
+
+    def _expand_indicator_path(self, indicator_slug: str) -> str:
+        if self.expand_path_mode == "table":
+            table_path = self.table_name
+        elif self.expand_path_mode == "dataset":
+            table_path = f"{self.dataset_name}/{self.table_name}"
+        elif self.expand_path_mode == "full":
+            table_path = f"{self.dataset_uri}/{self.table_name}"
+        else:
+            raise ValueError(f"Unknown expand_path_mode: {self.expand_path_mode}")
+        return f"{table_path}#{indicator_slug}"
 
     def build_df_dims(self, tb: Table, indicator_names: Optional[Union[str, List[str]]]):
         """Build dataframe with dimensional information from table tb.

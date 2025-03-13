@@ -16,7 +16,6 @@ from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Unio
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog import Table
 from owid.catalog.meta import GrapherConfig, MetaBase
 
 from etl.collections.utils import merge_common_metadata_by_dimension
@@ -25,7 +24,10 @@ from etl.paths import SCHEMAS_DIR
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 T = TypeVar("T")
 REGEX_CATALOG_PATH = (
-    r"^(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
+    r"^grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/[A-Za-z0-9_]+/[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
+)
+REGEX_CATALOG_PATH_OPTIONS = (
+    r"^(?:(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/)?[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
 )
 
 
@@ -76,11 +78,18 @@ class Indicator(MDIMBase):
             raise ValueError(f"Invalid catalog path: {self.catalogPath}")
 
     def has_complete_path(self) -> bool:
-        return "/" in self.catalogPath
+        pattern = re.compile(REGEX_CATALOG_PATH)
+        complete = bool(pattern.match(self.catalogPath))
+        return complete
 
     @classmethod
     def is_a_valid_path(cls, path: str) -> bool:
-        pattern = re.compile(REGEX_CATALOG_PATH)
+        """Valid paths are:
+        - grapher/namespace/version/dataset/table#indicator.
+        - dataset/table#indicator
+        - table#indicator
+        """
+        pattern = re.compile(REGEX_CATALOG_PATH_OPTIONS)
         valid = bool(pattern.match(path))
         return valid
 
@@ -91,13 +100,13 @@ class Indicator(MDIMBase):
                 raise ValueError(f"Invalid catalog path: {value}")
         return super().__setattr__(name, value)
 
-    def expand_path(self, tables_by_name: Dict[str, List[Table]]):
+    def expand_path(self, tables_by_name: Dict[str, List[str]]):
         # Do nothing if path is already complete
         if self.has_complete_path():
             return self
 
         # If path is not complete, we need to expand it!
-        table_name = self.catalogPath.split("#")[0]
+        table_name, indicator_name = self.catalogPath.split("#")
 
         # Check table is in any of the datasets!
         assert (
@@ -107,14 +116,14 @@ class Indicator(MDIMBase):
         # Check table name to table mapping is unique
         assert (
             len(tables_by_name[table_name]) == 1
-        ), f"There are multiple dependencies (datasets) with a table named {table_name}. Please use the complete dataset URI in this case."
+        ), f"There are multiple dependencies (datasets) with a table named {table_name}. Please add dataset name (dataset_name/table_name#indicator_name) if you haven't already, or use the complete dataset URI in this case."
 
         # Check dataset in table metadata is not None
-        tb = tables_by_name[table_name][0]
-        assert tb.m.dataset is not None, f"Dataset not found for table {table_name}"
+        tb_uri = tables_by_name[table_name][0]
+        # assert tb.m.dataset is not None, f"Dataset not found for table {table_name}"
 
         # Build URI
-        self.catalogPath = tb.m.dataset.uri + "/" + self.catalogPath
+        self.catalogPath = tb_uri + "#" + indicator_name
 
         return self
 
@@ -161,7 +170,7 @@ class ViewIndicators(MDIMBase):
                 indicators.append({"path": dimension_val.catalogPath, "dimension": dim})
         return indicators
 
-    def expand_paths(self, tables_by_name: Dict[str, List[Table]]):
+    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
         """Expand the catalog paths of all indicators in the view."""
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -237,7 +246,7 @@ class View(MDIMBase):
     def metadata_is_needed(self) -> bool:
         return self.has_multiple_indicators and (self.metadata is None)
 
-    def expand_paths(self, tables_by_name: Dict[str, List[Table]]):
+    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
         """Expand all indicator paths in the view.
 
         Make sure that they are all complete paths. This includes indicators in view, but also those in config (if any).

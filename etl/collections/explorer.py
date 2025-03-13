@@ -130,7 +130,7 @@ def process_views(
 
     TODO: See if we can converge to one solution with etl.collections.multidim.process_views.
     """
-    # Get table information by table name, and table URI
+    # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
     tables_by_name = get_tables_by_name_mapping(dependencies)
 
     for view in explorer.views:

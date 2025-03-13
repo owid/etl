@@ -69,6 +69,15 @@ dimensions:
       - slug: estimates
         name: None
         description: null
+      - slug: medium
+        name: Medium variant
+        description: null
+      - slug: high
+        name: High variant
+        description: null
+      - slug: low
+        name: Low variant
+        description: null
     presentation:
       type: radio
 
