@@ -64,6 +64,7 @@ steps:
   export://explorers/climate/latest/climate_change:
     - data://grapher/climate/2025-01-21/climate_change_impacts_monthly
     - data://grapher/climate/2025-01-21/climate_change_impacts_annual
+    - data://grapher/met_office_hadley_centre/2025-01-21/near_surface_temperature
 
   #
   # Global Wildfire Information System - Monthly burned area.

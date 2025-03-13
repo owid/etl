@@ -591,6 +591,9 @@ class PathFinder:
         elif path is None:
             path = self.config_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
+
+        # TODO: Get all indicators mentioned in config, and ensure they are included in paths.dependencies.
+
         return config
 
     def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:

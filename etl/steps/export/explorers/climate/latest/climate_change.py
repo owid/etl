@@ -1,26 +1,5 @@
-"""Load a grapher dataset and create an explorer dataset with its tsv file.
+"""Load grapher datasets and create an explorer tsv file.
 
-This step contains tooling that should moved to a more general module so that it can be easily used by other explorer steps!
-
-# optional
-        fields_optional = [
-            "title",
-            "subtitle",
-            "type",  # NO
-            "hasMapTab",
-            "hideAnnotationFieldsInTitle",
-            "sortBy",
-            "sortColumnSlug",
-            "hideTotalValueLabel",
-            "selectedFacetStrategy",
-            "facetYDomain",  # NO
-            "timelineMinTime",
-            "note",
-            "defaultView",  # NO
-            "relatedQuestionText",  # NO
-            "relatedQuestionUrl",  # NO
-            "tab",
-        ]
 """
 
 from etl.helpers import PathFinder
@@ -29,7 +8,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -42,5 +21,5 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new explorers dataset and tsv file.
+    # Write explorer tsv file to owid-content.
     ds_explorer.save(tolerate_extra_indicators=True)
