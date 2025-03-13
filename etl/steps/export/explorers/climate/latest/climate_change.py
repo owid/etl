@@ -40,19 +40,7 @@ def run(dest_dir: str) -> None:
     ds_explorer = paths.create_explorer(config=config, explorer_name="climate-change")
 
     #
-    # Process data.
-    #
-
-    # Set dtypes -- TODO: is this needed?
-    # if "timelineMinTime" in df_grapher.columns:
-    #     df_grapher = df_grapher.astype(
-    #         {
-    #             "timelineMinTime": "Int64",
-    #         }
-    #     )
-    #
     # Save outputs.
     #
-
     # Create a new explorers dataset and tsv file.
     ds_explorer.save(tolerate_extra_indicators=True)
