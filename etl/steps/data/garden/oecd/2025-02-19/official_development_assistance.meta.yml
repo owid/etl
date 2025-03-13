@@ -125,6 +125,10 @@ definitions:
 
   key_constant_usd: The data is measured in constant {definitions.inflation_year} US$ – this adjusts for inflation.
 
+  key_indonor: "This data considers these subcategories of ODA: scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries"
+
+  key_overseas: "This data considers the total ODA given by the donor country to other countries and multilateral organizations, minus the ODA given in-donor (scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries)."
+
   producer_oda: |-
     _[From OECD's indicator explainer](https://www.oecd.org/en/data/indicators/net-oda.html)_
 
@@ -179,6 +183,12 @@ definitions:
 
   processing_share_oda: |-
     We calculated this indicator by dividing the subcomponent of ODA by total ODA by donor, expressed as a percentage.
+
+  processing_indonor: |-
+    We calculated this indicator by summing the subcomponents of ODA that are considered in-donor (scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries). In the case of shares, we divided this sum by total ODA by donor, expressed as a percentage.
+
+  processing_overseas: |-
+    We calculated this indicator by subtracting the subcomponents of ODA that are considered in-donor (scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries) from total ODA by donor. In the case of shares, we divided this difference by total ODA by donor, expressed as a percentage.
 
   processing_oda_net_disbursements: |-
     We have combined net disbursements aid data from the [DAC1: Flows by donor (ODA+OOF+Private) dataset](https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CDevelopment%23DEV%23%7COfficial%20Development%20Assistance%20%28ODA%29%23DEV_ODA%23&pg=0&fc=Topic&bp=true&snb=20&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_DAC1%40DF_DAC1&df[ag]=OECD.DCD.FSD&df[vs]=1.2&dq=DAC...1140%2B1160..Q.&lom=LASTNPERIODS&lo=10&to[TIME_PERIOD]=false) with the [DAC2A: Aid (ODA) disbursements to countries and regions dataset](https://data-explorer.oecd.org/vis?fs[0]=Topic%2C1%7CDevelopment%23DEV%23%7COfficial%20Development%20Assistance%20%28ODA%29%23DEV_ODA%23&pg=0&fc=Topic&bp=true&snb=20&df[ds]=dsDisseminateFinalDMZ&df[id]=DSD_DAC2%40DF_DAC2A&df[ag]=OECD.DCD.FSD&df[vs]=1.1&dq=.DPGC.206.USD.Q&lom=LASTNPERIODS&lo=5&to[TIME_PERIOD]=false) to add aid given by multilateral organizations and grants given by civil society organizations.
@@ -831,6 +841,24 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
 
+      # i_a_8_2_refugees_other_provider_countries_grant_equivalents:
+      #   title: ODA by donor - Support to refugees and asylum seekers in other provider countries - Grant equivalents
+      #   unit: "constant {definitions.inflation_year} US$"
+      #   short_unit: "$"
+      #   description_short: "[Official development assistance](#dod:oda) component that represents support to refugees and asylum seekers in other provider countries. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+      #   description_key:
+      #     - "{definitions.key_oda}"
+      #     - "{definitions.key_oda_coverage_limits}"
+      #     - "{definitions.key_grant_equivalents}"
+      #     - "{definitions.key_constant_usd}"
+      #   presentation:
+      #     title_public: ODA by donor - Support to refugees and asylum seekers in other provider countries
+      #     title_variant: Grant equivalents
+      #   display:
+      #     name: ODA by donor - Support to refugees and asylum seekers in other provider countries
+      #     numDecimalPlaces: 0
+      #     <<: *common_display
+
       i_a_9_recoveries_bilateral_oda_grants_negative_commitments_grant_equivalents:
         title: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments - Grant equivalents"
         unit: "constant {definitions.inflation_year} US$"
@@ -902,6 +930,46 @@ tables:
       #     name: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
       #     numDecimalPlaces: 0
       #     <<: *common_display
+
+      oda_indonor_grant_equivalents:
+        title: ODA by donor - In-donor aid - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents in-donor aid. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_indonor}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_constant_usd}"
+        description_processing: "{definitions.processing_indonor}"
+        presentation:
+          title_public: ODA by donor - In-donor aid
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - In-donor aid
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      oda_overseas_grant_equivalents:
+        title: ODA by donor - Overseas aid - Grant equivalents
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents overseas aid. {definitions.short_grant_equivalents} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_overseas}"
+          - "{definitions.key_grant_equivalents}"
+          - "{definitions.key_constant_usd}"
+        description_processing: "{definitions.processing_overseas}"
+        presentation:
+          title_public: ODA by donor - Overseas aid
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Overseas aid
+          numDecimalPlaces: 0
+          <<: *common_display
 
       i_a_1_budget_support_net_disbursements:
         title: ODA by donor - Budget support - Net disbursements
@@ -1083,6 +1151,24 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
 
+      i_a_8_2_refugees_other_provider_countries_net_disbursements:
+        title: ODA by donor - Support to refugees and asylum seekers in other provider countries - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents support to refugees and asylum seekers in other provider countries. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_constant_usd}"
+        presentation:
+          title_public: ODA by donor - Support to refugees and asylum seekers in other provider countries
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Support to refugees and asylum seekers in other provider countries
+          numDecimalPlaces: 0
+          <<: *common_display
+
       i_a_9_recoveries_bilateral_oda_grants_negative_commitments_net_disbursements:
         title: "ODA by donor - Recoveries on bilateral ODA grants / negative commitments - Net disbursements"
         unit: "constant {definitions.inflation_year} US$"
@@ -1152,6 +1238,46 @@ tables:
           title_variant: Net disbursements
         display:
           name: "ODA by donor - Other ODA not assigned to the above categories (historical series)"
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      oda_indonor_net_disbursements:
+        title: ODA by donor - In-donor aid - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents in-donor aid. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_indonor}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_constant_usd}"
+        description_processing: "{definitions.processing_indonor}"
+        presentation:
+          title_public: ODA by donor - In-donor aid
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - In-donor aid
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      oda_overseas_net_disbursements:
+        title: ODA by donor - Overseas aid - Net disbursements
+        unit: "constant {definitions.inflation_year} US$"
+        short_unit: "$"
+        description_short: "[Official development assistance](#dod:oda) component that represents overseas aid. {definitions.short_net_disbursements} {definitions.short_constant_usd}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_overseas}"
+          - "{definitions.key_net_disbursements}"
+          - "{definitions.key_constant_usd}"
+        description_processing: "{definitions.processing_overseas}"
+        presentation:
+          title_public: ODA by donor - Overseas aid
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Overseas aid
           numDecimalPlaces: 0
           <<: *common_display
 
@@ -1227,6 +1353,44 @@ tables:
             numDecimalPlaces: 1
             <<: *common_display
 
+      oda_indonor_grant_equivalents_share_oda:
+        title: ODA by donor - In-donor aid (% of ODA) - Grant equivalents
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents in-donor aid, expressed as a percentage of ODA. {definitions.short_grant_equivalents}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_indonor}"
+          - "{definitions.key_grant_equivalents}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_public: ODA by donor - In-donor aid (% of ODA)
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - In-donor aid (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      oda_overseas_grant_equivalents_share_oda:
+        title: ODA by donor - Overseas aid (% of ODA) - Grant equivalents
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents overseas aid, expressed as a percentage of ODA. {definitions.short_grant_equivalents}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_overseas}"
+          - "{definitions.key_grant_equivalents}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_public: ODA by donor - Overseas aid (% of ODA)
+          title_variant: Grant equivalents
+        display:
+          name: ODA by donor - Overseas aid (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
+
       i_a_5_scholarships_student_costs_donor_countries_net_disbursements_share_oda:
           title: ODA by donor - Scholarships and student costs in donor countries (% of ODA) - Net disbursements
           unit: "%"
@@ -1298,6 +1462,44 @@ tables:
             name: ODA by donor - Refugees in donor countries (% of ODA)
             numDecimalPlaces: 1
             <<: *common_display
+
+      oda_indonor_net_disbursements_share_oda:
+        title: ODA by donor - In-donor aid (% of ODA) - Net disbursements
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents in-donor aid, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_indonor}"
+          - "{definitions.key_net_disbursements}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_public: ODA by donor - In-donor aid (% of ODA)
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - In-donor aid (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      oda_overseas_net_disbursements_share_oda:
+        title: ODA by donor - Overseas aid (% of ODA) - Net disbursements
+        unit: "%"
+        short_unit: "%"
+        description_short: "[Official development assistance](#dod:oda) component that represents overseas aid, expressed as a percentage of ODA. {definitions.short_net_disbursements}"
+        description_key:
+          - "{definitions.key_oda}"
+          - "{definitions.key_oda_coverage_limits}"
+          - "{definitions.key_overseas}"
+          - "{definitions.key_net_disbursements}"
+        description_processing: "{definitions.processing_share_oda}"
+        presentation:
+          title_public: ODA by donor - Overseas aid (% of ODA)
+          title_variant: Net disbursements
+        display:
+          name: ODA by donor - Overseas aid (% of ODA)
+          numDecimalPlaces: 1
+          <<: *common_display
 
       # From DAC2A dataset, but "inverted" to show data by donor
       grants:
