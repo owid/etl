@@ -133,7 +133,7 @@ def run() -> None:
     # Export
     # Combine explorers
     # TODO: falla si tenemos POP_FULL junto con SR!
-    explorers = [explorer_pop, explorer_pop_full, explorer_dep]
+    explorers = [explorer_pop, explorer_pop_full, explorer_dep, explorer_sr]
     explorer = combine_explorers(
         explorers=explorers,
         explorer_name="population-and-demography",
@@ -292,6 +292,19 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
         views=views,
         _catalog_path=catalog_path,
     )
+
+    # 5) Announce conflicts
+    df_conflict = df_choices.loc[df_choices["in_conflict"]]
+    paths.log.warning("Conflicts resolved")
+    for (dimension_slug, choice_slug), group in df_conflict.groupby(["dimension_slug", "slug_original"]):
+        # Now group by 'value' to see which col3 values correspond to each unique 'value'
+        paths.log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
+        for choice_slug_id, subgroup in group.groupby("choice_slug_id"):
+            explorer_list = subgroup["explorer_id"].astype(int).unique().tolist()
+            record = subgroup[cols_choices].drop_duplicates().to_dict("records")
+            assert len(record) == 1, "Unexpected, please report!"
+            paths.log.warning(f" Explorers {explorer_list} map to {record[0]}")
+
     return explorer
 
 
@@ -304,24 +317,43 @@ def _build_df_choices(explorers_by_id: Dict[str, Explorer]) -> Tuple[pd.DataFram
                 records.append(
                     {
                         **choice.to_dict(),
-                        "explorer_id": i,
                         "dimension_slug": dim.slug,
+                        "explorer_id": i,
                     }
                 )
     # This needs to change to support checkboxes
     df_choices = pd.DataFrame(records).astype("string")
 
-    # Drop choices that are identical (same slug, same name, etc.)
-    cols_choices = [col for col in df_choices.columns if col not in ["explorer_id", "dimension_slug"]]
-    df_choices = df_choices.drop_duplicates(subset=cols_choices)
+    # Get column names of fields from choice objects
+    cols_choices = [col for col in df_choices.columns if col not in ["slug", "explorer_id", "dimension_slug"]]
 
-    # Flag choices that have same slug but differ in some of other fields
-    df_choices["duplicate"] = df_choices.duplicated(subset=["slug", "dimension_slug"], keep=False)
+    # For each choice slug, assign an ID (choice_slug_id) that identifies that "slug flavour". E.g. if a slug has different names (or descriptions) across explorers, each "flavour" will have a different ID. This will be useful later to identify conflicts & rename slugs.
+    df_choices["choice_slug_id"] = (
+        df_choices.groupby(["dimension_slug", "slug"], group_keys=False)
+        .apply(
+            lambda g: pd.Series(
+                pd.factorize(pd.Series(zip(*[g[c] for c in cols_choices])))[0],
+                index=g.index,
+            ),
+            include_groups=False,
+        )
+        .astype("string")
+    )
+    # Mark choice slugs as "in conflict": A choice slug maps to different names (or descriptions) across explorers
+    df_choices["in_conflict"] = (
+        df_choices.groupby(["dimension_slug", "slug"], as_index=False)["choice_slug_id"].transform("nunique").ne(1)
+    )
+
+    # Mark choices as duplicates: Same choice properties for a given dimension
+    df_choices["duplicate"] = df_choices.duplicated(subset=cols_choices + ["slug", "dimension_slug"])
+
+    # Drop duplicates, except those that are in conflict
+    df_choices = df_choices.loc[~df_choices["duplicate"] | df_choices["in_conflict"]]
 
     # Rename slugs for choices that are duplicates. 'slug' for final slugs, 'slug_original' keeps the original slug
     df_choices.loc[:, "slug_original"] = df_choices.loc[:, "slug"].copy()
-    mask = df_choices["duplicate"]
-    df_choices.loc[mask, "slug"] = df_choices.loc[mask, "slug"] + "__" + df_choices.loc[mask, "explorer_id"]
+    mask = df_choices["in_conflict"]
+    df_choices.loc[mask, "slug"] = df_choices.loc[mask, "slug"] + "__" + df_choices.loc[mask, "choice_slug_id"]
 
     return df_choices, cols_choices
 
@@ -329,7 +361,7 @@ def _build_df_choices(explorers_by_id: Dict[str, Explorer]) -> Tuple[pd.DataFram
 def _extract_choice_slug_changes(df_choices) -> Dict[str, Any]:
     # Track modifications (useful later for views)
     slug_changes = (
-        df_choices.loc[df_choices["duplicate"]]
+        df_choices.loc[df_choices["in_conflict"]]
         .groupby(["explorer_id", "dimension_slug"])
         .apply(lambda x: dict(zip(x["slug_original"], x["slug"])), include_groups=False)
         .unstack("explorer_id")
@@ -341,9 +373,17 @@ def _extract_choice_slug_changes(df_choices) -> Dict[str, Any]:
 
 def _combine_dimensions(df_choices: pd.DataFrame, cols_choices: List[str], explorer: Explorer) -> List[Dimension]:
     """Combine dimensions from different explorers"""
+    # Dimension bucket
     dimensions = explorer.dimensions.copy()
+
+    # Drop duplicates
+    df_choices = df_choices.drop_duplicates(subset=cols_choices + ["slug", "dimension_slug"])
+
+    # Iterate over each dimension and update the list of choices
     for dimension in dimensions:
-        df_dim_choices = df_choices.loc[df_choices["dimension_slug"] == dimension.slug, cols_choices].drop_duplicates()
+        df_dim_choices = df_choices.loc[
+            df_choices["dimension_slug"] == dimension.slug, cols_choices + ["slug"]
+        ].drop_duplicates()
 
         assert len(df_dim_choices) == df_dim_choices["slug"].nunique(), "Duplicate slugs in dimension choices."
 
