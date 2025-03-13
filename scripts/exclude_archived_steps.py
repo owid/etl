@@ -1,6 +1,5 @@
 """Exclude archived steps from files tab and search in VSCode."""
 
-import json
 from collections import OrderedDict
 from pathlib import Path
 from typing import Set, Tuple
@@ -8,8 +7,8 @@ from typing import Set, Tuple
 import click
 import commentjson
 
+from etl.dag_helpers import load_dag
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
-from etl.steps import load_dag
 
 
 def active_steps_and_snapshots() -> Tuple[Set[str], Set[str]]:
