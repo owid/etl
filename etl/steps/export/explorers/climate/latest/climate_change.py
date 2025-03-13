@@ -1,6 +1,4 @@
-"""Load grapher datasets and create an explorer tsv file.
-
-"""
+"""Load grapher datasets and create an explorer tsv file."""
 
 from etl.helpers import PathFinder
 

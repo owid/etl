@@ -214,7 +214,8 @@ class CurrentStepMustBeInDag(ExceptionFromDocstring):
 
 
 class NoMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
-    """No steps found among dependencies of current ETL step, that match the given specifications."""
+    """No steps found among dependencies of current ETL step, that match the given specifications.
+    Add those missing datasets as dependencies of the current step in the DAG."""
 
 
 class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
@@ -231,6 +232,41 @@ class WrongStepName(ExceptionFromDocstring):
 
 # loading DAG can take up to 1 second, so cache it
 load_dag_cached = cache(load_dag)
+
+
+def extract_indicators_from_config(config):
+    """
+    Recursively extract all strings matching the pattern
+    'channel/namespace/date/dataset/table#indicator'
+    from any field in the explorer/mdim config dictionary.
+
+    Parameters
+    ----------
+    config : dict
+        The explorer/mdim config dictionary to search.
+
+    Returns
+    -------
+    list
+        A list of matching strings.
+
+    """
+    pattern = re.compile(r"\b[\w\-/]+/[\w\-/]+/[\w\-/]+/[\w\-/]+/[\w\-/]+#[\w\-/]+\b")
+    indicators = set()
+
+    def recursive_search(obj):
+        if isinstance(obj, dict):
+            for value in obj.values():
+                recursive_search(value)
+        elif isinstance(obj, list):
+            for item in obj:
+                recursive_search(item)
+        elif isinstance(obj, str):
+            matches = pattern.findall(obj)
+            indicators.update(matches)
+
+    recursive_search(config)
+    return sorted(indicators)
 
 
 class PathFinder:
@@ -592,7 +628,13 @@ class PathFinder:
             path = self.config_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
 
-        # TODO: Get all indicators mentioned in config, and ensure they are included in paths.dependencies.
+        # Extract all indicators mentioned in the config.
+        indicators = extract_indicators_from_config(config=config)
+        # List their corresponding datasets.
+        datasets = sorted(set(["data://" + "/".join(indicator.split("/")[:-1]) for indicator in indicators]))
+        # Ensure that their datasets are included as dependencies of the current step.
+        if not set(datasets) <= self.dependencies:
+            raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
 
         return config
 
