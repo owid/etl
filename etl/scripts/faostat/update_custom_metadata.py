@@ -4,13 +4,18 @@ After an update, FAO may have changed dataset, item, element, or unit names and 
 This will cause the garden faostat_metadata step to raise warnings, and may cause further issues on charts and the food
 explorer.
 
-This script updates all fao fields in custom_datasets.csv, custom_elements_and_units.csv, and custom_items.csv files.
-NOTE: It's recommended to run this script in interactive mode (using the -i flag) to check if any name change implies a
-significant change in the data.
+This script updates all fao fields in custom_datasets.csv, custom_elements_and_units.csv, and custom_items.csv files, as follows:
+* Compare the old FAO dataset names and descriptions with the new FAO ones. They will be updated automatically.
+* Compare the old OWID dataset names and descriptions with the new FAO ones. You will be prompted for confirmation and will be able to edit the changes.
+* TODO: Continue the flow here.
+
+
 """
 
 import argparse
 import difflib
+import os
+import tempfile
 
 import pandas as pd
 from owid.catalog import Dataset
@@ -29,7 +34,7 @@ GREEN = "\033[92m"
 RESET = "\033[0m"
 
 
-def _display_differences_and_wait(old: str, new: str, message: str) -> None:
+def _display_differences(old: str, new: str, message: str) -> None:
     tqdm.write("\n" + "------------" * 10)
     tqdm.write(message)
     tqdm.write("------------" * 10)
@@ -84,16 +89,18 @@ def _display_differences_and_wait(old: str, new: str, message: str) -> None:
                 tqdm.write("  " + sentence)
 
 
-def _display_confirmed_changes(old, new):
+def _display_confirmed_changes(old, new, old_label="Old", new_label="New"):
     # Print full old and new paragraphs after accepting
-    tqdm.write("\n" + RED + "Old:" + RESET)
+    tqdm.write("\n" + RED + f"{old_label}:" + RESET)
     tqdm.write(RED + old + RESET)
-    tqdm.write("\n" + GREEN + "New:" + RESET)
+    tqdm.write("\n" + GREEN + f"{new_label}:" + RESET)
     tqdm.write(GREEN + new + RESET + "\n")
     input("\nPress enter to continue...")
 
 
-def update_custom_datasets_file(interactive=False, version=VERSION, read_only=False):
+def update_custom_datasets_file(
+    interactive=False, version=VERSION, read_only=False, confirmation=False, compare_with="fao"
+):
     """Update custom_datasets.csv file of a specific version of the garden steps.
 
     Parameters
@@ -139,7 +146,7 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
             new = getattr(fao_new_dataset_metadata, field)
             try:
                 # Load custom dataset metadata for current domain.
-                old = custom_datasets.loc[dataset_short_name].fillna("")[f"fao_dataset_{field}"]
+                old = custom_datasets.loc[dataset_short_name].fillna("")[f"{compare_with}_dataset_{field}"]
             except KeyError:
                 # This may be a new dataset that didn't exist in the previous version.
                 old = ""
@@ -149,17 +156,35 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
             _new = new.replace("\n", " ").replace("  ", " ")
             if (_old != _new) and not (pd.isna(new) and pd.isna(old)):
                 if interactive:
-                    _display_differences_and_wait(
-                        old=_old, new=_new, message=f"Old and new FAO dataset {field} for {dataset_short_name}:"
+                    _display_differences(
+                        old=_old,
+                        new=_new,
+                        message=f"Old {compare_with.upper()} and new FAO dataset {field} for {dataset_short_name}:",
                     )
-                    choice = input("Type 'y' and enter to update this change or just enter to skip: ").strip().lower()
-                    if choice != "y":
-                        continue
-
-                    _display_confirmed_changes(old, new)
+                    if confirmation:
+                        choice = (
+                            input(
+                                "Type 'y' and enter to accept these changes, 'e' to edit them, or just enter to skip: "
+                            )
+                            .strip()
+                            .lower()
+                        )
+                        if choice == "y":
+                            _display_confirmed_changes(old, new)
+                        elif choice == "e":
+                            with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
+                                with open(f.name, "w") as f:
+                                    f.write(new)
+                                os.system(f"open -a TextEdit {f.name}")
+                                input("Press enter to save changes.")
+                                with open(f.name) as f:
+                                    new = f.read()
+                            _display_confirmed_changes(old, new)
+                    else:
+                        input("These changes will be saved after going through all datasets. Press enter to continue.")
 
                 # Update FAO field.
-                custom_datasets_updated.loc[dataset_short_name, f"fao_dataset_{field}"] = new
+                custom_datasets_updated.loc[dataset_short_name, f"{compare_with}_dataset_{field}"] = new
 
                 # There was at least one change.
                 CHANGES_FOUND = True
@@ -250,7 +275,7 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
                 # If old and new are not identical (or if they are not both nan) update custom_*.
                 if (old != new) and not (pd.isna(new) and pd.isna(old)):
                     if interactive:
-                        _display_differences_and_wait(
+                        _display_differences(
                             old=old,
                             new=new,
                             message=f"Old and new {field} for {dataset_short_name} with element code {element_code}:",
@@ -376,7 +401,7 @@ def update_custom_items_file(interactive=False, version=VERSION, read_only=False
             # If old and new are not identical (or if they are not both nan) update custom_*.
             if (old != new) and not (pd.isna(new) and pd.isna(old)):
                 if interactive:
-                    _display_differences_and_wait(
+                    _display_differences(
                         old=old,
                         new=new,
                         message=f"Old and new {field} for {dataset_short_name} with code {item_code}:",
@@ -421,13 +446,6 @@ def update_custom_items_file(interactive=False, version=VERSION, read_only=False
 if __name__ == "__main__":
     argument_parser = argparse.ArgumentParser(description=__doc__)
     argument_parser.add_argument(
-        "-i",
-        "--interactive",
-        default=False,
-        action="store_true",
-        help="If given, changes will be printed one by one, and confirmation will be required to save file.",
-    )
-    argument_parser.add_argument(
         "-r",
         "--read_only",
         default=False,
@@ -441,8 +459,13 @@ if __name__ == "__main__":
         help="Version of the latest garden steps (where custom_datasets.csv file to be updated is).",
     )
     args = argument_parser.parse_args()
-    _ = update_custom_datasets_file(interactive=args.interactive, version=args.version, read_only=args.read_only)
-    _ = update_custom_elements_and_units_file(
-        interactive=args.interactive, version=args.version, read_only=args.read_only
+    _ = update_custom_datasets_file(
+        interactive=True, version=args.version, read_only=args.read_only, confirmation=False, compare_with="fao"
     )
-    _ = update_custom_items_file(interactive=args.interactive, version=args.version, read_only=args.read_only)
+    _ = update_custom_datasets_file(
+        interactive=True, version=args.version, read_only=args.read_only, confirmation=True, compare_with="owid"
+    )
+    # _ = update_custom_elements_and_units_file(
+    #     interactive=args.interactive, version=args.version, read_only=args.read_only
+    # )
+    # _ = update_custom_items_file(interactive=args.interactive, version=args.version, read_only=args.read_only)
