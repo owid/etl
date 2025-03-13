@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived
 
 include default.mk
 
@@ -31,6 +31,7 @@ help:
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
+	@echo '  make vscode-exclude-archived  Exclude archived steps from VSCode user settings'
 	@echo '  make watch     	Run all tests, watching for changes'
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
@@ -174,3 +175,7 @@ install-vscode-extensions:
 	else \
 		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
 	fi
+
+vscode-exclude-archived: .venv
+	@echo '==> Excluding archived steps from VSCode user settings'
+	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user

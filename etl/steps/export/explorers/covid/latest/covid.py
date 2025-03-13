@@ -23,7 +23,6 @@ This step contains tooling that should moved to a more general module so that it
         ]
 """
 
-from etl.collections.explorers import create_explorer
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -38,12 +37,7 @@ def run(dest_dir: str) -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    ds_explorer = create_explorer(
-        dest_dir=dest_dir,
-        config=config,
-        dependencies=paths.dependencies,
-        tolerate_extra_indicators=True,
-    )
+    ds_explorer = paths.create_explorer(config=config)
 
     #
     # Process data.
@@ -61,4 +55,4 @@ def run(dest_dir: str) -> None:
     #
 
     # Create a new explorers dataset and tsv file.
-    ds_explorer.save()
+    ds_explorer.save(tolerate_extra_indicators=True)
