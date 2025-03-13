@@ -628,6 +628,7 @@ def combine_net_and_grant_equivalents(tb: Table) -> Table:
 def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: List[str]) -> Table:
     """
     Divide some of the ODA components by the total ODA to get the share of each component.
+    Add also the total of these components.
     """
 
     for subcomponent in subcomponent_list:
