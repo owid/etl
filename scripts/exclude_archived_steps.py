@@ -85,8 +85,10 @@ def main(settings_scope, dry_run):
         settings = commentjson.loads(settings_text)
 
         # Update exclusions
-        settings["files.exclude"].update(to_exclude)
-        settings["search.exclude"].update(to_exclude)
+        for col in ("files.exclude", "search.exclude"):
+            if col not in settings:
+                settings[col] = {}
+            settings[col].update(to_exclude)
 
         # Reorder settings to move 'files.exclude' and 'search.exclude' to the end
         reordered_settings = OrderedDict()
