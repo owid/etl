@@ -7,6 +7,8 @@ import pandas as pd
 
 from etl.snapshot import Snapshot
 
+SOURCE_DATA_URL = "http://databank.worldbank.org/data/download/site-content/CLASS.xlsx"
+
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
@@ -16,8 +18,8 @@ def run(upload: bool) -> None:
 
     assert snap.m.source
 
-    # Update metadata
-    df_new = pd.read_excel(snap.m.source.source_data_url, sheet_name="Notes")
+    # Update description
+    df_new = pd.read_excel(SOURCE_DATA_URL, sheet_name="Notes")
     s = "\n\n".join(df_new.dropna().Notes.tolist())
     snap.m.source.description = unicodedata.normalize("NFKD", s)
 
