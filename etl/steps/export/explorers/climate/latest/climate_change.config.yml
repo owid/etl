@@ -1,3 +1,9 @@
+definitions:
+  common_views:
+    - config:
+        relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
+        relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
+
 config:
   explorerTitle: Climate Change Impacts
   isPublished: true
@@ -18,6 +24,7 @@ config:
   wpBlockId: '45009'
   hasMapTab: false
   hideAnnotationFieldsInTitle: true
+
 dimensions:
   - slug: metric
     name: Metric
@@ -67,16 +74,14 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_temperature_anomaly
+        - catalogPath: grapher/met_office_hadley_centre/2025-01-21/near_surface_temperature/near_surface_temperature#temperature_anomaly
     config:
-      title: 'Global warming: monthly temperature anomaly'
+      title: 'Global warming: annual temperature anomaly'
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: sea_surface_temperature_anomaly
       long_run_series: false
@@ -101,8 +106,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: ocean_heat_content__top_700m
       long_run_series: false
@@ -155,8 +158,6 @@ views:
       hasMapTab: false
       note: |-
         Heat content is shown for four sources: Commonwealth Scientific and Industrial Research Organisation (CSIRO); Institute of Atmospheric Physics (IAP); National Oceanic and Atmospheric Administration (NOAA); and Meteorological Research Institute (MRI).
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: ocean_heat_content__top_2000m
       long_run_series: false
@@ -200,8 +201,6 @@ views:
       hasMapTab: false
       note: |-
         Heat content is shown for four sources: Commonwealth Scientific and Industrial Research Organisation (CSIRO); Institute of Atmospheric Physics (IAP); National Oceanic and Atmospheric Administration (NOAA); and Meteorological Research Institute (MRI).
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: ocean_ph
       long_run_series: false
@@ -229,8 +228,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
       hideAnnotationFieldsInTitle: true
   - dimensions:
       metric: sea_level_rise
@@ -279,8 +276,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: arctic_sea_ice_extent
       long_run_series: false
@@ -312,8 +307,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: antarctic_sea_ice_extent
       long_run_series: false
@@ -349,8 +342,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: mass_balance_of_ice_sheets
       long_run_series: false
@@ -384,8 +375,6 @@ views:
       type: LineChart
       hasMapTab: false
       note: Combined measurements are based on more than 20 different studies that have been combined for each region.
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: mass_balance_of_u_s__glaciers
       long_run_series: false
@@ -409,8 +398,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: snow_cover
       long_run_series: false
@@ -443,8 +430,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: co2_concentrations
       long_run_series: false
@@ -476,8 +461,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: ch4_concentrations
       long_run_series: false
@@ -509,8 +492,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: n2o_concentrations
       long_run_series: false
@@ -542,8 +523,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: co2_concentrations
       long_run_series: true
@@ -567,8 +546,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: ch4_concentrations
       long_run_series: true
@@ -591,8 +568,6 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: n2o_concentrations
       long_run_series: true
@@ -615,5 +590,3 @@ views:
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
-      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
