@@ -49,6 +49,11 @@ def run() -> None:
     tb_d_pop = tb_d_pop.drop_duplicates()
     tb_d_share = tb_d_share.drop_duplicates()
 
+    # population is given in thousands
+    for col in tb_d_pop.columns:
+        if col != "country":
+            tb_d_pop[col] = tb_d_pop[col].astype(float) * 1000
+
     tb_d_total = tb_d_total.format(["country"], short_name="migrant_stock_dest_total")
     tb_d_pop = tb_d_pop.format(["country"], short_name="un_desa_total_population")
     tb_d_share = tb_d_share.format(["country"], short_name="migrant_stock_dest_share")

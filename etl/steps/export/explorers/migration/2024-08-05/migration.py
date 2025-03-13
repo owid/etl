@@ -138,7 +138,7 @@ def run(dest_dir: str) -> None:
     df_columns = pd.DataFrame(col_dicts)
 
     df_columns["colorScaleNumericMinValue"] = 0
-    df_columns["colorScaleEqualSizeBins"] = True
+    df_columns["colorScaleEqualSizeBins"] = True  # equal size bins for all indicators
 
     # Save outputs.
     ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers, df_columns=df_columns)
