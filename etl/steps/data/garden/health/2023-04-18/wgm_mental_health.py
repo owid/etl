@@ -156,11 +156,15 @@ def _build_df_with_incomes(df: pd.DataFrame) -> pd.DataFrame:
         df_income.loc[msk, "country"] = income
 
     # Sanity check
-    unc_countries_expected = {"Venezuela"}  # WB unclassified Venezuela in 2021, bc of lacking data
+    unc_countries_expected = {
+        "Venezuela",
+        "Turkey",
+        "Cote d'Ivoire",
+    }  # WB unclassified Venezuela in 2021, bc of lacking data
     unc_countries = set(df_income.country).difference(incomes)
     assert (
         unc_countries == unc_countries_expected
-    ), f"Only Venezuela is expected to be unclassified, but found {unc_countries} to be unclassified!"
+    ), f"Only {unc_countries_expected} is expected to be unclassified, but found {unc_countries} to be unclassified!"
     # Remove Venezuela
     df_income = df_income[~df_income["country"].isin(unc_countries_expected)]
     return df_income
