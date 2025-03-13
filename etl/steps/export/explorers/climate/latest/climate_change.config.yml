@@ -62,32 +62,21 @@ dimensions:
     presentation:
       type: checkbox
 views:
-  # - dimensions:
-  #     metric: temperature_anomaly
-  #     long_run_series: false
-  #   indicators:
-  #     y:
-  #       - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#temperature_anomaly
-  #         display:
-  #           name: Temperature anomaly
-  #           type: Numeric
-  #           unit: °C
-  #           shortUnit: °C
-  #           sourceName: NASA Goddard Institute for Space Studies - GISS Surface Temperature Analysis
-  #           sourceLink: https://data.giss.nasa.gov/gistemp/
-  #           dataPublishedBy: |-
-  #             National Aeronautics and Space Administration (NASA), Goddard Institute for Space Studies (GISS) - GISS Surface Temperature Analysis.
-  #   config:
-  #     title: 'Global warming: monthly temperature anomaly'
-  #     subtitle: |-
-  #       The combined land-surface air and sea-surface water temperature anomaly is given as the deviation from the 1951–1980 mean.
-  #     yScaleToggle: false
-  #     yAxisMin: auto
-  #     baseColorScheme: owid-distinct
-  #     type: LineChart
-  #     hasMapTab: false
-  #     relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
-  #     relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
+  - dimensions:
+      metric: temperature_anomaly
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_temperature_anomaly
+    config:
+      title: 'Global warming: monthly temperature anomaly'
+      yScaleToggle: false
+      yAxisMin: auto
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+      relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
+      relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
   - dimensions:
       metric: sea_surface_temperature_anomaly
       long_run_series: false
