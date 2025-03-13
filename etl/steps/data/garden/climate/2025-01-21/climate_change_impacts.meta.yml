@@ -78,6 +78,24 @@ tables:
           name: MRI/JMA
         presentation:
           title_public: Annual average ocean heat content for the 0-2000 meters layer, according to MRI/JMA
+      co2_concentration:
+        title: Annual concentration of atmospheric carbon dioxide
+        display:
+          name: Annual average
+        presentation:
+          title_public: Annual concentration of atmospheric carbon dioxide
+      ch4_concentration:
+        title: Annual concentration of atmospheric methane
+        display:
+          name: Annual average
+        presentation:
+          title_public: Annual concentration of atmospheric methane
+      n2o_concentration:
+        title: Annual concentration of atmospheric nitrous oxide
+        display:
+          name: Annual average
+        presentation:
+          title_public: Annual concentration of atmospheric nitrous oxide
   climate_change_impacts_monthly:
     title: Climate Change Impacts - Monthly
     variables:
@@ -123,3 +141,39 @@ tables:
           name: Annual average
         presentation:
           title_public: Rolling yearly average of the area covered by snow
+      co2_concentration:
+        title: Monthly concentration of atmospheric carbon dioxide
+        display:
+          name: Monthly average
+        presentation:
+          title_public: Monthly concentration of atmospheric carbon dioxide
+      co2_concentration_yearly_average:
+        title: Rolling yearly average of the concentration of atmospheric carbon dioxide
+        display:
+          name: Annual average
+        presentation:
+          title_public: Rolling yearly average of the concentration of atmospheric carbon dioxide
+      ch4_concentration:
+        title: Monthly concentration of atmospheric methane
+        display:
+          name: Monthly average
+        presentation:
+          title_public: Monthly concentration of atmospheric methane
+      ch4_concentration_yearly_average:
+        title: Rolling yearly average of the concentration of atmospheric methane
+        display:
+          name: Annual average
+        presentation:
+          title_public: Rolling yearly average of the concentration of atmospheric methane
+      n2o_concentration:
+        title: Monthly concentration of atmospheric nitrous oxide
+        display:
+          name: Monthly average
+        presentation:
+          title_public: Monthly concentration of atmospheric nitrous oxide
+      n2o_concentration_yearly_average:
+        title: Rolling yearly average of the concentration of atmospheric nitrous oxide
+        display:
+          name: Annual average
+        presentation:
+          title_public: Rolling yearly average of the concentration of atmospheric nitrous oxide

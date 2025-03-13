@@ -253,23 +253,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#co2_concentration
-          display:
-            name: Monthly averaged
-            type: Numeric
-            unit: parts per million
-            shortUnit: ppm
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#co2_concentration_yearly_average
-          display:
-            name: Annual averaged
-            type: Numeric
-            unit: parts per million
-            shortUnit: ppm
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
     config:
       title: Global atmospheric CO₂ concentration
       subtitle: Atmospheric carbon dioxide (CO₂) concentration is measured in parts per million (ppm).
@@ -284,23 +268,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#ch4_concentration
-          display:
-            name: Monthly averaged
-            type: Numeric
-            unit: parts per billion
-            shortUnit: ppb
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#ch4_concentration_yearly_average
-          display:
-            name: Annual averaged
-            type: Numeric
-            unit: parts per billion
-            shortUnit: ppb
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
     config:
       title: Global atmospheric methane concentration
       subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
@@ -315,23 +283,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#n2o_concentration
-          display:
-            name: Monthly averaged
-            type: Numeric
-            unit: parts per billion
-            shortUnit: ppb
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#n2o_concentration_yearly_average
-          display:
-            name: Annual averaged
-            type: Numeric
-            unit: parts per billion
-            shortUnit: ppb
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
     config:
       title: Global atmospheric nitrous oxide concentration
       subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
@@ -346,14 +298,6 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#co2_concentration
-          display:
-            name: CO2 concentrations
-            type: Numeric
-            unit: parts per million
-            shortUnit: ppm
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
     config:
       title: Global atmospheric CO₂ concentration
       subtitle: |-
@@ -369,14 +313,6 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ch4_concentration
-          display:
-            name: CH4 concentrations
-            type: Numeric
-            unit: parts per billion
-            shortUnit: ppb
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
     config:
       title: Global atmospheric methane concentration
       subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
@@ -391,14 +327,6 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#n2o_concentration
-          display:
-            name: N2O concentrations
-            type: Numeric
-            unit: parts per billion
-            shortUnit: ppb
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://gml.noaa.gov/ccgg/trends/global.html
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
     config:
       title: Global atmospheric nitrous oxide concentration
       subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
