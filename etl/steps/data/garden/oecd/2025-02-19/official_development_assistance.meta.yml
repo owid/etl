@@ -1363,7 +1363,7 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_indonor}"
           - "{definitions.key_grant_equivalents}"
-        description_processing: "{definitions.processing_share_oda}"
+        description_processing: "{definitions.processing_indonor}"
         presentation:
           title_public: ODA by donor - In-donor aid (% of ODA)
           title_variant: Grant equivalents
@@ -1382,7 +1382,7 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_overseas}"
           - "{definitions.key_grant_equivalents}"
-        description_processing: "{definitions.processing_share_oda}"
+        description_processing: "{definitions.processing_overseas}"
         presentation:
           title_public: ODA by donor - Overseas aid (% of ODA)
           title_variant: Grant equivalents
@@ -1473,7 +1473,7 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_indonor}"
           - "{definitions.key_net_disbursements}"
-        description_processing: "{definitions.processing_share_oda}"
+        description_processing: "{definitions.processing_indonor}"
         presentation:
           title_public: ODA by donor - In-donor aid (% of ODA)
           title_variant: Net disbursements
@@ -1492,7 +1492,7 @@ tables:
           - "{definitions.key_oda_coverage_limits}"
           - "{definitions.key_overseas}"
           - "{definitions.key_net_disbursements}"
-        description_processing: "{definitions.processing_share_oda}"
+        description_processing: "{definitions.processing_overseas}"
         presentation:
           title_public: ODA by donor - Overseas aid (% of ODA)
           title_variant: Net disbursements
