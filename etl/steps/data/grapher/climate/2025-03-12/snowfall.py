@@ -21,18 +21,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
 
-    # Get the year
-    tb["year"] = tb["time"].astype(str).str[0:4]
-
-    # Group by year and calculate the mean of the specified columns
-    tb = tb.groupby(["year", "country"]).agg({"snow_cover": "mean"}).reset_index()
-
-    # Remove rows where the year is 2024 as it's incomplete
-    tb["year"] = tb["year"].astype(int)
-    tb = tb[tb["year"] != INCOMPLETE_YEAR]
-    print(tb)
-
-    tb = tb.format(["year", "country"])
+    tb = tb.format(["country", "time"])
 
     # Save outputs.
     #

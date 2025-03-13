@@ -25,9 +25,7 @@ def run(dest_dir: str) -> None:
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
 
-    tb["year"] = tb["time"].astype(str).str[0:4]
-    tb["month"] = tb["time"].astype(str).str[5:7]
-    print(tb)
+    tb = tb.format(["country", "time"])
 
     #
     # Save outputs.
