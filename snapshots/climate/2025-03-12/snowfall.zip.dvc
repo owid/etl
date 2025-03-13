@@ -18,3 +18,7 @@ meta:
     license:
       name: Copernicus License
       url: https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels-monthly-means?tab=overview
+outs:
+  - md5: 825401d5c860d20e8eba3c53d7a60cf6
+    size: 980438272
+    path: snowfall.zip
