@@ -48,7 +48,6 @@ steps:
     - data://garden/climate/2025-01-07/surface_temperature
   data://grapher/climate/2025-01-07/surface_global_monthly_anomaly_all_countries:
     - data://garden/climate/2025-01-07/surface_temperature
-
   #
   # Copernicus Climate Change Service - Precipitation.
   #
@@ -62,13 +61,10 @@ steps:
   #
   # Climate change impacts data explorer.
   #
-  data://explorers/climate/latest/climate_change_impacts:
-    - data://garden/climate/2025-01-21/climate_change_impacts
+  export://explorers/climate/latest/climate_change:
+    - data://grapher/climate/2025-01-21/climate_change_impacts_monthly
+    - data://grapher/climate/2025-01-21/climate_change_impacts_annual
 
-
-  #
-  # Weekly area burnt and emissions data on wildfires.
-  #
   #
   # Global Wildfire Information System - Monthly burned area.
   #
