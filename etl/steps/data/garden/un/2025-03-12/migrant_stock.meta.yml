@@ -87,18 +87,18 @@ tables:
       # data on 5 year changes
       immigrants_change_5_years:
         title: Change in the number of international immigrants in the previous five years
-        description_short: The change in the total number of migrants living in a given country compared to five years ago. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer.
+        description_short: The change in the total number of migrants living in a given country compared to five years ago. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer. For 2024, this is the change compared to 2020.
         processing_level: major
         description_processing: We calculated the change in the number of international immigrants by subtracting the number of immigrants that were living in a given country five years prior from the number of immigrants living in the country in the current year.
       emigrants_change_5_years:
         title: Change in the number of emigrants in the previous five years
-        description_short: The total number of people born in that country who are now living in another country, compared to five years ago. A positive number indicates that there are now more emigrants who have moved from a given country; a negative number means there are fewer.
+        description_short: The total number of people born in that country who are now living in another country, compared to five years ago. A positive number indicates that there are now more emigrants who have moved from a given country; a negative number means there are fewer. For 2024, this is the change compared to 2020.
         processing_level: major
         description_processing: We calculated the change in the number of emigrants by subtracting the number of emigrants that were living in a given country five years prior from the number of emigrants living in the country in the current year.
       immigrants_change_5_years_per_1000:
         title: Change in the number of international migrants per 1,000 people in the previous five years
         unit: per 1,000
-        description_short: The change in the total number of migrants living in a given country compared to five years ago, per 1,000 people in the host country. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer.
+        description_short: The change in the total number of migrants living in a given country compared to five years ago, per 1,000 people in the host country. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer. For 2024, this is the change compared to 2020.
         processing_level: major
         description_processing: We calculated the change in the number of international immigrants by subtracting the number of immigrants that were living in a given country five years prior from the number of immigrants living in the country in the current year. We then divided this number by the total population of the host country, per 1000 people.
         display:
@@ -106,8 +106,8 @@ tables:
       emigrants_change_5_years_per_1000:
         title: Change in the number of emigrants per 1,000 people in the previous five years
         unit: per 1,000
-        description_short: The total number of people born in that country who are now living in another country, compared to five years ago, per 1,000 people in the host country. A positive number indicates there are now more emigrants who have moved from a given country; a negative number means there are fewer.
+        description_short: The total number of people born in that country who are now living in another country, compared to five years ago, per 1,000 people in the host country. A positive number indicates there are now more emigrants who have moved from a given country; a negative number means there are fewer. For 2024, this is the change compared to 2020.
         processing_level: major
-        description_processing: We calculated the change in the number of emigrants by subtracting the number of emigrants that were living in a given country five years prior from the number of emigrants living in the country in the current year. We then divided this number by the total population of the host country, per 1000 people.
+        description_processing: We calculated the change in the number of emigrants by subtracting the number of emigrants that were living in a given country five years prior from the number of emigrants living in the country in the current year. We then divided this number by the total population of the host country, per 1000 people. For 2024, this is the change compared to 2020.
         display:
           numDecimalPlaces: 1

@@ -9,9 +9,9 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Column names for the years are different by sex
-BOTH_SEXES = ["_1990", "_1995", "_2000", "_2005", "_2010", "_2015", "_2020"]
-MALES = ["_1990_1", "_1995_1", "_2000_1", "_2005_1", "_2010_1", "_2015_1", "_2020_1"]
-FEMALES = ["_1990_2", "_1995_2", "_2000_2", "_2005_2", "_2010_2", "_2015_2", "_2020_2"]
+BOTH_SEXES = ["_1990", "_1995", "_2000", "_2005", "_2010", "_2015", "_2020", "_2024"]
+MALES = ["_1990_1", "_1995_1", "_2000_1", "_2005_1", "_2010_1", "_2015_1", "_2020_1", "_2024_1"]
+FEMALES = ["_1990_2", "_1995_2", "_2000_2", "_2005_2", "_2010_2", "_2015_2", "_2020_2", "_2024_2"]
 
 ALL_YEARS = BOTH_SEXES + MALES + FEMALES
 
@@ -166,6 +166,14 @@ def migrant_change_5_years(tb, tb_row, col_name):
     yr = tb_row["year"]
     if yr == 1990:
         return pd.NA
+    if yr == 2024:
+        tb_prev = tb[(tb["country"] == cnt) & (tb["year"] == 2020)].iloc[0]
+        if tb_prev.empty:
+            return pd.NA
+        elif pd.isna(tb_row[col_name]) or pd.isna(tb_prev[col_name]):
+            return pd.NA
+        else:
+            return float(tb_row[col_name] - tb_prev[col_name])
     else:
         tb_prev = tb[(tb["country"] == cnt) & (tb["year"] == yr - 5)].iloc[0]
         if tb_prev.empty:
