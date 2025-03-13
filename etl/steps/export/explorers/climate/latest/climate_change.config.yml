@@ -205,23 +205,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#land_ice_mass_nasa
-          display:
-            name: Seasonal variation
-            type: Numeric
-            unit: billion tonnes
-            shortUnit: billion t
-            sourceName: IMBIE and NASA via the United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ice-sheets
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#cumulative_ice_mass_change_imbie
-          display:
-            name: Combined measurements
-            type: Numeric
-            unit: billion tonnes
-            shortUnit: billion t
-            sourceName: IMBIE and NASA via the United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ice-sheets
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
     config:
       title: 'Climate change: change in mass of ice sheets'
       subtitle: |-

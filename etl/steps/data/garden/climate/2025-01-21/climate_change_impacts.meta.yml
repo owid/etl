@@ -99,3 +99,15 @@ tables:
           name: Average
         presentation:
           title_public: Global sea level as an average of Church and White (2011) and UHSLC data
+      land_ice_mass_nasa:
+        title: Cumulative change in mass in the ice sheets, according to NASA/JPL
+        display:
+          name: Seasonal variation
+        presentation:
+          title_public: Cumulative change in mass in the ice sheets, according to NASA/JPL
+      cumulative_ice_mass_change_imbie:
+        title: Cumulative change in mass in the ice sheets, according to IMBIE
+        display:
+          name: Combined measurements
+        presentation:
+          title_public: Cumulative change in mass in the ice sheets, according to IMBIE
