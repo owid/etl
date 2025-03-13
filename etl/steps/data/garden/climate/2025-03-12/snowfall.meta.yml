@@ -12,7 +12,7 @@ definitions:
 
 
 tables:
-  surface_temperature:
+  snowfall:
     variables:
       snow_cover:
         title: Snow cover
