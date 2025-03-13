@@ -628,7 +628,7 @@ def combine_net_and_grant_equivalents(tb: Table) -> Table:
 def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: List[str]) -> Table:
     """
     Divide some of the ODA components by the total ODA to get the share of each component.
-    Add also the total of these components.
+    Add also the total of these components, together with the difference (aid overseas).
     """
 
     for subcomponent in subcomponent_list:
@@ -655,6 +655,18 @@ def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: List[str]) 
 
     tb["oda_indonor_grant_equivalents_share_oda"] = (
         tb["oda_indonor_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
+    )
+
+    # ... the difference between the total ODA and the sum of these components
+    tb["oda_overseas_net_disbursements"] = tb["i_oda_net_disbursements"] - tb["oda_indonor_net_disbursements"]
+    tb["oda_overseas_grant_equivalents"] = tb["oda_grant_equivalents"] - tb["oda_indonor_grant_equivalents"]
+
+    # ... and the share of these components
+    tb["oda_overseas_net_disbursements_share_oda"] = (
+        tb["oda_overseas_net_disbursements"] / tb["i_oda_net_disbursements"] * 100
+    )
+    tb["oda_overseas_grant_equivalents_share_oda"] = (
+        tb["oda_overseas_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
     )
 
     return tb
