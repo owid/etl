@@ -143,8 +143,8 @@ def run() -> None:
     explorer.save(tolerate_extra_indicators=True)
 
     # Translate into mdim
-    mdim = explorer_to_mdim(explorer, "population-and-demography")
-    mdim.save()
+    # mdim = explorer_to_mdim(explorer, "population-and-demography")
+    # mdim.save()
 
 
 def explorer_to_mdim(explorer: Explorer, mdim_name: str):
@@ -189,7 +189,7 @@ def create_explorer(
         expand_path_mode = "full"
     elif has_duplicate_table_names(paths.dependencies):
         expand_path_mode = "dataset"
-    print(expand_path_mode)
+    # print(expand_path_mode)
 
     # Bake config automatically from table
     config_new = expand_config(
