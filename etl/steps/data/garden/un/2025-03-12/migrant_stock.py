@@ -167,18 +167,20 @@ def migrant_change_5_years(tb, tb_row, col_name):
     if yr == 1990:
         return pd.NA
     if yr == 2024:
-        tb_prev = tb[(tb["country"] == cnt) & (tb["year"] == 2020)].iloc[0]
-        if tb_prev.empty:
+        tb_prev_df = tb[(tb["country"] == cnt) & (tb["year"] == 2020)]
+        if tb_prev_df.empty:
             return pd.NA
-        elif pd.isna(tb_row[col_name]) or pd.isna(tb_prev[col_name]):
+        tb_prev = tb_prev_df.iloc[0]
+        if pd.isna(tb_row[col_name]) or pd.isna(tb_prev[col_name]):
             return pd.NA
         else:
             return float(tb_row[col_name] - tb_prev[col_name])
     else:
-        tb_prev = tb[(tb["country"] == cnt) & (tb["year"] == yr - 5)].iloc[0]
-        if tb_prev.empty:
+        tb_prev_df = tb[(tb["country"] == cnt) & (tb["year"] == yr - 5)]
+        if tb_prev_df.empty:
             return pd.NA
-        elif pd.isna(tb_row[col_name]) or pd.isna(tb_prev[col_name]):
+        tb_prev = tb_prev_df.iloc[0]
+        if pd.isna(tb_row[col_name]) or pd.isna(tb_prev[col_name]):
             return pd.NA
         else:
             return float(tb_row[col_name] - tb_prev[col_name])
