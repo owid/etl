@@ -1,4 +1,5 @@
 import owid.catalog.processing as pr
+import pandas as pd
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -13,7 +14,7 @@ def run(dest_dir: str) -> None:
     log.info("penn_world_table_national_accounts.start")
 
     # retrieve raw data
-    snap = paths.load_snapshot("penn_world_table.xlsx")
+    snap = paths.load_snapshot("penn_world_table_national_accounts.xlsx")
     tb = snap.read_excel(sheet_name="Data")
 
     # # clean and transform data
@@ -23,7 +24,7 @@ def run(dest_dir: str) -> None:
     tb_countries_regions = paths.load_dataset("regions")["regions"]
 
     # Merge dataset and country dictionary to get the name of the country (and rename it as "country")
-    tb = pr.merge(
+    tb = pr.keep_metadata(pd.merge)(
         tb, tb_countries_regions[["name", "iso_alpha3"]], left_on="countrycode", right_on="iso_alpha3", how="left"
     )
     tb = tb.rename(columns={"name": "country"})
