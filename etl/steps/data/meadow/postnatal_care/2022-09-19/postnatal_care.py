@@ -37,12 +37,12 @@ def run(dest_dir: str) -> None:
     log.info("postnatal_care.end")
 
 
-def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.drop(columns=["Country Code", "Series Name", "Series Code"])
+def clean_data(tb: pd.DataFrame) -> pd.DataFrame:
+    tb = tb.drop(columns=["Country Code", "Series Name", "Series Code"])
 
-    cols = df.columns[1:].str[:4].tolist()
-    df.columns = ["country"] + cols
-    df = df.replace("..", np.nan)
-    df = pd.melt(df, id_vars="country", value_vars=cols)
-    df = df.rename(columns={"variable": "year", "value": "postnatal_care_coverage"})
-    return df
+    cols = tb.columns[1:].str[:4].tolist()
+    tb.columns = ["country"] + cols
+    tb = tb.replace("..", np.nan)
+    tb = tb.melt(id_vars="country", value_vars=cols)
+    tb = tb.rename(columns={"variable": "year", "value": "postnatal_care_coverage"})
+    return tb
