@@ -133,7 +133,7 @@ def run() -> None:
     # Export
     # Combine explorers
     # TODO: falla si tenemos POP_FULL junto con SR!
-    explorers = [explorer_pop, explorer_pop_full, explorer_dep, explorer_sr]
+    explorers = [explorer_pop, explorer_pop_full, explorer_dep]
     explorer = combine_explorers(
         explorers=explorers,
         explorer_name="population-and-demography",
