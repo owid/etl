@@ -1,15 +1,4 @@
 steps:
-  # Migration UN DESA
-  data://meadow/un/2024-07-16/migrant_stock:
-    - snapshot://un/2024-07-16/migrant_stock_dest_origin.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_origin.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_dest.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
-  data://garden/un/2024-07-16/migrant_stock:
-    - data://meadow/un/2024-07-16/migrant_stock
-  data://grapher/un/2024-07-16/migrant_stock:
-    - data://garden/un/2024-07-16/migrant_stock
-
   # Internal displacement monitoring centre
   data://meadow/idmc/2024-08-02/internal_displacement:
     - snapshot://idmc/2024-08-02/internal_displacement.xlsx
