@@ -18,8 +18,14 @@ dimensions:
         name: Population density
       - slug: dependency_ratio
         name: Dependency ratio
-      - slug: sex_ratio
-        name: Sex ratio
+      - slug: net_migration
+        name: Net migration
+      - slug: net_migration_rate
+        name: Net migration rate
+      - slug: deaths
+        name: Deaths
+      - slug: death_rate
+        name: Death rate
 
   - slug: sex
     name: Sex
@@ -69,14 +75,14 @@ dimensions:
       - slug: estimates
         name: None
         description: null
+      - slug: low
+        name: Low
+        description: null
       - slug: medium
-        name: Medium variant
+        name: Medium
         description: null
       - slug: high
-        name: High variant
-        description: null
-      - slug: low
-        name: Low variant
+        name: High
         description: null
     presentation:
       type: radio

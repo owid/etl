@@ -10,8 +10,10 @@ dimensions:
   - slug: indicator
     name: indicator
     choices:
-      - slug: sex_ratio
-        name: Sex ratio
+      - slug: births
+        name: Births
+      - slug: birth_rate
+        name: Birth rate
 
   - slug: sex
     name: Sex

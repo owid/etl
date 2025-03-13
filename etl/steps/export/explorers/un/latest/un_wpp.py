@@ -25,7 +25,8 @@
 total done: 4/22
 """
 
-from typing import Any, Dict, List, Optional, Tuple, Union
+import inspect
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
 from owid.catalog import Table
@@ -69,13 +70,14 @@ def run() -> None:
     # Load dataset
     ds = paths.load_dataset("un_wpp")
     ds_full = paths.load_dataset("un_wpp_full")
+    explorer_creator = ExplorerCreator(ds, ds_full)
 
     # 1) Population
-    config = paths.load_explorer_config()
+    config_default = paths.load_explorer_config()
 
-    explorer_pop = create_explorer(
-        tb=ds.read("population", load_data=False),
-        config_yaml=config,
+    explorer_pop = explorer_creator.create(
+        table_name="population",
+        config_yaml=config_default,
         indicator_names=["population", "population_change", "population_density"],
         dimensions={
             "age": ["all", "0", "0-4", "0-14", "0-24"] + AGES_POP_LIST,
@@ -83,26 +85,12 @@ def run() -> None:
             "variant": ["estimates"],
         },
         choice_renames={"age": AGES_POP},
-        explorer_name="population-and-demography",
-    )
-
-    explorer_pop_full = create_explorer(
-        tb=ds_full.read("population", load_data=False),
-        config_yaml=config,
-        indicator_names=["population", "population_change", "population_density"],
-        dimensions={
-            "age": ["all", "0", "0-4", "0-14", "0-24"] + AGES_POP_LIST,
-            "sex": "*",
-            "variant": ["medium", "high", "low"],
-        },
-        choice_renames={"age": AGES_POP},
-        explorer_name="population-and-demography",
     )
 
     # 2) DEPENDENCY RATIO
-    explorer_dep = create_explorer(
-        tb=ds.read("dependency_ratio", load_data=False),
-        config_yaml=config,
+    explorer_dep = explorer_creator.create(
+        table_name="dependency_ratio",
+        config_yaml=config_default,
         indicator_names=["dependency_ratio"],
         dimensions={
             "age": "*",
@@ -113,8 +101,8 @@ def run() -> None:
     )
 
     # 3) SEX RATIO
-    explorer_sr = create_explorer(
-        tb=ds.read("sex_ratio", load_data=False),
+    explorer_sr = explorer_creator.create(
+        table_name="sex_ratio",
         config_yaml=paths.load_explorer_config("un_wpp.sex_ratio.config.yml"),
         indicator_names=["sex_ratio"],
         dimensions={
@@ -126,6 +114,57 @@ def run() -> None:
         choice_renames={"age": AGES_SR},
     )
 
+    # 4) MIGRATION
+    explorer_mig = explorer_creator.create(
+        table_name="migration",
+        config_yaml=config_default,
+        indicator_names=["net_migration", "net_migration_rate"],
+        dimensions={
+            "age": "*",
+            "sex": "*",
+            "variant": ["estimates"],
+        },
+        dimensions_proj={
+            "variant": ["medium"],
+        },
+        indicator_as_dimension=True,
+        choice_renames={"age": AGES_SR},
+    )
+
+    # 5) DEATHS
+    explorer_deaths = explorer_creator.create(
+        table_name="deaths",
+        config_yaml=config_default,
+        indicator_names=["deaths", "death_rate"],
+        dimensions={
+            "age": "*",
+            "sex": "*",
+            "variant": ["estimates"],
+        },
+        # dimensions_proj={
+        #     "variant": ["medium"],
+        # },
+        indicator_as_dimension=True,
+        choice_renames={"age": AGES_SR},
+    )
+
+    # 6) Births
+    explorer_b = explorer_creator.create(
+        table_name="births",
+        config_yaml=paths.load_explorer_config("un_wpp.births.config.yml"),
+        indicator_names=["births", "birth_rate"],
+        dimensions={
+            "age": "*",
+            "sex": "*",
+            "variant": ["estimates"],
+        },
+        # dimensions_proj={
+        #     "variant": ["medium"],
+        # },
+        indicator_as_dimension=True,
+        choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
+    )
+
     # DEBUGGING
     # with open("/home/lucas/repos/etl/etl/steps/export/explorers/un/latest/un_wpp2.config.yml", "w") as f:
     #     yaml_dump(config, f)
@@ -133,7 +172,14 @@ def run() -> None:
     # Export
     # Combine explorers
     # TODO: falla si tenemos POP_FULL junto con SR!
-    explorers = [explorer_pop, explorer_pop_full, explorer_dep, explorer_sr]
+    explorers = [
+        explorer_pop,
+        explorer_dep,
+        explorer_sr,
+        explorer_mig,
+        explorer_deaths,
+        explorer_b,
+    ]
     explorer = combine_explorers(
         explorers=explorers,
         explorer_name="population-and-demography",
@@ -165,6 +211,61 @@ def explorer_to_mdim(explorer: Explorer, mdim_name: str):
     )
 
 
+class ExplorerCreator:
+    """This class is particular to this step.
+
+    This step relies on two datasets that are particular. One contains just estimates (1950-2023), and the other contains projections (1950-2100).
+    """
+
+    def __init__(self, ds, ds_proj):
+        self.ds = ds
+        self.ds_proj = ds_proj
+        self.tbs = {"proj": {}, "estimates": {}}
+
+    def table(self, table_name: str):
+        if table_name not in self.tbs:
+            self.tbs["estimates"][table_name] = self.ds.read(table_name, load_data=False)
+        return self.tbs["estimates"][table_name]
+
+    def table_proj(self, table_name: str):
+        if table_name not in self.tbs:
+            self.tbs["proj"][table_name] = self.ds_proj.read(table_name, load_data=False)
+        return self.tbs["proj"][table_name]
+
+    def create(
+        self,
+        table_name: str,
+        dimensions: Dict[str, Union[List[str], str]],
+        dimensions_proj: Optional[Dict[str, Union[List[str], str]]] = None,
+        **kwargs,
+    ):
+        """Creates an explorer based on `tb` (1950-2023) and `tb_proj` (1950-2100)."""
+        paths.log.info(f"Creating explorer for {table_name}")
+
+        # Load tables
+        tb = self.table(table_name)
+        tb_proj = self.table_proj(table_name)
+
+        # Explorer with estimates
+        explorer = create_explorer(tb=tb, dimensions=dimensions, **kwargs)
+
+        # Explorer with projections
+        if dimensions_proj is not None:
+            dimensions.update(dimensions_proj)
+        else:
+            dimensions["variant"] = ["medium", "high", "low"]
+
+        explorer_proj = create_explorer(tb=tb_proj, dimensions=dimensions, **kwargs)
+
+        explorer = combine_explorers(
+            explorers=[explorer, explorer_proj],
+            explorer_name=explorer.explorer_name,
+            config=explorer.config,
+        )
+
+        return explorer
+
+
 def create_explorer(
     tb: Table,
     config_yaml: Dict[str, Any],
@@ -174,10 +275,37 @@ def create_explorer(
     indicators_slug: Optional[str] = None,
     indicator_as_dimension: bool = False,
     explorer_name: Optional[str] = None,
-    choice_renames: Optional[Dict[str, Dict[str, str]]] = None,
+    choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
     catalog_path_full: bool = False,
 ) -> Explorer:
-    """Experimental."""
+    """Experimental smarter explorer creation.
+
+    Args:
+    -----
+    tb: Table
+        Table object with data. This data will be expanded for the given indicators and dimensions.
+    config_yaml: Dict[str, Any]
+        Configuration YAML for the explorer. This can contain dimension renames, etc. Even views.
+    indicator_names: Optional[Union[str, List[str]]]
+        Name of the indicators to be used. If None, all indicators are used.
+    dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]]
+        Dimensions to be used. If None, all dimensions are used. If a list, all dimensions are used with the given names. If a dict, key represent dimensions to use and values choices to use. Note that if a list or dictionary is given, all dimensions must be present.
+    common_view_config: Optional[Dict[str, Any]]
+        Common view configuration to be used for all views.
+    indicators_slug: Optional[str]
+        Slug to be used for the indicators. A default is used.
+    indicator_as_dimension: bool
+        If True, the indicator is treated as a dimension.
+    explorer_name: Optional[str]
+        Name of the explorer. If None, the table name is used.
+    choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]]
+        Renames for choices. If a dictionary, the key is the dimension slug and the value is a dictionary with the original slug as key and the new name as value. If a callable, the function should return the new name for the given slug. NOTE: If the callable returns None, the name is not changed.
+    catalog_path_full: bool
+        If True, the full path is used for the catalog. If False, a shorter version is used (e.g. table#indicator` or `dataset/table#indicator`).
+
+
+    NOTE: This function is experimental for this step, but could be used in other steps as well. Consider migrating to etl.collections.explorer once we are happy with it.
+    """
     from copy import deepcopy
 
     config = deepcopy(config_yaml)
@@ -209,6 +337,10 @@ def create_explorer(
     # Add views
     config["views"] += config_new["views"]
 
+    # Default explorer name is table name
+    if explorer_name is None:
+        explorer_name = tb.m.short_name
+
     # Create actual explorer
     explorer = paths.create_explorer(
         config=config,
@@ -221,8 +353,15 @@ def create_explorer(
             if dim.slug in choice_renames:
                 renames = choice_renames[dim.slug]
                 for choice in dim.choices:
-                    if choice.slug in renames:
-                        choice.name = renames[choice.slug]
+                    if isinstance(renames, dict):
+                        if choice.slug in renames:
+                            choice.name = renames[choice.slug]
+                    elif inspect.isfunction(renames):
+                        rename = renames(choice.slug)
+                        if rename:
+                            choice.name = renames(choice.slug)
+                    else:
+                        raise ValueError("Invalid choice_renames format.")
 
     return explorer
 
@@ -295,15 +434,17 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
 
     # 5) Announce conflicts
     df_conflict = df_choices.loc[df_choices["in_conflict"]]
-    paths.log.warning("Conflicts resolved")
-    for (dimension_slug, choice_slug), group in df_conflict.groupby(["dimension_slug", "slug_original"]):
-        # Now group by 'value' to see which col3 values correspond to each unique 'value'
-        paths.log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
-        for choice_slug_id, subgroup in group.groupby("choice_slug_id"):
-            explorer_list = subgroup["explorer_id"].astype(int).unique().tolist()
-            record = subgroup[cols_choices].drop_duplicates().to_dict("records")
-            assert len(record) == 1, "Unexpected, please report!"
-            paths.log.warning(f" Explorers {explorer_list} map to {record[0]}")
+    if not df_conflict.empty:
+        paths.log.warning("Choice slug conflicts resolved")
+        for (dimension_slug, choice_slug), group in df_conflict.groupby(["dimension_slug", "slug_original"]):
+            # Now group by 'value' to see which col3 values correspond to each unique 'value'
+            paths.log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
+            for _, subgroup in group.groupby("choice_slug_id"):
+                explorer_ids = subgroup["explorer_id"].unique().tolist()
+                explorer_names = [explorers_by_id[i].explorer_name for i in explorer_ids]
+                record = subgroup[cols_choices].drop_duplicates().to_dict("records")
+                assert len(record) == 1, "Unexpected, please report!"
+                paths.log.warning(f" Explorers {explorer_names} map to {record[0]}")
 
     return explorer
 
