@@ -494,5 +494,5 @@ def _check_intersection_iters(
     items_unexpected = set(items_given) - set(items_expected)
     if check_unexpected and items_unexpected:
         raise ValueError(
-            f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`!"
+            f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`, available are {items_expected}!"
         )
