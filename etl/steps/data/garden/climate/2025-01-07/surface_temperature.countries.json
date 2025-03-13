@@ -193,5 +193,12 @@
   "U.S. Virgin Islands (US)": "United States Virgin Islands",
   "Venezuela, Republica Bolivariana de": "Venezuela",
   "Yemen, Republic of": "Yemen",
-  "World": "World"
+  "World": "World",
+  "North America": "North America",
+  "Europe": "Europe",
+  "South America": "South America",
+  "Africa": "Africa",
+  "Oceania": "Oceania",
+  "Antarctica": "Antarctica",
+  "Asia": "Asia"
 }
