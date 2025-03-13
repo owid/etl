@@ -88,15 +88,6 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_temperature_anomaly
-          display:
-            type: Numeric
-            unit: °C
-            shortUnit: °C
-            sourceName: Met Office Hadley Centre, Kennedy, et al. (2019). The Met Office Hadley Centre HadSST.4.0.0.0 data
-              set
-            sourceLink: https://www.metoffice.gov.uk/hadobs/hadsst4/data/download.html
-            dataPublishedBy: |-
-              Met Office Hadley Centre, Kennedy, J. J., Rayner, N. A., Atkinson, C. P., & Killick, R. E. (2019). An ensemble data set of sea‐surface temperature change from 1850: the Met Office Hadley Centre HadSST.4.0.0.0 data set. Journal of Geophysical Research: Atmospheres, 124. https://doi.org/10.1029/2018JD029867. HadSST.4.0.0.0 are obtained from http://www.metoffice.gov.uk/hadobs/hadsst4 on a monthly basis and are © British Crown Copyright, Met Office 2019, provided under an Open Government License, http://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
     config:
       title: 'Global warming: monthly sea surface temperature anomaly'
       subtitle: |-
@@ -112,41 +103,9 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_csiro_700m
-          display:
-            name: CSIRO
-            type: Numeric
-            sourceName: United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ocean-heat
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              The original data series is published from the Commonwealth Scientific and Industrial Research Organisation (CSIRO). 2016 update to data originally published in: Domingues, C.M., J.A. Church, N.J. White, P.J. Gleckler, S.E. Wijffels, P.M. Barker, and J.R. Dunn. 2008. Improved estimates of upper-ocean warming and multi-decadal sea-level rise. Nature 453:1090–1094. www.cmar.csiro.au/sealevel/thermal_expansion_ocean_heat_timeseries.html\nOcean heat content is measured in 10²² joules. For reference, one 10²² joules is equal to approximately 17 times the amount of energy used globally every year. It is measured relative to the 1971–2000 average, which is set at zero for reference.
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_iap_700m
-          display:
-            name: IAP
-            type: Numeric
-            sourceName: United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ocean-heat
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              The original data series is published from the Institute of Atmopsheric Physics (IAP). 2021 update to data originally published in: Cheng, L., K.E. Trenberth, J. Fasullo, T. Boyer, J. Abraham, and J. Zhu. 2017. Improved estimates of ocean heat content from 1960 to 2015. Science Advances 3(3):e1601545. Ocean heat content is measured in 10²² joules. For reference, one 10²² joules is equal to approximately 17 times the amount of energy used globally every year. It is measured relative to the 1971–2000 average, which is set at zero for reference.
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_mri_700m
-          display:
-            name: MRIJMA
-            type: Numeric
-            sourceName: United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ocean-heat
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              The original data series is published from the Meteorological Research Institute/Japan Meteorological Agency (MRI/JMA). 2021. Global ocean heat content. www.data.jma.go.jp/gmd/kaiyou/english/ohc/ohc_global_en.html Ocean heat content is measured in 10²² joules. For reference, one 10²² joules is equal to approximately 17 times the amount of energy used globally every year. It is measured relative to the 1971–2000 average, which is set at zero for reference.
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_noaa_700m
-          display:
-            name: NOAA
-            type: Numeric
-            sourceName: United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ocean-heat
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              The original data series is published from the National Oceanic and Atmospheric Administration (NOAA). Global ocean heat and salt content. www.nodc.noaa.gov/OC5/3M_HEAT_CONTENT\nOcean heat content is measured in 10²² joules. For reference, one 10²² joules is equal to approximately 17 times the amount of energy used globally every year. It is measured relative to the 1971–2000 average, which is set at zero for reference.
     config:
       title: "Global warming: heat content in the top 700 meters of the world's oceans"
       subtitle: |-
@@ -164,32 +123,8 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_iap_2000m
-          display:
-            name: IAP
-            type: Numeric
-            sourceName: United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ocean-heat
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              The original data series is published from the Institute of Atmopsheric Physics (IAP). 2021 update to data originally published in: Cheng, L., K.E. Trenberth, J. Fasullo, T. Boyer, J. Abraham, and J. Zhu. 2017. Improved estimates of ocean heat content from 1960 to 2015. Science Advances 3(3):e1601545. Ocean heat content is measured in 10²² joules. For reference, one 10²² joules is equal to approximately 17 times the amount of energy used globally every year. It is measured relative to the 1971–2000 average, which is set at zero for reference.
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_noaa_2000m
-          display:
-            name: NOAA
-            type: Numeric
-            sourceName: United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ocean-heat
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              The original data series is published from the National Oceanic and Atmospheric Administration (NOAA). Global ocean heat and salt content. www.nodc.noaa.gov/OC5/3M_HEAT_CONTENT\nOcean heat content is measured in 10²² joules. For reference, one 10²² joules is equal to approximately 17 times the amount of energy used globally every year. It is measured relative to the 1971–2000 average, which is set at zero for reference.
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_mri_2000m
-          display:
-            name: MRIJMA
-            type: Numeric
-            sourceName: United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-ocean-heat
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              The original data series is published from the Meteorological Research Institute/Japan Meteorological Agency (MRI/JMA). 2021. Global ocean heat content. www.data.jma.go.jp/gmd/kaiyou/english/ohc/ohc_global_en.html\nOcean heat content is measured in 10²² joules. For reference, one 10²² joules is equal to approximately 17 times the amount of energy used globally every year. It is measured relative to the 1971–2000 average, which is set at zero for reference.
     config:
       title: "Global warming: heat content in the top 2,000 meters of the world's oceans"
       subtitle: |-
@@ -207,19 +142,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#ocean_ph
-          display:
-            name: Monthly pH measurement
-            type: Numeric
-            sourceName: University of Hawaii
-            sourceLink: https://hahana.soest.hawaii.edu/hot/products/products.html
-            dataPublishedBy: University of Hawaii
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#ocean_ph_yearly_average
-          display:
-            name: Annual average
-            type: Numeric
-            sourceName: University of Hawaii
-            sourceLink: https://hahana.soest.hawaii.edu/hot/products/products.html
-            dataPublishedBy: University of Hawaii
     config:
       title: 'Ocean acidification: mean seawater pH'
       subtitle: Mean seawater pH is shown based on in-situ measurements of pH from the Aloha station in Hawaii.
@@ -235,38 +158,8 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_level_church_and_white_2011
-          display:
-            name: Church & White
-            type: Numeric
-            unit: millimeters
-            shortUnit: mm
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://www.climate.gov/news-features/understanding-climate/climate-change-global-sea-level
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
-            additionalInfo: |-
-              This series measures sea level rise from the Church and White (2011)'s reconstruction of 20th century sea level rise (https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2005GL024826). The values are shown as change in sea level in millimeters compared to the 1993-2008 average.
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_level_uhslc
-          display:
-            name: University of Hawaii
-            type: Numeric
-            unit: millimeters
-            shortUnit: mm
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://www.climate.gov/news-features/understanding-climate/climate-change-global-sea-level
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
-            additionalInfo: |-
-              This series measures sea level rise from the University of Hawaii's Sea Level Center Fast Track (http://uhslc.soest.hawaii.edu/data/?fd). The values are shown as change in sea level in millimeters compared to the 1993-2008 average.
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_level_average
-          display:
-            name: Average
-            type: Numeric
-            unit: millimeters
-            shortUnit: mm
-            sourceName: National Oceanic and Atmospheric Administration (NOAA)
-            sourceLink: https://www.climate.gov/news-features/understanding-climate/climate-change-global-sea-level
-            dataPublishedBy: National Oceanic and Atmospheric Administration (NOAA)
-            additionalInfo: |-
-              This series measures the average sea level rise from two sources:\n1. the University of Hawaii's Sea Level Center Fast Track (http://uhslc.soest.hawaii.edu/data/?fd).\n2. Church and White (2011)'s historical reconstruction (https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2005GL024826).\nThe values are shown as change in sea level in millimeters compared to the 1993-2008 average.
     config:
       title: Sea level rise
       subtitle: |-
@@ -282,23 +175,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#arctic_sea_ice_extent_max
-          display:
-            name: February
-            type: Numeric
-            unit: square kilometers
-            shortUnit: million km²
-            sourceName: NSIDC (National Snow and Ice Data Center) via NASA
-            sourceLink: https://climate.nasa.gov/vital-signs/arctic-sea-ice/
-            dataPublishedBy: National Aeronautics and Space Administration (NASA)
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#arctic_sea_ice_extent_min
-          display:
-            name: September
-            type: Numeric
-            unit: square kilometers
-            shortUnit: million km²
-            sourceName: NSIDC (National Snow and Ice Data Center) via NASA
-            sourceLink: https://climate.nasa.gov/vital-signs/arctic-sea-ice/
-            dataPublishedBy: National Aeronautics and Space Administration (NASA)
     config:
       title: 'Climate change: Arctic sea ice extent'
       subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
@@ -313,27 +190,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#antarctic_sea_ice_extent_min
-          display:
-            name: February
-            type: Numeric
-            unit: million square kilometers
-            shortUnit: million km²
-            sourceName: NSIDC (National Snow and Ice Data Center) via the US EPA
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-antarctic-sea-ice
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              Original data on Antarctic Sea Ice comes from the NSIDC (National Snow and Ice Data Center). Sea ice data and image archive: https://nsidc.org/data/seaice_index/archive
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#antarctic_sea_ice_extent_max
-          display:
-            name: September
-            type: Numeric
-            unit: million square kilometers
-            shortUnit: million km²
-            sourceName: NSIDC (National Snow and Ice Data Center) via the US EPA
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-antarctic-sea-ice
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
-            additionalInfo: |-
-              Original data on Antarctic Sea Ice comes from the NSIDC (National Snow and Ice Data Center). Sea ice data and image archive: https://nsidc.org/data/seaice_index/archive
     config:
       title: 'Climate change: Antarctic sea ice extent'
       subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
