@@ -111,3 +111,15 @@ tables:
           name: Combined measurements
         presentation:
           title_public: Cumulative change in mass in the ice sheets, according to IMBIE
+      snow_cover_extent:
+        title: Monthly measurement of the area covered by snow
+        display:
+          name: Snow cover
+        presentation:
+          title_public: Monthly measurement of the area covered by snow
+      snow_cover_extent_yearly_average:
+        title: Rolling yearly average of the area covered by snow
+        display:
+          name: Annual average
+        presentation:
+          title_public: Rolling yearly average of the area covered by snow

@@ -222,14 +222,6 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#mass_balance_us_glaciers
-          display:
-            name: Mass U.S. glaciers
-            type: Numeric
-            unit: meters
-            shortUnit: m
-            sourceName: United States Environmental Protection Agency (EPA)
-            sourceLink: https://www.epa.gov/climate-indicators/climate-change-indicators-glaciers
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
     config:
       title: 'Climate change: change of mass of US glaciers'
       subtitle: |-
@@ -245,23 +237,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#snow_cover_extent
-          display:
-            name: Snow cover
-            type: Numeric
-            unit: square kilometers
-            shortUnit: km²
-            sourceName: Rutgers University Global Snow Lab
-            sourceLink: https://climate.rutgers.edu/snowcover/table_area.php?ui_set=1&ui_sort=0
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
         - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#snow_cover_extent_yearly_average
-          display:
-            name: Annual average
-            type: Numeric
-            unit: square kilometers
-            shortUnit: km²
-            sourceName: Rutgers University Global Snow Lab
-            sourceLink: https://climate.rutgers.edu/snowcover/table_area.php?ui_set=1&ui_sort=0
-            dataPublishedBy: United States Environmental Protection Agency (EPA)
     config:
       title: Snow cover in North America
       subtitle: |-
