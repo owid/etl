@@ -53,8 +53,8 @@ steps:
   # Copernicus Climate Change Service - Precipitation.
   #
   data://meadow/climate/2025-01-07/total_precipitation:
-  - snapshot://climate/2025-01-07/total_precipitation.zip
-  - snapshot://countries/2023-12-27/world_bank.zip
+    - snapshot://climate/2025-01-07/total_precipitation.zip
+    - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2025-01-07/total_precipitation:
     - data://meadow/climate/2025-01-07/total_precipitation
   data://grapher/climate/2025-01-07/total_precipitation_annual:
@@ -65,8 +65,8 @@ steps:
   # Copernicus Climate Change Service - Snowcover.
   #
   data://meadow/climate/2025-03-12/snowfall:
-  - snapshot://climate/2025-03-12/snowfall.zip
-  - snapshot://countries/2023-12-27/world_bank.zip
+    - snapshot://climate/2025-03-12/snowfall.zip
+    - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2025-03-12/snowfall:
     - data://meadow/climate/2025-03-12/snowfall
   data://grapher/climate/2025-03-12/snowfall:
