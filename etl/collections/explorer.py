@@ -61,7 +61,8 @@ class Explorer(Collection):
             }
         return mapping
 
-    def _explorer_name(self):
+    @property
+    def explorer_name(self):
         if self.catalog_path is None:
             raise ValueError("Catalog path is not set. Please set it before saving.")
 
@@ -88,7 +89,7 @@ class Explorer(Collection):
         # TODO: this part is responsible for interacting with owid-content. Instead, it should be replaced with DB-interaction code, as with MDIMs.
         explorer_legacy = _create_explorer_legacy(
             explorer_path=self.catalog_path,
-            explorer_name=self._explorer_name(),
+            explorer_name=self.explorer_name,
             config=self.config,
             df_graphers=df_grapher,
         )
