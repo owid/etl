@@ -1,0 +1,18 @@
+
+definitions:
+  common:
+    unit: "%"
+    short_unit: "%"
+    presentation:
+      topic_tags:
+      - Climate Change
+    display:
+      numDecimalPlaces: 2
+    processing_level: major
+
+
+tables:
+  surface_temperature:
+    variables:
+      snow_cover:
+        title: Snow cover

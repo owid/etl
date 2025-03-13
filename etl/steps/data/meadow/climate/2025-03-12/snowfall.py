@@ -39,9 +39,7 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
                     # Load the GRIB file using xarray and cfgrib
                     da = xr.open_dataset(tmp_file.name, engine="cfgrib").load()
 
-    print(da)
-    # Convert temperature from Kelvin to Celsius.
-    da = da["t2m"] - 273.15
+    da = da["snowc"]
 
     # Set the coordinate reference system for the temperature data to EPSG 4326.
     da = da.rio.write_crs("epsg:4326")
@@ -158,13 +156,13 @@ def run(dest_dir: str) -> None:
     df_temp = pd.DataFrame(temp_country)
     df_temp["time"] = month_starts_list
 
-    melted_df = df_temp.melt(id_vars=["time"], var_name="country", value_name="temperature_2m")
+    melted_df = df_temp.melt(id_vars=["time"], var_name="country", value_name="snow_cover")
 
     # Create a new table and ensure all columns are snake-case and add relevant metadata.
     tb = Table(melted_df, short_name=paths.short_name, underscore=True)
     tb = tb.set_index(["time", "country"], verify_integrity=True)
 
-    tb["temperature_2m"].metadata.origins = [snap.metadata.origin]
+    tb["snow_cover"].metadata.origins = [snap.metadata.origin]
     #
     # Save outputs.
     #

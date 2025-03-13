@@ -69,7 +69,7 @@ steps:
   - snapshot://countries/2023-12-27/world_bank.zip
   data://garden/climate/2025-03-12/snowfall:
     - data://meadow/climate/2025-03-12/snowfall
-  data://grapher/climate/22025-03-12/snowfall:
+  data://grapher/climate/2025-03-12/snowfall:
     - data://garden/climate/2025-03-12/snowfall
   #
   # Climate change impacts data explorer.
