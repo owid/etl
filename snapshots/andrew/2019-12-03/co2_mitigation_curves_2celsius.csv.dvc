@@ -1,11 +1,13 @@
 meta:
-  name: CO2 mitigation curves for 1.5 Celsius (Andrew & GCP, 2019)
+  name: CO2 mitigation curves for 2 Celsius (Andrew & GCP, 2019)
   source_name: Robbie Andrew
   publication_year: 2019
   publication_date: 2019-12-03
   url: https://folk.universitetetioslo.no/roberan/t/global_mitigation_curves.shtml
-  source_data_url: https://folk.uio.no/roberan/t/data/mitigation_curves_1.5C_191203_data.csv
-  file_extension: csv
+  source_data_url: https://folk.uio.no/roberan/t/data/mitigation_curves_2.0C_191203_data.csv
   license_url: https://folk.universitetetioslo.no/roberan/t/global_mitigation_curves.shtml
   license_name: CC BY
-  description: |
+outs:
+  - md5: cb695aa35203bcd8b55a10d59413d6eb
+    size: 61194
+    path: co2_mitigation_curves_2celsius.csv

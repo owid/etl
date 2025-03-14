@@ -1,8 +1,5 @@
 dataset:
-  namespace: ggdc
-  version: 2022-11-28
   title: Penn World Table (GGDC, 2021)
-  short_name: penn_world_table
   description: Penn World Table is a database with information on GDP and its composition, employment, productivity and trade, covering 183 countries between 1950 and 2019.
   sources:
     -

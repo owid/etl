@@ -22,7 +22,7 @@ steps:
 
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
-    - walden://postnatal_care/2022-09-19/postnatal_care
+    - snapshot://postnatal_care/2022-09-19/postnatal_care.csv
   data://garden/postnatal_care/2022-09-19/postnatal_care:
     - data://meadow/postnatal_care/2022-09-19/postnatal_care
   data://grapher/postnatal_care/2022-09-19/postnatal_care:
