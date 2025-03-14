@@ -2,24 +2,24 @@
 - [x] population
 - [ ] population broad age groups
 - [x] population change
-- [ ] population growth rate
-- [ ] natural population growth rate
+- [x] population growth rate
+- [x] natural population growth rate
 - [x] population density
-- [ ] Fertility rate
-- [ ] Births
-- [ ] Birth rate
-- [ ] Deaths
-- [ ] Death rate
-- [ ] Number of child deaths
-- [ ] Child mortality rate
-- [ ] Number of infants deaths
-- [ ] Infant mortality rate
-- [ ] Life expectancy
+- [x] Fertility rate
+- [x] Births
+- [x] Birth rate
+- [x] Deaths
+- [x] Death rate
+- [x] Number of child deaths
+- [x] Child mortality rate
+- [x] Number of infants deaths
+- [x] Infant mortality rate
+- [x] Life expectancy
 - [ ] Age structure
 - [x] Dependency ratio
-- [ ] Median age
-- [ ] Net migration
-- [ ] Net migration rate
+- [x] Median age
+- [x] Net migration
+- [x] Net migration rate
 - [x] Sex ratio
 
 total done: 4/22
@@ -64,6 +64,10 @@ AGES_SR = {
     "100+": "At age 100 and over",
 }
 
+# Deaths
+AGES_DEATHS_LIST = [f"{i}-{i+4}" for i in range(5, 20, 5)] + [f"{i}-{i+9}" for i in range(20, 100, 10)] + ["100+"]
+AGES_DEATHS = {age: f"{age.replace('-', '–')} years" for age in AGES_POP_LIST}
+
 
 # etlr multidim
 def run() -> None:
@@ -72,7 +76,7 @@ def run() -> None:
     ds_full = paths.load_dataset("un_wpp_full")
     explorer_creator = ExplorerCreator(ds, ds_full)
 
-    # 1) Population
+    # 1) POPULATION
     config_default = paths.load_explorer_config()
 
     explorer_pop = explorer_creator.create(
@@ -97,7 +101,6 @@ def run() -> None:
             "sex": "*",
             "variant": ["estimates"],
         },
-        indicator_as_dimension=True,
     )
 
     # 3) SEX RATIO
@@ -110,7 +113,6 @@ def run() -> None:
             "sex": "*",
             "variant": ["estimates"],
         },
-        indicator_as_dimension=True,
         choice_renames={"age": AGES_SR},
     )
 
@@ -127,7 +129,6 @@ def run() -> None:
         dimensions_proj={
             "variant": ["medium"],
         },
-        indicator_as_dimension=True,
         choice_renames={"age": AGES_SR},
     )
 
@@ -137,21 +138,20 @@ def run() -> None:
         config_yaml=config_default,
         indicator_names=["deaths", "death_rate"],
         dimensions={
-            "age": "*",
+            "age": ["all", "0", "0-4"] + AGES_DEATHS_LIST,
             "sex": "*",
             "variant": ["estimates"],
         },
         # dimensions_proj={
         #     "variant": ["medium"],
         # },
-        indicator_as_dimension=True,
-        choice_renames={"age": AGES_SR},
+        choice_renames={"age": AGES_DEATHS},
     )
 
     # 6) Births
     explorer_b = explorer_creator.create(
         table_name="births",
-        config_yaml=paths.load_explorer_config("un_wpp.births.config.yml"),
+        config_yaml=config_default,
         indicator_names=["births", "birth_rate"],
         dimensions={
             "age": "*",
@@ -161,7 +161,66 @@ def run() -> None:
         # dimensions_proj={
         #     "variant": ["medium"],
         # },
-        indicator_as_dimension=True,
+        choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
+    )
+
+    # 6) Median age
+    explorer_ma = explorer_creator.create(
+        table_name="median_age",
+        config_yaml=config_default,
+        indicator_names=["median_age"],
+        dimensions={
+            "age": ["all"],
+            "sex": "*",
+            "variant": ["estimates"],
+        },
+        # dimensions_proj={
+        #     "variant": ["medium"],
+        # },
+        choice_renames={"age": lambda _: "None"},
+    )
+
+    # Manual
+    explorer_manual = explorer_creator.create_manual(
+        config=paths.load_explorer_config("un_wpp.manual.config.yml"),
+    )
+
+    # Life expectancy
+    explorer_le = explorer_creator.create(
+        table_name="life_expectancy",
+        config_yaml=config_default,
+        indicator_names=["life_expectancy"],
+        dimensions={
+            "age": "*",
+            "sex": "*",
+            "variant": ["estimates"],
+        },
+        # dimensions_proj={
+        #     "variant": ["medium"],
+        # },
+        choice_renames={
+            "age": {
+                0: "At birth",
+                15: "Aged 15",
+                60: "Aged 60",
+                80: "Aged 80",
+            }
+        },
+    )
+
+    # Fertility rate
+    explorer_fr = explorer_creator.create(
+        table_name="fertility_rate",
+        config_yaml=config_default,
+        indicator_names=["fertility_rate"],
+        dimensions={
+            "age": "*",
+            "sex": "*",
+            "variant": ["estimates"],
+        },
+        # dimensions_proj={
+        #     "variant": ["medium"],
+        # },
         choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
     )
 
@@ -169,6 +228,7 @@ def run() -> None:
     # with open("/home/lucas/repos/etl/etl/steps/export/explorers/un/latest/un_wpp2.config.yml", "w") as f:
     #     yaml_dump(config, f)
 
+    # TODO: getting a strange error if we add explorer_deaths_child, explorer_deaths_inf
     # Export
     # Combine explorers
     # TODO: falla si tenemos POP_FULL junto con SR!
@@ -179,6 +239,13 @@ def run() -> None:
         explorer_mig,
         explorer_deaths,
         explorer_b,
+        explorer_ma,
+        explorer_le,
+        explorer_fr,
+        # explorer_deaths_inf,
+        # explorer_deaths_child,
+        # manual views explorers
+        explorer_manual,
     ]
     explorer = combine_explorers(
         explorers=explorers,
@@ -186,6 +253,33 @@ def run() -> None:
         config=explorer_pop.config,
     )
 
+    # Sort indicator choices
+    explorer.sort_choices(
+        {
+            "indicator": [
+                "population",
+                "population_change",
+                "growth_rate",
+                "natural_change_rate",
+                "population_density",
+                "fertility_rate",
+                "births",
+                "birth_rate",
+                "deaths",
+                "death_rate",
+                "child_deaths",
+                "child_mortality_rate",
+                "infant_deaths",
+                "infant_mortality_rate",
+                "life_expectancy",
+                "dependency_ratio",
+                "median_age",
+                "net_migration",
+                "net_migration_rate",
+                "sex_ratio",
+            ]
+        }
+    )
     explorer.save(tolerate_extra_indicators=True)
 
     # Translate into mdim
@@ -232,6 +326,10 @@ class ExplorerCreator:
             self.tbs["proj"][table_name] = self.ds_proj.read(table_name, load_data=False)
         return self.tbs["proj"][table_name]
 
+    def create_manual(self, config: Dict[str, Any], **kwargs):
+        explorer = create_explorer(config, indicator_as_dimension=True, **kwargs)
+        return explorer
+
     def create(
         self,
         table_name: str,
@@ -247,7 +345,7 @@ class ExplorerCreator:
         tb_proj = self.table_proj(table_name)
 
         # Explorer with estimates
-        explorer = create_explorer(tb=tb, dimensions=dimensions, **kwargs)
+        explorer = create_explorer(tb=tb, dimensions=dimensions, indicator_as_dimension=True, **kwargs)
 
         # Explorer with projections
         if dimensions_proj is not None:
@@ -255,7 +353,7 @@ class ExplorerCreator:
         else:
             dimensions["variant"] = ["medium", "high", "low"]
 
-        explorer_proj = create_explorer(tb=tb_proj, dimensions=dimensions, **kwargs)
+        explorer_proj = create_explorer(tb=tb_proj, dimensions=dimensions, indicator_as_dimension=True, **kwargs)
 
         explorer = combine_explorers(
             explorers=[explorer, explorer_proj],
@@ -267,8 +365,8 @@ class ExplorerCreator:
 
 
 def create_explorer(
-    tb: Table,
     config_yaml: Dict[str, Any],
+    tb: Optional[Table] = None,
     indicator_names: Optional[Union[str, List[str]]] = None,
     dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
     common_view_config: Optional[Dict[str, Any]] = None,
@@ -310,36 +408,43 @@ def create_explorer(
 
     config = deepcopy(config_yaml)
 
-    # Check if there are collisions between table names
-    # TODO: We should do this at indicator level. Default to 'table' for all indicators, except when there is a collision, then go to 'dataset', otherwise go to 'full'
-    expand_path_mode = "table"
-    if catalog_path_full:
-        expand_path_mode = "full"
-    elif has_duplicate_table_names(paths.dependencies):
-        expand_path_mode = "dataset"
-    # print(expand_path_mode)
+    # Read from table (programatically expand)
+    config_auto = None
+    if tb is not None:
+        # Check if there are collisions between table names
+        # TODO: We should do this at indicator level. Default to 'table' for all indicators, except when there is a collision, then go to 'dataset', otherwise go to 'full'
+        expand_path_mode = "table"
+        if catalog_path_full:
+            expand_path_mode = "full"
+        elif has_duplicate_table_names(paths.dependencies):
+            expand_path_mode = "dataset"
 
-    # Bake config automatically from table
-    config_new = expand_config(
-        tb=tb,
-        indicator_names=indicator_names,
-        dimensions=dimensions,
-        common_view_config=common_view_config,
-        indicators_slug=indicators_slug,
-        indicator_as_dimension=indicator_as_dimension,
-        expand_path_mode=expand_path_mode,
-    )
-    # Combine & bake dimensions
-    config["dimensions"] = combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config["dimensions"],
-    )
-    # Add views
-    config["views"] += config_new["views"]
+        # Bake config automatically from table
+        config_auto = expand_config(
+            tb=tb,
+            indicator_names=indicator_names,
+            dimensions=dimensions,
+            common_view_config=common_view_config,
+            indicators_slug=indicators_slug,
+            indicator_as_dimension=indicator_as_dimension,
+            expand_path_mode=expand_path_mode,
+        )
 
-    # Default explorer name is table name
-    if explorer_name is None:
-        explorer_name = tb.m.short_name
+        # Combine & bake dimensions
+        config["dimensions"] = combine_config_dimensions(
+            config_dimensions=config_auto["dimensions"],
+            config_dimensions_yaml=config["dimensions"],
+        )
+
+        # Add views
+        config["views"] += config_auto["views"]
+
+        # Default explorer name is table name
+        if explorer_name is None:
+            explorer_name = tb.m.short_name
+    elif explorer_name is None:
+        explorer_name = "unknown"
+        paths.log.info(f"No table provided. Explorer name is not set. Using '{explorer_name}'.")
 
     # Create actual explorer
     explorer = paths.create_explorer(
@@ -526,7 +631,9 @@ def _combine_dimensions(df_choices: pd.DataFrame, cols_choices: List[str], explo
             df_choices["dimension_slug"] == dimension.slug, cols_choices + ["slug"]
         ].drop_duplicates()
 
-        assert len(df_dim_choices) == df_dim_choices["slug"].nunique(), "Duplicate slugs in dimension choices."
+        assert (
+            len(df_dim_choices) == df_dim_choices["slug"].nunique()
+        ), f"Duplicate slugs in dimension {dimension.slug} choices."
 
         # Raw choices
         choices = df_dim_choices.to_dict("records")
@@ -550,6 +657,7 @@ def _update_choice_slugs_in_views(choice_slug_changes, explorers_by_id):
         df_views_dimensions = df_views_dimensions.astype("string")
 
         # Process views
+        print(change)
         df_views_dimensions = df_views_dimensions.replace(change)
 
         # Bring back views to explorers

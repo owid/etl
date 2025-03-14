@@ -1,0 +1,280 @@
+config:
+  explorerTitle: "Population & Demography"
+  explorerSubtitle: "Explore data from the United Nations World Population Prospects."
+  wpBlockId: 52216
+  hasMapTab: true
+  thumbnail: "https://owid.cloud/app/uploads/2022/07/Population-Data-Explorer.png"
+  isPublished: true
+
+dimensions:
+  - slug: indicator
+    name: indicator
+    choices:
+      - slug: growth_rate
+        name: Population growth rate
+      - slug: natural_change_rate
+        name: Natural population growth rate
+      - slug: infant_deaths
+        name: Number of infant deaths
+      - slug: infant_mortality_rate
+        name: Infant mortality rate
+      - slug: child_deaths
+        name: Number of child deaths
+      - slug: child_mortality_rate
+        name: Child mortality rate
+
+      # - slug: median_age
+      #   name: Median age
+
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: all
+        name: Both sexes
+        description: null
+      - slug: female
+        name: Female
+        description: null
+      - slug: male
+        name: Male
+        description: null
+
+    presentation:
+      type: radio
+  - slug: age
+    name: Age
+    choices:
+      - slug: all
+        name: Total
+        description: null
+      - slug: "0"
+        name: Under 1 year
+        description: null
+      - slug: "0-4"
+        name: Under 5 year
+        description: null
+
+  - slug: variant
+    name: Projection scenario
+    choices:
+      - slug: estimates
+        name: None
+        description: null
+      - slug: low
+        name: Low
+        description: null
+      - slug: medium
+        name: Medium
+        description: null
+      - slug: high
+        name: High
+        description: null
+    presentation:
+      type: radio
+
+views:
+  # Growth rate
+  - dimensions:
+      indicator: growth_rate
+      age: all
+      sex: all
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: un_wpp/growth_rate#growth_rate__sex_all__age_all__variant_estimates
+  - dimensions:
+      indicator: growth_rate
+      age: all
+      sex: all
+      variant: high
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_high
+  - dimensions:
+      indicator: growth_rate
+      age: all
+      sex: all
+      variant: low
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_low
+  - dimensions:
+      indicator: growth_rate
+      age: all
+      sex: all
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/growth_rate#growth_rate__sex_all__age_all__variant_medium
+
+  # Natural growth rate
+  - dimensions:
+      indicator: natural_change_rate
+      age: all
+      sex: all
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: un_wpp/natural_change_rate#natural_change_rate__sex_all__age_all__variant_estimates
+  - dimensions:
+      indicator: natural_change_rate
+      age: all
+      sex: all
+      variant: high
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_high
+  - dimensions:
+      indicator: natural_change_rate
+      age: all
+      sex: all
+      variant: low
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_low
+  - dimensions:
+      indicator: natural_change_rate
+      age: all
+      sex: all
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/natural_change_rate#natural_change_rate__sex_all__age_all__variant_medium
+
+  # Age structure
+
+  # Population by broad age group
+
+  # Infant deaths
+  - dimensions:
+      indicator: infant_deaths
+      age: "0"
+      sex: all
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp/deaths#deaths__sex_all__age_0__variant_estimates
+  - dimensions:
+      indicator: infant_deaths
+      age: "0"
+      sex: female
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp/deaths#deaths__sex_female__age_0__variant_estimates
+  - dimensions:
+      indicator: infant_deaths
+      age: "0"
+      sex: male
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp/deaths#deaths__sex_male__age_0__variant_estimates
+  - dimensions:
+      indicator: infant_deaths
+      age: "0"
+      sex: all
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp_full/deaths#deaths__sex_all__age_0__variant_medium
+  - dimensions:
+      indicator: infant_deaths
+      age: "0"
+      sex: female
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp_full/deaths#deaths__sex_female__age_0__variant_medium
+  - dimensions:
+      indicator: infant_deaths
+      age: "0"
+      sex: male
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp_full/deaths#deaths__sex_male__age_0__variant_medium
+
+  # Child deaths
+  - dimensions:
+      indicator: child_deaths
+      age: 0-4
+      sex: all
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: un_wpp/deaths#deaths__sex_all__age_0_4__variant_estimates
+  - dimensions:
+      indicator: child_deaths
+      age: 0-4
+      sex: female
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: un_wpp/deaths#deaths__sex_female__age_0_4__variant_estimates
+  - dimensions:
+      indicator: child_deaths
+      age: 0-4
+      sex: male
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: un_wpp/deaths#deaths__sex_male__age_0_4__variant_estimates
+  - dimensions:
+      indicator: child_deaths
+      age: 0-4
+      sex: all
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/deaths#deaths__sex_all__age_0_4__variant_medium
+  - dimensions:
+      indicator: child_deaths
+      age: 0-4
+      sex: female
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/deaths#deaths__sex_female__age_0_4__variant_medium
+  - dimensions:
+      indicator: child_deaths
+      age: 0-4
+      sex: male
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: un_wpp_full/deaths#deaths__sex_male__age_0_4__variant_medium
+
+  # Mortality rates
+  - dimensions:
+      indicator: infant_mortality_rate
+      age: "0"
+      sex: all
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_estimates
+  - dimensions:
+      indicator: child_mortality_rate
+      age: 0-4
+      sex: all
+      variant: estimates
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_estimates
+  - dimensions:
+      indicator: infant_mortality_rate
+      age: "0"
+      sex: all
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0__variant_medium
+  - dimensions:
+      indicator: child_mortality_rate
+      age: 0-4
+      sex: all
+      variant: medium
+    indicators:
+      y:
+        - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0_4__variant_medium

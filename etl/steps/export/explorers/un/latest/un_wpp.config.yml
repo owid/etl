@@ -14,6 +14,10 @@ dimensions:
         name: Population
       - slug: population_change
         name: Annual population change
+      - slug: growth_rate
+        name: Population growth rate
+      - slug: natural_change_rate
+        name: Natural population growth rate
       - slug: population_density
         name: Population density
       - slug: dependency_ratio
@@ -26,6 +30,16 @@ dimensions:
         name: Deaths
       - slug: death_rate
         name: Death rate
+      - slug: median_age
+        name: Median age
+      - slug: life_expectancy
+        name: Life expectancy
+      - slug: fertility_rate
+        name: Fertility rate
+      - slug: births
+        name: Births
+      - slug: birth_rate
+        name: Birth rate
 
   - slug: sex
     name: Sex
