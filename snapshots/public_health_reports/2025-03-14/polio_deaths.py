@@ -52,7 +52,7 @@ DATA_CDC = pd.DataFrame(
             1948,
             1949,
         ],
-        "cases": [
+        "deaths": [
             950,
             440,
             421,

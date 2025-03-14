@@ -58,6 +58,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: f78fc8d3b7722d1ff80dd7efd8643097
-    size: 2493
+  - md5: 68b6e00538dfe34ce79a599c8ca4a364
+    size: 2494
     path: polio_deaths.csv
