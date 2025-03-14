@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical diphtheria cases in the United States - United States Census Bureau
+    description: |-
+      Data on historical diphtheria cases in the United States, from the United States Census Bureau.
+
+      * 1941: [Statistical Abstract of the United States: 1944-45 (Part 2 - Vital Statistics, Page 82)](https://www.census.gov/library/publications/1945/compendia/statab/66ed.html)
+
+    date_published: "1945-10-01"
+
+    # Citation
+    producer: United States Census Bureau
+    citation_full: |-
+      Statistical Abstract of the United States: 1944-45 (1945), United States Census Bureau.
+    # Files
+    url_main: https://www.census.gov/library/publications/1945/compendia/statab/66ed.html
+    date_accessed: 2025-02-25
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 72745c85986def2387cc2f8eea3f313b
+    size: 126
+    path: polio_cases.csv
