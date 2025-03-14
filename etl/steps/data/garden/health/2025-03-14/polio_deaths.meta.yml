@@ -7,6 +7,8 @@ definitions:
     description_key:
       - "Data on reported deaths from acute polio have been compiled from historical Public Health Reports for the United States and from the Centers for Disease Control and Prevention's Morbidity and Mortality Weekly Report."
       - "Acute polio deaths are defined as deaths from an acute polio infection, and not post-polio syndrome."
+      - "The first polio vaccine was created by Jonas Salk, it was licensed and began to be administered in 1955."
+      - "A second polio vaccine was created by Albert Sabin in 1960."
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
