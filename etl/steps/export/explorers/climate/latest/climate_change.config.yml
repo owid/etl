@@ -74,7 +74,7 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/met_office_hadley_centre/2025-01-21/near_surface_temperature/near_surface_temperature#temperature_anomaly
+        - catalogPath: near_surface_temperature#temperature_anomaly
     config:
       title: 'Global warming: annual temperature anomaly'
       yScaleToggle: false
@@ -87,7 +87,7 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_temperature_anomaly
+        - catalogPath: climate_change_impacts_monthly#sea_temperature_anomaly
     config:
       title: 'Global warming: monthly sea surface temperature anomaly'
       subtitle: |-
@@ -102,10 +102,10 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_csiro_700m
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_iap_700m
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_mri_700m
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_noaa_700m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_csiro_700m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_iap_700m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_mri_700m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_noaa_700m
     config:
       title: "Global warming: heat content in the top 700 meters of the world's oceans"
       subtitle: |-
@@ -122,9 +122,9 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_iap_2000m
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_noaa_2000m
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ocean_heat_content_mri_2000m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_iap_2000m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_noaa_2000m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_mri_2000m
     config:
       title: "Global warming: heat content in the top 2,000 meters of the world's oceans"
       subtitle: |-
@@ -141,8 +141,8 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#ocean_ph
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#ocean_ph_yearly_average
+        - catalogPath: climate_change_impacts_monthly#ocean_ph
+        - catalogPath: climate_change_impacts_monthly#ocean_ph_yearly_average
     config:
       title: 'Ocean acidification: mean seawater pH'
       subtitle: Mean seawater pH is shown based on in-situ measurements of pH from the Aloha station in Hawaii.
@@ -157,9 +157,9 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_level_church_and_white_2011
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_level_uhslc
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#sea_level_average
+        - catalogPath: climate_change_impacts_monthly#sea_level_church_and_white_2011
+        - catalogPath: climate_change_impacts_monthly#sea_level_uhslc
+        - catalogPath: climate_change_impacts_monthly#sea_level_average
     config:
       title: Sea level rise
       subtitle: |-
@@ -174,8 +174,8 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#arctic_sea_ice_extent_max
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#arctic_sea_ice_extent_min
+        - catalogPath: climate_change_impacts_annual#arctic_sea_ice_extent_max
+        - catalogPath: climate_change_impacts_annual#arctic_sea_ice_extent_min
     config:
       title: 'Climate change: Arctic sea ice extent'
       subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
@@ -189,8 +189,8 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#antarctic_sea_ice_extent_min
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#antarctic_sea_ice_extent_max
+        - catalogPath: climate_change_impacts_annual#antarctic_sea_ice_extent_min
+        - catalogPath: climate_change_impacts_annual#antarctic_sea_ice_extent_max
     config:
       title: 'Climate change: Antarctic sea ice extent'
       subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
@@ -204,8 +204,8 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#land_ice_mass_nasa
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#cumulative_ice_mass_change_imbie
+        - catalogPath: climate_change_impacts_monthly#land_ice_mass_nasa
+        - catalogPath: climate_change_impacts_monthly#cumulative_ice_mass_change_imbie
     config:
       title: 'Climate change: change in mass of ice sheets'
       subtitle: |-
@@ -221,7 +221,7 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#mass_balance_us_glaciers
+        - catalogPath: climate_change_impacts_annual#mass_balance_us_glaciers
     config:
       title: 'Climate change: change of mass of US glaciers'
       subtitle: |-
@@ -236,8 +236,8 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#snow_cover_extent
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#snow_cover_extent_yearly_average
+        - catalogPath: climate_change_impacts_monthly#snow_cover_extent
+        - catalogPath: climate_change_impacts_monthly#snow_cover_extent_yearly_average
     config:
       title: Snow cover in North America
       subtitle: |-
@@ -252,8 +252,8 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#co2_concentration
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#co2_concentration_yearly_average
+        - catalogPath: climate_change_impacts_monthly#co2_concentration
+        - catalogPath: climate_change_impacts_monthly#co2_concentration_yearly_average
     config:
       title: Global atmospheric CO₂ concentration
       subtitle: Atmospheric carbon dioxide (CO₂) concentration is measured in parts per million (ppm).
@@ -267,8 +267,8 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#ch4_concentration
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#ch4_concentration_yearly_average
+        - catalogPath: climate_change_impacts_monthly#ch4_concentration
+        - catalogPath: climate_change_impacts_monthly#ch4_concentration_yearly_average
     config:
       title: Global atmospheric methane concentration
       subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
@@ -282,8 +282,8 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#n2o_concentration
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_monthly/climate_change_impacts_monthly#n2o_concentration_yearly_average
+        - catalogPath: climate_change_impacts_monthly#n2o_concentration
+        - catalogPath: climate_change_impacts_monthly#n2o_concentration_yearly_average
     config:
       title: Global atmospheric nitrous oxide concentration
       subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
@@ -297,7 +297,7 @@ views:
       long_run_series: true
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#co2_concentration
+        - catalogPath: climate_change_impacts_annual#co2_concentration
     config:
       title: Global atmospheric CO₂ concentration
       subtitle: |-
@@ -312,7 +312,7 @@ views:
       long_run_series: true
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#ch4_concentration
+        - catalogPath: climate_change_impacts_annual#ch4_concentration
     config:
       title: Global atmospheric methane concentration
       subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
@@ -326,7 +326,7 @@ views:
       long_run_series: true
     indicators:
       y:
-        - catalogPath: grapher/climate/2025-01-21/climate_change_impacts_annual/climate_change_impacts_annual#n2o_concentration
+        - catalogPath: climate_change_impacts_annual#n2o_concentration
     config:
       title: Global atmospheric nitrous oxide concentration
       subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
