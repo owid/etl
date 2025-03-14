@@ -4,11 +4,15 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+    description_key:
+      - "Data on reported deaths from acute polio have been compiled from historical Public Health Reports for the United States and from the Centers for Disease Control and Prevention's Morbidity and Mortality Weekly Report."
+      - "Acute polio deaths are defined as deaths from an acute polio infection, and not post-polio syndrome."
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  title: Long-run reported polio deaths in the United States
 
 tables:
   polio_deaths:
