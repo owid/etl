@@ -157,7 +157,7 @@ class ViewIndicators(MDIMBase):
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
-    def to_records(self) -> List[Dict[str, str]]:
+    def to_records(self) -> List[Dict[str, Union[str, Dict[str, Any]]]]:
         indicators = []
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -165,9 +165,17 @@ class ViewIndicators(MDIMBase):
                 continue
             if isinstance(dimension_val, list):
                 for d in dimension_val:
-                    indicators.append({"path": d.catalogPath, "dimension": dim})
+                    display = d.display if d.display is not None else {}
+                    indicator_ = {"path": d.catalogPath, "axis": dim, "display": display}
+                    indicators.append(indicator_)
             else:
-                indicators.append({"path": dimension_val.catalogPath, "dimension": dim})
+                display = dimension_val.display if dimension_val.display is not None else {}
+                indicator_ = {
+                    "path": dimension_val.catalogPath,
+                    "axis": dim,
+                    "display": display,
+                }
+                indicators.append(indicator_)
         return indicators
 
     def expand_paths(self, tables_by_name: Dict[str, List[str]]):
