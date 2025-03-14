@@ -388,7 +388,9 @@ class ExplorerCreator:
         tb_proj = self.table_proj(table_name)
 
         # Explorer with estimates
-        explorer = create_explorer_experimental(tb=tb, dimensions=dimensions, indicator_as_dimension=True, **kwargs)
+        explorer = create_explorer_experimental(
+            self.paths, tb=tb, dimensions=dimensions, indicator_as_dimension=True, **kwargs
+        )
 
         # Explorer with projections
         if dimensions_proj is not None:
@@ -397,7 +399,7 @@ class ExplorerCreator:
             dimensions["variant"] = ["medium", "high", "low"]
 
         explorer_proj = create_explorer_experimental(
-            tb=tb_proj, dimensions=dimensions, indicator_as_dimension=True, **kwargs
+            self.paths, tb=tb_proj, dimensions=dimensions, indicator_as_dimension=True, **kwargs
         )
 
         explorer = combine_explorers(
