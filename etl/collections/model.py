@@ -448,15 +448,25 @@ class Collection(MDIMBase):
         return dix
 
     def validate_views_with_dimensions(self):
-        """Validate that the dimension choices in all views are defined."""
+        """Validates that dimensions in all views are valid:
+
+        - TODO: The dimension slugs in all views are defined.
+        - The dimension choices in all views are defined.
+        """
+        # Get all dimension and choice slugs
         dix = {dim.slug: dim.choice_slugs for dim in self.dimensions}
 
+        # Iterate over all views and validate dimensions and choices
         for view in self.views:
-            for slug, value in view.dimensions.items():
-                assert slug in dix, f"Dimension {slug} not found in dimensions! View: {self.to_dict()}"
+            for dim_slug, choice_slugs in dix.items():
+                # Check that dimension is defined in the view!
                 assert (
-                    value in dix[slug]
-                ), f"Choice {value} not found for dimension {slug}! View: {view.to_dict()}; Available choices: {dix[slug]}"
+                    dim_slug in view.dimensions
+                ), f"Dimension {dim_slug} not found in dimensions! View: {view.to_dict()}"
+                # Check that choices defined in the view are valid!
+                assert (
+                    view.dimensions[dim_slug] in choice_slugs
+                ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
 
     def validate_schema(self, schema_path):
         """Validate class against schema."""
