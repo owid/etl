@@ -1,3 +1,26 @@
+definitions:
+  common_views:
+    - dimensions:
+        indicator: population_density
+      config:
+        title: Population density
+    - dimensions:
+        indicator: death_rate
+      config:
+        title: Death rate
+    - dimensions:
+        indicator: median_age
+      config:
+        title: Median age
+    - dimensions:
+        indicator: net_migration
+      config:
+        title: Annual net migration
+    - dimensions:
+        indicator: net_migration_rate
+      config:
+        title: Annual net migration rate
+
 config:
   explorerTitle: "Population & Demography"
   explorerSubtitle: "Explore data from the United Nations World Population Prospects."
