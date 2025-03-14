@@ -215,8 +215,10 @@ def update_custom_datasets_file(version=VERSION, read_only=False, confirmation=F
                 old = ""
 
             # Normalize whitespace for comparison.
-            _old = old.replace("\n", " ").replace("  ", " ")
-            _new = new.replace("\n", " ").replace("  ", " ")
+            # _old = old.replace("\n", " ").replace("  ", " ")
+            # _new = new.replace("\n", " ").replace("  ", " ")
+            _old = old
+            _new = new
             if (_old != _new) and not (pd.isna(new) and pd.isna(old)):
                 _display_differences(
                     old=_old,
@@ -335,7 +337,7 @@ def update_custom_elements_and_units_file(version=VERSION, read_only=False, conf
 
 
 def update_custom_items_file(version=VERSION, read_only=False, confirmation=False, compare_with="fao"):
-    """Update custom_items.csv file of a specific version of the garden steps.
+    """Update custom_elements_and_units.csv file of a specific version of the garden steps.
 
     Parameters
     ----------
@@ -350,19 +352,19 @@ def update_custom_items_file(version=VERSION, read_only=False, confirmation=Fals
 
     Returns
     -------
-    custom_items_updated : pd.DataFrame
-        Updated dataframe of custom items.
+    custom_elements_updated : pd.DataFrame
+        Updated dataframe of custom elements and units.
 
     """
-    tqdm.write("\n*** Checking for changes in FAO item names and descriptions. ***")
+    tqdm.write("\n*** Checking for changes in FAO element names and descriptions as well as units and short units. ***")
 
-    # Path to custom items file in garden.
+    # Path to custom elements and units file in garden.
     custom_items_file = STEP_DIR / "data/garden/faostat" / version / "custom_items.csv"
 
     error = f"File custom_items.csv not found. Ensure garden steps for version {version} exist."
     assert custom_items_file.is_file(), error
 
-    # Load custom items file.
+    # Load custom items and units file.
     custom_items = pd.read_csv(custom_items_file, dtype=str).set_index(["dataset", "item_code"])
 
     # Initialize boolean that is True if there were changes in any field.
@@ -374,57 +376,41 @@ def update_custom_items_file(version=VERSION, read_only=False, confirmation=Fals
     # Load metadata from new garden dataset.
     fao_new_metadata = Dataset(DATA_DIR / "garden/faostat" / version / "faostat_metadata")
 
-    # Fields to compare.
-    fields_to_compare = ["fao_item", "fao_item_description"]
-
-    # Dataframe of fields to compare.
-    compared = pd.merge(
-        custom_items,
-        fao_new_metadata["items"],
-        left_index=True,
-        right_index=True,
-        how="left",
-        suffixes=("_old", "_new"),
-    )
-
-    # Ensure no column is of categorical type.
-    compared = compared.astype(object)
-
     # Go one by one on the datasets for which at least one custom item was defined.
-    for field in tqdm(fields_to_compare):
-        _compared = compared.copy()
-        _compared[f"{field}_old"] = _compared[f"{field}_old"].fillna("")
-        _compared[f"{field}_new"] = _compared[f"{field}_new"].fillna("")
-        _compared = _compared[_compared[f"{field}_old"] != _compared[f"{field}_new"]].reset_index()
-        n_changes = len(_compared)
-        tqdm.write(f"\nNumber of changes in {field} to review: {n_changes}")
-
-        for _, row in tqdm(_compared.iterrows(), total=len(_compared)):
-            dataset_short_name = row["dataset"]
-            item_code = row["item_code"]
-            old = row[f"{field}_old"]
-            new = row[f"{field}_new"]
-
-            # If old and new are not identical (or if they are not both nan) update custom_*.
-            if (old != new) and not (pd.isna(new) and pd.isna(old)):
-                _display_differences(
-                    old=old,
-                    new=new,
-                    message=f"Old {compare_with.upper()} and new FAO {field} for {dataset_short_name} with item code {item_code}:",
+    for dataset_short_name in tqdm(custom_items.index.get_level_values(0).unique()):
+        for item_code in tqdm(custom_items.loc[dataset_short_name].index.get_level_values(0).unique()):
+            try:
+                new_metadata = fao_new_metadata["items"].loc[dataset_short_name, item_code].fillna("")
+            except KeyError:
+                log.error(
+                    f"Item code {item_code} (for dataset {dataset_short_name}) in custom items file was not found in new faostat_metadata. Remove it from the custom file or replace it with another code."
                 )
-                if confirmation:
-                    chosen = _confirm_edit_or_skip(old, new)
-                else:
-                    chosen = new
-                    input("These changes will be saved after going through all items. Enter to continue.")
+                continue
+            old_metadata = custom_items.loc[dataset_short_name, item_code].fillna("")
+            for field in ["item", "item_description"]:
+                new = new_metadata[f"fao_{field}"]
+                old = old_metadata[f"{compare_with}_{field}"]
 
-                # Update FAO field.
-                custom_items_updated.loc[(dataset_short_name, item_code), f"{compare_with}_{field}"] = chosen
+                # If old and new are not identical (or if they are not both nan) update custom_*.
+                if (old != new) and not (pd.isna(new) and pd.isna(old)):
+                    _display_differences(
+                        old=old,
+                        new=new,
+                        message=f"Old {compare_with.upper()} and new FAO {field} for {dataset_short_name} with item code {item_code}:",
+                    )
+                    if confirmation:
+                        chosen = _confirm_edit_or_skip(old, new)
+                    else:
+                        chosen = new
+                        input("These changes will be saved after going through all items. Enter to continue.")
 
-                # There was at least one change.
-                CHANGES_FOUND = True
+                    # Update FAO field.
+                    custom_items_updated.loc[(dataset_short_name, item_code), f"{compare_with}_{field}"] = chosen
 
-    # Sort custom items conveniently.
+                    # There was at least one change.
+                    CHANGES_FOUND = True
+
+    # Sort custom element conveniently.
     custom_items_updated = custom_items_updated.sort_values(["fao_item"])
 
     if not CHANGES_FOUND:
@@ -434,6 +420,108 @@ def update_custom_items_file(version=VERSION, read_only=False, confirmation=Fals
         _confirm_and_write_data_to_file(custom_data=custom_items_updated, custom_data_file=custom_items_file)
 
     return custom_items_updated
+
+
+# def update_custom_items_file(version=VERSION, read_only=False, confirmation=False, compare_with="fao"):
+#     """Update custom_items.csv file of a specific version of the garden steps.
+
+#     Parameters
+#     ----------
+#     version : _type_, optional
+#         Version of the garden steps to consider (where the custom_*.csv file to be updated is).
+#     read_only : bool, optional
+#         True to find changes without actually overwriting existing file.
+#     confirmation : bool, optional
+#         True to prompt for confirmation before accepting changes.
+#     compare_with : str, optional
+#         The original source to compare with. Can be 'fao' or 'owid'.
+
+#     Returns
+#     -------
+#     custom_items_updated : pd.DataFrame
+#         Updated dataframe of custom items.
+
+#     """
+#     tqdm.write("\n*** Checking for changes in FAO item names and descriptions. ***")
+
+#     # Path to custom items file in garden.
+#     custom_items_file = STEP_DIR / "data/garden/faostat" / version / "custom_items.csv"
+
+#     error = f"File custom_items.csv not found. Ensure garden steps for version {version} exist."
+#     assert custom_items_file.is_file(), error
+
+#     # Load custom items file.
+#     custom_items = pd.read_csv(custom_items_file, dtype=str).set_index(["dataset", "item_code"])
+
+#     # Initialize boolean that is True if there were changes in any field.
+#     CHANGES_FOUND = False
+
+#     # Initialize a new custom items dataframe.
+#     custom_items_updated = custom_items.copy()
+
+#     # Load metadata from new garden dataset.
+#     fao_new_metadata = Dataset(DATA_DIR / "garden/faostat" / version / "faostat_metadata")
+
+#     # Fields to compare.
+#     fields_to_compare = ["fao_item", "fao_item_description"]
+
+#     # Dataframe of fields to compare.
+#     compared = pd.merge(
+#         custom_items,
+#         fao_new_metadata["items"],
+#         left_index=True,
+#         right_index=True,
+#         how="left",
+#         suffixes=("_old", "_new"),
+#     )
+
+#     # Ensure no column is of categorical type.
+#     compared = compared.astype(object)
+
+#     # Go one by one on the datasets for which at least one custom item was defined.
+#     for field in tqdm(fields_to_compare):
+#         _compared = compared.copy()
+#         _compared[f"{field}_old"] = _compared[f"{field}_old"].fillna("")
+#         _compared[f"{field}_new"] = _compared[f"{field}_new"].fillna("")
+#         _compared = _compared[_compared[f"{field}_old"] != _compared[f"{field}_new"]].reset_index()
+#         n_changes = len(_compared)
+#         tqdm.write(f"\nNumber of changes in {field} to review: {n_changes}")
+
+#         for _, row in tqdm(_compared.iterrows(), total=len(_compared)):
+#             dataset_short_name = row["dataset"]
+#             item_code = row["item_code"]
+#             old = row[f"{field}_old"]
+#             new = row[f"{field}_new"]
+
+#             # If old and new are not identical (or if they are not both nan) update custom_*.
+#             if (old != new) and not (pd.isna(new) and pd.isna(old)):
+#                 _display_differences(
+#                     old=old,
+#                     new=new,
+#                     message=f"Old {compare_with.upper()} and new FAO {field} for {dataset_short_name} with item code {item_code}:",
+#                 )
+#                 if confirmation:
+#                     chosen = _confirm_edit_or_skip(old, new)
+#                 else:
+#                     chosen = new
+#                     input("These changes will be saved after going through all items. Enter to continue.")
+
+#                 # Update FAO field.
+#                 custom_items_updated.loc[(dataset_short_name, item_code), f"{compare_with}_{field}"] = chosen
+
+#                 # There was at least one change.
+#                 CHANGES_FOUND = True
+
+#     # Sort custom items conveniently.
+#     custom_items_updated = custom_items_updated.sort_values(["fao_item"])
+
+#     if not CHANGES_FOUND:
+#         tqdm.write("\nNo changes found or accepted.")
+
+#     if CHANGES_FOUND and not read_only:
+#         _confirm_and_write_data_to_file(custom_data=custom_items_updated, custom_data_file=custom_items_file)
+
+#     return custom_items_updated
 
 
 if __name__ == "__main__":
