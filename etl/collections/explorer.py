@@ -69,13 +69,22 @@ class Explorer(Collection):
         _, name = self.catalog_path.split("#")
         return name
 
-    def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
+    def save(
+        self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False, prune_dimensions: bool = True
+    ):
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
 
         if self.catalog_path is None:
             raise ValueError("Catalog path is not set. Please set it before saving.")
+
+        # Prune non-used dimensions
+        if prune_dimensions:
+            self.prune_dimension_choices()
+
+        # Check that no choice name is repeated
+        self.validate_choice_names()
 
         # Check that all indicators in mdim exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
