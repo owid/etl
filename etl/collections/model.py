@@ -400,6 +400,27 @@ class Dimension(MDIMBase):
     def ppt(self):
         return self.presentation
 
+    def sort_choices(self, slug_order: List[str | bool]):
+        """Sort choices based on the given order."""
+        # Make sure all choices are in the given order
+        choices_missing = set(self.choice_slugs) - set(slug_order)
+        if choices_missing:
+            raise ValueError(
+                f"All choices for dimension {self.slug} must be in the given order! Missing: {choices_missing}"
+            )
+
+        # Create a dictionary to map slugs to their positions for faster sorting
+        slug_position = {slug: index for index, slug in enumerate(slug_order)}
+
+        # Sort based on your desired slug order
+        self.choices.sort(key=lambda choice: slug_position.get(choice.slug, float("inf")))
+
+    def validate_unique_names(self):
+        """Validate that all choice names are unique."""
+        names = [choice.name for choice in self.choices]
+        if len(names) != len(set(names)):
+            raise ValueError(f"Dimension choices for '{self.slug}' must have unique names!")
+
 
 @pruned_json
 @dataclass
@@ -496,6 +517,31 @@ class Collection(MDIMBase):
         # vc = inds.value_counts()
         # if vc[vc > 1].any():
         #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
+
+    def sort_choices(self, slug_order: Dict[str, List[str | bool]]):
+        """Sort choices based on the given order."""
+        for dim in self.dimensions:
+            if dim.slug in slug_order:
+                dim.sort_choices(slug_order[dim.slug])
+
+    def validate_choice_names(self):
+        """Validate that all choice names are unique."""
+        for dim in self.dimensions:
+            dim.validate_unique_names()
+
+    def prune_dimension_choices(self):
+        from collections import defaultdict
+
+        # Get all dimension choices in use
+        all_occurrences = defaultdict(set)
+
+        for view in self.views:
+            for key, value in view.dimensions.items():
+                all_occurrences[key].add(value)
+
+        # Remove those not in use
+        for dim in self.dimensions:
+            dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences[dim.slug]]
 
 
 # def main():
