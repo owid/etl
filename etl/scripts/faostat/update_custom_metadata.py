@@ -15,6 +15,7 @@ This script updates all fao fields in custom_datasets.csv, custom_elements_and_u
 import argparse
 import difflib
 import os
+import re
 import tempfile
 
 import pandas as pd
@@ -35,19 +36,36 @@ RESET = "\033[0m"
 
 
 def _display_differences(old: str, new: str, message: str) -> None:
+    # NOTE: This function was quickly created by chatGPT and it does the job, but it probably doesn't handle all edge cases. So, always compare old and new before overwriting.
     tqdm.write("\n" + "------------" * 10)
     tqdm.write(message)
     tqdm.write("------------" * 10)
 
-    old_sentences = [s + "." if not s.endswith(".") else s for s in old.split(". ")]
-    new_sentences = [s + "." if not s.endswith(".") else s for s in new.split(". ")]
+    # Ensure sentences are split while keeping punctuation intact
+    old_sentences = re.split(r"(\.|\n)", old)
+    new_sentences = re.split(r"(\.|\n)", new)
+
+    def reconstruct_sentences(segments):
+        """Reconstructs sentences from split segments while preserving structure."""
+        sentences = []
+        buffer = ""
+        for segment in segments:
+            buffer += segment
+            if segment in {".", "\n"}:
+                sentences.append(buffer.strip())
+                buffer = ""
+        if buffer:
+            sentences.append(buffer.strip())
+        return sentences
+
+    old_sentences = reconstruct_sentences(old_sentences)
+    new_sentences = reconstruct_sentences(new_sentences)
 
     matcher = difflib.SequenceMatcher(None, old_sentences, new_sentences)
     first_change = True
 
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
         if tag == "replace":
-            # Ensure all unmatched sentences are displayed
             max_len = max(i2 - i1, j2 - j1)
             for i in range(max_len):
                 old_sentence = old_sentences[i1 + i] if i1 + i < i2 else ""
@@ -57,13 +75,13 @@ def _display_differences(old: str, new: str, message: str) -> None:
                     tqdm.write("")
                 first_change = False
 
-                word_matcher = difflib.SequenceMatcher(None, old_sentence.split(), new_sentence.split())
+                word_matcher = difflib.SequenceMatcher(None, old_sentence, new_sentence)
                 highlighted_old = []
                 highlighted_new = []
 
                 for word_tag, w1, w2, w3, w4 in word_matcher.get_opcodes():
-                    old_segment = " ".join(old_sentence.split()[w1:w2])
-                    new_segment = " ".join(new_sentence.split()[w3:w4])
+                    old_segment = old_sentence[w1:w2]
+                    new_segment = new_sentence[w3:w4]
 
                     if word_tag == "replace":
                         highlighted_old.append(RED + old_segment + RESET)
@@ -76,10 +94,8 @@ def _display_differences(old: str, new: str, message: str) -> None:
                         highlighted_old.append(old_segment)
                         highlighted_new.append(new_segment)
 
-                if highlighted_old:
-                    tqdm.write("- " + " ".join(highlighted_old))
-                if highlighted_new:
-                    tqdm.write("+ " + " ".join(highlighted_new) + "\n")
+                tqdm.write("- " + "".join(highlighted_old))
+                tqdm.write("+ " + "".join(highlighted_new) + "\n")
         elif tag == "delete":
             if not first_change:
                 tqdm.write("")
@@ -104,6 +120,41 @@ def _display_confirmed_changes(old, new, old_label="Old", new_label="New"):
     tqdm.write("\n" + GREEN + f"{new_label}:" + RESET)
     tqdm.write(GREEN + new + RESET + "\n")
     input("\nPress enter to continue...")
+
+
+def _confirm_edit_or_skip(old, new):
+    choice = (
+        input("Type 'y' and enter to accept these changes, 'e' to edit them, or just enter to skip: ").strip().lower()
+    )
+    if choice == "y":
+        _display_confirmed_changes(old, new)
+    elif choice == "e":
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
+            with open(f.name, "w") as f:
+                f.write(new)
+            os.system(f"open -a TextEdit {f.name}")
+            input("Press enter to save changes.")
+            with open(f.name) as f:
+                new = f.read()
+        _display_confirmed_changes(old, new)
+
+    return new
+
+
+def _confirm_and_write_data_to_file(custom_data, custom_data_file):
+    while True:
+        choice = (
+            input(f"Type 'y' and enter to overwrite file {custom_data_file} or type 'n' to ignore changes: ")
+            .strip()
+            .lower()
+        )
+        if choice == "y":
+            # Update custom elements file.
+            custom_data.to_csv(custom_data_file)
+            break
+        elif choice == "n":
+            tqdm.write("File not updated.")
+            break
 
 
 def update_custom_datasets_file(
@@ -170,24 +221,7 @@ def update_custom_datasets_file(
                         message=f"Old {compare_with.upper()} and new FAO dataset {field} for {dataset_short_name}:",
                     )
                     if confirmation:
-                        choice = (
-                            input(
-                                "Type 'y' and enter to accept these changes, 'e' to edit them, or just enter to skip: "
-                            )
-                            .strip()
-                            .lower()
-                        )
-                        if choice == "y":
-                            _display_confirmed_changes(old, new)
-                        elif choice == "e":
-                            with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
-                                with open(f.name, "w") as f:
-                                    f.write(new)
-                                os.system(f"open -a TextEdit {f.name}")
-                                input("Press enter to save changes.")
-                                with open(f.name) as f:
-                                    new = f.read()
-                            _display_confirmed_changes(old, new)
+                        new = _confirm_edit_or_skip(old, new)
                     else:
                         input("These changes will be saved after going through all datasets. Press enter to continue.")
 
@@ -204,27 +238,14 @@ def update_custom_datasets_file(
         tqdm.write("\nNo changes found or accepted.")
 
     if CHANGES_FOUND and not read_only:
-        if interactive:
-            while True:
-                choice = (
-                    input(
-                        f"Type 'y' and enter to overwrite file {custom_datasets_file} or type 'n' to ignore changes: "
-                    )
-                    .strip()
-                    .lower()
-                )
-                if choice == "y":
-                    # Update custom datasets file.
-                    custom_datasets_updated.sort_index().to_csv(custom_datasets_file)
-                    break
-                elif choice == "n":
-                    tqdm.write("File not updated.")
-                    break
+        _confirm_and_write_data_to_file(custom_data=custom_datasets_updated, custom_data_file=custom_datasets_file)
 
     return custom_datasets_updated
 
 
-def update_custom_elements_and_units_file(interactive=False, version=VERSION, read_only=False):
+def update_custom_elements_and_units_file(
+    interactive=False, version=VERSION, read_only=False, confirmation=False, compare_with="fao"
+):
     """Update custom_elements_and_units.csv file of a specific version of the garden steps.
 
     Parameters
@@ -276,9 +297,9 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
                 )
                 continue
             old_metadata = custom_elements.loc[dataset_short_name, element_code].fillna("")
-            for field in ["fao_element", "fao_element_description", "fao_unit", "fao_unit_short_name"]:
-                new = new_metadata[field]
-                old = old_metadata[field]
+            for field in ["element", "element_description", "unit", "unit_short_name"]:
+                new = new_metadata[f"fao_{field}"]
+                old = old_metadata[f"{compare_with}_{field}"]
 
                 # If old and new are not identical (or if they are not both nan) update custom_*.
                 if (old != new) and not (pd.isna(new) and pd.isna(old)):
@@ -286,18 +307,15 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
                         _display_differences(
                             old=old,
                             new=new,
-                            message=f"Old and new {field} for {dataset_short_name} with element code {element_code}:",
+                            message=f"Old {compare_with.upper()} and new FAO {field} for {dataset_short_name} with element code {element_code}:",
                         )
-                        choice = (
-                            input("\nType 'y' and enter to update this change or just enter to skip: ").strip().lower()
-                        )
-                        if choice != "y":
-                            continue
-
-                        _display_confirmed_changes(old, new)
+                        if confirmation:
+                            new = _confirm_edit_or_skip(old, new)
+                        else:
+                            input("These changes will be saved after going through all elements. Enter to continue.")
 
                     # Update FAO field.
-                    custom_elements_updated.loc[(dataset_short_name, element_code), field] = new
+                    custom_elements_updated.loc[(dataset_short_name, element_code), f"{compare_with}_{field}"] = new
 
                     # There was at least one change.
                     CHANGES_FOUND = True
@@ -309,25 +327,8 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
         tqdm.write("\nNo changes found or accepted.")
 
     if CHANGES_FOUND and not read_only:
-        if interactive:
-            while True:
-                choice = (
-                    input(
-                        f"Type 'y' and enter to overwrite file {custom_elements_file} or type 'n' to ignore changes: "
-                    )
-                    .strip()
-                    .lower()
-                )
-                if choice == "y":
-                    # Update custom elements file.
-                    custom_elements_updated.to_csv(custom_elements_file)
-                    tqdm.write(
-                        "Consider updating the 'owid_unit_factor' (and possibly other fields) if units have changed."
-                    )
-                    break
-                elif choice == "n":
-                    tqdm.write("File not updated.")
-                    break
+        _confirm_and_write_data_to_file(custom_data=custom_elements_updated, custom_data_file=custom_elements_file)
+        tqdm.write("Consider updating the 'owid_unit_factor' (and possibly other fields) if units have changed.")
 
     return custom_elements_updated
 
@@ -474,6 +475,9 @@ if __name__ == "__main__":
         interactive=True, version=args.version, read_only=args.read_only, confirmation=True, compare_with="owid"
     )
     _ = update_custom_elements_and_units_file(
-        interactive=args.interactive, version=args.version, read_only=args.read_only
+        interactive=True, version=args.version, read_only=args.read_only, confirmation=False, compare_with="fao"
     )
-    _ = update_custom_items_file(interactive=args.interactive, version=args.version, read_only=args.read_only)
+    _ = update_custom_elements_and_units_file(
+        interactive=True, version=args.version, read_only=args.read_only, confirmation=True, compare_with="owid"
+    )
+    _ = update_custom_items_file(interactive=True, version=args.version, read_only=args.read_only)
