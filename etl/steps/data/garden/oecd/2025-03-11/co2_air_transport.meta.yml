@@ -130,6 +130,7 @@ tables:
         description_short:  *desc_short_total
         unit: tonnes
         short_unit: t
+
       per_capita_total_annual_emissions:
         title: Per capita total annual CO₂ emissions from aviation
         description_short:  *desc_short_total
