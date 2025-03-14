@@ -36,6 +36,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb[tb["flight_type"] == "Passenger flights"]
     tb = tb.drop("flight_type", axis=1)
+
     tb = tb[tb["emissions_source"].isin(["TER_DOM", "TER_INT"])]
 
     tb_annual = process_annual_data(tb)
@@ -77,12 +78,14 @@ def run(dest_dir: str) -> None:
 
 def process_annual_data(tb):
     tb = tb[tb["frequency_of_observation"] == "Annual"]
+
     tb = tb.drop(["frequency_of_observation", "month"], axis=1)
 
     tb["emissions_source"] = tb["emissions_source"].apply(lambda x: x + "_a")
 
     tb = tb.pivot(values="value", index=["country", "year"], columns=["emissions_source"])
     tb = tb.reset_index()
+    tb["total_annual_emissions"] = tb["TER_INT_a"] + tb["TER_DOM_a"]
 
     return tb
 
@@ -129,7 +132,7 @@ def process_monthly_data(tb):
 
 def add_inbound_outbound_tour(tb, tb_tourism):
     just_inb_ratio = tb_tourism[["country", "year", "inbound_outbound_tourism"]]
-    tb = pr.merge(tb, just_inb_ratio, on=["year", "country"])
+    tb = pr.merge(tb, just_inb_ratio, on=["year", "country"], how="left")
 
     # Calculate the interaction between TER_INT_a and inb_outb_tour
     tb["int_inb_out_per_capita"] = tb["per_capita_TER_INT_a"] / tb["inbound_outbound_tourism"]

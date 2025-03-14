@@ -24,7 +24,6 @@ def main(upload: bool) -> None:
     # snap.create_snapshot(upload=upload)
     snap = modify_metadata(snap, date)
     # Add the file to DVC and optionally upload it to S3, based on the `upload` parameter.
-    # snap.dvc_add(upload=upload)
     snap.create_snapshot(upload=upload)
 
 
