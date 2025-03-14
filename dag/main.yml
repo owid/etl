@@ -21,7 +21,7 @@ steps:
 
   # Others
   data://meadow/wb/2021-07-01/wb_income:
-    - walden://wb/2021-07-01/wb_income
+    - snapshot://wb/2021-07-01/wb_income.xlsx
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income
 
@@ -85,9 +85,9 @@ steps:
 
   # Penn World Table
   data://meadow/ggdc/2022-11-28/penn_world_table:
-    - walden://ggdc/2021-06-18/penn_world_table
+    - snapshot://ggdc/2021-06-18/penn_world_table.xlsx
   data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
-    - walden://ggdc/2021-06-18/penn_world_table_national_accounts
+    - snapshot://ggdc/2021-06-18/penn_world_table_national_accounts.xlsx
     - data://garden/regions/2023-01-01/regions
   data://garden/ggdc/2022-11-28/penn_world_table:
     - data://meadow/ggdc/2022-11-28/penn_world_table
