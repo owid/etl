@@ -34,7 +34,7 @@ from shared import (
     prepare_wide_table,
 )
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # First year for which we have data in fbs dataset (it defines the first year when new methodology is used).
 FBS_FIRST_YEAR = 2010
@@ -120,7 +120,7 @@ def _assert_tb_size(tb: Table, size_mb: float) -> None:
     assert real_size_mb <= size_mb, f"Table size is too big: {real_size_mb} MB > {size_mb} MB"
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
@@ -231,8 +231,8 @@ def run(dest_dir: str) -> None:
     tb_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
     # Initialise new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb_long, tb_wide], default_metadata=ds_fbs.metadata, check_variables_metadata=False
+    ds_garden = paths.create_dataset(
+        tables=[tb_long, tb_wide], default_metadata=ds_fbs.metadata, check_variables_metadata=False
     )
 
     # Check that the title assigned here coincides with the one in custom_datasets.csv (for consistency).
@@ -240,6 +240,7 @@ def run(dest_dir: str) -> None:
     assert DATASET_TITLE == dataset_metadata["owid_dataset_title"], error
 
     # Update dataset metadata.
+    ds_garden.metadata.title = dataset_metadata["owid_dataset_title"]
     # The following description is not publicly shown in charts; it is only visible when accessing the catalog.
     ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
 
