@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical polio cases in the United States - Public Health Reports
+    title: Historical polio deaths in the United States - Public Health Reports
     description: |-
-      Data on historical polio cases in the United States, compiled from a selection of sources from the United States - Public Health Reports.
+      Data on historical polio deaths in the United States, compiled from a selection of sources from the United States - Public Health Reports.
 
       Sources for each year are as follows:
 
@@ -58,6 +58,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: 0243202f66b58abd704b86a5dddbda02
-    size: 2524
-    path: polio_cases.csv
+  - md5: f78fc8d3b7722d1ff80dd7efd8643097
+    size: 2493
+    path: polio_deaths.csv
