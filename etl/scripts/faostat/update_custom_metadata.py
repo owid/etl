@@ -47,10 +47,16 @@ def _display_differences(old: str, new: str, message: str) -> None:
 
     for tag, i1, i2, j1, j2 in matcher.get_opcodes():
         if tag == "replace":
-            for old_sentence, new_sentence in zip(old_sentences[i1:i2], new_sentences[j1:j2]):
+            # Ensure all unmatched sentences are displayed
+            max_len = max(i2 - i1, j2 - j1)
+            for i in range(max_len):
+                old_sentence = old_sentences[i1 + i] if i1 + i < i2 else ""
+                new_sentence = new_sentences[j1 + i] if j1 + i < j2 else ""
+
                 if not first_change:
                     tqdm.write("")
                 first_change = False
+
                 word_matcher = difflib.SequenceMatcher(None, old_sentence.split(), new_sentence.split())
                 highlighted_old = []
                 highlighted_new = []
@@ -70,8 +76,10 @@ def _display_differences(old: str, new: str, message: str) -> None:
                         highlighted_old.append(old_segment)
                         highlighted_new.append(new_segment)
 
-                tqdm.write("- " + " ".join(highlighted_old))
-                tqdm.write("+ " + " ".join(highlighted_new) + "\n")
+                if highlighted_old:
+                    tqdm.write("- " + " ".join(highlighted_old))
+                if highlighted_new:
+                    tqdm.write("+ " + " ".join(highlighted_new) + "\n")
         elif tag == "delete":
             if not first_change:
                 tqdm.write("")
@@ -465,7 +473,7 @@ if __name__ == "__main__":
     _ = update_custom_datasets_file(
         interactive=True, version=args.version, read_only=args.read_only, confirmation=True, compare_with="owid"
     )
-    # _ = update_custom_elements_and_units_file(
-    #     interactive=args.interactive, version=args.version, read_only=args.read_only
-    # )
-    # _ = update_custom_items_file(interactive=args.interactive, version=args.version, read_only=args.read_only)
+    _ = update_custom_elements_and_units_file(
+        interactive=args.interactive, version=args.version, read_only=args.read_only
+    )
+    _ = update_custom_items_file(interactive=args.interactive, version=args.version, read_only=args.read_only)
