@@ -987,7 +987,9 @@ def process_metadata(
         tb_items = dataframes.concatenate([tb_items, items_from_data], ignore_index=True)
         tb_elements = dataframes.concatenate([tb_elements, elements_from_data], ignore_index=True)
 
-    tb_datasets = clean_global_dataset_descriptions_table(tb_datasets=tb_datasets, tb_custom_datasets=tb_custom_datasets)
+    tb_datasets = clean_global_dataset_descriptions_table(
+        tb_datasets=tb_datasets, tb_custom_datasets=tb_custom_datasets
+    )
     tb_items = clean_global_items_table(tb_items=tb_items, tb_custom_items=tb_custom_items)
 
     tb_elements = clean_global_elements_table(tb_elements=tb_elements, custom_elements=tb_custom_elements)
