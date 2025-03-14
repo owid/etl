@@ -428,3 +428,28 @@ steps:
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-10/faostat_metadata
+  #
+  # FAOSTAT grapher steps for version 2025-03-10
+  #
+  data://grapher/faostat/2025-03-10/faostat_fbsc:
+    - data://garden/faostat/2025-03-10/faostat_fbsc
+  data://grapher/faostat/2025-03-10/faostat_fs:
+    - data://garden/faostat/2025-03-10/faostat_fs
+  data://grapher/faostat/2025-03-10/faostat_ic:
+    - data://garden/faostat/2025-03-10/faostat_ic
+  data://grapher/faostat/2025-03-10/faostat_lc:
+    - data://garden/faostat/2025-03-10/faostat_lc
+  data://grapher/faostat/2025-03-10/faostat_qcl:
+    - data://garden/faostat/2025-03-10/faostat_qcl
+  data://grapher/faostat/2025-03-10/faostat_qv:
+    - data://garden/faostat/2025-03-10/faostat_qv
+  data://grapher/faostat/2025-03-10/faostat_rfn:
+    - data://garden/faostat/2025-03-10/faostat_rfn
+  data://grapher/faostat/2025-03-10/faostat_rl:
+    - data://garden/faostat/2025-03-10/faostat_rl
+  data://grapher/faostat/2025-03-10/faostat_rp:
+    - data://garden/faostat/2025-03-10/faostat_rp
+  data://grapher/faostat/2025-03-10/faostat_scl:
+    - data://garden/faostat/2025-03-10/faostat_scl
+  data://grapher/faostat/2025-03-10/faostat_sdgb:
+    - data://garden/faostat/2025-03-10/faostat_sdgb
