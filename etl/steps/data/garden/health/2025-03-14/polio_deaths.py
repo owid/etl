@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.data_helpers import geo
+from owid.catalog import processing as pr
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -21,13 +22,14 @@ def run() -> None:
     tb_cdc = ds_cdc.read("polio_deaths")
     tb_pop = ds_population.read("population")
 
+    tb = pr.concat([tb_phr, tb_cdc], axis=0)
+    tb = tb.drop(columns=["source"])
+
+    tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left", indicator=True)
+    tb["death_rate"] = tb["deaths"] / tb["population"] * 100000
+    tb = tb.drop(columns=["population", "_merge", "source", "world_pop_share"])
     #
     # Process data.
-    #
-    # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
 
     # Improve table format.
     tb = tb.format(["country", "year"])
