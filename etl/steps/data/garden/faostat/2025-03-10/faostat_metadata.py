@@ -852,9 +852,9 @@ def check_definitions_in_value_amendments(table: Table, dataset_short_name: str,
 def process_metadata(
     paths: PathFinder,
     metadata: Dataset,
-    custom_datasets: Table,
-    custom_elements: Table,
-    custom_items: Table,
+    tb_custom_datasets: Table,
+    tb_custom_elements: Table,
+    tb_custom_items: Table,
     countries_harmonization: Dict[str, str],
     excluded_countries: List[str],
     value_amendments: Table,
@@ -867,11 +867,11 @@ def process_metadata(
     ----------
     metadata : Dataset
         Additional metadata dataset from meadow.
-    custom_datasets : Table
+    tb_custom_datasets : Table
         Data from custom_datasets.csv file.
-    custom_elements : Table
+    tb_custom_elements : Table
         Data from custom_elements_and_units.csv file.
-    custom_items : Table
+    tb_custom_items : Table
         Data from custom_items.csv file.
     countries_harmonization : dict
         Data from faostat.countries.json file.
@@ -987,10 +987,10 @@ def process_metadata(
         tb_items = dataframes.concatenate([tb_items, items_from_data], ignore_index=True)
         tb_elements = dataframes.concatenate([tb_elements, elements_from_data], ignore_index=True)
 
-    tb_datasets = clean_global_dataset_descriptions_table(tb_datasets=tb_datasets, tb_custom_datasets=custom_datasets)
-    tb_items = clean_global_items_table(tb_items=tb_items, custom_items=custom_items)
+    tb_datasets = clean_global_dataset_descriptions_table(tb_datasets=tb_datasets, tb_custom_datasets=tb_custom_datasets)
+    tb_items = clean_global_items_table(tb_items=tb_items, custom_items=tb_custom_items)
 
-    tb_elements = clean_global_elements_table(tb_elements=tb_elements, custom_elements=custom_elements)
+    tb_elements = clean_global_elements_table(tb_elements=tb_elements, custom_elements=tb_custom_elements)
     tb_countries = clean_global_countries_table(
         countries_in_data=countries_in_data,
         country_groups=country_groups_in_data,
@@ -1031,9 +1031,9 @@ def run(dest_dir: str) -> None:
     metadata = paths.load_dataset()
 
     # Load custom dataset names, items, element-unit names, and value amendments.
-    custom_datasets = pr.read_csv(custom_datasets_file, dtype=str)
-    custom_elements = pr.read_csv(custom_elements_and_units_file, dtype=str)
-    custom_items = pr.read_csv(custom_items_file, dtype=str)
+    tb_custom_datasets = pr.read_csv(custom_datasets_file, dtype=str)
+    tb_custom_elements = pr.read_csv(custom_elements_and_units_file, dtype=str)
+    tb_custom_items = pr.read_csv(custom_items_file, dtype=str)
     value_amendments = pr.read_csv(value_amendments_file, dtype=str)
 
     # Load country mapping and excluded countries files.
@@ -1046,9 +1046,9 @@ def run(dest_dir: str) -> None:
     tb_countries, tb_datasets, tb_elements, tb_items = process_metadata(
         paths=paths,
         metadata=metadata,
-        custom_datasets=custom_datasets,
-        custom_elements=custom_elements,
-        custom_items=custom_items,
+        tb_custom_datasets=tb_custom_datasets,
+        tb_custom_elements=tb_custom_elements,
+        tb_custom_items=tb_custom_items,
         countries_harmonization=countries_harmonization,
         excluded_countries=excluded_countries,
         value_amendments=value_amendments,
