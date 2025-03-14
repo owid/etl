@@ -1,0 +1,337 @@
+definitions:
+  common_views:
+    - config:
+        relatedQuestionUrl: https://ourworldindata.org/explorers/climate-change
+        relatedQuestionText: "Data explorer: how is the Earth's climate changing?"
+
+config:
+  explorerTitle: Climate Change Impacts
+  isPublished: true
+  entityType: region
+  explorerSubtitle: Explore the impacts of global climate change.
+  selection:
+    - World
+    - Antarctica
+    - Gulkana Glacier
+    - Lemon Creek Glacier
+    - North America
+    - South Cascade Glacier
+    - Wolverine Glacier
+    - Hawaii
+    - Arctic Ocean
+  subNavId: co2
+  subNavCurrentId: climate-impacts
+  wpBlockId: '45009'
+  hasMapTab: false
+  hideAnnotationFieldsInTitle: true
+
+dimensions:
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: temperature_anomaly
+        name: Temperature anomaly
+      - slug: sea_surface_temperature_anomaly
+        name: Sea surface temperature anomaly
+      - slug: ocean_heat_content__top_700m
+        name: Ocean heat content (top 700m)
+      - slug: ocean_heat_content__top_2000m
+        name: Ocean heat content (top 2000m)
+      - slug: ocean_ph
+        name: Ocean pH
+      - slug: sea_level_rise
+        name: Sea level rise
+      - slug: arctic_sea_ice_extent
+        name: Arctic sea ice extent
+      - slug: antarctic_sea_ice_extent
+        name: Antarctic sea ice extent
+      - slug: mass_balance_of_ice_sheets
+        name: Mass balance of ice sheets
+      - slug: mass_balance_of_u_s__glaciers
+        name: Mass balance of U.S. Glaciers
+      - slug: snow_cover
+        name: Snow cover
+      - slug: co2_concentrations
+        name: CO₂ concentrations
+      - slug: ch4_concentrations
+        name: CH₄ concentrations
+      - slug: n2o_concentrations
+        name: N₂O concentrations
+    presentation:
+      type: dropdown
+  - slug: long_run_series
+    name: Long-run series
+    choices:
+      - slug: false
+        name: 'false'
+      - slug: true
+        name: 'true'
+    presentation:
+      type: checkbox
+views:
+  - dimensions:
+      metric: temperature_anomaly
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: near_surface_temperature#temperature_anomaly
+    config:
+      title: 'Global warming: annual temperature anomaly'
+      yScaleToggle: false
+      yAxisMin: auto
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: sea_surface_temperature_anomaly
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_monthly#sea_temperature_anomaly
+    config:
+      title: 'Global warming: monthly sea surface temperature anomaly'
+      subtitle: |-
+        This is measured at a nominal depth of 20cm, and given relative to the average temperature from the period of 1961 - 1990.
+      yScaleToggle: false
+      yAxisMin: auto
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: ocean_heat_content__top_700m
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_csiro_700m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_iap_700m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_mri_700m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_noaa_700m
+    config:
+      title: "Global warming: heat content in the top 700 meters of the world's oceans"
+      subtitle: |-
+        Ocean heat content is measured relative to the 1971–2000 average, which is set at zero for reference. It is measured in 10²² joules. For reference, 10²² joules are equal to approximately 17 times the amount of energy used globally every year.
+      yScaleToggle: false
+      yAxisMin: auto
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+      note: |-
+        Heat content is shown for four sources: Commonwealth Scientific and Industrial Research Organisation (CSIRO); Institute of Atmospheric Physics (IAP); National Oceanic and Atmospheric Administration (NOAA); and Meteorological Research Institute (MRI).
+  - dimensions:
+      metric: ocean_heat_content__top_2000m
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_iap_2000m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_noaa_2000m
+        - catalogPath: climate_change_impacts_annual#ocean_heat_content_mri_2000m
+    config:
+      title: "Global warming: heat content in the top 2,000 meters of the world's oceans"
+      subtitle: |-
+        Ocean heat content is measured relative to the 1971–2000 average, which is set at zero for reference. It is measured in 10²² joules. For reference, 10²² joules are equal to approximately 17 times the amount of energy used globally every year.
+      yScaleToggle: false
+      yAxisMin: auto
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+      note: |-
+        Heat content is shown for four sources: Commonwealth Scientific and Industrial Research Organisation (CSIRO); Institute of Atmospheric Physics (IAP); National Oceanic and Atmospheric Administration (NOAA); and Meteorological Research Institute (MRI).
+  - dimensions:
+      metric: ocean_ph
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_monthly#ocean_ph
+        - catalogPath: climate_change_impacts_monthly#ocean_ph_yearly_average
+    config:
+      title: 'Ocean acidification: mean seawater pH'
+      subtitle: Mean seawater pH is shown based on in-situ measurements of pH from the Aloha station in Hawaii.
+      yScaleToggle: false
+      yAxisMin: auto
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+      hideAnnotationFieldsInTitle: true
+  - dimensions:
+      metric: sea_level_rise
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_monthly#sea_level_church_and_white_2011
+        - catalogPath: climate_change_impacts_monthly#sea_level_uhslc
+        - catalogPath: climate_change_impacts_monthly#sea_level_average
+    config:
+      title: Sea level rise
+      subtitle: |-
+        Global mean sea level rise is measured relative to the 1993 - 2008 average sea level. This is shown as three series: the widely-cited Church & White dataset; the University of Hawaii Sea Level Center (UHLSC); and the average of the two.
+      yScaleToggle: false
+      yAxisMin: auto
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: arctic_sea_ice_extent
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_annual#arctic_sea_ice_extent_max
+        - catalogPath: climate_change_impacts_annual#arctic_sea_ice_extent_min
+    config:
+      title: 'Climate change: Arctic sea ice extent'
+      subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
+      yScaleToggle: false
+      yAxisMin: '0'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: antarctic_sea_ice_extent
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_annual#antarctic_sea_ice_extent_min
+        - catalogPath: climate_change_impacts_annual#antarctic_sea_ice_extent_max
+    config:
+      title: 'Climate change: Antarctic sea ice extent'
+      subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
+      yScaleToggle: false
+      yAxisMin: '0'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: mass_balance_of_ice_sheets
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_monthly#land_ice_mass_nasa
+        - catalogPath: climate_change_impacts_monthly#cumulative_ice_mass_change_imbie
+    config:
+      title: 'Climate change: change in mass of ice sheets'
+      subtitle: |-
+        Cumulative change in mass of ice sheets, measured relative to a base year of 2002. For reference, 1,000 billion metric tons is equal to about 260 cubic miles of ice—enough to raise sea level by about 3 millimeters.
+      yScaleToggle: false
+      yAxisMin: '-5200'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+      note: Combined measurements are based on more than 20 different studies that have been combined for each region.
+  - dimensions:
+      metric: mass_balance_of_u_s__glaciers
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_annual#mass_balance_us_glaciers
+    config:
+      title: 'Climate change: change of mass of US glaciers'
+      subtitle: |-
+        Cumulative mass balance of U.S. reference glaciers, relative to the base year 1965. This is given in meters of water equivalent, which represent changes in the average thickness of a glacier.
+      yScaleToggle: false
+      yAxisMin: '-50'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: snow_cover
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_monthly#snow_cover_extent
+        - catalogPath: climate_change_impacts_monthly#snow_cover_extent_yearly_average
+    config:
+      title: Snow cover in North America
+      subtitle: |-
+        This metric measures the area covered by snow, based on an analysis of weekly maps. These data cover all of North America (including Greenland).
+      yScaleToggle: false
+      yAxisMin: '0'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: co2_concentrations
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_monthly#co2_concentration
+        - catalogPath: climate_change_impacts_monthly#co2_concentration_yearly_average
+    config:
+      title: Global atmospheric CO₂ concentration
+      subtitle: Atmospheric carbon dioxide (CO₂) concentration is measured in parts per million (ppm).
+      yScaleToggle: false
+      yAxisMin: '320'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: ch4_concentrations
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_monthly#ch4_concentration
+        - catalogPath: climate_change_impacts_monthly#ch4_concentration_yearly_average
+    config:
+      title: Global atmospheric methane concentration
+      subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
+      yScaleToggle: false
+      yAxisMin: '1600'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: n2o_concentrations
+      long_run_series: false
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_monthly#n2o_concentration
+        - catalogPath: climate_change_impacts_monthly#n2o_concentration_yearly_average
+    config:
+      title: Global atmospheric nitrous oxide concentration
+      subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
+      yScaleToggle: false
+      yAxisMin: '300'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: co2_concentrations
+      long_run_series: true
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_annual#co2_concentration
+    config:
+      title: Global atmospheric CO₂ concentration
+      subtitle: |-
+        Atmospheric carbon dioxide (CO₂) concentration is measured in parts per million (ppm). Long-term trends in CO₂ concentrations can be measured at high-resolution using preserved air samples from ice cores.
+      yScaleToggle: false
+      yAxisMin: '150'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: ch4_concentrations
+      long_run_series: true
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_annual#ch4_concentration
+    config:
+      title: Global atmospheric methane concentration
+      subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
+      yScaleToggle: false
+      yAxisMin: '550'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false
+  - dimensions:
+      metric: n2o_concentrations
+      long_run_series: true
+    indicators:
+      y:
+        - catalogPath: climate_change_impacts_annual#n2o_concentration
+    config:
+      title: Global atmospheric nitrous oxide concentration
+      subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
+      yScaleToggle: false
+      yAxisMin: '250'
+      baseColorScheme: owid-distinct
+      type: LineChart
+      hasMapTab: false

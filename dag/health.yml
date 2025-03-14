@@ -1160,7 +1160,7 @@ steps:
     - data://garden/cdc/2025-03-04/pertussis_cases
 
   #
-  # TODO: add step name (just something recognizable)
+  # Pertussis deaths - US Census Bureau
   #
   data://meadow/us_census_bureau/2025-03-06/pertussis_deaths:
     - snapshot://us_census_bureau/2025-03-06/pertussis_deaths.csv
@@ -1168,7 +1168,7 @@ steps:
     - data://meadow/us_census_bureau/2025-03-06/pertussis_deaths
 
   #
-  # TODO: add step name (just something recognizable)
+  # Pertussis deaths - combined
   #
   data://garden/health/2025-03-06/pertussis_deaths:
     - data://garden/us_census_bureau/2025-03-06/pertussis_deaths
@@ -1176,3 +1176,53 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-03-06/pertussis_deaths:
     - data://garden/health/2025-03-06/pertussis_deaths
+
+  #
+  # Polio cases - Public Health Reports
+  #
+  data://meadow/public_health_reports/2025-03-12/polio_cases:
+    - snapshot://public_health_reports/2025-03-12/polio_cases.csv
+
+  #
+  # Polio cases - US Census Bureau
+  #
+  data://meadow/us_census_bureau/2025-03-12/polio_cases:
+    - snapshot://us_census_bureau/2025-03-12/polio_cases.csv
+
+  #
+  # Polio cases - CDC
+  #
+  data://meadow/cdc/2025-03-12/polio_cases:
+    - snapshot://cdc/2025-03-12/polio_cases.csv
+
+  #
+  # Polio cases - combined
+  #
+  data://garden/health/2025-03-12/polio_cases:
+    - data://meadow/cdc/2025-03-12/polio_cases
+    - data://meadow/us_census_bureau/2025-03-12/polio_cases
+    - data://meadow/public_health_reports/2025-03-12/polio_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-03-12/polio_cases:
+    - data://garden/health/2025-03-12/polio_cases
+
+  #
+  # Polio deaths - Public Health Reports
+  #
+  data://meadow/public_health_reports/2025-03-14/polio_deaths:
+    - snapshot://public_health_reports/2025-03-14/polio_deaths.csv
+
+  #
+  # Polio deaths - CDC
+  #
+  data://meadow/cdc/2025-03-14/polio_deaths:
+    - snapshot://cdc/2025-03-14/polio_deaths.csv
+
+  #
+  # Polio deaths - combined
+  data://garden/health/2025-03-14/polio_deaths:
+    - data://meadow/cdc/2025-03-14/polio_deaths
+    - data://meadow/public_health_reports/2025-03-14/polio_deaths
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-03-14/polio_deaths:
+    - data://garden/health/2025-03-14/polio_deaths

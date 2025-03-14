@@ -558,4 +558,8 @@ def migrate_csv_explorer(explorer_path: Union[Path, str]):
         - [x] Otherwise, must be of length 2n+1
 - [ ] Columns
 - [ ] Graph
+- [ ] Function migrate_csv_explorer seems to have a few issues:
+    - [ ] Booleans are written as strings in the yaml.
+    - [ ] Field config.hideAnnotationFieldsInTitle is stored as a list, while it should probably be a boolean field.
+    - [ ] To avoid hardcoded paths, I suppose this function should write only table_name#indicator_name in config.
 """
