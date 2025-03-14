@@ -207,6 +207,27 @@
         }
       },
       "additionalProperties": false
+    },
+    "dimension": {
+      "type": "object",
+      "description": "Definition of a dimension in a multidimensional dataset",
+      "required": ["name", "slug"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Human-readable name of the dimension"
+        },
+        "slug": {
+          "type": "string",
+          "description": "Machine-readable identifier for the dimension",
+          "pattern": "^[a-z0-9_]*$"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of what this dimension represents"
+        }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false,
@@ -1455,6 +1476,13 @@
                   ]
                 }
               }
+            }
+          },
+          "dimensions": {
+            "type": "array",
+            "description": "List of dimensions that define the structure of multidimensional data in this table",
+            "items": {
+              "$ref": "#/$defs/dimension"
             }
           }
         }

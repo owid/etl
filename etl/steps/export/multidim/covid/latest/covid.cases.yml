@@ -10,12 +10,12 @@ definitions:
 
 title:
   title: COVID-19 confirmed cases
-  titleVariant: ""
-defaultSelection:
+  title_variant: ""
+default_selection:
   - World
   - Europe
   - Asia
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:

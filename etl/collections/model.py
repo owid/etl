@@ -10,6 +10,7 @@ THINGS TO SOLVE:
 import json
 import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
 
 import fastjsonschema
@@ -19,6 +20,7 @@ from owid.catalog import Table
 from owid.catalog.meta import GrapherConfig, MetaBase
 
 from etl.collections.utils import merge_common_metadata_by_dimension
+from etl.paths import SCHEMAS_DIR
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 T = TypeVar("T")
@@ -56,9 +58,16 @@ def pruned_json(cls: T) -> T:
     return cls
 
 
+class MDIMBase(MetaBase):
+    def save_file(self, filename: Union[str, Path]) -> None:
+        filename = Path(filename).as_posix()
+        with open(filename, "w") as ostream:
+            json.dump(self.to_dict(), ostream, indent=2, default=str)
+
+
 @pruned_json
 @dataclass
-class Indicator(MetaBase):
+class Indicator(MDIMBase):
     catalogPath: str
     display: Optional[Dict[str, Any]] = None
 
@@ -113,7 +122,7 @@ class Indicator(MetaBase):
 
 @pruned_json
 @dataclass
-class ViewIndicators(MetaBase):
+class ViewIndicators(MDIMBase):
     """Indicators in a MDIM/Explorer view."""
 
     y: Optional[List[Indicator]] = None
@@ -170,7 +179,7 @@ class ViewIndicators(MetaBase):
 
 @pruned_json
 @dataclass
-class CommonView(MetaBase):
+class CommonView(MDIMBase):
     dimensions: Optional[Dict[str, Any]] = None
     config: Optional[Dict[str, Any]] = None
     metadata: Optional[Dict[str, Any]] = None
@@ -182,7 +191,7 @@ class CommonView(MetaBase):
 
 @pruned_json
 @dataclass
-class Definitions(MetaBase):
+class Definitions(MDIMBase):
     common_views: Optional[List[CommonView]] = None
 
     def __post_init__(self):
@@ -206,7 +215,7 @@ class Definitions(MetaBase):
 
 @pruned_json
 @dataclass
-class View(MetaBase):
+class View(MDIMBase):
     """MDIM/Explorer view configuration."""
 
     dimensions: Dict[str, ChoiceSlugType]
@@ -315,7 +324,7 @@ class MDIMView(View):
 
 @pruned_json
 @dataclass
-class DimensionChoice(MetaBase):
+class DimensionChoice(MDIMBase):
     slug: ChoiceSlugType
     name: str
     description: Optional[str] = None
@@ -340,7 +349,7 @@ class UITypes:
 
 @pruned_json
 @dataclass
-class DimensionPresentation(MetaBase):
+class DimensionPresentation(MDIMBase):
     type: str
 
     def __post_init__(self):
@@ -350,7 +359,7 @@ class DimensionPresentation(MetaBase):
 
 @pruned_json
 @dataclass
-class Dimension(MetaBase):
+class Dimension(MDIMBase):
     """MDIM/Explorer dimension configuration."""
 
     slug: str
@@ -370,10 +379,9 @@ class Dimension(MetaBase):
 
     @property
     def ui_type(self):
-        default = UITypes.DROPDOWN
-        if self.presentation is not None:
-            return self.presentation.type
-        return default
+        if self.presentation is None:
+            return UITypes.DROPDOWN
+        return self.presentation.type
 
     @property
     def choice_slugs(self):
@@ -387,7 +395,7 @@ class Dimension(MetaBase):
 
 @pruned_json
 @dataclass
-class Collection(MetaBase):
+class Collection(MDIMBase):
     """Overall MDIM/Explorer config"""
 
     dimensions: List[Dimension]
@@ -400,6 +408,9 @@ class Collection(MetaBase):
     @property
     def d(self):
         return self.dimensions
+
+    def save(self):  # type: ignore[override]
+        raise NotImplementedError("This method should be implemented in the children class")
 
     def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)
@@ -421,9 +432,30 @@ class Collection(MetaBase):
     def validate_schema(self, schema_path):
         """Validate class against schema."""
         with open(schema_path) as f:
-            schema = json.load(f)
+            s = f.read()
 
-        validator = fastjsonschema.compile(schema)
+            # Add "file://" prefix to "dataset-schema.json#"
+            # This is needed to activate file handler below. Unfortunately, fastjsonschema does not
+            # support file references out of the box
+            s = s.replace("dataset-schema.json#", "file://dataset-schema.json#")
+
+            schema = json.loads(s)
+
+        # file handler for file:// URIs
+        def file_handler(uri):
+            # Remove 'file://' prefix and build local path relative to the schema file
+            local_file = SCHEMAS_DIR / Path(uri.replace("file://", "")).name
+            with local_file.open() as f:
+                return json.load(f)
+
+        # Pass custom format for date validation
+        # NOTE: we use fastjsonschema because schema uses multiple $ref to an external schema.
+        #   python-jsonschema doesn't cache external resources and is extremely slow. It should be
+        #   possible to speed it up by pre-loading schema and inserting it dynamically if
+        #   fastjsonschema becomes hard to maintain.
+        validator = fastjsonschema.compile(
+            schema, handlers={"file": file_handler}, formats={"date": r"^\d{4}-\d{2}-\d{2}$"}
+        )
 
         try:
             validator(self.to_dict())  # type: ignore
@@ -456,54 +488,6 @@ class Collection(MetaBase):
         # vc = inds.value_counts()
         # if vc[vc > 1].any():
         #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
-
-
-@pruned_json
-@dataclass
-class Explorer(Collection):
-    """Model for Explorer configuration."""
-
-    views: List[ExplorerView]
-    config: Dict[str, str]
-    definitions: Optional[Definitions] = None
-
-    def display_config_names(self):
-        """Get display names for all dimensions and choices.
-
-        The structure of the output is:
-
-        {
-            dimension_slug: {
-                "widget_name": "...",
-                "choices": {
-                    choice_slug: choice_name,
-                    ...
-                }
-            },
-            ...
-        }
-
-        where `widget_name` is actually not displayed anywhere, but used as header name in explorer config.
-        """
-        mapping = {}
-        for dim in self.dimensions:
-            mapping[dim.slug] = {
-                "widget_name": f"{dim.name} {dim.ui_type.title()}",
-                "choices": {choice.slug: choice.name for choice in dim.choices},
-            }
-        return mapping
-
-
-@pruned_json
-@dataclass
-class Multidim(Collection):
-    """Model for MDIM configuration."""
-
-    views: List[MDIMView]
-    title: Dict[str, str]
-    defaultSelection: List[str]
-    topicTags: Optional[List[str]] = None
-    definitions: Optional[Definitions] = None
 
 
 # def main():

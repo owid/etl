@@ -209,9 +209,6 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/tuberculosis/2023-11-27/outcomes_disagg:
     - data://garden/tuberculosis/2023-11-27/outcomes_disagg
-  # Mpox grapher step
-  data://grapher/who/latest/monkeypox:
-    - data://garden/who/latest/monkeypox
 
   # MICROBE - neonatal deaths by pathogen and amr resistance
   data-private://meadow/antibiotics/2024-12-05/microbe_neonatal_total_amr:

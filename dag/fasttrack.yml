@@ -190,8 +190,6 @@ steps:
     - snapshot://fasttrack/latest/road_miles_uk.csv
   data://grapher/fasttrack/2024-11-18/supercomputers:
     - snapshot://fasttrack/2024-11-18/supercomputers.csv
-  data://grapher/fasttrack/latest/in_donor_foreign_aid_categories_dac_countries:
-    - snapshot://fasttrack/latest/in_donor_foreign_aid_categories_dac_countries.csv
   data://grapher/fasttrack/latest/poverty_latam_idb:
     - snapshot://fasttrack/latest/poverty_latam_idb.csv
   data://grapher/fasttrack/latest/foreign_aid_govt_private:
@@ -204,8 +202,6 @@ steps:
     - snapshot://fasttrack/latest/skaaning_democracy_di.csv
   data://grapher/fasttrack/latest/pre_term_births_europe_usa:
     - snapshot://fasttrack/latest/pre_term_births_europe_usa.csv
-  data://grapher/fasttrack/latest/indonor_oda_costs_oecd:
-    - snapshot://fasttrack/latest/indonor_oda_costs_oecd.csv
   data://grapher/fasttrack/latest/aiddata_china_fasttrack__sheet1:
     - snapshot://fasttrack/latest/aiddata_china_fasttrack__sheet1.csv
   data://grapher/fasttrack/latest/aiddata_china_fasttrack_2014_2021__sheet1:

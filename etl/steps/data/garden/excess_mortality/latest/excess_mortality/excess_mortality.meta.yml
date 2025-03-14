@@ -356,6 +356,14 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
+      deaths_2025_all_ages:
+        title: deaths_2025_all_ages
+        # title: Number of deaths (weekly or monthly, 2022)
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2025.
+        display:
+          includeInTable: true
+          numDecimalPlaces: 0
       deaths_since_2020_all_ages:
         title: deaths_since_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020–2022)

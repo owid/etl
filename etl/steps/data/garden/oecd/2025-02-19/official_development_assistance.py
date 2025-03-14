@@ -63,6 +63,9 @@ CATEGORIES = {
             "I.A.8. Other in-donor expenditures": {"new_name": "i_a_8_other_in_donor_expenditures"},
             "I.A.8.1. Development awareness": {"new_name": "i_a_8_1_development_awareness"},
             "I.A.8.2. Refugees in donor countries": {"new_name": "i_a_8_2_refugees_in_donor_countries"},
+            "I.A.8.2. Refugees in donor countries, of which: Support to refugees and asylum seekers in other provider countries": {
+                "new_name": "i_a_8_2_refugees_other_provider_countries",
+            },
             "I.A.9. Recoveries on bilateral ODA grants / negative commitments": {
                 "new_name": "i_a_9_recoveries_bilateral_oda_grants_negative_commitments",
             },
@@ -240,6 +243,16 @@ def run(dest_dir: str) -> None:
     tb_dac1 = limit_grant_equivalents_from_2018_only(tb=tb_dac1)
 
     tb_dac1 = combine_net_and_grant_equivalents(tb=tb_dac1)
+
+    tb_dac1 = add_oda_components_as_share_of_oda(
+        tb=tb_dac1,
+        subcomponent_list=[
+            "i_a_5_scholarships_student_costs_donor_countries",
+            "i_a_7_administrative_costs_not_included_elsewhere",
+            "i_a_8_1_development_awareness",
+            "i_a_8_2_refugees_in_donor_countries",
+        ],
+    )
 
     tb = add_donor_data_from_recipient_dataset(tb_donor=tb_dac1, tb_recipient=tb_dac2a)
 
@@ -608,5 +621,52 @@ def combine_net_and_grant_equivalents(tb: Table) -> Table:
 
     # Fill with net disbursements before 2018
     tb.loc[tb["year"] < 2018, "oda_official_estimate_share_gni"] = tb["i_oda_net_disbursements_share_gni"]
+
+    return tb
+
+
+def add_oda_components_as_share_of_oda(tb: Table, subcomponent_list: List[str]) -> Table:
+    """
+    Divide some of the ODA components by the total ODA to get the share of each component.
+    Add also the total of these components, together with the difference (aid overseas).
+    """
+
+    for subcomponent in subcomponent_list:
+        tb[f"{subcomponent}_net_disbursements_share_oda"] = (
+            tb[f"{subcomponent}_net_disbursements"] / tb["i_oda_net_disbursements"] * 100
+        )
+
+        tb[f"{subcomponent}_grant_equivalents_share_oda"] = (
+            tb[f"{subcomponent}_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
+        )
+
+    # Also calculate the sum of these components
+    tb["oda_indonor_net_disbursements"] = tb[
+        [f"{subcomponent}_net_disbursements" for subcomponent in subcomponent_list]
+    ].sum(axis=1)
+
+    tb["oda_indonor_net_disbursements_share_oda"] = (
+        tb["oda_indonor_net_disbursements"] / tb["i_oda_net_disbursements"] * 100
+    )
+
+    tb["oda_indonor_grant_equivalents"] = tb[
+        [f"{subcomponent}_grant_equivalents" for subcomponent in subcomponent_list]
+    ].sum(axis=1)
+
+    tb["oda_indonor_grant_equivalents_share_oda"] = (
+        tb["oda_indonor_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
+    )
+
+    # ... the difference between the total ODA and the sum of these components
+    tb["oda_overseas_net_disbursements"] = tb["i_oda_net_disbursements"] - tb["oda_indonor_net_disbursements"]
+    tb["oda_overseas_grant_equivalents"] = tb["oda_grant_equivalents"] - tb["oda_indonor_grant_equivalents"]
+
+    # ... and the share of these components
+    tb["oda_overseas_net_disbursements_share_oda"] = (
+        tb["oda_overseas_net_disbursements"] / tb["i_oda_net_disbursements"] * 100
+    )
+    tb["oda_overseas_grant_equivalents_share_oda"] = (
+        tb["oda_overseas_grant_equivalents"] / tb["oda_grant_equivalents"] * 100
+    )
 
     return tb

@@ -227,5 +227,5 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = paths.create_explorer(config=config, df_graphers=df_graphers)
+    ds_explorer = paths.create_explorer_legacy(config=config, df_graphers=df_graphers)
     ds_explorer.save()

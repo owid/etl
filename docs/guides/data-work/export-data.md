@@ -34,10 +34,10 @@ Multi-dimensional indicators are powered by a configuration that is typically cr
 ```yaml title="etl/steps/export/multidim/energy/latest/energy_prices.yaml"
 title:
   title: "Energy prices"
-  titleVariant: "by energy source"
-defaultSelection:
+  title_variant: "by energy source"
+default_selection:
   - "European Union (27)"
-topicTags:
+topic_tags:
   - "Energy"
 dimensions:
   - slug: "frequency"
@@ -71,7 +71,7 @@ views:
 
 ```
 
-The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collections.multidim.generate_views_for_dimensions`).
+The `dimensions` field specifies selectors, and the `views` field defines views for the selection. Since there are numerous possible configurations, `views` are usually generated programmatically (using function `etl.collections.multidim.expand_config`).
 
 You can also combine manually defined views with generated ones. See the `etl.collections.multidim` module for available helper functions or refer to examples from `etl/steps/export/multidim/`. Feel free to add or modify the helper functions as needed.
 
@@ -96,18 +96,17 @@ def run(dest_dir: str) -> None:
     config = paths.load_mdim_config()
 
     # Create views.
-    config["views"] = multidim.generate_views_for_dimensions(
-        dimensions=config["dimensions"],
-        tables=[tb_annual, tb_monthly],
-        dimensions_order_in_slug=("frequency", "source", "unit"),
-        warn_on_missing_combinations=False,
+    config["views"] = multidim.expand_config(
+        tb_annual,
+        dimensions=["frequency", "source", "unit"],
         additional_config={"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"},
     )
 
     #
     # Save outputs.
     #
-    multidim.upsert_multidim_data_page(config=config, paths=paths)
+    mdim = paths.create_mdim(config=config)
+    mdim.save()
 
 ```
 

@@ -1,7 +1,7 @@
 title:
   title: Causes of death
-  titleVariant: by cause and age group
-defaultSelection:
+  title_variant: by cause and age group
+default_selection:
   - World
   - Europe
   - Asia
@@ -18,39 +18,9 @@ dimensions:
       # Additional causes will be added programmatically.
   - name: Age group
     slug: age
-    choices:
-      - description: null
-        name: 15-49 years
-        slug: 15-49 years
-      - description: null
-        name: 5-14 years
-        slug: 5-14 years
-      - description: null
-        name: 50-69 years
-        slug: 50-69 years
-      - description: null
-        name: 70+ years
-        slug: 70+ years
-      - description: null
-        name: <5 years
-        slug: <5 years
-      - description: null
-        name: All ages
-        slug: All ages
-      - description: null
-        name: Age-standardized
-        slug: Age-standardized
+    # Choices will be added programmatically.
   - name: Metric
     slug: metric
-    choices:
-      - description: null
-        name: Number
-        slug: Number
-      - description: null
-        name: Percent
-        slug: Percent
-      - description: null
-        name: Rate
-        slug: Rate
+    # Choices will be added programmatically.
 
 views: []

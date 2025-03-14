@@ -1,0 +1,74 @@
+config:
+  explorerTitle: "Population & Demography"
+  explorerSubtitle: "Explore data from the United Nations World Population Prospects."
+  wpBlockId: 52216
+  hasMapTab: true
+  thumbnail: "https://owid.cloud/app/uploads/2022/07/Population-Data-Explorer.png"
+  isPublished: true
+  pickerColumnSlugs: location population__all__all__records population_change__all__all__records population_density__all__all__records births__all__all__records birth_rate__all__all__records deaths__all__all__records death_rate__all__all__records fertility_rate__all__all__records growth_natural_rate__all__all__records growth_rate__all__all__records life_expectancy__all__at_birth__records net_migration__all__all__records net_migration_rate__all__all__records sex_ratio__none__at_birth__records dependency_ratio_total__all__none__records dependency_ratio_child__all__none__records dependency_ratio_old__all__none__records median_age__all__all__records
+
+dimensions:
+  - slug: indicator
+    name: indicator
+    choices:
+      - slug: population
+        name: Population
+      - slug: population_change
+        name: Annual population change
+      - slug: population_density
+        name: Population density
+      - slug: dependency_ratio
+        name: Dependency ratio
+      - slug: sex_ratio
+        name: Sex ratio
+
+  - slug: sex
+    name: Sex
+    choices:
+      - slug: all
+        name: Both sexes
+        description: null
+      - slug: female
+        name: Female
+        description: null
+      - slug: male
+        name: Male
+        description: null
+    presentation:
+      type: radio
+  - slug: age
+    name: Age
+    choices:
+      - slug: all
+        name: Total
+        description: null
+      - slug: "0"
+        name: Under 1 year
+        description: null
+      - slug: 0-4
+        name: Under 5 years
+        description: null
+      - slug: 0-14
+        name: Under 15 years
+        description: null
+      - slug: 0-24
+        name: Under 25 years
+        description: null
+      - slug: "total"
+        name: Total dependency ratio
+        description: null
+      - slug: "youth"
+        name: Youth dependency ratio
+        description: null
+      - slug: "old"
+        name: Old-age dependency ratio
+        description: null
+
+  - slug: variant
+    name: Projection scenario
+    choices:
+      - slug: estimates
+        name: None
+        description: null
+    presentation:
+      type: radio

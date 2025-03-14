@@ -3,6 +3,7 @@
 #
 
 import json
+import time
 import types
 from collections import defaultdict
 from functools import wraps
@@ -39,15 +40,7 @@ from owid.repack import repack_frame
 
 from . import processing_log as pl
 from . import utils, variables, warnings
-from .meta import (
-    SOURCE_EXISTS_OPTIONS,
-    DatasetMeta,
-    License,
-    Origin,
-    Source,
-    TableMeta,
-    VariableMeta,
-)
+from .meta import SOURCE_EXISTS_OPTIONS, DatasetMeta, License, Origin, Source, TableMeta, VariableMeta
 from .variables import Variable
 
 log = structlog.get_logger()
@@ -185,6 +178,12 @@ class Table(pd.DataFrame):
         # Add processing log to the metadata of each variable in the table.
         table = update_processing_logs_when_loading_or_creating_table(table=table)
 
+        # Fill dimensions from additional_info for compatibility
+        for col in table.columns:
+            dims = (table[col].m.additional_info or {}).get("dimensions")
+            if dims:
+                update_variable_dimensions(table[col], dims)
+
         if cls.DEBUG:
             table.check_metadata()
 
@@ -296,7 +295,13 @@ class Table(pd.DataFrame):
         if repack:
             # use smaller data types wherever possible
             # NOTE: this can be slow for large dataframes
+            t = time.time()
             df = repack_frame(df)
+            if time.time() - t > 5:
+                log.warning(
+                    "repacking took a long time, consider adding create_dataset(..., repack=False)",
+                    time=time.time() - t,
+                )
 
         df.to_feather(path, compression=compression, **kwargs)
 
@@ -637,14 +642,22 @@ class Table(pd.DataFrame):
         if isinstance(keys, str):
             keys = [keys]
 
+        # create metadata dimensions
+        for col in keys:
+            # TODO: make this work with append=True
+            dimensions = [{"name": self[col].title or key, "slug": key} for key in keys]
+
         if kwargs.get("inplace"):
             super().set_index(keys, **kwargs)
-            self.metadata.primary_key = keys
-            return None
+            t = self
+            to_return = None
         else:
             t = super().set_index(keys, **kwargs)
-            t.metadata.primary_key = keys
-            return cast(Table, t)
+            to_return = cast(Table, t)
+
+        t.metadata.primary_key = keys
+        t.metadata.dimensions = dimensions  # type: ignore
+        return to_return
 
     @overload
     def reset_index(self, level=None, *, inplace: Literal[True], **kwargs) -> None: ...
@@ -658,11 +671,17 @@ class Table(pd.DataFrame):
     def reset_index(self, level=None, *, inplace: bool = False, **kwargs) -> Optional["Table"]:  # type: ignore
         """Fix type signature of reset_index."""
         t = super().reset_index(level=level, inplace=inplace, **kwargs)  # type: ignore
+
         if inplace:
+            # TODO: make this work for reset_index with subset of levels
+            # drop dimensions
+            self.metadata.dimensions = None
             return None
         else:
             # preserve metadata in _fields, calling reset_index() on a table drops it
             t._fields = self._fields
+            # drop dimensions
+            t.metadata.dimensions = None
             return t  # type: ignore
 
     def astype(self, *args, **kwargs) -> "Table":
@@ -1647,6 +1666,10 @@ def pivot(
         # There may be a way to allow for both.
         table[column].metadata = column_metadata
 
+        # Fill dimensions
+        if isinstance(column, tuple) and isinstance(columns, list):
+            table[column].m.dimensions = dict(zip(columns, column))
+
     # Transfer also the metadata of the index columns.
     # Note: This metadata will only be accessible if columns are reset and flattened to one level.
     for index_column in list(table.index.names):
@@ -2197,3 +2220,17 @@ def keep_metadata(func: Callable[..., Union[pd.DataFrame, pd.Series]]) -> Callab
 
 to_datetime = keep_metadata(pd.to_datetime)
 to_numeric = keep_metadata(pd.to_numeric)
+
+
+def update_variable_dimensions(variable, dimensions_data: Dict[str, Any]) -> None:
+    """
+    Update a variable's dimensions metadata.
+
+    Args:
+        variable: The variable to update with dimension information
+        dimensions_data: Dictionary containing dimension information
+    """
+    if dimensions_data:
+        variable.m.original_short_name = dimensions_data.get("originalShortName")
+        variable.m.original_title = dimensions_data.get("originalName")
+        variable.m.dimensions = {f["name"]: f["value"] for f in dimensions_data.get("filters", [])}

@@ -157,7 +157,7 @@ class Dataset:
 
     def read(
         self,
-        name: str,
+        name: Optional[str] = None,
         reset_index: bool = True,
         safe_types: bool = True,
         reset_metadata: Literal["keep", "keep_origins", "reset"] = "keep",
@@ -177,6 +177,11 @@ class Dataset:
         :param load_data: If false, only load metadata and not the actual data. This can be useful
             when you only need to read metadata from a large dataset.
         """
+        if name is None:
+            if len(self.table_names) == 1:
+                name = self.table_names[0]
+            else:
+                raise ValueError("Multiple tables exist. Please specify the table name.")
         stem = self.path / Path(name)
 
         for format in SUPPORTED_FORMATS:

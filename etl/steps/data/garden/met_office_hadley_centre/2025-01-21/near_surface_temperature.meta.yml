@@ -2,8 +2,11 @@ definitions:
   common:
     description_key:
       - Temperature anomalies show how many degrees Celsius temperatures have changed compared to the 1861-1890 period. This baseline period is commonly used to highlight the changes in temperature since pre-industrial times, prior to major human impacts.
+      - Temperature averages and anomalies are calculated over all land and ocean surfaces.
       - The data includes separate measurements for the Northern and Southern Hemispheres, which helps researchers analyze regional differences.
       - The global temperature anomaly is the average of both hemisphere measurements.
+      - This data is based on the HadCRUT4 method. This method averages temperature measurements onto a fixed grid. If no data is available for a grid cell, it remains empty and adds extra uncertainty when calculating averages like the global mean.
+      - Despite different approaches, HadCRUT4 and other methods show similar global temperature trends.
     description_from_producer: |-
        The 1961-90 period is most often used as a baseline because it is the period recommended by the World Meteorological Organisation. In some cases other periods are used. For global average temperatures, an 1861-1890 period is sometimes used to show the warming since the "pre-industrial" period.
     description_processing: |-
@@ -27,7 +30,7 @@ tables:
         title: Global average temperature anomaly relative to 1861-1890
         short_unit: °C
         unit: degrees Celsius
-        description_short: Global average land-sea temperature anomaly relative to the 1861-1890 average temperature baseline.
+        description_short: The difference in average land-sea surface temperature compared to the 1861-1890 mean, in degrees Celsius.
 
       upper_limit:
         title: Upper bound of the annual temperature anomaly (95% confidence interval)
