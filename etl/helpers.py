@@ -234,41 +234,6 @@ class WrongStepName(ExceptionFromDocstring):
 load_dag_cached = cache(load_dag)
 
 
-def extract_indicators_from_config(config):
-    """
-    Recursively extract all strings matching the pattern
-    'channel/namespace/date/dataset/table#indicator'
-    from any field in the explorer/mdim config dictionary.
-
-    Parameters
-    ----------
-    config : dict
-        The explorer/mdim config dictionary to search.
-
-    Returns
-    -------
-    list
-        A list of matching strings.
-
-    """
-    pattern = re.compile(r"\b[\w\-/]+/[\w\-/]+/[\w\-/]+/[\w\-/]+/[\w\-/]+#[\w\-/]+\b")
-    indicators = set()
-
-    def recursive_search(obj):
-        if isinstance(obj, dict):
-            for value in obj.values():
-                recursive_search(value)
-        elif isinstance(obj, list):
-            for item in obj:
-                recursive_search(item)
-        elif isinstance(obj, str):
-            matches = pattern.findall(obj)
-            indicators.update(matches)
-
-    recursive_search(config)
-    return sorted(indicators)
-
-
 class PathFinder:
     """Helper object with naming conventions. It uses your module path (__file__) and
     extracts from it commonly used attributes like channel / namespace / version / short_name or
@@ -627,15 +592,6 @@ class PathFinder:
         elif path is None:
             path = self.config_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
-
-        # Extract all indicators mentioned in the config.
-        indicators = extract_indicators_from_config(config=config)
-        # List their corresponding datasets.
-        datasets = sorted(set(["data://" + "/".join(indicator.split("/")[:-1]) for indicator in indicators]))
-        # Ensure that their datasets are included as dependencies of the current step.
-        if not set(datasets) <= self.dependencies:
-            raise NoMatchingStepsAmongDependencies(step_name=self.step_name)
-
         return config
 
     def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
