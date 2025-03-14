@@ -310,7 +310,6 @@ class VersionTracker:
         "data://examples/examples/latest/notebook_example",
         "data://examples/examples/latest/script_example",
         "data://examples/examples/latest/vs_code_cells_example",
-        "data-private://examples/examples/latest/private_example",
     ]
 
     # List of metrics to fetch related to analytics.
@@ -493,8 +492,6 @@ class VersionTracker:
             path_to_script = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
             path_to_script = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
-        elif channel == "walden":
-            path_to_script = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
         elif channel in ["backport", "etag"]:
             # Ignore these channels, for which there is never a script.
             return None
@@ -1011,7 +1008,7 @@ class VersionTracker:
         missing_steps = set(self.all_active_dependencies) - set(self.all_active_usages)
 
         # Remove those special steps that are expected to not appear in the dag as executable steps (e.g. snapshots).
-        channels_to_ignore = ("snapshot", "etag", "github", "walden")
+        channels_to_ignore = ("snapshot", "etag", "github")
         missing_steps = set([step for step in missing_steps if not step.startswith(channels_to_ignore)])
 
         if len(missing_steps) > 0:
