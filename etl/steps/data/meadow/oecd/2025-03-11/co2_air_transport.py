@@ -34,7 +34,6 @@ def run(dest_dir: str) -> None:
     tb["month"] = tb["TIME_PERIOD"].dt.month
     tb["year"] = tb["TIME_PERIOD"].dt.year
     tb = tb.drop(["TIME_PERIOD"], axis=1)
-
     tb = tb.rename(columns={"Reference area": "country", "OBS_VALUE": "value"})
     #
     # Process data.
