@@ -1,11 +1,14 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_key:
+     - This data isn’t seasonally adjusted—summer travel increases emissions, but the actual impact may be lower as Northern Hemisphere plants absorb more CO₂ during this time.
     presentation:
       topic_tags:
         - Tourism
     display:
       numDecimalPlaces: 0
+
   desc_short_total: &desc_short_total |-
       Includes emissions from both domestic and international aviation. International aviation emissions are assigned to the country of departure. CO₂ emissions from commercial passenger flights only.
 
@@ -121,6 +124,11 @@ tables:
         display:
           zeroDay: '2019-01-01'
           yearIsDay: true
+      total_annual_emissions:
+        title: Total annual CO₂ emissions from aviation
+        description_short:  *desc_short_total
+        unit: tonnes
+        short_unit: t
 
       _2019_total_emissions:
         title: Total CO₂ emissions from aviation in 2019
