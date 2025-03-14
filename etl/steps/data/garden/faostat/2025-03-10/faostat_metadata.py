@@ -305,7 +305,7 @@ def create_items_table_for_domain(table: Table, metadata: Dataset, dataset_short
     return items_from_data
 
 
-def clean_global_items_table(tb_items: Table, custom_items: Table) -> Table:
+def clean_global_items_table(tb_items: Table, tb_custom_items: Table) -> Table:
     """Apply global sanity checks to items gathered from all datasets, and create a clean global items table.
 
     Parameters
@@ -341,7 +341,7 @@ def clean_global_items_table(tb_items: Table, custom_items: Table) -> Table:
 
     # Add custom item names.
     tb_items = tb_items.merge(
-        custom_items.rename(columns={"fao_item": "fao_item_check"}),
+        tb_custom_items.rename(columns={"fao_item": "fao_item_check"}),
         on=["dataset", "item_code"],
         how="left",
         suffixes=("_new", "_old"),
@@ -988,7 +988,7 @@ def process_metadata(
         tb_elements = dataframes.concatenate([tb_elements, elements_from_data], ignore_index=True)
 
     tb_datasets = clean_global_dataset_descriptions_table(tb_datasets=tb_datasets, tb_custom_datasets=tb_custom_datasets)
-    tb_items = clean_global_items_table(tb_items=tb_items, custom_items=tb_custom_items)
+    tb_items = clean_global_items_table(tb_items=tb_items, tb_custom_items=tb_custom_items)
 
     tb_elements = clean_global_elements_table(tb_elements=tb_elements, custom_elements=tb_custom_elements)
     tb_countries = clean_global_countries_table(
