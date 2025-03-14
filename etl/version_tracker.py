@@ -350,6 +350,8 @@ class VersionTracker:
         self.dag_archive = {step: self.dag_all[step] for step in self.dag_all if step not in self.dag_active}
         # List all unique steps that exist in the dag.
         self.all_steps = list_all_steps_in_dag(self.dag_all)
+        # Remove walden steps (TODO: remove this when walden is fully deprecated).
+        self.all_steps = [step for step in self.all_steps if not step.startswith("walden")]
         # List all unique active steps.
         self.all_active_steps = list_all_steps_in_dag(self.dag_active)
         # List all active steps usages (i.e. list of steps in the dag that should be executable by ETL).
