@@ -214,7 +214,8 @@ class CurrentStepMustBeInDag(ExceptionFromDocstring):
 
 
 class NoMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
-    """No steps found among dependencies of current ETL step, that match the given specifications."""
+    """No steps found among dependencies of current ETL step, that match the given specifications.
+    Add those missing datasets as dependencies of the current step in the DAG."""
 
 
 class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
