@@ -48,13 +48,22 @@ def load_data(snapshot: Snapshot) -> Table:
         (filename,) = list(filter(lambda x: "(Normalized)" in x, os.listdir(temp_dir)))
 
         # Load data from main file.
-        data = pr.read_csv(
-            os.path.join(temp_dir, filename),
-            encoding="latin-1",
-            low_memory=False,
-            origin=snapshot.metadata.origin,
-            metadata=snapshot.to_table_metadata(),
-        )
+        try:
+            data = pr.read_csv(
+                os.path.join(temp_dir, filename),
+                encoding="utf-8",
+                low_memory=False,
+                origin=snapshot.metadata.origin,
+                metadata=snapshot.to_table_metadata(),
+            )
+        except UnicodeDecodeError:
+            data = pr.read_csv(
+                os.path.join(temp_dir, filename),
+                encoding="windows-1252",
+                low_memory=False,
+                origin=snapshot.metadata.origin,
+                metadata=snapshot.to_table_metadata(),
+            )
 
     return data
 
