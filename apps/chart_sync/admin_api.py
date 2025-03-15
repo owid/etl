@@ -122,8 +122,9 @@ class AdminAPI(object):
 
     def put_mdim_config(self, mdim_catalog_path: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
         # Retry in case we're restarting Admin on staging server
+        url = self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}"
         resp = requests_with_retry().put(
-            self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}",
+            url,
             cookies={"sessionid": self._get_session_id(user_id)},
             json={"config": mdim_config},
         )
