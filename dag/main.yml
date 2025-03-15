@@ -719,6 +719,20 @@ steps:
   data://grapher/oecd/2025-02-19/official_development_assistance:
     - data://garden/oecd/2025-02-19/official_development_assistance
 
+# ATUS - American Time Use Survey
+  data://meadow/atus/2024-12-10/atus_0323:
+    - snapshot://atus/2024-12-10/atus_who.zip
+    - snapshot://atus/2024-12-10/atus_activities.zip
+    - snapshot://atus/2024-12-10/atus_summary.zip
+    - snapshot://atus/2024-12-10/activity_codes_2023.xls
+    - snapshot://atus/2024-12-10/atus_respondent.zip
+
+  data://garden/atus/2025-01-06/atus_who:
+    - data://meadow/atus/2024-12-10/atus_0323
+
+  data://grapher/atus/2025-01-06/atus_who:
+    - data://garden/atus/2025-01-06/atus_who
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
