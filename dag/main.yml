@@ -430,14 +430,6 @@ steps:
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
-  # Refugee, Asylum and Migration Explorer:
-  export://explorers/migration/2024-08-05/migration:
-    - data://grapher/unicef/2024-07-30/child_migration
-    - data://grapher/un/2024-07-25/refugee_data
-    - data://grapher/un/2024-07-16/migrant_stock
-    - data://grapher/un/2024-07-12/un_wpp_full
-    - data://grapher/worldbank_wdi/2024-05-20/wdi
-    - data://grapher/idmc/2024-08-02/internal_displacement
 
   ######################################################################################################################
   # Map (Natural Earth)
@@ -666,21 +658,6 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
-  # Migration distances
-  data://garden/migration/2024-11-19/migration_distance:
-    - data://garden/un/2024-07-16/migrant_stock
-    - data://garden/geography/2023-11-28/nat_earth_110
-  data://grapher/migration/2024-11-19/migration_distance:
-    - data://garden/migration/2024-11-19/migration_distance
-
-  # Migration between regions, based on UN DESA flows
-  data://garden/migration/2024-11-18/migration_between_regions:
-    - data://garden/un/2024-07-16/migrant_stock
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
-
-  data://grapher/migration/2024-11-18/migration_between_regions:
-    - data://garden/migration/2024-11-18/migration_between_regions
 
   # IMF World Economic Outlook
   data://meadow/imf/2024-11-25/world_economic_outlook:

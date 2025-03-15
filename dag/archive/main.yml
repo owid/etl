@@ -412,6 +412,17 @@ steps:
   data://grapher/oecd/2024-08-21/official_development_assistance:
     - data://garden/oecd/2024-08-21/official_development_assistance
 
+  # Migration UN DESA (2020 data)
+  data://meadow/un/2024-07-16/migrant_stock:
+    - snapshot://un/2024-07-16/migrant_stock_dest_origin.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_origin.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_dest.xlsx
+    - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
+  data://garden/un/2024-07-16/migrant_stock:
+    - data://meadow/un/2024-07-16/migrant_stock
+  data://grapher/un/2024-07-16/migrant_stock:
+    - data://garden/un/2024-07-16/migrant_stock
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
