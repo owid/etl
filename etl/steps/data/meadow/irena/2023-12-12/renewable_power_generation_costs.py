@@ -273,7 +273,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new Meadow dataset and reuse walden metadata.
+    # Create a new Meadow dataset and reuse metadata.
     ds = create_dataset(
         dest_dir=dest_dir,
         tables=[tb_combined, tb_solar_pv_prices],

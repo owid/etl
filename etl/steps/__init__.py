@@ -32,9 +32,6 @@ from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.catalogs import OWID_CATALOG_URI
 from owid.catalog.datasets import DEFAULT_FORMATS
-from owid.walden import CATALOG as WALDEN_CATALOG
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden import Dataset as WaldenDataset
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
@@ -193,9 +190,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     if step_type == "data":
         step = DataStep(path, dependencies)
 
-    elif step_type == "walden":
-        step = WaldenStep(path)
-
     elif step_type == "snapshot":
         step = SnapshotStep(path)
 
@@ -213,9 +207,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
-
-    elif step_type == "walden-private":
-        step = WaldenStepPrivate(path)
 
     elif step_type == "snapshot-private":
         step = SnapshotStepPrivate(path)
@@ -273,7 +264,7 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
         version = "latest"
         name = root
         identifier = root
-    elif prefix in ["snapshot", "walden"]:
+    elif prefix in ["snapshot"]:
         # Ingestion steps.
         channel = prefix
 
@@ -305,16 +296,11 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
     return attributes
 
 
-def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
+def load_from_uri(uri: str) -> catalog.Dataset | Snapshot:
     """Load an ETL dataset from a URI."""
     attributes = extract_step_attributes(cast(str, uri))
-    # Walden
-    if attributes["channel"] == "walden":
-        dataset = WaldenCatalog().find_one(
-            namespace=attributes["namespace"], version=attributes["version"], short_name=attributes["name"]
-        )
     # Snapshot
-    elif attributes["channel"] == "snapshot":
+    if attributes["channel"] == "snapshot":
         path = f"{attributes['namespace']} / {attributes['version']} / {attributes['name']}"
         try:
             dataset = Snapshot(path)
@@ -685,69 +671,6 @@ class DataStep(Step):
 
 
 @dataclass
-class WaldenStep(Step):
-    path: str
-    dependencies = []
-
-    def __init__(self, path: str) -> None:
-        self.path = path
-
-    def __str__(self) -> str:
-        return f"walden://{self.path}"
-
-    def run(self) -> None:
-        "Ensure the dataset we're looking for is there."
-        self._walden_dataset.ensure_downloaded(quiet=True)
-
-    def is_dirty(self) -> bool:
-        if not Path(self._walden_dataset.local_path).exists():
-            return True
-
-        if files.checksum_file(self._walden_dataset.local_path) != self._walden_dataset.md5:
-            return True
-
-        return False
-
-    def has_existing_data(self) -> bool:
-        return True
-
-    def checksum_output(self) -> str:
-        if not self._walden_dataset.md5:
-            raise Exception(f"walden dataset is missing checksum: {self}")
-
-        inputs = [
-            # the contents of the dataset
-            self._walden_dataset.md5,
-            # the metadata describing the dataset
-            files.checksum_file(self._walden_dataset.index_path),
-        ]
-
-        checksum = hashlib.md5(",".join(inputs).encode("utf8")).hexdigest()
-
-        return checksum
-
-    @property
-    def _walden_dataset(self) -> WaldenDataset:
-        if self.path.count("/") != 2:
-            raise ValueError(f"malformed walden path: {self.path}")
-
-        namespace, version, short_name = self.path.split("/")
-
-        # normally version is a year or date, but we also accept "latest"
-        if version == "latest":
-            dataset = WALDEN_CATALOG.find_latest(namespace=namespace, short_name=short_name)
-        else:
-            dataset = WALDEN_CATALOG.find_one(namespace=namespace, version=version, short_name=short_name)
-
-        return dataset
-
-    @property
-    def version(self) -> str:
-        # namspace / version / dataset
-        return self.path.split("/")[1]
-
-
-@dataclass
 class SnapshotStep(Step):
     path: str
     dependencies = []
@@ -1109,14 +1032,6 @@ class DataStepPrivate(PrivateMixin, DataStep):
 
     def __str__(self) -> str:
         return f"data-private://{self.path}"
-
-
-class WaldenStepPrivate(WaldenStep):
-    is_public = False
-    dependencies = []
-
-    def __str__(self) -> str:
-        return f"walden-private://{self.path}"
 
 
 def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:

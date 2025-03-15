@@ -701,7 +701,7 @@ def _check_dag_completeness(dag: DAG) -> None:
     """Make sure the DAG is complete, i.e. all dependencies are there."""
     for step, deps in dag.items():
         for dep in deps:
-            if re.match(r"^(snapshot|walden|snapshot-private|walden-private|github|etag)://", dep):
+            if re.match(r"^(snapshot|snapshot-private|github|etag)://", dep):
                 pass
             elif dep not in dag:
                 raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")

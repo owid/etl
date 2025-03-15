@@ -379,7 +379,7 @@ class StepUpdater:
             return
 
         # Skip snapshots (since they do not appear as steps in the dag).
-        if step_info["channel"] in ["snapshot", "walden"]:
+        if step_info["channel"] in ["snapshot"]:
             log.info(f"Skipping snapshot: {step}")
             return
 

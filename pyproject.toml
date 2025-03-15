@@ -62,7 +62,6 @@ dependencies = [
     "owid-catalog",
     "owid-datautils",
     "owid-repack",
-    "walden",
     "deprecated>=1.2.14",
     "scikit-learn>=1.5.2",
     "geopy>=2.4.1",
@@ -78,7 +77,6 @@ dependencies = [
 owid-catalog = { path = "lib/catalog", editable = true }
 owid-datautils = { path = "lib/datautils", editable = true }
 owid-repack = { path = "lib/repack", editable = true }
-walden = { path = "lib/walden", editable = true }
 sqlacodegen = { git = "https://github.com/agronholm/sqlacodegen.git" }
 
 [tool.uv]

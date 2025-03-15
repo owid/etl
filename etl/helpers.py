@@ -22,8 +22,6 @@ from owid.catalog.tables import (
     get_unique_sources_from_tables,
 )
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
 from etl.collections.explorer import Explorer, create_explorer
@@ -223,7 +221,7 @@ class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
 
 
 class UnknownChannel(ExceptionFromDocstring):
-    """Unknown channel name. Valid channels are 'examples', 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
+    """Unknown channel name. Valid channels are 'examples', 'snapshot', 'meadow', 'garden', or 'grapher'."""
 
 
 class WrongStepName(ExceptionFromDocstring):
@@ -337,10 +335,6 @@ class PathFinder:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
-    def walden_dataset(self) -> WaldenDataset:
-        return WaldenCatalog().find_one(namespace=self.namespace, version=self.version, short_name=self.short_name)
-
-    @property
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
@@ -386,10 +380,8 @@ class PathFinder:
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
         elif channel in CHANNEL.__args__:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
-        elif channel == "walden":
-            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
+            step_name = rf"(?:snapshot{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
@@ -409,7 +401,7 @@ class PathFinder:
     def _get_attributes_from_step_name(step_name: str) -> Dict[str, str]:
         """Get attributes (channel, namespace, version, short name and is_private) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
-        if channel_type.startswith(("walden", "snapshot")):
+        if channel_type.startswith(("snapshot",)):
             channel = channel_type
             namespace, version, short_name = path.split("/")
         elif channel_type.startswith(("data", "export")):
@@ -528,7 +520,7 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
         is_private: Optional[bool] = None,
-    ) -> Union[catalog.Dataset, Snapshot, WaldenCatalog]:
+    ) -> Union[catalog.Dataset, Snapshot]:
         """Load a dataset dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
             step_type=step_type,
@@ -539,11 +531,7 @@ class PathFinder:
             is_private=is_private,
         )
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
-        if dependency["channel"] == "walden":
-            dataset = WaldenCatalog().find_one(
-                namespace=dependency["namespace"], version=dependency["version"], short_name=dependency["short_name"]
-            )
-        elif dependency["channel"] == "snapshot":
+        if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
         else:
             dataset_path = (

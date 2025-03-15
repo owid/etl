@@ -182,7 +182,7 @@ First of all, you need to have the [ETL project](https://github.com/owid/etl) in
 git clone https://github.com/owid/etl.git
 ```
 
-Along with various directories and files, the project also has sub-packages in the `lib/` folder: `catalog`, `walden` (deprecated), `repack` and `datautils`. These redistributable in-house libraries simplify access to data.
+Along with various directories and files, the project also has sub-packages in the `lib/` folder: `catalog`, `repack` and `datautils`. These redistributable in-house libraries simplify access to data.
 
 ## Check your environment
 

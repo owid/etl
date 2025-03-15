@@ -99,7 +99,7 @@ On a high level our data pipeline consists of four steps:
 ① Ingest the data and store it
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This entails locating data releases, downloading the data, storing a snapshot in our external data snaphot repository called **Walden** (named after `Walden Pond <https://en.wikipedia.org/wiki/Walden_Pond>`_), and collect and store some metadata alongside. At this point in the pipeline, the data exists as a zip file of all the files (or API responses) as they were fetched from the original source.
+This entails locating data releases, downloading the data, storing a snapshot in our external data snapshot repository, and collect and store some metadata alongside. At this point in the pipeline, the data exists as a zip file of all the files (or API responses) as they were fetched from the original source.
 
 ② Extract the data into dataframe form
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -164,7 +164,7 @@ For important and common index columns, notably countries/regions, there exists 
 Layout of the ETL repository
 ----------------------------
 
-The `ETL github repository`_  contains the code of the OWID ETL pipeline. For every dataset release there exists a folder in ``/etl/steps`` with the python code to take this dataset from the walden snapshot stage all the way through the pipeline (usually all the way to the Grapher stage). When running the etl command, either a subset or all of these steps are executed and produce their output dataframes and acompanying metadat files in ``/data``. The folder structure between the steps and the produced data files matches closely by convention (some scripts generate more than one table but the folder structure is still mirrored between steps and data folders.)
+The `ETL github repository`_  contains the code of the OWID ETL pipeline. For every dataset release there exists a folder in ``/etl/steps`` with the python code to take this dataset from the snapshot stage all the way through the pipeline (usually all the way to the Grapher stage). When running the etl command, either a subset or all of these steps are executed and produce their output dataframes and acompanying metadat files in ``/data``. The folder structure between the steps and the produced data files matches closely by convention (some scripts generate more than one table but the folder structure is still mirrored between steps and data folders.)
 
 Design goals and non-goals of the ETL
 -------------------------------------
