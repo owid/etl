@@ -211,22 +211,6 @@ steps:
   data://grapher/climate/2025-01-21/climate_change_impacts_annual:
     - data://garden/climate/2025-01-21/climate_change_impacts
   #
-  # NSIDC - Monthly sea ice extent ("country" for decades and latest year, "year" for month number, one indicator per hemisphere).
-  #
-  data://grapher/climate/2025-01-21/sea_ice_extent_by_decade:
-    - data://garden/climate/2025-01-21/sea_ice_index
-  #
-  # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
-  #
-  data://grapher/climate/2025-01-21/sea_ice_anomalies_by_month:
-    - data://garden/climate/2025-01-21/sea_ice_index
-  #
-  # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
-  #
-  data://grapher/climate/2025-01-21/sea_ice_extent_by_year:
-    - data://garden/climate/2025-01-21/sea_ice_index
-
-  #
   # Equatorial Pacific Sea Surface Temperatures (SST) data - El Niño or La Niña
   #
   data://meadow/climate/2025-02-12/sst:

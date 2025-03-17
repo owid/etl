@@ -1017,3 +1017,18 @@ steps:
     - snapshot://epa/2024-01-29/mass_balance_us_glaciers.csv
   data://garden/epa/2024-01-29/mass_balance_us_glaciers:
     - data://meadow/epa/2024-01-29/mass_balance_us_glaciers
+  #
+  # NSIDC - Monthly sea ice extent ("country" for decades and latest year, "year" for month number, one indicator per hemisphere).
+  #
+  data://grapher/climate/2025-01-21/sea_ice_extent_by_decade:
+    - data://garden/climate/2025-01-21/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice anomalies ("country" for month names, "year" for years, one indicator per hemisphere).
+  #
+  data://grapher/climate/2025-01-21/sea_ice_anomalies_by_month:
+    - data://garden/climate/2025-01-21/sea_ice_index
+  #
+  # NSIDC - Monthly sea ice extent ("country" for years, "year" for month number, one indicator per hemisphere).
+  #
+  data://grapher/climate/2025-01-21/sea_ice_extent_by_year:
+    - data://garden/climate/2025-01-21/sea_ice_index
