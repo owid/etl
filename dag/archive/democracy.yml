@@ -12,7 +12,7 @@ steps:
   data://grapher/democracy/2024-05-22/eiu:
     - data://garden/democracy/2024-03-07/eiu
 
-  # VDEM (2023)
+  # Varieties of Democracy (2023)
   data://meadow/democracy/2023-03-02/vdem:
     - snapshot://democracy/2023-03-02/vdem.csv
   data://garden/democracy/2023-03-02/vdem:
