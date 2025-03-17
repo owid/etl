@@ -74,5 +74,7 @@ steps:
     - snapshot://un/2025-03-12/migrant_stock_dest_origin.xlsx
   data://garden/un/2025-03-12/migrant_stock:
     - data://meadow/un/2025-03-12/migrant_stock
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
   data://grapher/un/2025-03-12/migrant_stock:
     - data://garden/un/2025-03-12/migrant_stock

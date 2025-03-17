@@ -7,15 +7,18 @@ definitions:
       grapher_config:
         originUrl: "https://ourworldindata.org/migration"
     processing_level: minor #minor for most indicators, major for data that has been manipulated (e.g. 5 year change, share of child migrants)
-    unit: ""
     short_unit: ""
     display:
       numDecimalPlaces: 0 # 0 for most indicators, 1 for percentages/ shares
+    description_processing: |-
+      - {definitions.description_processing.owid_regions}
   description_un:
     migrant_stock: International migrant stock at mid-year by age and sex and by region, country or area of destination, 1990-2024
     share_migrant_stock: International migrant stock as percentage of the total population by age and sex and by region, country or area of destination, 1990-2024
     migrants_per_age: International migrant stock at mid-year by age and sex and by region, country or area of destination, 1990-2024
     share_age_migrants: Percentage distribution of the international migrant stock by age and sex and by region, country or area of destination, 1990-2024
+  description_processing:
+    owid_regions: Regional aggregates (such as continents, income groups and the worldwide aggregate) are based on [our definition of the continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and the [World Bank definition of income groups](https://ourworldindata.org/grapher/world-bank-income-groups), unless otherwise indicated. They might differ from the definitions used by the United Nations.
 
 dataset:
   update_period_days: 730 # had biyearly releases in the past, maybe they are going back to it?
@@ -29,14 +32,17 @@ tables:
         title: Total number of international immigrants
         description_short: People living in a given country who were born in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: "immigrants"
       immigrants_female:
         title: Total number of international immigrants - female
-        description_short: The total number of female people living in a given country who were born in another country.
+        description_short: The total number of women living in a given country who were born in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: female immigrants
       immigrants_male:
         title: Total number of international immigrants - male
-        description_short: The total number of male people living in a given country who were born in another country.
+        description_short: The total number of men living in a given country who were born in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: male immigrants
       # Immigrant share
       immigrant_share_of_dest_population_all:
         title: Share of the population that was born in another country
@@ -67,40 +73,53 @@ tables:
         title: Total number of emigrants
         description_short: People that were born in a country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: emigrants
       emigrants_female:
         title: Total number of emigrants - female
-        description_short: Female people that were born in a country but now live in another country.
+        description_short: Women that were born in this country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: female emigrants
       emigrants_male:
         title: Total number of emigrants - male
-        description_short: Male people that were born in a country but now live in another country.
+        description_short: Men that were born in this country but now live in another country.
         description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: male emigrants
       # Emigrant share
       emigrants_share_of_total_population:
         title: Share of the population that was born in this country but now lives in another country.
         unit: "%"
         short_unit: "%"
         description_short: The total number of people that have left the country, as a share of the current population.
-        description_processing: We calculated the share of emigrants as the number of emigrants divided by the total population of their home country.
+        description_processing: |-
+          - We calculated the share of emigrants as the number of emigrants divided by the total population of their home country.
+          - {definitions.description_processing.owid_regions}
         display:
           numDecimalPlaces: 1
       # data on 5 year changes
       immigrants_change_5_years:
         title: Change in the number of international immigrants in the previous five years
-        description_short: The change in the total number of migrants living in a given country compared to five years ago. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer. For 2024, this is the change compared to 2020.
+        description_short: The change in the total number of migrants living in a given country compared to five years ago. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer.
         processing_level: major
-        description_processing: We calculated the change in the number of international immigrants by subtracting the number of immigrants that were living in a given country five years prior from the number of immigrants living in the country in the current year.
+        description_processing: |-
+          - We calculated the change in the number of international immigrants by subtracting the number of immigrants that were living in a given country five years prior from the number of immigrants living in the country in the current year.
+          - {definitions.description_processing.owid_regions}
+        unit: immigrants compared to 5 years ago
       emigrants_change_5_years:
         title: Change in the number of emigrants in the previous five years
         description_short: The total number of people born in that country who are now living in another country, compared to five years ago. A positive number indicates that there are now more emigrants who have moved from a given country; a negative number means there are fewer. For 2024, this is the change compared to 2020.
         processing_level: major
-        description_processing: We calculated the change in the number of emigrants by subtracting the number of emigrants that were living in a given country five years prior from the number of emigrants living in the country in the current year.
+        description_processing:  |-
+          - We calculated the change in the number of emigrants by subtracting the number of emigrants that were living in a given country five years prior from the number of emigrants living in the country in the current year.
+          - {definitions.description_processing.owid_regions}
+        unit: emigrants compared to 5 years ago
       immigrants_change_5_years_per_1000:
         title: Change in the number of international migrants per 1,000 people in the previous five years
         unit: per 1,000
         description_short: The change in the total number of migrants living in a given country compared to five years ago, per 1,000 people in the host country. A positive number indicates there are now more migrants living in a given country; a negative number means there are fewer. For 2024, this is the change compared to 2020.
         processing_level: major
-        description_processing: We calculated the change in the number of international immigrants by subtracting the number of immigrants that were living in a given country five years prior from the number of immigrants living in the country in the current year. We then divided this number by the total population of the host country, per 1000 people.
+        description_processing:  |-
+          - We calculated the change in the number of international immigrants by subtracting the number of immigrants that were living in a given country five years prior from the number of immigrants living in the country in the current year. We then divided this number by the total population of the host country, per 1000 people.
+          - {definitions.description_processing.owid_regions}
         display:
           numDecimalPlaces: 1
       emigrants_change_5_years_per_1000:
@@ -108,6 +127,8 @@ tables:
         unit: per 1,000
         description_short: The total number of people born in that country who are now living in another country, compared to five years ago, per 1,000 people in the host country. A positive number indicates there are now more emigrants who have moved from a given country; a negative number means there are fewer. For 2024, this is the change compared to 2020.
         processing_level: major
-        description_processing: We calculated the change in the number of emigrants by subtracting the number of emigrants that were living in a given country five years prior from the number of emigrants living in the country in the current year. We then divided this number by the total population of the host country, per 1000 people. For 2024, this is the change compared to 2020.
+        description_processing:  |-
+          - We calculated the change in the number of emigrants by subtracting the number of emigrants that were living in a given country five years prior from the number of emigrants living in the country in the current year. We then divided this number by the total population of the host country, per 1000 people. For 2024, this is the change compared to 2020.
+          - {definitions.description_processing.owid_regions}
         display:
           numDecimalPlaces: 1

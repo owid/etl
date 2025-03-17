@@ -1,5 +1,5 @@
+import numpy as np
 import pandas as pd
-from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -14,6 +14,42 @@ MALES = ["_1990_1", "_1995_1", "_2000_1", "_2005_1", "_2010_1", "_2015_1", "_202
 FEMALES = ["_1990_2", "_1995_2", "_2000_2", "_2005_2", "_2010_2", "_2015_2", "_2020_2", "_2024_2"]
 
 ALL_YEARS = BOTH_SEXES + MALES + FEMALES
+
+REGIONS = list(geo.REGIONS.keys()) + ["World"]
+
+EXCL_REGIONS = [
+    "Developed regions",
+    "Australia and New Zealand",
+    "Caribbean",
+    "Less developed regions, excluding least developed countries",
+    "Less developed regions, excluding China",
+    "Least developed countries",
+    "Less developed regions",
+    "More developed regions",
+    "Australia/New Zealand",
+    "Other",
+    "OTHER",
+    "AFRICA",
+    "ASIA",
+    "EUROPE",
+    "Africa",
+    "Asia",
+    "Europe",
+    "Oceania",
+    "OCEANIA",
+    "South America",
+    "WORLD",
+    "World",
+    "High-income countries",
+    "Low-income countries",
+    "Lower-middle-income countries",
+    "Upper-middle-income countries",
+    "High-and-upper-middle-income countries",
+    "Low-and-lower-middle-income-countries",
+    "Low-and-middle-income-countries",
+    "Oceania (excluding Australia and New Zealand)",
+    "Middle-income countries",
+]
 
 
 def run() -> None:
@@ -33,21 +69,14 @@ def run() -> None:
     # origin table
     tb_o = ds_meadow.read("migrant_stock_origin")
 
-    # Australia & New Zealand shows up twice in the data
-    duplicates = tb_do[tb_do.duplicated(subset=["country_destination", "country_origin"])]
-    assert (
-        len(
-            duplicates[
-                ~(
-                    (duplicates["country_destination"] == "Australia/New Zealand")
-                    | (duplicates["country_origin"] == "Australia/New Zealand")
-                )
-            ]
-        )
-        == 0
-    )
+    # Load regions dataset
+    ds_regions = paths.load_dataset("regions")
+    # Load income groups dataset
+    ds_income_groups = paths.load_dataset("income_groups")
 
-    tb_do = tb_do.drop_duplicates(subset=["country_destination", "country_origin"], keep="first")
+    # Remove excluded regions from the dataset.
+    tb_do = tb_do[~tb_do["country_destination"].isin(EXCL_REGIONS)]
+    tb_do = tb_do[~tb_do["country_origin"].isin(EXCL_REGIONS)]
 
     tb_do = format_table(tb_do, ["country_destination", "country_origin"], "migrants")
 
@@ -66,11 +95,52 @@ def run() -> None:
     ## all combine tables except for destination and origin table
     tb = combine_all_tables(tb_d_total, tb_d_share, tb_o, tb_d_pop)
 
+    # calculate regions
+    agg = {
+        "immigrants_all": "sum",
+        "immigrants_female": "sum",
+        "immigrants_male": "sum",
+        "emigrants_all": "sum",
+        "emigrants_female": "sum",
+        "emigrants_male": "sum",
+        "total_population": "sum",
+        "female_population": "sum",
+        "male_population": "sum",
+    }
+
+    tb = geo.add_regions_to_table(
+        tb,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        regions=REGIONS,
+        frac_allowed_nans_per_year=0.1,
+        country_col="country",
+        aggregations=agg,
+    )
+
+    # set column names for readable code
+    im_s_all = "immigrant_share_of_dest_population_all"
+    im_s_fem = "immigrant_share_of_dest_population_female"
+    im_s_male = "immigrant_share_of_dest_population_male"
+    em_s_all = "emigrants_share_of_total_population"
+
+    # calculate shares for regions & add metadata
+    tb[im_s_all] = np.where(
+        tb["country"].isin(REGIONS), (tb["immigrants_all"] / tb["total_population"]) * 100, tb[im_s_all]
+    )
+    tb[im_s_all] = tb[im_s_all].copy_metadata(tb["immigrants_all"])
+    tb[im_s_fem] = np.where(
+        tb["country"].isin(REGIONS), (tb["immigrants_female"] / tb["female_population"] * 100), tb[im_s_fem]
+    )
+    tb[im_s_fem] = tb[im_s_fem].copy_metadata(tb["immigrants_all"])
+    tb[im_s_male] = np.where(
+        tb["country"].isin(REGIONS), (tb["immigrants_male"] / tb["male_population"] * 100), tb[im_s_male]
+    )
+    tb[im_s_male] = tb[im_s_male].copy_metadata(tb["immigrants_all"])
+    tb[em_s_all] = tb["emigrants_all"] / (tb["total_population"]) * 100
+
     # statistics on change in migrants over 5 years
     tb = calculate_change_over_5_years(tb)
-
-    # share of emigrants in total population in home country
-    tb["emigrants_share_of_total_population"] = tb["emigrants_all"] / (tb["total_population"]) * 100
 
     # drop total population columns
     tb = tb.drop(columns=["total_population", "male_population", "female_population"])
@@ -167,14 +237,7 @@ def migrant_change_5_years(tb, tb_row, col_name):
     if yr == 1990:
         return pd.NA
     if yr == 2024:
-        tb_prev_df = tb[(tb["country"] == cnt) & (tb["year"] == 2020)]
-        if tb_prev_df.empty:
-            return pd.NA
-        tb_prev = tb_prev_df.iloc[0]
-        if pd.isna(tb_row[col_name]) or pd.isna(tb_prev[col_name]):
-            return pd.NA
-        else:
-            return float(tb_row[col_name] - tb_prev[col_name])
+        return pd.NA
     else:
         tb_prev_df = tb[(tb["country"] == cnt) & (tb["year"] == yr - 5)]
         if tb_prev_df.empty:
@@ -231,19 +294,17 @@ def format_table(tb, country_cols, value_name):
     # harmonize country names
     for cnt in country_cols:
         tb = geo.harmonize_countries(
-            df=tb, countries_file=paths.country_mapping_path, country_col=cnt, warn_on_unused_countries=False
+            df=tb,
+            countries_file=paths.country_mapping_path,
+            excluded_countries_file=paths.excluded_countries_path,
+            country_col=cnt,
+            warn_on_unused_countries=False,
+            warn_on_unknown_excluded_countries=False,
         )
 
     # remove duplicate data
     tb = tb.drop_duplicates()
 
-    return tb
-
-
-# Add metadata to columns after e.g. pivoting or changing dtype
-def add_metadata(tb: Table, cols_wo_metadata: list, col_with_metadata: str):
-    for col in cols_wo_metadata:
-        tb[col] = tb[col].copy_metadata(tb[col_with_metadata])
     return tb
 
 
