@@ -4,7 +4,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -57,13 +57,13 @@ def separate_antarctica_and_greenland_data(tb: Table) -> Table:
     return tb_combined
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("ice_sheet_mass_balance")
-    tb = ds_meadow["ice_sheet_mass_balance"].reset_index()
+    tb = ds_meadow.read("ice_sheet_mass_balance")
 
     #
     # Process data.
@@ -87,5 +87,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

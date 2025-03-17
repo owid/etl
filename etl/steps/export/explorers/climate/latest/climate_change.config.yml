@@ -74,7 +74,7 @@ views:
       long_run_series: false
     indicators:
       y:
-        - catalogPath: near_surface_temperature#temperature_anomaly
+        - catalogPath: climate_change_impacts_annual#near_surface_temperature_anomaly
     config:
       title: 'Global warming: annual temperature anomaly'
       yScaleToggle: false

@@ -178,7 +178,9 @@ class StepUpdater:
         step_info = self.get_step_info(step=step)
 
         # Define the folder of the old step files.
-        folder = STEP_DIR / "data" / step_info["channel"] / step_info["namespace"] / step_info["version"]
+        folder = (
+            STEP_DIR / step_info["step_type"] / step_info["channel"] / step_info["namespace"] / step_info["version"]
+        )
 
         if ((folder / step_info["name"]).with_suffix(".py")).is_file():
             # Gather all relevant files from this folder.
