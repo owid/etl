@@ -10,14 +10,15 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load data from snapshots.
-    tb = paths.load_snapshot("mass_balance_us_glaciers.csv").read(skiprows=6)
+    # Load snapshot and read its data.
+    tb = paths.load_snapshot("hawaii_ocean_time_series.csv").read(skiprows=8, sep="\t", na_values=[-999])
 
     #
     # Process data.
     #
+
     # Set an appropriate index and sort conveniently.
-    tb = tb.format(["year"])
+    tb = tb.format(["date"], sort_columns=True)
 
     #
     # Save outputs.
