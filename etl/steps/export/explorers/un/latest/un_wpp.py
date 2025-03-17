@@ -1,58 +1,42 @@
 """
-PROGRESS:
-[in explorer] [FAUST] [map]:
-- [x] [x] [ ] population
-- [x] [o] [x] population broad age groups: legend
-- [x] [x] [ ] population change
-- [x] [o] [ ] population growth rate: type (+/-)
-- [x] [o] [ ] natural population growth rate: type (+/-)
-- [x] [x] [ ] population density
-- [x] [x] [ ] Fertility rate
-- [x] [x] [ ] Births
-- [x] [x] [ ] Birth rate
-- [x] [x] [ ] Deaths
-- [x] [x] [ ] Death rate
-- [x] [x] [ ] Number of child deaths
-- [x] [x] [ ] Child mortality rate
-- [x] [x] [ ] Number of infants deaths
-- [x] [x] [ ] Infant mortality rate
-- [x] [x] [ ] Life expectancy
-- [x] [o] [x] Age structure: Legend display names
-- [x] [x] [ ] Dependency ratio
-- [x] [x] [ ] Median age
-- [x] [x] [ ] Net migration
-- [x] [x] [ ] Net migration rate
-- [x] [x] [ ] Sex ratio
+This step creates the population and demography explorer. It uses MDIM-based configuration, and some custom processing.
 
+Strategy:
 
-x: done
-o: in progress
+    - This explorer relies on multiple tables from the UN WPP dataset. Therefore, we first create individual explorers for each table and then combine them.
+    - While some of the metadata is inherited from Garden/Grapher, some of it is set manually in the YAML files or programmatically once explorers are created.
+    - Most of the explorers are created programmatically, with slight edits coming from YAML files (un_wpp.config.yml and un_wpp.sex_ratio.yml).
+    - In addition, some views, were created using manual configuration (see un_wpp.manual.yml).
+    - To create an explorer, we use the custom-made class ExplorerCreator, which has a function `create`. While these object/functions are custom (they combine ds and ds_full tables in a particular way), some of its logic could be generalized and moved to etl.collections. For more details, please refer to the module utils.py.
+    - All the created explorers are combined into a single one, which is then exported.
+
+NOTE: This pipeline assumes that there is a TSV template in owid-content, this should probably be change din the future.
 """
 
-# from etl.files import yaml_dump
-# from etl.db import get_engine
 from etl.helpers import PathFinder
 
-from .config_edits import ConfigEditor
 from .utils import ExplorerCreator, combine_explorers
+from .view_edits import ViewEditor
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-# Population
+# DEFINITIONS
+# Rename of age dimension choices: We could alternatively specify these in the YAML file, but this can also be programmatically done.
 AGES_POP_LIST = (
     [
         "15-64",
         "15+",
         "18+",
         "1",
+        "1-4",
     ]
     + [f"{i}-{i+4}" for i in range(5, 20, 5)]
     + [f"{i}-{i+9}" for i in range(20, 100, 10)]
     + ["100+"]
 )
-AGES_POP = {age: f"{age.replace('-', '–')} years" if age != "1" else "1 year" for age in AGES_POP_LIST}
+AGES_POP = {age: f"{age.replace('-', '–')} years" if age != "1" else "At age 1" for age in AGES_POP_LIST}
 
 # Sex ratio
 AGES_SR = {
@@ -66,19 +50,29 @@ AGES_DEATHS = {age: f"{age.replace('-', '–')} years" for age in AGES_POP_LIST}
 
 
 def run() -> None:
-    # LOAD DATASETS,
+    # Load datasets: ds (contains data 1950-2023) and ds_full (contains data 1950-2100, i.e. includes projections)
     ds = paths.load_dataset("un_wpp")
     ds_full = paths.load_dataset("un_wpp_full")
+
+    # Build object to deal with explorers creation. It is a wrapper around our classic create_explorer function.
     explorer_creator = ExplorerCreator(paths, ds, ds_full)
 
-    # Default config
+    # Default config: This config contains the default metadata for most explorers. Exceptions are sex_ratio, which needs other names for certain dimension choices, and manual views.
     config_default = paths.load_explorer_config()
+
+    # Object used to edit view configs: Some of the views need extra-curation (this includes adding map brackets, renaming titles, etc.)
+    view_editor = ViewEditor(paths.side_file("map_brackets.yml"))
 
     #################################################################################################
     # Create individual explorers (building blocks)
+    #
+    # There are various tables required for this explorer. We create one explorer for each of them.
+    # Later, we combine them into a single one.
+    # Note that all configs have `indicator` dimension, as a way to "hack" the indicator name
+    # into the view dimension config.
     #################################################################################################
 
-    # 1) Population
+    ########## Population explorer
     explorer_pop = explorer_creator.create(
         table_name="population",
         config_yaml=config_default,
@@ -90,9 +84,9 @@ def run() -> None:
         },
         choice_renames={"age": AGES_POP},
     )
-    ConfigEditor.edit_views_pop(explorer_pop)
+    view_editor.edit_views_pop(explorer_pop)
 
-    # 2) Dependency ratio
+    ########## Dependency ratio explorer
     explorer_dep = explorer_creator.create(
         table_name="dependency_ratio",
         config_yaml=config_default,
@@ -103,9 +97,9 @@ def run() -> None:
             "variant": ["estimates"],
         },
     )
-    ConfigEditor.edit_views_dr(explorer_dep)
+    view_editor.edit_views_dr(explorer_dep)
 
-    # 3) Sex ratio
+    ########## Sex ratio explorer
     explorer_sr = explorer_creator.create(
         table_name="sex_ratio",
         config_yaml=paths.load_explorer_config("un_wpp.sex_ratio.config.yml"),
@@ -117,9 +111,9 @@ def run() -> None:
         },
         choice_renames={"age": AGES_SR},
     )
-    ConfigEditor.edit_views_sr(explorer_sr)
+    view_editor.edit_views_sr(explorer_sr)
 
-    # 4) Migration
+    ########## Migration explorer
     explorer_mig = explorer_creator.create(
         table_name="migration",
         config_yaml=config_default,
@@ -134,8 +128,9 @@ def run() -> None:
         },
         choice_renames={"age": AGES_SR},
     )
+    view_editor.edit_views_mig(explorer_mig)
 
-    # 5) Deaths
+    ########## Deaths explorer
     explorer_deaths = explorer_creator.create(
         table_name="deaths",
         config_yaml=config_default,
@@ -147,9 +142,9 @@ def run() -> None:
         },
         choice_renames={"age": AGES_DEATHS},
     )
-    ConfigEditor.edit_views_deaths(explorer_deaths)
+    view_editor.edit_views_deaths(explorer_deaths)
 
-    # 6) Births
+    ########## Births explorer
     explorer_b = explorer_creator.create(
         table_name="births",
         config_yaml=config_default,
@@ -161,9 +156,9 @@ def run() -> None:
         },
         choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
     )
-    ConfigEditor.edit_views_b(explorer_b)
+    view_editor.edit_views_b(explorer_b)
 
-    # 7) Median age
+    ########## Median age explorer
     explorer_ma = explorer_creator.create(
         table_name="median_age",
         config_yaml=config_default,
@@ -175,8 +170,9 @@ def run() -> None:
         },
         choice_renames={"age": lambda x: {"all": "None"}.get(x, None)},
     )
+    view_editor.edit_views_ma(explorer_ma)
 
-    # 8) Life expectancy
+    ########## Life expectancy explorer
     explorer_le = explorer_creator.create(
         table_name="life_expectancy",
         config_yaml=config_default,
@@ -195,9 +191,9 @@ def run() -> None:
             }
         },
     )
-    ConfigEditor.edit_views_le(explorer_le)
+    view_editor.edit_views_le(explorer_le)
 
-    # 9) Fertility rate
+    ########## Fertility rate explorer
     explorer_fr = explorer_creator.create(
         table_name="fertility_rate",
         config_yaml=config_default,
@@ -209,12 +205,13 @@ def run() -> None:
         },
         choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
     )
-    ConfigEditor.edit_views_fr(explorer_fr)
+    view_editor.edit_views_fr(explorer_fr)
 
-    # 10 Manual
+    ########## Manual explorer: views with grouped indicators, and others
     explorer_manual = explorer_creator.create_manual(
         config=paths.load_explorer_config("un_wpp.manual.config.yml"),
     )
+    view_editor.edit_views_manual(explorer_manual)
 
     #################################################################################################
     # Combine explorers

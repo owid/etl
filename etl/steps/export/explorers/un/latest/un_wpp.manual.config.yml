@@ -1,4 +1,8 @@
 definitions:
+  display_mortality: &display_mortality
+    display:
+      colorScaleNumericBins: 0.1;0.2;0.5;1;2;5;10;1
+      colorScaleScheme: "OrRd"
   common_views:
     # Age structure
     - dimensions:
@@ -25,7 +29,7 @@ definitions:
         title: Population by broad age group
         type: StackedArea
         hasMapTab: false
-        selectedFacetStrategy: false
+        selectedFacetStrategy: entity
     - dimensions:
         indicator: population_broad
         sex: female
@@ -662,6 +666,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp/mortality_rate#mortality_rate__sex_all__age_0__variant_estimates
+          <<: *display_mortality
   - dimensions:
       indicator: child_mortality_rate
       age: 0-4
@@ -670,6 +675,8 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp/mortality_rate#mortality_rate__sex_all__age_0_4__variant_estimates
+          <<: *display_mortality
+
   - dimensions:
       indicator: infant_mortality_rate
       age: "0"
@@ -678,6 +685,8 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0__variant_low
+          <<: *display_mortality
+
   - dimensions:
       indicator: child_mortality_rate
       age: 0-4
@@ -686,6 +695,8 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0_4__variant_low
+          <<: *display_mortality
+
   - dimensions:
       indicator: infant_mortality_rate
       age: "0"
@@ -694,6 +705,8 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0__variant_medium
+          <<: *display_mortality
+
   - dimensions:
       indicator: child_mortality_rate
       age: 0-4
@@ -702,6 +715,7 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0_4__variant_medium
+          <<: *display_mortality
 
   - dimensions:
       indicator: infant_mortality_rate
@@ -711,6 +725,8 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0__variant_high
+          <<: *display_mortality
+
   - dimensions:
       indicator: child_mortality_rate
       age: 0-4
@@ -719,3 +735,4 @@ views:
     indicators:
       y:
         - catalogPath: grapher/un/2024-07-12/un_wpp_full/mortality_rate#mortality_rate__sex_all__age_0_4__variant_high
+          <<: *display_mortality

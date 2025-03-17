@@ -1,4 +1,14 @@
-"""The code here was developed for population-and-demography explorer. However, I think there are bits of this that could be migrated into etl.collections so that others can use it. It might need some cleaning, testing, and documenting."""
+"""The code here was developed for population-and-demography explorer.
+
+However, I think there are bits of this that could be migrated into etl.collections so that others can use it. It might need some cleaning, testing, and documenting.
+
+Relevant functions:
+
+* `create_explorer_experimental`: Create an explorer based on a table and a YAML config. It is a wrapper around `expand_config` and `combine_config_dimensions`. We could consider replacing the existing `paths.create_explorer` with this one. Currently table is optional, and YAML is mandatory.
+* `combine_explorers`: Combine multiple explorers into a single one.
+
+TODO: We should add testing!
+"""
 
 import inspect
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
