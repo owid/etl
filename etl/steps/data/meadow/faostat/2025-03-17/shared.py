@@ -15,7 +15,7 @@ import owid.catalog.processing as pr
 import structlog
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 # Initialise log.
@@ -183,6 +183,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset.
-    # NOTE: Do not check if all variables have metadata. We asserted above that "value" has an origin.
-    ds_meadow = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=False)
+    ds_meadow = paths.create_dataset(tables=[tb])
     ds_meadow.save()

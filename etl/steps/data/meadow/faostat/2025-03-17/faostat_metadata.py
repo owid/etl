@@ -12,15 +12,12 @@ import owid.catalog.processing as pr
 import structlog
 from owid.catalog import Table
 from owid.datautils.io import load_json
-from shared import CURRENT_DIR, NAMESPACE
+from shared import CURRENT_DIR
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
-
-# Name for new meadow dataset.
-DATASET_SHORT_NAME = f"{NAMESPACE}_metadata"
 
 # Define the structure of the additional metadata file.
 category_structure = {
@@ -170,7 +167,7 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any], sn
                 verify_integrity=True,
                 inplace=True,
             )
-            table_short_name = f'{NAMESPACE}_{domain.lower()}_{category_structure[category]["short_name"]}'
+            table_short_name = f'faostat_{domain.lower()}_{category_structure[category]["short_name"]}'
 
             # there might be duplicates coming from `itemsgroup` and `itemgroup`
             if table_short_name in used_short_names:
@@ -184,15 +181,12 @@ def create_tables_for_all_domain_records(additional_metadata: Dict[str, Any], sn
     return tables
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
-    # Fetch the dataset short name from dest_dir.
-    dataset_short_name = f"{NAMESPACE}_metadata"
-
     # Define path to current step file.
-    current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
+    current_step_file = (CURRENT_DIR / "faostat_metadata").with_suffix(".py")
 
     # Get paths and naming conventions for current data step.
     paths = PathFinder(current_step_file.as_posix())
@@ -214,5 +208,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = create_dataset(dest_dir=dest_dir, tables=tables, default_metadata=snapshot.metadata)
+    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snapshot.metadata)
     ds_meadow.save()
