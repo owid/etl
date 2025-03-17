@@ -95,14 +95,6 @@ steps:
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
 
-  # Democracy and Human rights - V-Dem index
-  data://meadow/democracy/2023-03-02/vdem:
-    - snapshot://democracy/2023-03-02/vdem.csv
-  data://garden/democracy/2023-03-02/vdem:
-    - data://meadow/democracy/2023-03-02/vdem
-  data://grapher/democracy/2023-03-02/vdem:
-    - data://garden/democracy/2023-03-02/vdem
-
   # Microprocessor trend data
   data://meadow/technology/2023-03-08/microprocessor_trend:
     - snapshot://technology/2023-03-08/microprocessor_trend.dat
@@ -719,7 +711,7 @@ steps:
   data://grapher/oecd/2025-02-19/official_development_assistance:
     - data://garden/oecd/2025-02-19/official_development_assistance
 
-# ATUS - American Time Use Survey
+  # ATUS - American Time Use Survey
   data://meadow/atus/2024-12-10/atus_0323:
     - snapshot://atus/2024-12-10/atus_who.zip
     - snapshot://atus/2024-12-10/atus_activities.zip

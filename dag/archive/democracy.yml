@@ -11,3 +11,11 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/democracy/2024-05-22/eiu:
     - data://garden/democracy/2024-03-07/eiu
+
+  # VDEM (2023)
+  data://meadow/democracy/2023-03-02/vdem:
+    - snapshot://democracy/2023-03-02/vdem.csv
+  data://garden/democracy/2023-03-02/vdem:
+    - data://meadow/democracy/2023-03-02/vdem
+  data://grapher/democracy/2023-03-02/vdem:
+    - data://garden/democracy/2023-03-02/vdem
