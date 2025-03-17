@@ -20,7 +20,7 @@ from shared import (
 )
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"
