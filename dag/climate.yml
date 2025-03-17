@@ -37,14 +37,6 @@ steps:
   data://grapher/climate/2025-01-07/total_precipitation_annual:
     - data://garden/climate/2025-01-07/total_precipitation
   #
-  # Climate change impacts data explorer.
-  #
-  export://explorers/climate/latest/climate_change:
-    - data://grapher/climate/2025-01-21/climate_change_impacts_monthly
-    - data://grapher/climate/2025-01-21/climate_change_impacts_annual
-    - data://grapher/met_office_hadley_centre/2025-01-21/near_surface_temperature
-
-  #
   # Global Wildfire Information System - Monthly burned area.
   #
   data://meadow/climate/2024-02-19/monthly_burned_area:
@@ -161,7 +153,6 @@ steps:
   #
   data://garden/climate/2025-01-21/sea_surface_temperature:
     - data://meadow/climate/2025-01-21/sea_surface_temperature
-
   #
   # Various sources - Long-run greenhouse gas concentration.
   #
@@ -362,3 +353,10 @@ steps:
   #
   data://grapher/climate/2025-03-17/climate_change_impacts_annual:
     - data://garden/climate/2025-03-17/climate_change_impacts
+  #
+  # Climate change impacts data explorer.
+  #
+  export://explorers/climate/latest/climate_change:
+    - data://grapher/climate/2025-03-17/climate_change_impacts_monthly
+    - data://grapher/climate/2025-03-17/climate_change_impacts_annual
+    - data://grapher/climate/2025-03-17/near_surface_temperature
