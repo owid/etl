@@ -47,7 +47,9 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/climate/2024-02-19/yearly_burned_area:
     - data://garden/climate/2024-02-19/monthly_burned_area
-
+  #
+  # Global Wildfire Information System - Weekly wildfires.
+  #
   data://meadow/climate/latest/weekly_wildfires:
     - snapshot://climate/2024-02-22/weekly_wildfires_2003_2023.csv
     - snapshot://climate/latest/weekly_wildfires.csv

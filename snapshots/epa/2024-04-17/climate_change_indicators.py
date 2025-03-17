@@ -30,7 +30,7 @@ FILES = [
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     # Create a new snapshot for each of the data files.
     for file_name in FILES:
         snap = Snapshot(f"epa/{SNAPSHOT_VERSION}/{file_name}")
@@ -40,4 +40,4 @@ def main(upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()
