@@ -40,6 +40,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: 9eb6efaceba4d79d0f489ff959d3887c
-    size: 3668
+  - md5: 5ed8a6687a5f87782de24a0bd3b95f1c
+    size: 3669
     path: mumps_deaths.csv

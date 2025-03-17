@@ -1226,3 +1226,25 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-03-14/polio_deaths:
     - data://garden/health/2025-03-14/polio_deaths
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/cdc/2025-03-17/mumps_cases:
+    - snapshot://cdc/2025-03-17/mumps_cases.csv
+  data://garden/cdc/2025-03-17/mumps_cases:
+    - data://meadow/cdc/2025-03-17/mumps_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-17/mumps_cases:
+    - data://garden/cdc/2025-03-17/mumps_cases
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/cdc/2025-03-17/mumps_deaths:
+    - snapshot://cdc/2025-03-17/mumps_deaths.csv
+  data://garden/cdc/2025-03-17/mumps_deaths:
+    - data://meadow/cdc/2025-03-17/mumps_deaths
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-17/mumps_deaths:
+    - data://garden/cdc/2025-03-17/mumps_deaths

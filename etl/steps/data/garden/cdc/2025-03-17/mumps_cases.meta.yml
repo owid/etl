@@ -1,0 +1,27 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  mumps_cases:
+    variables:
+      cases:
+        title: Mumps cases
+        description_short: Reported number of [mumps](#dod:mumps) cases in the United States.
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+      case_rate:
+        title: Mumps case per 100,000 people
+        description_short: Reported number of [mumps](#dod:mumps) deaths in the United States per 100,000 people.
+        unit: cases per 100,000 people
+        display:
+          numDecimalPlaces: 1

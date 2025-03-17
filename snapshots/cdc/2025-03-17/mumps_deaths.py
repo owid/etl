@@ -13,7 +13,7 @@ DATA_CDC = pd.DataFrame(
     {
         "country": ["United States"] * 62,
         "year": list(range(1959, 2021)),
-        "cases": [
+        "deaths": [
             51,
             42,
             53,
