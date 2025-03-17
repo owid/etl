@@ -3,7 +3,7 @@
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -43,17 +43,17 @@ def convert_monthly_to_annual(tb_new: Table) -> Table:
     return tb_new
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load garden dataset on long-run GHG concentrations from EPA, and read its main table.
     ds_old = paths.load_dataset("ghg_concentration", namespace="epa")
-    tb_old = ds_old["ghg_concentration"].reset_index()
+    tb_old = ds_old.read("ghg_concentration")
 
     # Load garden dataset of up-to-date GHG concentrations, and read its main table.
     ds_new = paths.load_dataset("ghg_concentration", namespace="climate")
-    tb_new = ds_new["ghg_concentration"].reset_index()
+    tb_new = ds_new.read("ghg_concentration")
 
     #
     # Process data.
@@ -67,18 +67,15 @@ def run(dest_dir: str) -> None:
     # Combine old and new data, prioritizing the latter.
     tb = combine_two_overlapping_dataframes(df1=tb_new, df2=tb_old, index_columns=["year"])
 
-    # Rename table.
-    tb.metadata.short_name = paths.short_name
-
     # Add location column.
     tb["location"] = "World"
 
-    # Set an appropriate index and sort conveniently.
-    tb = tb.format(["location", "year"])
+    # Improve table format.
+    tb = tb.format(["location", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

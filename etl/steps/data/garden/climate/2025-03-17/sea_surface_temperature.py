@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -17,7 +17,7 @@ COLUMNS = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -84,5 +84,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the combined table.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_annual], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb, tb_annual])
     ds_garden.save()

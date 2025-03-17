@@ -2,7 +2,7 @@
 
 import owid.catalog.processing as pr
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -15,7 +15,7 @@ FILES = [
 ]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -34,16 +34,11 @@ def run(dest_dir: str) -> None:
     tb = pr.concat(tables)
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.format(["location", "year", "month"], sort_columns=True)
-
-    # Rename table.
-    tb.metadata.short_name = paths.short_name
+    tb = tb.format(["location", "year", "month"], sort_columns=True, short_name=paths.short_name)
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
-
-    # Save changes in the new meadow dataset.
+    # Create a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=[tb])
     ds_meadow.save()

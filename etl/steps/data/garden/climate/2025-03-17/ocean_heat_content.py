@@ -12,8 +12,8 @@ def run() -> None:
     #
     # Load meadow dataset and read its tables.
     ds_meadow = paths.load_dataset("ocean_heat_content")
-    tb_monthly = ds_meadow["ocean_heat_content_monthly"].reset_index()
-    tb_annual = ds_meadow["ocean_heat_content_annual"].reset_index()
+    tb_monthly = ds_meadow.read("ocean_heat_content_monthly")
+    tb_annual = ds_meadow.read("ocean_heat_content_annual")
 
     #
     # Process data.

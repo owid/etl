@@ -3,7 +3,7 @@
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -61,7 +61,7 @@ def prepare_ocean_heat_content(tb_ocean_heat_annual: Table, tb_ocean_heat_annual
     return tb_ocean_heat_annual
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -182,6 +182,6 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create explorer dataset with combined table in csv format.
-    ds_explorer = create_dataset(dest_dir, tables=[tb_annual, tb_monthly])
+    # Create garden dataset.
+    ds_explorer = paths.create_dataset(tables=[tb_annual, tb_monthly])
     ds_explorer.save()

@@ -1,19 +1,19 @@
 """Load a garden dataset and create a grapher dataset."""
 
 from etl.grapher.helpers import adapt_table_with_dates_to_grapher
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load garden dataset and read its monthly table.
     ds_garden = paths.load_dataset("climate_change_impacts")
-    tb = ds_garden["climate_change_impacts_monthly"].reset_index()
+    tb = ds_garden.read("climate_change_impacts_monthly")
 
     #
     # Process data.
@@ -31,5 +31,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_grapher = paths.create_dataset(tables=[tb])
     ds_grapher.save()

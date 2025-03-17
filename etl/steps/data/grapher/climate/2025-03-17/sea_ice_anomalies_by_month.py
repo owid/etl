@@ -2,7 +2,7 @@
 
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -103,7 +103,7 @@ def sanity_check_inputs(tb: Table) -> None:
     ).all(), error
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -166,5 +166,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_grapher = paths.create_dataset(tables=[tb])
     ds_grapher.save()

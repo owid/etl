@@ -3,7 +3,7 @@
 import pandas as pd
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -45,13 +45,13 @@ def add_rolling_average(tb: Table) -> Table:
     return tb_with_average
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its tables.
     ds_meadow = paths.load_dataset("hawaii_ocean_time_series")
-    tb_meadow = ds_meadow["hawaii_ocean_time_series"].reset_index()
+    tb_meadow = ds_meadow.read("hawaii_ocean_time_series")
 
     #
     # Process data.
@@ -69,14 +69,11 @@ def run(dest_dir: str) -> None:
     tb = add_rolling_average(tb=tb)
 
     # Set an appropriate index to each table and sort conveniently.
-    tb = tb.format(["location", "date"])
-
-    # Rename table.
-    tb.metadata.short_name = paths.short_name
+    tb = tb.format(["location", "date"], short_name=paths.short_name)
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

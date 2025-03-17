@@ -5,7 +5,7 @@ from typing import List
 import pandas as pd
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -63,7 +63,7 @@ def add_rolling_average(tb: Table, original_column_names: List[str]) -> Table:
     for original_column_name in original_column_names:
         # Check that the values of the original column have not been altered.
         error = f"The values of the original {original_column_name} column have been altered."
-        assert tb_with_average[original_column_name].astype(float).equals(tb[original_column_name].astype(float)), error
+        assert (tb_with_average[original_column_name] - tb[original_column_name]).abs().max() < 1e-5, error
 
     return tb_with_average
 
@@ -105,15 +105,15 @@ def prepare_gas_data(tb: Table) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("ghg_concentration")
-    tb_co2 = ds_meadow["co2_concentration_monthly"].reset_index()
-    tb_ch4 = ds_meadow["ch4_concentration_monthly"].reset_index()
-    tb_n2o = ds_meadow["n2o_concentration_monthly"].reset_index()
+    tb_co2 = ds_meadow.read("co2_concentration_monthly")
+    tb_ch4 = ds_meadow.read("ch4_concentration_monthly")
+    tb_n2o = ds_meadow.read("n2o_concentration_monthly")
 
     #
     # Process data.
@@ -135,5 +135,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()
