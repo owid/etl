@@ -3,7 +3,6 @@
 from itertools import chain
 from typing import Dict, Optional, Tuple, cast
 
-import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.tables import concat

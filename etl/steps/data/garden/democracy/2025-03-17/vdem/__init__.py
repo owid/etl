@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import cast
-
 import vdem_aggregate as aggregate  # VDEM's aggregating library
 import vdem_clean as clean  # VDEM's cleaning library
 import vdem_impute as impute  # VDEM's imputing library
