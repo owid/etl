@@ -321,8 +321,6 @@ steps:
     - snapshot://faostat/2025-03-10/faostat_rl.zip
   data://meadow/faostat/2025-03-10/faostat_rp:
     - snapshot://faostat/2025-03-10/faostat_rp.zip
-  data://meadow/faostat/2025-03-10/faostat_scl:
-    - snapshot://faostat/2025-03-10/faostat_scl.zip
   data://meadow/faostat/2025-03-10/faostat_sdgb:
     - snapshot://faostat/2025-03-10/faostat_sdgb.zip
   #
@@ -371,7 +369,6 @@ steps:
     - data://meadow/faostat/2024-03-14/faostat_ti
     - data://meadow/faostat/2025-03-10/faostat_sdgb
     - data://meadow/faostat/2025-03-10/faostat_qv
-    - data://meadow/faostat/2025-03-10/faostat_scl
     - data://meadow/faostat/2025-03-10/faostat_ic
     - data://meadow/faostat/2024-03-14/faostat_rfb
     - data://meadow/faostat/2024-03-14/faostat_esb
@@ -416,12 +413,6 @@ steps:
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-10/faostat_metadata
-  data://garden/faostat/2025-03-10/faostat_scl:
-    - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2024-07-29/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/faostat/2025-03-10/faostat_metadata
-    - data://meadow/faostat/2025-03-10/faostat_scl
   data://garden/faostat/2025-03-10/faostat_sdgb:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-10/faostat_sdgb
@@ -449,7 +440,5 @@ steps:
     - data://garden/faostat/2025-03-10/faostat_rl
   data://grapher/faostat/2025-03-10/faostat_rp:
     - data://garden/faostat/2025-03-10/faostat_rp
-  data://grapher/faostat/2025-03-10/faostat_scl:
-    - data://garden/faostat/2025-03-10/faostat_scl
   data://grapher/faostat/2025-03-10/faostat_sdgb:
     - data://garden/faostat/2025-03-10/faostat_sdgb

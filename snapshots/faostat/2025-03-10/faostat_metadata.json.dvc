@@ -7,11 +7,11 @@ meta:
     attribution_short: FAOSTAT
     url_main: http://www.fao.org/faostat/en/#data
     date_accessed: '2025-03-10'
-    date_published: '2025-03-10'
+    date_published: '2025-03-17'
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
 outs:
-  - md5: 54af38394926c4f4cbe3e9d91b79d0cd
-    size: 6641342
+  - md5: 77d9647afe86acb01a6f5ba96b8aa305
+    size: 5193305
     path: faostat_metadata.json
