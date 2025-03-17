@@ -41,9 +41,7 @@ config:
   hideAlertBanner: "true"
   yAxisMin: "0"
   hasMapTab: "true"
-  pickerColumnSlugs:
-    - location total_confirmed_by_confirmation total_confirmed_by_confirmation_per_million
-  downloadDataLink: https://catalog.ourworldindata.org/explorers/who/latest/monkeypox/monkeypox.csv
+  downloadDataLink: https://catalog.ourworldindata.org/garden/who/latest/monkeypox/monkeypox.csv
 
 dimensions:
   - slug: metric
