@@ -21,7 +21,7 @@ from shared import (
     prepare_wide_table,
 )
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Item and item code for 'Meat, poultry'.
 ITEM_POULTRY = "Meat, poultry"
@@ -559,8 +559,7 @@ def run(dest_dir: str) -> None:
     tb_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
     # Initialise new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_long, tb_wide],
         default_metadata=ds_meadow.metadata,
         check_variables_metadata=False,

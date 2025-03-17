@@ -548,9 +548,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Initialise new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir, tables=[tb], default_metadata=ds_fbsc.metadata, check_variables_metadata=True
-    )
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_fbsc.metadata)
 
     # Update dataset metadata and combine sources from qcl and fbsc datasets.
     ds_garden.metadata.title = DATASET_TITLE
