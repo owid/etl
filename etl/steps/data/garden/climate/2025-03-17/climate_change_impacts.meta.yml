@@ -96,6 +96,24 @@ tables:
           name: Annual average
         presentation:
           title_public: Annual concentration of atmospheric nitrous oxide
+      near_surface_temperature_anomaly:
+        title: Global average temperature anomaly relative to 1861-1890
+        display:
+          name: Global temperature anomaly
+        presentation:
+          title_public: Global average temperature anomaly relative to 1861-1890
+      near_surface_temperature_anomaly_upper:
+        title: Upper bound of the annual temperature anomaly (95% confidence interval)
+        display:
+          name: Upper bound
+        presentation:
+          title_public: Upper bound of the annual temperature anomaly (95% confidence interval)
+      near_surface_temperature_anomaly_lower:
+        title: Lower bound of the annual temperature anomaly (95% confidence interval)
+        display:
+          name: Lower bound
+        presentation:
+          title_public: Lower bound of the annual temperature anomaly (95% confidence interval)
   climate_change_impacts_monthly:
     title: Climate Change Impacts - Monthly
     variables:

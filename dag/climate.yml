@@ -343,6 +343,7 @@ steps:
     - data://garden/climate/2025-03-17/sea_surface_temperature
     - data://garden/epa/2024-04-17/ocean_heat_content
     - data://garden/epa/2024-04-17/mass_balance_us_glaciers
+    - data://garden/climate/2025-03-17/near_surface_temperature
   #
   # Various sources - Climate change impacts (monthly).
   #

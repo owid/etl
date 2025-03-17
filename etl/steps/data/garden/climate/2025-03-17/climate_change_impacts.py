@@ -111,6 +111,10 @@ def run(dest_dir: str) -> None:
     ds_sea_level = paths.load_dataset("global_sea_level")
     tb_sea_level = ds_sea_level.read("global_sea_level")
 
+    # Load near surface temperature.
+    ds_near_surface_temperature = paths.load_dataset("near_surface_temperature")
+    tb_near_surface_temperature = ds_near_surface_temperature.read("near_surface_temperature")
+
     #
     # Process data.
     #
@@ -152,6 +156,15 @@ def run(dest_dir: str) -> None:
         antarctic_sea_ice_extent,
         tb_ghg,
         tb_us_glaciers.astype({"year": int}),
+        tb_near_surface_temperature.rename(
+            columns={
+                "region": "location",
+                "temperature_anomaly": "near_surface_temperature_anomaly",
+                "lower_limit": "near_surface_temperature_anomaly_lower",
+                "upper_limit": "near_surface_temperature_anomaly_upper",
+            },
+            errors="raise",
+        ),
     ]:
         tb_annual = tb_annual.merge(
             table,
