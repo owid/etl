@@ -8,7 +8,7 @@ meta:
     attribution_short: FAOSTAT
     url_main: http://www.fao.org/faostat/en/#data/LC
     url_download: https://bulks-faostat.fao.org/production/Environment_LandCover_E_All_Data_(Normalized).zip
-    date_accessed: '2025-03-10'
+    date_accessed: '2025-03-17'
     date_published: '2024-07-04'
     license:
       name: CC BY-NC-SA 3.0 IGO

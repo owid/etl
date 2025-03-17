@@ -138,8 +138,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("additional_variables")
 
     # Read tables from garden dataset.
-    # TODO: Add qi back to the data and uncomment.
-    # tb_arable_land_per_crop_output = ds_garden.read("arable_land_per_crop_output", reset_index=False)
+    tb_arable_land_per_crop_output = ds_garden.read("arable_land_per_crop_output", reset_index=False)
     tb_area_used_per_crop_type = ds_garden.read("area_used_per_crop_type")
     tb_sustainable_and_overexploited_fish = ds_garden.read(
         "share_of_sustainable_and_overexploited_fish", reset_index=False
@@ -190,8 +189,7 @@ def run() -> None:
     # Create a new grapher dataset.
     ds_grapher = paths.create_dataset(
         tables=[
-            # TODO: Add qi back to the data and uncomment.
-            # tb_arable_land_per_crop_output,
+            tb_arable_land_per_crop_output,
             tb_area_used_per_crop_type,
             tb_sustainable_and_overexploited_fish,
             tb_land_spared_by_increased_crop_yields,

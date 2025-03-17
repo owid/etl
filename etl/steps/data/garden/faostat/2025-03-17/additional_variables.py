@@ -1227,10 +1227,9 @@ def run() -> None:
     ds_rl = paths.load_dataset("faostat_rl")
     tb_rl = ds_rl.read("faostat_rl")
 
-    # TODO: Add qi back to the data and uncomment.
-    # # Load dataset about production indices and load its main (long-format) table.
-    # ds_qi = paths.load_dataset("faostat_qi")
-    # tb_qi = ds_qi.read("faostat_qi")
+    # Load dataset about production indices and load its main (long-format) table.
+    ds_qi = paths.load_dataset("faostat_qi")
+    tb_qi = ds_qi.read("faostat_qi")
 
     # Load dataset about crops and livestock and load its main (long-format) table.
     ds_qcl = paths.load_dataset("faostat_qcl")
@@ -1251,9 +1250,8 @@ def run() -> None:
     #
     # Process data.
     #
-    # TODO: Add qi back to the data and uncomment.
-    # # Create table for arable land per crop output.
-    # tb_arable_land_per_crop_output = generate_arable_land_per_crop_output(tb_rl=tb_rl, tb_qi=tb_qi)
+    # Create table for arable land per crop output.
+    tb_arable_land_per_crop_output = generate_arable_land_per_crop_output(tb_rl=tb_rl, tb_qi=tb_qi)
 
     # Create table for area used for production per crop type.
     tb_area_by_crop_type = generate_area_used_for_production_per_crop_type(tb_qcl=tb_qcl)
@@ -1300,8 +1298,7 @@ def run() -> None:
     # Create a new garden dataset.
     ds_garden = paths.create_dataset(
         tables=[
-            # TODO: Add qi back to the data and uncomment.
-            # tb_arable_land_per_crop_output,
+            tb_arable_land_per_crop_output,
             tb_area_by_crop_type,
             tb_sustainable_and_overexploited_fish,
             tb_spared_land_from_increased_yields,

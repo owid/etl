@@ -49,6 +49,9 @@ INCLUDED_DATASETS_CODES = [
     "lc",
     # Production: Crops and livestock products.
     "qcl",
+    # Production: Production Indices.
+    # NOTE: This dataset is not used in grapher charts directly or in explorers, but it's used by the additional_variables dataset (and used in a chart).
+    "qi",
     # Production: Value of Agricultural Production.
     "qv",
     # Land, Inputs and Sustainability: Fertilizers by Nutrient.
@@ -76,8 +79,6 @@ INCLUDED_DATASETS_CODES = [
     # "fo",
     # Energy use.
     # "gn",
-    # Production: Production Indices.
-    # "qi",
     # Land, Inputs and Sustainability: Fertilizers by Product.
     # "rfb",
     # Land, Inputs and Sustainability: Pesticides Trade.

@@ -6,12 +6,12 @@ meta:
     citation_full: Food and Agriculture Organization of the United Nations (2025).
     attribution_short: FAOSTAT
     url_main: http://www.fao.org/faostat/en/#data
-    date_accessed: '2025-03-10'
+    date_accessed: '2025-03-17'
     date_published: '2025-03-17'
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
 outs:
-  - md5: 77d9647afe86acb01a6f5ba96b8aa305
-    size: 5193305
+  - md5: ef8297a11fe992efdab12810fa7ef0e2
+    size: 5847375
     path: faostat_metadata.json

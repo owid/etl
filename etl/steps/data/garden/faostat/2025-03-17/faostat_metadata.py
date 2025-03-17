@@ -54,7 +54,6 @@ from shared import (
     N_CHARACTERS_ELEMENT_CODE,
     N_CHARACTERS_ITEM_CODE,
     N_CHARACTERS_ITEM_CODE_EXTENDED,
-    NAMESPACE,
     harmonize_elements,
     harmonize_items,
     log,
@@ -193,7 +192,7 @@ def check_that_item_and_element_harmonization_does_not_trim_codes(
     # respectively.
 
     # Set the maximum number of characters for item_code.
-    if dataset_short_name in [f"{NAMESPACE}_sdgb", f"{NAMESPACE}_fs"]:
+    if dataset_short_name in ["faostat_sdgb", "faostat_fs"]:
         n_characters_item_code = N_CHARACTERS_ITEM_CODE_EXTENDED
     else:
         n_characters_item_code = N_CHARACTERS_ITEM_CODE
@@ -896,9 +895,7 @@ def process_metadata(
     check_that_flag_definitions_in_dataset_agree_with_those_in_flags_ranking(metadata)
 
     # List all FAOSTAT dataset short names.
-    dataset_short_names = sorted(
-        set([NAMESPACE + "_" + table_name.split("_")[1] for table_name in metadata.table_names])
-    )
+    dataset_short_names = sorted(set(["faostat_" + table_name.split("_")[1] for table_name in metadata.table_names]))
 
     # Initialise table of dataset descriptions, items, and element-units.
     # We cannot remove "dataset" from the items and elements tables, because it can happen that, for a given
@@ -1008,7 +1005,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Fetch the dataset short name from dest_dir.
-    dataset_short_name = f"{NAMESPACE}_metadata"
+    dataset_short_name = "faostat_metadata"
 
     # Define path to current step file.
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
@@ -1023,9 +1020,9 @@ def run(dest_dir: str) -> None:
     # Path to file with custom element and unit names and descriptions.
     custom_elements_and_units_file = paths.directory / "custom_elements_and_units.csv"
     # Path to file with mapping from FAO names to OWID harmonized country names.
-    countries_file = paths.directory / f"{NAMESPACE}.countries.json"
+    countries_file = paths.directory / "faostat.countries.json"
     # Path to file with list of excluded countries and regions.
-    excluded_countries_file = paths.directory / f"{NAMESPACE}.excluded_countries.json"
+    excluded_countries_file = paths.directory / "faostat.excluded_countries.json"
     # Path to file with spurious values and amendments.
     value_amendments_file = paths.directory / "value_amendments.csv"
 

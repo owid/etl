@@ -12,31 +12,30 @@ definitions:
       attribution_short: FAO
 
 tables:
-  # TODO: Add qi back to the data and uncomment.
-  # arable_land_per_crop_output:
-  #   variables:
-  #     area:
-  #       title: 'Arable land'
-  #       unit: 'hectares'
-  #       short_unit: 'ha'
-  #       description_short: |
-  #         Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
-  #     index:
-  #       title: 'Gross Production Index Number'
-  #       unit: ''
-  #       short_unit: ''
-  #       description_short: |
-  #         Gross Production Index Number (2014-2016 = 100).
-  #     arable_land_per_crop_output:
-  #       title: Arable land needed to produce a fixed quantity of crops
-  #       unit: ''
-  #       short_unit: ''
-  #       description_short: |
-  #         Index of arable land needed to produce a fixed quantity of crops (where values in 1961 are equal to 1.0).
-  #       description_key:
-  #         - Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
-  #         - This is calculated as arable land divided by the crop production index (PIN). The crop production index is the sum of crop commodities produced after deductions of quantities used as seed and feed.
-  #         - It is weighted by the commodity prices.
+  arable_land_per_crop_output:
+    variables:
+      area:
+        title: 'Arable land'
+        unit: 'hectares'
+        short_unit: 'ha'
+        description_short: |
+          Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
+      index:
+        title: 'Gross Production Index Number'
+        unit: ''
+        short_unit: ''
+        description_short: |
+          Gross Production Index Number (2014-2016 = 100).
+      arable_land_per_crop_output:
+        title: Arable land needed to produce a fixed quantity of crops
+        unit: ''
+        short_unit: ''
+        description_short: |
+          Index of arable land needed to produce a fixed quantity of crops (where values in 1961 are equal to 1.0).
+        description_key:
+          - Arable land is the total of areas (extent of surface of land or water) under temporary crops, temporary meadows and pastures, and land with temporary fallow.  Arable land does not include land that is potentially cultivable but is not normally cultivated.
+          - This is calculated as arable land divided by the crop production index (PIN). The crop production index is the sum of crop commodities produced after deductions of quantities used as seed and feed.
+          - It is weighted by the commodity prices.
   area_used_per_crop_type:
     variables:
       area_used_for_production:
