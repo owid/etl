@@ -1,49 +1,49 @@
 steps:
 ###########  UPDATED MONTHLY #############################################################################
   # Main EPOCH dataset
-  data://meadow/artificial_intelligence/2025-02-04/epoch:
-    - snapshot://artificial_intelligence/2025-02-04/epoch.csv
-  data://garden/artificial_intelligence/2025-02-04/epoch:
-    - data://meadow/artificial_intelligence/2025-02-04/epoch
-  data://grapher/artificial_intelligence/2025-02-04/epoch:
-    - data://garden/artificial_intelligence/2025-02-04/epoch
+  data://meadow/artificial_intelligence/2025-03-12/epoch:
+    - snapshot://artificial_intelligence/2025-03-12/epoch.csv
+  data://garden/artificial_intelligence/2025-03-12/epoch:
+    - data://meadow/artificial_intelligence/2025-03-12/epoch
+  data://grapher/artificial_intelligence/2025-03-12/epoch:
+    - data://garden/artificial_intelligence/2025-03-12/epoch
 
   # Main EPOCH dataset regression lines
-  data://garden/artificial_intelligence/2025-02-04/epoch_regressions:
-     - data://garden/artificial_intelligence/2025-02-04/epoch
-  data://grapher/artificial_intelligence/2025-02-04/epoch_regressions:
-    - data://garden/artificial_intelligence/2025-02-04/epoch_regressions
+  data://garden/artificial_intelligence/2025-03-12/epoch_regressions:
+     - data://garden/artificial_intelligence/2025-03-12/epoch
+  data://grapher/artificial_intelligence/2025-03-12/epoch_regressions:
+    - data://garden/artificial_intelligence/2025-03-12/epoch_regressions
 
   # EPOCH aggregates by domain
-  data://garden/artificial_intelligence/2025-02-04/epoch_aggregates_domain:
-    - data://meadow/artificial_intelligence/2025-02-04/epoch
-  data://grapher/artificial_intelligence/2025-02-04/epoch_aggregates_domain:
-    - data://garden/artificial_intelligence/2025-02-04/epoch_aggregates_domain
+  data://garden/artificial_intelligence/2025-03-12/epoch_aggregates_domain:
+    - data://meadow/artificial_intelligence/2025-03-12/epoch
+  data://grapher/artificial_intelligence/2025-03-12/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/2025-03-12/epoch_aggregates_domain
 
   # EPOCH aggregates by researcher affiliaiton
-  data://garden/artificial_intelligence/2025-02-04/epoch_aggregates_affiliation:
-    - data://garden/artificial_intelligence/2025-02-04/epoch
-  data://grapher/artificial_intelligence/2025-02-04/epoch_aggregates_affiliation:
-    - data://garden/artificial_intelligence/2025-02-04/epoch_aggregates_affiliation
+  data://garden/artificial_intelligence/2025-03-12/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2025-03-12/epoch
+  data://grapher/artificial_intelligence/2025-03-12/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2025-03-12/epoch_aggregates_affiliation
 
  # EPOCH dataset on Compute Intensive AI
-  data://meadow/artificial_intelligence/2025-02-04/epoch_compute_intensive:
-    - snapshot://artificial_intelligence/2025-02-04/epoch_compute_intensive.csv
-  data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive:
-    - data://meadow/artificial_intelligence/2025-02-04/epoch_compute_intensive
+  data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive:
+    - snapshot://artificial_intelligence/2025-03-12/epoch_compute_intensive.csv
+  data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive:
+    - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
 
 
   # EPOCH dataset on Compute Intensive AI, aggregates by country
-  data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_countries:
-    - data://meadow/artificial_intelligence/2025-02-04/epoch_compute_intensive
-  data://grapher/artificial_intelligence/2025-02-04/epoch_compute_intensive_countries:
-    - data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_countries
+  data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_countries:
+    - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2025-03-12/epoch_compute_intensive_countries:
+    - data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_countries
 
   # EPOCH dataset on Compute Intensive AI, aggregates by domain
-  data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_domain:
-    - data://meadow/artificial_intelligence/2025-02-04/epoch_compute_intensive
-  data://grapher/artificial_intelligence/2025-02-04/epoch_compute_intensive_domain:
-    - data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_domain
+  data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_domain:
+    - data://meadow/artificial_intelligence/2025-03-12/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2025-03-12/epoch_compute_intensive_domain:
+    - data://garden/artificial_intelligence/2025-03-12/epoch_compute_intensive_domain
 
  ############### OTHERS #####################################################################################
 
