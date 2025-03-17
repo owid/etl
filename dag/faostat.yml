@@ -277,11 +277,6 @@ steps:
   data://grapher/faostat/2024-03-14/faostat_ti:
     - data://garden/faostat/2024-03-14/faostat_ti
   #
-  # FAOSTAT food explorer step.
-  #
-  data://explorers/faostat/latest/food_explorer:
-    - data://garden/faostat/2024-03-14/faostat_food_explorer
-  #
   # FAOSTAT garden step for additional variables (2024-03-14).
   #
   data://garden/faostat/2024-03-14/additional_variables:
@@ -442,3 +437,25 @@ steps:
     - data://garden/faostat/2025-03-10/faostat_rp
   data://grapher/faostat/2025-03-10/faostat_sdgb:
     - data://garden/faostat/2025-03-10/faostat_sdgb
+  #
+  # FAOSTAT food explorer step.
+  #
+  # TODO: Adapt explorer step (indicators have changed).
+  # data://explorers/faostat/latest/food_explorer:
+  #   - data://garden/faostat/2025-03-10/faostat_food_explorer
+  #
+  # FAOSTAT garden step for additional variables for version 2025-03-10
+  #
+  data://garden/faostat/2025-03-10/additional_variables:
+    - data://garden/faostat/2025-03-10/faostat_rl
+    # TODO: Add qi back to the data and uncomment.
+    # - data://garden/faostat/2025-03-10/faostat_qi
+    - data://garden/faostat/2025-03-10/faostat_qcl
+    - data://garden/faostat/2025-03-10/faostat_sdgb
+    - data://garden/faostat/2025-03-10/faostat_fbsc
+    - data://garden/faostat/2025-03-10/faostat_rfn
+  #
+  # FAOSTAT grapher step for additional variables for version 2025-03-10
+  #
+  data://grapher/faostat/2025-03-10/additional_variables:
+    - data://garden/faostat/2025-03-10/additional_variables
