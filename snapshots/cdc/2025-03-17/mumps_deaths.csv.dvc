@@ -9,31 +9,13 @@ meta:
 
       Sources for each year are as follows:
 
-      * 1968-1993: [Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
+      * 1959-1967: [Reported Incidence of Notifiable Diseases in the United States, 1970. Morbidity and Mortality Vol. 19, No. 53 (1971)](https://www.jstor.org/stable/44323897?read-now=1&seq=5#page_scan_tab_contents)
 
-      * 1994-2000: [PART 3: Historical Summaries of Notifiable Diseases in the United States, 1969–2000; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2000](https://www.jstor.org/stable/23310295?seq=2)
+      * 1968-1978: [Compressed Mortality, 1968-1978 - CDC Wonder (ICD-8)](https://wonder.cdc.gov/cmf-icd8.html)
 
-      * 2001-2006: * 1994-2000: [PART 3: Historical Summaries of Notifiable Diseases in the United States, 1975–2006; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2006](https://www.jstor.org/stable/23317332)
+      * 1979-1998: [Compressed Mortality, 1979-1998 - CDC Wonder (ICD-9)](https://wonder.cdc.gov/cmf-icd9.html)
 
-      * 2007: [Summary of Notifiable Diseases --- United States, 2007](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5653a1.htm)
-
-      * 2008: [Summary of Notifiable Diseases --- United States, 2008](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5754a1.htm)
-
-      * 2009: [Summary of Notifiable Diseases --- United States, 2009](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm)
-
-      * 2010: [Summary of Notifiable Diseases --- United States, 2010](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5953a1.htm)
-
-      * 2011: [Summary of Notifiable Diseases --- United States, 2011](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6053a1.htm)
-
-      * 2012: [Summary of Notifiable Diseases --- United States, 2012](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6153a1.htm)
-
-      * 2013: [Summary of Notifiable Diseases --- United States, 2013](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6253a1.htm)
-
-      * 2014: [Summary of Notifiable Diseases --- United States, 2014](https://www.cdc.gov/mmwr/volumes/63/wr/mm6354a1.htm)
-
-      * 2015: [Summary of Notifiable Diseases --- United States, 2015](https://www.cdc.gov/mmwr/volumes/64/wr/mm6453a1.htm)
-
-      * 2016-2022: [National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC)](https://wonder.cdc.gov/nndss-annual-summary.html)
+      * 1999-2020: [Compressed Mortality, 1999-2020 - CDC Wonder (ICD-10)](https://wonder.cdc.gov/cmf-icd10.html)
 
     date_published: "2023"
 
@@ -42,13 +24,14 @@ meta:
     citation_full: |-
       Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.
 
-      Historical Summaries of Notifiable Diseases in the United States, 1969–2000; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2000
+      Reported Incidence of Notifiable Diseases in the United States, 1970. Morbidity and Mortality Vol. 19, No. 53 (1971)
 
-      PART 3: Historical Summaries of Notifiable Diseases in the United States, 1975–2006; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2006
+      Compressed Mortality, 1968-1978 - CDC Wonder (ICD-8)
 
-      Summary of Notifiable Diseases --- United States, 2007-2015
+      Compressed Mortality, 1979-1998 - CDC Wonder (ICD-9)
 
-      National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC)
+      Compressed Mortality, 1999-2020 - CDC Wonder (ICD-10)
+
     # Files
     url_main: https://wonder.cdc.gov/ucd-icd10.html
     date_accessed: 2025-03-14
@@ -57,6 +40,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: cb282d946f3a090458485176636b06da
-    size: 3984
-    path: mumps_cases.csv
+  - md5: 9eb6efaceba4d79d0f489ff959d3887c
+    size: 3668
+    path: mumps_deaths.csv

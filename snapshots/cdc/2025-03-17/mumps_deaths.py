@@ -12,7 +12,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 DATA_CDC = pd.DataFrame(
     {
         "country": ["United States"] * 62,
-        "year": list(range(1958, 2020)),
+        "year": list(range(1959, 2021)),
         "cases": [
             51,
             42,
@@ -79,18 +79,9 @@ DATA_CDC = pd.DataFrame(
         ],
         "source": [
             *["https://www.jstor.org/stable/44323897"] * 9,
-            *["https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm"] * 7,
-            *["https://www.jstor.org/stable/23317332"] * 6,
-            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5653a1.htm",
-            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5754a1.htm",
-            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm",
-            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5953a1.htm",
-            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6053a1.htm",
-            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6153a1.htm",
-            "https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6253a1.htm",
-            "https://www.cdc.gov/mmwr/volumes/63/wr/mm6354a1.htm",
-            "https://www.cdc.gov/mmwr/volumes/64/wr/mm6453a1.htm",
-            *["https://wonder.cdc.gov/nndss-annual-summary.html"] * 7,
+            *["https://wonder.cdc.gov/cmf-icd8.html"] * 11,
+            *["https://wonder.cdc.gov/cmf-icd9.html"] * 20,
+            *["https://wonder.cdc.gov/cmf-icd10.html"] * 22,
         ],
     }
 )
