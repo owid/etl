@@ -27,18 +27,17 @@ from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialise log.
 log = structlog.get_logger()
 
-# Define path to current folder, namespace and version of all datasets in this folder.
+# Define path to current folder and version of all datasets in this folder.
 CURRENT_DIR = Path(__file__).parent
-NAMESPACE = CURRENT_DIR.parent.name
 VERSION = CURRENT_DIR.name
 
 # Name of FAOSTAT metadata dataset.
-FAOSTAT_METADATA_SHORT_NAME = f"{NAMESPACE}_metadata"
+FAOSTAT_METADATA_SHORT_NAME = "faostat_metadata"
 
 # Elements and items.
 
@@ -448,7 +447,7 @@ def harmonize_items(tb: Table, dataset_short_name: str, item_col: str = "item") 
     tb = tb.copy()
 
     # Set the maximum number of characters for item_code.
-    if dataset_short_name == f"{NAMESPACE}_sdgb":
+    if dataset_short_name == "faostat_sdgb":
         n_characters_item_code = N_CHARACTERS_ITEM_CODE_EXTENDED
     else:
         n_characters_item_code = N_CHARACTERS_ITEM_CODE
@@ -1845,7 +1844,7 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow[dataset_short_name].reset_index()
 
     # Load dataset of FAOSTAT metadata.
-    metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
+    metadata = paths.load_dataset("faostat_metadata")
 
     # Load dataset, items, element-units, countries metadata, and value amendments.
     dataset_metadata = metadata["datasets"].loc[dataset_short_name].to_dict()
@@ -1921,8 +1920,7 @@ def run(dest_dir: str) -> None:
     tb_wide.metadata.title = dataset_metadata["owid_dataset_title"] + ADDED_TITLE_TO_WIDE_TABLE
 
     # Initialise new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir=dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_long, tb_wide],
         default_metadata=ds_meadow.metadata,
         check_variables_metadata=False,

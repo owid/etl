@@ -8,7 +8,6 @@ from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     CURRENT_DIR,
     FLAG_MULTIPLE_FLAGS,
-    NAMESPACE,
     REGIONS_TO_ADD,
     add_per_capita_variables,
     add_regions,
@@ -462,7 +461,7 @@ def run(dest_dir: str) -> None:
     # Load data.
     #
     # Define the dataset short name.
-    dataset_short_name = f"{NAMESPACE}_qcl"
+    dataset_short_name = "faostat_qcl"
 
     # Define path to current step file.
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
@@ -475,7 +474,7 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow[dataset_short_name].reset_index()
 
     # Load dataset of FAOSTAT metadata.
-    metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
+    metadata = paths.load_dataset("faostat_metadata")
 
     # Load dataset, items, element-units, and countries metadata.
     dataset_metadata = metadata["datasets"].loc[dataset_short_name].to_dict()

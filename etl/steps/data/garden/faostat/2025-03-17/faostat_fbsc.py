@@ -21,7 +21,6 @@ from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     CURRENT_DIR,
     ELEMENTS_IN_FBSH_MISSING_IN_FBS,
-    NAMESPACE,
     add_per_capita_variables,
     add_regions,
     clean_data,
@@ -125,7 +124,7 @@ def run() -> None:
     # Load data.
     #
     # Define the dataset short name.
-    dataset_short_name = f"{NAMESPACE}_fbsc"
+    dataset_short_name = "faostat_fbsc"
 
     # Define path to current step file.
     current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
@@ -135,11 +134,11 @@ def run() -> None:
 
     # Load fbsh and fbs.
     log.info("faostat_fbsc.loading_datasets")
-    ds_fbsh = paths.load_dataset(f"{NAMESPACE}_fbsh")
-    ds_fbs = paths.load_dataset(f"{NAMESPACE}_fbs")
+    ds_fbsh = paths.load_dataset("faostat_fbsh")
+    ds_fbs = paths.load_dataset("faostat_fbs")
 
     # Load dataset of FAOSTAT metadata.
-    metadata = paths.load_dataset(f"{NAMESPACE}_metadata")
+    metadata = paths.load_dataset("faostat_metadata")
 
     # Load dataset, items, element-units, and countries metadata.
     dataset_metadata = metadata["datasets"].loc[dataset_short_name].to_dict()

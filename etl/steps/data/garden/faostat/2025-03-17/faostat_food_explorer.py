@@ -17,7 +17,6 @@ from shared import (
     FAO_POPULATION_ELEMENT_NAME,
     FAO_POPULATION_ITEM_NAME,
     FAO_POPULATION_UNIT_NAME,
-    NAMESPACE,
 )
 
 from etl.data_helpers import geo
@@ -523,12 +522,12 @@ def run(dest_dir: str) -> None:
     paths = PathFinder(current_step_file.as_posix())
 
     # Load latest qcl and fbsc datasets from garden.
-    ds_qcl = paths.load_dataset(f"{NAMESPACE}_qcl")
-    ds_fbsc = paths.load_dataset(f"{NAMESPACE}_fbsc")
+    ds_qcl = paths.load_dataset("faostat_qcl")
+    ds_fbsc = paths.load_dataset("faostat_fbsc")
 
     # Get main long tables from qcl and fbsc datasets.
-    tb_qcl = ds_qcl[f"{NAMESPACE}_qcl"]
-    tb_fbsc = ds_fbsc[f"{NAMESPACE}_fbsc"]
+    tb_qcl = ds_qcl["faostat_qcl"]
+    tb_fbsc = ds_fbsc["faostat_fbsc"]
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
