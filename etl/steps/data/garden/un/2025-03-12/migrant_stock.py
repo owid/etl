@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
@@ -139,9 +138,6 @@ def run() -> None:
     tb[im_s_male] = tb[im_s_male].copy_metadata(tb["immigrants_all"])
     tb[em_s_all] = tb["emigrants_all"] / (tb["total_population"]) * 100
 
-    # statistics on change in migrants over 5 years
-    tb = calculate_change_over_5_years(tb)
-
     # drop total population columns
     tb = tb.drop(columns=["total_population", "male_population", "female_population"])
 
@@ -198,55 +194,6 @@ def combine_all_tables(tb_d_total, tb_d_share, tb_o, tb_d_pop):
     tb = pr.multi_merge([tb_d_total, tb_d_share, tb_o, tb_d_pop], on=["country", "year"], how="outer")
 
     return tb
-
-
-def calculate_change_over_5_years(tb):
-    """Calculate change in migrants over 5 years and change in migrants over 5 years per 1000 people
-    - immigrant_change_5_years: total change of immigrant stock in destination in the last 5 years
-    - emigrant_change_5_years: change in the total amount of emigrants who have left in origin in the last 5 years
-    - immigrant_change_5_years_per_1000: change of immigrant stock in destination in the last 5 years per 1000 people
-    - emigrant_change_5_years_per_1000: change in the total amount of emigrants who have left in origin in the last 5 years per 1000 people
-    """
-    # total change in migrants over 5 years
-    tb["immigrants_change_5_years"] = tb.apply(lambda x: migrant_change_5_years(tb, x, "immigrants_all"), axis=1)
-    tb["emigrants_change_5_years"] = tb.apply(lambda x: migrant_change_5_years(tb, x, "emigrants_all"), axis=1)
-
-    tb["immigrants_change_5_years"] = tb["immigrants_change_5_years"].copy_metadata(tb["immigrants_all"])
-    tb["emigrants_change_5_years"] = tb["emigrants_change_5_years"].copy_metadata(tb["emigrants_all"])
-
-    # change in migrants over 5 years per 1000 people
-    tb["immigrants_change_5_years_per_1000"] = tb["immigrants_change_5_years"] / (tb["total_population"] / 1000)
-    tb["emigrants_change_5_years_per_1000"] = tb["emigrants_change_5_years"] / (tb["total_population"] / 1000)
-
-    change_cols = [
-        "immigrants_change_5_years",
-        "emigrants_change_5_years",
-        "immigrants_change_5_years_per_1000",
-        "emigrants_change_5_years_per_1000",
-    ]
-
-    for col in change_cols:
-        tb[col] = tb[col].astype("Float64")
-
-    return tb
-
-
-def migrant_change_5_years(tb, tb_row, col_name):
-    cnt = tb_row["country"]
-    yr = tb_row["year"]
-    if yr == 1990:
-        return pd.NA
-    if yr == 2024:
-        return pd.NA
-    else:
-        tb_prev_df = tb[(tb["country"] == cnt) & (tb["year"] == yr - 5)]
-        if tb_prev_df.empty:
-            return pd.NA
-        tb_prev = tb_prev_df.iloc[0]
-        if pd.isna(tb_row[col_name]) or pd.isna(tb_prev[col_name]):
-            return pd.NA
-        else:
-            return float(tb_row[col_name] - tb_prev[col_name])
 
 
 def format_table(tb, country_cols, value_name):
