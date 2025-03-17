@@ -165,9 +165,9 @@ def run(dest_dir: str) -> None:
     snap_act_codes = paths.load_snapshot("activity_codes_2023.xls")
 
     # load tables:
-    who_data = snap_who.read_in_archive("atuswho_0323.dat", set_file_extension="csv")
-    act_data = snap_act.read_in_archive("atusact_0323.dat", set_file_extension="csv")
-    sum_data = snap_sum.read_in_archive("atussum_0323.dat", set_file_extension="csv")
+    who_data = snap_who.read_in_archive("atuswho_0323.dat", force_extension="csv")
+    act_data = snap_act.read_in_archive("atusact_0323.dat", force_extension="csv")
+    sum_data = snap_sum.read_in_archive("atussum_0323.dat", force_extension="csv")
     act_codes = pr.read_excel(snap_act_codes.path, sheet_name="ATUS 2023 Lexicon", header=1)
 
     # format act codes:
