@@ -995,3 +995,25 @@ steps:
   #
   data://explorers/climate/latest/climate_change_impacts:
     - data://garden/climate/2025-01-21/climate_change_impacts
+  #
+  # EPA - Climate change indicators (possibly not updateable).
+  #
+  data://meadow/epa/2024-01-29/ocean_heat_content:
+    - snapshot://epa/2024-01-29/ocean_heat_content_annual_world_700m.csv
+    - snapshot://epa/2024-01-29/ocean_heat_content_annual_world_2000m.csv
+  data://garden/epa/2024-01-29/ocean_heat_content:
+    - data://meadow/epa/2024-01-29/ocean_heat_content
+  data://meadow/epa/2024-01-29/ice_sheet_mass_balance:
+    - snapshot://epa/2024-01-29/ice_sheet_mass_balance.csv
+  data://garden/epa/2024-01-29/ice_sheet_mass_balance:
+    - data://meadow/epa/2024-01-29/ice_sheet_mass_balance
+  data://meadow/epa/2024-01-29/ghg_concentration:
+    - snapshot://epa/2024-01-29/co2_concentration.csv
+    - snapshot://epa/2024-01-29/ch4_concentration.csv
+    - snapshot://epa/2024-01-29/n2o_concentration.csv
+  data://garden/epa/2024-01-29/ghg_concentration:
+    - data://meadow/epa/2024-01-29/ghg_concentration
+  data://meadow/epa/2024-01-29/mass_balance_us_glaciers:
+    - snapshot://epa/2024-01-29/mass_balance_us_glaciers.csv
+  data://garden/epa/2024-01-29/mass_balance_us_glaciers:
+    - data://meadow/epa/2024-01-29/mass_balance_us_glaciers
