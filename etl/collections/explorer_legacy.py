@@ -320,12 +320,17 @@ class ExplorerLegacy:
         # Boolean types
         df = cls._process_df_common(df)
 
+        def _parse_variable_id(variable_ids):
+            if isinstance(variable_ids, str):
+                variable_ids = variable_ids.split()
+                result = [int(variable_id) if variable_id.isnumeric() else variable_id for variable_id in variable_ids]
+            else:
+                result = variable_ids
+            return result
+
         # Convert "yVariableIds" into a list of integers, or strings (if they are catalog paths).
         if "yVariableIds" in df.columns:
-            df["yVariableIds"] = [
-                [int(variable_id) if variable_id.isnumeric() else variable_id for variable_id in variable_ids.split()]
-                for variable_ids in df["yVariableIds"]
-            ]
+            df["yVariableIds"] = [_parse_variable_id(variable_ids) for variable_ids in df["yVariableIds"]]
 
         return df
 
