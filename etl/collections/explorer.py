@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 
 import numpy as np
 import pandas as pd
+from owid.catalog.utils import underscore
 
 from etl.collections.common import INDICATORS_SLUG, expand_config, map_indicator_paths_to_ids
 from etl.collections.explorer_legacy import _create_explorer_legacy
@@ -204,9 +205,9 @@ def extract_explorers_tables(
     # Drop duplicates, if any
     df_columns = df_columns.drop_duplicates()
 
-    # Sanity check
-    if df_columns["catalogPath"].fillna(df_columns["slug"]).duplicated().any():
-        raise ValueError("Duplicate catalogPath or slug found in df_columns.")
+    # Sanity check (even if all-NA, we keep it because otherwise Grapher complains!)
+    assert df_columns["catalogPath"].isna().all(), "catalogPath should be all NA in df_columns."
+
     return df_grapher, df_columns
 
 
@@ -287,34 +288,42 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
             .to_dict()
         )
 
-        return pd.Series({"slug_renames": nested_mapping})
+        return pd.Series({"_slug_renames": nested_mapping})
 
     ## Drop duplicates, if any
     df_columns = df_columns.drop_duplicates()
 
+    # Drop those that do not have any settings set
+    cols_settings = [col for col in df_columns.columns if col not in columns_widgets + ["_axis", "catalogPath"]]
+    df_columns = df_columns.dropna(how="all", subset=cols_settings)
+
     # If there is more than one definition for the same indicator, proceed to adapt tables
-    mask = df_columns.duplicated(subset=["catalogPath"])
-    if mask.any():
+    # mask = df_columns.duplicated(subset=["catalogPath"])
+    if not df_columns.empty:
+        # Assign ID to each row, based on whether the indicator config is the same. This helps us reduce unnecessary duplication of display settings.
+        columns_subset = [col for col in df_columns.columns if col not in columns_widgets + ["_axis"]]
+        df_columns.loc[:, "_slug_id"] = df_columns.groupby(columns_subset, dropna=False).ngroup()
+
         # 1. Tweak df_columns to have a row for all the different display settings of each indicator
-        # TODO: Get indicator IDs
         catalog_paths = df_columns["catalogPath"].unique().tolist()
         ids = map_indicator_paths_to_ids(catalog_paths)
         mapping = dict(zip(catalog_paths, ids))
-        df_columns["_variableId"] = df_columns["catalogPath"].map(mapping)
+        df_columns.loc[:, "_variableId"] = df_columns["catalogPath"].map(mapping)
 
         # Add unique identifier
         df_columns.loc[:, "slug"] = (
-            df_columns["catalogPath"].str.split("#").str[-1] + "_" + df_columns.index.astype(str)
+            df_columns["catalogPath"].apply(lambda x: underscore(x.replace("/", "__").replace("#", "__")))
+            + "__"
+            + df_columns["_slug_id"].astype(str)
         )
         # Add transform column
-        df_columns["transform"] = "duplicate " + df_columns["_variableId"].astype(str)
+        df_columns.loc[:, "transform"] = "duplicate " + df_columns["_variableId"].astype(str)
 
-        # 2. Tweak df_columns
+        # 3. Tweak df_grapher
         # Get dictionary for re-mapping
-        df_transform = df_columns[mask]
         # Generate mapping
         mapping_series = (
-            df_transform.groupby(columns_widgets)[["_axis", "catalogPath", "slug"]].apply(_create_mapping).reset_index()
+            df_columns.groupby(columns_widgets)[["_axis", "catalogPath", "slug"]].apply(_create_mapping).reset_index()
         )
         # Merge mapping
         df_grapher = df_grapher.merge(mapping_series, on=columns_widgets, how="left")
@@ -322,9 +331,9 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
         columns_slugs = ["xSlug", "ySlugs", "colorSlug", "sizeSlug"]
         df_grapher[columns_slugs] = None
         # Iterate over affected rows, add slugs / remove paths
-        mask_2 = df_grapher["slug_renames"].notna()
+        mask_2 = df_grapher["_slug_renames"].notna()
         for idx, row in df_grapher[mask_2].iterrows():
-            renames = row["slug_renames"]
+            renames = row["_slug_renames"]
 
             for axis, renames_axis in renames.items():
                 if axis == "y":
@@ -342,29 +351,26 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
                 slugs = [renames_axis.get(p) for p in row[col_id] if p in renames_axis]
                 paths = [p for p in row[col_id] if p not in renames_axis]
                 # Set new values
-                df_grapher.loc[idx, [col_slug]] = [
-                    slugs if slugs != [] else np.nan,
-                ]
-                df_grapher.loc[idx, [col_id]] = [
-                    paths if paths != [] else np.nan,
-                ]
+                df_grapher.at[idx, col_slug] = slugs if slugs != [] else np.nan
+                df_grapher.at[idx, col_id] = paths if paths != [] else np.nan
 
         # 3. Finalize df_columns and df_grapher
         # COLUMNS
         # Reorder
         columns_first = ["catalogPath", "slug", "transform"]
         df_columns = df_columns[[*columns_first, *df_columns.columns.difference(columns_first)]]
-        # Set columns to None
-        df_columns.loc[~mask, "slug"] = None
-        df_columns.loc[~mask, "transform"] = None
-        df_columns.loc[mask, "catalogPath"] = None
+        # Set catalogPath to None
+        df_columns.loc[:, "catalogPath"] = None
         # Drop auxiliary columns
-        df_columns = df_columns.drop(columns=["_variableId"])
+        df_columns = df_columns.drop(columns=["_variableId", "_slug_id"])
 
         # GRAPHER
         # Drop all-NA columns (TODO: does something happen if there is 'xSlug' but no 'xVariableId'? or any other axis?)
+        cols_variables = df_grapher.filter(regex=r"(y|x|color|size)VariableIds?").columns
+        df_grapher_ids = df_grapher[cols_variables].copy()
         df_grapher = df_grapher.dropna(how="all", axis=1)
-        df_grapher = df_grapher.drop(columns=["slug_renames"])
+        df_grapher.loc[:, cols_variables] = df_grapher_ids
+        df_grapher = df_grapher.drop(columns=["_slug_renames"])
 
     return df_grapher, df_columns
 

@@ -180,6 +180,14 @@ EXPLORER_CONFIG = {
                 },
             },
         },
+        {
+            "dimensions": {"metric": "suspected_cases", "frequency": "cumulative", "scale": "relative_to_population"},
+            "indicators": {
+                "y": {
+                    "catalogPath": "monkeypox#suspected_cases_cumulative",
+                },
+            },
+        },
     ],
 }
 
@@ -225,12 +233,12 @@ def mock_map_indicator_paths_to_ids(paths):
 @patch("etl.collections.explorer.map_indicator_paths_to_ids", side_effect=mock_map_indicator_paths_to_ids)
 def test_explorer_config_legacy(mock_map_func):
     explorer = Explorer.from_dict(EXPLORER_CONFIG)
-    assert len(explorer.views) == 5
+    assert len(explorer.views) == 6
     df_grapher, df_columns = extract_explorers_tables(explorer)
 
     # Output shape test
-    assert df_grapher.shape[0] == 5
-    assert df_columns.shape[0] == 6
+    assert df_grapher.shape[0] == 6
+    assert df_columns.shape[0] == 7
 
     # Check that columns makes sense
     mask = df_columns["catalogPath"].notna()
@@ -241,3 +249,9 @@ def test_explorer_config_legacy(mock_map_func):
     assert df_columns.loc[mask, "catalogPath"].isna().all()
 
     # TODO: check df_grapher
+    mask = df_grapher["yVariableIds"].notna()
+    assert (df_grapher[mask].index == [5]).all()
+    mask = df_grapher["ySlugs"].notna()
+    assert (df_grapher[mask].index == [0, 1, 2, 3]).all()
+    mask = df_grapher["xSlug"].notna()
+    assert (df_grapher[mask].index == [4]).all()
