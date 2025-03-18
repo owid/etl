@@ -21,7 +21,7 @@ config:
     - Arctic Ocean
   subNavId: co2
   subNavCurrentId: climate-impacts
-  wpBlockId: '45009'
+  wpBlockId: "45009"
   hasMapTab: false
   hideAnnotationFieldsInTitle: true
 
@@ -62,21 +62,22 @@ dimensions:
   - slug: long_run_series
     name: Long-run series
     choices:
-      - slug: false
-        name: 'false'
-      - slug: true
-        name: 'true'
+      - slug: short
+        name: "Short-term series"
+      - slug: long
+        name: "Long-term series"
     presentation:
-      type: checkbox
+      type: "checkbox"
+      choice_slug_true: long
 views:
   - dimensions:
       metric: temperature_anomaly
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#near_surface_temperature_anomaly
     config:
-      title: 'Global warming: annual temperature anomaly'
+      title: "Global warming: annual temperature anomaly"
       yScaleToggle: false
       yAxisMin: auto
       baseColorScheme: owid-distinct
@@ -84,12 +85,12 @@ views:
       hasMapTab: false
   - dimensions:
       metric: sea_surface_temperature_anomaly
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#sea_temperature_anomaly
     config:
-      title: 'Global warming: monthly sea surface temperature anomaly'
+      title: "Global warming: monthly sea surface temperature anomaly"
       subtitle: |-
         This is measured at a nominal depth of 20cm, and given relative to the average temperature from the period of 1961 - 1990.
       yScaleToggle: false
@@ -99,7 +100,7 @@ views:
       hasMapTab: false
   - dimensions:
       metric: ocean_heat_content__top_700m
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#ocean_heat_content_csiro_700m
@@ -119,7 +120,7 @@ views:
         Heat content is shown for four sources: Commonwealth Scientific and Industrial Research Organisation (CSIRO); Institute of Atmospheric Physics (IAP); National Oceanic and Atmospheric Administration (NOAA); and Meteorological Research Institute (MRI).
   - dimensions:
       metric: ocean_heat_content__top_2000m
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#ocean_heat_content_iap_2000m
@@ -138,13 +139,13 @@ views:
         Heat content is shown for four sources: Commonwealth Scientific and Industrial Research Organisation (CSIRO); Institute of Atmospheric Physics (IAP); National Oceanic and Atmospheric Administration (NOAA); and Meteorological Research Institute (MRI).
   - dimensions:
       metric: ocean_ph
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#ocean_ph
         - catalogPath: climate_change_impacts_monthly#ocean_ph_yearly_average
     config:
-      title: 'Ocean acidification: mean seawater pH'
+      title: "Ocean acidification: mean seawater pH"
       subtitle: Mean seawater pH is shown based on in-situ measurements of pH from the Aloha station in Hawaii.
       yScaleToggle: false
       yAxisMin: auto
@@ -154,7 +155,7 @@ views:
       hideAnnotationFieldsInTitle: true
   - dimensions:
       metric: sea_level_rise
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#sea_level_church_and_white_2011
@@ -171,69 +172,69 @@ views:
       hasMapTab: false
   - dimensions:
       metric: arctic_sea_ice_extent
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#arctic_sea_ice_extent_max
         - catalogPath: climate_change_impacts_annual#arctic_sea_ice_extent_min
     config:
-      title: 'Climate change: Arctic sea ice extent'
+      title: "Climate change: Arctic sea ice extent"
       subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
       yScaleToggle: false
-      yAxisMin: '0'
+      yAxisMin: "0"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: antarctic_sea_ice_extent
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#antarctic_sea_ice_extent_min
         - catalogPath: climate_change_impacts_annual#antarctic_sea_ice_extent_max
     config:
-      title: 'Climate change: Antarctic sea ice extent'
+      title: "Climate change: Antarctic sea ice extent"
       subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
       yScaleToggle: false
-      yAxisMin: '0'
+      yAxisMin: "0"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: mass_balance_of_ice_sheets
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#land_ice_mass_nasa
         - catalogPath: climate_change_impacts_monthly#cumulative_ice_mass_change_imbie
     config:
-      title: 'Climate change: change in mass of ice sheets'
+      title: "Climate change: change in mass of ice sheets"
       subtitle: |-
         Cumulative change in mass of ice sheets, measured relative to a base year of 2002. For reference, 1,000 billion metric tons is equal to about 260 cubic miles of ice—enough to raise sea level by about 3 millimeters.
       yScaleToggle: false
-      yAxisMin: '-5200'
+      yAxisMin: "-5200"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
       note: Combined measurements are based on more than 20 different studies that have been combined for each region.
   - dimensions:
       metric: mass_balance_of_u_s__glaciers
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#mass_balance_us_glaciers
     config:
-      title: 'Climate change: change of mass of US glaciers'
+      title: "Climate change: change of mass of US glaciers"
       subtitle: |-
         Cumulative mass balance of U.S. reference glaciers, relative to the base year 1965. This is given in meters of water equivalent, which represent changes in the average thickness of a glacier.
       yScaleToggle: false
-      yAxisMin: '-50'
+      yAxisMin: "-50"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: snow_cover
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#snow_cover_extent
@@ -243,13 +244,13 @@ views:
       subtitle: |-
         This metric measures the area covered by snow, based on an analysis of weekly maps. These data cover all of North America (including Greenland).
       yScaleToggle: false
-      yAxisMin: '0'
+      yAxisMin: "0"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: co2_concentrations
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#co2_concentration
@@ -258,13 +259,13 @@ views:
       title: Global atmospheric CO₂ concentration
       subtitle: Atmospheric carbon dioxide (CO₂) concentration is measured in parts per million (ppm).
       yScaleToggle: false
-      yAxisMin: '320'
+      yAxisMin: "320"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: ch4_concentrations
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#ch4_concentration
@@ -273,13 +274,13 @@ views:
       title: Global atmospheric methane concentration
       subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
       yScaleToggle: false
-      yAxisMin: '1600'
+      yAxisMin: "1600"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: n2o_concentrations
-      long_run_series: false
+      long_run_series: short
     indicators:
       y:
         - catalogPath: climate_change_impacts_monthly#n2o_concentration
@@ -288,13 +289,13 @@ views:
       title: Global atmospheric nitrous oxide concentration
       subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
       yScaleToggle: false
-      yAxisMin: '300'
+      yAxisMin: "300"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: co2_concentrations
-      long_run_series: true
+      long_run_series: long
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#co2_concentration
@@ -303,13 +304,13 @@ views:
       subtitle: |-
         Atmospheric carbon dioxide (CO₂) concentration is measured in parts per million (ppm). Long-term trends in CO₂ concentrations can be measured at high-resolution using preserved air samples from ice cores.
       yScaleToggle: false
-      yAxisMin: '150'
+      yAxisMin: "150"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: ch4_concentrations
-      long_run_series: true
+      long_run_series: long
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#ch4_concentration
@@ -317,13 +318,13 @@ views:
       title: Global atmospheric methane concentration
       subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
       yScaleToggle: false
-      yAxisMin: '550'
+      yAxisMin: "550"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
   - dimensions:
       metric: n2o_concentrations
-      long_run_series: true
+      long_run_series: long
     indicators:
       y:
         - catalogPath: climate_change_impacts_annual#n2o_concentration
@@ -331,7 +332,7 @@ views:
       title: Global atmospheric nitrous oxide concentration
       subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
       yScaleToggle: false
-      yAxisMin: '250'
+      yAxisMin: "250"
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
