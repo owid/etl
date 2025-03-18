@@ -20,19 +20,19 @@ steps:
     - data://garden/wb/2024-10-07/world_bank_pip
 
   # World Inequality Database
-  data://meadow/wid/2025-02-25/world_inequality_database:
-    - snapshot://wid/2025-02-25/world_inequality_database_with_extrapolations.csv
-    - snapshot://wid/2025-02-25/world_inequality_database_distribution.csv
-    - snapshot://wid/2025-02-25/world_inequality_database_distribution_with_extrapolations.csv
-    - snapshot://wid/2025-02-25/world_inequality_database.csv
-    - snapshot://wid/2025-02-25/world_inequality_database_fiscal.csv
+  data://meadow/wid/2025-03-14/world_inequality_database:
+    - snapshot://wid/2025-03-14/world_inequality_database_with_extrapolations.csv
+    - snapshot://wid/2025-03-14/world_inequality_database_distribution.csv
+    - snapshot://wid/2025-03-14/world_inequality_database_distribution_with_extrapolations.csv
+    - snapshot://wid/2025-03-14/world_inequality_database.csv
+    - snapshot://wid/2025-03-14/world_inequality_database_fiscal.csv
     - data://garden/regions/2023-01-01/regions
-  data://garden/wid/2025-02-25/world_inequality_database:
-    - data://meadow/wid/2025-02-25/world_inequality_database
-  data://grapher/wid/2025-02-25/world_inequality_database:
-    - data://garden/wid/2025-02-25/world_inequality_database
+  data://garden/wid/2025-03-14/world_inequality_database:
+    - data://meadow/wid/2025-03-14/world_inequality_database
+  data://grapher/wid/2025-03-14/world_inequality_database:
+    - data://garden/wid/2025-03-14/world_inequality_database
   data://explorers/wid/latest/world_inequality_database:
-    - data://garden/wid/2025-02-25/world_inequality_database
+    - data://garden/wid/2025-03-14/world_inequality_database
 
   # Luxembourg Income Study
   data://meadow/lis/2025-01-24/luxembourg_income_study:
@@ -55,7 +55,7 @@ steps:
   # Poverty and inequality file for inequality comparisons at OWID
   data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
     - data://garden/wb/2024-10-07/world_bank_pip
-    - data://garden/wid/2025-02-25/world_inequality_database
+    - data://garden/wid/2025-03-14/world_inequality_database
     - data://garden/lis/2025-01-24/luxembourg_income_study
     - data://garden/wb/2024-01-22/thousand_bins_distribution
     - data://garden/worldbank_wdi/2024-05-20/wdi
@@ -66,7 +66,7 @@ steps:
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-10-07/world_bank_pip
-    - data://garden/wid/2025-02-25/world_inequality_database
+    - data://garden/wid/2025-03-14/world_inequality_database
     - data://garden/lis/2025-01-24/luxembourg_income_study
   data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
     - data://garden/poverty_inequality/2025-01-22/inequality_comparison

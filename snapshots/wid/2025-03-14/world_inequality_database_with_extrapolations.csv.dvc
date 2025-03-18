@@ -4,16 +4,16 @@ meta:
     title: World Inequality Database (WID)
     description: |-
       The World Inequality Database (WID.world) aims to provide open and convenient access to the most extensive available database on the historical evolution of the world distribution of income and wealth, both within countries and between countries.
-    title_snapshot: World Inequality Database (WID) - Key indicators
+    title_snapshot: World Inequality Database (WID) - Key indicators (with extrapolations)
     citation_full: World Inequality Database (WID), https://wid.world
     attribution_short: WID
     url_main: https://wid.world
-    date_accessed: '2025-02-25'
+    date_accessed: '2025-03-14'
     date_published: '2025'
     license:
       name: CC BY 4.0
       url: https://wid.world/
 outs:
-  - md5: f952408983c9f9e67ed9100c44ac4211
-    size: 18669253
-    path: world_inequality_database.csv
+  - md5: bd3ca650156a489f200ac9b933b54560
+    size: 23653301
+    path: world_inequality_database_with_extrapolations.csv
