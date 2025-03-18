@@ -17,19 +17,48 @@ dataset:
 
 
 tables:
-  migration_stock_flows:
+  migrant_stock_dest_origin:
     variables:
       migrants_all_sexes:
-        title: Migrants from {country_origin} who now live in {country_destination}
-        description_short: The number of people who were born in {country_origin} and now live in {country_destination}.
+        title: |-
+          <% if metric == "immigrants" %>
+          Immigrants who moved from another country to << country_select >>
+          <% elif metric == "emigrants" %>
+          Emigrants who moved from << country_select >> to another country
+          <% endif %>
+        description_short: |-
+          <% if metric == "immigrants" %>
+          The number of people who moved from another country to << country_select >>.
+          <% elif metric == "emigrants" %>
+          The number of people who were born in << country_select >> and now live abroad.
+          <% endif %>
         unit: migrants
       migrants_female:
-        title: Women from {country_origin} who now live in {country_destination}
-        description_short: The number of women who were born in {country_origin} and now live in {country_destination}.
+        title: |-
+          <% if metric == "immigrants" %>
+          Women who moved from another country to << country_select >>
+          <% elif metric == "emigrants" %>
+          Women who moved from << country_select >> to another country
+          <% endif %>
+        description_short: |-
+          <% if metric == "immigrants" %>
+          The number of women who moved from another country to << country_select >>.
+          <% elif metric == "emigrants" %>
+          The number of women who were born in << country_select >> and now live abroad.
+          <% endif %>
         unit: migrants
       migrants_male:
-        title: Men from {country_origin} who now live in {country_destination}
-        description_short: The number of men who were born in {country_origin} and now live in {country_destination}.
+        title: |-
+          <% if metric == "immigrants" %>
+          Men who moved from another country to << country_select >>
+          <% elif metric == "emigrants" %>
+          Men who moved from << country_select >> to another country
+          <% endif %>
+        description_short: |-
+          <% if metric == "immigrants" %>
+          The number of men who moved from another country to << country_select >>.
+          <% elif metric == "emigrants" %>
+          The number of men who were born in << country_select >> and now live abroad.
+          <% endif %>
         unit: migrants
-
 

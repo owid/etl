@@ -33,6 +33,9 @@ def run() -> None:
     # combine tables
     tb = pr.concat([tb, tb_switched])
 
+    # drop female and male migrants as not to clutter the grapher
+    tb = tb.drop(columns=["migrants_female", "migrants_male"])
+
     tb = tb.format(["country", "country_select", "metric", "year"])
 
     #

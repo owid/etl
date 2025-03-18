@@ -15,16 +15,22 @@ def run() -> None:
 
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
-    ds = paths.load_dataset("vaccination_coverage")
-    tb = ds.read("vaccination_coverage", load_data=False)
+    ds = paths.load_dataset("migration_stock_flows")
+    tb = ds.read("migrant_stock_dest_origin")
+
+    # add country names and slugs to the config
+    all_countries = tb["country"].unique()
+    cty_dict_ls = [{"slug": c.lower(), "name": c} for c in all_countries]
+    config["dimensions"][1]["choices"] = cty_dict_ls
 
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
         tb,
-        indicator_names=["coverage", "unvaccinated", "vaccinated"],
-        dimensions=["antigen"],
-        indicators_slug="metric",
+        indicator_names=["migrants_all_sexes"],
+        dimensions=["metric", "country_select"],
+        indicators_slug="migrants",
     )
+
     # 3: Combine both sources (basically dimensions and views)
     config["dimensions"] = multidim.combine_config_dimensions(
         config_dimensions=config_new["dimensions"],
@@ -35,6 +41,6 @@ def run() -> None:
     # 4: Upsert to DB
     mdim = paths.create_mdim(
         config=config,
-        mdim_name="mdd-vaccination-who",
+        mdim_name="mdd-migration-flows",
     )
     mdim.save()

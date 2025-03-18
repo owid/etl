@@ -12,6 +12,6 @@ dimensions:
       - slug: "emigrants"
         name: "Emigrants - People moving away from country"
   - name: Country
-    slug: country
+    slug: country_select
 
 views: []

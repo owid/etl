@@ -89,5 +89,5 @@ steps:
 
 
   # UN DESA multidim migration flows (2024)
-  data://multidim/migration/latest/migration_flows:
+  export://multidim/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
