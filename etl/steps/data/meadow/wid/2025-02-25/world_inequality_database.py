@@ -30,19 +30,20 @@ NA_VALUES = [
 ]
 
 # List of countries/regions not included in the ISO2 standard, but added by WID
+# NOTE: I am excluding subnational data from China and "Other" regions, because they have issues
 ISO2_MISSING = {
-    "CN-RU": "China (rural)",
-    "CN-UR": "China (urban)",
+    # "CN-RU": "China (rural)",
+    # "CN-UR": "China (urban)",
     "DD": "East Germany",
     "KS": "Kosovo",
-    "OA": "Other Russia and Central Asia (WID)",
-    "OB": "Other East Asia (WID)",
-    "OC": "Other Western Europe (WID)",
-    "OD": "Other Latin America (WID)",
-    "OE": "Other MENA (WID)",
-    "OH": "Other North America and Oceania (WID)",
-    "OI": "Other South & South-East Asia (WID)",
-    "OJ": "Other Sub-Saharan Africa (WID)",
+    # "OA": "Other Russia and Central Asia (WID)",
+    # "OB": "Other East Asia (WID)",
+    # "OC": "Other Western Europe (WID)",
+    # "OD": "Other Latin America (WID)",
+    # "OE": "Other MENA (WID)",
+    # "OH": "Other North America and Oceania (WID)",
+    # "OI": "Other South & South-East Asia (WID)",
+    # "OJ": "Other Sub-Saharan Africa (WID)",
     "QB": "Africa (WID)",
     "QD": "Asia (WID)",
     "QE": "Europe (WID)",
