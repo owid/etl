@@ -373,7 +373,7 @@ class DimensionPresentation(MDIMBase):
         if not UITypes.is_valid(self.type):
             raise ValueError(f"Invalid type: {self.type}. Accepted values: {UITypes.ALL}")
         if (self.type == UITypes.CHECKBOX) and (self.choice_slug_true is None):
-            raise ValueError(f"True slug must be provided for '{UITypes.CHECKBOX}' type.")
+            raise ValueError(f"`choice_slug_true` slug must be provided for '{UITypes.CHECKBOX}' type.")
 
 
 @pruned_json
