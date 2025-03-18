@@ -30,6 +30,7 @@ definitions:
         type: StackedArea
         hasMapTab: false
         selectedFacetStrategy: entity
+        hideRelativeToggle: false
     - dimensions:
         indicator: population_broad
         sex: female
