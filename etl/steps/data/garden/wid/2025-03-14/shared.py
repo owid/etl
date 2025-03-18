@@ -391,8 +391,6 @@ def var_metadata_income(var, origins, wel, ext) -> VariableMeta:
         "tolerance": TOLERANCE,
     }
 
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
     return meta
 
 
@@ -449,8 +447,6 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
         "tolerance": TOLERANCE,
     }
 
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
     return meta
 
 
@@ -480,8 +476,6 @@ def var_metadata_income_relative(var, origins, wel, rel, ext) -> VariableMeta:
         "numDecimalPlaces": VAR_DICT[var]["numDecimalPlaces"],
         "tolerance": TOLERANCE,
     }
-
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
 
@@ -597,7 +591,5 @@ def var_metadata_distribution(var: str, origins, ext: str) -> VariableMeta:
         "numDecimalPlaces": VAR_DICT_DISTRIBUTION[var]["numDecimalPlaces"],
         "tolerance": TOLERANCE,
     }
-
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta

@@ -26,7 +26,6 @@ tables:
     variables:
       p99p100_share_pretax:
         presentation:
-          title_public: Income share of the richest 1%
           title_variant: Before tax
           grapher_config:
             title: Income share of the richest 1% (before tax)
@@ -60,7 +59,6 @@ tables:
               - France
       p90p100_share_pretax:
         presentation:
-          title_public: Income share of the richest 10%
           title_variant: Before tax
           grapher_config:
             title: Income share of the richest 10% (before tax)
@@ -96,14 +94,6 @@ tables:
               - China
               - France
 
-      p90p100_share_wealth:
-        presentation:
-          title_public: Wealth share of the richest 10%
-
-      p99p100_share_wealth:
-        presentation:
-          title_public: Wealth share of the richest 1%
-
   world_inequality_database_fiscal:
     common:
       description_key:
@@ -121,8 +111,6 @@ tables:
           name: Top 1% - Share (Fiscal, individuals)
           numDecimalPlaces: 1
           tolerance: 5
-        presentation:
-          title_public: Top 1% - Share (Fiscal, individuals)
 
       p99p100_share_fiscal992j:
         title: Top 1% - Share (Fiscal, equal-split adults)
@@ -133,8 +121,6 @@ tables:
           name: Top 1% - Share (Fiscal, equal-split adults)
           numDecimalPlaces: 1
           tolerance: 5
-        presentation:
-          title_public: Top 1% - Share (Fiscal, equal-split adults)
 
       p99p100_share_fiscal992t:
         title: Top 1% - Share (Fiscal, tax units)
@@ -145,7 +131,5 @@ tables:
           name: Top 1% - Share (Fiscal, tax units)
           numDecimalPlaces: 1
           tolerance: 5
-        presentation:
-          title_public: Top 1% - Share (Fiscal, tax units)
 
 
