@@ -1,0 +1,35 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+    short_unit: ""
+    processing_level: major
+    description_processing: |-
+      - Regional aggregates (such as continents, income groups and the worldwide aggregate) are based on [our definition of the continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and the [World Bank definition of income groups](https://ourworldindata.org/grapher/world-bank-income-groups), unless otherwise indicated. They might differ from the definitions used by the United Nations.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 729
+
+
+tables:
+  migration_stock_flows:
+    variables:
+      migrants_all_sexes:
+        title: Migrants from {country_origin} who now live in {country_destination}
+        description_short: The number of people who were born in {country_origin} and now live in {country_destination}.
+        unit: migrants
+      migrants_female:
+        title: Women from {country_origin} who now live in {country_destination}
+        description_short: The number of women who were born in {country_origin} and now live in {country_destination}.
+        unit: migrants
+      migrants_male:
+        title: Men from {country_origin} who now live in {country_destination}
+        description_short: The number of men who were born in {country_origin} and now live in {country_destination}.
+        unit: migrants
+
+

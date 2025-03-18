@@ -1,0 +1,17 @@
+title:
+  title: Migration
+  title_variant: to and from each country
+default_selection:
+  - World
+dimensions:
+  - name: Metric
+    slug: metric
+    choices:
+      - slug: "immigrants"
+        name: "Immigrants - People moving to country"
+      - slug: "emigrants"
+        name: "Emigrants - People moving away from country"
+  - name: Country
+    slug: country
+
+views: []
