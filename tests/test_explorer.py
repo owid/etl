@@ -230,7 +230,7 @@ def mock_map_indicator_paths_to_ids(paths):
     return [e for e, _ in enumerate(paths)]
 
 
-@patch("etl.collections.explorer.map_indicator_paths_to_ids", side_effect=mock_map_indicator_paths_to_ids)
+@patch("etl.collections.explorer.get_mapping_paths_to_id", side_effect=mock_map_indicator_paths_to_ids)
 def test_explorer_config_legacy(mock_map_func):
     explorer = Explorer.from_dict(EXPLORER_CONFIG)
     assert len(explorer.views) == 6
