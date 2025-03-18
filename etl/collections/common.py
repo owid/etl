@@ -12,7 +12,7 @@ from etl.collections.model import Collection
 from etl.collections.utils import (
     validate_indicators_in_db,
 )
-from etl.db import get_engine
+from etl.config import OWID_ENV, OWIDEnv
 
 INDICATORS_SLUG = "indicator"
 
@@ -37,17 +37,32 @@ def validate_collection_config(collection: Collection, engine: Engine, tolerate_
     validate_indicators_in_db(indicators, engine)
 
 
-def map_indicator_path_to_id(catalog_path: str) -> str | int:
+def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = None) -> str | int:
     # Check if given path is actually an ID
     if str(catalog_path).isdigit():
         return catalog_path
 
     # Get ID, assuming given path is a catalog path
-    engine = get_engine()
+    if owid_env is None:
+        engine = OWID_ENV.engine
+    else:
+        engine = owid_env.engine
     with Session(engine) as session:
         db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
         assert db_indicator.id is not None
         return db_indicator.id
+
+
+def map_indicator_paths_to_ids(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> List[int]:
+    # Check if given path is actually an ID
+    # Get ID, assuming given path is a catalog path
+    if owid_env is None:
+        engine = OWID_ENV.engine
+    else:
+        engine = owid_env.engine
+    with Session(engine) as session:
+        db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # type: ignore
+        return [indicator.id for indicator in db_indicators]
 
 
 def expand_config(
