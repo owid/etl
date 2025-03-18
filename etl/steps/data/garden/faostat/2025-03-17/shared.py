@@ -1005,7 +1005,7 @@ def remove_overlapping_data_between_historical_regions_and_successors(
             overlapping_years = pr.concat([historical_region_years, historical_successors_years], ignore_index=True)
             overlapping_years = overlapping_years[overlapping_years.duplicated()]
         if not overlapping_years.empty:
-            log.warning(
+            log.info(
                 f"Removing rows where historical region {historical_region} overlaps with its successors "
                 f"(years {sorted(set(overlapping_years['year']))})."
             )
@@ -1074,9 +1074,12 @@ def add_regions(
 
         # Invert dictionary of aggregations to have the aggregation as key, and the list of element codes as value.
         aggregations_inverted = {
-            unique_value: pd.unique([item for item, value in aggregations.items() if value == unique_value]).tolist()
+            unique_value: pd.unique(
+                np.array([item for item, value in aggregations.items() if value == unique_value])
+            ).tolist()
             for unique_value in aggregations.values()
         }
+
         for region in tqdm(REGIONS_TO_ADD, file=sys.stdout):
             countries_in_region = geo.list_members_of_region(
                 region,
@@ -1410,9 +1413,9 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
             owid_regions_mask = np.ones(len(per_capita_data), dtype=bool)
 
         # Add per capita values to all other regions that are not FAO regions.
-        per_capita_data.loc[owid_regions_mask, "value"] = (
-            per_capita_data[owid_regions_mask]["value"] / per_capita_data[owid_regions_mask]["population_with_data"]  # type: ignore
-        )
+        per_capita_data.loc[owid_regions_mask, "value"] = per_capita_data[owid_regions_mask]["value"] / per_capita_data[
+            owid_regions_mask
+        ]["population_with_data"].astype(float)
 
         # Remove nans (which may have been created because of missing FAO population).
         per_capita_data = per_capita_data.dropna(subset="value").reset_index(drop=True)  # type: ignore
