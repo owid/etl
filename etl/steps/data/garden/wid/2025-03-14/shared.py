@@ -5,7 +5,7 @@ If new variables are included in the dataset (from `wid` command in Stata) the d
 
 from typing import List
 
-from owid.catalog import Table, VariableMeta, VariablePresentationMeta
+from owid.catalog import Table, VariableMeta
 
 # Define PPP year
 # NOTE: Change the year when needed
