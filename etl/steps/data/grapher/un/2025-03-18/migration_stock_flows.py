@@ -39,6 +39,9 @@ def run() -> None:
     countries = regions[regions["region_type"] == "country"]["name"].unique()
     tb = tb[tb["country_select"].isin(countries)]
 
+    # set migrants_all_sexes to 0 if country and country_select are the same
+    tb.loc[tb["country"] == tb["country_select"], "migrants_all_sexes"] = 0
+
     # drop female and male migrants as not to clutter the grapher
     tb = tb.drop(columns=["migrants_female", "migrants_male"])
 

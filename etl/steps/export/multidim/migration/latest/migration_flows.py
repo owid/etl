@@ -33,8 +33,11 @@ def run() -> None:
             "colorScale": {
                 "binningStrategy": "manual",
                 "baseColorScheme": "YlGnBu",
-                "customNumericValues": [-1, 0, 100, 1000, 10000, 100000, 1000000, 10000000],
-                "customNumericColors": ["#AF1629", None, None, None, None, None, None],
+                "customNumericColorsActive": True,
+                "customNumericMinValue": 0,
+                "customNumericValues": [0, 1000, 10000, 100000, 1000000, 10000000],
+                "customNumericColors": ["#AF1629", None, None, None, None, None],
+                "customNumericLabels": ["Selected Country", None, None, None, None, None],
             },
         },
     }
