@@ -240,33 +240,31 @@ def run() -> None:
     )
 
     # Sort indicator choices
-    explorer.sort_choices(
-        {
-            "indicator": [
-                "population",
-                "population_broad",
-                "population_change",
-                "growth_rate",
-                "natural_change_rate",
-                "population_density",
-                "fertility_rate",
-                "births",
-                "birth_rate",
-                "deaths",
-                "death_rate",
-                "child_deaths",
-                "child_mortality_rate",
-                "infant_deaths",
-                "infant_mortality_rate",
-                "life_expectancy",
-                "age_structure",
-                "dependency_ratio",
-                "median_age",
-                "net_migration",
-                "net_migration_rate",
-                "sex_ratio",
-            ]
-        }
+    explorer.sort_indicators(
+        [
+            "population",
+            "population_broad",
+            "population_change",
+            "growth_rate",
+            "natural_change_rate",
+            "population_density",
+            "fertility_rate",
+            "births",
+            "birth_rate",
+            "deaths",
+            "death_rate",
+            "child_deaths",
+            "child_mortality_rate",
+            "infant_deaths",
+            "infant_mortality_rate",
+            "life_expectancy",
+            "age_structure",
+            "dependency_ratio",
+            "median_age",
+            "net_migration",
+            "net_migration_rate",
+            "sex_ratio",
+        ]
     )
 
     # Save explorer (upsert to DB)
