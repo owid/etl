@@ -86,6 +86,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/un/2025-03-18/migration_stock_flows:
     - data://garden/un/2025-03-18/migration_stock_flows
+    - data://garden/regions/2023-01-01/regions
 
 
   # UN DESA multidim migration flows (2024)

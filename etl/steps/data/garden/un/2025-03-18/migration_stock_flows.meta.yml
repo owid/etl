@@ -60,5 +60,5 @@ tables:
           <% elif metric == "emigrants" %>
           The number of men who were born in << country_select >> and now live abroad.
           <% endif %>
-        unit: migrants
+
 

@@ -14,9 +14,11 @@ def run() -> None:
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("migration_stock_flows")
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from garden dataset.
     tb = ds_garden.read("migrant_stock_dest_origin")
+    regions = ds_regions.read("regions")
 
     # Copy table
     tb_switched = tb.copy(deep=True)
@@ -32,6 +34,10 @@ def run() -> None:
 
     # combine tables
     tb = pr.concat([tb, tb_switched])
+
+    # remove regions as "country_select" dimension
+    countries = regions[regions["region_type"] == "country"]["name"].unique()
+    tb = tb[tb["country_select"].isin(countries)]
 
     # drop female and male migrants as not to clutter the grapher
     tb = tb.drop(columns=["migrants_female", "migrants_male"])
