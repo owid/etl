@@ -434,3 +434,4 @@ include:
   - dag/archive/biodiversity.yml
   - dag/archive/space.yml
   - dag/archive/survey.yml
+  - dag/archive/migration.yml

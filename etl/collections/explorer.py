@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 import pandas as pd
 
-from etl.collections.common import expand_config
+from etl.collections.common import INDICATORS_SLUG, expand_config
 from etl.collections.explorer_legacy import _create_explorer_legacy
 from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
 from etl.collections.utils import (
@@ -56,10 +56,15 @@ class Explorer(Collection):
         """
         mapping = {}
         for dim in self.dimensions:
-            mapping[dim.slug] = {
+            dix = {
                 "widget_name": f"{dim.name} {dim.ui_type.title()}",
                 "choices": {choice.slug: choice.name for choice in dim.choices},
             }
+            # Add checkbox_true if it is of type checkbox
+            if dim.ui_type == "checkbox":
+                assert dim.presentation is not None
+                dix["checkbox_true"] = dix["choices"][dim.presentation.choice_slug_true]
+            mapping[dim.slug] = dix
         return mapping
 
     @property
@@ -69,6 +74,12 @@ class Explorer(Collection):
 
         _, name = self.catalog_path.split("#")
         return name
+
+    def sort_indicators(self, order: List[str], indicators_slug: Optional[str] = None):
+        """Sort indicators in all views."""
+        if indicators_slug is None:
+            indicators_slug = INDICATORS_SLUG
+        self.sort_choices({"indicator": order})
 
     def save(
         self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False, prune_dimensions: bool = True
@@ -229,6 +240,14 @@ def extract_explorers_tables(
 
         # Convert columns to categorical with the specified order
         df_grapher[column] = pd.Categorical(df_grapher[column], categories=choices_ordered, ordered=True)
+
+    # Set checkbox columns (if any) as boolean
+    for _, properties in dimensions_display.items():
+        if "checkbox_true" in properties:
+            column = properties["widget_name"]
+            true_label = properties["checkbox_true"]
+            df_grapher[column] = df_grapher[column] == true_label
+
     df_grapher = df_grapher.sort_values(by=[d["widget_name"] for _, d in dimensions_display.items()])
 
     ## Order columns
@@ -269,6 +288,11 @@ def bake_dimensions_view(dimensions_display, view) -> Dict[str, str]:
     view_dimensions = {}
     for slug_dim, slug_choice in view.dimensions.items():
         widget_name = dimensions_display[slug_dim]["widget_name"]
+
+        # Checkbox
+        # if "checkbox_true" in dimensions_display[slug_dim]:
+        #     view_dimensions[widget_name] = slug_choice == dimensions_display[slug_dim]["checkbox_true"]
+        # else:
         view_dimensions[widget_name] = dimensions_display[slug_dim]["choices"][slug_choice]
     return view_dimensions
 
