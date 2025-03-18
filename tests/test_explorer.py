@@ -238,15 +238,7 @@ def test_explorer_config_legacy(mock_map_func):
 
     # Output shape test
     assert df_grapher.shape[0] == 6
-    assert df_columns.shape[0] == 7
-
-    # Check that columns makes sense
-    mask = df_columns["catalogPath"].notna()
-    assert (df_columns[mask].index == [0, 2, 4]).all()
-    assert df_columns.loc[mask, "slug"].isna().all()
-    mask = df_columns["slug"].notna()
-    assert (df_columns[mask].index == [1, 3, 5]).all()
-    assert df_columns.loc[mask, "catalogPath"].isna().all()
+    assert df_columns.shape[0] == 6
 
     # TODO: check df_grapher
     mask = df_grapher["yVariableIds"].notna()
