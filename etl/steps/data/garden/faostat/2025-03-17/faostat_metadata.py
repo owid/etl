@@ -40,7 +40,6 @@ important issues (since we use item_code to merge different datasets, and we use
 import json
 import os
 import sys
-from copy import deepcopy
 from typing import Dict, List, Tuple
 
 import owid.catalog.processing as pr
@@ -49,7 +48,6 @@ from owid.datautils import dataframes, io
 from shared import (
     CURRENT_DIR,
     ELEMENTS_IN_FBSH_MISSING_IN_FBS,
-    FAOSTAT_METADATA_SHORT_NAME,
     FLAGS_RANKING,
     N_CHARACTERS_ELEMENT_CODE,
     N_CHARACTERS_ITEM_CODE,
@@ -1000,15 +998,12 @@ def process_metadata(
     return tb_countries, tb_datasets, tb_elements, tb_items
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
-    # Fetch the dataset short name from dest_dir.
-    dataset_short_name = "faostat_metadata"
-
     # Define path to current step file.
-    current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
+    current_step_file = (CURRENT_DIR / "faostat_metadata").with_suffix(".py")
 
     # Get paths and naming conventions for current data step.
     paths = PathFinder(current_step_file.as_posix())
@@ -1053,18 +1048,7 @@ def run(dest_dir: str) -> None:
         value_amendments=value_amendments,
     )
 
-    #
-    # Save outputs.
-    #
-    # Initialize new garden dataset.
-    dataset_garden = Dataset.create_empty(dest_dir)
-    dataset_garden.short_name = FAOSTAT_METADATA_SHORT_NAME
-    # Keep original dataset's metadata from meadow.
-    dataset_garden.metadata = deepcopy(metadata.metadata)
-    # Create new dataset in garden.
-    dataset_garden.save()
-
-    # Create new garden dataset with all dataset descriptions, items, element-units, and countries.
+    # Create all tables with dataset descriptions, items, element-units, and countries.
     datasets_table = create_table(tb=tb_datasets, short_name="datasets", index_cols=["dataset"])
     items_table = create_table(tb=tb_items, short_name="items", index_cols=["dataset", "item_code"])
     elements_table = create_table(tb=tb_elements, short_name="elements", index_cols=["dataset", "element_code"])
@@ -1074,9 +1058,14 @@ def run(dest_dir: str) -> None:
         ["dataset", "spurious_value"], verify_integrity=True
     )
 
-    # Add tables to dataset.
-    dataset_garden.add(datasets_table, repack=False)
-    dataset_garden.add(items_table, repack=False)
-    dataset_garden.add(elements_table, repack=False)
-    dataset_garden.add(countries_table, repack=False)
-    dataset_garden.add(amendments_table, repack=False)
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset.
+    ds_grapher = paths.create_dataset(
+        tables=[datasets_table, items_table, elements_table, countries_table, amendments_table],
+        repack=False,
+        default_metadata=metadata.metadata,
+        check_variables_metadata=False,
+    )
+    ds_grapher.save()
