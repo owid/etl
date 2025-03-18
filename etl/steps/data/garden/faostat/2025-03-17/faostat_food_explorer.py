@@ -8,8 +8,6 @@ The resulting dataset will later be loaded by the `explorer/food_explorer` which
 
 """
 
-from pathlib import Path
-
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 from shared import (
@@ -291,16 +289,16 @@ ITEM_CODES_FBSC = [
 ELEMENT_CODES_QCL = [
     "005312",
     "005313",
-    "005314",
+    # "005314",
     "005318",
     "005320",
     "005321",
-    "005410",
+    # "005410",
     "005413",
     "005417",
-    "005419",
-    "005420",
-    "005422",
+    "005412",
+    # "005420",
+    # "005422",
     "005424",
     "005510",
     "005513",
@@ -377,6 +375,8 @@ def combine_qcl_and_fbsc(tb_qcl: Table, tb_fbsc: Table) -> Table:
     ]
     qcl = tb_qcl.reset_index()[columns]
     # Select relevant element codes.
+    missing_elements = set(ELEMENT_CODES_QCL) - set(qcl["element_code"])
+    assert len(missing_elements) == 0, f"Missing element codes in faostat_qcl: {missing_elements}"
     qcl = qcl[qcl["element_code"].isin(ELEMENT_CODES_QCL)].reset_index(drop=True)
     qcl["value"] = qcl["value"].astype(float)
     qcl["element"] = [element for element in qcl["element"]]
@@ -384,6 +384,8 @@ def combine_qcl_and_fbsc(tb_qcl: Table, tb_fbsc: Table) -> Table:
     qcl["item"] = [item for item in qcl["item"]]
     fbsc = tb_fbsc.reset_index()[columns]
     # Select relevant element codes.
+    missing_elements = set(ELEMENT_CODES_FBSC) - set(fbsc["element_code"])
+    assert len(missing_elements) == 0, f"Missing element codes in faostat_fbsc: {missing_elements}"
     fbsc = fbsc[fbsc["element_code"].isin(ELEMENT_CODES_FBSC)].reset_index(drop=True)
     fbsc["value"] = fbsc["value"].astype(float)
     fbsc["element"] = [element for element in fbsc["element"]]
@@ -502,21 +504,15 @@ def process_combined_data(tb: Table, ds_population: Dataset) -> Table:
 
     assert len(tb_wide.columns[tb_wide.isnull().all(axis=0)]) == 0, "Unexpected columns with only nan values."
 
-    # Set a reasonable index.
-    tb_wide = tb_wide.set_index(index_columns, verify_integrity=True)
-
     return tb_wide
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
-    # Fetch the dataset short name from dest_dir.
-    dataset_short_name = Path(dest_dir).name
-
     # Define path to current step file.
-    current_step_file = (CURRENT_DIR / dataset_short_name).with_suffix(".py")
+    current_step_file = (CURRENT_DIR / "faostat_food_explorer").with_suffix(".py")
 
     # Get paths and naming conventions for current data step.
     paths = PathFinder(current_step_file.as_posix())
@@ -541,8 +537,8 @@ def run(dest_dir: str) -> None:
     # Prepare data in the format required by the food explorer.
     tb = process_combined_data(tb=tb, ds_population=ds_population)
 
-    # Rename table of products.
-    tb.metadata.short_name = dataset_short_name
+    # Improve table format.
+    tb = tb.format(keys=["product", "country", "year"], short_name=paths.short_name)
 
     #
     # Save outputs.

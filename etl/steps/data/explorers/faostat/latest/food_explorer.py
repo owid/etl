@@ -10,7 +10,7 @@ from typing import List
 from owid.catalog import Table, utils
 from tqdm.auto import tqdm
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 paths = PathFinder(__file__)
 
@@ -38,7 +38,7 @@ EXPECTED_COLUMNS = {
     "other_uses__tonnes_per_capita": "other_uses__tonnes__per_capita",
     "producing_or_slaughtered_animals__animals": "producing_or_slaughtered_animals__animals",
     "producing_or_slaughtered_animals__animals_per_capita": "producing_or_slaughtered_animals__animals__per_capita",
-    "production__tonnes": "production__tonnes",
+    # "production__tonnes": "production__tonnes",
     "production__tonnes_per_capita": "production__tonnes__per_capita",
     "waste_in_supply_chain__tonnes": "waste_in_supply_chain__tonnes",
     "waste_in_supply_chain__tonnes_per_capita": "waste_in_supply_chain__tonnes__per_capita",
@@ -89,7 +89,7 @@ def create_table_for_each_product(tb_garden: Table) -> List[Table]:
     return tables
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
@@ -97,7 +97,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("faostat_food_explorer")
 
     # Get the table of all food products.
-    tb_garden = ds_garden["faostat_food_explorer"]
+    tb_garden = ds_garden.read("faostat_food_explorer", reset_index=False)
 
     #
     # Process data.
@@ -108,9 +108,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Initialize new explorers dataset.
-    ds_explorers = create_dataset(
-        dest_dir=dest_dir, tables=tables, default_metadata=ds_garden.metadata, formats=["csv"]
-    )
+    ds_explorers = paths.create_dataset(tables=tables, default_metadata=ds_garden.metadata, formats=["csv"])
 
     # Create new explorers dataset.
     ds_explorers.save()

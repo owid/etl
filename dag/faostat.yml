@@ -437,9 +437,8 @@ steps:
   #
   # FAOSTAT food explorer step.
   #
-  # TODO: Adapt explorer step (indicators have changed).
-  # data://explorers/faostat/latest/food_explorer:
-  #   - data://garden/faostat/2025-03-17/faostat_food_explorer
+  data://explorers/faostat/latest/food_explorer:
+    - data://garden/faostat/2025-03-17/faostat_food_explorer
   #
   # FAOSTAT garden step for additional variables for version 2025-03-17
   #
