@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Set, Tuple
 
 import pandas as pd
 
-from etl.collections.common import expand_config
+from etl.collections.common import INDICATORS_SLUG, expand_config
 from etl.collections.explorer_legacy import _create_explorer_legacy
 from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
 from etl.collections.utils import (
@@ -69,6 +69,12 @@ class Explorer(Collection):
 
         _, name = self.catalog_path.split("#")
         return name
+
+    def sort_indicators(self, order: List[str], indicators_slug: Optional[str] = None):
+        """Sort indicators in all views."""
+        if indicators_slug is None:
+            indicators_slug = INDICATORS_SLUG
+        self.sort_choices({"indicator": order})
 
     def save(
         self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False, prune_dimensions: bool = True
