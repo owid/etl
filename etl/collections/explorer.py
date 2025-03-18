@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog.utils import underscore
 
-from etl.collections.common import INDICATORS_SLUG, expand_config, map_indicator_paths_to_ids
+from etl.collections.common import INDICATORS_SLUG, expand_config, get_mapping_paths_to_id
 from etl.collections.explorer_legacy import _create_explorer_legacy
 from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
 from etl.collections.utils import (
@@ -306,8 +306,7 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
 
         # 1. Tweak df_columns to have a row for all the different display settings of each indicator
         catalog_paths = df_columns["catalogPath"].unique().tolist()
-        ids = map_indicator_paths_to_ids(catalog_paths)
-        mapping = dict(zip(catalog_paths, ids))
+        mapping = get_mapping_paths_to_id(catalog_paths)
         df_columns.loc[:, "_variableId"] = df_columns["catalogPath"].map(mapping)
 
         # Add unique identifier

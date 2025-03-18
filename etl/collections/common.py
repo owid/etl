@@ -53,7 +53,7 @@ def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = No
         return db_indicator.id
 
 
-def map_indicator_paths_to_ids(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> List[int]:
+def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> Dict[str, str]:
     # Check if given path is actually an ID
     # Get ID, assuming given path is a catalog path
     if owid_env is None:
@@ -62,7 +62,9 @@ def map_indicator_paths_to_ids(catalog_paths: List[str], owid_env: Optional[OWID
         engine = owid_env.engine
     with Session(engine) as session:
         db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # type: ignore
-        return [indicator.id for indicator in db_indicators]
+        # scores = dict(zip(catalog_paths, range(len(catalog_paths))))
+        # db_indicators.sort(key=lambda x: scores[x.catalogPath], reverse=True)
+        return {indicator.catalogPath: indicator.id for indicator in db_indicators}
 
 
 def expand_config(
@@ -266,7 +268,7 @@ class CollectionConfigExpander:
         if dimensions is None:
             # If table defines dimensions, use them
             if self.tb_dims:
-                dimensions = [d["slug"] for d in self.tb_dims]
+                dimensions = [str(d["slug"]) for d in self.tb_dims]
             else:
                 # If dimensions is None, use a list with all dimension names (in no particular order)
                 dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
@@ -313,8 +315,8 @@ class CollectionConfigExpander:
                 # Build choices for given dimension
                 choices = [
                     {
-                        "slug": val,
-                        "name": val,
+                        "slug": str(val),
+                        "name": str(val),
                         "description": None,
                     }
                     for val in dim_values
@@ -327,14 +329,15 @@ class CollectionConfigExpander:
                         dim_name = next(d["name"] for d in self.tb_dims if d["slug"] == dim)
                     except StopIteration:
                         dim_name = dim
+                    dim_name = dim_name
                 else:
                     # Otherwise use slug
                     dim_name = dim
 
                 # Build dimension
                 dimension = {
-                    "slug": dim,
-                    "name": dim_name,
+                    "slug": str(dim),
+                    "name": str(dim_name),
                     "choices": choices,
                 }
 
@@ -453,6 +456,10 @@ class CollectionConfigExpander:
         # Re-order columns
         cols_dims = [col for col in df_dims.columns if col not in [self.indicators_slug, "short_name"]]
         df_dims = df_dims[[self.indicators_slug] + sorted(cols_dims) + ["short_name"]]
+
+        # Set df_dims as string!
+        df_dims = df_dims.astype(str)
+
         return df_dims
 
     def _sanity_checks_df_dims(self, indicator_names: Optional[List[str]], df_dims: pd.DataFrame):
