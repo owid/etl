@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import pandas as pd
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
@@ -19,6 +21,7 @@ def run() -> None:
     # Read table from garden dataset.
     tb = ds_garden.read("migrant_stock_dest_origin")
     regions = ds_regions.read("regions")
+    countries = regions[regions["region_type"] == "country"]["name"].unique()
 
     # Copy table
     tb_switched = tb.copy(deep=True)
@@ -32,15 +35,14 @@ def run() -> None:
     tb_switched = tb_switched.rename(columns={"country_destination": "country", "country_origin": "country_select"})
     tb_switched["metric"] = "emigrants"
 
+    # Add rows for country and country select being equal
+    tb_same_country = create_same_country_rows(countries)
+
     # combine tables
-    tb = pr.concat([tb, tb_switched])
+    tb = pr.concat([tb, tb_switched, tb_same_country])
 
     # remove regions as "country_select" dimension
-    countries = regions[regions["region_type"] == "country"]["name"].unique()
     tb = tb[tb["country_select"].isin(countries)]
-
-    # set migrants_all_sexes to 0 if country and country_select are the same
-    tb.loc[tb["country"] == tb["country_select"], "migrants_all_sexes"] = 0
 
     # drop female and male migrants as not to clutter the grapher
     tb = tb.drop(columns=["migrants_female", "migrants_male"])
@@ -55,3 +57,22 @@ def run() -> None:
 
     # Save grapher dataset.
     ds_grapher.save()
+
+
+def create_same_country_rows(countries):
+    """Create rows for countries where country and country select are the same and set migrants to 0."""
+    rows = []
+    for country in countries:
+        for year in [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024]:
+            for metric in ["immigrants", "emigrants"]:
+                row = {
+                    "country_select": country,
+                    "country": country,
+                    "year": year,
+                    "migrants_all_sexes": 0,
+                    "migrants_female": 0,
+                    "migrants_male": 0,
+                    "metric": metric,
+                }
+                rows.append(row)
+    return Table(pd.DataFrame(rows))
