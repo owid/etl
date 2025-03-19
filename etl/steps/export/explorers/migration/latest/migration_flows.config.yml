@@ -1,0 +1,35 @@
+config:
+  explorerTitle: Migration Flows
+  explorerSubtitle: Explore global migration data, country-by-country.
+  isPublished: true
+  selection:
+    - United States
+    - United Kingdom
+    - France
+    - Mexico
+    - India
+    - China
+    - Germany
+    - Australia
+    - Brazil
+    - South Africa
+  thumbnail: https://ourworldindata.org/app/uploads/2022/03/migration-flows-explorer.png
+  subNavId:
+  subNavCurrentId:
+  hasMapTab: true
+  yAxisMin: 0
+  hideAnnotationFieldsInTitle: true
+  tab: map
+
+dimensions:
+  - name: Country
+    slug: country_select
+  - name: Metric
+    slug: metric
+    choices:
+      - slug: "immigrants"
+        name: "Immigrants - People moving to country"
+      - slug: "emigrants"
+        name: "Emigrants - People moving away from country"
+
+views: []
