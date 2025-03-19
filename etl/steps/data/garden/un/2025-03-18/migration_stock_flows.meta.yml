@@ -28,9 +28,9 @@ tables:
           <% endif %>
         description_short: |-
           <% if metric == "immigrants" %>
-          The number of people who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year – it is not the annual flow of immigrants.
+          The number of people who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
           <% elif metric == "emigrants" %>
-          The number of people who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year – it is not the annual flow of emigrants.
+          The number of people who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
           <% endif %>
         unit: people
       migrants_female:
@@ -42,9 +42,9 @@ tables:
           <% endif %>
         description_short: |-
           <% if metric == "immigrants" %>
-          The number of women who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year – it is not the annual flow of immigrants.
+          The number of women who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
           <% elif metric == "emigrants" %>
-          The number of women who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year – it is not the annual flow of emigrants.
+          The number of women who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
           <% endif %>
         unit: people
       migrants_male:
@@ -56,9 +56,9 @@ tables:
           <% endif %>
         description_short: |-
           <% if metric == "immigrants" %>
-          The number of men who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year – it is not the annual flow of immigrants.
+          The number of men who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
           <% elif metric == "emigrants" %>
-          The number of men who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year – it is not the annual flow of emigrants.
+          The number of men who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
           <% endif %>
         unit: people
 

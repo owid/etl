@@ -35,14 +35,17 @@ def run() -> None:
     tb_switched = tb_switched.rename(columns={"country_destination": "country", "country_origin": "country_select"})
     tb_switched["metric"] = "emigrants"
 
-    # Add rows for country and country select being equal
-    tb_same_country = create_same_country_rows(countries)
-
     # combine tables
-    tb = pr.concat([tb, tb_switched, tb_same_country])
+    tb = pr.concat([tb, tb_switched])
 
     # remove regions as "country_select" dimension
     tb = tb[tb["country_select"].isin(countries)]
+
+    # Add rows for country and country select being equal
+    tb_same_country = create_same_country_rows(tb["country_select"].unique())
+
+    # include rows for countries where country and country select are the same
+    tb = pr.concat([tb, tb_same_country])  # type: ignore
 
     # drop female and male migrants as not to clutter the grapher
     tb = tb.drop(columns=["migrants_female", "migrants_male"])
@@ -69,9 +72,9 @@ def create_same_country_rows(countries):
                     "country_select": country,
                     "country": country,
                     "year": year,
-                    "migrants_all_sexes": 0,
-                    "migrants_female": 0,
-                    "migrants_male": 0,
+                    "migrants_all_sexes": -1,
+                    "migrants_female": -1,
+                    "migrants_male": -1,
                     "metric": metric,
                 }
                 rows.append(row)
