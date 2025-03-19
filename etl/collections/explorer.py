@@ -1,11 +1,12 @@
-import re
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
+import numpy as np
 import pandas as pd
+from owid.catalog.utils import underscore
 
-from etl.collections.common import INDICATORS_SLUG, expand_config
+from etl.collections.common import INDICATORS_SLUG, expand_config, get_mapping_paths_to_id
 from etl.collections.explorer_legacy import _create_explorer_legacy
 from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
 from etl.collections.utils import (
@@ -176,7 +177,43 @@ def extract_explorers_tables(
     # 1. Prepare Dimension display dictionary
     dimensions_display = explorer.display_config_names()
 
-    # 2. Remix configuration to generate explorer-friendly graphers table.
+    # 2. Remix configuration to generate explorer-friendly grapher and columns tables.
+    df_grapher, df_columns = _extract_explorers_tables(
+        explorer=explorer,
+        dimensions_display=dimensions_display,
+    )
+    columns_widgets = [props["widget_name"] for _, props in dimensions_display.items()]
+
+    # 3. Order views
+    df_grapher = _order_explorer_views(
+        df=df_grapher,
+        dimensions_display=dimensions_display,
+    )
+    # 4. Adapt tables for view-level indicator display settings
+    df_grapher, df_columns = _add_indicator_display_settings(df_grapher, df_columns, columns_widgets)
+
+    # 5. Order columns
+    df_grapher = _order_columns(df_grapher, columns_widgets)
+
+    # 6. Set checkbox columns (if any) as boolean
+    df_grapher = _set_checkbox_as_boolean(df_grapher, dimensions_display)
+
+    # Drop dimension columns
+    df_columns = df_columns.drop(columns=columns_widgets + ["_axis"])
+    # # Drop All-NA rows
+    # df_columns = df_columns.dropna(subset=[col for col in df_columns.columns if col != "catalogPath"], how="all")
+    # Drop duplicates, if any
+    df_columns = df_columns.drop_duplicates()
+
+    # Sanity check (even if all-NA, we keep it because otherwise Grapher complains!)
+    assert df_columns["catalogPath"].isna().all(), "catalogPath should be all NA in df_columns."
+
+    return df_grapher, df_columns
+
+
+def _extract_explorers_tables(
+    explorer: Explorer, dimensions_display: Dict[str, Any]
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     records_grapher = []
     records_columns = []
     for view in explorer.views:
@@ -214,7 +251,7 @@ def extract_explorers_tables(
         record_columns = [
             {
                 "catalogPath": item["path"],
-                "axis": item["axis"],
+                "_axis": item["axis"],
                 **dimensions,
                 **(item["display"] if isinstance(item["display"], dict) else {}),
             }
@@ -229,58 +266,158 @@ def extract_explorers_tables(
     df_grapher = pd.DataFrame.from_records(records_grapher)
     df_columns = pd.DataFrame.from_records(records_columns)
 
-    # Order views
+    return df_grapher, df_columns
+
+
+def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
+    """Add indicator display settings.
+
+    Since we want to support different display settings for the same indicator across different views, we need to use some 'hacks' (transform column, slugs instead of paths, etc.).
+
+    TODO: transform operations can only be applied to indicator IDs (hence we need DB-access!).
+    """
+
+    def _create_mapping(group):
+        # Check for duplicates across axis and catalogPath combinations
+        if group.duplicated(subset=["_axis", "catalogPath"]).any():
+            raise ValueError(f"Duplicate ('catalogPath', 'axis') found in group:\n{group}")
+
+        nested_mapping = (
+            group.groupby("_axis")[["catalogPath", "slug"]]
+            .apply(lambda g: dict(zip(g["catalogPath"], g["slug"])))
+            .to_dict()
+        )
+
+        return pd.Series({"_slug_renames": nested_mapping})
+
+    ## Drop duplicates, if any
+    df_columns = df_columns.drop_duplicates()
+
+    # Drop those that do not have any settings set
+    cols_settings = [col for col in df_columns.columns if col not in columns_widgets + ["_axis", "catalogPath"]]
+    df_columns = df_columns.dropna(how="all", subset=cols_settings)
+
+    # If there is more than one definition for the same indicator, proceed to adapt tables
+    # mask = df_columns.duplicated(subset=["catalogPath"])
+    if not df_columns.empty:
+        # Assign ID to each row, based on whether the indicator config is the same. This helps us reduce unnecessary duplication of display settings.
+        columns_subset = [col for col in df_columns.columns if col not in columns_widgets + ["_axis"]]
+        df_columns.loc[:, "_slug_id"] = df_columns.groupby(columns_subset, dropna=False).ngroup()
+
+        # 1. Tweak df_columns to have a row for all the different display settings of each indicator
+        catalog_paths = df_columns["catalogPath"].unique().tolist()
+        mapping = get_mapping_paths_to_id(catalog_paths)
+        df_columns.loc[:, "_variableId"] = df_columns["catalogPath"].map(mapping)
+
+        # Add unique identifier
+        df_columns.loc[:, "slug"] = (
+            df_columns["catalogPath"].apply(lambda x: underscore(x.replace("/", "__").replace("#", "__")))
+            + "__"
+            + df_columns["_slug_id"].astype(str)
+        )
+        # Add transform column
+        df_columns.loc[:, "transform"] = "duplicate " + df_columns["_variableId"].astype(str)
+
+        # 3. Tweak df_grapher
+        # Get dictionary for re-mapping
+        # Generate mapping
+        mapping_series = (
+            df_columns.groupby(columns_widgets)[["_axis", "catalogPath", "slug"]].apply(_create_mapping).reset_index()
+        )
+        # Merge mapping
+        df_grapher = df_grapher.merge(mapping_series, on=columns_widgets, how="left")
+        # Add ySlugs, xSlug, colorSlug or sizeSlug.
+        columns_slugs = ["xSlug", "ySlugs", "colorSlug", "sizeSlug"]
+        df_grapher[columns_slugs] = None
+        # Iterate over affected rows, add slugs / remove paths
+        mask_2 = df_grapher["_slug_renames"].notna()
+        for idx, row in df_grapher[mask_2].iterrows():
+            renames = row["_slug_renames"]
+
+            for axis, renames_axis in renames.items():
+                if axis == "y":
+                    col_id = "yVariableIds"
+                    col_slug = "ySlugs"
+                    # Sanity check
+                    assert (col_id in row) and isinstance(row[col_id], list) and (len(row[col_id]) >= 1)
+                else:
+                    col_id = f"{axis}VariableId"
+                    col_slug = f"{axis}Slug"
+                    # Sanity check
+                    assert (col_id in row) and isinstance(row[col_id], list) and (len(row[col_id]) == 1)
+
+                # Get new values
+                slugs = [renames_axis.get(p) for p in row[col_id] if p in renames_axis]
+                paths = [p for p in row[col_id] if p not in renames_axis]
+                # Set new values
+                df_grapher.at[idx, col_slug] = slugs if slugs != [] else np.nan
+                df_grapher.at[idx, col_id] = paths if paths != [] else np.nan
+
+        # 3. Finalize df_columns and df_grapher
+        # COLUMNS
+        # Reorder
+        columns_first = ["catalogPath", "slug", "transform"]
+        df_columns = df_columns[[*columns_first, *df_columns.columns.difference(columns_first)]]
+        # Set catalogPath to None
+        df_columns.loc[:, "catalogPath"] = None
+        # Drop auxiliary columns
+        df_columns = df_columns.drop(columns=["_variableId", "_slug_id"])
+
+        # GRAPHER
+        # Drop all-NA columns (TODO: does something happen if there is 'xSlug' but no 'xVariableId'? or any other axis?)
+        cols_variables = df_grapher.filter(regex=r"(y|x|color|size)VariableIds?").columns
+        df_grapher_ids = df_grapher[cols_variables].copy()
+        df_grapher = df_grapher.dropna(how="all", axis=1)
+        df_grapher.loc[:, cols_variables] = df_grapher_ids
+        df_grapher = df_grapher.drop(columns=["_slug_renames"])
+
+    return df_grapher, df_columns
+
+
+def _order_columns(df, columns_widgets):
+    columns_first = columns_widgets + [
+        "yVariableIds",
+        "ySlugs",
+        "xVariableId",
+        "xSlug",
+        "colorVariableId",
+        "colorSlug",
+        "sizeVariableId",
+        "sizeSlug",
+    ]
+    columns_first = [col for col in columns_first if col in df.columns]
+    df = df[columns_first + [col for col in df.columns if col not in columns_first]]
+    return df
+
+
+def _order_explorer_views(df: pd.DataFrame, dimensions_display: Dict[str, Any]) -> pd.DataFrame:
     ## Order rows
     for _, properties in dimensions_display.items():
         column = properties["widget_name"]
         choices_ordered = list(properties["choices"].values())
         # Check if all DataFrame values exist in the predefined lists
-        if not set(df_grapher[column]).issubset(set(choices_ordered)):
+        if not set(df[column]).issubset(set(choices_ordered)):
             raise ValueError(f"Column `{column}` contains values not present in `choices_ordered`.")
 
         # Convert columns to categorical with the specified order
-        df_grapher[column] = pd.Categorical(df_grapher[column], categories=choices_ordered, ordered=True)
+        df[column] = pd.Categorical(df[column], categories=choices_ordered, ordered=True)
 
-    # Set checkbox columns (if any) as boolean
+    df = df.sort_values(by=[d["widget_name"] for _, d in dimensions_display.items()])
+
+    return df
+
+
+def _set_checkbox_as_boolean(df: pd.DataFrame, dimensions_display: Dict[str, Any]) -> pd.DataFrame:
     for _, properties in dimensions_display.items():
         if "checkbox_true" in properties:
             column = properties["widget_name"]
             true_label = properties["checkbox_true"]
-            df_grapher[column] = df_grapher[column] == true_label
+            df[column] = df[column] == true_label
 
-    df_grapher = df_grapher.sort_values(by=[d["widget_name"] for _, d in dimensions_display.items()])
-
-    ## Order columns
-    cols_widgets = [d["widget_name"] for _, d in dimensions_display.items()]
-    df_grapher = df_grapher[cols_widgets + [col for col in df_grapher.columns if col not in cols_widgets]]
-
-    # TODO: Adjust df_grapher and df_columns to allow for multiple displays per-view
-    # How?
-    # Columns: Use transform=`duplicate <indicator_uri>` and slug=`<indicator_unique_identifier>`
-    # Grapher: Reference the specific "tweaked" indicator via ySlugs, xSlug, colorSlug or sizeSlug.
-    # reference: https://ourworldindata.org/war-and-peace-data-explorers (row ~318 in config)
-
-    # Drop dimension columns
-    pattern = re.compile(r"^.*\s(Dropdown|Radio|Checkbox)$")
-    drop_columns = [col for col in df_columns.columns if pattern.match(col)]
-    df_columns = df_columns.drop(columns=drop_columns + ["axis"])
-
-    # Drop All-NA rows
-    df_columns = df_columns.dropna(subset=[col for col in df_columns.columns if col != "catalogPath"], how="all")
-
-    # Drop duplicates, if any
-    df_columns = df_columns.drop_duplicates()
-
-    # Sanity check
-    mask = df_columns.duplicated(subset=["catalogPath"])
-    if mask.any():
-        raise ValueError(
-            f"Different display settings cannot be set for the same indicators. We are working to make this possible so that you can define different settings in different views. This is possible in MDIMs already! Review indicators: {df_columns.loc[mask, 'catalogPath'].tolist()}"
-        )
-    return df_grapher, df_columns
+    return df
 
 
-def bake_dimensions_view(dimensions_display, view) -> Dict[str, str]:
+def bake_dimensions_view(dimensions_display: Dict[str, Any], view) -> Dict[str, str]:
     """Cinfgure dimension details for an Explorer view.
 
     Given is dimension_slug: choice_slug. We need to convert it to dimension_name: choice_name (using dimensions_display).

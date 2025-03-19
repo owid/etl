@@ -17,8 +17,8 @@ def run() -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    ds_explorer = paths.create_explorer(
+    explorer = paths.create_explorer(
         config=config,
     )
 
-    ds_explorer.save(tolerate_extra_indicators=True)
+    explorer.save(tolerate_extra_indicators=True)
