@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical mumps cases in the United States - Centers for Disease Control and Prevention
+    title: Historical rubella cases in the United States - Centers for Disease Control and Prevention
     description: |-
-      Data on historical mumps cases in the United States, compiled from a selection of sources from the US CDC.
+      Data on historical rubella cases in the United States, compiled from a selection of sources from the US CDC.
 
       Sources for each year are as follows:
 
@@ -57,6 +57,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: 38cfc11d931cc8150af412065489c965
-    size: 3984
-    path: mumps_cases.csv
+  - md5: b3976da2a2d6213ab6395b664875cf9b
+    size: 4066
+    path: rubella_cases.csv
