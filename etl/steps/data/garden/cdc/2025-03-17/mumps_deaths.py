@@ -16,7 +16,7 @@ def run() -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("mumps_deaths")
     tb = tb.drop(columns=["source"])
-    tb_pop = ds_population.read("population")
+    tb_pop = ds_population.read("population", reset_metadata="keep_origins")
     #
     # Process data.
 
