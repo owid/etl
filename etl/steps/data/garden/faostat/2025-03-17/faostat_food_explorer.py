@@ -522,8 +522,8 @@ def run() -> None:
     ds_fbsc = paths.load_dataset("faostat_fbsc")
 
     # Get main long tables from qcl and fbsc datasets.
-    tb_qcl = ds_qcl["faostat_qcl"]
-    tb_fbsc = ds_fbsc["faostat_fbsc"]
+    tb_qcl = ds_qcl.read("faostat_qcl", reset_index=False)
+    tb_fbsc = ds_fbsc.read("faostat_fbsc", reset_index=False)
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
