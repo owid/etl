@@ -9,10 +9,10 @@ definitions:
       tolerance: 5
       # NOTE: I also define another entity annotations map for the cases where Multilateral organizations is just EU institutions.
       entityAnnotationsMap: |-
-        DAC countries (OECD): Major aid donors in the OECD plus EU institutions
-        Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
-        G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
-        Multilateral organizations (OECD): e.g. World Bank and UN agencies
+        DAC countries: Major aid donors in the OECD plus EU institutions
+        Non-DAC countries: Qatar, Saudi Arabia, Turkey, UAE, among others
+        G7 countries: Canada, France, Germany, Italy, Japan, UK and US
+        Multilateral organizations: e.g. World Bank and UN agencies
         Official donors: DAC countries, non-DAC countries and multilateral organizations
         Private donors: Civil society organizations reporting aid data
 
@@ -21,18 +21,18 @@ definitions:
 
   # NOTE: These annotations only differ from the default one on the definition of multilateral organizations.
   entity_annotations_alternative: &entity_annotations_alternative |-
-    DAC countries (OECD): Major aid donors in the OECD plus EU institutions
-    Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
-    G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
-    Multilateral organizations (OECD): EU institutions
+    DAC countries: Major aid donors in the OECD plus EU institutions
+    Non-DAC countries: Qatar, Saudi Arabia, Turkey, UAE, among others
+    G7 countries: Canada, France, Germany, Italy, Japan, UK and US
+    Multilateral organizations: EU institutions
     Official donors: DAC countries, non-DAC countries and multilateral organizations
     Private donors: Civil society organizations reporting aid data
 
   # NOTE: These annotations exclude EU institutions from the definition of DAC countries, because we use it for per capita and as a share of GNI calculations.
   entity_annotations_alternative_2: &entity_annotations_alternative_2 |-
-    DAC countries (OECD): Major aid donors in the OECD
-    Non-DAC countries (OECD): Qatar, Saudi Arabia, Turkey, UAE, among others
-    G7 countries (OECD): Canada, France, Germany, Italy, Japan, UK and US
+    DAC countries: Major aid donors in the OECD
+    Non-DAC countries: Qatar, Saudi Arabia, Turkey, UAE, among others
+    G7 countries: Canada, France, Germany, Italy, Japan, UK and US
     Official donors: DAC countries and non-DAC countries
 
   short_oda: "[Official development assistance (ODA)](#dod:oda) is defined as government aid designed to promote the economic development and welfare of developing countries."
