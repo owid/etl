@@ -23,13 +23,11 @@ def run(dest_dir: str) -> None:
     snap = paths.load_snapshot("flunet.csv")
 
     # Load data from snapshot.
-    df = pd.read_csv(snap.path)
-
+    tb = snap.read_csv(underscore=True)
     #
     # Process data.
     #
     # Create a new table and ensure all columns are snake-case.
-    tb = Table(df, short_name=paths.short_name, underscore=True)
     tb = tb.rename(columns={"country_area_territory": "country"})
 
     # Convert messy columns to string.
@@ -37,9 +35,6 @@ def run(dest_dir: str) -> None:
     for col in ("aother_subtype_details", "other_respvirus_details"):
         ix = tb[col].notnull()
         tb.loc[ix, col] = tb.loc[ix, col].astype("str")
-
-    # Clean up columns.
-    # tb["iso_week"] = tb["iso_week"].replace({"NOTDEFINED": None}).astype(float).astype("Int64")
 
     #
     # Save outputs.
