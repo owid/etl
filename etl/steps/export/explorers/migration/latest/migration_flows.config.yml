@@ -1,3 +1,19 @@
+definitions:
+  common_views:
+    # Applies to all views with dimension metric=emigrants, unless overridden
+    - dimensions:
+        metric: emigrants
+      config:
+        hasChartTab: true
+        type: LineChart
+        yScaleToggle: true
+    # Applies to all views with dimension metric=immigrants, unless overridden
+    - dimensions:
+        metric: immigrants
+      config:
+        hasChartTab: false
+        type: None
+
 config:
   explorerTitle: Migration Flows
   explorerSubtitle: Explore global migration data, country-by-country.
@@ -26,10 +42,12 @@ dimensions:
     slug: country_select
   - name: Metric
     slug: metric
+    presentation:
+      type: radio
     choices:
       - slug: "immigrants"
-        name: "Immigrants - People moving to country"
+        name: "Immigrants: People moving to country"
       - slug: "emigrants"
-        name: "Emigrants - People moving away from country"
+        name: "Emigrants: People moving away from country"
 
 views: []
