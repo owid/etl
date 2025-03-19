@@ -3,15 +3,13 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical polio deaths in the United States - Centers for Disease Control and Prevention
+    title: Historical mumps deaths in the United States - Centers for Disease Control and Prevention
     description: |-
-      Data on historical polio deaths in the United States, compiled from a selection of sources from the US CDC.
+      Data on historical mumps deaths in the United States, compiled from a selection of sources from the US CDC.
 
       Sources for each year are as follows:
 
-      * 1950-1959: [Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.](https://www.globalhealthchronicles.org/items/show/6303)
-
-      * 1960-1967: [Reported Incidence of Notifiable Diseases in the United States, 1970. Morbidity and Mortality Vol. 19, No. 53 (1971)](https://www.jstor.org/stable/44323897?read-now=1&seq=5#page_scan_tab_contents)
+      * 1959-1967: [Reported Incidence of Notifiable Diseases in the United States, 1970. Morbidity and Mortality Vol. 19, No. 53 (1971)](https://www.jstor.org/stable/44323897?read-now=1&seq=5#page_scan_tab_contents)
 
       * 1968-1978: [Compressed Mortality, 1968-1978 - CDC Wonder (ICD-8)](https://wonder.cdc.gov/cmf-icd8.html)
 
@@ -42,6 +40,6 @@ meta:
     license:
       name: Public domain
 outs:
-  - md5: ea0d2da5d22bb6332304c85e19e91b9f
-    size: 4514
-    path: polio_deaths.csv
+  - md5: 5ed8a6687a5f87782de24a0bd3b95f1c
+    size: 3669
+    path: mumps_deaths.csv
