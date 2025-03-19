@@ -26,7 +26,7 @@ tables:
           numDecimalPlaces: 0
       case_rate:
         title: Mumps cases per 100,000 people
-        description_short: Reported number of [mumps](#dod:mumps) deaths in the United States per 100,000 people.
+        description_short: Reported number of [mumps](#dod:mumps) cases in the United States per 100,000 people.
         unit: cases per 100,000 people
         display:
           numDecimalPlaces: 1
