@@ -79,7 +79,7 @@ log = structlog.get_logger()
     "--export/--no-export",
     default=False,
     type=bool,
-    help="Run export steps like writing explorer TSV file to owid-content repository _(OWID staff only, access required)_",
+    help="Run export steps like saving explorer _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
