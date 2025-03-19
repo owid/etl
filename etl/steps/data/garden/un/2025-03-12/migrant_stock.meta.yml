@@ -1,0 +1,97 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Migration
+      grapher_config:
+        originUrl: "https://ourworldindata.org/migration"
+    processing_level: minor #minor for most indicators, major for data that has been manipulated (e.g. 5 year change, share of child migrants)
+    short_unit: ""
+    display:
+      numDecimalPlaces: 0 # 0 for most indicators, 1 for percentages/ shares
+    description_processing: |-
+      - {definitions.description_processing.owid_regions}
+  description_un:
+    migrant_stock: International migrant stock at mid-year by age and sex and by region, country or area of destination, 1990-2024
+    share_migrant_stock: International migrant stock as percentage of the total population by age and sex and by region, country or area of destination, 1990-2024
+    migrants_per_age: International migrant stock at mid-year by age and sex and by region, country or area of destination, 1990-2024
+    share_age_migrants: Percentage distribution of the international migrant stock by age and sex and by region, country or area of destination, 1990-2024
+  description_processing:
+    owid_regions: Regional aggregates (such as continents, income groups and the worldwide aggregate) are based on [our definition of the continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and the [World Bank definition of income groups](https://ourworldindata.org/grapher/world-bank-income-groups), unless otherwise indicated. They might differ from the definitions used by the United Nations.
+
+dataset:
+  update_period_days: 730 # had biyearly releases in the past, maybe they are going back to it?
+
+
+tables:
+  migrant_stock:
+    variables:
+      # Immigrant stock
+      immigrants_all:
+        title: Total number of international immigrants
+        description_short: People living in a given country who were born in another country.
+        description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: "immigrants"
+      immigrants_female:
+        title: Total number of international immigrants - female
+        description_short: The total number of women living in a given country who were born in another country.
+        description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: female immigrants
+      immigrants_male:
+        title: Total number of international immigrants - male
+        description_short: The total number of men living in a given country who were born in another country.
+        description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: male immigrants
+      # Immigrant share
+      immigrant_share_of_dest_population_all:
+        title: Share of the population that was born in another country
+        unit: "%"
+        short_unit: "%"
+        description_short: Immigrants as a share of the total population.
+        description_from_producer: "{definitions.description_un.share_migrant_stock}"
+        display:
+          numDecimalPlaces: 1
+      immigrant_share_of_dest_population_female:
+        title: Share of the population that was born in another country - female
+        unit: "%"
+        short_unit: "%"
+        description_short: Female immigrants as a share of the total (female) population.
+        description_from_producer: "{definitions.description_un.share_migrant_stock}"
+        display:
+          numDecimalPlaces: 1
+      immigrant_share_of_dest_population_male:
+        title: Share of the population that was born in another country - male
+        unit: "%"
+        short_unit: "%"
+        description_short: Male immigrants as a share of the total (male) population.
+        description_from_producer: "{definitions.description_un.share_migrant_stock}"
+        display:
+          numDecimalPlaces: 1
+      # Emigrant stock
+      emigrants_all:
+        title: Total number of emigrants
+        description_short: People that were born in a country but now live in another country.
+        description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: emigrants
+      emigrants_female:
+        title: Total number of emigrants - female
+        description_short: Women that were born in this country but now live in another country.
+        description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: female emigrants
+      emigrants_male:
+        title: Total number of emigrants - male
+        description_short: Men that were born in this country but now live in another country.
+        description_from_producer: "{definitions.description_un.migrant_stock}"
+        unit: male emigrants
+      # Emigrant share
+      emigrants_share_of_total_population:
+        title: Share of the population that was born in this country but now lives in another country.
+        unit: "%"
+        short_unit: "%"
+        description_short: The total number of people that have left the country, as a share of the current population.
+        description_processing: |-
+          - We calculated the share of emigrants as the number of emigrants divided by the total population of their home country.
+          - {definitions.description_processing.owid_regions}
+        display:
+          numDecimalPlaces: 1
