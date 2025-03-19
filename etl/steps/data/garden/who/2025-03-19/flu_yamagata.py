@@ -29,10 +29,10 @@ def run() -> None:
     # tb_agg = tb.groupby(["country", "iso_weekstartdate", "iso_year"]).sum().reset_index()
     tb_world = tb.groupby(["iso_weekstartdate"])["byam"].sum().reset_index()
     tb_world["country"] = "World"
-    tb_world.rename(columns={"iso_weekstartdate": "year"}, inplace=True)
+    tb_world.rename(columns={"iso_weekstartdate": "date"}, inplace=True)
 
     # Improve table format.
-    tb_world = tb_world.format(["country", "year"])
+    tb_world = tb_world.format(["country", "date"], short_name="flu_yamagata")
 
     #
     # Save outputs.
