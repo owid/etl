@@ -24,8 +24,8 @@ tables:
         display:
           numDecimalPlaces: 0
       death_rate:
-        title: Mumps deaths per 100,000 people
-        description_short: Reported number of [mumps](#dod:mumps) deaths in the United States per 100,000 people.
-        unit: deaths per 100,000 people
+        title: Mumps deaths per ten million people
+        description_short: Reported number of [mumps](#dod:mumps) deaths in the United States per ten million people.
+        unit: deaths per 10,000,000 people
         display:
           numDecimalPlaces: 1
