@@ -3,9 +3,9 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: Historical mumps cases in the United States - Centers for Disease Control and Prevention
+    title: Historical mumps deaths in the United States - Centers for Disease Control and Prevention
     description: |-
-      Data on historical mumps cases in the United States, compiled from a selection of sources from the US CDC.
+      Data on historical mumps deaths in the United States, compiled from a selection of sources from the US CDC.
 
       Sources for each year are as follows:
 
