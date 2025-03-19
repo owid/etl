@@ -74,8 +74,8 @@ def expand_config(
     indicator_names: Optional[Union[str, List[str]]] = None,
     dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
     common_view_config: Optional[Dict[str, Any]] = None,
-    indicators_slug: Optional[str] = None,
     indicator_as_dimension: bool = False,
+    indicators_slug: Optional[str] = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
@@ -138,8 +138,10 @@ def expand_config(
     common_view_config : Dict[str, Any] | None
         Additional config fields to add to each view, e.g.
         {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
+    indicator_as_dimension: bool
+        Set to True to keep the indicator as a dimension. For instance, if you expand a table with multiple - dimensional - indicators (e.g. 'population', 'population_density'), a dimension is added in the config that specifies the indicator. If there are more than one indicators being expanded, the indicator information is kept as a dimension regardless of this flag.
     indicators_slug: str
-        Name of the slug for the indicator. Default is 'indicator'.
+        Name to use as the slug for the indicator dimension. Default is 'indicator'. This is used to identify the indicator in a view using dimensional information.
 
     EXAMPLES
     --------
