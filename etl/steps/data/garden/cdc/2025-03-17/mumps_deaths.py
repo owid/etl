@@ -22,7 +22,7 @@ def run() -> None:
 
     tb = tb.merge(tb_pop, on=["country", "year"], how="left")
     tb["death_rate"] = tb["deaths"] / tb["population"] * 100000
-    tb = tb.drop(columns=["population", "world_pop_share"])
+    tb = tb.drop(columns=["population", "world_pop_share", "source"])
     # Improve table format.
     tb = tb.format(["country", "year"])
 
