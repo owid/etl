@@ -38,7 +38,7 @@ EXPECTED_COLUMNS = {
     "other_uses__tonnes_per_capita": "other_uses__tonnes__per_capita",
     "producing_or_slaughtered_animals__animals": "producing_or_slaughtered_animals__animals",
     "producing_or_slaughtered_animals__animals_per_capita": "producing_or_slaughtered_animals__animals__per_capita",
-    # "production__tonnes": "production__tonnes",
+    "production__tonnes": "production__tonnes",
     "production__tonnes_per_capita": "production__tonnes__per_capita",
     "waste_in_supply_chain__tonnes": "waste_in_supply_chain__tonnes",
     "waste_in_supply_chain__tonnes_per_capita": "waste_in_supply_chain__tonnes__per_capita",
