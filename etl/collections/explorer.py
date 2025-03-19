@@ -1,6 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -42,9 +42,6 @@ class Explorer(Collection):
         assert "#" in value, "Catalog path should be in the format `path#name`."
         self._catalog_path = value
 
-    def from_mdim(self, mdim):
-        pass
-
     def display_config_names(self):
         """Get display names for all dimensions and choices.
 
@@ -84,7 +81,7 @@ class Explorer(Collection):
         _, name = self.catalog_path.split("#")
         return name
 
-    def sort_indicators(self, order: List[str], indicators_slug: Optional[str] = None):
+    def sort_indicators(self, order: Union[List[str], Callable], indicators_slug: Optional[str] = None):
         """Sort indicators in all views."""
         if indicators_slug is None:
             indicators_slug = INDICATORS_SLUG
