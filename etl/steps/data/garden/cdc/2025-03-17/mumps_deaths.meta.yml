@@ -4,7 +4,11 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
-
+      grapher_config:
+        tab: chart
+        hasMapTab: false
+        selectedEntityNames:
+          - United States
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
