@@ -18,10 +18,16 @@ def run() -> None:
     ds = paths.load_dataset("migration_stock_flows")
     tb = ds.read("migrant_stock_dest_origin")
 
+    # sort columns by country select
+    dim_col = sorted([c for c in tb.columns if "migrants_all_sexes" in c])
+    tb = tb[["country", "year"] + dim_col]
+
     # add country names and slugs to the config
-    all_countries = tb["country"].unique()
+    cty_idx = [i for i, d in enumerate(config["dimensions"]) if d["slug"] == "country_select"][0]
+
+    all_countries = sorted(tb["country"].unique())
     cty_dict_ls = [{"slug": c.lower(), "name": c} for c in all_countries]
-    config["dimensions"][1]["choices"] = cty_dict_ls
+    config["dimensions"][cty_idx]["choices"] = cty_dict_ls
 
     # Define common view configuration
     common_view_config = {
@@ -30,13 +36,18 @@ def run() -> None:
         "hasMapTab": True,
         "tab": "map",
         "map": {
+            "tooltipUseCustomLabels": True,
             "colorScale": {
                 "binningStrategy": "manual",
                 "baseColorScheme": "YlGnBu",
-                "customNumericValues": [-1, 0, 100, 1000, 10000, 100000, 1000000, 10000000],
-                "customNumericColors": ["#AF1629", None, None, None, None, None, None],
+                "customNumericColorsActive": True,
+                "customNumericMinValue": -1,
+                "customNumericValues": [-1, 1000, 10000, 100000, 1000000, 0],
+                "customNumericColors": ["#AF1629", None, None, None, None, None, None, None],
+                "customNumericLabels": ["Selected Country", None, None, None, None, None, None, None],
             },
         },
+        "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
     }
 
     # 2: Bake config automatically from table
