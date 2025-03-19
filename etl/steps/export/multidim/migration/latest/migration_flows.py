@@ -19,9 +19,11 @@ def run() -> None:
     tb = ds.read("migrant_stock_dest_origin")
 
     # add country names and slugs to the config
+    cty_idx = [i for i, d in enumerate(config["dimensions"]) if d["slug"] == "country_select"][0]
+
     all_countries = tb["country"].unique()
     cty_dict_ls = [{"slug": c.lower(), "name": c} for c in all_countries]
-    config["dimensions"][1]["choices"] = cty_dict_ls
+    config["dimensions"][cty_idx]["choices"] = cty_dict_ls
 
     # Define common view configuration
     common_view_config = {

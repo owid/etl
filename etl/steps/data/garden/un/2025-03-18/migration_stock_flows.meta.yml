@@ -22,17 +22,17 @@ tables:
       migrants_all_sexes:
         title: |-
           <% if metric == "immigrants" %>
-          Immigrants who moved from another country to << country_select >>
+          Immigrants to << country_select >>: Where did they move from?
           <% elif metric == "emigrants" %>
-          Emigrants who moved from << country_select >> to another country
+          Emigrants from << country_select >>: Where did they move to?
           <% endif %>
         description_short: |-
           <% if metric == "immigrants" %>
-          The number of people who moved from another country to << country_select >>.
+          The number of people who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year – it is not the annual flow of immigrants.
           <% elif metric == "emigrants" %>
-          The number of people who were born in << country_select >> and now live abroad.
+          The number of people who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year – it is not the annual flow of emigrants.
           <% endif %>
-        unit: migrants
+        unit: people
       migrants_female:
         title: |-
           <% if metric == "immigrants" %>
@@ -42,11 +42,11 @@ tables:
           <% endif %>
         description_short: |-
           <% if metric == "immigrants" %>
-          The number of women who moved from another country to << country_select >>.
+          The number of women who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year – it is not the annual flow of immigrants.
           <% elif metric == "emigrants" %>
-          The number of women who were born in << country_select >> and now live abroad.
+          The number of women who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year – it is not the annual flow of emigrants.
           <% endif %>
-        unit: migrants
+        unit: people
       migrants_male:
         title: |-
           <% if metric == "immigrants" %>
@@ -56,9 +56,10 @@ tables:
           <% endif %>
         description_short: |-
           <% if metric == "immigrants" %>
-          The number of men who moved from another country to << country_select >>.
+          The number of men who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year – it is not the annual flow of immigrants.
           <% elif metric == "emigrants" %>
-          The number of men who were born in << country_select >> and now live abroad.
+          The number of men who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year – it is not the annual flow of emigrants.
           <% endif %>
+        unit: people
 
 

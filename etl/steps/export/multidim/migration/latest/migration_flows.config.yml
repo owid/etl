@@ -4,6 +4,8 @@ title:
 default_selection:
   - World
 dimensions:
+  - name: Country
+    slug: country_select
   - name: Metric
     slug: metric
     choices:
@@ -11,7 +13,5 @@ dimensions:
         name: "Immigrants - People moving to country"
       - slug: "emigrants"
         name: "Emigrants - People moving away from country"
-  - name: Country
-    slug: country_select
 
 views: []
