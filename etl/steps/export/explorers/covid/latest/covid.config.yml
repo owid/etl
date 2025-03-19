@@ -159,12 +159,13 @@ dimensions:
   - slug: relative
     name: Relative to population
     choices:
-      - slug: false
+      - slug: absolute
         name: "Total"
-      - slug: true
+      - slug: relative
         name: Per 100,000 people
     presentation:
-      type: checkbox
+      type: "checkbox"
+      choice_slug_true: "relative"
 
 views:
   #######################
@@ -174,7 +175,7 @@ views:
   - dimensions:
       metric: xm
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y:
         - catalogPath: excess_mortality_economist#cumulative_estimated_daily_excess_deaths
@@ -191,7 +192,7 @@ views:
   - dimensions:
       metric: xm
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y:
         - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_per_100k
@@ -211,7 +212,7 @@ views:
   - dimensions:
       metric: xm
       interval: cum_12
-      relative: false
+      relative: absolute
     indicators:
       y:
         - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_last12m
@@ -229,7 +230,7 @@ views:
   - dimensions:
       metric: xm
       interval: cum_12
-      relative: true
+      relative: relative
     indicators:
       y:
         - excess_mortality_economist#cumulative_estimated_daily_excess_deaths_per_100k_last12m
@@ -247,7 +248,7 @@ views:
   - dimensions:
       metric: xm
       interval: 7d_avg
-      relative: false
+      relative: absolute
     indicators:
       y:
         - excess_mortality_economist#estimated_daily_excess_deaths
@@ -265,7 +266,7 @@ views:
   - dimensions:
       metric: xm
       interval: 7d_avg
-      relative: true
+      relative: relative
     indicators:
       y:
         - excess_mortality_economist#estimated_daily_excess_deaths_per_100k
@@ -285,14 +286,14 @@ views:
   - dimensions:
       metric: xm_count
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y: excess_mortality#cum_excess_proj_all_ages
 
   - dimensions:
       metric: xm_count
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y: excess_mortality#cum_excess_per_million_proj_all_ages
 
@@ -302,13 +303,13 @@ views:
   - dimensions:
       metric: xm_perc
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y: excess_mortality#cum_p_proj_all_ages
   - dimensions:
       metric: xm_perc
       interval: weekly
-      relative: false
+      relative: absolute
     indicators:
       y: excess_mortality#p_proj_all_ages
 
@@ -321,90 +322,90 @@ views:
     dimensions:
       metric: deaths
       interval: cum
-      relative: false
+      relative: absolute
   - indicators:
       y: cases_deaths#total_deaths_per_million
     dimensions:
       metric: deaths
       interval: cum
-      relative: true
+      relative: relative
   # Cumulative (last 12 months)
   - indicators:
       y: cases_deaths#total_deaths_last12m
     dimensions:
       metric: deaths
       interval: cum_12
-      relative: false
+      relative: absolute
   - indicators:
       y: cases_deaths#total_deaths_per_million_last12m
     dimensions:
       metric: deaths
       interval: cum_12
-      relative: true
+      relative: relative
   # 7-day smooth
   - indicators:
       y: cases_deaths#new_deaths_per_million_7_day_avg_right
     dimensions:
       metric: deaths
       interval: 7d_avg
-      relative: true
+      relative: relative
   - indicators:
       y: cases_deaths#new_deaths_7_day_avg_right
     dimensions:
       metric: deaths
       interval: 7d_avg
-      relative: false
+      relative: absolute
   # Daily
   - indicators:
       y: cases_deaths#new_deaths
     dimensions:
       metric: deaths
       interval: daily_new
-      relative: false
+      relative: absolute
   - indicators:
       y: cases_deaths#new_deaths_per_million
     dimensions:
       metric: deaths
       interval: daily_new
-      relative: true
+      relative: relative
   # Weekly
   - indicators:
       y: cases_deaths#weekly_deaths
     dimensions:
       metric: deaths
       interval: weekly
-      relative: false
+      relative: absolute
   - indicators:
       y: cases_deaths#weekly_deaths_per_million
     dimensions:
       metric: deaths
       interval: weekly
-      relative: true
+      relative: relative
   - indicators:
       y: cases_deaths#weekly_pct_growth_deaths
     dimensions:
       metric: deaths
       interval: weekly_ch
-      relative: false
+      relative: absolute
   # Biweekly
   - indicators:
       y: cases_deaths#biweekly_deaths
     dimensions:
       metric: deaths
       interval: biweekly
-      relative: false
+      relative: absolute
   - indicators:
       y: cases_deaths#biweekly_deaths_per_million
     dimensions:
       metric: deaths
       interval: biweekly
-      relative: true
+      relative: relative
   - indicators:
       y: cases_deaths#biweekly_pct_growth_deaths
     dimensions:
       metric: deaths
       interval: biweekly_ch
-      relative: false
+      relative: absolute
 
   #######################
   # Cases
@@ -413,58 +414,58 @@ views:
   - dimensions:
       metric: cases
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y: cases_deaths#total_cases
   - dimensions:
       metric: cases
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y: cases_deaths#total_cases_per_million
   # 7-day smooth
   - dimensions:
       metric: cases
       interval: 7d_avg
-      relative: false
+      relative: absolute
     indicators:
       y: cases_deaths#new_cases_7_day_avg_right
   - dimensions:
       metric: cases
       interval: 7d_avg
-      relative: true
+      relative: relative
     indicators:
       y: cases_deaths#new_cases_per_million_7_day_avg_right
   # Daily
   - dimensions:
       metric: cases
       interval: daily_new
-      relative: false
+      relative: absolute
     indicators:
       y: cases_deaths#new_cases
   - dimensions:
       metric: cases
       interval: daily_new
-      relative: true
+      relative: relative
     indicators:
       y: cases_deaths#new_cases_per_million
   # Weekly
   - dimensions:
       metric: cases
       interval: weekly
-      relative: false
+      relative: absolute
     indicators:
       y: cases_deaths#weekly_cases
   - dimensions:
       metric: cases
       interval: weekly
-      relative: true
+      relative: relative
     indicators:
       y: cases_deaths#weekly_cases_per_million
   - dimensions:
       metric: cases
       interval: weekly_ch
-      relative: false
+      relative: absolute
     indicators:
       y: cases_deaths#weekly_pct_growth_cases
 
@@ -472,20 +473,20 @@ views:
   - dimensions:
       metric: cases
       interval: biweekly
-      relative: false
+      relative: absolute
     indicators:
       y: cases_deaths#biweekly_cases
   - dimensions:
       metric: cases
       interval: biweekly
-      relative: true
+      relative: relative
     indicators:
       y: cases_deaths#biweekly_cases_per_million
 
   - dimensions:
       metric: cases
       interval: biweekly_ch
-      relative: false
+      relative: absolute
     indicators:
       y: cases_deaths#biweekly_pct_growth_cases
 
@@ -495,7 +496,7 @@ views:
   - dimensions:
       metric: cases_deaths
       interval: 7d_avg
-      relative: true
+      relative: relative
     indicators:
       y:
         - cases_deaths#new_cases_per_million_7_day_avg_right
@@ -513,7 +514,7 @@ views:
   - dimensions:
       metric: patients
       interval: daily
-      relative: false
+      relative: absolute
     indicators:
       y: hospital#daily_occupancy_hosp
     config:
@@ -522,7 +523,7 @@ views:
   - dimensions:
       metric: patients
       interval: daily
-      relative: true
+      relative: relative
     indicators:
       y: hospital#daily_occupancy_hosp_per_1m
     config:
@@ -534,14 +535,14 @@ views:
   - dimensions:
       metric: admissions
       interval: weekly
-      relative: false
+      relative: absolute
     indicators:
       y: hospital#weekly_admissions_hosp
 
   - dimensions:
       metric: admissions
       interval: weekly
-      relative: true
+      relative: relative
     indicators:
       y: hospital#weekly_admissions_hosp_per_1m
 
@@ -551,7 +552,7 @@ views:
   - dimensions:
       metric: icu_patients
       interval: daily
-      relative: false
+      relative: absolute
     indicators:
       y: hospital#daily_occupancy_icu
     config:
@@ -560,7 +561,7 @@ views:
   - dimensions:
       metric: icu_patients
       interval: daily
-      relative: true
+      relative: relative
     indicators:
       y: hospital#daily_occupancy_icu_per_1m
     config:
@@ -572,13 +573,13 @@ views:
   - dimensions:
       metric: icu_admissions
       interval: daily_new
-      relative: false
+      relative: absolute
     indicators:
       y: hospital#weekly_admissions_icu
   - dimensions:
       metric: icu_admissions
       interval: daily_new
-      relative: true
+      relative: relative
     indicators:
       y: hospital#weekly_admissions_icu_per_1m
 
@@ -588,7 +589,7 @@ views:
   - dimensions:
       metric: cases_deaths_hospital
       interval: 7d_avg
-      relative: true
+      relative: relative
     indicators:
       y:
         - cases_deaths#new_cases_per_million_7_day_avg_right
@@ -610,14 +611,14 @@ views:
     dimensions:
       metric: cfr
       interval: cum
-      relative: false
+      relative: absolute
 
   - indicators:
       y: cases_deaths#cfr_short_term
     dimensions:
       metric: cfr
       interval: 7d_avg
-      relative: false
+      relative: absolute
 
   #######################
   # Vaccine doses
@@ -625,72 +626,72 @@ views:
   - dimensions:
       metric: doses
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#total_vaccinations
   - dimensions:
       metric: doses
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#total_vaccinations_per_hundred
 
   - dimensions:
       metric: doses
       interval: 7d_avg
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#daily_vaccinations_smoothed
   - dimensions:
       metric: doses
       interval: 7d_avg
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#daily_vaccinations_smoothed_per_million
 
   - dimensions:
       metric: doses
       interval: daily_new
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#daily_vaccinations
 
   - dimensions:
       metric: doses
       interval: 6m
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#rolling_vaccinations_6m
   - dimensions:
       metric: doses
       interval: 6m
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#rolling_vaccinations_6m_per_hundred
 
   - dimensions:
       metric: doses
       interval: 9m
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#rolling_vaccinations_9m
   - dimensions:
       metric: doses
       interval: 9m
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#rolling_vaccinations_9m_per_hundred
 
   - dimensions:
       metric: doses
       interval: 12m
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#rolling_vaccinations_12m
   - dimensions:
       metric: doses
       interval: 12m
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#rolling_vaccinations_12m_per_hundred
 
@@ -700,14 +701,14 @@ views:
   - dimensions:
       metric: boosters
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#total_boosters
 
   - dimensions:
       metric: boosters
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#total_boosters_per_hundred
 
@@ -717,7 +718,7 @@ views:
   - dimensions:
       metric: doses_type
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y:
         - vaccinations_global#total_vaccinations_no_boosters_interpolated
@@ -730,7 +731,7 @@ views:
   - dimensions:
       metric: doses_type
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y:
         - vaccinations_global#total_vaccinations_no_boosters_per_hundred_interpolated
@@ -747,28 +748,28 @@ views:
   - dimensions:
       metric: people_vax
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#people_vaccinated
 
   - dimensions:
       metric: people_vax
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#people_vaccinated_per_hundred
 
   - dimensions:
       metric: people_vax
       interval: 7d_avg
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#daily_people_vaccinated_smoothed
 
   - dimensions:
       metric: people_vax
       interval: 7d_avg
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#daily_people_vaccinated_smoothed_per_hundred
 
@@ -778,14 +779,14 @@ views:
   - dimensions:
       metric: people_fully_vax
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y: vaccinations_global#people_fully_vaccinated
 
   - dimensions:
       metric: people_fully_vax
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y: vaccinations_global#people_fully_vaccinated_per_hundred
 
@@ -801,7 +802,7 @@ views:
     dimensions:
       metric: vax_people
       interval: cum
-      relative: true
+      relative: relative
     config:
       title: COVID-19 vaccine doses, people with at least one dose, people with a full initial protocol, and boosters per 100 people
       subtitle: " "
@@ -819,7 +820,7 @@ views:
     dimensions:
       metric: vax_deaths
       interval: 7d_avg
-      relative: true
+      relative: relative
     config:
       title: COVID-19 vaccine doses and confirmed deaths
       subtitle: Due to varying protocols and challenges in the attribution of the cause of death, the number of confirmed deaths may not accurately represent the true number of deaths caused by COVID-19.
@@ -839,7 +840,7 @@ views:
     dimensions:
       metric: vax_cases_icu_deaths
       interval: 7d_avg
-      relative: true
+      relative: relative
     config:
       title: COVID-19 vaccine doses, ICU patients, and confirmed cases and deaths
       subtitle: Limited testing and challenges in the attribution of cause of death means the cases and deaths counts may not be accurate.
@@ -853,7 +854,7 @@ views:
   - dimensions:
       metric: variants
       interval: biweekly
-      relative: false
+      relative: absolute
     indicators:
       y:
         - variants#perc_sequences__variant_alpha
@@ -886,7 +887,7 @@ views:
   - dimensions:
       metric: omicron
       interval: biweekly
-      relative: false
+      relative: absolute
     indicators:
       y: variants#perc_sequences__variant_omicron
     config:
@@ -900,7 +901,7 @@ views:
   - dimensions:
       metric: delta
       interval: biweekly
-      relative: false
+      relative: absolute
     indicators:
       y: variants#perc_sequences__variant_delta
     config:
@@ -913,7 +914,7 @@ views:
   - dimensions:
       metric: cases_sequenced
       interval: biweekly
-      relative: false
+      relative: absolute
     indicators:
       y: combined#share_cases_sequenced
 
@@ -923,7 +924,7 @@ views:
   - dimensions:
       metric: stringency
       interval: daily
-      relative: false
+      relative: absolute
     indicators:
       y:
         - oxcgrt_policy#stringency_index_nonvax
@@ -941,7 +942,7 @@ views:
   - dimensions:
       metric: r
       interval: 7d_avg
-      relative: false
+      relative: absolute
     indicators:
       y: tracking_r#r
 
@@ -951,42 +952,42 @@ views:
   - dimensions:
       metric: tests
       interval: cum
-      relative: false
+      relative: absolute
     indicators:
       y: testing#total_tests
 
   - dimensions:
       metric: tests
       interval: cum
-      relative: true
+      relative: relative
     indicators:
       y: testing#total_tests_per_thousand
 
   - dimensions:
       metric: tests
       interval: 7d_avg
-      relative: false
+      relative: absolute
     indicators:
       y: testing#new_tests_7day_smoothed
 
   - dimensions:
       metric: tests
       interval: 7d_avg
-      relative: true
+      relative: relative
     indicators:
       y: testing#new_tests_per_thousand_7day_smoothed
 
   - dimensions:
       metric: tests
       interval: daily_new
-      relative: false
+      relative: absolute
     indicators:
       y: testing#new_tests
 
   - dimensions:
       metric: tests
       interval: daily_new
-      relative: true
+      relative: relative
     indicators:
       y: testing#new_tests_per_thousand
 
@@ -996,7 +997,7 @@ views:
   - dimensions:
       metric: tests_cases
       interval: 7d_avg
-      relative: false
+      relative: absolute
     indicators:
       y: combined#short_term_tests_per_case
 
@@ -1006,7 +1007,7 @@ views:
   - dimensions:
       metric: tests_pos
       interval: 7d_avg
-      relative: false
+      relative: absolute
     indicators:
       y: combined#short_term_positivity_rate
 
@@ -1016,7 +1017,7 @@ views:
   - dimensions:
       metric: cases_tests_pos_r
       interval: 7d_avg
-      relative: true
+      relative: relative
     indicators:
       y:
         - cases_deaths#new_cases_per_million_7_day_avg_right

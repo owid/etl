@@ -22,8 +22,6 @@ steps:
     - data://meadow/lis/2023-08-30/luxembourg_income_study
   data://grapher/lis/2023-08-30/luxembourg_income_study:
     - data://garden/lis/2023-08-30/luxembourg_income_study
-  data://explorers/lis/latest/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
 
   data://meadow/lis/2024-06-13/luxembourg_income_study:
     - snapshot://lis/2024-06-13/lis_keyvars.csv
@@ -56,6 +54,19 @@ steps:
     - data://meadow/ophi/2023-07-05/multidimensional_poverty_index
   data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
     - data://garden/ophi/2023-07-05/multidimensional_poverty_index
+
+  # World Inequality Database
+  data://meadow/wid/2024-05-24/world_inequality_database:
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://wid/2024-05-24/world_inequality_database.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_with_extrapolations.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_distribution.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_distribution_with_extrapolations.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_fiscal.csv
+  data://garden/wid/2024-05-24/world_inequality_database:
+    - data://meadow/wid/2024-05-24/world_inequality_database
+  data://grapher/wid/2024-05-24/world_inequality_database:
+    - data://garden/wid/2024-05-24/world_inequality_database
 
   # Poverty projections from the World Bank
   data://meadow/wb/2024-06-26/poverty_projections:

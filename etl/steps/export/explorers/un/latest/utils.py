@@ -178,6 +178,7 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
             ), "Dimensions are not the same across explorers. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
 
     # Check that there are no checkbox dimensions (only first explorer, since all dimensions are the same based on previous check)
+    # TODO: Need to run concrete tests when merging checkboxes: should have the same exact choices, same choice_slug_true
     for dim in explorers[0].dimensions:
         if dim.ui_type == "checkbox":
             raise NotImplementedError("Checkbox dimensions are not supported yet.")
@@ -289,7 +290,6 @@ def _update_choice_slugs_in_views(choice_slug_changes, explorers_by_id):
         df_views_dimensions = df_views_dimensions.astype("string")
 
         # Process views
-        print(change)
         df_views_dimensions = df_views_dimensions.replace(change)
 
         # Bring back views to explorers

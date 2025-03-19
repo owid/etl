@@ -86,7 +86,7 @@ def run(dest_dir: str) -> None:
     df_graphers["yAxisMin"] = 0
 
     # Make all views stacked area charts.
-    df_graphers["chartTypes"] = ["StackedArea"]
+    df_graphers["chartTypes"] = [["StackedArea"]] * len(df_graphers)
 
     # Sanity check.
     error = "Duplicated rows in explorer."

@@ -1,0 +1,31 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+      grapher_config:
+        tab: chart
+        hasMapTab: false
+        selectedEntityNames:
+          - United States
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  mumps_deaths:
+    variables:
+      deaths:
+        title: Mumps deaths
+        description_short: Reported number of [mumps](#dod:mumps) deaths in the United States.
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+      death_rate:
+        title: Mumps deaths per ten million people
+        description_short: Reported number of [mumps](#dod:mumps) deaths in the United States per ten million people.
+        unit: deaths per 10,000,000 people
+        display:
+          numDecimalPlaces: 1

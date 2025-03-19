@@ -111,14 +111,14 @@ INDICES = {
 
 # Define type of donors to include from the recipient dataset.
 DONORS_TOTALS = {
-    "DAC countries (OECD)": "DAC countries",
-    "Non-DAC countries (OECD)": "Non-DAC countries",
-    "Multilateral organizations (OECD)": "Multilateral organizations",
-    "Private donors (OECD)": "Private donors",
+    "DAC countries": "DAC countries",
+    "Non-DAC countries": "Non-DAC countries",
+    "Multilateral organizations": "Multilateral organizations",
+    "Private donors": "Private donors",
 }
 
 # Define official donors aggregation
-OFFICIAL_DONORS = {"Official donors (OECD)": "Official donors"}
+OFFICIAL_DONORS = {"Official donors": "Official donors"}
 
 # Define sectors to include from the DAC5 dataset.
 SECTORS_DAC5 = {

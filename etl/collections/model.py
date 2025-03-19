@@ -234,7 +234,7 @@ class Definitions(MDIMBase):
 class View(MDIMBase):
     """MDIM/Explorer view configuration."""
 
-    dimensions: Dict[str, str | bool]
+    dimensions: Dict[str, str]
     indicators: ViewIndicators
     # NOTE: Maybe worth putting as classes at some point?
     config: Optional[GrapherConfig] = None
@@ -341,7 +341,7 @@ class MDIMView(View):
 @pruned_json
 @dataclass
 class DimensionChoice(MDIMBase):
-    slug: str | bool
+    slug: str
     name: str
     description: Optional[str] = None
 
@@ -367,10 +367,13 @@ class UITypes:
 @dataclass
 class DimensionPresentation(MDIMBase):
     type: str
+    choice_slug_true: Optional[str] = None
 
     def __post_init__(self):
         if not UITypes.is_valid(self.type):
             raise ValueError(f"Invalid type: {self.type}. Accepted values: {UITypes.ALL}")
+        if (self.type == UITypes.CHECKBOX) and (self.choice_slug_true is None):
+            raise ValueError(f"`choice_slug_true` slug must be provided for '{UITypes.CHECKBOX}' type.")
 
 
 @pruned_json
@@ -386,12 +389,20 @@ class Dimension(MDIMBase):
     def __post_init__(self):
         """Validations."""
 
-        # If presentation is binary (checkbox), then choices must be exactly two (true, false)
+        # Checks when presentation is checkbox
         if self.ui_type == UITypes.CHECKBOX:
-            if not set(self.choice_slugs) == {True, False}:
+            assert self.presentation is not None, "Presentation must be provided for 'checkbox' type."
+
+            # Choices must be exactly two
+            if (num_choices := len(self.choice_slugs)) != 2:
                 raise ValueError(
-                    f"Dimension choices for '{UITypes.CHECKBOX}' must have exactly two choices with slugs: ['True', 'False']. Instead, found {self.choice_slugs}"
+                    f"Dimension choices for '{UITypes.CHECKBOX}' must have exactly two choices. Instead, found {num_choices} choices."
                 )
+
+            # True slug must be provided, and must be a valid choice
+            # assert self.presentation.choice_slug_true is not None
+            if self.presentation.choice_slug_true not in self.choice_slugs:
+                raise ValueError(f"True slug '{self.presentation.choice_slug_true}' must be one of the choices.")
 
     @property
     def ui_type(self):
@@ -400,7 +411,7 @@ class Dimension(MDIMBase):
         return self.presentation.type
 
     @property
-    def choice_slugs(self):
+    def choice_slugs(self) -> List[str]:
         # if self.choices is not None:
         return [choice.slug for choice in self.choices]
 
@@ -408,7 +419,7 @@ class Dimension(MDIMBase):
     def ppt(self):
         return self.presentation
 
-    def sort_choices(self, slug_order: List[str | bool]):
+    def sort_choices(self, slug_order: List[str]):
         """Sort choices based on the given order."""
         # Make sure all choices are in the given order
         choices_missing = set(self.choice_slugs) - set(slug_order)
@@ -536,7 +547,7 @@ class Collection(MDIMBase):
         # if vc[vc > 1].any():
         #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
 
-    def sort_choices(self, slug_order: Dict[str, List[str | bool]]):
+    def sort_choices(self, slug_order: Dict[str, List[str]]):
         """Sort choices based on the given order."""
         for dim in self.dimensions:
             if dim.slug in slug_order:

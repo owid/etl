@@ -1,0 +1,62 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical rubella cases in the United States - Centers for Disease Control and Prevention
+    description: |-
+      Data on historical rubella cases in the United States, compiled from a selection of sources from the US CDC.
+
+      Sources for each year are as follows:
+
+      * 1968-1993: [Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
+
+      * 1994-2000: [PART 3: Historical Summaries of Notifiable Diseases in the United States, 1969–2000; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2000](https://www.jstor.org/stable/23310295?seq=2)
+
+      * 2001-2006: [PART 3: Historical Summaries of Notifiable Diseases in the United States, 1975–2006; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2006](https://www.jstor.org/stable/23317332)
+
+      * 2007: [Summary of Notifiable Diseases --- United States, 2007](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5653a1.htm)
+
+      * 2008: [Summary of Notifiable Diseases --- United States, 2008](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5754a1.htm)
+
+      * 2009: [Summary of Notifiable Diseases --- United States, 2009](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm)
+
+      * 2010: [Summary of Notifiable Diseases --- United States, 2010](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5953a1.htm)
+
+      * 2011: [Summary of Notifiable Diseases --- United States, 2011](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6053a1.htm)
+
+      * 2012: [Summary of Notifiable Diseases --- United States, 2012](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6153a1.htm)
+
+      * 2013: [Summary of Notifiable Diseases --- United States, 2013](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6253a1.htm)
+
+      * 2014: [Summary of Notifiable Diseases --- United States, 2014](https://www.cdc.gov/mmwr/volumes/63/wr/mm6354a1.htm)
+
+      * 2015: [Summary of Notifiable Diseases --- United States, 2015](https://www.cdc.gov/mmwr/volumes/64/wr/mm6453a1.htm)
+
+      * 2016-2022: [National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC)](https://wonder.cdc.gov/nndss-annual-summary.html)
+
+    date_published: "2023"
+
+    # Citation
+    producer: Centers for Disease Control and Prevention
+    citation_full: |-
+      Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.
+
+      Historical Summaries of Notifiable Diseases in the United States, 1969–2000; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2000
+
+      PART 3: Historical Summaries of Notifiable Diseases in the United States, 1975–2006; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2006
+
+      Summary of Notifiable Diseases --- United States, 2007-2015
+
+      National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC)
+    # Files
+    url_main: https://wonder.cdc.gov/ucd-icd10.html
+    date_accessed: 2025-03-14
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: b3976da2a2d6213ab6395b664875cf9b
+    size: 4066
+    path: rubella_cases.csv

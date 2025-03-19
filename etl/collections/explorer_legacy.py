@@ -320,12 +320,17 @@ class ExplorerLegacy:
         # Boolean types
         df = cls._process_df_common(df)
 
+        def _parse_variable_id(variable_ids):
+            if isinstance(variable_ids, str):
+                variable_ids = variable_ids.split()
+                result = [int(variable_id) if variable_id.isnumeric() else variable_id for variable_id in variable_ids]
+            else:
+                result = variable_ids
+            return result
+
         # Convert "yVariableIds" into a list of integers, or strings (if they are catalog paths).
         if "yVariableIds" in df.columns:
-            df["yVariableIds"] = [
-                [int(variable_id) if variable_id.isnumeric() else variable_id for variable_id in variable_ids.split()]
-                for variable_ids in df["yVariableIds"]
-            ]
+            df["yVariableIds"] = [_parse_variable_id(variable_ids) for variable_ids in df["yVariableIds"]]
 
         return df
 
@@ -450,19 +455,38 @@ class ExplorerLegacy:
         for column in df_.select_dtypes(include="bool").columns:
             df_[column] = df_[column].astype(str).str.lower()
 
+        # There must be at least one indicator given!!!
+        columns_indicators = [
+            "yVariableIds",
+            "ySlugs",
+            "xVariableId",
+            "xSlug",
+            "sizeVariableId",
+            "sizeSlug",
+            "colorVariableId",
+            "colorSlug",
+        ]
+        columns_indicators = [col for col in columns_indicators if col in df_.columns]
+        x = df_[columns_indicators].copy().astype(str)
+        assert (x.groupby(columns_indicators).size() >= 1).all()
+
+        # Convert lists of variable ids to strings.
+
         if "yVariableIds" in df_.columns:
-            if not all([isinstance(ids, list) for ids in df_["yVariableIds"]]):
-                raise ValueError(
-                    "Each row in 'yVariableIds' (in the graphers dataframe) must contain a list of variable ids (or ETL paths)."
-                )
             # Convert lists of variable ids to strings.
-            df_["yVariableIds"] = df_["yVariableIds"].apply(lambda x: " ".join(str(variable_id) for variable_id in x))
+            df_["yVariableIds"] = df_["yVariableIds"].apply(
+                lambda x: " ".join(str(variable_id) for variable_id in x) if isinstance(x, list) else x
+            )
+        if "ySlugs" in df_.columns:
+            # Convert lists of variable ids to strings.
+            df_["ySlugs"] = df_["ySlugs"].apply(
+                lambda x: " ".join(str(variable_id) for variable_id in x) if isinstance(x, list) else x
+            )
 
         # For convenience, ensure the first columns are index columns (yVariableIds, variableId and/or catalogPath).
-        index_columns = ["yVariableIds"]
         df_ = df_[
-            [col for col in index_columns if col in df_.columns]
-            + [col for col in df_.columns if col not in index_columns]
+            [col for col in columns_indicators if col in df_.columns]
+            + [col for col in df_.columns if col not in columns_indicators]
         ]
         return df_
 

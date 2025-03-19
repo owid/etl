@@ -13,10 +13,10 @@ Strategy:
 NOTE: This pipeline assumes that there is a TSV template in owid-content, this should probably be change din the future.
 """
 
-from etl.helpers import PathFinder
+from utils import ExplorerCreator, combine_explorers
+from view_edits import ViewEditor
 
-from .utils import ExplorerCreator, combine_explorers
-from .view_edits import ViewEditor
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -61,7 +61,7 @@ def run() -> None:
     config_default = paths.load_explorer_config()
 
     # Object used to edit view configs: Some of the views need extra-curation (this includes adding map brackets, renaming titles, etc.)
-    view_editor = ViewEditor(paths.side_file("map_brackets.yml"))
+    view_editor = ViewEditor(map_brackets_yaml=paths.side_file("map_brackets.yml"))
 
     #################################################################################################
     # Create individual explorers (building blocks)
@@ -83,9 +83,11 @@ def run() -> None:
             "variant": ["estimates"],
         },
         choice_renames={"age": AGES_POP},
+        explorer_name="population-and-demography",
     )
     view_editor.edit_views_pop(explorer_pop)
 
+    # Save explorer (upsert to DB)
     ########## Dependency ratio explorer
     explorer_dep = explorer_creator.create(
         table_name="dependency_ratio",
@@ -184,10 +186,10 @@ def run() -> None:
         },
         choice_renames={
             "age": {
-                0: "At birth",
-                15: "Aged 15",
-                65: "Aged 65",
-                80: "Aged 80",
+                "0": "At birth",
+                "15": "Aged 15",
+                "65": "Aged 65",
+                "80": "Aged 80",
             }
         },
     )
@@ -240,34 +242,32 @@ def run() -> None:
     )
 
     # Sort indicator choices
-    explorer.sort_choices(
-        {
-            "indicator": [
-                "population",
-                "population_broad",
-                "population_change",
-                "growth_rate",
-                "natural_change_rate",
-                "population_density",
-                "fertility_rate",
-                "births",
-                "birth_rate",
-                "deaths",
-                "death_rate",
-                "child_deaths",
-                "child_mortality_rate",
-                "infant_deaths",
-                "infant_mortality_rate",
-                "life_expectancy",
-                "age_structure",
-                "dependency_ratio",
-                "median_age",
-                "net_migration",
-                "net_migration_rate",
-                "sex_ratio",
-            ]
-        }
+    explorer.sort_indicators(
+        [
+            "population",
+            "population_broad",
+            "population_change",
+            "growth_rate",
+            "natural_change_rate",
+            "population_density",
+            "fertility_rate",
+            "births",
+            "birth_rate",
+            "deaths",
+            "death_rate",
+            "child_deaths",
+            "child_mortality_rate",
+            "infant_deaths",
+            "infant_mortality_rate",
+            "life_expectancy",
+            "age_structure",
+            "dependency_ratio",
+            "median_age",
+            "net_migration",
+            "net_migration_rate",
+            "sex_ratio",
+        ]
     )
 
-    # Save explorer (upsert to DB)
+    # # Save explorer (upsert to DB)
     explorer.save(tolerate_extra_indicators=True)

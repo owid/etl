@@ -161,20 +161,17 @@ class ViewEditor:
                 # Edit display
                 assert v.indicators.y is not None
                 for indicator in v.indicators.y:
-                    if (
-                        "age_0_4__" not in indicator.catalogPath
-                    ):  # Skip 0-4 years, as it's already handled in the population explorer
-                        match = pattern.match(indicator.catalogPath)
-                        if not match:
-                            raise ValueError(f"Unexpected indicator path: {indicator.catalogPath}")
-                        age = match.group(1).replace("_", "-").replace("plus", "+")
-                        display = {
-                            "name": f"{age} years",
-                        }
-                        if indicator.display is None:
-                            indicator.display = display
-                        else:
-                            indicator.display = {**indicator.display, **display}
+                    match = pattern.match(indicator.catalogPath)
+                    if not match:
+                        raise ValueError(f"Unexpected indicator path: {indicator.catalogPath}")
+                    age = match.group(1).replace("_", "-").replace("plus", "+")
+                    display = {
+                        "name": f"{age} years",
+                    }
+                    if indicator.display is None:
+                        indicator.display = display
+                    else:
+                        indicator.display = {**indicator.display, **display}
             elif indicator_name in {"growth_rate", "natural_change_rate"}:
                 # Edit display
                 assert v.indicators.y is not None
@@ -311,7 +308,7 @@ class ViewEditor:
                 else:
                     title = f"{sex.title()} life expectancy"
 
-                if age == 0:
+                if age == "0":
                     title += " at birth"
                 else:
                     title += f" at age {age}"
