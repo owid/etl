@@ -135,6 +135,19 @@ class AdminAPI(object):
             )
         return js
 
+    def put_explorer_config(self, slug: str, tsv: str, user_id: Optional[int] = None) -> dict:
+        # Retry in case we're restarting Admin on staging server
+        url = self.owid_env.admin_api + f"/explorers/{slug}"
+        resp = requests_with_retry().put(
+            url,
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json={"tsv": tsv, "commitMessage": "Update explorer from ETL"},
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "slug": slug, "tsv": tsv[:1000]})
+        return js
+
 
 @cache
 def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:
