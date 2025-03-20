@@ -1,5 +1,29 @@
-# NOTE: To learn more about the fields, hover over their names.
 definitions:
+  people_label: |-
+    <% if gender == "all" %>people<% elif gender == "female" %>women<% elif gender == "male" %>men<% endif %>
+  immigrants:
+    title: |-
+      <% if gender == "all" %>
+      Immigrants to << country_origin_or_dest >>: Where did they move from?
+      <%- elif gender == "female" %>
+      Women who moved from another country to << country_origin_or_dest >>
+      <%- elif gender == "male" %>
+      Men who moved from another country to << country_origin_or_dest >>
+      <%- endif %>
+    description_short: |-
+      The number of {definitions.people_label} who moved from another country to << country_origin_or_dest >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+  emigrants:
+    title: |-
+      <% if gender == "all" %>
+      Emigrants from << country_origin_or_dest >>: Where did they move to?
+      <%- elif gender == "female" %>
+      Women who moved from << country_origin_or_dest >> to another country
+      <%- elif gender == "male" %>
+      Men who moved from << country_origin_or_dest >> to another country
+      <%- endif %>
+    description_short: |-
+      The number of {definitions.people_label} who were born in << country_origin_or_dest >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+
   common:
     display:
       numDecimalPlaces: 0
@@ -10,88 +34,79 @@ definitions:
     processing_level: major
     description_processing: |-
       - Regional aggregates (such as continents, income groups and the worldwide aggregate) are based on [our definition of the continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and the [World Bank definition of income groups](https://ourworldindata.org/grapher/world-bank-income-groups), unless otherwise indicated. They might differ from the definitions used by the United Nations.
+    unit: people
 
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 729
 
-
 tables:
+  migration_stock_flows:
+    variables:
+      immigrants:
+        title: "{definitions.immigrants.title}"
+        description_short: "{definitions.immigrants.description_short}"
+      emigrants:
+        title: "{definitions.emigrants.title}"
+        description_short: "{definitions.emigrants.description_short}"
+
   migrant_stock_dest_origin:
     variables:
       migrants:
         title: |-
-          <% if (metric == "immigrants") and (gender == "all") %>
-            Immigrants to << country_select >>: Where did they move from?
-          <% elif (metric == "immigrants") and (gender == "female") %>
-            Women who moved from another country to << country_select >>
-          <% elif (metric == "immigrants") and (gender == "male") %>
-            Men who moved from another country to << country_select >>
-          <% elif (metric == "emigrants") and (gender == "all") %>
-            Emigrants from << country_select >>: Where did they move to?
-          <% elif (metric == "emigrants") and (gender == "female") %>
-            Women who moved from << country_select >> to another country
-          <% elif (metric == "emigrants") and (gender == "male")%>
-            Men who moved from << country_select >> to another country
-          <% endif %>
+          <% if metric == "immigrants" %>
+          {definitions.immigrants.title}
+          <%- elif metric == "emigrants"%>
+          {definitions.emigrants.title}
+          <%- endif %>
         description_short: |-
-          <% if (metric == "immigrants") and (gender == "all") %>
-          The number of people who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
-          <% elif (metric == "immigrants") and (gender == "female") %>
-          The number of women who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
-          <% elif (metric == "immigrants") and (gender == "male") %>
-          The number of men who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
-          <% elif (metric == "emigrants") and (gender == "all") %>
-          The number of people who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
-          <% elif (metric == "emigrants") and (gender == "female") %>
-          The number of women who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
-          <% elif (metric == "emigrants") and (gender == "male") %>
-          The number of men who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+          <% if metric == "immigrants" %>
+          {definitions.immigrants.description_short}
+          <% elif metric == "emigrants" %>
+          {definitions.emigrants.description_short}
           <% endif %>
-        unit: people
+
+        # TODO: SHOULD REMOVE?
+
 #      migrants_all_sexes:
 #        title: |-
 #          <% if metric == "immigrants" %>
-#          Immigrants to << country_select >>: Where did they move from?
+#          Immigrants to << country_origin_or_dest >>: Where did they move from?
 #          <% elif metric == "emigrants" %>
-#          Emigrants from << country_select >>: Where did they move to?
+#          Emigrants from << country_origin_or_dest >>: Where did they move to?
 #          <% endif %>
 #        description_short: |-
 #          <% if metric == "immigrants" %>
-#          The number of people who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+#          The number of people who moved from another country to << country_origin_or_dest >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
 #          <% elif metric == "emigrants" %>
-#          The number of people who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+#          The number of people who were born in << country_origin_or_dest >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
 #          <% endif %>
 #        unit: people
 #      migrants_female:
 #        title: |-
 #          <% if metric == "immigrants" %>
-#          Women who moved from another country to << country_select >>
+#          Women who moved from another country to << country_origin_or_dest >>
 #          <% elif metric == "emigrants" %>
-#          Women who moved from << country_select >> to another country
+#          Women who moved from << country_origin_or_dest >> to another country
 #          <% endif %>
 #        description_short: |-
 #          <% if metric == "immigrants" %>
-#          The number of women who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+#          The number of women who moved from another country to << country_origin_or_dest >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
 #          <% elif metric == "emigrants" %>
-#          The number of women who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+#          The number of women who were born in << country_origin_or_dest >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
 #          <% endif %>
 #        unit: people
 #      migrants_male:
 #        title: |-
 #          <% if metric == "immigrants" %>
-#          Men who moved from another country to << country_select >>
+#          Men who moved from another country to << country_origin_or_dest >>
 #          <% elif metric == "emigrants" %>
-#          Men who moved from << country_select >> to another country
+#          Men who moved from << country_origin_or_dest >> to another country
 #          <% endif %>
 #        description_short: |-
 #          <% if metric == "immigrants" %>
-#          The number of men who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+#          The number of men who moved from another country to << country_origin_or_dest >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
 #          <% elif metric == "emigrants" %>
-#          The number of men who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+#          The number of men who were born in << country_origin_or_dest >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
 #          <% endif %>
 #        unit: people
-
 

@@ -60,17 +60,52 @@ def run() -> None:
         var_name="gender",
         value_name="migrants",
     )
+    tb["gender"] = tb["gender"].map(
+        {
+            "migrants_all_sexes": "all",
+            "migrants_female": "female",
+            "migrants_male": "male",
+        }
+    )
 
-    tb["gender"] = tb["gender"].map({"migrants_all_sexes": "all", "migrants_female": "female", "migrants_male": "male"})
+    # Copy table
+    tb_dest_origin = tb.copy()
 
-    # Improve table format.
-    tb = tb.format(["country_destination", "country_origin", "year", "gender"])
+    # Adapt table
+    tb = get_table_column_pet_indicator(tb)
+
+    # Format table
+    tables = [
+        tb_dest_origin.format(["country_destination", "country_origin", "year", "gender"]),
+        tb.format(["country", "year", "gender", "country_origin_or_dest"], short_name="migration_stock_flows"),
+    ]
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=tables, default_metadata=ds_meadow.metadata)
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def get_table_column_pet_indicator(tb):
+    """Have a column for 'migrants' and another for 'emigrants'."""
+    tb_emigrants = tb.rename(
+        columns={
+            "country_origin": "country",
+            "country_destination": "country_origin_or_dest",
+            "migrants": "emigrants",
+        }
+    )
+    tb_immigrants = tb.rename(
+        columns={
+            "country_origin": "country_origin_or_dest",
+            "country_destination": "country",
+            "migrants": "immigrants",
+        }
+    )
+    tb = tb_emigrants.merge(tb_immigrants, on=["country", "country_origin_or_dest", "year", "gender"], how="outer")
+
+    return tb
