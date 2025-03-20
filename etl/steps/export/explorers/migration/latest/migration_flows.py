@@ -15,13 +15,12 @@ DISPLAY_SETTINGS = {
 
 
 def run() -> None:
-    # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 
     # Add views for all dimensions
     ds = paths.load_dataset("migration_stock_flows")
-    tb = ds.read("migrant_stock_dest_origin", load_data=False)
+    tb = ds.read("migration_stock_flows", load_data=False)
 
     # Define common view configuration
     common_view_config = {
@@ -34,8 +33,8 @@ def run() -> None:
     # 2: Bake config automatically from table
     config_new = expand_config(
         tb,
-        indicator_names=["migrants"],
-        dimensions=["country_select", "metric", "gender"],
+        indicator_names=["immigrants", "emigrants"],
+        dimensions=["country_origin_or_dest", "gender"],
         common_view_config=common_view_config,
     )
 
@@ -53,7 +52,7 @@ def run() -> None:
     )
 
     # 5: Edit order of slugs
-    explorer.sort_choices({"country_select": lambda x: sorted(x)})
+    explorer.sort_choices({"country_origin_or_dest": lambda x: sorted(x)})
 
     # 6: Set display settings
     add_display_settings(explorer)
@@ -72,8 +71,8 @@ def add_display_settings(explorer):
         assert view.num_indicators == 1, "More than one indicator in the view!"
 
         # Set default display settings
-        if view.dimensions["metric"] == "emigrants":
+        if view.dimensions["indicator"] == "emigrants":
             view.indicators.y[0].display = DISPLAY_SETTINGS
             # view.config = {}
-        elif view.dimensions["metric"] == "immigrants":
+        elif view.dimensions["indicator"] == "immigrants":
             view.indicators.y[0].display = DISPLAY_SETTINGS
