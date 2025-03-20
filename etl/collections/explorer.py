@@ -1,12 +1,12 @@
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from owid.catalog.utils import underscore
 
-from etl.collections.common import INDICATORS_SLUG, expand_config, get_mapping_paths_to_id
+from etl.collections.common import INDICATORS_SLUG, combine_config_dimensions, expand_config, get_mapping_paths_to_id
 from etl.collections.explorer_legacy import _create_explorer_legacy
 from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
 from etl.collections.utils import (
@@ -14,6 +14,11 @@ from etl.collections.utils import (
     validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
+
+__all__ = [
+    "expand_config",
+    "combine_config_dimensions",
+]
 
 
 @pruned_json
@@ -76,7 +81,7 @@ class Explorer(Collection):
         _, name = self.catalog_path.split("#")
         return name
 
-    def sort_indicators(self, order: List[str], indicators_slug: Optional[str] = None):
+    def sort_indicators(self, order: Union[List[str], Callable], indicators_slug: Optional[str] = None):
         """Sort indicators in all views."""
         if indicators_slug is None:
             indicators_slug = INDICATORS_SLUG
@@ -118,9 +123,6 @@ class Explorer(Collection):
         )
 
         explorer_legacy.save()
-
-
-__all__ = ["expand_config"]
 
 
 def create_explorer(
