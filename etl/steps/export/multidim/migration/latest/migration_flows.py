@@ -16,7 +16,7 @@ def run() -> None:
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("migration_stock_flows")
-    tb = ds.read("migrant_stock_dest_origin")
+    tb = ds.read("migrant_stock_dest_origin", load_data=False)
 
     # sort columns by country select
     dim_col = sorted([c for c in tb.columns if "migrants_all_sexes" in c])
@@ -40,16 +40,12 @@ def run() -> None:
             "colorScale": {
                 "binningStrategy": "manual",
                 "baseColorScheme": "YlGnBu",
-                # "customNumericColorsActive": True,
                 "customNumericMinValue": 0,
-                "customNumericValues": [1000, 10000, 100000, 1000000, 0],
-                # "customNumericColors": ["#AF1629", None, None, None, None, None, None, None],
-                # "customNumericLabels": ["Selected Country", None, None, None, None, None, None, None],
+                "customNumericValues": [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0],
                 "customCategoryColors": {"Selected country": "#AF1629"},
                 "customCategoryLabels": {"Selected country": "Selected country"},
             },
         },
-        "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
     }
 
     # 2: Bake config automatically from table

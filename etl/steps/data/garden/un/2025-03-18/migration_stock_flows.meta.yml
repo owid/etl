@@ -1,9 +1,16 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    display:
+      numDecimalPlaces: 0
     presentation:
       topic_tags:
         - Migration
+      grapher_config:
+        note: |-
+          <% if metric == "immigrants" %>
+          For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.
+          <% endif %>
     short_unit: ""
     processing_level: major
     description_processing: |-
