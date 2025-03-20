@@ -5,14 +5,16 @@ default_selection:
   - World
 dimensions:
   - name: Country
-    slug: country_select
+    slug: country_origin_or_dest
   - name: Metric
-    slug: metric
+    slug: indicator
     choices:
       - slug: "immigrants"
-        name: "Immigrants: People moving to country"
+        name: "Immigrants"
+        description: People moving to country
       - slug: "emigrants"
-        name: "Emigrants: People moving away from country"
+        name: "Emigrants"
+        description: People moving away from country
   - name: Gender
     slug: "gender"
     choices:
