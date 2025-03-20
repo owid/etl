@@ -42,7 +42,6 @@ steps:
   data://grapher/wb/2024-12-17/bilateral_remittance:
     - data://garden/wb/2024-12-17/bilateral_remittance
 
-
   # Migration distances
   data://garden/migration/2024-11-19/migration_distance:
     - data://garden/un/2025-03-12/migrant_stock
@@ -88,7 +87,8 @@ steps:
     - data://garden/un/2025-03-18/migration_stock_flows
     - data://garden/regions/2023-01-01/regions
 
-
   # UN DESA multidim migration flows (2024)
   export://multidim/migration/latest/migration_flows:
+    - data://grapher/un/2025-03-18/migration_stock_flows
+  export://explorers/migration/latest/migration_flows:
     - data://grapher/un/2025-03-18/migration_stock_flows
