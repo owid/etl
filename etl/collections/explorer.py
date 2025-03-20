@@ -473,6 +473,7 @@ def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
         Slug for the indicator. Default is `indicator`. I think this is irrelevant, and shouldn't matter what you input here.
 
     """
+    COL_METADATA = "__metadata"
     if indicator_slug is None:
         indicator_slug = "indicator"
 
@@ -487,12 +488,12 @@ def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
                 {
                     **tb[col].m.dimensions,
                     indicator_slug: tb[col].m.original_short_name,
-                    "metadata": tb[col].m,
+                    COL_METADATA: tb[col].m,
                 }
             )
 
     df = pd.DataFrame(records)
-    dimension_slugs_tb = [col for col in df.columns if col not in ["metadata"]]
+    dimension_slugs_tb = [col for col in df.columns if col not in [COL_METADATA]]
     dimension_slugs = set(explorer.dimension_slugs)
 
     assert len(dimension_slugs_tb) >= len(set(dimension_slugs_tb))
@@ -510,7 +511,7 @@ def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
             raise ValueError("Dimension slugs mismatch")
 
     # Set index
-    cols_index = [col for col in df.columns if col not in ["metadata"]]
+    cols_index = [col for col in df.columns if col not in [COL_METADATA]]
     df = df.set_index(cols_index, verify_integrity=True)
 
     for view in explorer.views:
@@ -526,7 +527,7 @@ def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
             dimension_idx = [str(dimensions[col]) for col in cols_index]
 
             try:
-                meta = df.loc[tuple(dimension_idx), "metadata"]
+                meta = df.loc[tuple(dimension_idx), COL_METADATA]
             except KeyError:
                 continue
 
