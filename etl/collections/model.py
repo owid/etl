@@ -597,6 +597,10 @@ class Collection(MDIMBase):
         for dim in self.dimensions:
             dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences[dim.slug]]
 
+    @property
+    def dimension_slugs(self):
+        return [dim.slug for dim in self.dimensions]
+
 
 # def main():
 # import yaml
