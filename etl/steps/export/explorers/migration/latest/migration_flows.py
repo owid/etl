@@ -1,3 +1,5 @@
+import pandas as pd
+
 from etl.collections.explorer import combine_config_dimensions, expand_config
 
 # from etl.db import get_engine
@@ -6,19 +8,11 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-DISPLAY_IMMIGRANTS = {
-    "colorScaleNumericMinValue": -1000000000,
+DISPLAY_SETTINGS = {
+    # "colorScaleNumericMinValue": -10000000,
     "colorScaleNumericBins": "-1,#AF1629,Selected country;100,,;1000,,;10000,,;100000,,;1000000,,;10000000",
     "colorScaleEqualSizeBins": True,
     "colorScaleScheme": "YlGnBu",
-    "colorScaleInvert": False,
-}
-DISPLAY_EMMIGRANTS = {
-    "colorScaleNumericMinValue": "-10000000",
-    "colorScaleNumericBins": "-1000000,,;-100000,,;-10000,,;-1000,,;-100,,;0,,;1000000000,#AF1629,Selected country",
-    "colorScaleEqualSizeBins": True,
-    "colorScaleScheme": "YlGnBu",
-    "colorScaleInvert": True,
 }
 
 
@@ -36,18 +30,6 @@ def run() -> None:
         # "type": "LineChart",
         "hasMapTab": True,
         "tab": "map",
-        # "map": {
-        #     "tooltipUseCustomLabels": True,
-        #     "colorScale": {
-        #         "binningStrategy": "manual",
-        #         "baseColorScheme": "YlGnBu",
-        #         "customNumericColorsActive": True,
-        #         "customNumericMinValue": -1,
-        #         "customNumericValues": [-1, 1000, 10000, 100000, 1000000, 0],
-        #         "customNumericColors": ["#AF1629", None, None, None, None, None, None, None],
-        #         "customNumericLabels": ["Selected Country", None, None, None, None, None, None, None],
-        #     },
-        # },
         "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
     }
 
@@ -78,7 +60,10 @@ def run() -> None:
     # 6: Set display settings
     add_display_settings(explorer)
 
-    # 7: Save explorer to DB
+    # 7: HACK
+    # hack_metadata_propagation(explorer, [tb])
+
+    # 8: Save explorer to DB
     explorer.save()
 
 
@@ -87,9 +72,6 @@ def add_display_settings(explorer):
         # Check that there is only one indicator and is in the y axis.
         assert view.indicators.y is not None, "No y indicator found"
         assert view.num_indicators == 1, "More than one indicator in the view!"
-        if view.dimensions["metric"] == "emigrants":
-            view.indicators.y[0].display = DISPLAY_EMMIGRANTS
-        elif view.dimensions["metric"] == "immigrants":
-            view.indicators.y[0].display = DISPLAY_IMMIGRANTS
-        else:
-            raise ValueError(f"Unknown metric: {view.dimensions['metric']}")
+
+        # Set default display settings
+        view.indicators.y[0].display = DISPLAY_SETTINGS

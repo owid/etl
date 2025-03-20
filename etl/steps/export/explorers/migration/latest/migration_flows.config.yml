@@ -45,9 +45,9 @@ dimensions:
     presentation:
       type: radio
     choices:
-      - slug: "immigrants"
-        name: "Immigrants: People moving to country"
       - slug: "emigrants"
         name: "Emigrants: People moving away from country"
+      - slug: "immigrants"
+        name: "Immigrants: People moving to country"
 
 views: []
