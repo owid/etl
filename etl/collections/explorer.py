@@ -532,22 +532,30 @@ def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
 
             # Propagate subtitle
             if (view.config is None) or ((view.config is not None) and ("subtitle" not in view.config)):
+                subtitle = ""
                 if (
                     (meta.presentation is not None)
                     and (meta.presentation.grapher_config is not None)
                     and ("subtitle" in meta.presentation.grapher_config)
                 ):
-                    additional_config["subtitle"] = meta.presentation.grapher_config["subtitle"]
+                    subtitle = meta.presentation.grapher_config["subtitle"]
                 elif meta.description_short is not None:
-                    additional_config["subtitle"] = meta.description_short
+                    subtitle = meta.description_short
+
+                if subtitle != "":
+                    additional_config["subtitle"] = subtitle
             # Propagate note
             if (view.config is None) or ((view.config is not None) and ("note" not in view.config)):
+                note = ""
                 if (
                     (meta.presentation is not None)
                     and (meta.presentation.grapher_config is not None)
                     and ("note" in meta.presentation.grapher_config)
                 ):
-                    additional_config["note"] = meta.note
+                    note = meta.presentation.grapher_config["note"]
+
+                if note != "":
+                    additional_config["note"] = note
 
             if (additional_config != {}) and (view.config is None):
                 view.config = additional_config
