@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Data compiled from multiple sources by World Bank
+    title: number_electricity_fuels_access_wb
+    citation_full: |-
+      Data compiled from multiple sources by World Bank – with minor processing by Our World in Data. World Bank and International Energy Agency, “World Development Indicators” [original data].
+    url_main: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vQw_Z1ALEukjL2BtFKZzZj76X9K5gtm30ztuoAWLTWasq_GsvfkGHGb2tIMk0wlMd0M-82nTfuJ31cW/pub?output=csv
+    date_accessed: '2025-03-20'
+  name: Number with and without electricity and clean fuels (WB)
+  description: ''
+  license: {}
+outs:
+  - md5: 018f16cfd05a462d97dadd584a19b469
+    size: 441138
+    path: number_electricity_fuels_access_wb.csv
