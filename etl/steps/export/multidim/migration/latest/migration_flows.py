@@ -16,16 +16,13 @@ def run() -> None:
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("migration_stock_flows")
-    tb = ds.read("migrant_stock_dest_origin")
-
-    # sort columns by country select
-    dim_col = sorted([c for c in tb.columns if "migrants_all_sexes" in c])
-    tb = tb[["country", "year"] + dim_col]
+    tb = ds.read("migrant_stock_dest_origin", load_data=False)
 
     # add country names and slugs to the config
     cty_idx = [i for i, d in enumerate(config["dimensions"]) if d["slug"] == "country_select"][0]
 
-    all_countries = sorted(tb["country"].unique())
+    all_countries = [tb[col].dimensions["country_select"] for col in tb.columns if col not in ["year", "country"]]
+    all_countries = sorted(list(set(all_countries)))
     cty_dict_ls = [{"slug": c.lower(), "name": c} for c in all_countries]
     config["dimensions"][cty_idx]["choices"] = cty_dict_ls
 
@@ -40,24 +37,19 @@ def run() -> None:
             "colorScale": {
                 "binningStrategy": "manual",
                 "baseColorScheme": "YlGnBu",
-                # "customNumericColorsActive": True,
                 "customNumericMinValue": 0,
-                "customNumericValues": [1000, 10000, 100000, 1000000, 0],
-                # "customNumericColors": ["#AF1629", None, None, None, None, None, None, None],
-                # "customNumericLabels": ["Selected Country", None, None, None, None, None, None, None],
+                "customNumericValues": [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0],
                 "customCategoryColors": {"Selected country": "#AF1629"},
                 "customCategoryLabels": {"Selected country": "Selected country"},
             },
         },
-        "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
     }
 
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
         tb,  # type: ignore
-        indicator_names=["migrants_all_sexes"],
-        dimensions=["metric", "country_select"],
-        indicators_slug="migrants",
+        indicator_names=["migrants"],
+        dimensions=["country_select", "metric", "gender"],
         common_view_config=common_view_config,
     )
 
