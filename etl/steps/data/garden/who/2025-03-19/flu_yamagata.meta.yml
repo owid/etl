@@ -19,3 +19,5 @@ tables:
         unit: cases
         display:
           numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: "1995-01-02"
