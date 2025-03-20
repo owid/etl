@@ -1,0 +1,23 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Influenza
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  flu_yamagata:
+    variables:
+      byamcombined:
+        title: Reported cases of the B Yamagata strain of influenza
+        description_short: Reported number of B Yamagata influenza cases from all types of influenza surveillance.
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+          yearIsDay: true
+          zeroDay: "1995-01-02"
