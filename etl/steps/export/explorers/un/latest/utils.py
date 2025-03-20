@@ -369,6 +369,10 @@ class ExplorerCreator:
         self.ds_proj = ds_proj
         self.tbs = {"proj": {}, "estimates": {}}
 
+    @property
+    def all_tables(self):
+        return [tt for t in self.tbs.values() for tt in t.values()]
+
     def table(self, table_name: str):
         if table_name not in self.tbs:
             self.tbs["estimates"][table_name] = self.ds.read(table_name, load_data=False)

@@ -449,3 +449,117 @@ def bake_indicators_view(indicator_paths) -> Dict[str, List[str]]:
                 indicators[f"{dim}VariableId"].append(indicator["path"])
                 break
     return indicators
+
+
+def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
+    """There is some issue with metadata not being propagated into explorer views.
+
+    It looks like, as long as we use `slug` (instead of `catalogPath`) to reference indicators, parts of the indicator's metadata is ignored (subtitle, note, originUrl, etc.). My impression is that fields from `presentation.grapher_config` are being ignored?
+
+    This issue appears whenever we define display settings for an indicator in a view. That's because our workaround to define indicator-display settings for a view is to use slug together with `transform` to duplicate an existing indicator. Note that this only applies to views with one indicator, because those are the only ones that propagate indicator's metadata to the FAUST.
+
+    More details: https://owid.slack.com/archives/C46U9LXRR/p1742416990042489
+
+    For now, this function manually hardcodes the relevant metadata in the explorer config. That means, that we set the subtitle and note in the grapher table based on the metadata of it's indicator (only if it uses one indicator!).
+
+    Args:
+    -----
+
+    explorer: Explorer
+        Final explorer. Only use this function once you've finished processing the explorer.
+    tbs: List[Table]
+        List of tables used in the explorer. TODO: Could be generated from `paths`.
+    indicator_slug: str
+        Slug for the indicator. Default is `indicator`. I think this is irrelevant, and shouldn't matter what you input here.
+
+    """
+    if indicator_slug is None:
+        indicator_slug = "indicator"
+
+    # Build dataframe mapping dimensions to metadata
+    records = []
+    for tb in tbs:
+        for col in tb.columns:
+            if tb[col].m.dimensions is None:
+                continue
+
+            records.append(
+                {
+                    **tb[col].m.dimensions,
+                    indicator_slug: tb[col].m.original_short_name,
+                    "metadata": tb[col].m,
+                }
+            )
+
+    df = pd.DataFrame(records)
+    dimension_slugs_tb = [col for col in df.columns if col not in ["metadata"]]
+    dimension_slugs = set(explorer.dimension_slugs)
+
+    assert len(dimension_slugs_tb) >= len(set(dimension_slugs_tb))
+    if set(dimension_slugs_tb) != dimension_slugs:
+        if len(dimension_slugs_tb) > len(dimension_slugs):
+            dim_extra = set(dimension_slugs_tb) - dimension_slugs
+            assert len(dim_extra) == 1, f"Extra dimensions found: {dim_extra}"
+            assert df[list(dim_extra)[0]].nunique() == 1, f"Expected to only have one value in {dim_extra}"
+            df = df.drop(columns=list(dim_extra))
+        elif len(dimension_slugs_tb) == len(dimension_slugs):
+            assert len(set(dimension_slugs_tb).intersection(set(dimension_slugs))) == 2
+            renames = dict(zip(dimension_slugs_tb, dimension_slugs))
+            df = df.rename(columns=renames)
+        else:
+            raise ValueError("Dimension slugs mismatch")
+
+    # Set index
+    cols_index = [col for col in df.columns if col not in ["metadata"]]
+    df = df.set_index(cols_index, verify_integrity=True)
+
+    for view in explorer.views:
+        # Conditions for metadata propagation (otherwise not needed)
+        ## 1) Only one indicator: Metadata is only relevant in views with single indicator
+        has_one_indicator = view.num_indicators == 1
+        ## 2) It has display settings: When display settings are set, metadata is overwritten
+        props = view.indicators.to_records()[0]
+        has_display = ("display" in props) and (props["display"] is not None)
+        ## Validate two conditions
+        if has_one_indicator and has_display:
+            dimensions = view.dimensions
+            dimension_idx = [str(dimensions[col]) for col in cols_index]
+
+            try:
+                meta = df.loc[dimension_idx, "metadata"]
+            except KeyError:
+                continue
+
+            additional_config = {}
+
+            # Propagate subtitle
+            if (view.config is None) or ((view.config is not None) and ("subtitle" not in view.config)):
+                subtitle = ""
+                if (
+                    (meta.presentation is not None)
+                    and (meta.presentation.grapher_config is not None)
+                    and ("subtitle" in meta.presentation.grapher_config)
+                ):
+                    subtitle = meta.presentation.grapher_config["subtitle"]
+                elif meta.description_short is not None:
+                    subtitle = meta.description_short
+
+                if subtitle != "":
+                    additional_config["subtitle"] = subtitle
+            # Propagate note
+            if (view.config is None) or ((view.config is not None) and ("note" not in view.config)):
+                note = ""
+                if (
+                    (meta.presentation is not None)
+                    and (meta.presentation.grapher_config is not None)
+                    and ("note" in meta.presentation.grapher_config)
+                ):
+                    note = meta.presentation.grapher_config["note"]
+
+                if note != "":
+                    additional_config["note"] = note
+
+            if (additional_config != {}) and (view.config is None):
+                view.config = additional_config
+            if (additional_config != {}) and (view.config is not None):
+                view.config = {**view.config, **additional_config}
