@@ -72,4 +72,8 @@ def add_display_settings(explorer):
         assert view.num_indicators == 1, "More than one indicator in the view!"
 
         # Set default display settings
-        view.indicators.y[0].display = DISPLAY_SETTINGS
+        if view.dimensions["metric"] == "emigrants":
+            view.indicators.y[0].display = DISPLAY_SETTINGS
+            # view.config = {}
+        elif view.dimensions["metric"] == "immigrants":
+            view.indicators.y[0].display = DISPLAY_SETTINGS
