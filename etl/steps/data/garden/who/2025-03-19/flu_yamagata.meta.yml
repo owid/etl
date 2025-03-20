@@ -13,9 +13,9 @@ dataset:
 tables:
   flu_yamagata:
     variables:
-      byam:
+      byamcombined:
         title: Reported cases of the B Yamagata strain of influenza
-        description_short: Reported number of B Yamagata influenza cases.
+        description_short: Reported number of B Yamagata influenza cases from all types of influenza surveillance.
         unit: cases
         display:
           numDecimalPlaces: 0
