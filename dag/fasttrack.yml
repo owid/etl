@@ -218,3 +218,5 @@ steps:
     - snapshot://fasttrack/latest/housing_prices_eurostat_q4_2023__sheet1.csv
   data://grapher/fasttrack/latest/deflated_housing_prices__sheet1:
     - snapshot://fasttrack/latest/deflated_housing_prices__sheet1.csv
+  data-private://grapher/fasttrack/latest/test:
+    - snapshot-private://fasttrack/latest/test.csv
