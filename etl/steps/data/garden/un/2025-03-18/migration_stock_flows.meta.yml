@@ -1,0 +1,72 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Migration
+      grapher_config:
+        note: |-
+          <% if metric == "immigrants" %>
+          For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.
+          <% endif %>
+    short_unit: ""
+    processing_level: major
+    description_processing: |-
+      - Regional aggregates (such as continents, income groups and the worldwide aggregate) are based on [our definition of the continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and the [World Bank definition of income groups](https://ourworldindata.org/grapher/world-bank-income-groups), unless otherwise indicated. They might differ from the definitions used by the United Nations.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 729
+
+
+tables:
+  migrant_stock_dest_origin:
+    variables:
+      migrants_all_sexes:
+        title: |-
+          <% if metric == "immigrants" %>
+          Immigrants to << country_select >>: Where did they move from?
+          <% elif metric == "emigrants" %>
+          Emigrants from << country_select >>: Where did they move to?
+          <% endif %>
+        description_short: |-
+          <% if metric == "immigrants" %>
+          The number of people who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+          <% elif metric == "emigrants" %>
+          The number of people who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+          <% endif %>
+        unit: people
+      migrants_female:
+        title: |-
+          <% if metric == "immigrants" %>
+          Women who moved from another country to << country_select >>
+          <% elif metric == "emigrants" %>
+          Women who moved from << country_select >> to another country
+          <% endif %>
+        description_short: |-
+          <% if metric == "immigrants" %>
+          The number of women who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+          <% elif metric == "emigrants" %>
+          The number of women who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+          <% endif %>
+        unit: people
+      migrants_male:
+        title: |-
+          <% if metric == "immigrants" %>
+          Men who moved from another country to << country_select >>
+          <% elif metric == "emigrants" %>
+          Men who moved from << country_select >> to another country
+          <% endif %>
+        description_short: |-
+          <% if metric == "immigrants" %>
+          The number of men who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+          <% elif metric == "emigrants" %>
+          The number of men who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+          <% endif %>
+        unit: people
+
+
