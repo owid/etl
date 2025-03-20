@@ -1256,3 +1256,11 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/cdc/2025-03-19/rubella_cases:
     - data://garden/cdc/2025-03-19/rubella_cases
+
+  #
+  # B Yamagata flu strain - from Flunet
+  #
+  data://garden/who/2025-03-19/flu_yamagata:
+    - data://garden/who/latest/flunet
+  data://grapher/who/2025-03-19/flu_yamagata:
+    - data://garden/who/2025-03-19/flu_yamagata
