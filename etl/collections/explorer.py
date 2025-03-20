@@ -521,7 +521,7 @@ def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
         ## Validate two conditions
         if has_one_indicator and has_display:
             dimensions = view.dimensions
-            dimension_idx = [dimensions[col] for col in cols_index]
+            dimension_idx = [str(dimensions[col]) for col in cols_index]
 
             try:
                 meta = df.loc[*dimension_idx].metadata
