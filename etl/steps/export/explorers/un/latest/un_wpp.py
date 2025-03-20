@@ -1,4 +1,6 @@
 """
+TODO: Remove usage of `hack_metadata_propagation` once https://owid.slack.com/archives/C46U9LXRR/p1742416990042489 is solved.
+
 This step creates the population and demography explorer. It uses MDIM-based configuration, and some custom processing.
 
 Strategy:
