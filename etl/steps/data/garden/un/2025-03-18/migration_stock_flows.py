@@ -53,8 +53,18 @@ def run() -> None:
         index_columns=["country_destination", "country_origin", "year"],
     )
 
+    # make male and female migrants dimensions
+    tb = tb.melt(
+        id_vars=["country_origin", "country_destination", "year"],
+        value_vars=["migrants_all_sexes", "migrants_female", "migrants_male"],
+        var_name="gender",
+        value_name="migrants",
+    )
+
+    tb["gender"] = tb["gender"].map({"migrants_all_sexes": "all", "migrants_female": "female", "migrants_male": "male"})
+
     # Improve table format.
-    tb = tb.format(["country_destination", "country_origin", "year"])
+    tb = tb.format(["country_destination", "country_origin", "year", "gender"])
 
     #
     # Save outputs.

@@ -49,5 +49,16 @@ dimensions:
         name: "Emigrants: People moving away from country"
       - slug: "immigrants"
         name: "Immigrants: People moving to country"
+  - name: Gender
+    slug: gender
+    presentation:
+      type: radio
+    choices:
+      - slug: "all"
+        name: "All migrants"
+      - slug: "female"
+        name: "Female migrants"
+      - slug: "male"
+        name: "Male migrants"
 
 views: []

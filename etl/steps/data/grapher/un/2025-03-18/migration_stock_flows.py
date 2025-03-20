@@ -38,8 +38,9 @@ def run() -> None:
     # combine tables
     tb = pr.concat([tb, tb_switched])
 
-    # remove regions as "country_select" dimension
+    # remove regions as "country_select" dimension and sort countries
     tb = tb[tb["country_select"].isin(countries)]
+    tb = tb.sort_values(by=["country_select"], ascending=True)
 
     # Add rows for country and country select being equal
     tb_same_country = create_same_country_rows(tb["country_select"].unique())
@@ -47,15 +48,10 @@ def run() -> None:
     # include rows for countries where country and country select are the same
     tb = pr.concat([tb, tb_same_country])  # type: ignore
 
-    # convert all columns to string
-    for col in tb.columns:
-        if col not in ["year"]:
-            tb[col] = tb[col].astype(str)
+    # convert column to string and set unit
+    tb["migrants"] = tb["metric"].astype(str)
 
-    # drop female and male migrants as not to clutter the grapher
-    tb = tb.drop(columns=["migrants_female", "migrants_male"])
-
-    tb = tb.format(["country", "country_select", "metric", "year"])
+    tb = tb.format(["country", "country_select", "metric", "gender", "year"])
 
     #
     # Save outputs.
@@ -73,14 +69,14 @@ def create_same_country_rows(countries):
     for country in countries:
         for year in [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024]:
             for metric in ["immigrants", "emigrants"]:
-                row = {
-                    "country_select": country,
-                    "country": country,
-                    "year": year,
-                    "migrants_all_sexes": "Selected country",
-                    "migrants_female": "Selected country",
-                    "migrants_male": "Selected country",
-                    "metric": metric,
-                }
-                rows.append(row)
+                for gender in ["all", "female", "male"]:
+                    row = {
+                        "country_select": country,
+                        "country": country,
+                        "year": year,
+                        "migrants": "Selected country",
+                        "metric": metric,
+                        "gender": gender,
+                    }
+                    rows.append(row)
     return Table(pd.DataFrame(rows))

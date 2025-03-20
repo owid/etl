@@ -34,8 +34,8 @@ def run() -> None:
     # 2: Bake config automatically from table
     config_new = expand_config(
         tb,
-        indicator_names=["migrants_all_sexes"],
-        dimensions=["metric", "country_select"],
+        indicator_names=["migrants"],
+        dimensions=["country_select", "metric", "gender"],
         common_view_config=common_view_config,
     )
 
