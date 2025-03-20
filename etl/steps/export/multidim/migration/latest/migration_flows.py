@@ -40,11 +40,13 @@ def run() -> None:
             "colorScale": {
                 "binningStrategy": "manual",
                 "baseColorScheme": "YlGnBu",
-                "customNumericColorsActive": True,
-                "customNumericMinValue": -1,
-                "customNumericValues": [-1, 1000, 10000, 100000, 1000000, 0],
-                "customNumericColors": ["#AF1629", None, None, None, None, None, None, None],
-                "customNumericLabels": ["Selected Country", None, None, None, None, None, None, None],
+                # "customNumericColorsActive": True,
+                "customNumericMinValue": 0,
+                "customNumericValues": [1000, 10000, 100000, 1000000, 0],
+                # "customNumericColors": ["#AF1629", None, None, None, None, None, None, None],
+                # "customNumericLabels": ["Selected Country", None, None, None, None, None, None, None],
+                "customCategoryColors": {"Selected country": "#AF1629"},
+                "customCategoryLabels": {"Selected country": "Selected country"},
             },
         },
         "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
@@ -52,7 +54,7 @@ def run() -> None:
 
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
-        tb,
+        tb,  # type: ignore
         indicator_names=["migrants_all_sexes"],
         dimensions=["metric", "country_select"],
         indicators_slug="migrants",

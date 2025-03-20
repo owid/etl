@@ -47,6 +47,11 @@ def run() -> None:
     # include rows for countries where country and country select are the same
     tb = pr.concat([tb, tb_same_country])  # type: ignore
 
+    # convert all columns to string
+    for col in tb.columns:
+        if col not in ["year"]:
+            tb[col] = tb[col].astype(str)
+
     # drop female and male migrants as not to clutter the grapher
     tb = tb.drop(columns=["migrants_female", "migrants_male"])
 
@@ -72,9 +77,9 @@ def create_same_country_rows(countries):
                     "country_select": country,
                     "country": country,
                     "year": year,
-                    "migrants_all_sexes": -1,
-                    "migrants_female": -1,
-                    "migrants_male": -1,
+                    "migrants_all_sexes": "Selected country",
+                    "migrants_female": "Selected country",
+                    "migrants_male": "Selected country",
                     "metric": metric,
                 }
                 rows.append(row)
