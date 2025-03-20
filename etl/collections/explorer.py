@@ -524,7 +524,7 @@ def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
             dimension_idx = [str(dimensions[col]) for col in cols_index]
 
             try:
-                meta = df.loc[*dimension_idx].metadata
+                meta = df.loc[dimension_idx, "metadata"]
             except KeyError:
                 continue
 
