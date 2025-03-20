@@ -1371,7 +1371,11 @@ class Variable(Base):
         cls, session: Session, catalog_path: str | List[str], columns: Optional[List[str]] = None
     ) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
-        assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        if isinstance(catalog_path, str):
+            assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        elif isinstance(catalog_path, list):
+            assert all("#" in path for path in catalog_path), "catalog_path should end with #indicator_short_name"
+
         # Return Variable if columns is None and return Row object if columns is provided
         execute = session.execute if columns else session.scalars
         if isinstance(catalog_path, str):

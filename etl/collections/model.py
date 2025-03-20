@@ -11,7 +11,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
+from typing import Any, Callable, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
 
 import fastjsonschema
 import pandas as pd
@@ -138,6 +138,11 @@ class ViewIndicators(MDIMBase):
     size: Optional[Indicator] = None
     color: Optional[Indicator] = None
 
+    @property
+    def num_indicators(self) -> int:
+        """Get the total number of indicators in the view."""
+        return sum([1 for dim in CHART_DIMENSIONS if getattr(self, dim, None) is not None])
+
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "ViewIndicators":
         """Coerce the dictionary into the expected shape before passing it to the parent class."""
@@ -249,6 +254,11 @@ class View(MDIMBase):
         # Get list of indicators
         indicators = self.indicators.to_records()
         return len(indicators) > 1
+
+    @property
+    def num_indicators(self) -> int:
+        """Get the total number of indicators in the view."""
+        return self.indicators.num_indicators
 
     @property
     def metadata_is_needed(self) -> bool:
@@ -373,7 +383,7 @@ class DimensionPresentation(MDIMBase):
         if not UITypes.is_valid(self.type):
             raise ValueError(f"Invalid type: {self.type}. Accepted values: {UITypes.ALL}")
         if (self.type == UITypes.CHECKBOX) and (self.choice_slug_true is None):
-            raise ValueError(f"True slug must be provided for '{UITypes.CHECKBOX}' type.")
+            raise ValueError(f"`choice_slug_true` slug must be provided for '{UITypes.CHECKBOX}' type.")
 
 
 @pruned_json
@@ -419,17 +429,28 @@ class Dimension(MDIMBase):
     def ppt(self):
         return self.presentation
 
-    def sort_choices(self, slug_order: List[str]):
-        """Sort choices based on the given order."""
+    def sort_choices(self, slug_order: Union[List[str], Callable]):
+        """Sort choices based on the given order.
+
+        Args:
+        slug_order: List[str] | Callable
+            If a list, it must contain all the slugs in the desired order. If a callable, this callable will be applied to the choice slugs to sort them.
+        """
+        choice_slugs = self.choice_slugs
+        if callable(slug_order):
+            slug_order_ = slug_order(choice_slugs)
+        else:
+            slug_order_ = slug_order
+
         # Make sure all choices are in the given order
-        choices_missing = set(self.choice_slugs) - set(slug_order)
+        choices_missing = set(choice_slugs) - set(slug_order_)
         if choices_missing:
             raise ValueError(
                 f"All choices for dimension {self.slug} must be in the given order! Missing: {choices_missing}"
             )
 
         # Create a dictionary to map slugs to their positions for faster sorting
-        slug_position = {slug: index for index, slug in enumerate(slug_order)}
+        slug_position = {slug: index for index, slug in enumerate(slug_order_)}
 
         # Sort based on your desired slug order
         self.choices.sort(key=lambda choice: slug_position.get(choice.slug, float("inf")))
@@ -448,6 +469,10 @@ class Collection(MDIMBase):
 
     dimensions: List[Dimension]
     views: List[Any]
+
+    # Private for fast access
+    # _views_hash: Optional[Dict[str, Any]] = None
+    # _dimensions_hash: Optional[Dict[str, Dimension]] = None
 
     @property
     def v(self):
@@ -547,7 +572,7 @@ class Collection(MDIMBase):
         # if vc[vc > 1].any():
         #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
 
-    def sort_choices(self, slug_order: Dict[str, List[str]]):
+    def sort_choices(self, slug_order: Dict[str, Union[List[str], Callable]]):
         """Sort choices based on the given order."""
         for dim in self.dimensions:
             if dim.slug in slug_order:
@@ -571,6 +596,10 @@ class Collection(MDIMBase):
         # Remove those not in use
         for dim in self.dimensions:
             dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences[dim.slug]]
+
+    @property
+    def dimension_slugs(self):
+        return [dim.slug for dim in self.dimensions]
 
 
 # def main():
