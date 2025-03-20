@@ -1,5 +1,3 @@
-import pandas as pd
-
 from etl.collections.explorer import combine_config_dimensions, expand_config
 
 # from etl.db import get_engine
