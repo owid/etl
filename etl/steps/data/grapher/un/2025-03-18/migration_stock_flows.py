@@ -49,7 +49,7 @@ def run() -> None:
     tb = pr.concat([tb, tb_same_country])  # type: ignore
 
     # convert column to string and set unit
-    tb["migrants"] = tb["metric"].astype(str)
+    tb["migrants"] = tb["migrants"].astype(str).copy_metadata(tb["migrants"])
 
     tb = tb.format(["country", "country_select", "metric", "gender", "year"])
 
