@@ -985,7 +985,7 @@ class GrapherStep(Step):
 class ExportStep(DataStep):
     """
     A step which exports something once. For instance committing to a Github repository
-    or creating a TSV file for owid-content.
+    or upserting an Explorer to DB.
     """
 
     path: str

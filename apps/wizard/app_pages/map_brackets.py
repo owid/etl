@@ -17,8 +17,7 @@ from apps.wizard.utils.components import grapher_chart
 from etl.collections.explorer_legacy import ExplorerLegacy
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_nearest_power_of_ten, round_to_shifted_power_of_ten, round_to_sig_figs
-from etl.grapher.model import Entity, Variable
-from etl.paths import EXPLORERS_DIR
+from etl.grapher.model import Entity, Explorer, Variable
 
 # TODO:
 #  * Create another slider (from 0 to 10) for tolerance.
@@ -931,27 +930,22 @@ if use_type in [USE_TYPE_CHART, USE_TYPE_ETL]:
     st.error(f"Use type '{use_type}' not yet implemented.")
     st.stop()
 elif use_type == USE_TYPE_EXPLORERS:
-    if not EXPLORERS_DIR.is_dir():
-        st.error(f"Explorer directory not found: {EXPLORERS_DIR}")
-        st.stop()
-
     with st.container(border=True):
         # List all explorer names.
-        explorer_names = [
-            explorer_file.stem.replace(".explorer", "")
-            for explorer_file in sorted(EXPLORERS_DIR.glob("*.explorer.tsv"))
-        ]
+        with Session(OWID_ENV.engine) as session:
+            explorers = Explorer.load_explorers(session=session, columns=["slug"])
+            explorer_names = [explorer.slug for explorer in explorers]
+
         # Select an explorer name from a dropdown menu.
         explorer_name: str = st.selectbox(  # type: ignore
-            label="Name of explorer file",
+            label="Name of explorer",
             options=explorer_names,
             index=[i for i, name in enumerate(explorer_names) if name == EXPLORER_NAME_DEFAULT][0],
-            help="Name of .explorer.tsv file inside owid-content/explorers.",
+            help="Name/slug of explorer",
         )
 
         # Load and parse explorer content.
-        path = str((Path(EXPLORERS_DIR) / explorer_name).with_suffix(".explorer.tsv"))
-        explorer = ExplorerLegacy.from_file(path=path)
+        explorer = ExplorerLegacy.from_db(explorer_name)
 
         # Gather all variable ids of indicators with a map tab. In yVariableIds there can be variable ids or etl paths, so be careful going forward
         variable_ids = list(

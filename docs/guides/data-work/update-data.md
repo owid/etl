@@ -240,8 +240,4 @@ For convenience, we should archive grapher datasets that have been replaced by n
 
 - Close any relevant issues from the `owid-issues` or `etl` repositories.
 - Have a look at some of the public charts (like [the chart on temperature anomaly](https://ourworldindata.org/grapher/temperature-anomaly)) and their metadata.
-- If your changes affect explorers, you can run `etl explorer-update`.
-    - It may take a few minutes, and it will update all `*-explorer.tsv` files in your `owid-content` repository.
-    - You can access the `owid-content` repository, and commit any useful changes (otherwise, you can revert them with `git restore .`).
-    - Push those changes and create a new PR in `owid-content`.
 - If it's an important update, announce it on slack `#article-and-data-updates` channel.
