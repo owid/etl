@@ -180,15 +180,22 @@ class Snapshot:
             log.warn("Skipping upload", snapshot=self.uri)
             return
 
-        # Upload to S3
+        # Calculate md5
         md5 = checksum_file(self.path)
+
+        # Get metadata file
+        with open(self.metadata_path, "r") as f:
+            meta = ruamel_load(f)
+
+        # If the file already exists with the same md5, skip the upload
+        if meta["outs"] and meta["outs"][0]["md5"] == md5:
+            log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
+            return
+
+        # Upload to S3
         bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
         assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
-
-        # Update metadata file
-        with open(self.metadata_path, "r") as f:
-            meta = ruamel_load(f)
 
         meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
 
@@ -421,6 +428,30 @@ class SnapshotMeta(MetaBase):
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _meta_to_dict(self):
+        d = self.to_dict()
+
+        # exclude `outs` with md5, we reset it when saving new metadata
+        d.pop("outs", None)
+
+        # remove default values
+        if d["is_public"]:
+            del d["is_public"]
+
+        # remove namespace/version/short_name/file_extension if they match path
+        if _parse_snapshot_path(self.path) == (
+            d["namespace"],
+            str(d["version"]),
+            d["short_name"],
+            d["file_extension"],
+        ):
+            del d["namespace"]
+            del d["version"]
+            del d["short_name"]
+            del d["file_extension"]
+
+        return d
+
     def to_yaml(self) -> str:
         """Convert to YAML string."""
         d = self.to_dict()
@@ -448,8 +479,36 @@ class SnapshotMeta(MetaBase):
 
     def save(self) -> None:  # type: ignore
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        with open(self.path, "w") as f:
-            f.write(self.to_yaml())
+
+        # Create new file
+        if not self.path.exists():
+            with open(self.path, "w") as f:
+                f.write(self.to_yaml())
+        # Edit existing file, keep outs
+        else:
+            # Load outs from existing file
+            with open(self.path, "r") as f:
+                yaml = ruamel_load(f)
+                outs = yaml["outs"]
+                wdir = yaml["wdir"]
+
+            # Save metadata to file
+            meta = self._meta_to_dict()
+            with open(self.path, "w") as f:
+                f.write(yaml_dump({"meta": meta, "wdir": wdir, "outs": outs}))
+
+            # with open(self.path, "r") as f:
+
+            # with open(self.path, "r") as f:
+            #     meta = ruamel_load(f)
+
+            # for k, v in self._meta_to_dict()["origin"].items():
+            #     if meta["meta"]["origin"][k].strip() != v.strip():
+            #         __import__("ipdb").set_trace()
+            #         meta["meta"]["origin"][k] = v
+
+            # with open(self.path, "w") as f:
+            #     f.write(ruamel_dump(meta))
 
     @property
     def uri(self):

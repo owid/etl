@@ -433,7 +433,9 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
                 raise
             execution_times[str(step)] = time_taken
 
-            click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
+                click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
+            except Exception as e:
+                click.echo(f"{click.style('ERROR', fg='red')}: {e}")
             print()
 
         # Write the recorded execution times to the file after all steps have been executed
