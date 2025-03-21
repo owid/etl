@@ -287,12 +287,6 @@ Also, instead of relying on `etl.collections.multidim`, you should instead use t
 While MDIMs are pushed to our database, explorers need to go through the old legacy channel of `owid-content` repository. Hence, when calling `Explorer.save`, the configuration is re-shaped and stored as a TSV file in `owid-content`.
 
 
-```python
-# Create a new explorers dataset and tsv file.
-explorer = paths.create_explorer(config=config, df_graphers=df_graphers)
-explorer.save()
-```
-
 !!! info "Creating explorers on staging servers"
     Explorers can be created or edited on staging servers and then manually migrated to production. Each staging server creates a branch in the `owid-content` repository. Editing explorers in Admin or running the `create_explorer` function pushes changes to that branch. Once the PR is merged, the branch gets pushed to the `owid-content` repository (not to the `master` branch, but its own branch). You then need to manually create a PR from that branch and merge it into `master`.
 
