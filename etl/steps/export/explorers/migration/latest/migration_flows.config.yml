@@ -3,16 +3,9 @@ definitions:
     # Applies to all views with dimension metric=emigrants, unless overridden
     - dimensions:
         metric: emigrants
-      config:
-        hasChartTab: true
-        type: LineChart
-        yScaleToggle: true
     # Applies to all views with dimension metric=immigrants, unless overridden
     - dimensions:
         metric: immigrants
-      config:
-        hasChartTab: false
-        type: None
 
 config:
   explorerTitle: Migration Flows
