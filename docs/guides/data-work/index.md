@@ -8,10 +8,10 @@ Adding and updating datasets in ETL is part of our routinary work. To this end, 
 
 ```mermaid
 graph LR
-    A["<a href='#1-create-environment'><b>1. Create environment</b></a><br>Create PR, staging server"]
-    A --> B["<a href='#2-data-work'><b>2. Data work</b></a><br>Add or update data in ETL<br><ul><li value='2.1.'><a href='add-data'><b>Add data</b></a></li><li><a href='update-data'><b>Update data</b></a></li></ul>"]
-    B --> C["<a href='#update-charts'><b>3. Update charts</b></a><br>Charts, Explorers, MDIMs"]
-    C --> D["<a href='#4-migrate-changes'><b>4. Migrate changes to PROD</b></a><br>Merge your PR into master"]
+    A["<a href='#create-environment'><b>Create environment</b></a><br>Create PR, staging server"]
+    A --> B["<a href='#data-work'><b>Data work</b></a><br>Add or update data in ETL<br><ul><li value='2.1.'><a href='add-data'><b>Add data</b></a></li><li><a href='update-data'><b>Update data</b></a></li></ul>"]
+    B --> C["<a href='#update-charts'><b>Update charts</b></a><br>Charts, Explorers, MDIMs"]
+    C --> D["<a href='#migrate-changes'><b>Migrate changes to prod</b></a><br>Merge your PR into master"]
 
     style A text-align:left;
     style B text-align:left;
@@ -19,7 +19,7 @@ graph LR
     style D text-align:left;
 ```
 
-## 1. Create environment
+## Create environment
 
 The first thing you need to do is creating a new environment for your work. To do this simply pull the latest changes from the `master` branch and use our command [etl pr](../etl-cli/#etl-pr).
 
@@ -29,14 +29,19 @@ git pull origin master
 etl pr "some description of your work"
 ```
 
-This command will create a new branch, push it to the remote repository, and create a new PR for you. It will also create a staging server for you to test your changes. Shortly after creating the PR, @owidbot will post a comment to the PR with all the workflow-relevant links (see image below).
+This will create a new branch, push it to the remote repository, and create a draft PR for you. It will also create a staging server for you to test your changes. Shortly after creating the PR, @owidbot will post a comment to the PR with all the workflow-relevant links (see image below).
 
 <figure markdown="span">
   <img src="../../assets/owidbot-staging.png" alt="Post on GitHub PR by @owidbot" style="width:90%;">
   <figcaption>@owidbot will post a message with relevant links.</figcaption>
 </figure>
 
-## 2. Data work
+!!! note
+
+  Ensure that, in your `.env` file, you have set STAGING=1
+
+
+## Data work
 
 Once you have your environment ready, it is time to actually start working on your task!
 
@@ -45,12 +50,12 @@ The first question you have to ask yourself is whether you want to add a new dat
 - [**Adding a new dataset**](add-data) typically involves creating various ETL steps for a dataset that did not exist before (maybe it existed in Grapher database, but not in ETL).
 - [**Updating a dataset**](update-data), on the other hand, involves updating the existing ETL steps to reflect the changes in the dataset.
 
-## 3. Update charts
+## Update charts
 Once you have the data ready in the database, you can now [**update any chart**](update-charts) (or create new ones).
 
 Here, you can also decide whether you want to create or update an Explorer or an MDIM with the new data. This is done with [**export steps**](export-data.md).
 
-## 4. Migrate changes
+## Migrate changes
 
 Once you are happy with your changes, your code has been reviewed and approved, and all the CI/CD jobs are successfully passed, you can merge your PR into the `master` branch.
 

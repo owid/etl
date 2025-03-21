@@ -142,7 +142,7 @@ git checkout -b data/new-dataset
 
 1. **Create the step**
     - Path of the step should be similar to `etl/steps/data/meadow/<namespace>/<version>/<dataset_short_name>.py`.
-    - The step script must contain a `run(dest_dir)` function that loads data from the `snapshot` and creates a dataset
+    - The step script must contain a `run()` function that loads data from the `snapshot` and creates a dataset
     (a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
     - Run `make format && make test` to ensure that the step runs well and is well formatted.
 
@@ -158,7 +158,7 @@ git checkout -b data/new-dataset
 
 1. **Create the step**
     - Path of the step should be similar to `etl/steps/data/garden/<namespace>/<version>/<dataset_short_name>.py`.
-    - The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and
+    - The step must contain a `run()` function that loads data from the last `meadow` step, processes the data and
     creates a dataset with one or more tables and the necessary metadata.
     - Country names must be harmonized (for which the [harmonize](../architecture/workflow/harmonization.md) tool of `etl` can be used).
     - Add plenty of assertions and sanity checks to the step (if possible, compare the data with its previous version and
@@ -177,7 +177,7 @@ git checkout -b data/new-dataset
 
 1. **Create the step**
     - Path of the step should be similar to `etl/steps/data/grapher/<namespace>/<version>/<dataset_short_name>.py`.
-    - The step must contain a `run(dest_dir)` function that loads data from the last `garden` step, processes the data and
+    - The step must contain a `run()` function that loads data from the last `garden` step, processes the data and
     creates a dataset with one or more tables and the necessary metadata.
     - Run `make format && make test` to ensure that the step runs well and is well formatted.
 
