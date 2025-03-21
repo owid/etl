@@ -4,42 +4,177 @@ After an update, FAO may have changed dataset, item, element, or unit names and 
 This will cause the garden faostat_metadata step to raise warnings, and may cause further issues on charts and the food
 explorer.
 
-This script updates all fao fields in custom_datasets.csv, custom_elements_and_units.csv, and custom_items.csv files.
-NOTE: It's recommended to run this script in interactive mode (using the -i flag) to check if any name change implies a
-significant change in the data.
+This script updates all fao fields in custom_datasets.csv, custom_elements_and_units.csv, and custom_items.csv files, as follows:
+* Compare the old FAO dataset names and descriptions with the new FAO ones. They will be updated automatically.
+* Compare the old OWID dataset names and descriptions with the new FAO ones. You will be prompted for confirmation and will be able to edit the changes.
+* Compare the old FAO element names, element descriptions, and units, with the new FAO ones.
+* Compare the old OWID element names, element descriptions, and units, with the new FAO ones. You will be prompted for confirmation and will be able to edit the changes.
+* Compare the old FAO item names and descriptions with the new FAO ones.
+* Compare the old OWID item names and descriptions with the new FAO ones. You will be prompted for confirmation and will be able to edit the changes.
+
 """
 
 import argparse
+import difflib
+import os
+import re
+import tempfile
 
 import pandas as pd
 from owid.catalog import Dataset
 from shared import INCLUDED_DATASETS_CODES, VERSION  # type: ignore[reportMissingImports]
+from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.paths import DATA_DIR, STEP_DIR
 
+# Initialize logger.
+log = get_logger()
 
-def _display_differences_and_wait(old: str, new: str, message: str) -> None:
+# ANSI color codes.
+RED = "\033[91m"
+GREEN = "\033[92m"
+RESET = "\033[0m"
+
+
+def _display_differences(old: str, new: str, message: str) -> None:
+    # NOTE: This function was quickly created by chatGPT and it does the job, but it probably doesn't handle all edge cases. So, always compare old and new before overwriting.
     tqdm.write("\n" + "------------" * 10)
     tqdm.write(message)
     tqdm.write("------------" * 10)
-    tqdm.write(f"\n{old}")
-    tqdm.write("\n->")
-    tqdm.write(f"\n{new}")
-    input("\nEnter to move on.")
+
+    # Ensure sentences are split while keeping punctuation intact
+    old_sentences = re.split(r"(\.|\n)", old)
+    new_sentences = re.split(r"(\.|\n)", new)
+
+    def reconstruct_sentences(segments):
+        """Reconstructs sentences from split segments while preserving structure."""
+        sentences = []
+        buffer = ""
+        for segment in segments:
+            buffer += segment
+            if segment in {".", "\n"}:
+                sentences.append(buffer.strip())
+                buffer = ""
+        if buffer:
+            sentences.append(buffer.strip())
+        return sentences
+
+    old_sentences = reconstruct_sentences(old_sentences)
+    new_sentences = reconstruct_sentences(new_sentences)
+
+    matcher = difflib.SequenceMatcher(None, old_sentences, new_sentences)
+    first_change = True
+
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "replace":
+            max_len = max(i2 - i1, j2 - j1)
+            for i in range(max_len):
+                old_sentence = old_sentences[i1 + i] if i1 + i < i2 else ""
+                new_sentence = new_sentences[j1 + i] if j1 + i < j2 else ""
+
+                if not first_change:
+                    tqdm.write("")
+                first_change = False
+
+                word_matcher = difflib.SequenceMatcher(None, old_sentence, new_sentence)
+                highlighted_old = []
+                highlighted_new = []
+
+                for word_tag, w1, w2, w3, w4 in word_matcher.get_opcodes():
+                    old_segment = old_sentence[w1:w2]
+                    new_segment = new_sentence[w3:w4]
+
+                    if word_tag == "replace":
+                        highlighted_old.append(RED + old_segment + RESET)
+                        highlighted_new.append(GREEN + new_segment + RESET)
+                    elif word_tag == "delete":
+                        highlighted_old.append(RED + old_segment + RESET)
+                    elif word_tag == "insert":
+                        highlighted_new.append(GREEN + new_segment + RESET)
+                    elif word_tag == "equal":
+                        highlighted_old.append(old_segment)
+                        highlighted_new.append(new_segment)
+
+                tqdm.write("- " + "".join(highlighted_old))
+                tqdm.write("+ " + "".join(highlighted_new) + "\n")
+        elif tag == "delete":
+            if not first_change:
+                tqdm.write("")
+            first_change = False
+            for old_sentence in old_sentences[i1:i2]:
+                tqdm.write(RED + "- " + old_sentence + RESET + "\n")
+        elif tag == "insert":
+            if not first_change:
+                tqdm.write("")
+            first_change = False
+            for new_sentence in new_sentences[j1:j2]:
+                tqdm.write(GREEN + "+ " + new_sentence + RESET + "\n")
+        elif tag == "equal":
+            for sentence in old_sentences[i1:i2]:
+                tqdm.write("  " + sentence)
 
 
-def update_custom_datasets_file(interactive=False, version=VERSION, read_only=False):
+def _display_confirmed_changes(old, new, old_label="Old", new_label="New"):
+    # Print full old and new paragraphs after accepting
+    tqdm.write("\n" + RED + f"{old_label}:" + RESET)
+    tqdm.write(RED + old + RESET)
+    tqdm.write("\n" + GREEN + f"{new_label}:" + RESET)
+    tqdm.write(GREEN + new + RESET + "\n")
+    input("\nPress enter to continue...")
+
+
+def _confirm_edit_or_skip(old, new):
+    choice = (
+        input("Type 'y' and enter to accept these changes, 'e' to edit them, or just enter to skip: ").strip().lower()
+    )
+    if choice == "y":
+        _display_confirmed_changes(old, new)
+        chosen = new
+    elif choice == "e":
+        with tempfile.NamedTemporaryFile(mode="w", delete=False) as f:
+            with open(f.name, "w") as f:
+                f.write(new)
+            os.system(f"open -a TextEdit {f.name}")
+            input("Press enter to save changes.")
+            with open(f.name) as f:
+                chosen = f.read()
+        _display_confirmed_changes(old, new)
+    else:
+        chosen = old
+
+    return chosen
+
+
+def _confirm_and_write_data_to_file(custom_data, custom_data_file):
+    while True:
+        choice = (
+            input(f"Type 'y' and enter to overwrite file {custom_data_file} or type 'n' to ignore changes: ")
+            .strip()
+            .lower()
+        )
+        if choice == "y":
+            # Update custom elements file.
+            custom_data.to_csv(custom_data_file)
+            break
+        elif choice == "n":
+            tqdm.write("File not updated.")
+            break
+
+
+def update_custom_datasets_file(version=VERSION, read_only=False, confirmation=False, compare_with="fao"):
     """Update custom_datasets.csv file of a specific version of the garden steps.
 
     Parameters
     ----------
-    interactive : bool, optional
-        True to print changes one by one (and to confirm before overwriting file). False to do all changes silently.
     version : _type_, optional
         Version of the garden steps to consider (where the custom_*.csv file to be updated is).
     read_only : bool, optional
         True to find changes without actually overwriting existing file.
+    confirmation : bool, optional
+        True to prompt for confirmation before accepting changes.
+    compare_with : str, optional
+        The original source to compare with. Can be 'fao' or 'owid'.
 
     Returns
     -------
@@ -47,8 +182,7 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
         Updated dataframe of custom datasets.
 
     """
-    if interactive:
-        tqdm.write("\nChecking for changes in FAO dataset titles and descriptions.")
+    tqdm.write("\nChecking for changes in FAO dataset titles and descriptions.")
 
     # Path to custom datasets file in garden.
     custom_datasets_file = STEP_DIR / "data/garden/faostat" / version / "custom_datasets.csv"
@@ -75,23 +209,30 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
             new = getattr(fao_new_dataset_metadata, field)
             try:
                 # Load custom dataset metadata for current domain.
-                old = custom_datasets.loc[dataset_short_name].fillna("")[f"fao_dataset_{field}"]
+                old = custom_datasets.loc[dataset_short_name].fillna("")[f"{compare_with}_dataset_{field}"]
             except KeyError:
                 # This may be a new dataset that didn't exist in the previous version.
                 old = ""
 
-            # For faostat_fa, the new description is empty (while the old wasn't).
-            # For consistency, we will change it too, while keeping the old custom dataset description.
-
-            # If old and new are not identical (or if they are not both nan) update custom_datasets.
-            if (old != new) and not (pd.isna(new) and pd.isna(old)):
-                if interactive:
-                    _display_differences_and_wait(
-                        old=old, new=new, message=f"Old and new FAO dataset {field} for {dataset_short_name}:"
-                    )
+            # Normalize whitespace for comparison.
+            # _old = old.replace("\n", " ").replace("  ", " ")
+            # _new = new.replace("\n", " ").replace("  ", " ")
+            _old = old
+            _new = new
+            if (_old != _new) and not (pd.isna(new) and pd.isna(old)):
+                _display_differences(
+                    old=_old,
+                    new=_new,
+                    message=f"Old {compare_with.upper()} and new FAO dataset {field} for {dataset_short_name}:",
+                )
+                if confirmation:
+                    chosen = _confirm_edit_or_skip(old, new)
+                else:
+                    chosen = new
+                    input("These changes will be saved after going through all datasets. Press enter to continue.")
 
                 # Update FAO field.
-                custom_datasets_updated.loc[dataset_short_name, f"fao_dataset_{field}"] = new
+                custom_datasets_updated.loc[dataset_short_name, f"{compare_with}_dataset_{field}"] = chosen
 
                 # There was at least one change.
                 CHANGES_FOUND = True
@@ -99,30 +240,32 @@ def update_custom_datasets_file(interactive=False, version=VERSION, read_only=Fa
     # Sort custom datasets conveniently.
     custom_datasets_updated = custom_datasets_updated.sort_index()
 
-    if interactive and not CHANGES_FOUND:
-        tqdm.write("\nNo changes found.")
+    if not CHANGES_FOUND:
+        tqdm.write("\nNo changes found or accepted.")
 
     if CHANGES_FOUND and not read_only:
-        if interactive:
-            input(f"Press enter to overwrite file: {custom_datasets_file}")
-
-        # Update custom datasets file.
-        custom_datasets_updated.sort_index().to_csv(custom_datasets_file)
+        _confirm_and_write_data_to_file(custom_data=custom_datasets_updated, custom_data_file=custom_datasets_file)
 
     return custom_datasets_updated
 
 
-def update_custom_elements_and_units_file(interactive=False, version=VERSION, read_only=False):
+def update_custom_items_or_elements_file(
+    item_or_element, version=VERSION, read_only=False, confirmation=False, compare_with="fao"
+):
     """Update custom_elements_and_units.csv file of a specific version of the garden steps.
 
     Parameters
     ----------
-    interactive : bool, optional
-        True to print changes one by one (and to confirm before overwriting file). False to do all changes silently.
+    item_or_element: str
+        Either "item" or "element".
     version : _type_, optional
         Version of the garden steps to consider (where the custom_*.csv file to be updated is).
     read_only : bool, optional
         True to find changes without actually overwriting existing file.
+    confirmation : bool, optional
+        True to prompt for confirmation before accepting changes.
+    compare_with : str, optional
+        The original source to compare with. Can be 'fao' or 'owid'.
 
     Returns
     -------
@@ -130,183 +273,82 @@ def update_custom_elements_and_units_file(interactive=False, version=VERSION, re
         Updated dataframe of custom elements and units.
 
     """
-    if interactive:
-        tqdm.write(
-            "\n*** Checking for changes in FAO element names and descriptions, as well as units and short units. ***"
-        )
+    if item_or_element == "element":
+        tqdm.write("\n*** Checking for changes in FAO element names and descriptions, units and short units. ***")
+        # Path to custom elements and units file in garden.
+        custom_file = STEP_DIR / "data/garden/faostat" / version / "custom_elements_and_units.csv"
+        fields = ["element", "element_description", "unit", "unit_short_name"]
 
-    # Path to custom elements and units file in garden.
-    custom_elements_file = STEP_DIR / "data/garden/faostat" / version / "custom_elements_and_units.csv"
+    else:
+        tqdm.write("\n*** Checking for changes in FAO item names and descriptions. ***")
+        custom_file = STEP_DIR / "data/garden/faostat" / version / "custom_items.csv"
+        fields = ["item", "item_description"]
 
-    error = f"File custom_elements_and_units.csv not found. Ensure garden steps for version {version} exist."
-    assert custom_elements_file.is_file(), error
+    error = f"File of custom definitions not found. Ensure garden steps for version {version} exist."
+    assert custom_file.is_file(), error
 
-    # Load custom elements and units file.
-    custom_elements = pd.read_csv(custom_elements_file, dtype=str).set_index(["dataset", "element_code"])
+    # Load custom definitions file.
+    custom_definitions = pd.read_csv(custom_file, dtype=str).set_index(["dataset", f"{item_or_element}_code"])
 
     # Initialize boolean that is True if there were changes in any field.
     CHANGES_FOUND = False
 
-    # Initialize a new custom elements and units dataframe.
-    custom_elements_updated = custom_elements.copy()
+    # Initialize a new custom definitions dataframe.
+    custom_definitions_updated = custom_definitions.copy()
 
     # Load metadata from new garden dataset.
     fao_new_metadata = Dataset(DATA_DIR / "garden/faostat" / version / "faostat_metadata")
 
-    # Go one by one on the datasets for which at least one custom element or unit was defined.
-    for dataset_short_name in tqdm(custom_elements.index.get_level_values(0).unique()):
-        for element_code in tqdm(custom_elements.loc[dataset_short_name].index.get_level_values(0).unique()):
-            new_metadata = fao_new_metadata["elements"].loc[dataset_short_name, element_code].fillna("")
-            old_metadata = custom_elements.loc[dataset_short_name, element_code].fillna("")
-            for field in ["fao_element", "fao_element_description", "fao_unit", "fao_unit_short_name"]:
-                new = new_metadata[field]
-                old = old_metadata[field]
+    # Go one by one on the datasets for which there is at least one custom definition.
+    for dataset_short_name in tqdm(custom_definitions.index.get_level_values(0).unique()):
+        for code in tqdm(custom_definitions.loc[dataset_short_name].index.get_level_values(0).unique()):
+            try:
+                new_metadata = fao_new_metadata[f"{item_or_element}s"].loc[dataset_short_name, code].fillna("")
+            except KeyError:
+                log.error(
+                    f"{item_or_element.capitalize()} code {code} (for dataset {dataset_short_name}) in custom definitions file was not found in new faostat_metadata. Remove it from the custom file or replace it with another code."
+                )
+                continue
+            old_metadata = custom_definitions.loc[dataset_short_name, code].fillna("")
+            for field in fields:
+                new = new_metadata[f"fao_{field}"]
+                old = old_metadata[f"{compare_with}_{field}"]
 
                 # If old and new are not identical (or if they are not both nan) update custom_*.
                 if (old != new) and not (pd.isna(new) and pd.isna(old)):
-                    if interactive:
-                        _display_differences_and_wait(
-                            old=old,
-                            new=new,
-                            message=f"Old and new {field} for {dataset_short_name} with element code {element_code}:",
+                    _display_differences(
+                        old=old,
+                        new=new,
+                        message=f"Old {compare_with.upper()} and new FAO {field} for {dataset_short_name} with {item_or_element} code {code}:",
+                    )
+                    if confirmation:
+                        chosen = _confirm_edit_or_skip(old, new)
+                    else:
+                        chosen = new
+                        input(
+                            f"These changes will be saved after going through all {item_or_element}s. Enter to continue."
                         )
 
                     # Update FAO field.
-                    custom_elements_updated.loc[dataset_short_name, element_code][field] = new
+                    custom_definitions_updated.loc[(dataset_short_name, code), f"{compare_with}_{field}"] = chosen
 
                     # There was at least one change.
                     CHANGES_FOUND = True
 
-    # Sort custom element conveniently.
-    custom_elements_updated = custom_elements_updated.sort_values(["fao_element"])
+    # Sort custom definitions file conveniently.
+    custom_definitions_updated = custom_definitions_updated.sort_values([f"fao_{item_or_element}"])
 
-    if interactive and not CHANGES_FOUND:
-        tqdm.write("\nNo changes found.")
-
-    if CHANGES_FOUND and not read_only:
-        if interactive:
-            input(f"Press enter to overwrite file: {custom_elements_file}")
-
-        # Update custom elements file.
-        custom_elements_updated.to_csv(custom_elements_file)
-
-    return custom_elements_updated
-
-
-def update_custom_items_file(interactive=False, version=VERSION, read_only=False):
-    """Update custom_items.csv file of a specific version of the garden steps.
-
-    NOTE: This function is structuraly very similar to update_custom_elements_and_units_file.
-    They could be merged into one to avoid redundant code.
-
-    Parameters
-    ----------
-    interactive : bool, optional
-        True to print changes one by one (and to confirm before overwriting file). False to do all changes silently.
-    version : _type_, optional
-        Version of the garden steps to consider (where the custom_*.csv file to be updated is).
-    read_only : bool, optional
-        True to find changes without actually overwriting existing file.
-
-    Returns
-    -------
-    custom_items_updated : pd.DataFrame
-        Updated dataframe of custom items.
-
-    """
-    if interactive:
-        tqdm.write("\n*** Checking for changes in FAO item names and descriptions. ***")
-
-    # Path to custom items file in garden.
-    custom_items_file = STEP_DIR / "data/garden/faostat" / version / "custom_items.csv"
-
-    error = f"File custom_items.csv not found. Ensure garden steps for version {version} exist."
-    assert custom_items_file.is_file(), error
-
-    # Load custom items file.
-    custom_items = pd.read_csv(custom_items_file, dtype=str).set_index(["dataset", "item_code"])
-
-    # Initialize boolean that is True if there were changes in any field.
-    CHANGES_FOUND = False
-
-    # Initialize a new custom items dataframe.
-    custom_items_updated = custom_items.copy()
-
-    # Load metadata from new garden dataset.
-    fao_new_metadata = Dataset(DATA_DIR / "garden/faostat" / version / "faostat_metadata")
-
-    # Fields to compare.
-    fields_to_compare = ["fao_item", "fao_item_description"]
-
-    # Dataframe of fields to compare.
-    compared = pd.merge(
-        custom_items,
-        fao_new_metadata["items"],
-        left_index=True,
-        right_index=True,
-        how="left",
-        suffixes=("_old", "_new"),
-    )
-
-    # Ensure no column is of categorical type.
-    compared = compared.astype(object)
-
-    # Go one by one on the datasets for which at least one custom item was defined.
-    for field in tqdm(fields_to_compare):
-        _compared = compared.copy()
-        _compared[f"{field}_old"] = _compared[f"{field}_old"].fillna("")
-        _compared[f"{field}_new"] = _compared[f"{field}_new"].fillna("")
-        _compared = _compared[_compared[f"{field}_old"] != _compared[f"{field}_new"]].reset_index()
-        if interactive:
-            n_changes = len(_compared)
-            tqdm.write(f"\nNumber of changes in {field} to review: {n_changes}")
-
-        for _, row in tqdm(_compared.iterrows(), total=len(_compared)):
-            dataset_short_name = row["dataset"]
-            item_code = row["item_code"]
-            old = row[f"{field}_old"]
-            new = row[f"{field}_new"]
-
-            # If old and new are not identical (or if they are not both nan) update custom_*.
-            if (old != new) and not (pd.isna(new) and pd.isna(old)):
-                if interactive:
-                    _display_differences_and_wait(
-                        old=old,
-                        new=new,
-                        message=f"Old and new {field} for {dataset_short_name} with code {item_code}:",
-                    )
-
-                # Update FAO field.
-                custom_items_updated.loc[dataset_short_name, item_code][field] = new
-
-                # There was at least one change.
-                CHANGES_FOUND = True
-
-    # Sort custom item conveniently.
-    custom_items_updated = custom_items_updated.sort_values(["fao_item"])
-
-    if interactive and not CHANGES_FOUND:
-        tqdm.write("\nNo changes found.")
+    if not CHANGES_FOUND:
+        tqdm.write("\nNo changes found or accepted.")
 
     if CHANGES_FOUND and not read_only:
-        if interactive:
-            input(f"Press enter to overwrite file: {custom_items_file}")
+        _confirm_and_write_data_to_file(custom_data=custom_definitions_updated, custom_data_file=custom_file)
 
-        # Update custom items file.
-        custom_items_updated.to_csv(custom_items_file)
-
-    return custom_items_updated
+    return custom_definitions_updated
 
 
 if __name__ == "__main__":
     argument_parser = argparse.ArgumentParser(description=__doc__)
-    argument_parser.add_argument(
-        "-i",
-        "--interactive",
-        default=False,
-        action="store_true",
-        help="If given, changes will be printed one by one, and confirmation will be required to save file.",
-    )
     argument_parser.add_argument(
         "-r",
         "--read_only",
@@ -321,8 +363,24 @@ if __name__ == "__main__":
         help="Version of the latest garden steps (where custom_datasets.csv file to be updated is).",
     )
     args = argument_parser.parse_args()
-    _ = update_custom_datasets_file(interactive=args.interactive, version=args.version, read_only=args.read_only)
-    _ = update_custom_elements_and_units_file(
-        interactive=args.interactive, version=args.version, read_only=args.read_only
+    _ = update_custom_datasets_file(
+        version=args.version, read_only=args.read_only, confirmation=False, compare_with="fao"
     )
-    _ = update_custom_items_file(interactive=args.interactive, version=args.version, read_only=args.read_only)
+    _ = update_custom_datasets_file(
+        version=args.version, read_only=args.read_only, confirmation=True, compare_with="owid"
+    )
+    for item_or_element in ["element", "item"]:
+        _ = update_custom_items_or_elements_file(
+            item_or_element=item_or_element,
+            version=args.version,
+            read_only=args.read_only,
+            confirmation=False,
+            compare_with="fao",
+        )
+        _ = update_custom_items_or_elements_file(
+            item_or_element=item_or_element,
+            version=args.version,
+            read_only=args.read_only,
+            confirmation=True,
+            compare_with="owid",
+        )

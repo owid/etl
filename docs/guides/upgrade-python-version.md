@@ -1,7 +1,3 @@
----
-status: new
----
-
 To upgrade the version of Python used in the ETL pipeline, follow these steps on the ETL terminal:
 
 1. Remove the current environment configuration:
