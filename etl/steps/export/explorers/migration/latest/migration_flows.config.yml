@@ -38,10 +38,12 @@ dimensions:
     presentation:
       type: radio
     choices:
-      - slug: "emigrants"
-        name: "Emigrants: People moving away from country"
       - slug: "immigrants"
-        name: "Immigrants: People moving to country"
+        name: "Immigrants"
+        description: People moving to country
+      - slug: "emigrants"
+        name: "Emigrants"
+        description: People moving away from country
   - name: Gender
     slug: gender
     presentation:
