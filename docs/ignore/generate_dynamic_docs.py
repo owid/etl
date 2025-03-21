@@ -66,16 +66,22 @@ with open(BASE_DIR / "docs/api/index.md", "r") as f2:
 with open(LIB_DIR / "catalog/README.md", "r") as f2:
     docs_catalog = f2.readlines()
 
-docs_catalog = "    ".join(docs_catalog)
+docs_catalog1 = "    ".join(docs_catalog)
+docs_catalog = "".join(docs_catalog)
 docs_api = "".join(docs_api)
 
+docs_api = ""
 docs = """
 {docs_api}
 
 
 {docs_catalog}
-""".format(docs_catalog=f"    {docs_catalog}", docs_api=docs_api)
+""".format(docs_catalog=f"    {docs_catalog1}", docs_api=docs_api)
+
+# docs = """
+# {docs_catalog}
+# """.format(docs_catalog=f"    {docs_catalog}")
 
 # Dynamically create the API documentation
-with mkdocs_gen_files.open("api/index.md", "w") as f:
-    print(docs, file=f)
+with mkdocs_gen_files.open("api/example-usage.md", "w") as f:
+    print(docs_catalog, file=f)
