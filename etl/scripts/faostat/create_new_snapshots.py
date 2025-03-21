@@ -313,7 +313,7 @@ def main(read_only: bool = False) -> None:
             else:
                 log.warning(f"Dataset {dataset_code} needs to be updated.")
                 if not read_only:
-                    # Download dataset, upload file to walden bucket and add metadata file to walden index.
+                    # Download dataset, upload file and add metadata file to index.
                     faostat_dataset.to_snapshot()
                 any_dataset_was_updated = True
 
@@ -322,7 +322,7 @@ def main(read_only: bool = False) -> None:
         log.warning("Additional metadata needs to be fetched.")
         if not read_only:
             additional_metadata = FAOAdditionalMetadata()
-            # Fetch additional metadata from FAO API, upload file to S3 and add metadata file to walden index.
+            # Fetch additional metadata from FAO API, upload file to S3 and add metadata file to index.
             additional_metadata.to_snapshot()
     else:
         log.info("No need to fetch additional metadata, since all datasets are up-to-date.")

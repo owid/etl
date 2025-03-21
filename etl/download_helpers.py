@@ -5,12 +5,11 @@
 #
 
 import hashlib
-import json
 import os
 import shutil
-from os import path, walk
-from typing import IO, Iterator, Optional, Tuple
+from typing import IO, Optional
 
+import click
 import requests
 from rich.progress import (
     BarColumn,
@@ -20,7 +19,14 @@ from rich.progress import (
     TransferSpeedColumn,
 )
 
-from .ui import log
+
+def blue(s: str) -> str:
+    return click.style(s, fg="blue")
+
+
+def log(action: str, message: str) -> None:
+    action = f"{action:20s}"
+    click.echo(f"{blue(action)}{message}")
 
 
 def _create_progress_bar() -> Progress:
@@ -92,7 +98,7 @@ def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet:
             if os.path.exists(filename):
                 os.remove(filename)
             raise ChecksumDoesNotMatch(
-                f"for file downloaded from {url}. Is your walden repository up to date?\n\twalden index checksum = {expected_md5}\n\tdownloaded checksum = {md5}"
+                f"for file downloaded from {url}. Is your repository up to date?\n\tindex checksum = {expected_md5}\n\tdownloaded checksum = {md5}"
                 ""
             )
 
@@ -100,47 +106,6 @@ def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet:
 
     if not quiet:
         log("DOWNLOADED", f"{url} -> {filename}")
-
-
-def checksum(local_path: str) -> str:
-    md5 = hashlib.md5()
-    chunk_size = 2**20  # 1MB
-    with open(local_path, "rb") as f:
-        chunk = f.read(chunk_size)
-        while chunk:
-            md5.update(chunk)
-            chunk = f.read(chunk_size)
-
-    return md5.hexdigest()
-
-
-def iter_docs(folder) -> Iterator[Tuple[str, dict]]:
-    "Iterate over the JSON documents in the catalog."
-    for filename in sorted(iter_json(folder)):
-        try:
-            with open(filename) as istream:
-                yield filename, json.load(istream)
-
-        except json.decoder.JSONDecodeError:
-            raise RecordWithInvalidJSON(filename)
-
-
-def iter_json(base_dir: str) -> Iterator[str]:
-    for dirname, _, filenames in walk(base_dir):
-        for filename in filenames:
-            if filename.endswith(".json"):
-                yield path.join(dirname, filename)
-
-
-def verify_md5(filename: str, expected_md5: str) -> None:
-    "Throw an exception if the filename does not match the checksum."
-    md5 = checksum(filename)
-    if md5 != expected_md5:
-        raise ChecksumDoesNotMatch(filename)
-
-
-class RecordWithInvalidJSON(Exception):
-    pass
 
 
 class ChecksumDoesNotMatch(Exception):

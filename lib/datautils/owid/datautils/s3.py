@@ -35,7 +35,7 @@ class S3:
             raise NotImplementedError(f"Missing HTTP base for bucket {bucket}")
 
     def connect(self, profile_name: str = AWS_PROFILE) -> Any:
-        """Return a connection to Walden's DigitalOcean space."""
+        """Return a connection to S3."""
         import boto3
 
         check_for_aws_profile(profile_name)
@@ -89,7 +89,7 @@ class S3:
         quiet: bool = False,
     ) -> str:
         """
-        Upload file to Walden.
+        Upload file.
 
         Parameters
         ----------
