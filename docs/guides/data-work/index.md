@@ -2,15 +2,16 @@
 tags:
   - 👷 Staff
 ---
+# Data work
 
-Adding and updating datasets in ETL is part of our routinary work. To this end, we've simplified the process as much as possible. Find below the list of the steps involved in the workflow. Click on each step to learn more about it.
+Adding and updating datasets in ETL is part of our routinary work. To this end, we strive to keep this process as simple as possible. Find below the list of the steps involved in the workflow. Click on each step to learn more about it.
 
 ```mermaid
-graph TD
-    A["<a href='#1-create-environment'><b>1. Create environment</b></a><br>Create Branch, PR"]
+graph LR
+    A["<a href='#1-create-environment'><b>1. Create environment</b></a><br>Create PR, staging server"]
     A --> B["<a href='#2-data-work'><b>2. Data work</b></a><br>Add or update data in ETL<br><ul><li value='2.1.'><a href='add-data'><b>Add data</b></a></li><li><a href='update-data'><b>Update data</b></a></li></ul>"]
-    B --> C["<a href='update-charts'><b>3. Update charts</b></a>"]
-    C --> D["<a href='#4-migrate-changes'><b>4. Migrate changes to production</b></a><br>Merge your PR into master"]
+    B --> C["<a href='#update-charts'><b>3. Update charts</b></a><br>Charts, Explorers, MDIMs"]
+    C --> D["<a href='#4-migrate-changes'><b>4. Migrate changes to PROD</b></a><br>Merge your PR into master"]
 
     style A text-align:left;
     style B text-align:left;
@@ -20,33 +21,20 @@ graph TD
 
 ## 1. Create environment
 
-The first thing you need to do is to create a new branch for your work.
+The first thing you need to do is creating a new environment for your work. To do this simply pull the latest changes from the `master` branch and use our command [etl pr](../etl-cli/#etl-pr).
 
-```
-git checkout -b new-branch
-```
-
-Next, we recommend you create a Pull request so that a staging server is automatically created for you. This will allow you to test your changes before merging them into the live site.
-
-To create one, first push your branch (you can add an empty commit):
-
-```
-git commit --allow-empty -m "initiate branch with empty commit"
-git push origin new-branch
+```bash
+git checkout master
+git pull origin master
+etl pr "some description of your work"
 ```
 
-Then, create a [pull request](https://github.com/owid/etl/pulls) as a draft (should be the default option).
-
-After all CI/CD jobs are executed, you will have a staging server ready for you to test your changes at `http://staging-site-new-branch` (requires Tailscale).
-
-Also, shortly after latest commit, GitHub user @owidbot will post a comment to the PR with all the workflow-relevant links (see image below).
+This command will create a new branch, push it to the remote repository, and create a new PR for you. It will also create a staging server for you to test your changes. Shortly after creating the PR, @owidbot will post a comment to the PR with all the workflow-relevant links (see image below).
 
 <figure markdown="span">
-  ![owidbot-staging](../../assets/owidbot-staging.png)
+  <img src="../../assets/owidbot-staging.png" alt="Post on GitHub PR by @owidbot" style="width:90%;">
   <figcaption>@owidbot will post a message with relevant links.</figcaption>
 </figure>
-
-You can now start the data work!
 
 ## 2. Data work
 
@@ -54,13 +42,13 @@ Once you have your environment ready, it is time to actually start working on yo
 
 The first question you have to ask yourself is whether you want to add a new dataset or update an existing one. The workflow is slightly different depending on your choice.
 
-[**Adding a new dataset**](add-data) typically involves creating various ETL steps for a dataset that did not exist before (maybe it existed in Grapher database, but not in ETL).
-
-[**Updating a dataset**](update-data), on the other hand, involves updating the existing ETL steps to reflect the changes in the dataset.
+- [**Adding a new dataset**](add-data) typically involves creating various ETL steps for a dataset that did not exist before (maybe it existed in Grapher database, but not in ETL).
+- [**Updating a dataset**](update-data), on the other hand, involves updating the existing ETL steps to reflect the changes in the dataset.
 
 ## 3. Update charts
+Once you have the data ready in the database, you can now [**update any chart**](update-charts) (or create new ones).
 
-For details on how to update charts, please refer to the [**update charts guide**](update-charts).
+Here, you can also decide whether you want to create or update an Explorer or an MDIM with the new data. This is done with [**export steps**](export-data.md).
 
 ## 4. Migrate changes
 
