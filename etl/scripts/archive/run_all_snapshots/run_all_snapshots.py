@@ -60,7 +60,7 @@ def main():
             log.info(f"Skipping {snapshot_script} because it does not have --upload flag.")
             continue
         # Skip scripts that require the use of a local file.
-        if "--path-to-file" in snapshot_text:
+        if ("--path-to-file" in snapshot_text) or ("-f " in snapshot_text):
             log.info(f"Skipping {snapshot_script} because it requires a local file.")
             continue
 

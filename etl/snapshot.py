@@ -497,19 +497,6 @@ class SnapshotMeta(MetaBase):
             with open(self.path, "w") as f:
                 f.write(yaml_dump({"meta": meta, "wdir": wdir, "outs": outs}))
 
-            # with open(self.path, "r") as f:
-
-            # with open(self.path, "r") as f:
-            #     meta = ruamel_load(f)
-
-            # for k, v in self._meta_to_dict()["origin"].items():
-            #     if meta["meta"]["origin"][k].strip() != v.strip():
-            #         __import__("ipdb").set_trace()
-            #         meta["meta"]["origin"][k] = v
-
-            # with open(self.path, "w") as f:
-            #     f.write(ruamel_dump(meta))
-
     @property
     def uri(self):
         return f"{self.namespace}/{self.version}/{self.short_name}.{self.file_extension}"
