@@ -47,9 +47,6 @@ def main(upload: bool) -> None:
         # to that date). Hence, assume that the publication date is the access date.
         snap.metadata.origin.date_published = snap.metadata.origin.date_accessed  # type: ignore
 
-        # Rewrite metadata to dvc file.
-        snap.metadata_path.write_text(snap.metadata.to_yaml())
-
         # Download data from source, add file to DVC and upload to S3.
         snap.create_snapshot(upload=upload)
 

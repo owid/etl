@@ -506,7 +506,6 @@ class SnapshotMeta(MetaBase):
         if not self.path.exists():
             with open(self.path, "w") as f:
                 f.write(self.to_yaml())
-
         # Edit existing file, keep outs
         else:
             # Load outs from existing file

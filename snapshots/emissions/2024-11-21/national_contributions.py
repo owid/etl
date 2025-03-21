@@ -46,9 +46,6 @@ def main(upload: bool) -> None:
             # Replace metadata fields with the new extracted fields.
             setattr(snap.metadata.origin, field, extracted_fields[field])
 
-        # Rewrite metadata to dvc file.
-        snap.metadata_path.write_text(snap.metadata.to_yaml())
-
         # Download data from source, add file to DVC and upload to S3.
         snap.create_snapshot(upload=upload)
 
