@@ -1,8 +1,4 @@
----
-status: new
----
-
-!!! warning "Export steps are a work in progress"
+# Export steps
 
 Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. They are run with the `--export` flag:
 
@@ -10,7 +6,7 @@ Export steps are defined in `etl/steps/export` directory and have similar struct
 etlr export://explorers/minerals/latest/minerals --export
 ```
 
-The `def run(dest_dir):` function doesn't save a dataset, but calls a method that performs the action. For instance `create_explorer(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
+The `def run():` function doesn't save a dataset, but calls a method that performs the action. For instance `create_explorer(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
 
 ## Exporting data to GitHub
 
