@@ -134,19 +134,19 @@ def clean_global_dataset_descriptions_table(tb_datasets: Table, tb_custom_datase
         suffixes=("_new", "_old"),
     )
 
-    changed_titles = tb_datasets[
-        tb_datasets["fao_dataset_title_old"].fillna("") != tb_datasets["fao_dataset_title_new"].fillna("")
-    ]
-    changed_descriptions = tb_datasets[
-        tb_datasets["fao_dataset_description_old"].fillna("") != tb_datasets["fao_dataset_description_new"].fillna("")
-    ]
-
-    if len(changed_titles) > 0:
-        log.warning(f"{len(changed_titles)} domains have changed titles, consider updating custom_datasets.csv.")
-    if len(changed_descriptions) > 0:
-        log.warning(
-            f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_datasets.csv."
-        )
+    # NOTE: Do not warn if dataset titles and descriptions have changed, since they will be updated later on with update_snapshots_metadata.py.
+    # changed_titles = tb_datasets[
+    #     tb_datasets["fao_dataset_title_old"].fillna("") != tb_datasets["fao_dataset_title_new"].fillna("")
+    # ]
+    # changed_descriptions = tb_datasets[
+    #     tb_datasets["fao_dataset_description_old"].fillna("") != tb_datasets["fao_dataset_description_new"].fillna("")
+    # ]
+    # if len(changed_titles) > 0:
+    #     log.warning(f"{len(changed_titles)} domains have changed titles, consider updating custom_datasets.csv.")
+    # if len(changed_descriptions) > 0:
+    #     log.warning(
+    #         f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_datasets.csv."
+    #     )
     tb_datasets = tb_datasets.drop(columns=["fao_dataset_title_old", "fao_dataset_description_old"]).rename(
         columns={
             "fao_dataset_title_new": "fao_dataset_title",
