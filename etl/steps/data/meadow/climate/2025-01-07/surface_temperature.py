@@ -85,7 +85,9 @@ def run(dest_dir: str) -> None:
     shapefile_regions = _load_shapefile(
         snap_coninents_oceans.path, "World_Geographic_Regions/World_Geographic_Regionst.shp"
     )
-    shapefile_regions = shapefile_regions[shapefile_regions["country"] != "Australia"]
+    # Rename "Australia" to "Australia" in the "country" column
+    shapefile_regions["country"] = shapefile_regions["country"].replace("Australia", "Australia (NIAID)")
+
     shapefile = pd.concat([shapefile_countries, shapefile_regions])
 
     # Read surface temperature data from snapshot
