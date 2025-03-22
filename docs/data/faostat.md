@@ -348,7 +348,17 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
         Sometimes items change in FAOSTAT. If that's the case, you may need to edit a file in the `owid-content` repository, namely `scripts/global-food-explorer/foods.csv`. Then, follow the instructions in `scripts/global-food-explorer/README.md`.
 
-15. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
+15. Update titles and descriptions of snapshot origins (to use the custom dataset titles and descriptions defined in garden). Also, attributions will be added to origins.
+
+    ```bash
+    python etl/scripts/faostat/update_snapshots_metadata.py
+    ```
+
+    !!! note
+
+        The current workflow is a bit convoluted: we fetch snapshots, create meadow and garden steps, and the edit snapshots again. But for now, this workflow is the safest working solution.
+
+16. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
 
     ```bash
     python etl/scripts/faostat/archive_old_datasets.py -e
