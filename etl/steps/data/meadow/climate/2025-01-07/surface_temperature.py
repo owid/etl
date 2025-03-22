@@ -7,7 +7,6 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pyproj
-import rarfile
 import xarray as xr
 from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
@@ -17,8 +16,6 @@ from tqdm import tqdm
 
 from etl.helpers import PathFinder, create_dataset
 from etl.snapshot import Snapshot
-
-rarfile.UNRAR_TOOL = "./tools/bin/unar"
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
