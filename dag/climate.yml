@@ -12,6 +12,7 @@ steps:
   data://meadow/climate/2025-01-07/surface_temperature:
   - snapshot://climate/2025-03-07/surface_temperature.zip
   - snapshot://countries/2023-12-27/world_bank.zip
+  - snapshot://countries/2025-03-22/continents_oceans.zip
   data://garden/climate/2025-01-07/surface_temperature:
     - data://meadow/climate/2025-01-07/surface_temperature
   data://grapher/climate/2025-01-07/surface_temperature_anomalies:

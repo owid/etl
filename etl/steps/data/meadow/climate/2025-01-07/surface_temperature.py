@@ -24,7 +24,7 @@ log = get_logger()
 
 
 def _load_data_array(snap: Snapshot) -> xr.DataArray:
-    log.info("load_data_array.start")
+    log.info("Load temperature data")
     with zipfile.ZipFile(snap.path, "r") as zip_file:
         for file_info in zip_file.infolist():
             if file_info.filename.endswith((".grb", ".grib")):  # Filter GRIB files
@@ -47,10 +47,22 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     return da
 
 
-def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
-    log.info("load_shapefile.start")
+def _load_shapefile(file_path: str, shapefile: str) -> pd.DataFrame:
+    # Check if the shapefile exists in the ZIP archive
+    with zipfile.ZipFile(file_path, "r"):
+        # Construct the correct path for Geopandas
+        file_path = f"zip://{file_path}!/{shapefile}"
+
     shapefile = gpd.read_file(file_path)
-    return shapefile[["geometry", "WB_NAME"]]
+    if "WB_NAME" in shapefile.columns:
+        log.info("Process shapefiles with countries")
+
+        shapefile = shapefile.rename(columns={"WB_NAME": "country"})
+    elif "Region" in shapefile.columns:
+        log.info("Process shapefiles with regions")
+
+        shapefile = shapefile.rename(columns={"Region": "country"})
+    return shapefile[["geometry", "country"]]  # type: ignore
 
 
 def run(dest_dir: str) -> None:
@@ -64,20 +76,22 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("surface_temperature.zip")
 
-    # Read surface temperature data from snapshot
-    da = _load_data_array(snap)
-
     # Read the shapefile to extract country information
     snap_geo = paths.load_snapshot("world_bank.zip")
-    shapefile_name = "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp"
+    # Read the shapefile directly from the ZIP archive
+    shapefile_countries = _load_shapefile(snap_geo.path, "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp")
+    # Load continents and oceans
+    snap_coninents_oceans = paths.load_snapshot("continents_oceans.zip")
+    shapefile_regions = _load_shapefile(
+        snap_coninents_oceans.path, "World_Geographic_Regions/World_Geographic_Regionst.shp"
+    )
+    # Rename "Australia" to "Australia" in the "country" column
+    shapefile_regions["country"] = shapefile_regions["country"].replace("Australia", "Australia (NIAID)")
 
-    # Check if the shapefile exists in the ZIP archive
-    with zipfile.ZipFile(snap_geo.path, "r"):
-        # Construct the correct path for Geopandas
-        file_path = f"zip://{snap_geo.path}!/{shapefile_name}"
+    shapefile = pd.concat([shapefile_countries, shapefile_regions])
 
-        # Read the shapefile directly from the ZIP archive
-        shapefile = _load_shapefile(file_path)
+    # Read surface temperature data from snapshot
+    da = _load_data_array(snap)
 
     #
     # Process data.
@@ -100,7 +114,8 @@ def run(dest_dir: str) -> None:
     for i in tqdm(range(shapefile.shape[0])):
         # Extract the data for the current row.
         geometry = shapefile.iloc[i]["geometry"]
-        country_name = shapefile.iloc[i]["WB_NAME"]
+        country_name = shapefile.iloc[i]["country"]
+        log.info(f"Processing data for {country_name}")
 
         try:
             # Clip to the bounding box for the country's shape to significantly improve performance.
@@ -133,12 +148,13 @@ def run(dest_dir: str) -> None:
             log.info(
                 f"No data was found in the specified bounds for {country_name}."
             )  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
-            small_countries.append(shapefile.iloc[i]["WB_NAME"])
+            small_countries.append(shapefile.iloc[i]["country"])
 
     # Log information about countries for which temperature data could not be extracted.
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
+
     # Define the start and end dates
     da["time"] = xr.DataArray(pd.to_datetime(da["time"].values), dims=da["valid_time"].dims)
 
