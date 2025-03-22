@@ -1,7 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
 import os
-import shutil
 import tempfile
 import zipfile
 
