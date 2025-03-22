@@ -71,6 +71,7 @@ dependencies = [
     "streamlit-aggrid>=1.0.5",
     "sentry-sdk>=2.20.0",
     "fastjsonschema>=2.21.1",
+    "rarfile>=4.2",
 ]
 
 [tool.uv.sources]

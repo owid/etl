@@ -2,7 +2,6 @@
 
 import os
 import shutil
-import subprocess
 import tempfile
 import zipfile
 
@@ -10,6 +9,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pyproj
+import rarfile
 import xarray as xr
 from owid.catalog import Table
 from rioxarray.exceptions import NoDataInBounds, OneDimensionalRaster
@@ -57,23 +57,25 @@ def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
 
 
 def _load_oceans_regions_shapefile(file_path: str) -> gpd.GeoDataFrame:
-    temp_dir = tempfile.mkdtemp()
+    log.info("Load regions shapefile")
 
-    try:
-        subprocess.run(["unar", "-o", temp_dir, file_path], check=True)
+    required_exts = (".shp", ".dbf", ".shx", ".prj", ".cpg")
 
-        shp_path = None
+    with tempfile.TemporaryDirectory() as temp_dir:
+        with rarfile.RarFile(file_path) as rf:
+            for f in rf.infolist():
+                if f.filename.lower().endswith(required_exts):
+                    rf.extract(f, path=temp_dir)
+
+        # Find .shp file
         for root, dirs, files in os.walk(temp_dir):
             for file in files:
                 if file.lower().endswith(".shp"):
                     shp_path = os.path.join(root, file)
                     shapefile = gpd.read_file(shp_path)
-                    break
+                    return shapefile[["Region", "geometry"]]
 
-        return shapefile[["Region", "geometry"]]
-
-    finally:
-        shutil.rmtree(temp_dir)
+        raise FileNotFoundError("No .shp file found in the .rar archive.")
 
 
 def run(dest_dir: str) -> None:
