@@ -1,4 +1,4 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset. The easiest way to add it to the snapshots is to download the .rar and then convert it to zip file."""
 
 from pathlib import Path
 
