@@ -29,7 +29,3 @@ meta:
       url: https://data.niaid.nih.gov/resources?id=zenodo_10778078
 
 
-outs:
-  - md5: f083a6029aece63c5bd8b6335db17222
-    size: 95291539
-    path: continents_oceans.zip
