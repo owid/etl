@@ -1,0 +1,35 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Worldwide Geographic Division: Continents and Oceans/Seas Shapefile"
+    description: |-
+      This shapefile provides a worldwide geographic division by merging the World Continents division proposed by Esri Data and Maps (2024) to the Global Oceans and Seas version 1 division proposed by the Flanders Marine Institute (2021). Though divisions of continents and oceans/seas are available, the combination of both in a single shapefile is scarce.
+
+
+      The Continents and Oceans/Seas shapefile was carefully processed to remove overlaps between the inputs, and to fill gaps (i.e., areas with no information) by spatially joining these gaps to neighbour polygons. In total, the original world continents input divides land areas into 8 categories (Africa, Antarctica, Asia, Australia, Europe, North America, Oceania, and South America), while the original oceans/seas input divides the oceans/seas into 10 categories (Arctic Ocean, Baltic Sea, Indian Ocean, Mediterranean Region, North Atlantic Ocean, North Pacific Ocean, South Atlantic Ocean, South China and Easter Archipelagic Seas, South Pacific Ocean, and Southern Ocean). Therefore, the resulting world geographic division has 18 possible categories.
+
+
+    date_published: "2024-03-04"
+
+    # Citation
+    producer: National Institute of Allergy and Infectious Diseases
+    citation_full: |-
+      Mataveli, G. (2024). Worldwide Geographic Division: Continents and Oceans/Seas Shapefile [Data set]. Zenodo. https://doi.org/10.5281/zenodo.10778079
+    attribution_short: NIAID
+
+    # Files
+    url_main: https://data.niaid.nih.gov/resources?id=zenodo_10778078
+    url_download: https://zenodo.org/records/10778079/files/World_Geographic_Regions.rar?download=1
+    date_accessed: 2025-03-22
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://data.niaid.nih.gov/resources?id=zenodo_10778078
+
+outs:
+  - md5: aee68b50e64a2b9efc6ae8837f0fc982
+    size: 73135651
+    path: continents_oceans.rar

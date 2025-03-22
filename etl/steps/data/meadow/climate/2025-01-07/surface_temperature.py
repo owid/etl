@@ -1,5 +1,8 @@
 """Load a snapshot and create a meadow dataset."""
 
+import os
+import shutil
+import subprocess
 import tempfile
 import zipfile
 
@@ -24,7 +27,7 @@ log = get_logger()
 
 
 def _load_data_array(snap: Snapshot) -> xr.DataArray:
-    log.info("load_data_array.start")
+    log.info("Load temperature data")
     with zipfile.ZipFile(snap.path, "r") as zip_file:
         for file_info in zip_file.infolist():
             if file_info.filename.endswith((".grb", ".grib")):  # Filter GRIB files
@@ -48,9 +51,29 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
 
 
 def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
-    log.info("load_shapefile.start")
+    log.info("Load countries shapefile")
     shapefile = gpd.read_file(file_path)
-    return shapefile[["geometry", "WB_NAME"]]
+    return shapefile[["geometry", "WB_NAME"]]  # type: ignore
+
+
+def _load_oceans_regions_shapefile(file_path: str) -> gpd.GeoDataFrame:
+    temp_dir = tempfile.mkdtemp()
+
+    try:
+        subprocess.run(["unar", "-o", temp_dir, file_path], check=True)
+
+        shp_path = None
+        for root, dirs, files in os.walk(temp_dir):
+            for file in files:
+                if file.lower().endswith(".shp"):
+                    shp_path = os.path.join(root, file)
+                    shapefile = gpd.read_file(shp_path)
+                    break
+
+        return shapefile[["Region", "geometry"]]
+
+    finally:
+        shutil.rmtree(temp_dir)
 
 
 def run(dest_dir: str) -> None:
@@ -64,9 +87,6 @@ def run(dest_dir: str) -> None:
     # Retrieve snapshot.
     snap = paths.load_snapshot("surface_temperature.zip")
 
-    # Read surface temperature data from snapshot
-    da = _load_data_array(snap)
-
     # Read the shapefile to extract country information
     snap_geo = paths.load_snapshot("world_bank.zip")
     shapefile_name = "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp"
@@ -77,7 +97,18 @@ def run(dest_dir: str) -> None:
         file_path = f"zip://{snap_geo.path}!/{shapefile_name}"
 
         # Read the shapefile directly from the ZIP archive
-        shapefile = _load_shapefile(file_path)
+        shapefile_countries = _load_shapefile(file_path)
+        shapefile_countries = shapefile_countries.rename(columns={"WB_NAME": "country"})
+    # Load continents and oceans
+    snap_coninents_oceans = paths.load_snapshot("continents_oceans.rar")
+    geo_continents_oceans = _load_oceans_regions_shapefile(snap_coninents_oceans.path)
+    geo_continents_oceans = geo_continents_oceans.rename(columns={"Region": "country"})
+    # Remove Australia from the continents and oceans shapefile as it's already in the countries shapefile
+    geo_continents_oceans = geo_continents_oceans[geo_continents_oceans["country"] != "Australia"]
+    shapefile = pd.concat([shapefile_countries, geo_continents_oceans])
+
+    # Read surface temperature data from snapshot
+    da = _load_data_array(snap)
 
     #
     # Process data.
@@ -100,7 +131,8 @@ def run(dest_dir: str) -> None:
     for i in tqdm(range(shapefile.shape[0])):
         # Extract the data for the current row.
         geometry = shapefile.iloc[i]["geometry"]
-        country_name = shapefile.iloc[i]["WB_NAME"]
+        country_name = shapefile.iloc[i]["country"]
+        log.info(f"Processing data for {country_name}")
 
         try:
             # Clip to the bounding box for the country's shape to significantly improve performance.
@@ -133,49 +165,13 @@ def run(dest_dir: str) -> None:
             log.info(
                 f"No data was found in the specified bounds for {country_name}."
             )  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.  # If an error occurs (usually due to small size of the country), add the country's name to the small_countries list.
-            small_countries.append(shapefile.iloc[i]["WB_NAME"])
+            small_countries.append(shapefile.iloc[i]["country"])
 
     # Log information about countries for which temperature data could not be extracted.
     log.info(
         f"It wasn't possible to extract temperature data for {len(small_countries)} small countries as they are too small for the resolution of the Copernicus data."
     )
-    temp_continent = {}
 
-    # Define bounding boxes for continents
-    bounding_boxes = {
-        "Asia": {"xmin": 26, "ymin": -10, "xmax": 180, "ymax": 81},
-        "Africa": {"xmin": -25, "ymin": -35, "xmax": 55, "ymax": 37},
-        "North America": {"xmin": -170, "ymin": 5, "xmax": -52, "ymax": 83},
-        "South America": {"xmin": -82, "ymin": -56, "xmax": -35, "ymax": 13},
-        "Antarctica": {"xmin": -180, "ymin": -90, "xmax": 180, "ymax": -60},
-        "Europe": {"xmin": -25, "ymin": 35, "xmax": 45, "ymax": 71},
-        "Oceania": {"xmin": 110, "ymin": -50, "xmax": 180, "ymax": 10},
-    }
-    # Iterate over continents and compute average temperature
-    for continent, bbox in bounding_boxes.items():
-        try:
-            # Clip data to the continent's bounding box
-            clip = da.rio.clip_box(minx=bbox["xmin"], miny=bbox["ymin"], maxx=bbox["xmax"], maxy=bbox["ymax"])
-
-            # Calculate weights based on latitude
-            weights = np.cos(np.deg2rad(clip.latitude))
-            weights.name = "weights"
-
-            # Apply weights and compute weighted mean temperature
-            clim_month_weighted = clip.weighted(weights)
-            continent_weighted_mean = clim_month_weighted.mean(dim=["longitude", "latitude"]).values
-
-            # Store result
-            temp_continent[continent] = continent_weighted_mean
-
-            # Clean up memory
-            del clip, weights, clim_month_weighted
-
-        except Exception as e:
-            print(f"Failed to extract temperature data for {continent}: {e}")
-
-    # Combine country and continent temperature data
-    temp_country.update(temp_continent)
     # Define the start and end dates
     da["time"] = xr.DataArray(pd.to_datetime(da["time"].values), dims=da["valid_time"].dims)
 
