@@ -21,7 +21,6 @@ meta:
 
     # Files
     url_main: https://data.niaid.nih.gov/resources?id=zenodo_10778078
-    url_download: https://zenodo.org/records/10778079/files/World_Geographic_Regions.rar?download=1
     date_accessed: 2025-03-22
 
     # License
@@ -29,7 +28,8 @@ meta:
       name: CC BY 4.0
       url: https://data.niaid.nih.gov/resources?id=zenodo_10778078
 
+
 outs:
-  - md5: aee68b50e64a2b9efc6ae8837f0fc982
-    size: 73135651
-    path: continents_oceans.rar
+  - md5: f083a6029aece63c5bd8b6335db17222
+    size: 95291539
+    path: continents_oceans.zip
