@@ -179,7 +179,6 @@ class Snapshot:
         if not upload:
             log.warn("Skipping upload", snapshot=self.uri)
             return
-
         # Calculate md5
         md5 = checksum_file(self.path)
 
@@ -187,8 +186,8 @@ class Snapshot:
         with open(self.metadata_path, "r") as f:
             meta = ruamel_load(f)
 
-        # If the file already exists with the same md5, skip the upload
-        if meta["outs"] and meta["outs"][0]["md5"] == md5:
+        outs = meta.get("outs")
+        if outs and outs[0].get("md5") == md5:
             log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
             return
 

@@ -1,6 +1,5 @@
 """Load a snapshot and create a meadow dataset."""
 
-import os
 import tempfile
 import zipfile
 
@@ -51,32 +50,22 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     return da
 
 
-def _load_shapefile(file_path: str) -> pd.DataFrame:
-    log.info("Load countries shapefile")
+def _load_shapefile(file_path: str, shapefile: str) -> pd.DataFrame:
+    # Check if the shapefile exists in the ZIP archive
+    with zipfile.ZipFile(file_path, "r"):
+        # Construct the correct path for Geopandas
+        file_path = f"zip://{file_path}!/{shapefile}"
+
     shapefile = gpd.read_file(file_path)
-    return shapefile[["geometry", "WB_NAME"]]  # type: ignore
+    if "WB_NAME" in shapefile.columns:
+        log.info("Process shapefiles with countries")
 
+        shapefile = shapefile.rename(columns={"WB_NAME": "country"})
+    elif "Region" in shapefile.columns:
+        log.info("Process shapefiles with regions")
 
-def _load_oceans_regions_shapefile(file_path: str) -> pd.DataFrame:
-    log.info("Load regions shapefile")
-
-    required_exts = (".shp", ".dbf", ".shx", ".prj", ".cpg")
-
-    with tempfile.TemporaryDirectory() as temp_dir:
-        with rarfile.RarFile(file_path) as rf:
-            for f in rf.infolist():
-                if f.filename.lower().endswith(required_exts):
-                    rf.extract(f, path=temp_dir)
-
-        # Find .shp file
-        for root, dirs, files in os.walk(temp_dir):
-            for file in files:
-                if file.lower().endswith(".shp"):
-                    shp_path = os.path.join(root, file)
-                    shapefile = gpd.read_file(shp_path)
-                    return shapefile[["Region", "geometry"]]
-
-        raise FileNotFoundError("No .shp file found in the .rar archive.")
+        shapefile = shapefile.rename(columns={"Region": "country"})
+    return shapefile[["geometry", "country"]]  # type: ignore
 
 
 def run(dest_dir: str) -> None:
@@ -92,23 +81,15 @@ def run(dest_dir: str) -> None:
 
     # Read the shapefile to extract country information
     snap_geo = paths.load_snapshot("world_bank.zip")
-    shapefile_name = "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp"
-
-    # Check if the shapefile exists in the ZIP archive
-    with zipfile.ZipFile(snap_geo.path, "r"):
-        # Construct the correct path for Geopandas
-        file_path = f"zip://{snap_geo.path}!/{shapefile_name}"
-
-        # Read the shapefile directly from the ZIP archive
-        shapefile_countries = _load_shapefile(file_path)
-        shapefile_countries = shapefile_countries.rename(columns={"WB_NAME": "country"})
+    # Read the shapefile directly from the ZIP archive
+    shapefile_countries = _load_shapefile(snap_geo.path, "WB_countries_Admin0_10m/WB_countries_Admin0_10m.shp")
     # Load continents and oceans
-    snap_coninents_oceans = paths.load_snapshot("continents_oceans.rar")
-    geo_continents_oceans = _load_oceans_regions_shapefile(snap_coninents_oceans.path)
-    geo_continents_oceans = geo_continents_oceans.rename(columns={"Region": "country"})
-    # Remove Australia from the continents and oceans shapefile as it's already in the countries shapefile
-    geo_continents_oceans = geo_continents_oceans[geo_continents_oceans["country"] != "Australia"]
-    shapefile = pd.concat([shapefile_countries, geo_continents_oceans])
+    snap_coninents_oceans = paths.load_snapshot("continents_oceans.zip")
+    shapefile_regions = _load_shapefile(
+        snap_coninents_oceans.path, "World_Geographic_Regions/World_Geographic_Regionst.shp"
+    )
+    shapefile_regions = shapefile_regions[shapefile_regions["country"] != "Australia"]
+    shapefile = pd.concat([shapefile_countries, shapefile_regions])
 
     # Read surface temperature data from snapshot
     da = _load_data_array(snap)
