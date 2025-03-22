@@ -49,13 +49,13 @@ def _load_data_array(snap: Snapshot) -> xr.DataArray:
     return da
 
 
-def _load_shapefile(file_path: str) -> gpd.GeoDataFrame:
+def _load_shapefile(file_path: str) -> pd.DataFrame:
     log.info("Load countries shapefile")
     shapefile = gpd.read_file(file_path)
     return shapefile[["geometry", "WB_NAME"]]  # type: ignore
 
 
-def _load_oceans_regions_shapefile(file_path: str) -> gpd.GeoDataFrame:
+def _load_oceans_regions_shapefile(file_path: str) -> pd.DataFrame:
     log.info("Load regions shapefile")
 
     required_exts = (".shp", ".dbf", ".shx", ".prj", ".cpg")
