@@ -79,7 +79,7 @@ def run() -> None:
 
     tb_do = format_table(tb_do, ["country_destination", "country_origin"], "migrants")
 
-    tb_do = tb_do.format(["country_destination", "country_origin", "year"])
+    tb_do = tb_do.format(["country_destination", "country_origin", "year"], short_name="migrant_stock_dest_origin")
 
     ## format data on destination
     tb_d_total = format_table(tb_d_total, ["country"], "migrants")
