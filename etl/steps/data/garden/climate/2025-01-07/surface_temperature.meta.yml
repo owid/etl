@@ -47,7 +47,7 @@ tables:
       temperature_anomaly:
         title: Temperature anomaly
         description_short: |-
-          The deviation of a specific month's average surface temperature from the 1991-2020 mean, in degrees Celsius.
+          The difference of a specific month's average surface temperature from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -55,7 +55,7 @@ tables:
       anomaly_below_0:
         title: Anomaly below 0
         description_short: |-
-          The deviation of a specific month's average surface temperature when it falls below the historical average from the 1991-2020 mean, in degrees Celsius.
+          The difference of a specific month's average surface temperature when it falls below the historical average from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -64,7 +64,7 @@ tables:
       anomaly_above_0:
         title: Anomaly above 0
         description_short: |-
-          The deviation of a specific month's average surface temperature when it exceeds the historical average from the 1991-2020 mean, in degrees Celsius.
+          The difference of a specific month's average surface temperature when it exceeds the historical average from the 1991-2020 mean, in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
