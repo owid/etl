@@ -489,8 +489,8 @@ class SnapshotMeta(MetaBase):
             # Load outs from existing file
             with open(self.path, "r") as f:
                 yaml = ruamel_load(f)
-                outs = yaml["outs"]
-                wdir = yaml["wdir"]
+                outs = yaml.get("outs", [])
+                wdir = yaml.get("wdir", ".")
 
             # Save metadata to file
             meta = self._meta_to_dict()
