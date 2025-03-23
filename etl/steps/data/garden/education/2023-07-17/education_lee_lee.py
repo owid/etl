@@ -19,7 +19,6 @@ REGIONS = [
     "Europe",
     "Africa",
     "Asia",
-    "Oceania",
     "World",
 ]
 
