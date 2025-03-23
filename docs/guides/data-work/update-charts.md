@@ -11,7 +11,7 @@ This process is very common in our workflow, and we have tools to help us with i
 
 This guide assumes:
 
-- [You have created your environment](../#1-create-environment).
+- [You have created your environment](../#create-environment).
 - You have [added](add-data) (or [updated](update-data)) the new dataset in the ETL catalog. Also, the dataset should be available in the database from your staging server.
 
 <!--

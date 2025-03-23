@@ -15,11 +15,12 @@ Strategy:
 NOTE: This pipeline assumes that there is a TSV template in owid-content, this should probably be change din the future.
 """
 
-from utils import ExplorerCreator, combine_explorers
-from view_edits import ViewEditor
-
+from etl.collections.beta import combine_explorers
 from etl.collections.explorer import hack_metadata_propagation
 from etl.helpers import PathFinder
+
+from .utils import ExplorerCreator
+from .view_edits import ViewEditor
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)

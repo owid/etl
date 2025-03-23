@@ -29,16 +29,16 @@ def main(upload: bool) -> None:
     snap_config.pull()
 
     # Create snapshot metadata for the new file
+    snap = Snapshot(f"{SNAPSHOT_NAMESPACE}/{SNAPSHOT_VERSION}/share_of_agriculture_in_gdp.feather")
+
     meta = SnapshotMeta(**snap_values.metadata.to_dict())
     meta.namespace = SNAPSHOT_NAMESPACE
     meta.version = SNAPSHOT_VERSION
     meta.short_name = "share_of_agriculture_in_gdp"
     meta.is_public = True
     meta.fill_from_backport_snapshot(snap_config.path)
-    meta.save()
 
-    # Create a new snapshot.
-    snap = Snapshot(meta.uri)
+    snap.metadata = meta
 
     # Convert from long to wide format.
     df = long_to_wide(pd.read_feather(snap_values.path))

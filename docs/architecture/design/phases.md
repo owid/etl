@@ -26,7 +26,7 @@ Snapshots are edge nodes in the computational graph. They represent a copy of a 
 ```mermaid
 flowchart LR
 
-    upstream((____)):::node -.->|copy| snapshot((____)):::node
+    upstream((&nbsp;&nbsp;&nbsp;)):::node -.->|copy| snapshot((&nbsp;&nbsp;&nbsp;)):::node
     subgraph id [Snapshot]
     snapshot
     end
