@@ -108,6 +108,8 @@ def process_annual_data(tb):
         tb, emissions_comparison[["country", "year", "emissions_difference"]], on=["country", "year"], how="left"
     )
 
+    tb["emissions_difference"] = tb["emissions_difference"].copy_metadata(tb["total_annual_emissions"])
+
     return tb
 
 
