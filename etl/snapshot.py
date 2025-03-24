@@ -490,12 +490,15 @@ class SnapshotMeta(MetaBase):
             with open(self.path, "r") as f:
                 yaml = ruamel_load(f)
                 outs = yaml["outs"]
-                wdir = yaml["wdir"]
+                wdir = yaml.get("wdir", None)
 
             # Save metadata to file
             meta = self._meta_to_dict()
             with open(self.path, "w") as f:
-                f.write(yaml_dump({"meta": meta, "wdir": wdir, "outs": outs}))
+                d = {"meta": meta, "outs": outs}
+                if wdir:
+                    d["wdir"] = wdir
+                f.write(yaml_dump(d))
 
     @property
     def uri(self):
