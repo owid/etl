@@ -20,7 +20,6 @@ from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
-from etl.db import get_engine
 from etl.grapher import model as gm
 from etl.grapher.io import get_variables_data
 
@@ -167,17 +166,18 @@ class ExplorerLegacy:
         return explorer
 
     @classmethod
-    def from_db(cls, name: str) -> "ExplorerLegacy":
+    def from_db(cls, name: str, owid_env: Optional[OWIDEnv] = None) -> "ExplorerLegacy":
         """Load explorer config from DB."""
-        # Build explorer from DB
-        engine = get_engine()
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
 
-        with Session(engine) as session:
+        # Build explorer from DB
+        with Session(owid_env.engine) as session:
             db_exp = gm.Explorer.load_explorer(session, slug=name)
             if db_exp is None:
                 raise ValueError(f"Explorer '{name}' not found in the database.")
 
-        # TODO: can sep ever be ","?
         assert "\t" in db_exp.tsv, "Explorer config should use \t separator."
         explorer = cls.from_raw_string(db_exp.tsv, sep="\t", name=name)
 
