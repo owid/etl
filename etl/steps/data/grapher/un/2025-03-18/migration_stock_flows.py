@@ -64,14 +64,13 @@ def run() -> None:
 def add_same_country_rows(tb):
     """Create rows for countries where country and country select are the same and set migrants to 0."""
     # Get dataframe with same-country rows
-    tb_same = tb[["country_select", "year", "gender"]].drop_duplicates()
-    tb_same.loc[:, ["emigrants", "immigrants"]] = "Selected country"
+    tb_same = tb[["country_select", "year", "gender", "metric"]].drop_duplicates()
+    tb_same.loc[:, ["migrants"]] = "Selected country"
     tb_same["country"] = tb_same["country_select"]
 
     # Add to main table
     tb = pr.concat([tb, tb_same])
 
     # Ensure typing
-    cols = ["emigrants", "immigrants"]
-    tb[cols] = tb[cols].astype("string")
+    tb["migrants"] = tb["migrants"].astype("string")
     return tb

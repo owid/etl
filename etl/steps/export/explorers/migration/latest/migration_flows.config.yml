@@ -22,6 +22,7 @@ config:
     - Australia
     - Brazil
     - South Africa
+    - World
   thumbnail: https://ourworldindata.org/app/uploads/2022/03/migration-flows-explorer.png
   subNavId:
   subNavCurrentId:

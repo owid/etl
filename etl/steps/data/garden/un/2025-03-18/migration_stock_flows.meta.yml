@@ -1,29 +1,29 @@
-# NOTE: To learn more about the fields, hover over their names.
+# This metadata is applied to the GRAPHER step set - as the garden set is in a different format with less dimensions for reusing in other steps
 definitions:
   people_label: |-
     <% if gender == "all" %>people<% elif gender == "female" %>women<% elif gender == "male" %>men<% endif %>
   immigrants:
     title: |-
       <% if gender == "all" %>
-      Immigrants to << country_origin_or_dest >>: Where did they move from?
+      Immigrants to << country_select >>: Where did they move from?
       <%- elif gender == "female" %>
-      Women who moved from another country to << country_origin_or_dest >>
+      Women who moved from another country to << country_select >>
       <%- elif gender == "male" %>
-      Men who moved from another country to << country_origin_or_dest >>
+      Men who moved from another country to << country_select >>
       <%- endif %>
     description_short: |-
-      The number of {definitions.people_label} who moved from another country to << country_origin_or_dest >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+      The number of {definitions.people_label} who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
   emigrants:
     title: |-
       <% if gender == "all" %>
-      Emigrants from << country_origin_or_dest >>: Where did they move to?
+      Emigrants from << country_select >>: Where did they move to?
       <%- elif gender == "female" %>
-      Women who moved from << country_origin_or_dest >> to another country
+      Women who moved from << country_select >> to another country
       <%- elif gender == "male" %>
-      Men who moved from << country_origin_or_dest >> to another country
+      Men who moved from << country_select >> to another country
       <%- endif %>
     description_short: |-
-      The number of {definitions.people_label} who were born in << country_origin_or_dest >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+      The number of {definitions.people_label} who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
   common:
     display:
       numDecimalPlaces: 0
