@@ -934,6 +934,11 @@ class ExportStep(DataStep):
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        from etl.helpers import create_dataset
+
+        # Create folder for the dataset, export step can save files there
+        ds = create_dataset(self._dest_dir, tables=[])
+
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             if config.DEBUG:
@@ -942,9 +947,6 @@ class ExportStep(DataStep):
                 DataStep._run_py(self)  # type: ignore
 
         # save checksum
-        from etl.helpers import create_dataset
-
-        ds = create_dataset(self._dest_dir, tables=[])
         ds.metadata.source_checksum = self.checksum_input()
         ds.save()
 

@@ -22,10 +22,14 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher import model as gm
 from etl.grapher.io import get_variables_data
-from etl.paths import EXPLORERS_DIR
+from etl.paths import EXPLORERS_DIR, EXPORT_DIR
 
 # Initialize logger.
 log = get_logger()
+
+# Fields in config section that are lists and need to be tabbed.
+# NOTE: Can we do this for all fields that are lists instead of hardcoding it?
+LIST_CONFIG_FIELDS = ["selection", "pickerColumnSlugs"]
 
 
 class ExplorerLegacy:
@@ -64,6 +68,7 @@ class ExplorerLegacy:
         df_graphers: Optional[pd.DataFrame] = None,
         df_columns: Optional[pd.DataFrame] = None,
         comments: Optional[List[str]] = None,
+        explorer_path: Optional[str] = None,
     ):
         """Build Explorer object from `content`.
 
@@ -97,6 +102,10 @@ class ExplorerLegacy:
 
         # Others
         self.name = name
+        self.explorer_path = explorer_path
+
+        # Path
+        self.path = None
         self.content_raw = None
 
     @classmethod
@@ -105,6 +114,7 @@ class ExplorerLegacy:
         content: Optional[str] = None,
         sep: str = ",",
         name: Optional[str] = None,
+        explorer_path: Optional[str] = None,
     ):
         """Build Explorer object from `content`.
 
@@ -117,7 +127,7 @@ class ExplorerLegacy:
         if content is None:
             log.info("Initializing a new explorer file from scratch.")
 
-            explorer = cls(name=name)
+            explorer = cls(name=name, explorer_path=explorer_path)
         else:
             # Text content of an explorer file. (this is given by the user)
             assert isinstance(content, str), "content should be a string!"
@@ -160,6 +170,7 @@ class ExplorerLegacy:
                 df_graphers=df_graphers,
                 df_columns=df_columns,
                 comments=comments,
+                explorer_path=explorer_path,
             )
 
             explorer.content_raw = content_raw
@@ -184,6 +195,12 @@ class ExplorerLegacy:
 
         return explorer
 
+    def export(self, path: Union[str, Path]):
+        """Export file."""
+        path = Path(path)
+        # Write parsed content to file.
+        path.write_text(self.content)
+
     def save(self, owid_env: Optional[OWIDEnv] = None) -> None:
         # Ensure we have an environment set
         if owid_env is None:
@@ -198,6 +215,42 @@ class ExplorerLegacy:
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
         admin_api.put_explorer_config(self.name, self.content)
+
+    def to_owid_content(self, path: Optional[Union[str, Path]] = None):
+        """Save your config in owid-content and push to server if applicable.
+
+        This is useful when working with config files from the owid-content repository.
+        """
+        if path is None:
+            path = self.path
+
+        # Export content to path
+        assert isinstance(path, (str, Path)), "Path should be a string or a Path object."
+        self.export(path)
+
+        # Upload it to staging server.
+        if self._on_staging():
+            upload_file_to_server(Path(path), f"owid@{config.DB_HOST}:~/owid-content/explorers/")
+
+            # Commit on the staging server
+            run_command_on_server(
+                f"owid@{config.DB_HOST}",
+                "cd owid-content && git add . && git diff-index --quiet HEAD || git commit -m ':robot: Update explorer from ETL'",
+            )
+
+    @property
+    def local_tsv_path(self) -> Path:
+        # export://explorers/who/latest/influenza#influenza -> explorers/who/latest/influenza/influenza.tsv
+        assert self.explorer_path
+        return EXPORT_DIR / (self.explorer_path.split("://")[1].replace("#", "/") + ".tsv")
+
+    def save(self, path: Optional[Union[str, Path]] = None) -> None:
+        """See docs for `to_owid_content`."""
+        self.to_owid_content(path)
+
+        # Export content to local directory in addition to uploading it to MySQL for debugging.
+        log.info(f"Exporting explorer to {self.local_tsv_path}")
+        self.export(self.local_tsv_path)
 
     @staticmethod
     def _parse_config(config_raw, sep) -> Dict[str, Any]:
@@ -382,13 +435,17 @@ class ExplorerLegacy:
             ignore_index=True,
         )
 
-        # Fix config.selection (should be tabbed!)
-        selections = df.loc[df[0] == "selection", 1].item()
-        for i, selection in enumerate(selections):
-            if i + 1 > df.shape[1] - 1:
-                # Add column
-                df[i + 1] = ""
-            df.loc[df[0] == "selection", i + 1] = selection
+        # Fix config.selection and config.pickerColumnSlugs (should be tabbed!)
+        for col in LIST_CONFIG_FIELDS:
+            sub_df = df.loc[df[0] == col, 1]
+            if sub_df.empty:
+                continue
+            selections = sub_df.item()
+            for i, selection in enumerate(selections):
+                if i + 1 > df.shape[1] - 1:
+                    # Add column
+                    df[i + 1] = ""
+                df.loc[df[0] == col, i + 1] = selection
 
         assert isinstance(df, pd.DataFrame), "df should be a dataframe!"
         return df  # type: ignore
@@ -396,7 +453,14 @@ class ExplorerLegacy:
     @property
     def content(self) -> str:
         """Based on modified config, graphers and column, build the raw content text."""
-        content = self.df.to_csv(sep="\t", index=False, header=False)
+        df_clean = self.df.copy()
+
+        # Replace actual newline characters with literal "\n"
+        for col in df_clean.select_dtypes(include=["object"]).columns:
+            df_clean[col] = df_clean[col].str.replace("\n", "\\n", regex=False)
+
+        content = df_clean.to_csv(sep="\t", index=False, header=False)
+
         assert isinstance(content, str), "content should be a string!"
         content = [c.rstrip() for c in content.splitlines()]
         content = "\n".join(content)
@@ -674,10 +738,15 @@ def _create_explorer_legacy(
     """
     if reset:
         # Create explorer from scratch.
-        explorer = ExplorerLegacy.from_raw_string(name=explorer_name)
+        explorer = ExplorerLegacy.from_raw_string(
+            content=None, sep="\t", name=explorer_name, explorer_path=explorer_path
+        )
     else:
         # Load explorer from database.
         explorer = ExplorerLegacy.from_db(explorer_name)
+
+    # TODO: this is temporary, in the future Explorers won't have path attribute.
+    explorer.path = (Path(EXPLORERS_DIR) / explorer_name).with_suffix(".explorer.tsv")  # type: ignore
 
     # Add a comment to avoid manual edits.
     explorer.comments = [f"# DO NOT EDIT THIS FILE MANUALLY. IT WAS GENERATED BY ETL step '{explorer_path}'."]
