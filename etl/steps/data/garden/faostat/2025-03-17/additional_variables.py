@@ -343,7 +343,7 @@ def generate_percentage_of_sustainable_and_overexploited_fish(tb_sdgb: Table) ->
     # Select the necessary item.
     tb_sdgb = tb_sdgb[tb_sdgb["item_code"] == ITEM_CODE_SUSTAINABLE_FISH].reset_index(drop=True)
     error = "Unit for fish data has changed."
-    assert list(tb_sdgb["unit"].unique()) == ["Percent"], error
+    assert list(tb_sdgb["unit"].unique()) == ["percent"], error
     error = "Element for fish data has changed."
     assert list(tb_sdgb["element"].unique()) == ["Value"], error
 
