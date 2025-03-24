@@ -1,0 +1,104 @@
+dataset:
+  title: 'Inputs: Pesticides Use'
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_rp_flat:
+    title: 'Inputs: Pesticides Use'
+    variables:
+      fungicides_and_bactericides__00001331__agricultural_use__005157__tonnes:
+        title: Fungicides and Bactericides | 00001331 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Fungicide and bactericide use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Fungicide and bactericide use
+      herbicides__00001320__agricultural_use__005157__tonnes:
+        title: Herbicides | 00001320 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Herbicide use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Herbicide use
+      insecticides__00001309__agricultural_use__005157__tonnes:
+        title: Insecticides | 00001309 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Insecticide use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Insecticide use
+      other_pesticides_nes__00001355__agricultural_use__005157__tonnes:
+        title: Other Pesticides nes | 00001355 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Other pesticide use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Other pesticide use
+      pesticides__total__00001357__agricultural_use__005157__tonnes:
+        title: Pesticides (total) | 00001357 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Total pesticide use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Total pesticide use
+      pesticides__total__00001357__use_per_area_of_cropland__005159__kilograms_per_hectare:
+        title: Pesticides (total) | 00001357 || Use per area of cropland | 005159 || Kilograms per hectare
+        unit: kilograms per hectare
+        short_unit: kg/ha
+        processing_level: major
+        display:
+          name: Total pesticide use per area of cropland
+          shortUnit: kg/ha
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Total pesticide use per area of cropland
+      plant_growth_regulators__00001341__agricultural_use__005157__tonnes:
+        title: Plant Growth Regulators | 00001341 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Plant growth regulator use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Plant growth regulator use
+      rodenticides__00001345__agricultural_use__005157__tonnes:
+        title: Rodenticides | 00001345 || Agricultural Use | 005157 || Tonnes
+        unit: tonnes
+        short_unit: t
+        processing_level: major
+        display:
+          name: Rodenticide use
+          shortUnit: t
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Rodenticide use
