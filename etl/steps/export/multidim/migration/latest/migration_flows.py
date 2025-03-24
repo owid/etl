@@ -52,18 +52,7 @@ def run() -> None:
     # Load table
     ds = paths.load_dataset("migration_stock_flows")
 
-    tb = ds.read("migrant_stock_dest_origin", load_data=False)
-
-    # add country names and slugs to the config
-    cty_idx = [i for i, d in enumerate(config["dimensions"]) if d["slug"] == "country_select"][0]
-
-    all_countries = [tb[col].dimensions["country_select"] for col in tb.columns if col not in ["year", "country"]]
-    all_countries = sorted(list(set(all_countries)))
-    cty_dict_ls = [{"slug": c.lower(), "name": c} for c in all_countries]
-    config["dimensions"][cty_idx]["choices"] = cty_dict_ls
-
-    # Define common view configuration
-    common_view_config = MULTIDIM_CONFIG
+    tb = ds.read("migration_stock_flows", load_data=False)
 
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
