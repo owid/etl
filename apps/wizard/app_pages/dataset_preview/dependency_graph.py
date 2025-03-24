@@ -14,7 +14,6 @@ from etl.steps import extract_step_attributes, filter_to_subgraph
 
 COLORS = {
     "snapshot": "#FC9090",
-    "walden": "#FC9090",
     "meadow": "#F5DB49",
     "garden": "#87E752",
     "grapher": "#67AAE1",
@@ -69,11 +68,11 @@ def generate_graph(
         return title
 
     def _collapse_node(attributes: Dict[str, str]) -> bool:
-        if collapse_snapshot and (attributes["channel"] in ["snapshot", "walden"]):
+        if collapse_snapshot and (attributes["channel"] in ["snapshot"]):
             return True
         if collapse_meadow and (attributes["channel"] in ["meadow"]):
             return True
-        if collapse_others and (attributes["channel"] not in ["snapshot", "walden", "meadow", "garden", "grapher"]):
+        if collapse_others and (attributes["channel"] not in ["snapshot", "meadow", "garden", "grapher"]):
             return True
         return False
 

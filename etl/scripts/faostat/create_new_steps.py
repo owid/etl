@@ -13,8 +13,6 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple, cast
 
-from owid.walden import Catalog
-
 from etl.dag_helpers import load_dag
 from etl.files import checksum_file
 from etl.paths import STEP_DIR
@@ -56,8 +54,6 @@ def get_channel_from_dag_line(dag_line: str) -> str:
         channel = "explorers"
     elif dag_line.startswith("snapshot://"):
         channel = "snapshot"
-    elif dag_line.startswith("walden://"):
-        channel = "walden"
     elif dag_line.startswith("data://grapher"):
         channel = "grapher"
     else:
@@ -282,13 +278,7 @@ def find_latest_version_for_step(channel: str, step_name: str, namespace: str = 
     """
     latest_version = None
     warning_message = f"Dataset {step_name} not found in {channel}."
-    if channel == "walden":
-        # Find latest version for current step in walden.
-        try:
-            latest_version = Catalog().find_latest(namespace=namespace, short_name=step_name).version
-        except ValueError:
-            log.warning(warning_message)
-    elif channel == "snapshot":
+    if channel == "snapshot":
         try:
             # Find all snapshots for current step.
             snapshots = [

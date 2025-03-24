@@ -320,7 +320,7 @@ class DatasetMeta(MetaBase):
     The metadata for this entire dataset kept in JSON (e.g. mydataset/index.json).
 
     The number of fields is limited, but should handle everything that we get from
-    Walden. There is a lot more opportunity to store more metadata at the table and
+    Snapshot. There is a lot more opportunity to store more metadata at the table and
     the variable level.
     """
 

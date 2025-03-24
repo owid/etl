@@ -10,7 +10,7 @@ from etl.paths import DAG_DIR
 # Initialize logger.
 log = get_logger()
 
-# Version tag to assign to new walden folders (both in S3 bucket and in index).
+# Version tag to assign to new folders (both in S3 bucket and in index).
 VERSION = str(dt.date.today())
 # Global namespace for datasets.
 NAMESPACE = "faostat"
@@ -34,7 +34,7 @@ N_CHARACTERS_ITEM_CODE = 8
 N_CHARACTERS_ITEM_CODE_EXTENDED = 15
 # Maximum number of characters for element_code (integers will be prepended with zeros).
 N_CHARACTERS_ELEMENT_CODE = 6
-# Codes of FAOSTAT domains to download from FAO and upload to walden bucket.
+# Codes of FAOSTAT domains to download from FAO and upload to bucket.
 # This is the list that will determine the datasets (faostat_*) to be created in all further etl data steps.
 INCLUDED_DATASETS_CODES = [
     # Food Balances: Food Balances (2010-).

@@ -14,7 +14,7 @@ data://garden/biodiversity/2024-01-25/cherry_blossom
 
 ## Build a dataset
 ### Preview dataset build
-You can build any dataset in ETL using our [ETL cli]((../../guides/etl-cli)): `etl run`. This will execute all the steps required to build a dataset.
+You can build any dataset in ETL using our [ETL cli](../../guides/etl-cli): `etl run` (or `etlr`). This will execute all the steps required to build a dataset.
 
 Before actually building the dataset, it is recommended to preview the steps that would be executed to build it by using the `--dry-run` flag.
 
