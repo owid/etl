@@ -17,7 +17,7 @@ This library allows you to query our data catalog programmatically, and get back
 ```mermaid
 graph TB
 
-etl -->|reads| walden[upstream datasets]
+etl -->|reads| snapshot[upstream datasets]
 etl -->|generates| s3[data catalog]
 catalog[owid-catalog-py] -->|queries| s3
 ```
