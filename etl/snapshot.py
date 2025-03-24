@@ -476,32 +476,36 @@ class SnapshotMeta(MetaBase):
         return yaml_dump({"meta": d})  # type: ignore
 
     def save(self) -> None:  # type: ignore
+        """Save metadata to YAML file. This is useful if you're dynamically changing
+        metadata (like dates) from the script and need to save them into YAML. This
+        function doesn't upload the file to S3, use `create_snapshot` instead.
+        """
         self.path.parent.mkdir(exist_ok=True, parents=True)
-        with open(self.path, "w") as f:
-            f.write(self.to_yaml())
 
-    # def save(self) -> None:  # type: ignore
-    #     self.path.parent.mkdir(exist_ok=True, parents=True)
+        # Create new file
+        if not self.path.exists():
+            with open(self.path, "w") as f:
+                f.write(self.to_yaml())
 
-    #     # Create new file
-    #     if not self.path.exists():
-    #         with open(self.path, "w") as f:
-    #             f.write(self.to_yaml())
-    #     # Edit existing file, keep outs
-    #     else:
-    #         # Load outs from existing file
-    #         with open(self.path, "r") as f:
-    #             yaml = ruamel_load(f)
-    #             outs = yaml.get("outs", None)
-    #             wdir = yaml.get("wdir", None)
+        # Edit existing file, keep outs
+        else:
+            # Load outs from existing file
+            with open(self.path, "r") as f:
+                yaml = ruamel_load(f)
+                outs = yaml.get("outs", None)
+                # wdir is a legacy field, we just ignore it
 
-    #         # Save metadata to file
-    #         meta = self._meta_to_dict()
-    #         with open(self.path, "w") as f:
-    #             d = {"meta": meta, "outs": outs}
-    #             if wdir:
-    #                 d["wdir"] = wdir
-    #             f.write(yaml_dump(d))
+            # Save metadata to file
+            # NOTE: meta does not have `outs` field, it's reset when saving
+            meta = self._meta_to_dict()
+            with open(self.path, "w") as f:
+                # set `outs` back
+                d = {"meta": meta}
+                if outs:
+                    d["outs"] = outs
+                # YAML is re-saved in the recommended format, if we wanted to keep the original format
+                # we'd need to use ruamel_dump and update `yaml` variable
+                f.write(yaml_dump(d))
 
     @property
     def uri(self):
