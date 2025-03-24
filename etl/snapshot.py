@@ -178,7 +178,6 @@ class Snapshot:
         if not upload:
             log.warn("Skipping upload", snapshot=self.uri)
             return
-
         # Calculate md5
         md5 = checksum_file(self.path)
 
