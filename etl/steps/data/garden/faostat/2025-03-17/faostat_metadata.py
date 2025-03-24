@@ -147,6 +147,7 @@ def clean_global_dataset_descriptions_table(tb_datasets: Table, tb_custom_datase
     #     log.warning(
     #         f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_datasets.csv."
     #     )
+
     tb_datasets = tb_datasets.drop(columns=["fao_dataset_title_old", "fao_dataset_description_old"]).rename(
         columns={
             "fao_dataset_title_new": "fao_dataset_title",
