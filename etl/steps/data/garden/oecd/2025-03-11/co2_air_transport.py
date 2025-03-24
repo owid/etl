@@ -86,6 +86,27 @@ def process_annual_data(tb):
     tb = tb.pivot(values="value", index=["country", "year"], columns=["emissions_source"])
     tb = tb.reset_index()
     tb["total_annual_emissions"] = tb["TER_INT_a"] + tb["TER_DOM_a"]
+    # Filter data for 2019 and 2024
+    emissions_2019 = tb[tb["year"] == 2019][["country", "total_annual_emissions"]].rename(
+        columns={"total_annual_emissions": "emissions_2019"}
+    )
+    emissions_2024 = tb[tb["year"] == 2024][["country", "total_annual_emissions"]].rename(
+        columns={"total_annual_emissions": "emissions_2024"}
+    )
+
+    # Merge the two datasets on 'country' to align emissions for 2019 and 2024
+    emissions_comparison = pd.merge(emissions_2019, emissions_2024, on="country", how="inner")
+
+    # Calculate the difference in emissions
+    emissions_comparison["emissions_difference"] = (
+        emissions_comparison["emissions_2024"] - emissions_comparison["emissions_2019"]
+    )
+    emissions_comparison["year"] = 2024
+
+    # Add the difference back to the original table for the year 2024
+    tb = pr.merge(
+        tb, emissions_comparison[["country", "year", "emissions_difference"]], on=["country", "year"], how="left"
+    )
 
     return tb
 

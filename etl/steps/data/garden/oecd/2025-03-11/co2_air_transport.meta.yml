@@ -185,3 +185,7 @@ tables:
         short_unit: t
         display:
           name: "2024"
+      emissions_difference:
+        title: Change in CO₂ emissions from aviation between 2024 and 2019
+        unit: tonnes
+        short_unit: t
