@@ -1,0 +1,38 @@
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_sdgb_flat:
+    variables:
+      _12_3_1a_food_loss_percentage__000000000024044__value__006121__percent:
+        display:
+          name: Share of food lost in post-harvest processes
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Share of food lost in post-harvest processes
+      _2_1_1_number_of_undernourished_people__000000000024001__value__006132__millions:
+        display:
+          name: Number of people that are undernourished
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of people that are undernourished
+      _2_1_1_prevalence_of_undernourishment__000000000024000__value__006121__percent:
+        display:
+          name: Share of people that are undernourished
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Share of people that are undernourished
+      _2_1_2_prevalence_of_severe_food_insecurity__both_sexes_or_no_breakdown_by_sex__all_age_ranges_or_no_breakdown_by_age__no_breakdown_by_urbanisation__00000024003_ttt__value__006121__percent:
+        display:
+          name: Severe food insecurity
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Share of the population defined as severely food insecure

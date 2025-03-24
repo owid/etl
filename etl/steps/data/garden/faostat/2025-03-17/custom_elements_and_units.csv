@@ -29,3 +29,5 @@
 "faostat_qcl","005412","Yield","Yield","Kilograms per hectare","kg/ha","tonnes per hectare","t/ha",0.001,,,,0,0
 "faostat_qcl","005417","Yield/Carcass Weight","Yield","Kilograms per animal","kg/An","kilograms per animal","kg/animal",,,,,0,0
 "faostat_qcl","005424","Yield/Carcass Weight","Yield","Grams per animal","g/An","kilograms per animal","kg/animal",0.001,,,,0,0
+"faostat_sdgb","006121","Value","Value","Percent","%","percent","%",,,,,0,0
+"faostat_sdgb","006132","Value","Value","million Number","million No","millions","millions",,,,,0,0

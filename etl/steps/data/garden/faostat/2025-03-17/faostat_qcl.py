@@ -456,7 +456,7 @@ def add_yield_to_aggregate_regions(tb: Table) -> Table:
     return combined_data
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
