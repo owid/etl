@@ -1,0 +1,19 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'Production: Value of Agricultural Production'
+    description: |-
+      The domain provides detailed data on the value of agricultural production that is calculated by the agricultural production data and the price data at farm gate. Thus, the value of production measures the agricultural production in monetary terms at the farm gate level.
+    citation_full: 'Food and Agriculture Organization of the United Nations - Production: Value of Agricultural Production (2025).'
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/QV
+    url_download: https://bulks-faostat.fao.org/production/Value_of_Production_E_All_Data_(Normalized).zip
+    date_accessed: '2025-03-17'
+    date_published: '2025-02-03'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+outs:
+  - md5: 175f4b519be5bc89450e1dac2653edf9
+    size: 27259658
+    path: faostat_qv.zip
