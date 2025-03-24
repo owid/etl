@@ -11,15 +11,24 @@ Further steps we take:
 * Calculate aggregates for both the global total and both hemispheres
 * For these aggregates we do not use inf_negative as a denominator, species processed is available many more countries and gives a better representation of the data. When using inf_negative many of the early datapoints are near 100%.
 * Create monthly aggregates where we sum the count variables and average the rate variables
+
+TODO:
+- This script is a bit outdated and doesn't use Table objects, hence doesn't propagate
+  metadata properly. It should set as much metadata as possible to minimize the need
+  to define display metadata in the export step.
 """
 
 from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
-from owid.catalog import Dataset, Table
+import structlog
+from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.files import yaml_load
+from etl.helpers import PathFinder, create_dataset, get_metadata_path
+
+log = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -33,12 +42,12 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    flunet_garden: Dataset = paths.load_dependency("flunet")
-    fluid_garden: Dataset = paths.load_dependency("fluid")
+    flunet_garden = paths.load_dataset("flunet")
+    fluid_garden = paths.load_dataset("fluid")
 
     # Read table from garden dataset.
-    tb_flunet = flunet_garden["flunet"]
-    tb_fluid = fluid_garden["fluid"]
+    tb_flunet = flunet_garden.read("flunet")
+    tb_fluid = fluid_garden.read("fluid")
 
     # Convert numeric types to float64 for consistency
     tb_flunet = convert_to_float(tb_flunet)
@@ -64,15 +73,22 @@ def run(dest_dir: str) -> None:
     # Create monthly aggregates - sum variables that are counts and recalculate rates based on these monthly totals
     tb_flu_monthly = create_monthly_aggregates(df=tb_flu, days_held_back=DAYS_HELD_BACK)
 
+    # Name `month_date` is not supported, we have to use `date` instead
+    tb_flu_monthly = tb_flu_monthly.rename(columns={"month_date": "date"})
+
     # Create Tables
     tb_flu = Table(tb_flu, short_name="flu").set_index(["country", "date"], verify_integrity=True)
     tb_flu_monthly = Table(tb_flu_monthly, short_name="flu_monthly").set_index(
-        ["country", "month_date"], verify_integrity=True
+        ["country", "date"], verify_integrity=True
     )
+
+    # Drop extra variables for both tables using the new helper function.
+    # Ideally, we'd have metadata for all variables in the table.
+    tb_flu = drop_extra_variables(tb_flu, "flu", dest_dir)
+    tb_flu_monthly = drop_extra_variables(tb_flu_monthly, "flu_monthly", dest_dir)
+
     # Create explorer dataset, with garden table and metadata in csv format
-    ds_explorer = create_dataset(
-        dest_dir, tables=[tb_flu, tb_flu_monthly], default_metadata=flunet_garden.metadata, formats=["csv"]
-    )
+    ds_explorer = create_dataset(dest_dir, tables=[tb_flu, tb_flu_monthly], default_metadata=flunet_garden.metadata)
     ds_explorer.save()
 
 
@@ -360,3 +376,16 @@ def remove_sparse_timeseries(
             if all(df.loc[(df["country"] == country), cols].fillna(0).sum() == 0):
                 df.loc[(df["country"] == country), cols] = np.nan
     return df
+
+
+def drop_extra_variables(tb: Table, table_name: str, dest_dir: str) -> Table:
+    # Load YAML metadata from destination directory.
+    meta_path = get_metadata_path(str(dest_dir))
+    with open(meta_path) as f:
+        meta = yaml_load(f)
+    meta_vars = set(meta["tables"][table_name]["variables"].keys())
+    extra_vars = set(tb.columns) - meta_vars
+    tb.drop(columns=extra_vars, inplace=True)
+    if extra_vars:
+        log.info("Dropped extra variables undefined in YAML", table_name=table_name, variables=sorted(extra_vars))
+    return tb

@@ -2,6 +2,7 @@
 
 import re
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -39,6 +40,7 @@ FLAGS = {
     "wpBlockId",
     "yAxisMin",
     "ySlugs",
+    "hideAnnotationFieldsInTitle",
 }
 PATTERN_CSV = r"https://catalog\.ourworldindata\.org/(?P<group>[^/]+/[^/]+/[^/]+/[^/]+/[^/]+)\.csv"
 
@@ -338,8 +340,14 @@ class ExplorerMigration:
                         "false",
                     }, f"{self.slug}: Checkbox must have 'true' and 'false' choices"
 
+                # Missing dimension value transaltes into empty string in TSV
+                if pd.isna(choice_name):
+                    choice_name = ""
+                    choice_slug = ""
+                else:
+                    choice_slug = underscore(str(choice_name))
+
                 # Define choice
-                choice_slug = underscore(str(choice_name))
                 choices.append(
                     {
                         "slug": choice_slug,
@@ -376,8 +384,8 @@ class ExplorerMigration:
                 "catalogPath": indicator_uri,
             }
             if indicator_uri in display_settings:
-                indicator["display"] = display_settings[indicator_uri]
-
+                # Use deepcopy so each indicator gets an independent display copy.
+                indicator["display"] = deepcopy(display_settings[indicator_uri])
             return indicator
 
         for block in self.grapher_block["block"]:
@@ -411,8 +419,9 @@ class ExplorerMigration:
             dimensions_view = {}
             for dim in dimensions:
                 raw_name = dimension_slug_to_raw_name[dim["slug"]]
+                # NOTE: Missing dimension value should translate into empty string, right?
                 if raw_name not in block:
-                    dimensions_view[dim["slug"]] = None
+                    dimensions_view[dim["slug"]] = ""
                 else:
                     choice_slug = underscore(block[raw_name])
                     if dim["presentation"]["type"] == "checkbox":
@@ -475,6 +484,9 @@ def _extract_table_uri(catalog_url: str):
         extracted_fragment = match.group("group")
     else:
         raise TableURLNotInCataloException(f"{catalog_url}")
+
+    # Don't keep full path like `explorers/who/latest/flu/flu`, but only keep the table name
+    extracted_fragment = extracted_fragment.split("/")[-1]
 
     return f"{extracted_fragment}"
 
