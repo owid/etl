@@ -331,26 +331,36 @@ class ExplorerMigration:
             if ui_type == "checkbox":
                 assert len(choices_raw) == 2, f"{self.slug}: Checkbox must have 2 choices"
             for choice_name in choices_raw:
-                if ui_type != "checkbox":
-                    choice_slug = underscore(str(choice_name))
-                else:
-                    choice_slug = choice_name == "true"
+                # Sanity check when is checkbox
+                if ui_type == "checkbox":
+                    assert choice_name in {
+                        "true",
+                        "false",
+                    }, f"{self.slug}: Checkbox must have 'true' and 'false' choices"
 
+                # Define choice
+                choice_slug = underscore(str(choice_name))
                 choices.append(
                     {
                         "slug": choice_slug,
                         "name": choice_name,
                     }
                 )
+
+            # Prepare presentation (for dimension)
+            presentation = {
+                "type": ui_type,
+            }
+            if ui_type == "checkbox":
+                presentation["choice_slug_true"] = "true"
+
             # Build dimension element
             dimensions.append(
                 {
                     "slug": dim_slug,
                     "name": dim_name,
                     "choices": choices,
-                    "presentation": {
-                        "type": ui_type,
-                    },
+                    "presentation": presentation,
                 }
             )
 
@@ -406,9 +416,11 @@ class ExplorerMigration:
                 else:
                     choice_slug = underscore(block[raw_name])
                     if dim["presentation"]["type"] == "checkbox":
-                        dimensions_view[dim["slug"]] = choice_slug == "true"
-                    else:
-                        dimensions_view[dim["slug"]] = choice_slug
+                        assert choice_slug in {
+                            "true",
+                            "false",
+                        }, f"{self.slug}: Checkbox must have 'true' and 'false' choices"
+                    dimensions_view[dim["slug"]] = choice_slug
 
             # Get config (remainder)
             config = {
@@ -474,7 +486,8 @@ def migrate_csv_explorer(explorer_path: Union[Path, str]):
         - Only works for CSV-based explorers which use ETL data (i.e. have a catalog URL for all tables)
         - The output config is not fully functional yet. It might use a catalog path from a table that is not in Grapher (e.g. an 'explorer' table). Modify it so it points to a table in Grapher.
 
-    Local path to explorer."""
+    Local path to explorer.
+    """
     if isinstance(explorer_path, str):
         explorer_path = Path(explorer_path)
     name = Path(explorer_path.stem).stem

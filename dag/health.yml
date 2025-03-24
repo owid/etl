@@ -624,7 +624,6 @@ steps:
     - data://garden/who/2024-08-06/mortality_database_cancer
   data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
     - data://garden/who/2024-08-06/mortality_database_cancer_most_common
-
   data://meadow/who/latest/monkeypox:
     - snapshot://who/latest/monkeypox.csv
   data://garden/who/latest/monkeypox:
@@ -632,12 +631,11 @@ steps:
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/health/latest/global_health_mpox
-  data://explorers/who/latest/monkeypox:
-    - data://garden/who/latest/monkeypox
+
   data://grapher/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
-  # export://explorers/who/latest/monkeypox:
-  #   - data://grapher/who/latest/monkeypox
+  export://explorers/who/latest/monkeypox:
+    - data://grapher/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
   # Mpox - Global.health
@@ -1226,3 +1224,43 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-03-14/polio_deaths:
     - data://garden/health/2025-03-14/polio_deaths
+
+  #
+  # Mumps cases - CDC
+  #
+  data://meadow/cdc/2025-03-17/mumps_cases:
+    - snapshot://cdc/2025-03-17/mumps_cases.csv
+  data://garden/cdc/2025-03-17/mumps_cases:
+    - data://meadow/cdc/2025-03-17/mumps_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-17/mumps_cases:
+    - data://garden/cdc/2025-03-17/mumps_cases
+
+  #
+  # Mumps deaths - CDC
+  #
+  data://meadow/cdc/2025-03-17/mumps_deaths:
+    - snapshot://cdc/2025-03-17/mumps_deaths.csv
+  data://garden/cdc/2025-03-17/mumps_deaths:
+    - data://meadow/cdc/2025-03-17/mumps_deaths
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-17/mumps_deaths:
+    - data://garden/cdc/2025-03-17/mumps_deaths
+
+  # Rubella cases - CDC
+  #
+  data://meadow/cdc/2025-03-19/rubella_cases:
+    - snapshot://cdc/2025-03-19/rubella_cases.csv
+  data://garden/cdc/2025-03-19/rubella_cases:
+    - data://meadow/cdc/2025-03-19/rubella_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-19/rubella_cases:
+    - data://garden/cdc/2025-03-19/rubella_cases
+
+  #
+  # B Yamagata flu strain - from Flunet
+  #
+  data://garden/who/2025-03-19/flu_yamagata:
+    - data://garden/who/latest/flunet
+  data://grapher/who/2025-03-19/flu_yamagata:
+    - data://garden/who/2025-03-19/flu_yamagata

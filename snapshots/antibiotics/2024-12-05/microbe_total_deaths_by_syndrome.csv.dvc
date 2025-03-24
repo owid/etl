@@ -20,7 +20,6 @@ meta:
     license:
       name: IHME's Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
-
   is_public: false
 outs:
   - md5: d494bc6e6c0a61cf05d3d9fb03a2f0b5

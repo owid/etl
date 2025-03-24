@@ -41,9 +41,7 @@ config:
   hideAlertBanner: "true"
   yAxisMin: "0"
   hasMapTab: "true"
-  pickerColumnSlugs:
-    - location total_confirmed_by_confirmation total_confirmed_by_confirmation_per_million
-  downloadDataLink: https://catalog.ourworldindata.org/explorers/who/latest/monkeypox/monkeypox.csv
+  downloadDataLink: https://catalog.ourworldindata.org/garden/who/latest/monkeypox/monkeypox.csv
 
 dimensions:
   - slug: metric
@@ -68,21 +66,22 @@ dimensions:
         name: Daily
     presentation:
       type: radio
-  - slug: relative_to_population
+  - slug: scale
     name: Relative to population
     choices:
-      - slug: false
-        name: "false"
-      - slug: true
-        name: "true"
+      - slug: absolute
+        name: "Total population"
+      - slug: relative_to_population
+        name: "Relative to population"
     presentation:
       type: checkbox
+      choice_slug_true: relative_to_population
 
 views:
   - dimensions:
       metric: confirmed_cases
       frequency: _7_day_average
-      relative_to_population: false
+      scale: absolute
     indicators:
       y:
         - catalogPath: monkeypox#new_cases_smoothed
@@ -101,7 +100,7 @@ views:
   - dimensions:
       metric: confirmed_cases
       frequency: cumulative
-      relative_to_population: false
+      scale: absolute
     indicators:
       y:
         - catalogPath: monkeypox#total_cases
@@ -117,7 +116,7 @@ views:
   - dimensions:
       metric: confirmed_cases
       frequency: daily
-      relative_to_population: false
+      scale: absolute
     indicators:
       y:
         - catalogPath: monkeypox#new_cases
@@ -132,7 +131,7 @@ views:
   - dimensions:
       metric: confirmed_cases
       frequency: cumulative
-      relative_to_population: true
+      scale: relative_to_population
     indicators:
       y:
         - catalogPath: monkeypox#total_cases_per_million
@@ -148,7 +147,7 @@ views:
   - dimensions:
       metric: confirmed_cases
       frequency: _7_day_average
-      relative_to_population: true
+      scale: relative_to_population
     indicators:
       y:
         - catalogPath: monkeypox#new_cases_smoothed_per_million
@@ -166,7 +165,7 @@ views:
   - dimensions:
       metric: confirmed_cases
       frequency: daily
-      relative_to_population: true
+      scale: relative_to_population
     indicators:
       y:
         - catalogPath: monkeypox#new_cases_per_million
@@ -182,7 +181,7 @@ views:
   - dimensions:
       metric: confirmed_and_suspected_cases
       frequency: cumulative
-      relative_to_population: false
+      scale: absolute
     indicators:
       y:
         - catalogPath: monkeypox#total_cases
@@ -213,7 +212,7 @@ views:
   - dimensions:
       metric: confirmed_deaths
       frequency: _7_day_average
-      relative_to_population: false
+      scale: absolute
     indicators:
       y:
         - catalogPath: monkeypox#new_deaths_smoothed
@@ -232,7 +231,7 @@ views:
   - dimensions:
       metric: confirmed_deaths
       frequency: cumulative
-      relative_to_population: false
+      scale: absolute
     indicators:
       y:
         - catalogPath: monkeypox#total_deaths
@@ -249,7 +248,7 @@ views:
   - dimensions:
       metric: confirmed_deaths
       frequency: daily
-      relative_to_population: false
+      scale: absolute
     indicators:
       y:
         - catalogPath: monkeypox#new_deaths
@@ -265,7 +264,7 @@ views:
   - dimensions:
       metric: confirmed_deaths
       frequency: cumulative
-      relative_to_population: true
+      scale: relative_to_population
     indicators:
       y:
         - catalogPath: monkeypox#total_deaths_per_million
@@ -282,7 +281,7 @@ views:
   - dimensions:
       metric: confirmed_deaths
       frequency: _7_day_average
-      relative_to_population: true
+      scale: relative_to_population
     indicators:
       y:
         - catalogPath: monkeypox#new_deaths_smoothed_per_million
@@ -301,7 +300,7 @@ views:
   - dimensions:
       metric: confirmed_deaths
       frequency: daily
-      relative_to_population: true
+      scale: relative_to_population
     indicators:
       y:
         - catalogPath: monkeypox#new_deaths_per_million

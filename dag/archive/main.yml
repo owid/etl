@@ -426,6 +426,7 @@ include:
   - dag/archive/fasttrack.yml
   - dag/archive/climate.yml
   - dag/archive/environment.yml
+  - dag/archive/poverty_inequality.yml
   - dag/archive/equality.yml
   - dag/archive/plastic_use.yml
   - dag/archive/artificial_intelligence.yml
@@ -434,3 +435,4 @@ include:
   - dag/archive/biodiversity.yml
   - dag/archive/space.yml
   - dag/archive/survey.yml
+  - dag/archive/migration.yml

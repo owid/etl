@@ -62,3 +62,16 @@ where
     - **Garden**: `data://garden/nasa/2023-03-06/ozone_hole_area`
     - **Grapher**: `data://grapher/nasa/2023-03-06/ozone_hole_area`
     - **Explorers**: `data://explorers/faostat/2023-02-22/food_explorer`
+
+### Path for `export://`
+Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. Their URI begins with the prefix `export://` and use the following format:
+
+```
+export://<channel>/<namespace>/<version>/<filename>
+```
+
+where channel is typically one of the following:
+
+- `multidim`: For multidimensional indicators.
+- `explorers`: For explorers.
+- `github`: For exports to GitHub.

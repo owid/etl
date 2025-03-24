@@ -11,12 +11,11 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
+from typing import Any, Callable, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
 
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog import Table
 from owid.catalog.meta import GrapherConfig, MetaBase
 
 from etl.collections.utils import merge_common_metadata_by_dimension
@@ -25,9 +24,11 @@ from etl.paths import SCHEMAS_DIR
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 T = TypeVar("T")
 REGEX_CATALOG_PATH = (
-    r"^(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
+    r"^grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/[A-Za-z0-9_]+/[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
 )
-ChoiceSlugType = Union[str, bool]
+REGEX_CATALOG_PATH_OPTIONS = (
+    r"^(?:(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/)?[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
+)
 
 
 def prune_dict(d: dict) -> dict:
@@ -77,11 +78,18 @@ class Indicator(MDIMBase):
             raise ValueError(f"Invalid catalog path: {self.catalogPath}")
 
     def has_complete_path(self) -> bool:
-        return "/" in self.catalogPath
+        pattern = re.compile(REGEX_CATALOG_PATH)
+        complete = bool(pattern.match(self.catalogPath))
+        return complete
 
     @classmethod
     def is_a_valid_path(cls, path: str) -> bool:
-        pattern = re.compile(REGEX_CATALOG_PATH)
+        """Valid paths are:
+        - grapher/namespace/version/dataset/table#indicator.
+        - dataset/table#indicator
+        - table#indicator
+        """
+        pattern = re.compile(REGEX_CATALOG_PATH_OPTIONS)
         valid = bool(pattern.match(path))
         return valid
 
@@ -92,13 +100,13 @@ class Indicator(MDIMBase):
                 raise ValueError(f"Invalid catalog path: {value}")
         return super().__setattr__(name, value)
 
-    def expand_path(self, tables_by_name: Dict[str, List[Table]]):
+    def expand_path(self, tables_by_name: Dict[str, List[str]]):
         # Do nothing if path is already complete
         if self.has_complete_path():
             return self
 
         # If path is not complete, we need to expand it!
-        table_name = self.catalogPath.split("#")[0]
+        table_name, indicator_name = self.catalogPath.split("#")
 
         # Check table is in any of the datasets!
         assert (
@@ -108,14 +116,14 @@ class Indicator(MDIMBase):
         # Check table name to table mapping is unique
         assert (
             len(tables_by_name[table_name]) == 1
-        ), f"There are multiple dependencies (datasets) with a table named {table_name}. Please use the complete dataset URI in this case."
+        ), f"There are multiple dependencies (datasets) with a table named {table_name}. Please add dataset name (dataset_name/table_name#indicator_name) if you haven't already, or use the complete dataset URI in this case."
 
         # Check dataset in table metadata is not None
-        tb = tables_by_name[table_name][0]
-        assert tb.m.dataset is not None, f"Dataset not found for table {table_name}"
+        tb_uri = tables_by_name[table_name][0]
+        # assert tb.m.dataset is not None, f"Dataset not found for table {table_name}"
 
         # Build URI
-        self.catalogPath = tb.m.dataset.uri + "/" + self.catalogPath
+        self.catalogPath = tb_uri + "#" + indicator_name
 
         return self
 
@@ -129,6 +137,11 @@ class ViewIndicators(MDIMBase):
     x: Optional[Indicator] = None
     size: Optional[Indicator] = None
     color: Optional[Indicator] = None
+
+    @property
+    def num_indicators(self) -> int:
+        """Get the total number of indicators in the view."""
+        return sum([1 for dim in CHART_DIMENSIONS if getattr(self, dim, None) is not None])
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "ViewIndicators":
@@ -149,7 +162,7 @@ class ViewIndicators(MDIMBase):
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
-    def to_records(self) -> List[Dict[str, str]]:
+    def to_records(self) -> List[Dict[str, Union[str, Dict[str, Any]]]]:
         indicators = []
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -157,12 +170,20 @@ class ViewIndicators(MDIMBase):
                 continue
             if isinstance(dimension_val, list):
                 for d in dimension_val:
-                    indicators.append({"path": d.catalogPath, "dimension": dim})
+                    display = d.display if d.display is not None else {}
+                    indicator_ = {"path": d.catalogPath, "axis": dim, "display": display}
+                    indicators.append(indicator_)
             else:
-                indicators.append({"path": dimension_val.catalogPath, "dimension": dim})
+                display = dimension_val.display if dimension_val.display is not None else {}
+                indicator_ = {
+                    "path": dimension_val.catalogPath,
+                    "axis": dim,
+                    "display": display,
+                }
+                indicators.append(indicator_)
         return indicators
 
-    def expand_paths(self, tables_by_name: Dict[str, List[Table]]):
+    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
         """Expand the catalog paths of all indicators in the view."""
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -218,7 +239,7 @@ class Definitions(MDIMBase):
 class View(MDIMBase):
     """MDIM/Explorer view configuration."""
 
-    dimensions: Dict[str, ChoiceSlugType]
+    dimensions: Dict[str, str]
     indicators: ViewIndicators
     # NOTE: Maybe worth putting as classes at some point?
     config: Optional[GrapherConfig] = None
@@ -235,10 +256,15 @@ class View(MDIMBase):
         return len(indicators) > 1
 
     @property
+    def num_indicators(self) -> int:
+        """Get the total number of indicators in the view."""
+        return self.indicators.num_indicators
+
+    @property
     def metadata_is_needed(self) -> bool:
         return self.has_multiple_indicators and (self.metadata is None)
 
-    def expand_paths(self, tables_by_name: Dict[str, List[Table]]):
+    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
         """Expand all indicator paths in the view.
 
         Make sure that they are all complete paths. This includes indicators in view, but also those in config (if any).
@@ -325,7 +351,7 @@ class MDIMView(View):
 @pruned_json
 @dataclass
 class DimensionChoice(MDIMBase):
-    slug: ChoiceSlugType
+    slug: str
     name: str
     description: Optional[str] = None
 
@@ -351,10 +377,13 @@ class UITypes:
 @dataclass
 class DimensionPresentation(MDIMBase):
     type: str
+    choice_slug_true: Optional[str] = None
 
     def __post_init__(self):
         if not UITypes.is_valid(self.type):
             raise ValueError(f"Invalid type: {self.type}. Accepted values: {UITypes.ALL}")
+        if (self.type == UITypes.CHECKBOX) and (self.choice_slug_true is None):
+            raise ValueError(f"`choice_slug_true` slug must be provided for '{UITypes.CHECKBOX}' type.")
 
 
 @pruned_json
@@ -370,12 +399,20 @@ class Dimension(MDIMBase):
     def __post_init__(self):
         """Validations."""
 
-        # If presentation is binary (checkbox), then choices must be exactly two (true, false)
+        # Checks when presentation is checkbox
         if self.ui_type == UITypes.CHECKBOX:
-            if not set(self.choice_slugs) == {True, False}:
+            assert self.presentation is not None, "Presentation must be provided for 'checkbox' type."
+
+            # Choices must be exactly two
+            if (num_choices := len(self.choice_slugs)) != 2:
                 raise ValueError(
-                    f"Dimension choices for '{UITypes.CHECKBOX}' must have exactly two choices with slugs: ['True', 'False']. Instead, found {self.choice_slugs}"
+                    f"Dimension choices for '{UITypes.CHECKBOX}' must have exactly two choices. Instead, found {num_choices} choices."
                 )
+
+            # True slug must be provided, and must be a valid choice
+            # assert self.presentation.choice_slug_true is not None
+            if self.presentation.choice_slug_true not in self.choice_slugs:
+                raise ValueError(f"True slug '{self.presentation.choice_slug_true}' must be one of the choices.")
 
     @property
     def ui_type(self):
@@ -384,13 +421,45 @@ class Dimension(MDIMBase):
         return self.presentation.type
 
     @property
-    def choice_slugs(self):
+    def choice_slugs(self) -> List[str]:
         # if self.choices is not None:
         return [choice.slug for choice in self.choices]
 
     @property
     def ppt(self):
         return self.presentation
+
+    def sort_choices(self, slug_order: Union[List[str], Callable]):
+        """Sort choices based on the given order.
+
+        Args:
+        slug_order: List[str] | Callable
+            If a list, it must contain all the slugs in the desired order. If a callable, this callable will be applied to the choice slugs to sort them.
+        """
+        choice_slugs = self.choice_slugs
+        if callable(slug_order):
+            slug_order_ = slug_order(choice_slugs)
+        else:
+            slug_order_ = slug_order
+
+        # Make sure all choices are in the given order
+        choices_missing = set(choice_slugs) - set(slug_order_)
+        if choices_missing:
+            raise ValueError(
+                f"All choices for dimension {self.slug} must be in the given order! Missing: {choices_missing}"
+            )
+
+        # Create a dictionary to map slugs to their positions for faster sorting
+        slug_position = {slug: index for index, slug in enumerate(slug_order_)}
+
+        # Sort based on your desired slug order
+        self.choices.sort(key=lambda choice: slug_position.get(choice.slug, float("inf")))
+
+    def validate_unique_names(self):
+        """Validate that all choice names are unique."""
+        names = [choice.name for choice in self.choices]
+        if len(names) != len(set(names)):
+            raise ValueError(f"Dimension choices for '{self.slug}' must have unique names!")
 
 
 @pruned_json
@@ -400,6 +469,10 @@ class Collection(MDIMBase):
 
     dimensions: List[Dimension]
     views: List[Any]
+
+    # Private for fast access
+    # _views_hash: Optional[Dict[str, Any]] = None
+    # _dimensions_hash: Optional[Dict[str, Dimension]] = None
 
     @property
     def v(self):
@@ -419,15 +492,25 @@ class Collection(MDIMBase):
         return dix
 
     def validate_views_with_dimensions(self):
-        """Validate that the dimension choices in all views are defined."""
+        """Validates that dimensions in all views are valid:
+
+        - TODO: The dimension slugs in all views are defined.
+        - The dimension choices in all views are defined.
+        """
+        # Get all dimension and choice slugs
         dix = {dim.slug: dim.choice_slugs for dim in self.dimensions}
 
+        # Iterate over all views and validate dimensions and choices
         for view in self.views:
-            for slug, value in view.dimensions.items():
-                assert slug in dix, f"Dimension {slug} not found in dimensions! View: {self.to_dict()}"
+            for dim_slug, choice_slugs in dix.items():
+                # Check that dimension is defined in the view!
                 assert (
-                    value in dix[slug]
-                ), f"Choice {value} not found for dimension {slug}! View: {view.to_dict()}; Available choices: {dix[slug]}"
+                    dim_slug in view.dimensions
+                ), f"Dimension {dim_slug} not found in dimensions! View: {view.to_dict()}"
+                # Check that choices defined in the view are valid!
+                assert (
+                    view.dimensions[dim_slug] in choice_slugs
+                ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
 
     def validate_schema(self, schema_path):
         """Validate class against schema."""
@@ -488,6 +571,35 @@ class Collection(MDIMBase):
         # vc = inds.value_counts()
         # if vc[vc > 1].any():
         #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
+
+    def sort_choices(self, slug_order: Dict[str, Union[List[str], Callable]]):
+        """Sort choices based on the given order."""
+        for dim in self.dimensions:
+            if dim.slug in slug_order:
+                dim.sort_choices(slug_order[dim.slug])
+
+    def validate_choice_names(self):
+        """Validate that all choice names are unique."""
+        for dim in self.dimensions:
+            dim.validate_unique_names()
+
+    def prune_dimension_choices(self):
+        from collections import defaultdict
+
+        # Get all dimension choices in use
+        all_occurrences = defaultdict(set)
+
+        for view in self.views:
+            for key, value in view.dimensions.items():
+                all_occurrences[key].add(value)
+
+        # Remove those not in use
+        for dim in self.dimensions:
+            dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences[dim.slug]]
+
+    @property
+    def dimension_slugs(self):
+        return [dim.slug for dim in self.dimensions]
 
 
 # def main():

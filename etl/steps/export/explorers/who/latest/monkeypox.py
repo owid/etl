@@ -9,7 +9,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -17,8 +17,8 @@ def run(dest_dir: str) -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    ds_explorer = paths.create_explorer(
+    explorer = paths.create_explorer(
         config=config,
     )
 
-    ds_explorer.save(tolerate_extra_indicators=True)
+    explorer.save(tolerate_extra_indicators=True)

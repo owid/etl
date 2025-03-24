@@ -559,6 +559,19 @@ def cleanup_ghost_variables(engine: Engine, dataset_id: int, upserted_variable_i
             {"variable_ids": variable_ids_to_delete},
         )
 
+        # NOTE: deleting mdim variables form grapher:// step could be a bit unexpected and could
+        # lead to side effects. If this causes problems, we should clean up ghost variables after
+        # the entire ETL & chart-sync is finished.
+        # delete from dependent multi_dim_x_chart_configs to avoid foreign key constraint
+        con.execute(
+            text(
+                """
+            DELETE FROM multi_dim_x_chart_configs WHERE variableId IN :variable_ids
+        """
+            ),
+            {"variable_ids": variable_ids_to_delete},
+        )
+
         # finally delete variables
         result = con.execute(
             text(

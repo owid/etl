@@ -15,6 +15,16 @@ paths = PathFinder(__file__)
 # whether to use existing map brackets from old explorer, if True existing map brackets are used & prioritized, if False map brackets from MAP_BRACKETS override existing
 USE_EXISTING_MAP_BRACKETS = False
 
+IND_RELATIVE_TOGGLE = [
+    "refugees_under_unhcrs_mandate_origin",
+    "asylum_seekers_origin",
+    "refugees_under_unhcrs_mandate_asylum",
+    "asylum_seekers_asylum",
+    "stateless_persons_asylum",
+    "immigrants_all",
+    "emigrants_all",
+]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -92,7 +102,7 @@ def run(dest_dir: str) -> None:
     # Sort rows conveniently
     df_graphers["Metric Dropdown"] = pd.Categorical(df_graphers["Metric Dropdown"], categories=SORTER, ordered=True)
     df_graphers["Period Radio"] = pd.Categorical(
-        df_graphers["Period Radio"], categories=["Total number", "Five-year change", "Annual change"], ordered=True
+        df_graphers["Period Radio"], categories=["Total number", "Annual change"], ordered=True
     )
     df_graphers["Sub-Metric Radio"] = pd.Categorical(
         df_graphers["Sub-Metric Radio"], categories=["Total", "Per capita / Share of population"], ordered=True
@@ -138,7 +148,7 @@ def run(dest_dir: str) -> None:
     df_columns = pd.DataFrame(col_dicts)
 
     df_columns["colorScaleNumericMinValue"] = 0
-    df_columns["colorScaleEqualSizeBins"] = True
+    df_columns["colorScaleEqualSizeBins"] = True  # equal size bins for all indicators
 
     # Save outputs.
     ds_explorer = paths.create_explorer_legacy(config=config, df_graphers=df_graphers, df_columns=df_columns)
@@ -165,6 +175,11 @@ def create_graphers_rows(graphers_dicts, tb, ds):
             graphers_row_dict["Period Radio"] = config["period_radio"]
             graphers_row_dict["Sub-Metric Radio"] = config["sub_metric_radio"]
             graphers_row_dict["Age Radio"] = config["age_radio"]
+
+            if column in IND_RELATIVE_TOGGLE:
+                graphers_row_dict["hideRelativeToggle"] = False
+            else:
+                graphers_row_dict["hideRelativeToggle"] = True
 
             if column in ADDITIONAL_DESCRIPTIONS.keys():
                 graphers_row_dict["subtitle"] = ADDITIONAL_DESCRIPTIONS[column]["description"]

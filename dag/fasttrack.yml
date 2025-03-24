@@ -216,3 +216,9 @@ steps:
     - snapshot://fasttrack/latest/graduation_returns_table__sheet1.csv
   data://grapher/fasttrack/latest/housing_prices_eurostat_q4_2023__sheet1:
     - snapshot://fasttrack/latest/housing_prices_eurostat_q4_2023__sheet1.csv
+  data://grapher/fasttrack/latest/deflated_housing_prices__sheet1:
+    - snapshot://fasttrack/latest/deflated_housing_prices__sheet1.csv
+  data-private://grapher/fasttrack/latest/test:
+    - snapshot-private://fasttrack/latest/test.csv
+  data://grapher/fasttrack/latest/number_electricity_fuels_access_wb:
+    - snapshot://fasttrack/latest/number_electricity_fuels_access_wb.csv

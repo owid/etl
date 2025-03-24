@@ -209,21 +209,24 @@ nav:
       - Contributing: "contributing.md"
   - Guides:
       - "guides/index.md"
-      - Adding data:
+      - Data work:
           - "guides/data-work/index.md"
           - New data: "guides/data-work/add-data.md"
           - Updating data: "guides/data-work/update-data.md"
           - Update charts: "guides/data-work/update-charts.md"
+          - MDIMs and Explorers: "guides/data-work/mdims.md"
           - Export data: "guides/data-work/export-data.md"
           - Access archived data: "guides/data-work/access-archived-data.md"
       - Admin:
           - Wizard: "guides/wizard.md"
           - CLI: "guides/etl-cli.md"
-      - Tools:
+      - Other ETL tasks:
           - Harmonize country names: "guides/harmonize-countries.md"
           - Backport from database: "guides/backport.md"
           - Regular updates: "guides/auto-regular-updates.md"
           - Pull requests: "guides/pull-requests.md"
+          - Tips when working with ETL: "guides/etl-tips.md"
+          - Metadata in data pages: "guides/metadata-play.md"
       - Servers & settings:
           - Upgrade Python version: "guides/upgrade-python-version.md"
           - Environments: "guides/environment.md"
@@ -232,12 +235,7 @@ nav:
           - Private datasets: "guides/private-import.md"
           - Types in Tables: "guides/types-tables.md"
           - OpenAI setup: "guides/openai.md"
-
-      - Tips when working with ETL: "guides/etl-tips.md"
-
-      - Others:
           - Edit the documentation: "dev/docs.md"
-          - Metadata in data pages: "guides/metadata-play.md"
 
   - Design principles:
       - Design principles & workflow: architecture/index.md
@@ -266,6 +264,8 @@ nav:
           - FAQs: "architecture/metadata/faqs.md"
   - API and catalog:
       - API: "api/index.md"
-      - Notebook: "api/python.ipynb"
+      - Charts API: "api/chart-api.md"
+      - ETL catalog API: "api/catalog-api.md"
+      - Example API usage: "api/example-usage.md"
       - Maintenance: "api/maintenance.md"
       - COVID-19: "api/covid.md"

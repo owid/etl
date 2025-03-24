@@ -3,7 +3,7 @@ from collections import defaultdict
 from copy import deepcopy
 from typing import Any, Dict, List, Optional, Set
 
-from owid.catalog import Dataset, Table
+from owid.catalog import Dataset
 
 from etl.db import read_sql
 from etl.paths import DATA_DIR
@@ -20,10 +20,30 @@ def records_to_dictionary(records, key: str):
     return dix
 
 
-def get_tables_by_name_mapping(dependencies: Set[str]) -> Dict[str, List[Table]]:
+def load_dataset_from_step(step: str) -> Dataset:
+    uri = re.sub(r"^(data|data-private)://", "", step)
+    # TODO: read no metadata
+    return Dataset(DATA_DIR / uri)
+
+
+def load_table_names_from_dependencies(dependencies: Set[str]) -> List[str]:
+    table_names = []
+    for uri in dependencies:
+        ds = load_dataset_from_step(uri)
+        for table_name in ds.table_names:
+            table_names.append(table_name)
+    return table_names
+
+
+def has_duplicate_table_names(dependencies: Set[str]) -> bool:
+    table_names = load_table_names_from_dependencies(dependencies)
+    return len(table_names) != len(set(table_names))
+
+
+def get_tables_by_name_mapping(dependencies: Set[str]) -> Dict[str, List[str]]:
     """Dictionary mapping table short name to table object.
 
-    Note that the format is {"table_name": [tb], ...}. This is because there could be collisions where multiple table names are mapped to the same table (e.g. two datasets could have a table with the same name).
+    Note that the format is {"table_name": [table_uri], ...}. This is because there could be collisions where multiple table names are mapped to the same table (e.g. two datasets could have a table with the same name).
     """
     tb_name_to_tb = defaultdict(list)
 
@@ -32,10 +52,15 @@ def get_tables_by_name_mapping(dependencies: Set[str]) -> Dict[str, List[Table]]
         if not re.match(r"^(data|data-private)://grapher/", dep):
             continue
 
-        uri = re.sub(r"^(data|data-private)://", "", dep)
-        ds = Dataset(DATA_DIR / uri)
+        ds = load_dataset_from_step(dep)
         for table_name in ds.table_names:
-            tb_name_to_tb[table_name].append(ds.read(table_name, load_data=False))
+            tb = ds.read(table_name, load_data=False)
+            assert tb.m.dataset is not None, f"Dataset not found for table {table_name}"
+            table_uri = f"{tb.m.dataset.uri}/{table_name}"
+            # Add table -> uri
+            tb_name_to_tb[table_name].append(table_uri)
+            # Add dataset -> uri
+            tb_name_to_tb[f"{ds.m.short_name}/{table_name}"].append(table_uri)
 
     return tb_name_to_tb
 

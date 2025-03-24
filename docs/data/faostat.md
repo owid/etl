@@ -323,24 +323,20 @@ which there is new data (let us call the new dataset version to be created `YYYY
     etl run faostat/YYYY-MM-DD --grapher
     ```
 
-10. Generate chart revisions (showing a chart using an old version of a variable and the same chart using the new
-    version) for each dataset, to replace variables of a dataset from its second latest version to its latest version.
+10. From the ETL Wizard, use Indicator Upgrader for each of the grapher datasets to replace variables in charts to their latest versions.
 
-        ```bash
-        # THIS FUNCTION WILL NO LONGER WORK, chart revisions workflow is deprecated
-        python etl/scripts/faostat/create_chart_revisions.py -e
-        ```
-
-        !!! note
-
-            This step may raise errors (because of limitations in our chart revision tool). If so, continue to the next step and come back to this one again. Keep repeating these two steps until there are no more errors (which may happen after two iterations).
-
-11. Use OWID's internal approval tool to visually inspect changes between the old and new versions of updated charts, and
+11. From the ETL Wizard, use Chart Diff to visually inspect changes between the old and new versions of updated charts, and
     accept or reject changes.
 
 12. Update the explorers step `data://explorers/faostat/latest/food_explorer` (for the moment, this has to be done manually): Edit the version of its only dependency in the dag, so that it loads the latest garden step. It should be `data://garden/faostat/YYYY-MM-DD/faostat_food_explorer`.
 
-13. Run the new etl explorers step, to generate the csv files for the global food explorer.
+13. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
+
+    !!! note
+
+        In the future this could be handled automatically by one of the existing scripts.
+
+14. Run the new etl explorers step, to generate the csv files for the global food explorer.
 
     ```bash
     etl run explorers/faostat/latest/food_explorer
@@ -351,12 +347,6 @@ which there is new data (let us call the new dataset version to be created `YYYY
     !!! note
 
         Sometimes items change in FAOSTAT. If that's the case, you may need to edit a file in the `owid-content` repository, namely `scripts/global-food-explorer/foods.csv`. Then, follow the instructions in `scripts/global-food-explorer/README.md`.
-
-14. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
-
-    !!! note
-
-        In the future this could be handled automatically by one of the existing scripts.
 
 15. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
 
