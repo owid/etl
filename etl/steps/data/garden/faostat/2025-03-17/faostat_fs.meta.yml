@@ -106,8 +106,8 @@ tables:
         presentation:
           title_public: Prevalence of undernourishment
           title_variant: annual value
-      share_of_dietary_energy_supply_derived_from_cereals__roots_and_tubers__kcal_cap_day__3_year_average__00021012__value__006121__percent:
-        title: Share of dietary energy supply derived from cereals, roots and tubers (kcal/cap/day) (3-year average) | 00021012 || Value | 006121 || Percent
+      share_of_dietary_energy_supply_derived_from_cereals__roots_and_tubers__percent__3_year_average__00021012__value__006121__percent:
+        title: Share of dietary energy supply derived from cereals, roots and tubers (3-year average) | 00021012 || Value | 006121 || Percent
         unit: percent
         short_unit: '%'
         processing_level: major
