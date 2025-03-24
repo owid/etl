@@ -222,3 +222,5 @@ steps:
     - snapshot-private://fasttrack/latest/test.csv
   data://grapher/fasttrack/latest/number_electricity_fuels_access_wb:
     - snapshot://fasttrack/latest/number_electricity_fuels_access_wb.csv
+  data://grapher/fasttrack/latest/measles_cases:
+    - snapshot://fasttrack/latest/measles_cases.csv
