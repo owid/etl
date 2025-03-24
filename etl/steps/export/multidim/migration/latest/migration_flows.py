@@ -27,12 +27,10 @@ MULTIDIM_CONFIG = {
 
 # etlr multidim
 def run() -> None:
-    # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 
-    # Add views for all dimensions
-    # NOTE: using load_data=False which only loads metadata significantly speeds this up
+    # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("migration_stock_flows")
     tb = ds.read("migrant_stock_dest_origin", load_data=False)
 
@@ -62,9 +60,14 @@ def run() -> None:
     )
     config["views"] = config_new["views"]
 
-    # 4: Upsert to DB
+    # 4: Create mdim
     mdim = paths.create_mdim(
         config=config,
         mdim_name="migration-flows",
     )
+
+    # 5: Edit order of slugs
+    mdim.sort_choices({"country_select": lambda x: sorted(x)})
+
+    # 6: Save & upload
     mdim.save()

@@ -1,13 +1,14 @@
 """Load a garden dataset and create a grapher dataset."""
 
-import pandas as pd
-from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# country_select is the country to be selected in the multidim
+# country is the country/ region which will be shown on the map
 
 
 def run() -> None:
@@ -43,10 +44,7 @@ def run() -> None:
     tb = tb.sort_values(by=["country_select"], ascending=True)
 
     # Add rows for country and country select being equal
-    tb_same_country = create_same_country_rows(tb["country_select"].unique())
-
-    # include rows for countries where country and country select are the same
-    tb = pr.concat([tb, tb_same_country])  # type: ignore
+    tb = add_same_country_rows(tb)
 
     # convert column to string and set unit
     tb["migrants"] = tb["migrants"].astype(str).copy_metadata(tb["migrants"])
@@ -63,20 +61,17 @@ def run() -> None:
     ds_grapher.save()
 
 
-def create_same_country_rows(countries):
+def add_same_country_rows(tb):
     """Create rows for countries where country and country select are the same and set migrants to 0."""
-    rows = []
-    for country in countries:
-        for year in [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024]:
-            for metric in ["immigrants", "emigrants"]:
-                for gender in ["all", "female", "male"]:
-                    row = {
-                        "country_select": country,
-                        "country": country,
-                        "year": year,
-                        "migrants": "Selected country",
-                        "metric": metric,
-                        "gender": gender,
-                    }
-                    rows.append(row)
-    return Table(pd.DataFrame(rows))
+    # Get dataframe with same-country rows
+    tb_same = tb[["country_select", "year", "gender"]].drop_duplicates()
+    tb_same.loc[:, ["emigrants", "immigrants"]] = "Selected country"
+    tb_same["country"] = tb_same["country_select"]
+
+    # Add to main table
+    tb = pr.concat([tb, tb_same])
+
+    # Ensure typing
+    cols = ["emigrants", "immigrants"]
+    tb[cols] = tb[cols].astype("string")
+    return tb
