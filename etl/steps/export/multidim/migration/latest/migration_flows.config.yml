@@ -10,9 +10,11 @@ dimensions:
     slug: metric
     choices:
       - slug: "immigrants"
-        name: "Immigrants: People moving to country"
+        name: "Immigrants"
+        description: People moving to country
       - slug: "emigrants"
-        name: "Emigrants: People moving away from country"
+        name: "Emigrants"
+        description: People moving away from country
   - name: Gender
     slug: "gender"
     choices:

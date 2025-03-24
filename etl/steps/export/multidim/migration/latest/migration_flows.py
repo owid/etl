@@ -6,6 +6,24 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+MULTIDIM_CONFIG = {
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+    "chartTypes": ["LineChart"],
+    "hasMapTab": True,
+    "tab": "map",
+    "map": {
+        "tooltipUseCustomLabels": True,
+        "colorScale": {
+            "binningStrategy": "manual",
+            "baseColorScheme": "YlGnBu",
+            "customNumericMinValue": 0,
+            "customNumericValues": [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0],
+            "customCategoryColors": {"Selected country": "#AF1629"},
+            "customCategoryLabels": {"Selected country": "Selected country"},
+        },
+    },
+}
+
 
 # etlr multidim
 def run() -> None:
@@ -27,23 +45,7 @@ def run() -> None:
     config["dimensions"][cty_idx]["choices"] = cty_dict_ls
 
     # Define common view configuration
-    common_view_config = {
-        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-        "chartTypes": ["LineChart"],
-        "hasMapTab": True,
-        "tab": "map",
-        "map": {
-            "tooltipUseCustomLabels": True,
-            "colorScale": {
-                "binningStrategy": "manual",
-                "baseColorScheme": "YlGnBu",
-                "customNumericMinValue": 0,
-                "customNumericValues": [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0],
-                "customCategoryColors": {"Selected country": "#AF1629"},
-                "customCategoryLabels": {"Selected country": "Selected country"},
-            },
-        },
-    }
+    common_view_config = MULTIDIM_CONFIG
 
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
@@ -53,7 +55,7 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
-    # 3: Combine both sources (basically dimensions and views)
+    # 3: Combine both sources
     config["dimensions"] = multidim.combine_config_dimensions(
         config_dimensions=config_new["dimensions"],
         config_dimensions_yaml=config.get("dimensions", {}),

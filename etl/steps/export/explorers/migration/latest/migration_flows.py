@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 DISPLAY_SETTINGS = {
     "colorScaleNumericMinValue": 0,
-    "colorScaleNumericBins": "1000,,;10000,,;100000,,;1000000,,;10000000",
+    "colorScaleNumericBins": "1000,,;3000,,;10000,,;30000,,;100000,,;300000,,;1000000,,;0",
     "colorScaleEqualSizeBins": True,
     "colorScaleScheme": "YlGnBu",
     "colorScaleCategoricalBins": "Selected country,#AF1629,Selected country",
