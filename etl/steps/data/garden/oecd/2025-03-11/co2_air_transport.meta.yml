@@ -189,3 +189,7 @@ tables:
         title: Change in CO₂ emissions from aviation between 2024 and 2019
         unit: tonnes
         short_unit: t
+      per_capita_emissions_difference:
+        title: Change in per capita CO₂ emissions from aviation between 2024 and 2019
+        unit: kilograms
+        short_unit: kg
