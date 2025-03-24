@@ -188,7 +188,7 @@ class Snapshot:
             meta = ruamel_load(f)
 
         # If the file already exists with the same md5, skip the upload
-        if meta["outs"] and meta["outs"][0]["md5"] == md5:
+        if meta.get("outs") and meta["outs"][0]["md5"] == md5:
             log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
             return
 
@@ -479,26 +479,31 @@ class SnapshotMeta(MetaBase):
 
     def save(self) -> None:  # type: ignore
         self.path.parent.mkdir(exist_ok=True, parents=True)
+        with open(self.path, "w") as f:
+            f.write(self.to_yaml())
 
-        # Create new file
-        if not self.path.exists():
-            with open(self.path, "w") as f:
-                f.write(self.to_yaml())
-        # Edit existing file, keep outs
-        else:
-            # Load outs from existing file
-            with open(self.path, "r") as f:
-                yaml = ruamel_load(f)
-                outs = yaml["outs"]
-                wdir = yaml.get("wdir", None)
+    # def save(self) -> None:  # type: ignore
+    #     self.path.parent.mkdir(exist_ok=True, parents=True)
 
-            # Save metadata to file
-            meta = self._meta_to_dict()
-            with open(self.path, "w") as f:
-                d = {"meta": meta, "outs": outs}
-                if wdir:
-                    d["wdir"] = wdir
-                f.write(yaml_dump(d))
+    #     # Create new file
+    #     if not self.path.exists():
+    #         with open(self.path, "w") as f:
+    #             f.write(self.to_yaml())
+    #     # Edit existing file, keep outs
+    #     else:
+    #         # Load outs from existing file
+    #         with open(self.path, "r") as f:
+    #             yaml = ruamel_load(f)
+    #             outs = yaml.get("outs", None)
+    #             wdir = yaml.get("wdir", None)
+
+    #         # Save metadata to file
+    #         meta = self._meta_to_dict()
+    #         with open(self.path, "w") as f:
+    #             d = {"meta": meta, "outs": outs}
+    #             if wdir:
+    #                 d["wdir"] = wdir
+    #             f.write(yaml_dump(d))
 
     @property
     def uri(self):
