@@ -5,9 +5,9 @@ default_selection:
   - World
 dimensions:
   - name: Country
-    slug: country_origin_or_dest
+    slug: country_select
   - name: Metric
-    slug: indicator
+    slug: metric
     choices:
       - slug: "immigrants"
         name: "Immigrants"

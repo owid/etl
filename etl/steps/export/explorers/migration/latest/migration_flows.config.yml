@@ -32,9 +32,9 @@ config:
 
 dimensions:
   - name: Country
-    slug: country_origin_or_dest
+    slug: country_select
   - name: Metric
-    slug: indicator
+    slug: metric
     presentation:
       type: radio
     choices:

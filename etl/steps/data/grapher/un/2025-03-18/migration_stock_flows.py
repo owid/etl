@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import pandas as pd
+from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.helpers import PathFinder
@@ -15,22 +17,41 @@ def run() -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("migration_stock_flows")
     ds_regions = paths.load_dataset("regions")
-    # Read table from garden dataset.
-    tb = ds_garden.read("migration_stock_flows")
-    regions = ds_regions.read("regions")
 
-    #
-    # Processing
-    #
-    # Keep only relevant countries
+    # Read table from garden dataset.
+    tb = ds_garden.read("migrant_stock_dest_origin")
+    regions = ds_regions.read("regions")
     countries = regions[regions["region_type"] == "country"]["name"].unique()
-    tb = tb.loc[tb["country_origin_or_dest"].isin(countries)]
+
+    # Copy table
+    tb_switched = tb.copy(deep=True)
+
+    # rename columns, so that "country select" is country to be selected in mdim
+    # and "country" is the country of origin, which will be shown on the map
+    tb = tb.rename(columns={"country_destination": "country_select", "country_origin": "country"})
+    tb["metric"] = "immigrants"
+
+    # the other way around for the second table
+    tb_switched = tb_switched.rename(columns={"country_destination": "country", "country_origin": "country_select"})
+    tb_switched["metric"] = "emigrants"
+
+    # combine tables
+    tb = pr.concat([tb, tb_switched])
+
+    # remove regions as "country_select" dimension and sort countries
+    tb = tb[tb["country_select"].isin(countries)]
+    tb = tb.sort_values(by=["country_select"], ascending=True)
 
     # Add rows for country and country select being equal
-    tb = add_same_country_rows(tb)
+    tb_same_country = create_same_country_rows(tb["country_select"].unique())
 
-    # Format
-    tb = tb.format(["country", "country_origin_or_dest", "year", "gender"])
+    # include rows for countries where country and country select are the same
+    tb = pr.concat([tb, tb_same_country])  # type: ignore
+
+    # convert column to string and set unit
+    tb["migrants"] = tb["migrants"].astype(str).copy_metadata(tb["migrants"])
+
+    tb = tb.format(["country", "country_select", "metric", "gender", "year"])
 
     #
     # Save outputs.
@@ -42,17 +63,20 @@ def run() -> None:
     ds_grapher.save()
 
 
-def add_same_country_rows(tb):
+def create_same_country_rows(countries):
     """Create rows for countries where country and country select are the same and set migrants to 0."""
-    # Get dataframe with same-country rows
-    tb_same = tb[["country_origin_or_dest", "year", "gender"]].drop_duplicates()
-    tb_same.loc[:, ["emigrants", "immigrants"]] = "Selected country"
-    tb_same["country"] = tb_same["country_origin_or_dest"]
-
-    # Add to main table
-    tb = pr.concat([tb, tb_same])
-
-    # Ensure typing
-    cols = ["emigrants", "immigrants"]
-    tb[cols] = tb[cols].astype("string")
-    return tb
+    rows = []
+    for country in countries:
+        for year in [1990, 1995, 2000, 2005, 2010, 2015, 2020, 2024]:
+            for metric in ["immigrants", "emigrants"]:
+                for gender in ["all", "female", "male"]:
+                    row = {
+                        "country_select": country,
+                        "country": country,
+                        "year": year,
+                        "migrants": "Selected country",
+                        "metric": metric,
+                        "gender": gender,
+                    }
+                    rows.append(row)
+    return Table(pd.DataFrame(rows))
