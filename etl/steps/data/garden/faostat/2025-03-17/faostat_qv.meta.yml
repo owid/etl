@@ -12,7 +12,7 @@ definitions:
 tables:
   faostat_qv_flat:
     variables:
-      agriculture__00002051__gross_production_value__current_thousand_usd__000057__1000_usd:
+      agriculture__00002051__gross_production_value__current_thousand_usd__000057__thousand_us_dollar:
         title: Agriculture | 00002051 || Gross Production Value (current thousand US$) | 000057 || 1000 USD
         unit: current thousand US$
         short_unit: '$'
