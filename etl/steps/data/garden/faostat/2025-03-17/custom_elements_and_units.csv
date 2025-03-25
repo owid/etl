@@ -43,3 +43,5 @@
 "faostat_rfn","005159","Use per area of cropland","Use per area of cropland","Kilograms per hectare","kg/ha","kilograms per hectare","kg/ha",,,,,0,0
 "faostat_rl","007208","Share in Agricultural land","Share in agricultural land","Percent","%","percent","%",,,,,0,0
 "faostat_rl","007209","Share in Land area","Share in land area","Percent","%","percent","%",,,,,0,0
+"faostat_rp","005157","Agricultural Use","Agricultural use","Tonnes","t","tonnes","t",,,,,0,0
+"faostat_rp","005159","Use per area of cropland","Use per area of cropland","Kilograms per hectare","kg/ha","kilograms per hectare","kg/ha",,,,,0,0
