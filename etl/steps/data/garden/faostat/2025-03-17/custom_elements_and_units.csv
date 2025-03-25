@@ -34,3 +34,7 @@
 "faostat_fs","006128","Value","Value","Kilocalories per capita per day","kcal/cap/d","kilocalories per person per day","kcal",,,,,0,0
 "faostat_fs","006132","Value","Value","million Number","million No","people","",1000000,,,,0,0
 "faostat_fs","006121","Value","Value","Percent","%","percent","%",,,,,0,0
+"faostat_lc","005006","Area from CGLS","Area from CGLS","thousand Hectares","1000 ha","hectares","ha",1000,,,,0,0
+"faostat_lc","005008","Area from CCI_LC","Area from CCI_LC","thousand Hectares","1000 ha","hectares","ha",1000,,,,0,0
+"faostat_lc","005007","Area from MODIS","Area from MODIS","thousand Hectares","1000 ha","hectares","ha",1000,,,,0,0
+"faostat_lc","005013","Area from WorldCover","Area from WorldCover","thousand Hectares","1000 ha","hectares","ha",1000,,,,0,0
