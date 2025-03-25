@@ -1,0 +1,74 @@
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+tables:
+  faostat_fs_flat:
+    variables:
+      minimum_dietary_energy_requirement__kcal_cap_day__00021056__value__006128__kilocalories_per_person_per_day:
+        display:
+          name: Minimum dietary energy requirement
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Minimum dietary energy requirement
+      number_of_moderately_or_severely_food_insecure_people__million__3_year_average__00210081__value__006132__people:
+        display:
+          name: Number of moderately or severely food insecure people
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of moderately or severely food insecure people
+          title_variant: 3-year average
+      number_of_severely_food_insecure_people__million__3_year_average__00210071__value__006132__people:
+        display:
+          name: Number of severely food insecure people
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Number of severely food insecure people
+          title_variant: 3-year average
+      number_of_severely_food_insecure_people__million__annual_value__00210070__value__006132__people:
+        display:
+          name: Number of severely food insecure people
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Number of severely food insecure people
+          title_variant: annual value
+      percentage_of_children_under_5_years_of_age_who_are_stunted__modelled_estimates__percent__00021025__value__006121__percent:
+        display:
+          name: Percentage of children under five years of age who are stunted
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Percentage of children under five years of age who are stunted (Percent)
+      prevalence_of_moderate_or_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210091__value__006121__percent:
+        display:
+          name: Prevalence of moderate or severe food insecurity in the total population
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Prevalence of moderate or severe food insecurity in the total population
+          title_variant: 3-year average
+      prevalence_of_severe_food_insecurity_in_the_total_population__percent__3_year_average__00210401__value__006121__percent:
+        display:
+          name: Prevalence of severe food insecurity in the total population
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Prevalence of severe food insecurity in the total population
+          title_variant: 3-year average
+      prevalence_of_undernourishment__percent__annual_value__00210040__value__006121__percent:
+        display:
+          name: Prevalence of undernourishment
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Prevalence of undernourishment
+          title_variant: annual value
+      share_of_dietary_energy_supply_derived_from_cereals__roots_and_tubers__percent__3_year_average__00021012__value__006121__percent:
+        display:
+          name: Share of dietary energy supply derived from cereals, roots and tubers
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Share of dietary energy supply derived from cereals, roots and tubers
