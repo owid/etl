@@ -632,11 +632,11 @@ def prepare_variable_description(item: str, element: str, item_description: str,
     description : str
         Variable description.
     """
-    description = f"Item: {item}\n"
+    description = f"Item: {item}\n\n"
     if len(item_description) > 0:
         description += f"Description: {item_description}\n"
 
-    description += f"\nMetric: {element}\n"
+    description += f"\nMetric: {element}\n\n"
     if len(element_description) > 0:
         description += f"Description: {element_description}"
 
