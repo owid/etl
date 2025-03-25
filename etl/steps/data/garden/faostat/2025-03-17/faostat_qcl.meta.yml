@@ -9,6 +9,9 @@ definitions:
         - Agricultural Production
       attribution_short: FAO
 
+# NOTE: You can modify all indicators' metadata below.
+# However, it is preferrable to change unit and short_unit in the custom_elements_and_units.csv.
+# After any modifications to the `custom_*.csv` files, remember to run the `faostat_metadata` garden step again.
 tables:
   faostat_qcl_flat:
     variables:
