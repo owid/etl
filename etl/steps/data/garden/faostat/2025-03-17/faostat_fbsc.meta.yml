@@ -1,0 +1,541 @@
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+# NOTE: You can modify all indicators' metadata below.
+# However, it is preferrable to change unit and short_unit in the custom_elements_and_units.csv.
+# After any modifications to the `custom_*.csv` files, remember to run the `faostat_metadata` garden step again.
+tables:
+  faostat_fbsc_flat:
+    variables:
+      alcoholic_beverages__00002924__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from alcoholic beverages
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from alcoholic beverages
+      all_egg_products__00002744__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from all egg products
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from all egg products
+      all_egg_products__00002744__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from egg products
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from egg products
+      animal_products__00002941__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from animal products
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from animal products
+      animal_fats_group__00002946__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from animal fats
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from animal fats
+      apples__00002617__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of apples
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of apples
+      bananas__00002615__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of bananas
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of bananas
+      barley__00002513__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from barley
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from barley
+      cephalopods__00002766__production__005511__tonnes:
+        display:
+          name: Production of cephalopods
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Production of cephalopods
+      cereals__excluding_beer__00002905__exports__005911__tonnes:
+        display:
+          name: Cereal exports
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Cereal exports
+      cereals__excluding_beer__00002905__feed__005521__tonnes:
+        display:
+          name: Cereals allocated to animal feed
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Cereals allocated to animal feed
+      cereals__excluding_beer__00002905__food__005142__tonnes:
+        display:
+          name: Cereals allocated to food
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Cereals allocated to food
+      cereals__excluding_beer__00002905__imports__005611__tonnes:
+        display:
+          name: Cereal imports
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Cereal imports
+      cereals__excluding_beer__00002905__other_uses__005154__tonnes:
+        display:
+          name: Other uses of cereals
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Other uses of cereals
+      cereals__excluding_beer__00002905__processing__005131__tonnes:
+        display:
+          name: Processing of cereals
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Processing of cereals
+      cereals__other__00002520__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from other cereals
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from other cereals
+      citrus__other__00002614__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of other citrus
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of other citrus
+      cocoa_beans__00002633__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of cocoa beans
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of cocoa beans
+      crustaceans__00002765__production__005511__tonnes:
+        display:
+          name: Production of crustaceans
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Production of crustaceans
+      dates__00002619__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of dates
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of dates
+      demersal_fish__00002762__production__005511__tonnes:
+        display:
+          name: Production of demersal fish
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Production of demersal fish
+      eggs__00002949__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of eggs
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of eggs
+      eggs__00002949__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from eggs
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from eggs
+      fish_and_seafood__00002960__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of fish and seafood
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of fish and seafood
+      fish_and_seafood__00002960__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from fish and seafood
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from fish and seafood
+      fish_and_seafood__00002960__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from fish and seafood
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from fish and seafood
+      fish_and_seafood__00002960__production__005511__tonnes:
+        display:
+          name: Production of fish and seafood
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Production of fish and seafood
+      freshwater_fish__00002761__production__005511__tonnes:
+        display:
+          name: Production of freshwater fish
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Production of freshwater fish
+      fruit__00002919__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of fruit
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of fruit
+      fruit__00002919__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from fruit
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from fruit
+      fruits__other__00002625__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of other fruits
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of other fruits
+      grapefruit__00002613__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of grapefruit
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of grapefruit
+      grapes_and_products__excl_wine__00002620__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        description_short: |-
+          Grapes, raisins, and grape juice are included, but not wine.
+        display:
+          name: Per capita consumption of grape products, excluding wine
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of grape products, excluding wine
+      lemons_and_limes__00002612__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of lemons and limes
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of lemons and limes
+      maize__00002514__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from maize
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from maize
+      marine_fish__other__00002764__production__005511__tonnes:
+        display:
+          name: Production of other marine fish
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Production of other marine fish
+      meat__other__00002735__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of other meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of other meat
+      meat__other__00002735__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from other meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from other meat
+      meat__other__00002735__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from other meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from other meat
+      meat__beef__00002731__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of beef
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of beef
+      meat__beef__00002731__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from beef
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from beef
+      meat__beef__00002731__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from beef
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from beef
+      meat__pig__00002733__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of pig meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of pig meat
+      meat__pig__00002733__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from pig meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from pig meat
+      meat__pig__00002733__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from pig meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from pig meat
+      meat__poultry__00002734__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of poultry meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of poultry meat
+      meat__poultry__00002734__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from poultry meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from poultry meat
+      meat__poultry__00002734__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from poultry meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from poultry meat
+      meat__sheep_and_goat__00002732__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of sheep and goat meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of sheep and goat meat
+      meat__sheep_and_goat__00002732__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from sheep and goat meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from sheep and goat meat
+      meat__sheep_and_goat__00002732__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from sheep and goat meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from sheep and goat meat
+      meat__total__00002943__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of meat
+      meat__total__00002943__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from meat
+      meat__total__00002943__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from meat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from meat
+      milk__excluding_butter__00002848__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of milk, excluding butter
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of milk, excluding butter
+      milk__excluding_butter__00002848__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from milk, excluding butter
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from milk, excluding butter
+      milk__excluding_butter__00002848__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from milk, excluding butter
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from milk, excluding butter
+      milk__00002948__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from milk
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from milk
+      milk__00002948__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from milk
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from milk
+      miscellaneous_group__00002928__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from other food commodities
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from other food commodities
+      molluscs__other__00002767__production__005511__tonnes:
+        display:
+          name: Production of other molluscs
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Production of other molluscs
+      nuts__00002551__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from nuts
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from nuts
+      oilcrops__00002913__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from oilcrops
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from oilcrops
+      oranges__00002611__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of oranges
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of oranges
+      palm_oil__00002577__imports__005611__tonnes:
+        display:
+          name: Palm oil imports
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Palm oil imports
+      pelagic_fish__00002763__production__005511__tonnes:
+        display:
+          name: Production of pelagic fish
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Production of pelagic fish
+      pineapples__00002618__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of pineapples
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of pineapples
+      plantains__00002616__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of plantains
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of plantains
+      # population__00002501__total_population__both_sexes__000511__thousand_number:
+      #   display:
+      #     name: Population
+      #     numDecimalPlaces: 0
+      #   presentation:
+      #     title_public: Population
+      pulses__00002911__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from pulses
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from pulses
+      rice__00002807__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from rice
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from rice
+      soybeans__00002555__feed__005521__tonnes:
+        display:
+          name: Soybeans allocated to animal feed
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Soybeans allocated to animal feed
+      soybeans__00002555__food__005142__tonnes:
+        display:
+          name: Soybeans allocated to food
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Soybeans allocated to food
+      soybeans__00002555__processing__005131__tonnes:
+        display:
+          name: Processing of soybeans
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Processing of soybeans
+      starchy_roots__00002907__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from starchy roots
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from starchy roots
+      sugar__and__sweeteners__00002909__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from sugar and sweeteners
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from sugar and sweeteners
+      sugar_crops__00002908__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from sugar crops
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from sugar crops
+      total__00002901__food_available_for_consumption__000664__kilocalories_per_day:
+        display:
+          name: Food available for consumption
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Food available for consumption
+      total__00002901__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Total daily supply of calories
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Total daily supply of calories
+      total__00002901__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Total daily supply of protein
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Total daily supply of protein
+      total__00002901__food_available_for_consumption__0684pc__grams_of_fat_per_day_per_capita:
+        display:
+          name: Daily fat supply
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily fat supply
+      vegetable_oils__00002914__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from vegetable oils
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from vegetable oils
+      vegetables__00002918__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
+        display:
+          name: Per capita consumption of vegetables
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Per capita consumption of vegetables
+      vegetables__00002918__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from vegetables
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from vegetables
+      vegetal_products__00002903__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from vegetal products
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from vegetal products
+      vegetal_products__00002903__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
+        display:
+          name: Daily supply of protein from vegetal products
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of protein from vegetal products
+      wheat__00002511__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
+        display:
+          name: Daily supply of calories from wheat
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Daily supply of calories from wheat

@@ -65,13 +65,18 @@ def _get_publication_date() -> date:
     else:
         raise ValueError(f"HTML in source may have changed. No element of class '{html_class}' was found.")
     # Extract date
-    match = re.search(r"Last update: (\d\d\-\d\d\-20\d\d)", date_raw)
-    if match:
-        date_str = match.group(1)
+    match1 = re.search(r"Last update: (\d\d-\d\d-20\d\d)", date_raw)
+    match2 = re.search(r"Last update: (\d\d/\d\d/20\d\d)", date_raw)
+    if match1:
+        date_str = match1.group(1)
+        date_format = "%d-%m-%Y"
+    elif match2:
+        date_str = match2.group(1)
+        date_format = "%m/%d/%Y"
     else:
         raise ValueError("No match was found! RegEx did not work, perhaps the date format has changed.")
     # Format date YYYY-MM-DD
-    return datetime.strptime(date_str, "%d-%m-%Y").date()
+    return datetime.strptime(date_str, date_format).date()
 
 
 if __name__ == "__main__":
