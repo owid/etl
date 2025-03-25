@@ -1,5 +1,3 @@
-import copy
-
 from etl.collections.explorer import combine_config_dimensions, expand_config, hack_metadata_propagation
 
 # from etl.db import get_engine
