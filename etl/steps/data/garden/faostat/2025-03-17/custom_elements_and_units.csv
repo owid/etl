@@ -38,3 +38,6 @@
 "faostat_lc","005008","Area from CCI_LC","Area from CCI_LC","thousand Hectares","1000 ha","hectares","ha",1000,,,,0,0
 "faostat_lc","005007","Area from MODIS","Area from MODIS","thousand Hectares","1000 ha","hectares","ha",1000,,,,0,0
 "faostat_lc","005013","Area from WorldCover","Area from WorldCover","thousand Hectares","1000 ha","hectares","ha",1000,,,,0,0
+"faostat_rfn","005157","Agricultural Use","Agricultural use","Tonnes","t","tonnes","t",,,,,0,0
+"faostat_rfn","005510","Production","Production","Tonnes","t","tonnes","t",,,,,0,0
+"faostat_rfn","005159","Use per area of cropland","Use per area of cropland","Kilograms per hectare","kg/ha","kilograms per hectare","kg/ha",,,,,0,0
