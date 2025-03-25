@@ -1,5 +1,3 @@
-import copy
-
 from etl.collections import multidim
 
 # from etl.db import get_engine
@@ -47,7 +45,7 @@ def run() -> None:
     # Define common view configuration
     common_view_config = MULTIDIM_CONFIG
 
-    # 2: Bake config automatically from table
+    # Bake config automatically from table
     config_new = multidim.expand_config(
         tb,  # type: ignore
         indicator_names=["migrants"],
@@ -55,28 +53,21 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
-    # 3: Combine both sources
+    # Combine both sources
     config["dimensions"] = multidim.combine_config_dimensions(
         config_dimensions=config_new["dimensions"],
         config_dimensions_yaml=config.get("dimensions", {}),
     )
     config["views"] = config_new["views"]
 
-    # 4: Remove selected country from entity selector
-    config["views"] = [copy.deepcopy(view) for view in config["views"]]  # doesn't work without deepcopy, why?
-
-    for view in config["views"]:
-        country_in_view = view["dimensions"]["country_select"]
-        view["config"]["excludedEntityNames"] = [country_in_view]
-
-    # 5: Create mdim
+    # Create mdim
     mdim = paths.create_mdim(
         config=config,
         mdim_name="migration-flows",
     )
 
-    # 6: Edit order of slugs
+    # Edit order of slugs
     mdim.sort_choices({"country_select": lambda x: sorted(x)})
 
-    # 7: Save & upload
+    # Save & upload
     mdim.save()
