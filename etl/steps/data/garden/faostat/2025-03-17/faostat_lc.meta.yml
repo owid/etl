@@ -18,7 +18,6 @@ tables:
       artificial_surfaces__including_urban_and_associated_areas__00006970__area_from_cgls__005006__hectares:
         description_key:
           - Land cover information is based on maps from the European Copernicus Global Land Service (CGLS), with a spatial resolution of 100m.
-        processing_level: major
         display:
           name: Area of artificial surfaces, including urban and associated areas
           numDecimalPlaces: 2
@@ -27,7 +26,6 @@ tables:
       inland_water_bodies__00006981__area_from_cgls__005006__hectares:
         description_key:
           - Land cover information is based on maps from the European Copernicus Global Land Service (CGLS), with a spatial resolution of 100m.
-        processing_level: major
         display:
           name: Area of inland water bodies
           numDecimalPlaces: 2
@@ -36,7 +34,6 @@ tables:
       shrub_covered_areas__00006976__area_from_cci_lc__005008__hectares:
         description_key:
           - Land cover information is based on maps from the European Spatial Agency (ESA) Climate Change Initiative (CCI) produced by the Université catholique de Louvain (UCL)-Geomatics and now under the European Copernicus Program.
-        processing_level: major
         display:
           name: Area of shrub-covered land
           numDecimalPlaces: 2

@@ -15,7 +15,6 @@ tables:
       fungicides_and_bactericides__00001331__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Fungicide and bactericide use
           shortUnit: t
@@ -25,7 +24,6 @@ tables:
       herbicides__00001320__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Herbicide use
           shortUnit: t
@@ -35,7 +33,6 @@ tables:
       insecticides__00001309__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Insecticide use
           shortUnit: t
@@ -45,7 +42,6 @@ tables:
       other_pesticides_nes__00001355__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Other pesticide use
           shortUnit: t
@@ -55,7 +51,6 @@ tables:
       pesticides__total__00001357__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Total pesticide use
           shortUnit: t
@@ -65,7 +60,6 @@ tables:
       pesticides__total__00001357__use_per_area_of_cropland__005159__kilograms_per_hectare:
         unit: kilograms per hectare
         short_unit: kg/ha
-        processing_level: major
         display:
           name: Total pesticide use per area of cropland
           shortUnit: kg/ha
@@ -75,7 +69,6 @@ tables:
       plant_growth_regulators__00001341__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Plant growth regulator use
           shortUnit: t
@@ -85,7 +78,6 @@ tables:
       rodenticides__00001345__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Rodenticide use
           shortUnit: t

@@ -18,7 +18,6 @@ tables:
       # credit_to_agriculture__forestry_and_fishing__00023068__agriculture_orientation_index_usd__006159:
       #   description_short: |-
       #     A value greater than 1 means the agriculture sector receives a higher share of government spending relative to its economic value. A value less than 1 reflects a lower orientation to agriculture.
-      #   processing_level: major
       #   display:
       #     name: "Agriculture orientation index: Credit to agriculture, forestry and fishing"
       #     numDecimalPlaces: 2

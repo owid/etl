@@ -15,7 +15,6 @@ tables:
       nutrient_nitrogen_n__total__00003102__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Nitrogen fertilizer user
           shortUnit: t
@@ -25,7 +24,6 @@ tables:
       nutrient_nitrogen_n__total__00003102__production__005510__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Nitrogen fertilizer production
           shortUnit: t
@@ -35,7 +33,6 @@ tables:
       nutrient_nitrogen_n__total__00003102__use_per_area_of_cropland__005159__kilograms_per_hectare:
         unit: kilograms per hectare
         short_unit: kg/ha
-        processing_level: major
         display:
           name: Nitrogen fertilizer use per area of cropland
           shortUnit: kg/ha
@@ -45,7 +42,6 @@ tables:
       nutrient_phosphate_p2o5__total__00003103__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Phosphate fertilizer use
           shortUnit: t
@@ -55,7 +51,6 @@ tables:
       nutrient_phosphate_p2o5__total__00003103__production__005510__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Phosphate fertilizer production
           shortUnit: t
@@ -65,7 +60,6 @@ tables:
       nutrient_phosphate_p2o5__total__00003103__use_per_area_of_cropland__005159__kilograms_per_hectare:
         unit: kilograms per hectare
         short_unit: kg/ha
-        processing_level: major
         display:
           name: Phosphate fertilizer use per area of cropland
           shortUnit: kg/ha
@@ -75,7 +69,6 @@ tables:
       nutrient_potash_k2o__total__00003104__agricultural_use__005157__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Potash fertilizer use
           shortUnit: t
@@ -85,7 +78,6 @@ tables:
       nutrient_potash_k2o__total__00003104__production__005510__tonnes:
         unit: tonnes
         short_unit: t
-        processing_level: major
         display:
           name: Potash fertilizer production
           shortUnit: t
@@ -95,7 +87,6 @@ tables:
       nutrient_potash_k2o__total__00003104__use_per_area_of_cropland__005159__kilograms_per_hectare:
         unit: kilograms per hectare
         short_unit: kg/ha
-        processing_level: major
         display:
           name: Potash fertilizer use per area of cropland
           shortUnit: kg/ha

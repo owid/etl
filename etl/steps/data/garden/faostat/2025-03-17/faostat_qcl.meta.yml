@@ -437,7 +437,6 @@ tables:
           title_public: Milk production
       # milk__00001780__yield__005420__kilograms_per_animal:
       #   title: Milk | 00001780 || Yield | 005420 || kilograms per animal
-      #   processing_level: major
       #   display:
       #     name: Milk yield per animal
       #     numDecimalPlaces: 2
