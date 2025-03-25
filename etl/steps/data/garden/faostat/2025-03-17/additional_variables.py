@@ -639,7 +639,7 @@ def generate_fertilizers(tb_rfn: Table, tb_rl: Table) -> Table:
 
     # Sanity checks.
     error = "Unit for use per area has changed."
-    assert list(fertilizers["unit"].unique()) == ["Kilograms per hectare"], error
+    assert list(fertilizers["unit"].unique()) == ["kilograms per hectare"], error
 
     error = "Unexpected list of item codes for fertilizers (maybe another was added to faostat_rfn)."
     assert set(fertilizers["item_code"]) == set(ITEM_CODES_FOR_FERTILIZERS), error
