@@ -392,8 +392,10 @@ def combine_tables(tb_extra: Table, tb_nonstate: Table, tb_inter: Table, tb_intr
     )
     # Keep correct year coverage by conflict type
     tb = tb[
+        # ALL (2003)
+        ((tb["conflict_type"].isin(["all"])) & (tb["year"] <= 2003))
         # EXTRA, NON-STATE, ALL (2007)
-        ((tb["conflict_type"].isin([CTYPE_EXTRA, CTYPE_NONSTATE, "all"])) & (tb["year"] <= 2007))
+        | ((tb["conflict_type"].isin([CTYPE_EXTRA, CTYPE_NONSTATE])) & (tb["year"] <= 2007))
         # INTER, STATE-BASED (2010)
         | ((tb["conflict_type"].isin([CTYPE_INTER, CTYPE_SBASED])) & (tb["year"] <= 2010))
         # INTRA (2014)
