@@ -224,3 +224,5 @@ steps:
     - snapshot://fasttrack/latest/number_electricity_fuels_access_wb.csv
   data://grapher/fasttrack/latest/measles_cases:
     - snapshot://fasttrack/latest/measles_cases.csv
+  data://grapher/fasttrack/latest/housing_construction_permits_europe:
+    - snapshot://fasttrack/latest/housing_construction_permits_europe.csv
