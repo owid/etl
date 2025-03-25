@@ -1,3 +1,5 @@
+import copy
+
 from etl.collections.explorer import combine_config_dimensions, expand_config, hack_metadata_propagation
 
 # from etl.db import get_engine
@@ -16,7 +18,6 @@ DISPLAY_SETTINGS = {
 
 
 def run() -> None:
-    # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_mdim_config()
 
@@ -47,22 +48,22 @@ def run() -> None:
     )
     config["views"] = config_new["views"]
 
-    # 4: Create explorer
+    # 6: Create explorer
     explorer = paths.create_explorer(
         config=config,
         explorer_name="migration-flows",
     )
 
-    # 5: Edit order of slugs
+    # 7: Edit order of slugs
     explorer.sort_choices({"country_select": lambda x: sorted(x)})
 
-    # 6: Set display settings
+    # 8: Set display settings
     add_display_settings(explorer)
 
-    # 7: HACK
+    # 9: HACK
     hack_metadata_propagation(explorer, [tb])
 
-    # 8: Save explorer to DB
+    # 10: Save explorer to DB
     explorer.save()
 
 

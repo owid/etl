@@ -24,22 +24,25 @@ def run() -> None:
     regions = ds_regions.read("regions")
     countries = regions[regions["region_type"] == "country"]["name"].unique()
 
-    # Copy table
+    #
+    # Create table where indicator is split into immigrants and emigrants instead of having country_origin and country_destination
+    #
+    # Copying the table to include both directions of flows between countries
     tb_switched = tb.copy(deep=True)
 
-    # rename columns, so that "country select" is country to be selected in mdim
+    # Rename columns, so that "country select" is country to be selected in mdim
     # and "country" is the country of origin, which will be shown on the map
     tb = tb.rename(columns={"country_destination": "country_select", "country_origin": "country"})
     tb["metric"] = "immigrants"
 
-    # the other way around for the second table
+    # the other way around (country is now country of destination) for the second table
     tb_switched = tb_switched.rename(columns={"country_destination": "country", "country_origin": "country_select"})
     tb_switched["metric"] = "emigrants"
 
     # combine tables
     tb = pr.concat([tb, tb_switched])
 
-    # remove regions as "country_select" dimension and sort countries
+    # remove regions as from mdim dropdown and sort values
     tb = tb[tb["country_select"].isin(countries)]
     tb = tb.sort_values(by=["country_select"], ascending=True)
 
@@ -51,9 +54,6 @@ def run() -> None:
 
     tb = tb.format(["country", "country_select", "metric", "gender", "year"])
 
-    #
-    # Save outputs.
-    #
     # Initialize a new grapher dataset.
     ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
 
@@ -62,7 +62,7 @@ def run() -> None:
 
 
 def add_same_country_rows(tb):
-    """Create rows for countries where country and country select are the same and set migrants to 0."""
+    """Create rows for countries where country and country select are the same and set value to "Selected country"."""
     # Get dataframe with same-country rows
     tb_same = tb[["country_select", "year", "gender", "metric"]].drop_duplicates()
     tb_same.loc[:, ["migrants"]] = "Selected country"
