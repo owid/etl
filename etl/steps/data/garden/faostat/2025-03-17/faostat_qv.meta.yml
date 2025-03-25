@@ -13,12 +13,8 @@ tables:
   faostat_qv_flat:
     variables:
       agriculture__00002051__gross_production_value__current_thousand_usd__000057__thousand_us_dollar:
-        unit: current thousand US$
-        short_unit: '$'
-        processing_level: major
         display:
           name: Gross production value of the agricultural sector
-          shortUnit: ''
           numDecimalPlaces: 2
         presentation:
           title_public: Gross production value of the agricultural sector
