@@ -131,3 +131,33 @@ steps:
     - snapshot://usda_ers/2024-05-23/food_availability.xls
   data://garden/usda_nass/2024-03-26/us_corn_yields:
     - data://meadow/usda_nass/2024-03-26/us_corn_yields
+  #
+  # Food expenditure in US - USDA
+  #
+  data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive:
+    - snapshot://usda_ers/2024-03-26/food_expenditure_in_us_archive.xlsx
+  data://meadow/usda_ers/2024-03-26/food_expenditure_in_us:
+    - snapshot://usda_ers/2024-03-26/food_expenditure_in_us.xlsx
+  data://garden/usda_ers/2024-03-26/food_expenditure_in_us:
+    - data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive
+    - data://meadow/usda_ers/2024-03-26/food_expenditure_in_us
+  data://grapher/usda_ers/2024-03-26/food_expenditure_in_us:
+    - data://garden/usda_ers/2024-03-26/food_expenditure_in_us
+  #
+  # Food expenditure - USDA
+  #
+  data://meadow/usda_ers/2024-03-26/food_expenditure:
+    - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
+  data://garden/usda_ers/2024-03-26/food_expenditure:
+    - data://meadow/usda_ers/2024-03-26/food_expenditure
+  data://grapher/usda_ers/2024-03-26/food_expenditure:
+    - data://garden/usda_ers/2024-03-26/food_expenditure
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://meadow/wb/2024-03-26/food_prices_for_nutrition:
+    - snapshot://wb/2024-03-26/food_prices_for_nutrition.csv
+  data://garden/wb/2024-03-26/food_prices_for_nutrition:
+    - data://meadow/wb/2024-03-26/food_prices_for_nutrition
+  data://grapher/wb/2024-03-26/food_prices_for_nutrition:
+    - data://garden/wb/2024-03-26/food_prices_for_nutrition
