@@ -1,0 +1,13 @@
+meta:
+  origin:
+    producer: USDA National Agricultural Statistics Service (NASS)
+    title: Long-term corn yields in United States
+    citation_full: |-
+      National Agricultural Statistics Service of the United States Department of Agriculture (USDA/NASS) - Long-term corn yields in United States (2024).
+    attribution_short: USDA/NASS
+    url_main: https://quickstats.nass.usda.gov/
+    date_accessed: '2025-03-26'
+    date_published: '2024-03-25'
+    license:
+      name: Public domain
+      url: https://www.nass.usda.gov/Data_and_Statistics/Citation_Request/index.php
