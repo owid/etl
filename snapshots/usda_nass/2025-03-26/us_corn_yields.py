@@ -49,11 +49,11 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
     type=bool,
     help="Upload snapshot",
 )
-def main(path_to_file: str, upload: bool) -> None:
+def run(path_to_file: str, upload: bool) -> None:
     # Create new snapshot.
     snap = Snapshot(f"usda_nass/{SNAPSHOT_VERSION}/us_corn_yields.csv")
     snap.create_snapshot(filename=path_to_file, upload=upload)
 
 
 if __name__ == "__main__":
-    main()
+    run()

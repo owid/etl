@@ -2,7 +2,7 @@
 
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -14,17 +14,17 @@ ITEM_CODE_FOR_WHEAT = "00000015"
 ELEMENT_CODE_FOR_YIELD = "005419"
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load long-term wheat yield data from Bayliss-Smith & Wanmali (1984), and read its main table.
     ds_bayliss = paths.load_dataset("bayliss_smith_wanmali_1984")
-    tb_bayliss = ds_bayliss["long_term_wheat_yields"].reset_index()
+    tb_bayliss = ds_bayliss.read("long_term_wheat_yields")
 
     # Load faostat data on crops and livestock products, and read its main table.
     ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl["faostat_qcl"].reset_index()
+    tb_qcl = ds_qcl.read("faostat_qcl")
 
     #
     # Process data.
@@ -58,5 +58,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[combined], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[combined])
     ds_garden.save()

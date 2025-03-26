@@ -3,7 +3,7 @@
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -50,25 +50,25 @@ def run_sanity_checks_on_inputs(tb_qcl: Table, tb_us: Table, tb_uk: Table, tb_wh
     assert set(tb_qcl["year"]) <= set(tb_wheat["year"])
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load FAOSTAT QCL dataset and read its main table.
     ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl["faostat_qcl"].reset_index()
+    tb_qcl = ds_qcl.read("faostat_qcl")
 
     # Load the UK long-term yields dataset and read its main table.
     ds_uk = paths.load_dataset("uk_long_term_yields")
-    tb_uk = ds_uk["uk_long_term_yields"].reset_index()
+    tb_uk = ds_uk.read("uk_long_term_yields")
 
     # Load the long-term US corn yields dataset and read its main table.
     ds_us = paths.load_dataset("us_corn_yields")
-    tb_us = ds_us["us_corn_yields"].reset_index()
+    tb_us = ds_us.read("us_corn_yields")
 
     # Load the long-term wheat yields dataset and read its main table.
     ds_wheat = paths.load_dataset("long_term_wheat_yields")
-    tb_wheat = ds_wheat["long_term_wheat_yields"].reset_index()
+    tb_wheat = ds_wheat.read("long_term_wheat_yields")
 
     #
     # Process data.
@@ -107,5 +107,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

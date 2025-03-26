@@ -3,19 +3,19 @@
 import numpy as np
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("bayliss_smith_wanmali_1984")
-    tb = ds_meadow["long_term_wheat_yields"].reset_index()
+    tb = ds_meadow.read("long_term_wheat_yields")
 
     #
     # Process data.
@@ -36,5 +36,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

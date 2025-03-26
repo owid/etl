@@ -2,7 +2,7 @@
 
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -29,21 +29,21 @@ ITEM_CODES = [
 ]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load UK long-term yields data from Broadberry et al. (2015), and read its main table.
     ds_broadberry = paths.load_dataset("broadberry_et_al_2015")
-    tb_broadberry = ds_broadberry["broadberry_et_al_2015"].reset_index()
+    tb_broadberry = ds_broadberry.read("broadberry_et_al_2015")
 
     # Load UK long-term yields data from Brassley (2000), and read its main table.
     ds_brassley = paths.load_dataset("brassley_2000")
-    tb_brassley = ds_brassley["brassley_2000"].reset_index()
+    tb_brassley = ds_brassley.read("brassley_2000")
 
     # Load faostat data on crop and livestock production, and read its main table.
     ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl["faostat_qcl"].reset_index()
+    tb_qcl = ds_qcl.read("faostat_qcl")
 
     #
     # Process data.
@@ -85,5 +85,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_garden])
     ds_garden.save()
