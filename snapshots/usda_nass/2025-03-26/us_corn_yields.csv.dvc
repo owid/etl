@@ -11,3 +11,7 @@ meta:
     license:
       name: Public domain
       url: https://www.nass.usda.gov/Data_and_Statistics/Citation_Request/index.php
+outs:
+  - md5: 27714283c4405fa77d36ecb4006d3513
+    size: 27137
+    path: us_corn_yields.csv

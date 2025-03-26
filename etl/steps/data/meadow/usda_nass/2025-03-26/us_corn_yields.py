@@ -18,7 +18,7 @@ def run() -> None:
     #
     # Retrieve snapshot and read its data.
     snap = paths.load_snapshot("us_corn_yields.csv")
-    tb = snap.read_csv()
+    tb = snap.read()
 
     #
     # Process data.
