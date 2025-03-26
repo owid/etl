@@ -1,4 +1,9 @@
-"""Script to create a snapshot of dataset 'Short-Term Mortality Fluctuations (HMD, 2023)'."""
+"""Script to create a snapshot of dataset 'Short-Term Mortality Fluctuations (HMD, 2023)'.
+
+To run the script, you have to set the following env variables with your credentials:
+- SNAPSHOTS_HMD_STMF_EMAIL
+- SNAPSHOTS_HMD_STMF_PASSWORD
+"""
 
 import os
 import re
