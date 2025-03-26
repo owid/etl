@@ -411,7 +411,7 @@ tables:
         short_unit: ""
         display:
           name: GDP price levels relative to the US
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
           tolerance: 5
         description_short: |-
           Ratio of Purchasing Power Parity (PPP) conversion factor to market exchange rate.
