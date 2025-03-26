@@ -112,6 +112,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: OECD Government at a Glance - Public finance main indicators
   update_period_days: 365
 
 
