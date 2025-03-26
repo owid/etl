@@ -13,7 +13,7 @@ meta:
       HMD provides an online STMF visualization toolkit (https://mpidr.shinyapps.io/stmortality).
     url: https://www.mortality.org/Data/STMF
     source_data_url: https://www.mortality.org/File/GetDocument/Public/STMF/Outputs/stmf.csv
-    date_accessed: 2025-03-25
+    date_accessed: 2025-03-26
     publication_date: 2025-03-24
     publication_year: 2025
     published_by: |-
@@ -33,6 +33,6 @@ meta:
     name: Creative Commons BY 4.0
     url: https://www.mortality.org/Data/UserAgreement
 outs:
-  - md5: 2411d8e1bb607db360661eebcfaffd0d
-    size: 21541746
+  - md5: 59bc9c8320ec2df4e6348b46d468407f
+    size: 12368
     path: hmd_stmf.csv
