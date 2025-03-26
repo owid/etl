@@ -5,7 +5,6 @@ import zipfile
 
 import numpy as np
 import owid.catalog.processing as pr
-import pandas as pd
 
 from etl.helpers import PathFinder
 
