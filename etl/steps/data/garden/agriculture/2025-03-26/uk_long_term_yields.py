@@ -8,7 +8,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Element code for "Yield".
-ELEMENT_CODE_FOR_YIELD = "005419"
+ELEMENT_CODE_FOR_YIELD = "005412"
 
 # Item codes for required items.
 ITEM_CODE_FOR_WHEAT = "00000015"

@@ -11,7 +11,7 @@ paths = PathFinder(__file__)
 ITEM_CODE_FOR_WHEAT = "00000015"
 
 # Element code for "Yield".
-ELEMENT_CODE_FOR_YIELD = "005419"
+ELEMENT_CODE_FOR_YIELD = "005412"
 
 
 def run() -> None:

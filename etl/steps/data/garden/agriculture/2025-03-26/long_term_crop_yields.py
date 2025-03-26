@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 FAOSTAT_SOURCE_NAME = "Food and Agriculture Organization of the United Nations"
 
 # FAOSTAT element code for "Yield".
-ELEMENT_CODE_FOR_YIELD = "005419"
+ELEMENT_CODE_FOR_YIELD = "005412"
 
 
 def prepare_faostat_data(tb_qcl: Table) -> Table:
