@@ -70,7 +70,7 @@ steps:
   # Food expenditure - USDA
   #
   data://meadow/usda_ers/2024-03-26/food_expenditure:
-    - snapshot://usda_ers/2024-03-26/food_expenditure.xlsx
+    - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
   data://garden/usda_ers/2024-03-26/food_expenditure:
     - data://meadow/usda_ers/2024-03-26/food_expenditure
   data://grapher/usda_ers/2024-03-26/food_expenditure:
@@ -191,7 +191,9 @@ steps:
   # TODO: On every update, the USDA adds a year and removes the oldes year. So, bring back old snapshots and combine them, to have data for all years.
   #
   data://meadow/usda_ers/2025-03-26/food_expenditure:
-    - snapshot://usda_ers/2025-03-26/food_expenditure.xlsx
+    - snapshot://usda_ers/2025-03-26/food_expenditure_since_2019.xlsx
+    - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
+    - snapshot://usda_ers/2023-06-07/food_expenditure_since_2017.xlsx
   #
   # Food expenditure - USDA
   #

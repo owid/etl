@@ -9,6 +9,14 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Years for which we have snapshots.
+AVAILABLE_YEARS = [
+    # TODO: We also have a snapshot for 2017, but the format is different. If needed, consider adapting the code to include it.
+    # 2017,
+    2018,
+    2019,
+]
+
 # Names of columns (expected to result from concatenating the header rows).
 COLUMNS = [
     "country",
@@ -55,15 +63,27 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshots and read their data.
-    snap = paths.load_snapshot("food_expenditure.xlsx")
-    data = snap.ExcelFile()
+    data = {year: paths.load_snapshot(f"food_expenditure_since_{year}.xlsx").ExcelFile() for year in AVAILABLE_YEARS}
 
     #
     # Process data.
     #
-    tb = combine_data_sheets(data=data)
+    tables = {}
+    for year in AVAILABLE_YEARS:
+        tables[year] = combine_data_sheets(data=data[year]).assign(**{"update_year": year})
 
-    # Set an appropriate index and sort conveniently.
+    # Concatenate tables.
+    tb = pr.concat(list(tables.values()), ignore_index=True, short_name=paths.short_name)
+
+    # On repeated years, keep the values from the latest update.
+    tb = (
+        tb.sort_values(by=["country", "year", "update_year"])
+        .drop_duplicates(subset=["country", "year"], keep="last")
+        .drop(columns=["update_year"])
+        .reset_index(drop=True)
+    )
+
+    # Improve table format.
     tb = tb.format(sort_columns=True)
 
     #

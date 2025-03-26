@@ -17,4 +17,4 @@ wdir: ../../../data/snapshots/usda_ers/2024-03-26
 outs:
   - md5: 9d93206556c052ddc2592f832ee72caf
     size: 63237
-    path: food_expenditure.xlsx
+    path: food_expenditure_since_2018.xlsx
