@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -26,7 +26,7 @@ MEAT_TOTAL_ITEM_CODES = {
     "00001111": "mule",  # 'Meat of mules, fresh or chilled',
     "00001166": "other_non_mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
     "00001163": "game",  # 'Game meat, fresh, chilled or frozen',
-    "00001176": "snails",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
+    # "00001176": "snails",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
     # Items that were in the list of "Meat, Total", but were not in the data:
     # "00001083",  # 'Other birds',
 }
@@ -63,13 +63,13 @@ SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
 STOCK_ANIMALS_ELEMENT_CODES = ["005111", "005112", "005114"]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load faostat qcl dataset, and read its main table.
     ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl["faostat_qcl"].reset_index()
+    tb_qcl = ds_qcl.read("faostat_qcl")
 
     #
     # Process data.
@@ -119,5 +119,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

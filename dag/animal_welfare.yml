@@ -123,3 +123,13 @@ steps:
   #
   data://grapher/animal_welfare/2024-12-17/fur_laws:
     - data://garden/animal_welfare/2024-12-17/fur_laws
+  #
+  # Total number of slaughtered animals.
+  #
+  data://garden/animal_welfare/2025-03-26/animals_used_for_food:
+    - data://garden/faostat/2025-03-17/faostat_qcl
+  #
+  # Total number of slaughtered animals.
+  #
+  data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
+    - data://garden/animal_welfare/2025-03-26/animals_used_for_food

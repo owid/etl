@@ -1,6 +1,6 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -25,19 +25,19 @@ OTHER_KILLED = [
     "donkeys",
     "other_camelids",
     "other_non_mammals",
-    "snails",
+    # "snails",
     "game",
     "mule",
 ]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("animals_used_for_food")
-    tb = ds_garden["animals_used_for_food"]
+    tb = ds_garden.read("animals_used_for_food", reset_index=False)
 
     #
     # Process data.
@@ -51,5 +51,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset.
-    ds_grapher = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_grapher = paths.create_dataset(tables=[tb])
     ds_grapher.save()

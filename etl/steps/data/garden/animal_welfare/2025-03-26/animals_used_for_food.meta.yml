@@ -95,12 +95,12 @@ tables:
           name: Pigeons
         presentation:
           title_public: <% set animal = "pigeons" %>{definitions.title_killed}
-      snails_killed:
-        title: <% set animal = "snails" %>{definitions.title_killed}
-        display:
-          name: Snails
-        presentation:
-          title_public: <% set animal = "snails" %>{definitions.title_killed}
+      # snails_killed:
+      #   title: <% set animal = "snails" %>{definitions.title_killed}
+      #   display:
+      #     name: Snails
+      #   presentation:
+      #     title_public: <% set animal = "snails" %>{definitions.title_killed}
       donkeys_killed:
         title: <% set animal = "donkeys" %>{definitions.title_killed}
         display:
