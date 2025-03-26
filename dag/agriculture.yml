@@ -49,6 +49,12 @@ steps:
   data://meadow/usda_ers/2025-03-26/food_availability:
     - snapshot://usda_ers/2025-03-26/food_availability.xls
   #
+  # Food expenditure in US archive (2018) - USDA
+  # NOTE: Not updateable.
+  #
+  data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive:
+    - snapshot://usda_ers/2025-03-26/food_expenditure_in_us_archive.xlsx
+  #
   # Food expenditure in US - USDA
   #
   data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive:
@@ -164,3 +170,35 @@ steps:
   #
   data://explorers/agriculture/latest/crop_yields:
     - data://garden/agriculture/2025-03-26/attainable_yields
+  #
+  # Food expenditure in US - USDA
+  #
+  data://meadow/usda_ers/2025-03-26/food_expenditure_in_us:
+    - snapshot://usda_ers/2025-03-26/food_expenditure_in_us.xlsx
+  #
+  # Food expenditure in US - USDA
+  #
+  data://garden/usda_ers/2025-03-26/food_expenditure_in_us:
+    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us
+    - data://meadow/usda_ers/2025-03-26/food_expenditure_in_us_archive
+  #
+  # Food expenditure in US - USDA
+  #
+  data://grapher/usda_ers/2025-03-26/food_expenditure_in_us:
+    - data://garden/usda_ers/2025-03-26/food_expenditure_in_us
+  #
+  # Food expenditure - USDA
+  # TODO: On every update, the USDA adds a year and removes the oldes year. So, bring back old snapshots and combine them, to have data for all years.
+  #
+  data://meadow/usda_ers/2025-03-26/food_expenditure:
+    - snapshot://usda_ers/2025-03-26/food_expenditure.xlsx
+  #
+  # Food expenditure - USDA
+  #
+  data://garden/usda_ers/2025-03-26/food_expenditure:
+    - data://meadow/usda_ers/2025-03-26/food_expenditure
+  #
+  # Food expenditure - USDA
+  #
+  data://grapher/usda_ers/2025-03-26/food_expenditure:
+    - data://garden/usda_ers/2025-03-26/food_expenditure
