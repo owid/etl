@@ -11,20 +11,57 @@ paths = PathFinder(__file__)
 
 # Years for which we have snapshots.
 AVAILABLE_YEARS = [
-    # TODO: We also have a snapshot for 2017, but the format is different. If needed, consider adapting the code to include it.
-    # 2017,
+    2017,
     2018,
     2019,
 ]
 
 # Names of columns (expected to result from concatenating the header rows).
+COLUMN_SHARE_OF_ON_FOOD = "Percent of consumer expenditures spent on food, alcoholic beverages, and tobacco that were consumed at home, by selected countries - Share of consumer expenditures on food2 - Percent"
+COLUMN_SHARE_OF_ON_ALCOHOL = "Percent of consumer expenditures spent on food, alcoholic beverages, and tobacco that were consumed at home, by selected countries - Share of consumer expenditures on alcoholic beverages and tobacco - Percent"
+COLUMN_EXPENDITURES = "Percent of consumer expenditures spent on food, alcoholic beverages, and tobacco that were consumed at home, by selected countries - Consumer expenditures3 - U.S. dollars per person"
+COLUMN_EXPENDITURES_ON_FOOD = "Percent of consumer expenditures spent on food, alcoholic beverages, and tobacco that were consumed at home, by selected countries - Expenditures on food2 - U.S. dollars per person"
 COLUMNS = [
     "country",
-    "Percent of consumer expenditures spent on food, alcoholic beverages, and tobacco that were consumed at home, by selected countries - Share of consumer expenditures on food2 - Percent",
-    "Percent of consumer expenditures spent on food, alcoholic beverages, and tobacco that were consumed at home, by selected countries - Share of consumer expenditures on alcoholic beverages and tobacco - Percent",
-    "Percent of consumer expenditures spent on food, alcoholic beverages, and tobacco that were consumed at home, by selected countries - Consumer expenditures3 - U.S. dollars per person",
-    "Percent of consumer expenditures spent on food, alcoholic beverages, and tobacco that were consumed at home, by selected countries - Expenditures on food2 - U.S. dollars per person",
+    COLUMN_SHARE_OF_ON_FOOD,
+    COLUMN_SHARE_OF_ON_ALCOHOL,
+    COLUMN_EXPENDITURES,
+    COLUMN_EXPENDITURES_ON_FOOD,
 ]
+
+
+def combine_data_sheets_for_2017(data: pd.ExcelFile) -> Table:
+    # Initialize empty dataframe that will gather data for all sheets.
+    combined = Table()
+    for sheet_name in sorted(data.sheet_names):
+        # Parse sheet for the current year.
+        tb = data.parse(sheet_name, skiprows=2, header=[0, 1, 2, 3])  # type: ignore
+
+        # Combine multiline header.
+        tb.columns = ["country"] + [column[0] for column in tb.columns[1:]]
+
+        # Drop empty rows, and footer rows.
+        tb = tb.dropna(subset=[column for column in tb.columns if column != "country"], how="all")
+
+        # Add a year column
+        tb = tb.assign(**{"year": int(sheet_name)})
+
+        # Add current data to the combined dataframe.
+        combined = pr.concat([combined, tb], ignore_index=False)
+
+    # Adjust column names with others.
+    combined = combined.rename(
+        columns={
+            "country": "country",
+            "Food2": COLUMN_SHARE_OF_ON_FOOD,
+            "Alcoholic beverages and tobacco": COLUMN_SHARE_OF_ON_ALCOHOL,
+            "Consumer expenditures3": COLUMN_EXPENDITURES,
+            "Expenditures on food2": COLUMN_EXPENDITURES_ON_FOOD,
+        },
+        errors="raise",
+    )
+
+    return combined
 
 
 def combine_data_sheets(data: pd.ExcelFile) -> Table:
@@ -70,7 +107,10 @@ def run() -> None:
     #
     tables = {}
     for year in AVAILABLE_YEARS:
-        tables[year] = combine_data_sheets(data=data[year]).assign(**{"update_year": year})
+        if year == 2017:
+            tables[year] = combine_data_sheets_for_2017(data=data[year]).assign(**{"update_year": year})
+        else:
+            tables[year] = combine_data_sheets(data=data[year]).assign(**{"update_year": year})
 
     # Concatenate tables.
     tb = pr.concat(list(tables.values()), ignore_index=True, short_name=paths.short_name)
