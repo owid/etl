@@ -1,0 +1,321 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &common_display
+      tolerance: 5
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Government Spending
+      attribution_short: OECD
+
+  unit_human_readable: |-
+    <% if unit == "ppp" %>
+    International-$
+    <%- elif unit == "share_gdp" %>
+    % of GDP
+    <%- elif unit == "share_gov_exp" %>
+    % of government expenditure
+    <%- elif unit == "share_investment" %>
+    % of investment of total economy
+    <%- elif unit == "share_potential_gdp" %>
+    % of potential GDP
+    <%- elif unit == "growth_rate" %>
+    Growth rate
+    <%- endif %>
+  unit: |-
+    <% if unit == "ppp" %>
+    current international-$
+    <%- elif unit == "share_gdp" %>
+    % of GDP
+    <%- elif unit == "share_gov_exp" %>
+    % of government expenditure
+    <%- elif unit == "share_investment" %>
+    % of investment of total economy
+    <%- elif unit == "share_potential_gdp" %>
+    % of potential GDP
+    <%- elif unit == "growth_rate" %>
+    %
+    <%- endif %>
+
+  short_unit: |-
+    <% if unit == "ppp" %>
+    $
+    <%- else %>
+    %
+    <%- endif %>
+
+  short_description_unit: |-
+    <% if unit == "ppp" %>
+    This data is adjusted for differences in living costs between countries but not for inflation.
+    <%- elif unit == "share_gdp" %>
+    This data is divided by gross domestic product, expressed as a percentage.
+    <%- elif unit == "share_gov_exp" %>
+    This data is divided by government expenditure, expressed as a percentage.
+    <%- elif unit == "share_investment" %>
+    This data is divided by government investment, expressed as a percentage.
+    <%- elif unit == "share_potential_gdp" %>
+    This data is divided by potential GDP (GDP if the economy operated at its full potential), expressed as a percentage.
+    <%- endif %>
+
+  num_decimal_places: |-
+    <% if unit == "ppp" %>
+    0
+    <%- else %>
+    1
+    <%- endif %>
+
+  key_government_expenditure: Government expenditure includes goods and services consumed in a production process within the territory, compensation of employees, subsidies, property income, social benefits, capital transfers and investments, and other current expenditures.
+
+  key_government_revenue: Government revenue includes taxes, net social contributions, and grants and other revenues.
+
+  key_fiscal_balance: Fiscal balance is the difference between government revenues and expenditures. It is also referred to as net lending (+) or net borrowing (-) of general government.
+
+  key_gross_debt: Gross debt refers to the total amount a government owes, including all financial obligations that require future payments, such as loans and bonds, but excluding assets or investments the government owns. It does not include shares, equity, or financial derivatives.
+
+  key_gross_debt_maastricht_definition: Under the Maastricht definition, gross debt is more narrowly defined, excluding pensions, financial derivatives, and other accounts payable, and is measured at nominal value rather than market value. It is named after the Maastricht Treaty, used to assess EU fiscal positions.
+
+  key_government_investment: Government investment mainly includes gross fixed capital formation, which is infrastructure for transport, office buildings, housing, schools and hospitals. It also includes expenditures in research and development.
+
+  key_government_primary_balance: The primary balance is the difference between revenues and expenditures, excluding interest payments. It is a measure of the government's capacity to meet its obligations without borrowing.
+
+  key_government_structural_balance: The structural balance is a measure of the budget balance a government would have with its current policies if the economy was operating at its full potential ("potential GDP").
+
+  key_government_structural_primary_balance: The structural primary balance is the primary balance adjusted for the impact of net interest payments on government debts.
+
+  description_from_producer: >-
+    General government expenditures data are from the
+    OECD National Accounts Statistics (database), which
+    are based on the System of National Accounts (SNA),
+    a set of internationally agreed concepts, definitions,
+    classifications and rules for national accounting. the
+    2008 SNA framework has been implemented by all
+    OECD countries. In SNA terminology, general
+    government consists of central, state and local
+    governments and social security funds. Expenditures
+    encompass intermediate consumption, compensation
+    of employees, subsidies, property income (including
+    interest spending), social benefits, other current
+    expenditures (mainly current transfers) and capital
+    expenditures (capital transfers and investments).
+    Gross domestic product (GDP) is the standard measure
+    of the value of the goods and services produced by
+    a country during a period. Government expenditures
+    per capita were calculated by converting total
+    government expenditures to USD using the OECD/
+    Eurostat purchasing power parities (PPP) for GDP
+    and dividing by population of the country. PPP is the
+    number of units of country B’s currency needed to buy
+    the same quantity of goods and services in country A.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  govt_glance_public_finance:
+    variables:
+      government_expenditure:
+        title: Government expenditure - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Total expenditure from central, state and local governments and social security funds. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_expenditure}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government expenditure - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_expenditure_per_capita:
+        title: Government expenditure per capita - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Total expenditure from central, state and local governments and social security funds per capita. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_expenditure}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government expenditure per capita - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_fiscal_balance:
+        title: Government fiscal balance - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_government_revenue}"
+          - "{definitions.key_fiscal_balance}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government fiscal balance - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_gross_debt:
+        title: Government gross debt - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: The total amount of money that a country's government has borrowed. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_gross_debt}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government gross debt - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_gross_debt_per_capita:
+        title: Government gross debt per capita - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: The total amount of money that a country's government has borrowed per capita. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_gross_debt}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_public: Government gross debt per capita
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government gross debt per capita - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_gross_debt__maastricht_definition:
+        title: Government gross debt (Maastricht definition) - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: The total amount of money that a country's government has borrowed according to the Maastricht definition. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_gross_debt}"
+          - "{definitions.key_gross_debt_maastricht_definition}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government gross debt (Maastricht definition) - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_investment:
+        title: Government investment - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Government investment includes capital transfers and investments. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_investment}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government investment - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_net_interest_spending:
+        title: Government net interest spending - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Government expenditure dedicated to investments. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_expenditure}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government net interest spending - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_primary_balance:
+        title: Government primary balance - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_government_revenue}"
+          - "{definitions.key_government_primary_balance}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government primary balance - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_revenues:
+        title: Government revenues - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: Total amount of money a government collects. {definitions.short_unit}
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_revenue}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government revenues - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_revenues_per_capita:
+        title: Government revenues per capita - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Total amount of money a government collects per capita. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_revenue}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government revenues per capita - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_structural_balance:
+        title: Government structural balance - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_structural_balance}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government structural balance - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_structural_primary_balance:
+        title: Government structural primary balance - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_primary_balance}"
+          - "{definitions.key_government_structural_primary_balance}"
+        description_from_producer: "{definitions.description_from_producer}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government structural primary balance - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
