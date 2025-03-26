@@ -11,7 +11,7 @@ import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -60,45 +60,45 @@ def correct_data_values(tb: Table) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load FAOSTAT FBSC dataset and read its main table.
     ds_fbsc = paths.load_dataset("faostat_fbsc")
-    tb_fbsc = ds_fbsc["faostat_fbsc"].reset_index()
+    tb_fbsc = ds_fbsc.read("faostat_fbsc")
 
     # Load Harris et al. (2015) dataset and read its main table.
     ds_harris = paths.load_dataset("harris_et_al_2015")
-    tb_harris = ds_harris["harris_et_al_2015"].reset_index()
+    tb_harris = ds_harris.read("harris_et_al_2015")
 
     # Load Floud et al. (2011) dataset and read its main table.
     ds_floud = paths.load_dataset("floud_et_al_2011")
-    tb_floud = ds_floud["floud_et_al_2011"].reset_index()
+    tb_floud = ds_floud.read("floud_et_al_2011")
 
     # Load Jonsson (1998) dataset and read its main table.
     ds_jonsson = paths.load_dataset("jonsson_1998")
-    tb_jonsson = ds_jonsson["jonsson_1998"].reset_index()
+    tb_jonsson = ds_jonsson.read("jonsson_1998")
 
     # Load Grigg (1995) dataset and read its main table.
     ds_grigg = paths.load_dataset("grigg_1995")
-    tb_grigg = ds_grigg["grigg_1995"].reset_index()
+    tb_grigg = ds_grigg.read("grigg_1995")
 
     # Load Fogel (2004) dataset and read its main table.
     ds_fogel = paths.load_dataset("fogel_2004")
-    tb_fogel = ds_fogel["fogel_2004"].reset_index()
+    tb_fogel = ds_fogel.read("fogel_2004")
 
     # Load FAO (2000) dataset and read its main table.
     ds_fao2000 = paths.load_dataset("fao_2000")
-    tb_fao2000 = ds_fao2000["fao_2000"].reset_index()
+    tb_fao2000 = ds_fao2000.read("fao_2000")
 
     # Load FAO (1949) dataset and read its main table.
     ds_fao1949 = paths.load_dataset("fao_1949")
-    tb_fao1949 = ds_fao1949["fao_1949"].reset_index()
+    tb_fao1949 = ds_fao1949.read("fao_1949")
 
     # Load USDA/ERS data on food availability.
     ds_usda = paths.load_dataset("food_availability")
-    tb_usda = ds_usda["food_availability"].reset_index()
+    tb_usda = ds_usda.read("food_availability")
 
     #
     # Process data.
@@ -319,6 +319,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined], check_variables_metadata=True)
+    # Initialize a new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb_combined])
+
+    # Save garden dataset.
     ds_garden.save()
