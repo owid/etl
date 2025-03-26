@@ -51,7 +51,7 @@ def run() -> None:
     # Check if all unit keys are in the dataset.
     assert set(tb["unit"].unique()) == set(
         UNITS.keys()
-    ), f"Some unit keys are not in the dataset: {set(UNITS.keys()) - set(tb["unit"].unique())}".format()
+    ), f"Some unit keys are not in the dataset: {set(UNITS.keys()) - set(tb['unit'].unique())}".format()
 
     # Rename unit column.
     tb["unit"] = tb["unit"].map(UNITS)
