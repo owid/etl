@@ -12,7 +12,7 @@ def run() -> None:
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("attainable_yields")
-    tb = ds_garden.raed("attainable_yields", reset_index=False)
+    tb = ds_garden.read("attainable_yields", reset_index=False)
 
     #
     # Save outputs.
