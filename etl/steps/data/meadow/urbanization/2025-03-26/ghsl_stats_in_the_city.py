@@ -13,47 +13,37 @@ paths = PathFinder(__file__)
 
 # Sheets and columns to extract.
 SHEETS_AND_COLUMNS = {
-    "SOCIOECONOMIC": [
-        "SC_SEC_PCF_",  # Share of female population
-        "SC_SEC_PCM_",  # Share of male population
-        "SC_SEC_PCY_",  # Share of young population (0-14 years)
-        "SC_SEC_PCA_",  # Share of adult population (15-64 years)
-        "SC_SEC_PCO_",  # Share of old population (> 65 years)
-    ],
-    "GREENNESS": ["GR_SHB_GRN_"],  # Share of green area in built-up area (prefix)
-    "EXPOSURE": ["EX_LEC_SHP_"],  # Share of population living in LECZ (below 10m)
-    "HAZARD_RISK": [
-        "HZ_CEV_EAR_",  # Earthquake occurrence
-        "HZ_CEV_EWI_",  # Extreme wind occurrence
-        "HZ_CEV_TSU_",  # Tsunami occurrence
-        "HZ_CEV_HEW_",  # Heatwave occurrence
-        "HZ_CEV_DRO_",  # Drought occurrence
-        "HZ_CEV_FLO_",  # Flood occurrence
-        "HZ_CEV_TCY_",  # Tropical Cyclone occurrence
-        "HZ_CEV_VOL_",  # Volcano occurrence
-        "HZ_CEV_LAN_",  # Landslide occurrence
-        "HZ_CEV_COW_",  # Coldwave occurrence
+    "EXPOSURE": ["EX_L05_SHP_"],  # Share of population living in Low Elevation Coastal Zones (<5m) (%)
+    "CLIMATE": [
+        "CL_WDS_CUR_"
+    ],  # Share of days exceeding the historical 90th percentile of maximum temperature for that calendar day
+    "HEALTH": [
+        "HL_FCL_HOS_",  # Number of hospitals
+        "HL_FCL_PHA_",  # Number of pharmacies
+        "HL_FPC_HOS_",  # Number of hospitals per capita
+        "HL_FPC_PHA_",  # Number of pharmacies per capita
+        "HL_FDE_HOS_",  # Number of hospitals per urban centre area
+        "HL_FDE_PHA_",  # Number of pharmacies per urban centre area
+        "HL_SHP_HOS_",  # Share of urban population within 1 km of a hospital
+        "HL_SHP_PHA_",  # Share of urban population within 1 km of a pharmacy
+        "HL_POP_HOS_",  # Population within 1 km of a hospital
+        "HL_POP_PHA_",  # Population within 1 km of a pharmacy
     ],
 }
 # Column and indicator mapping.
 COLUMN_MAPPING = {
-    "SC_SEC_PCF_": "Share of female population (%)",
-    "SC_SEC_PCM_": "Share of male population (%)",
-    "SC_SEC_PCY_": "Share of young population (0-14 years) (%)",
-    "SC_SEC_PCA_": "Share of adult population (15-64 years) (%)",
-    "SC_SEC_PCO_": "Share of old population (> 65 years) (%)",
-    "GR_SHB_GRN_": "Share of green area in built-up area (%)",
-    "EX_LEC_SHP_": "Share of population living in Low Elevation Coastal Zones (<10m) (%)",
-    "HZ_CEV_EAR_": "Earthquake occurrence (events per year)",
-    "HZ_CEV_EWI_": "Extreme wind occurrence (events per year)",
-    "HZ_CEV_TSU_": "Tsunami occurrence (events per year)",
-    "HZ_CEV_HEW_": "Heatwave occurrence (events per year)",
-    "HZ_CEV_DRO_": "Drought occurrence (events per year)",
-    "HZ_CEV_FLO_": "Flood occurrence (events per year)",
-    "HZ_CEV_TCY_": "Tropical Cyclone occurrence (events per year)",
-    "HZ_CEV_VOL_": "Volcano occurrence (events per year)",
-    "HZ_CEV_LAN_": "Landslide occurrence (events per year)",
-    "HZ_CEV_COW_": "Coldwave occurrence (events per year)",
+    "EX_L05_SHP_": "Share of population living in Low Elevation Coastal Zones (<5m) (%)",
+    "CL_WDS_CUR_": "Share of days exceeding the historical 90th percentile of maximum temperature for that calendar day",
+    "HL_FCL_HOS_": "Number of hospitals",
+    "HL_FCL_PHA_": "Number of pharmacies",
+    "HL_FPC_HOS_": "Number of hospitals per capita",
+    "HL_FPC_PHA_": "Number of pharmacies per capita",
+    "HL_FDE_HOS_": "Number of hospitals per urban centre area",
+    "HL_FDE_PHA_": "Number of pharmacies per urban centre area",
+    "HL_SHP_HOS_": "Share of urban centre population within 1 km of a hospital",
+    "HL_SHP_PHA_": "Share of urban centre population within 1 km of a pharmacy",
+    "HL_POP_HOS_": "Population within 1 km of a hospital",
+    "HL_POP_PHA_": "Population within 1 km of a pharmacy",
 }
 
 
