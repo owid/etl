@@ -6,6 +6,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 # Item codes that should add up to "Meat, Total".
+# NOTE: These should coincide with those defined in the garden faostat_qcl step.
 MEAT_TOTAL_ITEM_CODES = {
     "00001058": "chickens",  # 'Meat of chickens, fresh or chilled',
     "00001069": "ducks",  # 'Meat of ducks, fresh or chilled',
@@ -32,7 +33,6 @@ MEAT_TOTAL_ITEM_CODES = {
 }
 
 # List of item codes that should add up to the total stocks of animals.
-# TODO: Check that this list is correct.
 STOCK_ITEM_CODES = {
     "00000866": "cattle",  # Cattle
     "00000946": "buffalo",  # Buffalo
@@ -62,6 +62,37 @@ SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
 # Element code for the stocks of animals.
 STOCK_ANIMALS_ELEMENT_CODES = ["005111", "005112", "005114"]
 
+# Item code for "Meat, total" (used only for sanity checks).
+MEAT_TOTAL_ITEM_CODE = "00001765"
+
+
+def sanity_check_inputs(tb_killed, tb_stock, tb_qcl):
+    assert set(tb_killed["unit"]) == {"animals"}, "Units may have changed."
+
+    # Check that the sum of the different animals killed for food adds up to the total.
+    # NOTE: This should be true by construction, as the "Meat, total" was created in the faostat_qcl garden step.
+    # If this is not fulfilled, it may be because the list of items in that step differs from the one defined here.
+    tb_killed_global_sum = (
+        tb_killed[(tb_killed["country"] == "World")].groupby("year", as_index=False).agg({"value": "sum"})
+    )
+    tb_killed_global = (
+        tb_qcl[
+            (tb_qcl["country"] == "World")
+            & (tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES))
+            & (tb_qcl["item_code"] == MEAT_TOTAL_ITEM_CODE)
+        ]
+        .groupby("year", as_index=False)
+        .agg({"value": "sum"})
+    )
+    compared = tb_killed_global_sum.merge(tb_killed_global, on="year", suffixes=("_sum", "_global"))
+    error = "The sum of the different animals killed for food do not add up to the total."
+    assert ((100 * (compared["value_sum"] - compared["value_global"]) / compared["value_global"]) < 0.001).all(), error
+
+    # Sanity check for stock.
+    assert set(tb_stock["unit"]) == {"Number", "animals"}, "Units may have changed."
+
+    # TODO: It would be good to check that the sum of all values for Stocks (for all animals) agrees (within a certain percentage) with the Stocks for "Meat, Total". However, it doesn't. I just checked directly on https://www.fao.org/faostat/en/#data/QCL that Stocks for Meat, Total for World is 23449 in 2023 (in 1000 An). This means 23 million animals. This number is at least a factor of 1000 too small! I will try to figure out what this number means.
+
 
 def run() -> None:
     #
@@ -80,10 +111,15 @@ def run() -> None:
         & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
     ].reset_index(drop=True)
 
-    # Sanity check.
-    assert set(tb_killed["unit"]) == {"animals"}, "Units may have changed."
+    # Create a table for the number of animals in stock.
+    tb_stock = tb_qcl[
+        tb_qcl["element_code"].isin(STOCK_ANIMALS_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
+    ].reset_index(drop=True)
 
-    # Make one column per item.
+    # Sanity checks.
+    sanity_check_inputs(tb_killed=tb_killed, tb_stock=tb_stock, tb_qcl=tb_qcl)
+
+    # Make one column per item for the table of slaughtered animals.
     tb_killed = (
         tb_killed[["country", "year", "item_code", "value"]]
         .pivot(index=["country", "year"], columns="item_code", values="value")
@@ -93,15 +129,7 @@ def run() -> None:
         )
     )
 
-    # Create a table for the number of animals in stock.
-    tb_stock = tb_qcl[
-        tb_qcl["element_code"].isin(STOCK_ANIMALS_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
-    ].reset_index(drop=True)
-
-    # Sanity check.
-    assert set(tb_stock["unit"]) == {"Number", "animals"}, "Units may have changed."
-
-    # Make one column per item.
+    # Make one column per item for the table of live animals.
     tb_stock = (
         tb_stock[["country", "year", "item_code", "value"]]
         .pivot(index=["country", "year"], columns="item_code", values="value")
