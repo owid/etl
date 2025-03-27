@@ -14,7 +14,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def run(upload: bool) -> None:
     # Initialize a new snapshot.
-    snap = Snapshot(f"oecd/{SNAPSHOT_VERSION}/govt_glance_public_finance.csv")
+    snap = Snapshot(f"oecd/{SNAPSHOT_VERSION}/govt_glance_size_public_procurement.csv")
 
     # Save snapshot.
     snap.create_snapshot(upload=upload)

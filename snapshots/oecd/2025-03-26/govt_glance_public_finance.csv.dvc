@@ -16,6 +16,7 @@ meta:
 
     # Files
     url_main: https://data-explorer.oecd.org/
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.GOV.GIP,DSD_GOV@DF_GOV_PF_YU,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
     date_accessed: 2025-03-26
 
     # License
