@@ -89,6 +89,12 @@ definitions:
 
   key_government_procurement_spending: General government procurement spending is the purchase of goods, services and works by the government. It is defined as the sum of the goods and services purchased by the government for its own use, gross fixed capital formation (infrastructure for transport, office buildings, housing, schools and hospitals), and social transfers in kind via market producers. Public corporations are excluded.
 
+  key_expenditures_on_government_outsourcing: Expenditures on government outsourcing is the portion of government production costs used to buy goods and services from entities outside the government. This includes goods and services used by the government, financed by the government, and other production costs.
+
+  key_production_costs: Production costs of government are public expenditures on the goods and services the government uses. These costs include wages for government employees and purchases of goods and services, like supplies for schools and hospitals. They do not include government spending that does not involve a purchase of a good or service, such as spending on social welfare, unemployment benefits, and other transfers. It also includes outsourcing, the costs of buying goods and services from entities outside of government, such as private companies and other agencies.
+
+  key_tax_revenues: Tax revenues are the compulsory unrequited payments made by economic entities to the government. They include taxes on consumption, income, wealth, property and capital.
+
   description_from_producer_expenditure: >-
     General government expenditures data are from the
     OECD National Accounts Statistics (database), which
@@ -270,6 +276,45 @@ definitions:
     by market producers and supplied to households).
     Public corporations were excluded in the estimation of
     procurement spending.
+
+  description_from_producer_expenditures_on_government_outsourcing: |-
+    The concept and methodology of government outsourcing, which is also part of production costs, builds on the classification of government expenditures in the System of National Accounts (SNA). In detail, government outsourcing costs include: The goods and services used by government. In SNA terms, this includes intermediate consumption (procurement of intermediate products required for government production such as accounting or information technology services). The goods and services financed by government. In SNA terms, this includes social transfers in kind via market producers paid for by government (including those that are initially paid for by citizens but are ultimately refunded by government, such as medical treatments refunded by public social security payments).
+
+  description_from_producer_production_costs: |-
+    The concept and methodology of production costs builds on the classification of government expenditures in the System of National Accounts (SNA). In detail, government production costs include: Compensation costs of government employees including cash and in-kind remuneration plus all mandatory employer (and imputed) contributions to social insurance and voluntary contributions paid on behalf of employees. The goods and services used by government, which are the first component of government outsourcing. In SNA terms, this includes intermediate consumption (procurement of intermediate products required for government production such as accounting or information technology services). The goods and services financed by government, which are the second component of government outsourcing. In SNA terms, this includes social transfers in kind via market producers paid for by government (including those that are initially paid for by citizens but are ultimately refunded by government, such as medical treatments refunded by public social security payments). Other production costs, which include the remaining components of consumption of fixed capital (depreciation of capital) and other taxes on production less other subsidies on production.
+
+  description_from_producer_tax_revenues: >-
+    Data on revenues are computed from the OECD
+    National Accounts Statistics (database), which are based
+    on the System of National Accounts (SNA). the 2008
+    SNA framework has been implemented by all OECD
+    countries. revenues include taxes
+    (e.g. on consumption, income, wealth, property and
+    capital), net social contributions (i.e. contributions for
+    pensions, health and social security after deduction
+    of social insurance scheme service charges, where
+    applicable), sales of goods and services (e.g. market
+    output of government establishments, entrance
+    fees), and grants and other sources (e.g. current and
+    capital grants, property income, and subsidies). These
+    aggregates were constructed using sub-account
+    items. The definitions of tax
+    revenues differ between SNA and OECD Revenue
+    Statistics, especially regarding compulsory social
+    security contributions. In SNA, taxes are mandatory
+    unrequited payments, in cash or in kind, made by
+    institutional units to the government. Net social
+    contributions are actual or imputed payments to
+    social insurance schemes to make provision for
+    social benefits to be paid. These may be compulsory
+    or voluntary and funded or unfunded. OECD
+    Revenue Statistics treat compulsory social security
+    contributions as taxes, whereas the SNA considers
+    them net social contributions because the receipt of
+    social security benefits depends, in most countries,
+    upon appropriate contributions having been made,
+    even though the size of the benefit is not necessarily
+    related to the amount of the contributions.
 
 
 # Learn more about the available fields:
@@ -510,5 +555,85 @@ tables:
           title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government procurement spending - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      expenditures_on_government_outsourcing_by_economic_transaction:
+        title: Expenditures on government outsourcing by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_expenditures_on_government_outsourcing}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditures_on_government_outsourcing}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Expenditures on government outsourcing by economic transaction - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_expenditure_by_economic_transaction:
+        title: Government expenditure by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditure}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government expenditure by economic transaction - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_revenues_by_economic_transaction:
+        title: Government revenues by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_revenue}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_revenue}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government revenues by economic transaction - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      production_costs_by_economic_transaction:
+        title: Production costs by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_production_costs}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_production_costs}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Production costs by economic transaction - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      tax_revenues_by_economic_transaction:
+        title: Tax revenues by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "Government revenues that come from taxes. {definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_tax_revenues}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_tax_revenues}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Tax revenues by economic transaction - {definitions.unit_human_readable}
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display

@@ -18,7 +18,12 @@ UNITS = {
     "US dollars per person, PPP converted": "ppp",
     "US dollars, PPP converted": "ppp",
     "Growth rate": "growth_rate",
+    "Percentage of general government outsourcing expenditures": "share_gov_outsourcing_exp",
+    "Percentage of general government revenues": "share_gov_revenues",
+    "Percentage of general government production costs": "share_gov_production_costs",
+    "Percentage of tax revenue": "share_tax_revenue",
 }
+
 
 # Define new names for some of the indicators
 INDICATORS = {
@@ -38,12 +43,15 @@ def run() -> None:
     # Read tables from meadow
     tb_public_finance = ds_meadow.read("public_finance")
     tb_size_public_procurement = ds_meadow.read("size_public_procurement")
+    tb_public_finance_economic_transaction = ds_meadow.read("public_finance_economic_transaction")
 
     #
     # Process data.
     #
     # Concatenate tables.
-    tb = pr.concat([tb_public_finance, tb_size_public_procurement], ignore_index=True)
+    tb = pr.concat(
+        [tb_public_finance, tb_size_public_procurement, tb_public_finance_economic_transaction], ignore_index=True
+    )
 
     # Harmonize country names.
     tb = geo.harmonize_countries(
@@ -57,7 +65,7 @@ def run() -> None:
     # Check if all unit keys are in the dataset.
     assert set(tb["unit"].unique()) == set(
         UNITS.keys()
-    ), f"Some unit keys are not in the dataset: {set(UNITS.keys()) - set(tb['unit'].unique())}".format()
+    ), f"Some unit keys are not in the dataset: {set(tb['unit'].unique())- set(UNITS.keys())}".format()
 
     # Rename unit column.
     tb["unit"] = tb["unit"].map(UNITS)
@@ -67,11 +75,14 @@ def run() -> None:
 
     # Make table wide, using indicator as columns.
     tb = tb.pivot(
-        index=["country", "year", "unit"], columns=["indicator"], values="value", join_column_levels_with="_"
+        index=["country", "year", "unit", "economic_transaction"],
+        columns=["indicator"],
+        values="value",
+        join_column_levels_with="_",
     ).reset_index(drop=True)
 
     # Improve table format.
-    tb = tb.format(["country", "year", "unit"], short_name=paths.short_name)
+    tb = tb.format(["country", "year", "unit", "economic_transaction"], short_name=paths.short_name)
 
     #
     # Save outputs.
