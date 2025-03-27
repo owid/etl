@@ -228,6 +228,8 @@ def _extract_explorers_tables(
         # Get list of indicators with their paths & dimension
         indicator_paths = view.indicators.to_records()
 
+        print(indicator_paths)
+
         # Get indicators
         indicators = bake_indicators_view(indicator_paths)
 
