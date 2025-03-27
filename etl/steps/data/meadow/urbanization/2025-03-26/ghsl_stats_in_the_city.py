@@ -19,41 +19,34 @@ SHEETS_AND_COLUMNS = {
         "CL_B01_CUR_",  # Annual Mean Temperature in the decade
         "CL_B12_CUR_",  # Annual Precipitation in the decade
     ],
-    "HEALTH": [
-        "HL_FCL_HOS_",  # Number of hospitals
-        "HL_FCL_PHA_",  # Number of pharmacies
-        "HL_FPC_HOS_",  # Number of hospitals per capita
-        "HL_FPC_PHA_",  # Number of pharmacies per capita
-        "HL_FDE_HOS_",  # Number of hospitals per urban centre area
-        "HL_FDE_PHA_",  # Number of pharmacies per urban centre area
-        "HL_SHP_HOS_",  # Share of urban population within 1 km of a hospital
-        "HL_SHP_PHA_",  # Share of urban population within 1 km of a pharmacy
-        "HL_POP_HOS_",  # Population within 1 km of a hospital
-        "HL_POP_PHA_",  # Population within 1 km of a pharmacy
-    ],
     "SOCIOECONOMIC": [
         "SC_CON_DSF_",  # Average download speed
-        "SC_SEC_LET_",  # Life expectancy
+    ],
+    "EMISSIONS": [
+        "EM_CO2_PEC_",  # CO2 emissions per capita
+        "EM_ENE_PER_",  # Share of energy emissions in total emissions
+        "EM_RES_PER_",  # Share of residential emissions in total emissions
+        "EM_IND_PER_",  # Share of industrial emissions in total emissions
+        "EM_TRA_PER_",  # Share of transport emissions in total emissions
+        "EM_WAS_PER_",  # Share of waste emissions in total emissions
+        "EM_AGR_PER_",  # Share of agricultural emissions in total emissions
     ],
 }
 # Column and indicator mapping.
 COLUMN_MAPPING = {
     "EX_L05_SHP_": "Share of population living in Low Elevation Coastal Zones (<5m) (%)",
     "CL_WDS_CUR_": "Share of days exceeding the historical 90th percentile of maximum temperature for that calendar day",
-    "HL_FCL_HOS_": "Number of hospitals",
-    "HL_FCL_PHA_": "Number of pharmacies",
-    "HL_FPC_HOS_": "Number of hospitals per capita",
-    "HL_FPC_PHA_": "Number of pharmacies per capita",
-    "HL_FDE_HOS_": "Number of hospitals per urban centre area",
-    "HL_FDE_PHA_": "Number of pharmacies per urban centre area",
-    "HL_SHP_HOS_": "Share of urban centre population within 1 km of a hospital",
-    "HL_SHP_PHA_": "Share of urban centre population within 1 km of a pharmacy",
-    "HL_POP_HOS_": "Population within 1 km of a hospital",
-    "HL_POP_PHA_": "Population within 1 km of a pharmacy",
     "CL_B01_CUR_": "Annual mean temperature in the decade",
     "CL_B12_CUR_": "Annual precipitation in the decade",
     "SC_CON_DSF_": "Average download speed",
-    "SC_SEC_LET_": "Life expectancy",
+    "EM_CO2_PEC_": "CO2 emissions per capita",
+    "EM_GHG_PEC_": "Greenhouse gas emissions per capita",
+    "EM_ENE_PER_": "Share of energy emissions in total emissions",
+    "EM_RES_PER_": "Share of residential emissions in total emissions",
+    "EM_IND_PER_": "Share of industrial emissions in total emissions",
+    "EM_TRA_PER_": "Share of transport emissions in total emissions",
+    "EM_WAS_PER_": "Share of waste emissions in total emissions",
+    "EM_AGR_PER_": "Share of agricultural emissions in total emissions",
 }
 
 
@@ -80,7 +73,7 @@ def run() -> None:
 
     # Extract the required data from each sheet
     extracted_data = []
-    city_country = ["GC_UCN_MAI_2025", "GC_CNT_GAD_2025"]
+    city_country = ["GC_UCN_MAI_2025", "GC_CNT_GAD_2025", "ID_UC_G0"]
 
     for sheet, column_prefixes in SHEETS_AND_COLUMNS.items():
         tb = pr.read_excel(file_path, sheet_name=sheet, metadata=snap.to_table_metadata())
@@ -93,6 +86,7 @@ def run() -> None:
         tb = tb[selected_columns]
         # **Merge to filter rows that match capitals**
         tb = pr.merge(tb_capitals, tb, on=["GC_UCN_MAI_2025", "GC_CNT_GAD_2025"], how="inner")
+        tb = tb.drop("ID_UC_G0", axis=1)
         tb = tb.rename(columns={"GC_UCN_MAI_2025": "city", "GC_CNT_GAD_2025": "country"})
         # Identify columns that need to be melted (those with prefixes in the mapping)
         value_vars = [col for col in tb.columns if any(col.startswith(prefix) for prefix in COLUMN_MAPPING.keys())]
