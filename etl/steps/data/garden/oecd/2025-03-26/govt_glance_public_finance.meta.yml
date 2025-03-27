@@ -65,25 +65,29 @@ definitions:
     1
     <%- endif %>
 
-  key_government_expenditure: Government expenditure includes goods and services consumed in a production process within the territory, compensation of employees, subsidies, property income, social benefits, capital transfers and investments, and other current expenditures.
+  key_general_government: General government consists of central, state and local governments and social security funds.
 
-  key_government_revenue: Government revenue includes taxes, net social contributions, and grants and other revenues.
+  key_government_expenditure: General government expenditure includes goods and services consumed in a production process within the territory, compensation of employees, subsidies, property income, social benefits, capital transfers and investments, and other current expenditures.
+
+  key_government_revenue: General government revenue includes taxes, net social contributions, and grants and other revenues.
 
   key_fiscal_balance: Fiscal balance is the difference between government revenues and expenditures. It is also referred to as net lending (+) or net borrowing (-) of general government.
 
-  key_gross_debt: Gross debt refers to the total amount a government owes, including all financial obligations that require future payments, such as loans and bonds, but excluding assets or investments the government owns. It does not include shares, equity, or financial derivatives.
+  key_gross_debt: General government gross debt refers to the total amount a government owes, including all financial obligations that require future payments, such as loans and bonds, but excluding assets or investments the government owns. It does not include shares, equity, or financial derivatives.
 
   key_gross_debt_maastricht_definition: Under the Maastricht definition, gross debt is more narrowly defined, excluding pensions, financial derivatives, and other accounts payable, and is measured at nominal value rather than market value. It is named after the Maastricht Treaty, used to assess EU fiscal positions.
 
-  key_government_investment: Government investment mainly includes gross fixed capital formation, which is infrastructure for transport, office buildings, housing, schools and hospitals. It also includes expenditures in research and development.
+  key_government_investment: General government investment mainly includes gross fixed capital formation, which is infrastructure for transport, office buildings, housing, schools and hospitals. It also includes expenditures in research and development.
+
+  key_government_net_interest_spending: Net interest spending is the difference between interest payments and interest receipts on general government debt. It is an inflexible part of public budgeting and have to be honoured to guarantee access to international financial markets and multilateral funds.
 
   key_government_primary_balance: The primary balance is the difference between revenues and expenditures, excluding interest payments. It is a measure of the government's capacity to meet its obligations without borrowing.
 
-  key_government_structural_balance: The structural balance is a measure of the budget balance a government would have with its current policies if the economy was operating at its full potential ("potential GDP").
+  key_government_structural_balance: The general government structural balance is a measure of the budget balance a government would have with its current policies if the economy was operating at its full potential ("potential GDP").
 
   key_government_structural_primary_balance: The structural primary balance is the primary balance adjusted for the impact of net interest payments on government debts.
 
-  description_from_producer: >-
+  description_from_producer_expenditure: >-
     General government expenditures data are from the
     OECD National Accounts Statistics (database), which
     are based on the System of National Accounts (SNA),
@@ -108,6 +112,147 @@ definitions:
     number of units of country B’s currency needed to buy
     the same quantity of goods and services in country A.
 
+  description_from_producer_revenue: >-
+    Revenues data are derived from the OECD National
+    Account Statistics (database), which is based on the
+    System of National Accounts (SNA). the SNA provides a
+    set of internationally agreed concepts, classifications,
+    definitions and rules for national accounting. The
+    2008 SNA framework has been implemented by all
+    OECD countries. In SNA terminology, general
+    government is composed of central government,
+    state government, local government, and social
+    security funds. Revenues include taxes, net social
+    contributions and grants and other revenues. Gross
+    domestic product (GDP) is the standard measure of
+    the value of goods and services produced by a country
+    during a period. Government revenues per capita
+    were calculated by converting total revenues to USD
+    using the OECD/Eurostat purchasing power parity
+    (PPP) for GDP and dividing them by the population
+    of the country. PPP is the number of units of country
+    B’s currency needed to purchase the same quantity
+    of goods and services in country A.
+
+  description_from_producer_fiscal_balance: >-
+    Fiscal balance data are derived from the OECD National
+    Accounts Statistics (database), based on the System
+    of National Accounts (SNA), a set of internationally
+    agreed concepts, definitions, classifications and rules
+    for national accounting. The 2008 SNA framework
+    has been implemented by all OECD countries
+    . Using Sna terminology, general government
+    consists of central government, state government,
+    local government and social security funds.
+
+
+    Fiscal balance, also referred to as net lending (+) or net
+    borrowing (-) of general government, is calculated as
+    total government revenues minus total government
+    expenditures. Revenues encompass taxes, net social
+    contributions, and grants and other revenues.
+    Expenditures comprise intermediate consumption,
+    compensation of employees, subsidies, property
+    income (including interest spending), social benefits,
+    other current expenditures (mainly current transfers)
+    and capital expenditures (i.e. capital transfers and
+    investments).
+
+
+    The primary balance is the fiscal balance excluding net
+    interest payments on general government liabilities
+    (i.e. interest payments minus interest receipts). Gross
+    domestic product (GDP) is the standard measure of
+    the value of goods and services produced by a country
+    during a period.
+
+  description_from_producer_gross_debt: >-
+    Data are derived from the OECD National Accounts
+    Statistics (database) and the Eurostat Government
+    Finance Statistics (database), which are based on the
+    System of National Accounts (SNA). the 2008 SNA
+    framework has been implemented by all OECD
+    countries. Debt is defined as a specific
+    subset of liabilities identified according to the types of
+    financial instruments included or excluded. Generally,
+    it is defined as all liabilities that require payment or
+    payments of interest or principal by the debtor to
+    the creditor at a date or dates in the future. all debt
+    instruments are liabilities but some liabilities, such as
+    shares, equity, and financial derivatives, are not debt.
+    Debt is thus the sum of the following liability categories,
+    whenever available/applicable in the financial balance
+    sheet of the general government sector: currency and
+    deposits, debt securities, loans, and other liabilities
+    (i.e. insurance, pension and standardised guarantee
+    schemes, other accounts payable and, in some cases,
+    special drawing rights). According to the SNA, most
+    debt instruments are valued at market prices, when
+    appropriate (although some countries might not
+    apply this valuation, particularly for debt securities).
+    countries’ treatment of government liabilities in
+    respect of their employee pension plans varies,
+    making international comparability difficult. Some
+    OECD countries, such as Australia, Canada, Colombia,
+    Iceland, New Zealand, Sweden and the United States,
+    record employment-related pension liabilities, funded
+    or unfunded, in government debt data. For those
+    countries, the government debt ratio is adjusted by
+    excluding these unfunded pension liabilities. Government debt
+    here is recorded on a gross basis, not adjusted by
+    the value of government-held assets. The SNA debt
+    definition used here differs from the definition applied
+    under the Maastricht Treaty, which is used to assess eU
+    fiscal positions.
+
+  description_from_producer_government_investment: >-
+    Data are from the OECD National Accounts Statistics
+    (database) based on the System of National Accounts
+    (SNA), a set of internationally agreed concepts,
+    definitions, classifications and rules for national
+    accounting. The 2008 SNA framework has been
+    implemented by all OECD countries.
+    General government investment includes gross
+    capital formation and acquisitions, less disposals of
+    non-produced nonfinancial assets. Gross fixed capital
+    formation (also called fixed investment) is the main
+    component of investment. For government, it mainly
+    consists of transport infrastructure but also includes
+    infrastructure such as office buildings, housing,
+    schools and hospitals. In the SNA 2008 framework,
+    expenditures in research and development have
+    also been included in fixed investment. Government
+    investments together with capital transfers
+    constitute the category of government capital
+    expenditures. Government consists of central, state
+    and local governments and social security funds.
+    State government is only applicable to the nine
+    OECD countries that are federal states: australia,
+    Austria, Belgium, Canada, Germany, Mexico, Spain
+    (considered a quasi-federal country), Switzerland and
+    the United States.
+
+  description_from_producer_structural_balance: >-
+    Data are derived from the OECD Economic Outlook (database). the structural fiscal balance, or
+    underlying balance, represents the fiscal balance
+    as reported in the System of National Accounts (SNA)
+    framework adjusted for two factors: the state of the
+    economic cycle (as measured by the output gap) and
+    one-off fiscal operations. Potential GDP is not directly
+    observable, and estimates are subject to substantial
+    margins of error. One-off factors include both
+    exceptional and irregular fiscal transactions as well
+    as deviations from trend in net capital transfers. For
+    more details, see [Sources and methods of the OECD
+    Economic Outlook](www.oecd.org/eco/outlook/sourcesand-methods.htm).
+
+  description_from_producer_structural_primary_balance: >-
+    The general government structural primary balance is the
+    primary balance adjusted for the impact of net interest
+    payments on general government liabilities (i.e. interest
+    payments minus interest receipts).
+
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -126,7 +271,8 @@ tables:
         description_short: Total expenditure from central, state and local governments and social security funds. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_expenditure}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditure}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -141,7 +287,8 @@ tables:
         description_short: Total expenditure from central, state and local governments and social security funds per capita. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_expenditure}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditure}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -158,7 +305,8 @@ tables:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_government_revenue}"
           - "{definitions.key_fiscal_balance}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_fiscal_balance}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -173,7 +321,8 @@ tables:
         description_short: The total amount of money that a country's government has borrowed. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_gross_debt}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_gross_debt}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -188,7 +337,8 @@ tables:
         description_short: The total amount of money that a country's government has borrowed per capita. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_gross_debt}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_gross_debt}"
         presentation:
           title_public: Government gross debt per capita
           title_variant: "{definitions.unit_human_readable}"
@@ -205,7 +355,8 @@ tables:
         description_key:
           - "{definitions.key_gross_debt}"
           - "{definitions.key_gross_debt_maastricht_definition}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_gross_debt}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -217,10 +368,11 @@ tables:
         title: Government investment - {definitions.unit_human_readable}
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: Government investment includes capital transfers and investments. {definitions.short_description_unit}
+        description_short: Government expenditure dedicated to investments. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_investment}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_government_investment}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -232,10 +384,11 @@ tables:
         title: Government net interest spending - {definitions.unit_human_readable}
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: Government expenditure dedicated to investments. {definitions.short_description_unit}
+        description_short: "{definitions.short_description_unit}"
         description_key:
-          - "{definitions.key_government_expenditure}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_government_net_interest_spending}"
+          - "{definitions.key_general_government}"
+        description_from_producer: ""
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -252,7 +405,8 @@ tables:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_government_revenue}"
           - "{definitions.key_government_primary_balance}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_fiscal_balance}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -267,7 +421,8 @@ tables:
         description_short: "{definitions.short_description_unit}"
         description_key:
           - "{definitions.key_government_revenue}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_revenue}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -282,7 +437,8 @@ tables:
         description_short: Total amount of money a government collects per capita. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_revenue}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_revenue}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -297,7 +453,8 @@ tables:
         description_short: "{definitions.short_description_unit}"
         description_key:
           - "{definitions.key_government_structural_balance}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_structural_balance}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
@@ -313,7 +470,8 @@ tables:
         description_key:
           - "{definitions.key_government_primary_balance}"
           - "{definitions.key_government_structural_primary_balance}"
-        description_from_producer: "{definitions.description_from_producer}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_structural_primary_balance}"
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
