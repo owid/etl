@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("govt_glance_public_finance")
+    ds_garden = paths.load_dataset("government_at_a_glance")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("govt_glance_public_finance", reset_index=False)
+    tb = ds_garden.read("government_at_a_glance", reset_index=False)
 
     #
     # Save outputs.

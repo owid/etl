@@ -87,6 +87,8 @@ definitions:
 
   key_government_structural_primary_balance: The structural primary balance is the primary balance adjusted for the impact of net interest payments on government debts.
 
+  key_government_procurement_spending: General government procurement spending is the purchase of goods, services and works by the government. It is defined as the sum of the goods and services purchased by the government for its own use, gross fixed capital formation (infrastructure for transport, office buildings, housing, schools and hospitals), and social transfers in kind via market producers. Public corporations are excluded.
+
   description_from_producer_expenditure: >-
     General government expenditures data are from the
     OECD National Accounts Statistics (database), which
@@ -252,17 +254,33 @@ definitions:
     payments on general government liabilities (i.e. interest
     payments minus interest receipts).
 
+  description_from_producer_government_procurement_spending: >-
+    The size of general government procurement
+    spending is estimated using data from the OECD
+    National Accounts Statistics (database), based on the
+    System of National Accounts (SNA). General government
+    procurement is defined as the sum of intermediate
+    consumption (goods and services purchased by
+    governments for their own use, such as accounting or
+    information technology services), gross fixed capital
+    formation (acquisition of capital excluding sales of
+    fixed assets, such as building new roads) and social
+    transfers in kind via market producers (purchases by
+    general government of goods and services produced
+    by market producers and supplied to households).
+    Public corporations were excluded in the estimation of
+    procurement spending.
 
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
-  title: OECD Government at a Glance - Public finance main indicators
+  title: OECD Government at a Glance
   update_period_days: 365
 
 
 tables:
-  govt_glance_public_finance:
+  government_at_a_glance:
     variables:
       government_expenditure:
         title: Government expenditure - {definitions.unit_human_readable}
@@ -476,5 +494,21 @@ tables:
           title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government structural primary balance - {definitions.unit_human_readable}
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_procurement_spending:
+        title: Government procurement spending - {definitions.unit_human_readable}
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_procurement_spending}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_government_procurement_spending}"
+        presentation:
+          title_variant: "{definitions.unit_human_readable}"
+        display:
+          name: Government procurement spending - {definitions.unit_human_readable}
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display

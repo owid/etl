@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -31,14 +33,18 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("govt_glance_public_finance")
+    ds_meadow = paths.load_dataset("government_at_a_glance")
 
-    # Read table from meadow dataset.
-    tb = ds_meadow.read("govt_glance_public_finance")
+    # Read tables from meadow
+    tb_public_finance = ds_meadow.read("public_finance")
+    tb_size_public_procurement = ds_meadow.read("size_public_procurement")
 
     #
     # Process data.
     #
+    # Concatenate tables.
+    tb = pr.concat([tb_public_finance, tb_size_public_procurement], ignore_index=True)
+
     # Harmonize country names.
     tb = geo.harmonize_countries(
         df=tb,
@@ -65,7 +71,7 @@ def run() -> None:
     ).reset_index(drop=True)
 
     # Improve table format.
-    tb = tb.format(["country", "year", "unit"])
+    tb = tb.format(["country", "year", "unit"], short_name=paths.short_name)
 
     #
     # Save outputs.
