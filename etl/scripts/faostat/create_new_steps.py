@@ -13,8 +13,6 @@ import re
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple, cast
 
-from owid.walden import Catalog
-
 from etl.dag_helpers import load_dag
 from etl.files import checksum_file
 from etl.paths import STEP_DIR
@@ -56,8 +54,6 @@ def get_channel_from_dag_line(dag_line: str) -> str:
         channel = "explorers"
     elif dag_line.startswith("snapshot://"):
         channel = "snapshot"
-    elif dag_line.startswith("walden://"):
-        channel = "walden"
     elif dag_line.startswith("data://grapher"):
         channel = "grapher"
     else:
@@ -282,13 +278,7 @@ def find_latest_version_for_step(channel: str, step_name: str, namespace: str = 
     """
     latest_version = None
     warning_message = f"Dataset {step_name} not found in {channel}."
-    if channel == "walden":
-        # Find latest version for current step in walden.
-        try:
-            latest_version = Catalog().find_latest(namespace=namespace, short_name=step_name).version
-        except ValueError:
-            log.warning(warning_message)
-    elif channel == "snapshot":
+    if channel == "snapshot":
         try:
             # Find all snapshots for current step.
             snapshots = [
@@ -370,6 +360,12 @@ def create_step_file(channel: str, step_name: str) -> None:
         # Copy the file from its latest version.
         latest_step_file = versions_dir / step_latest_version / f"{step_name}.py"
         new_step_file.write_text(latest_step_file.read_text())
+
+        # If there is an adjacent metadata file, copy it over as well.
+        metadata_file = latest_step_file.with_name(f"{step_name}.meta.yml")
+        if metadata_file.exists():
+            new_metadata_file = new_step_file.with_name(f"{step_name}.meta.yml")
+            new_metadata_file.write_text(metadata_file.read_text())
 
         # Check if shared module in the latest version of the step is identical to the new shared module.
         latest_shared_file = versions_dir / step_latest_version / f"{RUN_FILE_NAME}.py"
@@ -732,7 +728,7 @@ def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel
     return step_names
 
 
-def main(channel: str, include_all_datasets: bool = False) -> None:
+def run(channel: str, include_all_datasets: bool = False) -> None:
     if include_all_datasets:
         # List all datasets, even if their source data was not updated.
         step_names = list_all_steps()
@@ -778,7 +774,7 @@ if __name__ == "__main__":
         "step files only for datasets that were updated.",
     )
     args = parser.parse_args()
-    main(
+    run(
         channel=args.channel,
         include_all_datasets=args.include_all_datasets,
     )

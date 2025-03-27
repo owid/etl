@@ -13,16 +13,7 @@ from unittest.mock import patch
 from etl import paths
 from etl.command import _detect_strictness_level, _grapher_steps
 from etl.dag_helpers import load_dag
-from etl.steps import DataStep, Step, WaldenStep, compile_steps
-
-
-def test_all_walden_deps_exist():
-    # find all walden steps
-    steps = [s for s in get_all_steps() if isinstance(s, WaldenStep)]
-
-    # check that each step matches a dataset in walden's index
-    for s in steps:
-        assert s._walden_dataset, f'no walden data found for "walden://{s.path}"'
+from etl.steps import DataStep, Step, compile_steps
 
 
 def test_all_data_steps_have_code():

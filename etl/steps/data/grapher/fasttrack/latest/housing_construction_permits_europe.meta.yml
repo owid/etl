@@ -1,0 +1,17 @@
+dataset:
+  title: DRAFT Housing Construction Permits Europe
+  description: ''
+tables:
+  housing_construction_permits_europe:
+    variables:
+      residential_building_permits__million_m2:
+        title: Residential Building Permits (Million m²)
+        unit: ''
+      new_residential_permits_useful_floor_area_in_m2__index__2021_100:
+        title: New Residential Permits Useful Floor Area in m2 (Index, 2021=100)
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

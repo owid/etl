@@ -291,9 +291,6 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Drop unneeded columns
-    regions = regions.drop(columns=["defined_by"], errors="raise")
-
     # Create slugs for all countries and keep track of legacy slugs.
     regions["slug"] = regions["name"].astype(str).map(slugify)
 
@@ -333,6 +330,7 @@ def run(dest_dir: str) -> None:
                 "short_name": income_group_name,
                 "region_type": "income_group",
                 "is_historical": False,
+                "defined_by": "owid",
                 "slug": slugify(income_group_name),
                 "is_mappable": False,
                 "is_unlisted": False,

@@ -19,6 +19,7 @@ from shared import (
     parse_amendments_table,
     prepare_long_table,
     prepare_wide_table,
+    sanity_check_custom_units,
 )
 
 from etl.helpers import PathFinder
@@ -456,7 +457,7 @@ def add_yield_to_aggregate_regions(tb: Table) -> Table:
     return combined_data
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
@@ -564,6 +565,9 @@ def run(dest_dir: str) -> None:
         default_metadata=ds_meadow.metadata,
         check_variables_metadata=False,
     )
+
+    # Sanity check custom units.
+    sanity_check_custom_units(tb_wide=tb_wide, ds_garden=ds_garden)
 
     # Update dataset metadata.
     # The following description is not publicly shown in charts; it is only visible when accessing the catalog.

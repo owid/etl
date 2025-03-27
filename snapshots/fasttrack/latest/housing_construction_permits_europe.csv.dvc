@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: Unknown
+    version_producer: Local CSV
+    url_main: https://unknown.com
+    url_download: Housing Construction Permits Europe.csv
+    date_accessed: '2025-03-25'
+    date_published: '2025-03-25'
+  name: DRAFT Housing Construction Permits Europe
+  description: ''
+outs:
+  - md5: 351dfe067a3bf45e5e7b67fa241f01f7
+    size: 30521
+    path: housing_construction_permits_europe.csv

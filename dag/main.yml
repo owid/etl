@@ -707,7 +707,6 @@ include:
   - dag/faostat.yml
   - dag/energy.yml
   - dag/wizard.yml
-  - dag/examples.yml
   - dag/emissions.yml
   - dag/papers.yml
   - dag/demography.yml

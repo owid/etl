@@ -25,9 +25,8 @@ from owid.catalog.meta import (
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
-from owid.walden import files
 
-from etl import config, paths
+from etl import config, download_helpers, paths
 from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump
 
 log = structlog.get_logger()
@@ -83,7 +82,7 @@ class Snapshot:
             # TODO: temporarily download files from R2 instead of public link to prevent
             # issues with cached snapshots. Remove this when convenient
             download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-            files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            download_helpers.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
             download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
@@ -161,7 +160,7 @@ class Snapshot:
         if download_url.startswith("s3://") or download_url.startswith("r2://"):
             s3_utils.download(download_url, str(self.path))
         else:
-            files.download(download_url, str(self.path))
+            download_helpers.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add a file to DVC and upload it to S3.
@@ -179,7 +178,6 @@ class Snapshot:
         if not upload:
             log.warn("Skipping upload", snapshot=self.uri)
             return
-
         # Calculate md5
         md5 = checksum_file(self.path)
 
@@ -188,7 +186,7 @@ class Snapshot:
             meta = ruamel_load(f)
 
         # If the file already exists with the same md5, skip the upload
-        if meta["outs"] and meta["outs"][0]["md5"] == md5:
+        if meta.get("outs") and meta["outs"][0]["md5"] == md5:
             log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
             return
 
@@ -479,23 +477,31 @@ class SnapshotMeta(MetaBase):
 
     def save(self) -> None:  # type: ignore
         self.path.parent.mkdir(exist_ok=True, parents=True)
+        with open(self.path, "w") as f:
+            f.write(self.to_yaml())
 
-        # Create new file
-        if not self.path.exists():
-            with open(self.path, "w") as f:
-                f.write(self.to_yaml())
-        # Edit existing file, keep outs
-        else:
-            # Load outs from existing file
-            with open(self.path, "r") as f:
-                yaml = ruamel_load(f)
-                outs = yaml["outs"]
-                wdir = yaml["wdir"]
+    # def save(self) -> None:  # type: ignore
+    #     self.path.parent.mkdir(exist_ok=True, parents=True)
 
-            # Save metadata to file
-            meta = self._meta_to_dict()
-            with open(self.path, "w") as f:
-                f.write(yaml_dump({"meta": meta, "wdir": wdir, "outs": outs}))
+    #     # Create new file
+    #     if not self.path.exists():
+    #         with open(self.path, "w") as f:
+    #             f.write(self.to_yaml())
+    #     # Edit existing file, keep outs
+    #     else:
+    #         # Load outs from existing file
+    #         with open(self.path, "r") as f:
+    #             yaml = ruamel_load(f)
+    #             outs = yaml.get("outs", None)
+    #             wdir = yaml.get("wdir", None)
+
+    #         # Save metadata to file
+    #         meta = self._meta_to_dict()
+    #         with open(self.path, "w") as f:
+    #             d = {"meta": meta, "outs": outs}
+    #             if wdir:
+    #                 d["wdir"] = wdir
+    #             f.write(yaml_dump(d))
 
     @property
     def uri(self):
@@ -690,7 +696,7 @@ def add_snapshot(
             `namespace/version/short_name.ext.dvc` must exist!
         filename (str or None): Path to local data file (if dataframe is not given).
         dataframe (Table or pd.DataFrame or None): Data to upload (if filename is not given).
-        upload (bool): True to upload data to Walden bucket.
+        upload (bool): True to upload data to bucket.
     """
     snap = Snapshot(uri)
 
