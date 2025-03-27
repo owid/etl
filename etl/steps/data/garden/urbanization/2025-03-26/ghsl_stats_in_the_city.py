@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -20,6 +22,10 @@ UNITS = {
     "Share of urban centre population within 1 km of a pharmacy": "%",
     "Population within 1 km of a hospital": "people",
     "Population within 1 km of a pharmacy": "people",
+    "Average download speed": "Mbps",
+    "Life expectancy": "years",
+    "Annual mean temperature in the decade": "°C",
+    "Annual precipitation in the decade": "mm",
 }
 
 SHORT_UNITS = {
@@ -35,6 +41,10 @@ SHORT_UNITS = {
     "Share of urban centre population within 1 km of a pharmacy": "%",
     "Population within 1 km of a hospital": "",
     "Population within 1 km of a pharmacy": "",
+    "Average download speed": "Mbps",
+    "Life expectancy": "",
+    "Annual mean temperature in the decade": "°C",
+    "Annual precipitation in the decade": "mm",
 }
 
 
@@ -53,11 +63,11 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    tb = tb.drop("city", axis=1)
+
     # Map units and short units to the table
     tb["unit"] = tb["indicator"].map(UNITS)
     tb["short_unit"] = tb["indicator"].map(SHORT_UNITS)
-
-    tb = tb.drop("city", axis=1)
 
     # Improve table format.
     tb = tb.format(["country", "year", "indicator", "unit", "short_unit"])

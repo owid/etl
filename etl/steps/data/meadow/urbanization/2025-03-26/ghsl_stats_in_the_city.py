@@ -15,8 +15,10 @@ paths = PathFinder(__file__)
 SHEETS_AND_COLUMNS = {
     "EXPOSURE": ["EX_L05_SHP_"],  # Share of population living in Low Elevation Coastal Zones (<5m) (%)
     "CLIMATE": [
-        "CL_WDS_CUR_"
-    ],  # Share of days exceeding the historical 90th percentile of maximum temperature for that calendar day
+        "CL_WDS_CUR_",  # Share of days exceeding the historical 90th percentile of maximum temperature for that calendar day
+        "CL_B01_CUR_",  # Annual Mean Temperature in the decade
+        "CL_B12_CUR_",  # Annual Precipitation in the decade
+    ],
     "HEALTH": [
         "HL_FCL_HOS_",  # Number of hospitals
         "HL_FCL_PHA_",  # Number of pharmacies
@@ -28,6 +30,10 @@ SHEETS_AND_COLUMNS = {
         "HL_SHP_PHA_",  # Share of urban population within 1 km of a pharmacy
         "HL_POP_HOS_",  # Population within 1 km of a hospital
         "HL_POP_PHA_",  # Population within 1 km of a pharmacy
+    ],
+    "SOCIOECONOMIC": [
+        "SC_CON_DSF_",  # Average download speed
+        "SC_SEC_LET_",  # Life expectancy
     ],
 }
 # Column and indicator mapping.
@@ -44,6 +50,10 @@ COLUMN_MAPPING = {
     "HL_SHP_PHA_": "Share of urban centre population within 1 km of a pharmacy",
     "HL_POP_HOS_": "Population within 1 km of a hospital",
     "HL_POP_PHA_": "Population within 1 km of a pharmacy",
+    "CL_B01_CUR_": "Annual mean temperature in the decade",
+    "CL_B12_CUR_": "Annual precipitation in the decade",
+    "SC_CON_DSF_": "Average download speed",
+    "SC_SEC_LET_": "Life expectancy",
 }
 
 
@@ -64,7 +74,7 @@ def run() -> None:
     # Create the full file path
     file_path = os.path.join(extract_dir, "GHS_UCDB_GLOBE_R2024A.xlsx")
 
-    # Extract capitals only
+    # Select the top 100 cities with the largest population in GC_POP_TOT_2025
     tb_capitals = pr.read_excel(file_path, sheet_name="GENERAL_CHARACTERISTICS", metadata=snap.to_table_metadata())
     tb_capitals = tb_capitals[tb_capitals["GC_UCM_CAP"] == 1][["GC_UCN_MAI_2025", "GC_CNT_GAD_2025"]]
 
@@ -81,7 +91,6 @@ def run() -> None:
 
         # Filter rows to include only those present in df_capitals
         tb = tb[selected_columns]
-
         # **Merge to filter rows that match capitals**
         tb = pr.merge(tb_capitals, tb, on=["GC_UCN_MAI_2025", "GC_CNT_GAD_2025"], how="inner")
         tb = tb.rename(columns={"GC_UCN_MAI_2025": "city", "GC_CNT_GAD_2025": "country"})
@@ -102,6 +111,7 @@ def run() -> None:
 
         # Replace indicator names with their mapped full names
         tb["indicator"] = tb["indicator"].map(COLUMN_MAPPING)
+
         extracted_data.append(tb)
 
     tb = pr.concat(extracted_data)
