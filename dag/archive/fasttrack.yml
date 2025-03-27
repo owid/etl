@@ -79,3 +79,5 @@ steps:
     - snapshot://fasttrack/latest/in_donor_foreign_aid_categories_dac_countries.csv
   data://grapher/fasttrack/latest/indonor_oda_costs_oecd:
     - snapshot://fasttrack/latest/indonor_oda_costs_oecd.csv
+  data://grapher/fasttrack/latest/daily_caloric_supply_fao_historical:
+    - snapshot://fasttrack/latest/daily_caloric_supply_fao_historical.csv

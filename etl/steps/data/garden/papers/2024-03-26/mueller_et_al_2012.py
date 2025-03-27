@@ -1,19 +1,19 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("mueller_et_al_2012")
-    tb = ds_meadow["mueller_et_al_2012"].reset_index()
+    tb = ds_meadow.read("mueller_et_al_2012")
 
     #
     # Process data.
@@ -37,5 +37,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

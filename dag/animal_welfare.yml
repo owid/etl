@@ -43,13 +43,6 @@ steps:
   data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
     - data://garden/animal_welfare/2023-09-01/chick_culling_laws
   #
-  # Total number of slaughtered animals.
-  #
-  data://garden/animal_welfare/2024-05-20/animals_used_for_food:
-    - data://garden/faostat/2024-03-14/faostat_qcl
-  data://grapher/animal_welfare/2024-05-20/animals_used_for_food:
-    - data://garden/animal_welfare/2024-05-20/animals_used_for_food
-  #
   # Various sources - Bullfighting laws.
   #
   data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
@@ -123,3 +116,13 @@ steps:
   #
   data://grapher/animal_welfare/2024-12-17/fur_laws:
     - data://garden/animal_welfare/2024-12-17/fur_laws
+  #
+  # Total number of slaughtered animals.
+  #
+  data://garden/animal_welfare/2025-03-26/animals_used_for_food:
+    - data://garden/faostat/2025-03-17/faostat_qcl
+  #
+  # Total number of slaughtered animals.
+  #
+  data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
+    - data://garden/animal_welfare/2025-03-26/animals_used_for_food

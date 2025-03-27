@@ -83,3 +83,10 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans:
     - data://garden/animal_welfare/2023-08-15/number_of_farmed_decapod_crustaceans
+  #
+  # Total number of slaughtered animals.
+  #
+  data://garden/animal_welfare/2024-05-20/animals_used_for_food:
+    - data://garden/faostat/2024-03-14/faostat_qcl
+  data://grapher/animal_welfare/2024-05-20/animals_used_for_food:
+    - data://garden/animal_welfare/2024-05-20/animals_used_for_food
