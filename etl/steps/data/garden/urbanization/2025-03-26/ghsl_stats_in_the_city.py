@@ -12,39 +12,34 @@ paths = PathFinder(__file__)
 UNITS = {
     "Share of population living in Low Elevation Coastal Zones (<5m) (%)": "%",
     "Share of days exceeding the historical 90th percentile of maximum temperature for that calendar day": "%",
-    "Number of hospitals": "hospitals",
-    "Number of pharmacies": "pharmacies",
-    "Number of hospitals per capita": "hospitals per 1,000 people",
-    "Number of pharmacies per capita": "pharmacies per 1,000 people",
-    "Number of hospitals per urban centre area": "hospitals per km²",
-    "Number of pharmacies per urban centre area": "pharmacies per km²",
-    "Share of urban centre population within 1 km of a hospital": "%",
-    "Share of urban centre population within 1 km of a pharmacy": "%",
-    "Population within 1 km of a hospital": "people",
-    "Population within 1 km of a pharmacy": "people",
     "Average download speed": "Mbps",
-    "Life expectancy": "years",
     "Annual mean temperature in the decade": "°C",
     "Annual precipitation in the decade": "mm",
+    "CO2 emissions per capita": "tonnes",
+    "Greenhouse gas emissions per capita": "t",
+    "Share of energy emissions in total emissions": "%",
+    "Share of residential emissions in total emissions": "%",
+    "Share of industrial emissions in total emissions": "%",
+    "Share of transport emissions in total emissions": "%",
+    "Share of waste emissions in total emissions": "%",
+    "Share of agricultural emissions in total emissions": "%",
 }
+
 
 SHORT_UNITS = {
     "Share of population living in Low Elevation Coastal Zones (<5m) (%)": "%",
     "Share of days exceeding the historical 90th percentile of maximum temperature for that calendar day": "%",
-    "Number of hospitals": "",
-    "Number of pharmacies": "",
-    "Number of hospitals per capita": "",
-    "Number of pharmacies per capita": "",
-    "Number of hospitals per urban centre area": "hospitals/km²",
-    "Number of pharmacies per urban centre area": "pharmacies/km²",
-    "Share of urban centre population within 1 km of a hospital": "%",
-    "Share of urban centre population within 1 km of a pharmacy": "%",
-    "Population within 1 km of a hospital": "",
-    "Population within 1 km of a pharmacy": "",
     "Average download speed": "Mbps",
-    "Life expectancy": "",
     "Annual mean temperature in the decade": "°C",
     "Annual precipitation in the decade": "mm",
+    "CO2 emissions per capita": "t",
+    "Greenhouse gas emissions per capita": "t",
+    "Share of energy emissions in total emissions": "%",
+    "Share of residential emissions in total emissions": "%",
+    "Share of industrial emissions in total emissions": "%",
+    "Share of transport emissions in total emissions": "%",
+    "Share of waste emissions in total emissions": "%",
+    "Share of agricultural emissions in total emissions": "%",
 }
 
 
@@ -63,7 +58,9 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = tb.drop("city", axis=1)
+    tb["country_city"] = tb["city"] + " (" + tb["country"] + ")"
+    tb = tb.drop(columns=["country", "city"])
+    tb = tb.rename(columns={"country_city": "country"})
 
     # Map units and short units to the table
     tb["unit"] = tb["indicator"].map(UNITS)
