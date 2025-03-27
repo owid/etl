@@ -228,3 +228,5 @@ steps:
     - snapshot://fasttrack/latest/housing_construction_permits_europe.csv
   data://grapher/fasttrack/latest/housing_overburden_rate_europe:
     - snapshot://fasttrack/latest/housing_overburden_rate_europe.csv
+  data://grapher/fasttrack/latest/housing_rents_indexed_2002:
+    - snapshot://fasttrack/latest/housing_rents_indexed_2002.csv
