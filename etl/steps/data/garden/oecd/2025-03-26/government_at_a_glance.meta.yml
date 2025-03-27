@@ -22,7 +22,16 @@ definitions:
     % of potential GDP
     <%- elif unit == "growth_rate" %>
     Growth rate
+    <%- elif unit == "share_gov_outsourcing_exp" %>
+    % of government outsourcing expenditures
+    <%- elif unit == "share_gov_revenues" %>
+    % of government revenues
+    <%- elif unit == "share_gov_production_costs" %>
+    % of government production costs
+    <%- elif unit == "share_tax_revenue" %>
+    % of tax revenue
     <%- endif %>
+
   unit: |-
     <% if unit == "ppp" %>
     current international-$
@@ -36,6 +45,14 @@ definitions:
     % of potential GDP
     <%- elif unit == "growth_rate" %>
     %
+    <%- elif unit == "share_gov_outsourcing_exp" %>
+    % of government outsourcing expenditures
+    <%- elif unit == "share_gov_revenues" %>
+    % of government revenues
+    <%- elif unit == "share_gov_production_costs" %>
+    % of government production costs
+    <%- elif unit == "share_tax_revenue" %>
+    % of tax revenue
     <%- endif %>
 
   short_unit: |-
@@ -51,11 +68,19 @@ definitions:
     <%- elif unit == "share_gdp" %>
     This data is divided by gross domestic product, expressed as a percentage.
     <%- elif unit == "share_gov_exp" %>
-    This data is divided by government expenditure, expressed as a percentage.
+    This data is divided by total government expenditure, expressed as a percentage.
     <%- elif unit == "share_investment" %>
-    This data is divided by government investment, expressed as a percentage.
+    This data is divided by total government investment, expressed as a percentage.
     <%- elif unit == "share_potential_gdp" %>
     This data is divided by potential GDP (GDP if the economy operated at its full potential), expressed as a percentage.
+    <%- elif unit == "share_gov_outsourcing_exp" %>
+    This data is divided by total government outsourcing expenditures, expressed as a percentage.
+    <%- elif unit == "share_gov_revenues" %>
+    This data is divided by total government revenues, expressed as a percentage.
+    <%- elif unit == "share_gov_production_costs" %>
+    This data is divided by total government production costs, expressed as a percentage.
+    <%- elif unit == "share_tax_revenue" %>
+    This data is divided by total tax revenue, expressed as a percentage.
     <%- endif %>
 
   num_decimal_places: |-
@@ -89,11 +114,11 @@ definitions:
 
   key_government_procurement_spending: General government procurement spending is the purchase of goods, services and works by the government. It is defined as the sum of the goods and services purchased by the government for its own use, gross fixed capital formation (infrastructure for transport, office buildings, housing, schools and hospitals), and social transfers in kind via market producers. Public corporations are excluded.
 
-  key_expenditures_on_government_outsourcing: Expenditures on government outsourcing is the portion of government production costs used to buy goods and services from entities outside the government. This includes goods and services used by the government, financed by the government, and other production costs.
+  key_expenditures_on_government_outsourcing: Expenditures on general government outsourcing is the portion of government production costs used to buy goods and services from entities outside the government. This includes goods and services used by the government, financed by the government, and other production costs.
 
-  key_production_costs: Production costs of government are public expenditures on the goods and services the government uses. These costs include wages for government employees and purchases of goods and services, like supplies for schools and hospitals. They do not include government spending that does not involve a purchase of a good or service, such as spending on social welfare, unemployment benefits, and other transfers. It also includes outsourcing, the costs of buying goods and services from entities outside of government, such as private companies and other agencies.
+  key_production_costs: Production costs of general government are public expenditures on the goods and services the government uses. These costs include wages for government employees and purchases of goods and services, like supplies for schools and hospitals. They do not include government spending that does not involve a purchase of a good or service, such as spending on social welfare, unemployment benefits, and other transfers. It also includes outsourcing, the costs of buying goods and services from entities outside of government, such as private companies and other agencies.
 
-  key_tax_revenues: Tax revenues are the compulsory unrequited payments made by economic entities to the government. They include taxes on consumption, income, wealth, property and capital.
+  key_tax_revenues: Tax revenues are the compulsory unrequited payments made by economic entities to the general government. They include taxes on consumption, income, wealth, property and capital.
 
   description_from_producer_expenditure: >-
     General government expenditures data are from the
@@ -328,7 +353,7 @@ tables:
   government_at_a_glance:
     variables:
       government_expenditure:
-        title: Government expenditure - {definitions.unit_human_readable}
+        title: Government expenditure ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: Total expenditure from central, state and local governments and social security funds. {definitions.short_description_unit}
@@ -339,12 +364,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government expenditure - {definitions.unit_human_readable}
+          name: Government expenditure ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_expenditure_per_capita:
-        title: Government expenditure per capita - {definitions.unit_human_readable}
+        title: Government expenditure per capita ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: Total expenditure from central, state and local governments and social security funds per capita. {definitions.short_description_unit}
@@ -355,12 +380,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government expenditure per capita - {definitions.unit_human_readable}
+          name: Government expenditure per capita ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_fiscal_balance:
-        title: Government fiscal balance - {definitions.unit_human_readable}
+        title: Government fiscal balance ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: "{definitions.short_description_unit}"
@@ -373,12 +398,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government fiscal balance - {definitions.unit_human_readable}
+          name: Government fiscal balance ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_gross_debt:
-        title: Government gross debt - {definitions.unit_human_readable}
+        title: Government gross debt ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: The total amount of money that a country's government has borrowed. {definitions.short_description_unit}
@@ -389,12 +414,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government gross debt - {definitions.unit_human_readable}
+          name: Government gross debt ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_gross_debt_per_capita:
-        title: Government gross debt per capita - {definitions.unit_human_readable}
+        title: Government gross debt per capita ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: The total amount of money that a country's government has borrowed per capita. {definitions.short_description_unit}
@@ -406,12 +431,12 @@ tables:
           title_public: Government gross debt per capita
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government gross debt per capita - {definitions.unit_human_readable}
+          name: Government gross debt per capita ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_gross_debt__maastricht_definition:
-        title: Government gross debt (Maastricht definition) - {definitions.unit_human_readable}
+        title: Government gross debt (Maastricht definition) ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: The total amount of money that a country's government has borrowed according to the Maastricht definition. {definitions.short_description_unit}
@@ -423,12 +448,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government gross debt (Maastricht definition) - {definitions.unit_human_readable}
+          name: Government gross debt (Maastricht definition) ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_investment:
-        title: Government investment - {definitions.unit_human_readable}
+        title: Government investment ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: Government expenditure dedicated to investments. {definitions.short_description_unit}
@@ -439,12 +464,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government investment - {definitions.unit_human_readable}
+          name: Government investment ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_net_interest_spending:
-        title: Government net interest spending - {definitions.unit_human_readable}
+        title: Government net interest spending ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: "{definitions.short_description_unit}"
@@ -455,12 +480,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government net interest spending - {definitions.unit_human_readable}
+          name: Government net interest spending ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_primary_balance:
-        title: Government primary balance - {definitions.unit_human_readable}
+        title: Government primary balance ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: "{definitions.short_description_unit}"
@@ -473,12 +498,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government primary balance - {definitions.unit_human_readable}
+          name: Government primary balance ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_revenues:
-        title: Government revenues - {definitions.unit_human_readable}
+        title: Government revenues ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: Total amount of money a government collects. {definitions.short_unit}
         description_short: "{definitions.short_description_unit}"
@@ -489,12 +514,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government revenues - {definitions.unit_human_readable}
+          name: Government revenues ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_revenues_per_capita:
-        title: Government revenues per capita - {definitions.unit_human_readable}
+        title: Government revenues per capita ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: Total amount of money a government collects per capita. {definitions.short_description_unit}
@@ -505,12 +530,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government revenues per capita - {definitions.unit_human_readable}
+          name: Government revenues per capita ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_structural_balance:
-        title: Government structural balance - {definitions.unit_human_readable}
+        title: Government structural balance ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: "{definitions.short_description_unit}"
@@ -521,12 +546,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government structural balance - {definitions.unit_human_readable}
+          name: Government structural balance ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_structural_primary_balance:
-        title: Government structural primary balance - {definitions.unit_human_readable}
+        title: Government structural primary balance ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: "{definitions.short_description_unit}"
@@ -538,12 +563,12 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government structural primary balance - {definitions.unit_human_readable}
+          name: Government structural primary balance ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
       government_procurement_spending:
-        title: Government procurement spending - {definitions.unit_human_readable}
+        title: Government procurement spending ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
         description_short: "{definitions.short_description_unit}"
@@ -554,7 +579,7 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government procurement spending - {definitions.unit_human_readable}
+          name: Government procurement spending ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -570,7 +595,7 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Expenditures on government outsourcing by economic transaction - {definitions.unit_human_readable}
+          name: Expenditures on government outsourcing by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -586,7 +611,7 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government expenditure by economic transaction - {definitions.unit_human_readable}
+          name: Government expenditure by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -602,7 +627,7 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Government revenues by economic transaction - {definitions.unit_human_readable}
+          name: Government revenues by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -618,7 +643,7 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Production costs by economic transaction - {definitions.unit_human_readable}
+          name: Production costs by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -634,6 +659,6 @@ tables:
         presentation:
           title_variant: "{definitions.unit_human_readable}"
         display:
-          name: Tax revenues by economic transaction - {definitions.unit_human_readable}
+          name: Tax revenues by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
