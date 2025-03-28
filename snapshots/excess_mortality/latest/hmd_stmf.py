@@ -1,5 +1,11 @@
-"""Script to create a snapshot of dataset 'Short-Term Mortality Fluctuations (HMD, 2023)'."""
+"""Script to create a snapshot of dataset 'Short-Term Mortality Fluctuations (HMD, 2023)'.
 
+To run the script, you have to set the following env variables with your credentials:
+- SNAPSHOTS_HMD_STMF_EMAIL
+- SNAPSHOTS_HMD_STMF_PASSWORD
+"""
+
+import os
 import re
 from datetime import date, datetime
 from pathlib import Path
@@ -28,11 +34,55 @@ def main(upload: bool) -> None:
     # Add date_accessed
     snap = modify_metadata(snap)
 
-    # Download data from source.
-    snap.download_from_source()
+    # Download CSV
+    download_csv(snap.path, snap.m.source.source_data_url)  # type: ignore
 
     # Add file to DVC and upload to S3.
     snap.dvc_add(upload=upload)
+
+
+def download_csv(path: Path, csv_url: str) -> None:
+    """Download CSV file from source and save it to the given path.
+    We need to login first, get session cookie and then use it to
+    download the CSV file."""
+
+    # Create a session object to persist cookies and headers
+    session = requests.Session()
+
+    # URL for login
+    login_url = "https://www.mortality.org/Account/Login"
+
+    # Step 1: Load the login page to get the dynamic anti-forgery token.
+    login_page_response = session.get(login_url)
+    assert login_page_response.ok, f"Failed to load the login page: {login_page_response.status_code}"
+
+    # Parse the login page HTML to extract the __RequestVerificationToken
+    soup = BeautifulSoup(login_page_response.text, "html.parser")
+    token_input = soup.find("input", {"name": "__RequestVerificationToken"})
+    assert token_input is not None, "Could not find the anti-forgery token on the login page."
+
+    token_value = token_input.get("value")  # type: ignore
+
+    # Step 2: Prepare login form data with the dynamic token.
+    login_data = {
+        "ReturnUrl": "https://www.mortality.org/Home/Index",
+        "Email": os.environ["SNAPSHOTS_HMD_STMF_EMAIL"],
+        "Password": os.environ["SNAPSHOTS_HMD_STMF_PASSWORD"],
+        "__RequestVerificationToken": token_value,
+    }
+
+    # Step 3: Perform the login POST request with the dynamic token.
+    login_response = session.post(login_url, data=login_data)
+    assert login_response.ok, "Login successful."
+
+    # Optionally, check if an Authorization cookie was set.
+    assert "Authorization" in session.cookies
+
+    # Step 4: Fetch the CSV file using the authenticated session.
+    csv_response = session.get(csv_url)
+    assert csv_response.ok, f"Failed to download CSV file: {csv_response.status_code}"
+    with open(path, "wb") as file:
+        file.write(csv_response.content)
 
 
 def modify_metadata(snap: Snapshot) -> Snapshot:

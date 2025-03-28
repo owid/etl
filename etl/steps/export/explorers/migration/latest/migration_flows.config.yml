@@ -1,0 +1,49 @@
+definitions:
+  common_views:
+    # Applies to all views with dimension metric=emigrants, unless overridden
+    - dimensions:
+        metric: emigrants
+    # Applies to all views with dimension metric=immigrants, unless overridden
+    - dimensions:
+        metric: immigrants
+
+config:
+  explorerTitle: Migration Flows
+  explorerSubtitle: Explore global migration data, country-by-country.
+  isPublished: true
+  selection:
+    - World
+  thumbnail: https://ourworldindata.org/app/uploads/2022/03/migration-flows-explorer.png
+  subNavId:
+  subNavCurrentId:
+  hasMapTab: true
+  yAxisMin: 0
+  pickerColumnSlugs: entityName
+  hideAnnotationFieldsInTitle: true
+  tab: map
+
+dimensions:
+  - name: Country
+    slug: country_select
+  - name: Metric
+    slug: metric
+    presentation:
+      type: radio
+    choices:
+      - slug: "emigrants"
+        name: "Emigrants: People moving away from country"
+      - slug: "immigrants"
+        name: "Immigrants: People moving to country"
+  - name: Gender
+    slug: gender
+    presentation:
+      type: radio
+    choices:
+      - slug: "all"
+        name: "All migrants"
+      - slug: "female"
+        name: "Female migrants"
+      - slug: "male"
+        name: "Male migrants"
+
+views: []

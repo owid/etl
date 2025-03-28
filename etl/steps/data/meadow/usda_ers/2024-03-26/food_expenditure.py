@@ -55,7 +55,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshots and read their data.
-    snap = paths.load_snapshot("food_expenditure.xlsx")
+    snap = paths.load_snapshot("food_expenditure_since_2018.xlsx")
     data = snap.ExcelFile()
 
     #

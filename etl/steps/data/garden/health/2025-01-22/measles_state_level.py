@@ -19,18 +19,20 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("measles_state_level", namespace="health")
     # Load the fast track of the CDC archive for 2002-2015
     ds_measles_cdc_archive = paths.load_snapshot("cdc_measles")
+    # Load in the CDC historical dataset for missing data < 2001
+    ds_measles_cdc_historical = paths.load_snapshot("measles_state_level", namespace="cdc")
     # Load the CDC dataset for 2016-2022
     ds_measles_cdc = paths.load_dataset("measles_state_level", namespace="cdc")
     ds_pop = paths.load_dataset("us_state_population")
-    ds_us_pop = paths.load_dataset("population")  # population for the whole of the United States
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("measles_state_level")
+    origins = tb["countvalue"].metadata.origins
+    tb_cdc_historical = ds_measles_cdc_historical.read_csv().drop(columns=["Unnamed: 0", "source"])
+    tb_cdc_historical = tb_cdc_historical[tb_cdc_historical["cases"] != "NN"].dropna(subset=["cases"])
     tb_cdc_archive = ds_measles_cdc_archive.read_csv()
     tb_cdc_state = ds_measles_cdc.read("state_measles")
-    tb_cdc_national = ds_measles_cdc.read("national_measles")
     tb_pop = ds_pop.read("us_state_population")
-    tb_us_pop = ds_us_pop.read("population")
     #
     # Process data.
     #
@@ -39,28 +41,25 @@ def run(dest_dir: str) -> None:
     tb = clean_project_tycho(tb)
     # Calculate annual cases
     tb = tb.groupby(["countryname", "state", "year"])["countvalue"].sum().reset_index()
-    tb_usa = tb.groupby(["countryname", "year"])["countvalue"].sum().reset_index()
     # Combine the tables from the different sources into one table.
-    tb = combine_state_tables(tb, tb_cdc_archive, tb_cdc_state)
-    tb_usa = combine_national_tables(tb_usa, tb_cdc_archive, tb_cdc_national)
+    tb = combine_state_tables(tb, tb_cdc_historical, tb_cdc_archive, tb_cdc_state)
     # Combine with population
     tb = tb.merge(tb_pop, left_on=["country", "year"], right_on=["state", "year"], how="left")
-    tb_usa = tb_usa.merge(tb_us_pop, left_on=["country", "year"], right_on=["country", "year"], how="left")
 
+    tb["case_count"] = pd.to_numeric(tb["case_count"], errors="coerce")
+    tb["population"] = pd.to_numeric(tb["population"], errors="coerce")
     tb["case_rate"] = tb["case_count"] / tb["population"] * 100000
-    tb_usa["national_case_rate"] = tb_usa["national_case_count"] / tb_usa["population"] * 100000
     tb = tb.drop(columns=["state", "population"])
-    tb_usa = tb_usa.drop(columns=["population", "source", "world_pop_share"])
-
+    tb["case_count"].metadata.origins = origins
+    tb["case_rate"].metadata.origins = origins
     # tb.metadata = metadata
     tb = tb.format(["country", "year"], short_name="measles")
-    tb_usa = tb_usa.format(["country", "year"], short_name="national_measles")
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
-        dest_dir, tables=[tb, tb_usa], check_variables_metadata=True, default_metadata=ds_meadow.metadata
+        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
     )
 
     # Save changes in the new garden dataset.
@@ -81,41 +80,20 @@ def clean_project_tycho(tb: Table) -> Table:
     return tb
 
 
-def combine_national_tables(tb_usa: Table, tb_cdc_archive: Table, tb_cdc_national: Table) -> Table:
-    """
-    Combine the tables from the different sources into one table.
-    - Project Tycho: 1888-2001 (tb_usa)
-    - CDC archive: 2002-2015 (tb_cdc_archive)
-    - CDC NNDSS: 2016-2022 (tb_cdc_national)
-    """
-    # Standardize the column names
-    tb_usa = tb_usa.rename(columns={"countvalue": "case_count", "countryname": "country"})
-
-    # Drop state-level data and type of case (indigenous vs imported) from the CDC archive
-    tb_cdc_archive = tb_cdc_archive[["country", "year", "total_measles_cases"]]
-    tb_cdc_archive = tb_cdc_archive.rename(columns={"total_measles_cases": "case_count"})
-    tb_cdc_archive = tb_cdc_archive[tb_cdc_archive["country"] == "United States"]
-
-    # Format the CDC current data to match
-    tb_cdc_national = tb_cdc_national[tb_cdc_national["disease"] == "Total"]
-    tb_cdc_national = tb_cdc_national[["country", "year", "case_count"]]
-
-    combined_tb = pr.concat([tb_usa, tb_cdc_archive, tb_cdc_national])
-
-    combined_tb = combined_tb.rename(columns={"case_count": "national_case_count"})
-    return combined_tb
-
-
-def combine_state_tables(tb: Table, tb_cdc_archive: Table, tb_cdc_state: Table) -> Table:
+def combine_state_tables(tb: Table, tb_cdc_historical: Table, tb_cdc_archive: Table, tb_cdc_state: Table) -> Table:
     """
     Combine the tables from the different sources into one table.
     - Project Tycho: 1888-2001 (tb)
+    - CDC Historical (from PDFs) <2001
     - CDC archive: 2002-2015 (tb_cdc_archive)
     - CDC NNDSS: 2016-2022 (tb_cdc_state)
     """
     # Format the Project Tycho data to match the CDC data
     tb = tb[["state", "year", "countvalue"]]
     tb = tb.rename(columns={"countvalue": "case_count", "state": "country"})
+
+    #
+    tb_cdc_historical = tb_cdc_historical.rename(columns={"cases": "case_count"})
 
     # Drop national data and type of case (indigenous vs imported) from the CDC archive
     tb_cdc_archive = tb_cdc_archive[["country", "year", "total_measles_cases"]]
@@ -127,7 +105,9 @@ def combine_state_tables(tb: Table, tb_cdc_archive: Table, tb_cdc_state: Table) 
     tb_cdc_state = tb_cdc_state[tb_cdc_state["disease"] == "Total"]
     tb_cdc_state = tb_cdc_state[["country", "year", "case_count"]]
 
-    combined_tb = pr.concat([tb, tb_cdc_archive, tb_cdc_state])
+    combined_tb = pr.concat([tb, tb_cdc_historical, tb_cdc_archive, tb_cdc_state])
+    # Check there aren't duplicate rows
+    combined_tb.set_index(["country", "year"], verify_integrity=True)
 
     return combined_tb
 

@@ -98,8 +98,6 @@ steps:
     - snapshot://fasttrack/latest/tomitaka_2018.csv
   data://grapher/fasttrack/latest/draft_joe_idd_oecd:
     - snapshot://fasttrack/latest/draft_joe_idd_oecd.csv
-  data://grapher/fasttrack/latest/daily_caloric_supply_fao_historical:
-    - snapshot://fasttrack/latest/daily_caloric_supply_fao_historical.csv
   data://grapher/fasttrack/latest/north_atlantic_hurricanes_noaa:
     - snapshot://fasttrack/latest/north_atlantic_hurricanes_noaa.csv
   data://grapher/fasttrack/latest/usa_hurricane_categories_noaa:
@@ -226,3 +224,11 @@ steps:
     - snapshot://fasttrack/latest/measles_cases.csv
   data://grapher/fasttrack/latest/housing_construction_permits_europe:
     - snapshot://fasttrack/latest/housing_construction_permits_europe.csv
+  data://grapher/fasttrack/latest/housing_overburden_rate_europe:
+    - snapshot://fasttrack/latest/housing_overburden_rate_europe.csv
+  data://grapher/fasttrack/latest/housing_rents_indexed_2002:
+    - snapshot://fasttrack/latest/housing_rents_indexed_2002.csv
+  data://grapher/fasttrack/latest/combined_housing_indices_2010:
+    - snapshot://fasttrack/latest/combined_housing_indices_2010.csv
+  data://grapher/fasttrack/latest/lives_saved_measles_vaccination_who:
+    - snapshot://fasttrack/latest/lives_saved_measles_vaccination_who.csv

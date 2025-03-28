@@ -601,7 +601,14 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
         # that case, we first check that the charts were really modified on our staging server.
         modified_charts = ChartDiffsLoader(config.OWID_ENV.get_engine(), production_or_master_engine()).df
         return bool(set(modified_charts.index) & set(rows.chartId))
-    # if not on staging, always raise an error
+    # Only show a warning in production. We can't raise an error because if someone merges changes to ETL
+    # with renamed variables and valid chart-sync, the ETL deploy would fail. It would fail because ETL (and this part) runs
+    # before chart-sync. If we only show a warning, the function `cleanup_ghost_variables` returns False, and ETL will
+    # re-run the step on the next deploy and delete those ghost variables.
+    # See https://github.com/owid/etl/issues/4099 for more details.
+    elif config.ENV == "production":
+        return False
+    # always raise an error otherwise
     else:
         return True
 
