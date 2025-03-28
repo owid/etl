@@ -686,3 +686,15 @@ tables:
           - Imports, exports, and domestic supply encompass the total of all items across the following groups: cereals and grains, pulses, starchy roots, fruits and vegetables, oils and fats, sugar, meat, dairy and eggs, alcoholic beverages, and an other products. The latter group includes miscellaneous items such as spices, offals, and other minor commodities.
         display:
           numDecimalPlaces: 1
+  milk_per_cow:
+    variables:
+      milk_per_cow:
+        title: Milk production per cow
+        unit: kilograms per cow
+        short_unit: kg
+        description_short: |
+          Average annual production of raw milk per cow.
+        description_key:
+          - This indicator is calculated by dividing the total production of raw milk from cattle by the number of cows used for milk production.
+        description_processing: |
+          - This indicator is calculated by dividing the total production of raw milk from cattle by the number of cows used for milk production.
