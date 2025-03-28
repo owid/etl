@@ -1,0 +1,21 @@
+dataset:
+  title: Lives saved by measles vaccinations (WHO, 2024)
+  description: Estimates of the number of lives saved by vaccination over the last 50 years (from 1974 to 2024).
+  licenses:
+    - {}
+tables:
+  lives_saved_measles_vaccination_who:
+    variables:
+      annual_lives_saved_measles:
+        title: Lives saved
+        unit: lives saved
+        description: The number of lives saved from measles as a result of vaccination efforts
+      cumulative_lives_saved_measles:
+        title: Cumulative lives saved
+        unit: lives saved
+        description: The cumulative number of lives saved from measles since 1974 as a result of vaccination efforts
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
