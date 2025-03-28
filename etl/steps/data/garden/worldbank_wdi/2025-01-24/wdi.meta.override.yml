@@ -420,7 +420,7 @@ tables:
           - A value below one means local goods and services are cheaper than in the US, while a value above one suggests local prices are higher.
           - These comparisons are based on PPP conversion rates (also called PPP conversion factors or PPP rates). PPP rates estimate how many units of a country’s local currency are needed to buy (roughly) the same basket of goods and services in that country that one US dollar would buy in the United States. For this indicator (at the level of [GDP](#dod:gdp)), the comparison is made using a broad, economy-wide basket of goods and services.
           - PPP rates are calculated by the [International Comparison Program (ICP)](https://www.worldbank.org/en/programs/icp), which uses the United States as a benchmark country.
-          - This data is expressed in international-$ at 2021 prices.
+          - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
         presentation:
           attribution_short: World Bank
           topic_tags:
