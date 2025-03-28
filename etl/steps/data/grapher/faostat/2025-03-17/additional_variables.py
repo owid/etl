@@ -154,7 +154,7 @@ def run() -> None:
     tb_maize_and_wheat = ds_garden.read("maize_and_wheat", reset_index=True)
     tb_fertilizer_exports = ds_garden.read("fertilizer_exports", reset_index=False)
     tb_net_exports_as_share_of_supply = ds_garden.read("net_exports_as_share_of_supply", reset_index=False)
-    tb_milk_per_cow = ds_garden.read("milk_per_cow", reset_index=False)
+    tb_milk_per_animal = ds_garden.read("milk_per_animal", reset_index=False)
 
     #
     # Process data.
@@ -204,7 +204,7 @@ def run() -> None:
             tb_maize_and_wheat_in_the_context_of_the_ukraine_war,
             tb_fertilizer_exports_in_the_context_of_the_ukraine_war,
             tb_net_exports_as_share_of_supply,
-            tb_milk_per_cow,
+            tb_milk_per_animal,
         ],
         default_metadata=ds_garden.metadata,
     )

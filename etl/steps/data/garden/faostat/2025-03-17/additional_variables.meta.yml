@@ -686,22 +686,25 @@ tables:
           - Imports, exports, and domestic supply encompass the total of all items across the following groups: cereals and grains, pulses, starchy roots, fruits and vegetables, oils and fats, sugar, meat, dairy and eggs, alcoholic beverages, and an other products. The latter group includes miscellaneous items such as spices, offals, and other minor commodities.
         display:
           numDecimalPlaces: 1
-  milk_per_cow:
+  milk_per_animal:
     variables:
-      milk_per_cow:
-        title: Milk production per cow
-        unit: kilograms per cow
+      milk_per_animal:
+        title: Milk production per animal
+        unit: kilograms per animal
         short_unit: kg
         description_short: |
-          Average annual milk production per cow. The values are estimated by dividing the total production of raw milk from cattle by the number of cows used for milk production.
+          Average annual milk production per animal. The values are estimated by dividing the total production of milk by the number of animals used for milk production.
+        description_key:
+          - This indicator is calculated by dividing the total production of milk by the number of animals used for milk production.
+          - In most countries, milk production is predominantly from cows, but the data includes milk from other species like sheep and goats.
         description_processing: |
-          - This indicator is calculated by dividing the total production of raw milk from cattle by the number of cows used for milk production.
-      cows_used_for_milk:
-        title: Number of cows used for milk production
+          - This indicator is calculated by dividing the total production of milk by the number of animals used for milk production.
+      animals_used_for_milk:
+        title: Number of animals used for milk production
         unit: animals
         short_unit: ""
       milk_production:
-        title: Raw milk production from cattle
+        title: Milk production
         unit: tonnes
         short_unit: t
   # NOTE: If you add any tables, remember to mention them as well in the grapher step!
