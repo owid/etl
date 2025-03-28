@@ -693,10 +693,11 @@ tables:
         unit: kilograms per animal
         short_unit: kg
         description_short: |
-          Average annual milk production per animal. The values are estimated by dividing the total production of milk by the number of animals used for milk production.
+          Average annual milk production per animal. Values are estimated by dividing the production of milk (from cattle, sheep, goats, and other animals) by the number of animals used for milk production.
         description_key:
-          - This indicator is calculated by dividing the total production of milk by the number of animals used for milk production.
+          - This indicator is calculated by dividing the net production of milk by the number of animals used for milk production.
           - In most countries, milk production is predominantly from cows, but the data includes milk from other species like sheep and goats.
+          - Net milk production refers to the total production of whole fresh milk, excluding the milk sucked by young animals but including the milked quantities used to feed livestock.
         description_processing: |
           - This indicator is calculated by dividing the total production of milk by the number of animals used for milk production.
       animals_used_for_milk:
