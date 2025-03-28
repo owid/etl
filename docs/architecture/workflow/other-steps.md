@@ -56,7 +56,7 @@ A step used to mark dependencies on HTTPS resources. The path is interpreted as 
 
 ## GitHub
 
-An empty step used only to mark a dependency on a Github repo, and trigger a rebuild of later steps whenever that repo changes. This is useful since Github is a good store for data that updates too frequently to be snapshotted into Walden, e.g. Gapminder's [open-numbers](https://github.com/open-numbers/).
+An empty step used only to mark a dependency on a Github repo, and trigger a rebuild of later steps whenever that repo changes. This is useful since Github is a good store for data that updates too frequently to be snapshotted, e.g. Gapminder's [open-numbers](https://github.com/open-numbers/).
 
 The most recent commit hash of the given branch will be used to determine whether the data has been updated. This way, the ETL will be triggered to rebuild any downstream steps each time the data is changed.
 

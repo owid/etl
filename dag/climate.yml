@@ -12,6 +12,7 @@ steps:
   data://meadow/climate/2025-01-07/surface_temperature:
   - snapshot://climate/2025-03-07/surface_temperature.zip
   - snapshot://countries/2023-12-27/world_bank.zip
+  - snapshot://countries/2025-03-22/continents_oceans.zip
   data://garden/climate/2025-01-07/surface_temperature:
     - data://meadow/climate/2025-01-07/surface_temperature
   data://grapher/climate/2025-01-07/surface_temperature_anomalies:
@@ -56,7 +57,7 @@ steps:
   data://garden/climate/latest/weekly_wildfires:
     - data://meadow/climate/latest/weekly_wildfires
     - data://garden/regions/2023-01-01/regions
-    - data://garden/faostat/2024-03-14/faostat_rl
+    - data://garden/faostat/2025-03-17/faostat_rl
   data://grapher/climate/latest/weekly_wildfires:
     - data://garden/climate/latest/weekly_wildfires
   data://grapher/climate/latest/wildfires_by_year:

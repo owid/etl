@@ -73,3 +73,91 @@ steps:
   data://grapher/wb/2023-07-24/food_prices_for_nutrition:
     - data://garden/wb/2023-07-24/food_prices_for_nutrition
 
+  #
+  # Agriculture - Long-run daily calorie supply per person.
+  #
+  data://garden/agriculture/2024-05-23/daily_calories_per_person:
+    - data://meadow/agriculture/2024-05-23/floud_et_al_2011
+    - data://garden/faostat/2024-03-14/faostat_fbsc
+    - data://meadow/agriculture/2024-05-23/fogel_2004
+    - data://meadow/agriculture/2024-05-23/fao_2000
+    - data://meadow/agriculture/2024-05-23/grigg_1995
+    - data://meadow/agriculture/2024-05-23/harris_et_al_2015
+    - data://meadow/usda_ers/2024-05-23/food_availability
+    - data://meadow/agriculture/2024-05-23/jonsson_1998
+    - data://meadow/agriculture/2024-05-23/fao_1949
+  #
+  # Long-term wheat yields in Europe.
+  #
+  data://garden/agriculture/2024-03-26/long_term_wheat_yields:
+    - data://garden/faostat/2024-03-14/faostat_qcl
+    - data://garden/papers/2024-03-26/bayliss_smith_wanmali_1984
+  #
+  # Long-term yields in the United Kingdom.
+  #
+  data://garden/agriculture/2024-03-26/uk_long_term_yields:
+    - data://garden/faostat/2024-03-14/faostat_qcl
+    - data://garden/papers/2024-03-26/brassley_2000
+    - data://garden/papers/2024-03-26/broadberry_et_al_2015
+  data://grapher/agriculture/2024-05-23/daily_calories_per_person:
+    - data://garden/agriculture/2024-05-23/daily_calories_per_person
+  #
+  # Long-term crop yields.
+  #
+  data://garden/agriculture/2024-03-26/long_term_crop_yields:
+    - data://garden/faostat/2024-03-14/faostat_qcl
+    - data://garden/agriculture/2024-03-26/long_term_wheat_yields
+    - data://garden/usda_nass/2024-03-26/us_corn_yields
+    - data://garden/agriculture/2024-03-26/uk_long_term_yields
+  #
+  # Attainable yields.
+  #
+  data://garden/agriculture/2024-03-26/attainable_yields:
+    - data://garden/papers/2024-03-26/mueller_et_al_2012
+    - data://garden/agriculture/2024-03-26/long_term_crop_yields
+  data://grapher/agriculture/2024-03-26/long_term_crop_yields:
+    - data://garden/agriculture/2024-03-26/long_term_crop_yields
+  data://grapher/agriculture/2024-03-26/attainable_yields:
+    - data://garden/agriculture/2024-03-26/attainable_yields
+  #
+  # Long-term corn yields in United States.
+  #
+  data://meadow/usda_nass/2024-03-26/us_corn_yields:
+    - snapshot://usda_nass/2024-03-26/us_corn_yields.csv
+  #
+  # USDA/ERS - Food availability.
+  #
+  data://meadow/usda_ers/2024-05-23/food_availability:
+    - snapshot://usda_ers/2024-05-23/food_availability.xls
+  data://garden/usda_nass/2024-03-26/us_corn_yields:
+    - data://meadow/usda_nass/2024-03-26/us_corn_yields
+  #
+  # Food expenditure in US - USDA
+  #
+  data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive:
+    - snapshot://usda_ers/2024-03-26/food_expenditure_in_us_archive.xlsx
+  data://meadow/usda_ers/2024-03-26/food_expenditure_in_us:
+    - snapshot://usda_ers/2024-03-26/food_expenditure_in_us.xlsx
+  data://garden/usda_ers/2024-03-26/food_expenditure_in_us:
+    - data://meadow/usda_ers/2024-03-26/food_expenditure_in_us_archive
+    - data://meadow/usda_ers/2024-03-26/food_expenditure_in_us
+  data://grapher/usda_ers/2024-03-26/food_expenditure_in_us:
+    - data://garden/usda_ers/2024-03-26/food_expenditure_in_us
+  #
+  # Food expenditure - USDA
+  #
+  data://meadow/usda_ers/2024-03-26/food_expenditure:
+    - snapshot://usda_ers/2024-03-26/food_expenditure_since_2018.xlsx
+  data://garden/usda_ers/2024-03-26/food_expenditure:
+    - data://meadow/usda_ers/2024-03-26/food_expenditure
+  data://grapher/usda_ers/2024-03-26/food_expenditure:
+    - data://garden/usda_ers/2024-03-26/food_expenditure
+  #
+  # Food prices for nutrition - World Bank based on FAO.
+  #
+  data://meadow/wb/2024-03-26/food_prices_for_nutrition:
+    - snapshot://wb/2024-03-26/food_prices_for_nutrition.csv
+  data://garden/wb/2024-03-26/food_prices_for_nutrition:
+    - data://meadow/wb/2024-03-26/food_prices_for_nutrition
+  data://grapher/wb/2024-03-26/food_prices_for_nutrition:
+    - data://garden/wb/2024-03-26/food_prices_for_nutrition

@@ -7,14 +7,14 @@ from owid.datautils import s3
 
 
 def test_s3_path_to_bucket_key():
-    url = "https://walden.owid.io/a/test.csv"
-    assert s3.s3_path_to_bucket_key(url) == ("walden", "a/test.csv")
+    url = "https://api.owid.io/a/test.csv"
+    assert s3.s3_path_to_bucket_key(url) == ("api", "a/test.csv")
 
-    url = "s3://walden/a/test.csv"
-    assert s3.s3_path_to_bucket_key(url) == ("walden", "a/test.csv")
+    url = "s3://api/a/test.csv"
+    assert s3.s3_path_to_bucket_key(url) == ("api", "a/test.csv")
 
-    url = "https://walden.s3.us-west-2.amazonaws.com/a/test.csv"
-    assert s3.s3_path_to_bucket_key(url) == ("walden", "a/test.csv")
+    url = "https://api.s3.us-west-2.amazonaws.com/a/test.csv"
+    assert s3.s3_path_to_bucket_key(url) == ("api", "a/test.csv")
 
 
 @mock.patch.object(s3.S3, "connect")
@@ -73,10 +73,10 @@ def test_connect(check_mocker, session_mocker_1, session_mocker_2):
 @mock.patch.object(s3.S3, "connect")
 def test_upload_to_s3(connect_mock):
     connect_mock.return_value.upload_file.return_value = None
-    url = "s3://owid-walden/a/test.csv"
+    url = "s3://owid-api/a/test.csv"
     S3 = s3.S3()
     s3_path = S3.upload_to_s3(s3_path=url, local_path="test.csv", public=True)
-    assert s3_path == "https://walden.owid.io/a/test.csv"
+    assert s3_path == "https://api.owid.io/a/test.csv"
 
     s3_path = S3.upload_to_s3(s3_path=url, local_path="test.csv", public=False)
-    assert s3_path == "s3://owid-walden/a/test.csv"
+    assert s3_path == "s3://owid-api/a/test.csv"

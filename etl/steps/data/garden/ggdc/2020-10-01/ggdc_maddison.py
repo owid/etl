@@ -1,4 +1,4 @@
-"""Load dataset for the Maddison Project Database from walden, process it, and transfer it to garden.
+"""Load dataset for the Maddison Project Database, process it, and transfer it to garden.
 
 Current dataset assumes the following approximate mapping:
 * "U.R. of Tanzania: Mainland" -> "Tanzania" (ignoring Zanzibar).

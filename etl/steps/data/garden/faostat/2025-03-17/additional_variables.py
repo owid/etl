@@ -343,7 +343,7 @@ def generate_percentage_of_sustainable_and_overexploited_fish(tb_sdgb: Table) ->
     # Select the necessary item.
     tb_sdgb = tb_sdgb[tb_sdgb["item_code"] == ITEM_CODE_SUSTAINABLE_FISH].reset_index(drop=True)
     error = "Unit for fish data has changed."
-    assert list(tb_sdgb["unit"].unique()) == ["Percent"], error
+    assert list(tb_sdgb["unit"].unique()) == ["percent"], error
     error = "Element for fish data has changed."
     assert list(tb_sdgb["element"].unique()) == ["Value"], error
 
@@ -639,7 +639,7 @@ def generate_fertilizers(tb_rfn: Table, tb_rl: Table) -> Table:
 
     # Sanity checks.
     error = "Unit for use per area has changed."
-    assert list(fertilizers["unit"].unique()) == ["Kilograms per hectare"], error
+    assert list(fertilizers["unit"].unique()) == ["kilograms per hectare"], error
 
     error = "Unexpected list of item codes for fertilizers (maybe another was added to faostat_rfn)."
     assert set(fertilizers["item_code"]) == set(ITEM_CODES_FOR_FERTILIZERS), error

@@ -270,10 +270,10 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
     !!! note
 
-        We used to handle custom definitions via custom_* files.
-        They let us handle individual definitions of items, elements and units (used by the food explorer).
-        However, for more common changes in an indicator's metadata, it is now better to directly modify the `faostat_*.meta.yml` files of the garden steps.
-        TODO: In the next data update, we will need to edit these scripts to be able to update not only the `custom_*` files, but also the `faostat_*.meta.yml` files, in case FAOSTAT definitions change.
+        The faostat_*.meta.yml files can be used to customize metadata of specific indicators.
+        However, units and short units should be modified in the `custom_elements_and_units.csv` file.
+        This way we can be aware of any unexpected FAO changes in units.
+        If any changes are made to `custom_*.csv` files, you may need to force-run the garden `faostat_metadata` step to implement those changes.
 
 6.  Run the new etl garden steps, to generate the garden datasets.
 
@@ -330,13 +330,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
 12. Update the explorers step `data://explorers/faostat/latest/food_explorer` (for the moment, this has to be done manually): Edit the version of its only dependency in the dag, so that it loads the latest garden step. It should be `data://garden/faostat/YYYY-MM-DD/faostat_food_explorer`.
 
-13. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
-
-    !!! note
-
-        In the future this could be handled automatically by one of the existing scripts.
-
-14. Run the new etl explorers step, to generate the csv files for the global food explorer.
+13. Run the new etl explorers step, to generate the csv files for the global food explorer.
 
     ```bash
     etl run explorers/faostat/latest/food_explorer
@@ -348,15 +342,27 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
         Sometimes items change in FAOSTAT. If that's the case, you may need to edit a file in the `owid-content` repository, namely `scripts/global-food-explorer/foods.csv`. Then, follow the instructions in `scripts/global-food-explorer/README.md`.
 
-15. Archive unnecessary DB datasets, and move old, unnecessary etl steps in the dag to the archive dag.
+14. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
+
+    !!! note
+
+        In the future this could be handled automatically by one of the existing scripts.
+
+15. Update titles and descriptions of snapshot origins (to use the custom dataset titles and descriptions defined in garden). Also, attributions will be added to origins.
 
     ```bash
-    python etl/scripts/faostat/archive_old_datasets.py -e
+    python etl/scripts/faostat/update_snapshots_metadata.py
     ```
 
     !!! note
 
-        This step may needs to be run several times, since archiving of steps currently needs to be done manually.
+        The current workflow is a bit convoluted: we fetch snapshots, create meadow and garden steps, and the edit snapshots again. But for now, this workflow is the safest working solution.
+
+16. Manually update the version of any `faostat` used as dependency in unrelated datasets (`faostat_rl` is used in `weekly_wildfires` and `population`).
+
+17. From the ETL dashboard, select archivable, namespace `faostat`, and archive all old steps.
+
+18. After merging all code and once production is up-to-date, archive unnecessary grapher datasets.
 
 ## Workflow to make changes to a dataset
 

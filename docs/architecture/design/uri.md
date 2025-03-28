@@ -14,7 +14,6 @@ Most of the time, the prefix will either be `snapshot` or `data`. The former is 
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `snapshot` | Used for [`snapshot`](../../workflow/#snapshot) steps.                                                                                                                                                                                   |
 | `data`     | Used for [`meadow`](../../workflow/#meadow), [`garden`](../../workflow/#garden), [`grapher`](../../workflow/#grapher) and most of the ETL steps where we operate with curated [Datasets](../common-format/#datasets-owidcatalogdataset). |
-| `walden`   | :warning: Deprecated. Used before the introduction of `snapshot`.                                                                                                                                                                        |
 | `backport` | Used to import datasets from the OWID database that are not present in the ETL.                                                                                                                                                          |
 
 ## Path

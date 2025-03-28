@@ -96,7 +96,7 @@ The meadow step is the first Transform step of our ETL. In it, we load a [`Snaps
 
 In this step, you can add and define metadata, but we rarely do this. Instead, we propagate the metadata defined in the Snapshot step and leave it to the Garden step to enhance the metadata.
 
-Meadow steps should only have `snapshot` dependencies and ー by definition ー should not depend on `garden` any other steps.
+Meadow steps should only have `snapshot` dependencies and ー by definition ー should not depend on `garden` or any other steps.
 
 ## Garden
 
