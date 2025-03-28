@@ -1224,6 +1224,10 @@ def generate_milk_per_cow(tb_qcl: Table) -> Table:
     # Numerically, it seems that their old milk yield indicator coincides with production / slaughtered animals.
     # So I will reproduce that indicator using their latest data on production and number of cows.
 
+    # Firstly, check if yield is still missing in the data.
+    error = "Yield for milk is not missing in the data anymore. Consider reusing it instead of calculating it."
+    assert tb_qcl[(tb_qcl["item_code"] == "00001780") & (tb_qcl["element_code"] == "005420")].empty, error
+
     # Element code for "Production".
     ELEMENT_CODE_FOR_PRODUCTION = "005510"
     # Unit for element of production.
