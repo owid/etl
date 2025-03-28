@@ -1921,9 +1921,13 @@ class Explorer(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(
         DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     )
-    # TODO: These fields are set by automation script that syncs owid-content to DB.
-    # They'll be deprecated soon
-    isPublished: Mapped[int] = mapped_column(TINYINT(1))
+
+    # isPublished is a virtual column and depends `isPublished\tTrue` string in TSV, it'll be soon treated
+    #   as a real column
+    isPublished: Mapped[Optional[int]] = mapped_column(
+        TINYINT(1), Computed("((`tsv` like _utf8mb4'%isPublished\ttrue%'))", persisted=False)
+    )
+    # TODO: this field is set by the mirror_explorers.py in automation, it'll be soon moved elsewhere
     config: Mapped[dict] = mapped_column(JSON)
 
     @classmethod
