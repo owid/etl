@@ -1221,7 +1221,7 @@ def generate_net_exports_as_share_of_supply(tb_fbsc: Table) -> Table:
 
 def generate_milk_per_cow(tb_qcl: Table) -> Table:
     # FAOSTAT QCL used to have yield for milk (milk per cow), but it was removed at some point (that combination of item and element is empty in the 2025 release).
-    # Numerically, it seems that their milk coincided with production / slaughtered animals.
+    # Numerically, it seems that their old milk yield indicator coincides with production / slaughtered animals.
     # So I will reproduce that indicator using their latest data on production and number of cows.
 
     # Element code for "Production".
