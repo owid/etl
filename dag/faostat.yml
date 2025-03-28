@@ -2,7 +2,6 @@ steps:
   ######################################################################################################################
   # The following datasets are still needed because:
   # * faostat_rl is used by population! We can't simply update the version of faostat_rl, because there are circular dependencies.
-  # * faostat_qcl and faostat_ic are still used in charts (there are indicators with no replacement).
   #
   # FAOSTAT meadow steps (2024-03-14).
   #
@@ -59,12 +58,6 @@ steps:
   #
   # FAOSTAT garden steps (2024-03-14).
   #
-  data://garden/faostat/2024-03-14/faostat_ic:
-    - data://garden/faostat/2024-03-14/faostat_metadata
-    - data://grapher/demography/2023-03-31/population
-    - data://meadow/faostat/2024-03-14/faostat_ic
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
   data://garden/faostat/2024-03-14/faostat_metadata:
     - data://meadow/faostat/2024-03-14/faostat_rt
     - data://meadow/faostat/2024-03-14/faostat_scl
@@ -91,25 +84,12 @@ steps:
     - data://meadow/faostat/2024-03-14/faostat_cahd
     - data://meadow/faostat/2024-03-14/faostat_fbs
     - data://meadow/faostat/2024-03-14/faostat_ti
-  data://garden/faostat/2024-03-14/faostat_qcl:
-    - data://garden/faostat/2024-03-14/faostat_metadata
-    - data://grapher/demography/2023-03-31/population
-    - data://meadow/faostat/2024-03-14/faostat_qcl
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
   data://garden/faostat/2024-03-14/faostat_rl:
     - data://garden/faostat/2024-03-14/faostat_metadata
     - data://meadow/faostat/2024-03-14/faostat_rl
     - data://grapher/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-03-11/income_groups
-  #
-  # FAOSTAT grapher steps (2024-03-14).
-  #
-  data://grapher/faostat/2024-03-14/faostat_ic:
-    - data://garden/faostat/2024-03-14/faostat_ic
-  data://grapher/faostat/2024-03-14/faostat_qcl:
-    - data://garden/faostat/2024-03-14/faostat_qcl
   ######################################################################################################################
   #
   # FAOSTAT meadow steps for version 2025-03-17
@@ -122,8 +102,6 @@ steps:
     - snapshot://faostat/2025-03-17/faostat_fbsh.zip
   data://meadow/faostat/2025-03-17/faostat_fs:
     - snapshot://faostat/2025-03-17/faostat_fs.zip
-  data://meadow/faostat/2025-03-17/faostat_ic:
-    - snapshot://faostat/2025-03-17/faostat_ic.zip
   data://meadow/faostat/2025-03-17/faostat_lc:
     - snapshot://faostat/2025-03-17/faostat_lc.zip
   data://meadow/faostat/2025-03-17/faostat_metadata:
@@ -171,12 +149,6 @@ steps:
     - data://garden/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
-  data://garden/faostat/2025-03-17/faostat_ic:
-    - data://meadow/faostat/2025-03-17/faostat_ic
-    - data://garden/demography/2024-07-15/population
-    - data://garden/wb/2024-07-29/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_lc:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_lc
@@ -192,7 +164,6 @@ steps:
     - data://meadow/faostat/2025-03-17/faostat_rp
     - data://meadow/faostat/2025-03-17/faostat_sdgb
     - data://meadow/faostat/2025-03-17/faostat_qv
-    - data://meadow/faostat/2025-03-17/faostat_ic
     - data://meadow/faostat/2025-03-17/faostat_fs
     - data://meadow/faostat/2025-03-17/faostat_rfn
     - data://meadow/faostat/2025-03-17/faostat_qi
@@ -249,8 +220,6 @@ steps:
     - data://garden/faostat/2025-03-17/faostat_fbsc
   data://grapher/faostat/2025-03-17/faostat_fs:
     - data://garden/faostat/2025-03-17/faostat_fs
-  data://grapher/faostat/2025-03-17/faostat_ic:
-    - data://garden/faostat/2025-03-17/faostat_ic
   data://grapher/faostat/2025-03-17/faostat_lc:
     - data://garden/faostat/2025-03-17/faostat_lc
   data://grapher/faostat/2025-03-17/faostat_qcl:

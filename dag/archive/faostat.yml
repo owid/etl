@@ -449,6 +449,28 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://grapher/demography/2023-03-31/population
     - data://meadow/faostat/2024-03-14/faostat_sdgb
+  data://garden/faostat/2024-03-14/faostat_ic:
+    - data://garden/faostat/2024-03-14/faostat_metadata
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://grapher/demography/2023-03-31/population
+    - data://meadow/faostat/2024-03-14/faostat_ic
+  data://garden/faostat/2024-03-14/faostat_qcl:
+    - data://garden/faostat/2024-03-14/faostat_metadata
+    - data://garden/wb/2024-03-11/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://grapher/demography/2023-03-31/population
+    - data://meadow/faostat/2024-03-14/faostat_qcl
+  data://garden/faostat/2024-03-14/faostat_food_explorer:
+    - data://garden/faostat/2024-03-14/faostat_fbsc
+    - data://grapher/demography/2023-03-31/population
+    - data://garden/faostat/2024-03-14/faostat_metadata
+    - data://garden/faostat/2024-03-14/faostat_qcl
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+  #
+  # FAOSTAT grapher steps (2024-03-14).
+  #
   data://grapher/faostat/2024-03-14/faostat_emn:
     - data://garden/faostat/2024-03-14/faostat_emn
   data://grapher/faostat/2024-03-14/faostat_qv:
@@ -461,20 +483,10 @@ steps:
     - data://garden/faostat/2024-03-14/faostat_qi
   data://grapher/faostat/2024-03-14/faostat_ti:
     - data://garden/faostat/2024-03-14/faostat_ti
-  data://garden/faostat/2024-03-14/faostat_food_explorer:
-    - data://garden/faostat/2024-03-14/faostat_fbsc
-    - data://grapher/demography/2023-03-31/population
-    - data://garden/faostat/2024-03-14/faostat_metadata
-    - data://garden/faostat/2024-03-14/faostat_qcl
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
   data://grapher/faostat/2024-03-14/faostat_fbsc:
     - data://garden/faostat/2024-03-14/faostat_fbsc
   data://grapher/faostat/2024-03-14/faostat_tcl:
     - data://garden/faostat/2024-03-14/faostat_tcl
-  #
-  # FAOSTAT grapher steps (2024-03-14).
-  #
   data://grapher/faostat/2024-03-14/faostat_cahd:
     - data://garden/faostat/2024-03-14/faostat_cahd
   data://grapher/faostat/2024-03-14/faostat_fo:
@@ -499,6 +511,10 @@ steps:
     - data://garden/faostat/2024-03-14/faostat_lc
   data://grapher/faostat/2024-03-14/faostat_sdgb:
     - data://garden/faostat/2024-03-14/faostat_sdgb
+  data://grapher/faostat/2024-03-14/faostat_ic:
+    - data://garden/faostat/2024-03-14/faostat_ic
+  data://grapher/faostat/2024-03-14/faostat_qcl:
+    - data://garden/faostat/2024-03-14/faostat_qcl
   #
   # FAOSTAT garden step for additional variables (2024-03-14).
   #
