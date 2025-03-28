@@ -7,11 +7,11 @@ tables:
   lives_saved_measles_vaccination_who:
     variables:
       annual_lives_saved_measles:
-        title: Lives saved
+        title: Lives saved by measles vaccination
         unit: lives saved
         description: The number of lives saved from measles as a result of vaccination efforts
       cumulative_lives_saved_measles:
-        title: Cumulative lives saved
+        title: Cumulative lives saved by measles vaccination
         unit: lives saved
         description: The cumulative number of lives saved from measles since 1974 as a result of vaccination efforts
     dimensions:
