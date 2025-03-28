@@ -1219,6 +1219,63 @@ def generate_net_exports_as_share_of_supply(tb_fbsc: Table) -> Table:
     return tb
 
 
+def generate_milk_per_animal(tb_qcl: Table) -> Table:
+    # FAOSTAT QCL used to have yield for milk (milk per animal), but it was removed at some point (that combination of item and element is empty in the 2025 release).
+    # Numerically, it seems that their old milk yield indicator coincides with production / number of animals.
+    # So I will reproduce that indicator using their latest data on production and number of milk animals.
+
+    # Firstly, check if yield is still missing in the data.
+    error = "Yield for milk is not missing in the data anymore. Consider reusing it instead of calculating it."
+    assert tb_qcl[(tb_qcl["item_code"] == "00001780") & (tb_qcl["element_code"] == "005420")].empty, error
+
+    # Element code for "Production".
+    ELEMENT_CODE_FOR_PRODUCTION = "005510"
+    # Unit for element of production.
+    UNIT_FOR_PRODUCTION = "tonnes"
+    # Element code for "Milk animals".
+    ELEMENT_CODE_FOR_MILK_ANIMALS = "005318"
+    # Unit for element of milk animals.
+    UNIT_FOR_ANIMALS = "animals"
+    # Item code for "Milk".
+    ITEM_CODE_FOR_MILK = "00001780"
+
+    # Select the relevant items/elements/units.
+    tb_milk = tb_qcl[
+        (tb_qcl["item_code"] == ITEM_CODE_FOR_MILK)
+        & (tb_qcl["element_code"].isin([ELEMENT_CODE_FOR_PRODUCTION, ELEMENT_CODE_FOR_MILK_ANIMALS]))
+    ].reset_index(drop=True)
+
+    # Sanity check.
+    error = "Units of milk production or milk animals have changed."
+    assert set(tb_milk["unit"]) == {UNIT_FOR_PRODUCTION, UNIT_FOR_ANIMALS}, error
+
+    # Transpose data and rename columns conveniently.
+    tb_milk = tb_milk.pivot(
+        index=["country", "year"], columns="element_code", values="value", join_column_levels_with="_"
+    ).rename(
+        columns={
+            ELEMENT_CODE_FOR_PRODUCTION: "milk_production",
+            ELEMENT_CODE_FOR_MILK_ANIMALS: "animals_used_for_milk",
+        },
+        errors="raise",
+    )
+
+    # Add column for milk production per animal.
+    # NOTE: We change the units from tonnes to kg.
+    tb_milk["milk_per_animal"] = 1000 * tb_milk["milk_production"] / tb_milk["animals_used_for_milk"]
+
+    # Sanity checks.
+    error = "Unexpected infinite values in the calculation of milk per animal."
+    assert not np.isinf(tb_milk["milk_per_animal"]).any(), error
+    error = "Yield per animal is unexpectedly high."
+    assert (tb_milk["milk_per_animal"] <= 15000).all(), error
+
+    # Improve table format.
+    tb_milk_per_animal = tb_milk.format(["country", "year"], short_name="milk_per_animal")
+
+    return tb_milk_per_animal
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -1292,6 +1349,9 @@ def run() -> None:
     # Create table for food trade as a share of consumption.
     tb_net_exports_as_share_of_supply = generate_net_exports_as_share_of_supply(tb_fbsc=tb_fbsc)
 
+    # Create atable for milk production per animal.
+    tb_milk_per_animal = generate_milk_per_animal(tb_qcl=tb_qcl)
+
     #
     # Save outputs.
     #
@@ -1312,6 +1372,7 @@ def run() -> None:
             tb_maize_and_wheat,
             tb_fertilizer_exports,
             tb_net_exports_as_share_of_supply,
+            tb_milk_per_animal,
         ],
     )
     ds_garden.save()

@@ -230,3 +230,5 @@ steps:
     - snapshot://fasttrack/latest/housing_rents_indexed_2002.csv
   data://grapher/fasttrack/latest/combined_housing_indices_2010:
     - snapshot://fasttrack/latest/combined_housing_indices_2010.csv
+  data://grapher/fasttrack/latest/lives_saved_measles_vaccination_who:
+    - snapshot://fasttrack/latest/lives_saved_measles_vaccination_who.csv
