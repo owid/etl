@@ -361,8 +361,6 @@ tables:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditure}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government expenditure ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -377,8 +375,6 @@ tables:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditure}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government expenditure per capita ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -395,8 +391,6 @@ tables:
           - "{definitions.key_fiscal_balance}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_fiscal_balance}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government fiscal balance ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -411,8 +405,6 @@ tables:
           - "{definitions.key_gross_debt}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_gross_debt}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government gross debt ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -427,9 +419,6 @@ tables:
           - "{definitions.key_gross_debt}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_gross_debt}"
-        presentation:
-          title_public: Government gross debt per capita
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government gross debt per capita ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -445,8 +434,6 @@ tables:
           - "{definitions.key_gross_debt_maastricht_definition}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_gross_debt}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government gross debt (Maastricht definition) ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -461,8 +448,6 @@ tables:
           - "{definitions.key_government_investment}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_government_investment}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government investment ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -477,8 +462,6 @@ tables:
           - "{definitions.key_government_net_interest_spending}"
           - "{definitions.key_general_government}"
         description_from_producer: ""
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government net interest spending ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -495,8 +478,6 @@ tables:
           - "{definitions.key_government_primary_balance}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_fiscal_balance}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government primary balance ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -511,8 +492,6 @@ tables:
           - "{definitions.key_government_revenue}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_revenue}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government revenues ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -527,8 +506,6 @@ tables:
           - "{definitions.key_government_revenue}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_revenue}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government revenues per capita ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -543,8 +520,6 @@ tables:
           - "{definitions.key_government_structural_balance}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_structural_balance}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government structural balance ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -560,8 +535,6 @@ tables:
           - "{definitions.key_government_structural_primary_balance}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_structural_primary_balance}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government structural primary balance ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -576,8 +549,6 @@ tables:
           - "{definitions.key_government_procurement_spending}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_government_procurement_spending}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government procurement spending ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -592,8 +563,6 @@ tables:
           - "{definitions.key_expenditures_on_government_outsourcing}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditures_on_government_outsourcing}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Expenditures on government outsourcing by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -608,8 +577,6 @@ tables:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditure}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government expenditure by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -624,8 +591,6 @@ tables:
           - "{definitions.key_government_revenue}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_revenue}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Government revenues by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -640,8 +605,6 @@ tables:
           - "{definitions.key_production_costs}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_production_costs}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Production costs by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
@@ -656,8 +619,6 @@ tables:
           - "{definitions.key_tax_revenues}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_tax_revenues}"
-        presentation:
-          title_variant: "{definitions.unit_human_readable}"
         display:
           name: Tax revenues by economic transaction ({definitions.unit_human_readable})
           numDecimalPlaces: "{definitions.num_decimal_places}"
