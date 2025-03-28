@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import owid.catalog.processing as pr
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -23,6 +21,20 @@ UNITS = {
     "Share of transport emissions in total emissions": "%",
     "Share of waste emissions in total emissions": "%",
     "Share of agricultural emissions in total emissions": "%",
+    "Tightly built city areas": "%",
+    "Buildings surrounded by green areas": "%",
+    "Dense single-story lightweight housing": "%",
+    "Large low-rise buildings with paved surroundings": "%",
+    "Scattered buildings in natural settings": "%",
+    "Industrial zones": "%",
+    "Forests, parks, and greenery": "%",
+    "Rocky or sandy land": "%",
+    "Water bodies": "%",
+    "Unknown": "%",
+    "Average daily photovoltaic potential": "kilowatt-hours per kilowatt-peak",
+    "Share of population living in the high green area": "%",
+    "Road network density": "m/m2²",
+    "Share of population living in areas exposed to floods (10 yrp)": "%",
 }
 
 
@@ -40,6 +52,20 @@ SHORT_UNITS = {
     "Share of transport emissions in total emissions": "%",
     "Share of waste emissions in total emissions": "%",
     "Share of agricultural emissions in total emissions": "%",
+    "Tightly built city areas": "%",
+    "Buildings surrounded by green areas": "%",
+    "Dense single-story lightweight housing": "%",
+    "Large low-rise buildings with paved surroundings": "%",
+    "Scattered buildings in natural settings": "%",
+    "Industrial zones": "%",
+    "Forests, parks, and greenery": "%",
+    "Rocky or sandy land": "%",
+    "Water bodies": "%",
+    "Unknown": "%",
+    "Average daily photovoltaic potential": "kWh/kWp",
+    "Share of population living in the high green area": "%",
+    "Road network density": "m/m²",
+    "Share of population living in areas exposed to floods (10 yrp)": "%",
 }
 
 
@@ -58,13 +84,12 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb["country_city"] = tb["city"] + " (" + tb["country"] + ")"
-    tb = tb.drop(columns=["country", "city"])
-    tb = tb.rename(columns={"country_city": "country"})
+    tb = tb.drop(columns=["city"])
 
     # Map units and short units to the table
     tb["unit"] = tb["indicator"].map(UNITS)
     tb["short_unit"] = tb["indicator"].map(SHORT_UNITS)
+    print(tb["indicator"].unique())
 
     # Improve table format.
     tb = tb.format(["country", "year", "indicator", "unit", "short_unit"])
