@@ -698,4 +698,12 @@ tables:
           - This indicator is calculated by dividing the total production of raw milk from cattle by the number of cows used for milk production.
         description_processing: |
           - This indicator is calculated by dividing the total production of raw milk from cattle by the number of cows used for milk production.
+      cows_used_for_milk:
+        title: Number of cows used for milk production
+        unit: animals
+        short_unit: ""
+      milk_production:
+        title: Raw milk production from cattle
+        unit: tonnes
+        short_unit: t
   # NOTE: If you add any tables, remember to mention them as well in the grapher step!
