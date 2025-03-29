@@ -32,7 +32,7 @@ CONFIG_BASE = {
     "hideLegend": False,
     "tab": "chart",
     "logo": "owid",
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.006.json",
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.007.json",
     "showYearLabels": False,
     "id": 807,
     "selectedFacetStrategy": "none",
