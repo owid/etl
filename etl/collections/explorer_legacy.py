@@ -15,10 +15,12 @@ from typing import Any, Dict, List, Optional, Union
 
 import numpy as np
 import pandas as pd
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
-from etl import config
-from etl.files import download_file_from_server, run_command_on_server, upload_file_to_server
+from apps.chart_sync.admin_api import AdminAPI
+from etl.config import OWID_ENV, OWIDEnv
+from etl.grapher import model as gm
 from etl.grapher.io import get_variables_data
 from etl.paths import EXPLORERS_DIR
 
@@ -95,9 +97,6 @@ class ExplorerLegacy:
 
         # Others
         self.name = name
-
-        # Path
-        self.path = None
         self.content_raw = None
 
     @classmethod
@@ -168,82 +167,37 @@ class ExplorerLegacy:
         return explorer
 
     @classmethod
-    def from_file(
-        cls,
-        path: str,
-        name: Optional[str] = None,
-    ) -> "ExplorerLegacy":
-        """Load explorer config from a given path (tsv or csv)."""
+    def from_db(cls, name: str, owid_env: Optional[OWIDEnv] = None) -> "ExplorerLegacy":
+        """Load explorer config from DB."""
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
 
-        if not (path.endswith("csv") or path.endswith("tsv")):
-            raise ValueError("Path should be CSV of TSV")
-        if Path(path).exists():
-            log.info(f"Loading explorer file {path}.")
-            with open(path, "r") as f:
-                content = f.read()
-            if path.endswith("csv"):
-                sep = ","
-            else:
-                sep = "\t"
-            return cls.from_raw_string(content, sep=sep, name=name)
-        else:
-            raise ValueError(f"Unknown path '{path}'!")
+        # Build explorer from DB
+        with Session(owid_env.engine) as session:
+            db_exp = gm.Explorer.load_explorer(session, slug=name)
+            if db_exp is None:
+                raise ValueError(f"Explorer '{name}' not found in the database.")
 
-    @classmethod
-    def from_owid_content(cls, name: str) -> "ExplorerLegacy":
-        """Load explorer config from a file in owid-content directory.
-
-        NOTE: owid-content should be at the same level as etl.
-        """
-        path = (Path(EXPLORERS_DIR) / name).with_suffix(".explorer.tsv")
-
-        # If working on staging server, pull the file from there and replace the local owid-content version
-        if cls._on_staging():
-            download_file_from_server(path, f"owid@{config.DB_HOST}:~/owid-content/explorers/{name}.explorer.tsv")
-
-        # Build explorer from file
-        explorer = cls.from_file(str(path), name=name)
-
-        # Save path to use when exporting?
-        explorer.path = path
+        assert "\t" in db_exp.tsv, "Explorer config should use \t separator."
+        explorer = cls.from_raw_string(db_exp.tsv, sep="\t", name=name)
 
         return explorer
 
-    def export(self, path: Union[str, Path]):
-        """Export file."""
-        path = Path(path)
-        # Write parsed content to file.
-        path.write_text(self.content)
+    def save(self, owid_env: Optional[OWIDEnv] = None) -> None:
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
 
-    @staticmethod
-    def _on_staging() -> bool:
-        return config.STAGING and "staging-site" in config.DB_HOST and "staging-site-master" not in config.DB_HOST  # type: ignore
+        # Update TSV in owid-content, this is only temporary to see a diff.
+        # TODO: Get rid of this and show diff in explorer-diff
+        if EXPLORERS_DIR.exists():
+            explorer_path = (Path(EXPLORERS_DIR) / self.name).with_suffix(".explorer.tsv")
+            explorer_path.write_text(self.content)
 
-    def to_owid_content(self, path: Optional[Union[str, Path]] = None):
-        """Save your config in owid-content and push to server if applicable.
-
-        This is useful when working with config files from the owid-content repository.
-        """
-        if path is None:
-            path = self.path
-
-        # Export content to path
-        assert isinstance(path, (str, Path)), "Path should be a string or a Path object."
-        self.export(path)
-
-        # Upload it to staging server.
-        if self._on_staging():
-            upload_file_to_server(Path(path), f"owid@{config.DB_HOST}:~/owid-content/explorers/")
-
-            # Commit on the staging server
-            run_command_on_server(
-                f"owid@{config.DB_HOST}",
-                "cd owid-content && git add . && git diff-index --quiet HEAD || git commit -m ':robot: Update explorer from ETL'",
-            )
-
-    def save(self, path: Optional[Union[str, Path]] = None) -> None:
-        """See docs for `to_owid_content`."""
-        self.to_owid_content(path)
+        # Upsert config via Admin API
+        admin_api = AdminAPI(owid_env)
+        admin_api.put_explorer_config(self.name, self.content)
 
     @staticmethod
     def _parse_config(config_raw, sep) -> Dict[str, Any]:
@@ -710,13 +664,20 @@ def _create_explorer_legacy(
     df_graphers: pd.DataFrame,
     explorer_name: str,
     df_columns: Optional[pd.DataFrame] = None,
+    reset: bool = False,
 ) -> ExplorerLegacy:
     """This function is used to create an Explorer object using the legacy configuration.
 
     To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
+
+    :param reset: If True, create explorer from scratch. If False, update explorer in database.
     """
-    # Initialize explorer.
-    explorer = ExplorerLegacy.from_owid_content(explorer_name)
+    if reset:
+        # Create explorer from scratch.
+        explorer = ExplorerLegacy.from_raw_string(name=explorer_name)
+    else:
+        # Load explorer from database.
+        explorer = ExplorerLegacy.from_db(explorer_name)
 
     # Add a comment to avoid manual edits.
     explorer.comments = [f"# DO NOT EDIT THIS FILE MANUALLY. IT WAS GENERATED BY ETL step '{explorer_path}'."]

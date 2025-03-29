@@ -243,14 +243,6 @@ For convenience, we should archive grapher datasets that have been replaced by n
 - Copy the dataset id from the URL (e.g. if the URL is [https://admin.owid.io/admin/datasets/6520](https://admin.owid.io/admin/datasets/6520), the dataset id is `6520`).
 - Access the production database (e.g. using DBeaver), search for the dataset with that id, and set `isPrivate` and `isArchived` to 1.
 
-### Pull changes to explorers in Admin
-If your work affects explorers,  you can run `etl explorer-update`.
-    - It may take a few minutes, and it will update all `*-explorer.tsv` files in your `owid-content` repository.
-    - You can access the `owid-content` repository, and commit any useful changes (otherwise, you can revert them with `git restore .`).
-    - Push those changes and create a new PR in `owid-content`.
-
-After updating any TSV configuration in `owid-content`, make sure to pull changes from the explorer admin site (up-right button).
-
 ### Wrap up
 
 - Close any relevant issues from the `owid-issues` or `etl` repositories.
