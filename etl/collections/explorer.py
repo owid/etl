@@ -114,6 +114,8 @@ class Explorer(Collection):
 
         # Transform to legacy format
         # TODO: this part is responsible for interacting with owid-content. Instead, it should be replaced with DB-interaction code, as with MDIMs.
+        # TODO: ExplorerLegacy would ideally only convert args into TSV, the rest would be handled by Explorer. Or ideally we migrate all df_ explorers
+        # into configs
         explorer_legacy = _create_explorer_legacy(
             explorer_path=f"export://explorers/{self.catalog_path}",
             explorer_name=self.explorer_name,

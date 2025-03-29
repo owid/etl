@@ -293,9 +293,9 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
     _check_public_private_steps(dag)
 
     if export:
-        # If there were any "export://multidim" steps, keep them in the dag, to be executed.
+        # If there were any "export://multidim" or "export://explorers" steps, keep them in the dag, to be executed.
         for step in list(dag.keys()):
-            if step.startswith("export://multidim/"):
+            if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
                 # If private is false and any of the dependencies are private, continue
                 if not private and any(_is_private_step(dep) for dep in dag[step]):
                     continue

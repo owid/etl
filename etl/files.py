@@ -210,6 +210,10 @@ def yaml_dump(
     return s
 
 
+def yaml_load(f: io.TextIOWrapper) -> Dict[str, Any]:
+    return yaml.safe_load(f)
+
+
 def ruamel_dump(d: Dict[str, Any]) -> str:
     """Dump dictionary with a consistent style using ruamel.yaml."""
     yml = ruamel.yaml.YAML()
