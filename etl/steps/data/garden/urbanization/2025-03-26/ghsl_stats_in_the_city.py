@@ -34,7 +34,6 @@ UNITS = {
     "Average daily photovoltaic potential": "kilowatt-hours per kilowatt-peak",
     "Share of population living in the high green area": "%",
     "Road network density": "m/m2²",
-    "Share of population living in areas exposed to floods (10 yrp)": "%",
 }
 
 
@@ -65,7 +64,6 @@ SHORT_UNITS = {
     "Average daily photovoltaic potential": "kWh/kWp",
     "Share of population living in the high green area": "%",
     "Road network density": "m/m²",
-    "Share of population living in areas exposed to floods (10 yrp)": "%",
 }
 
 
