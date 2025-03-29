@@ -80,8 +80,9 @@ def add_country_counts_and_population_by_status(tb: Table, ds_regions: Dataset, 
         column_title = tb[col].metadata.title
         description_from_producer = tb[col].metadata.description_from_producer
         tb_regions[col] = tb_regions[col].astype(str)
+
         # Define the mapping dictionary
-        value_map = {"nan": "missing", "0.0": "no", "1.0": "yes"}
+        value_map = {"<NA>": "missing", "0.0": "no", "1.0": "yes"}
         tb_regions[col] = tb_regions[col].map(value_map)
         # Get the unique values in the column
         status_list = list(tb_regions[col].unique())
