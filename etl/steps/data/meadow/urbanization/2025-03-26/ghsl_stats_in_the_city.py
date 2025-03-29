@@ -15,8 +15,7 @@ paths = PathFinder(__file__)
 SHEETS_AND_COLUMNS = {
     "EXPOSURE": [
         "EX_L05_SHP_",  # Share of population living in Low Elevation Coastal Zones (<5m) (%)
-        "EX_010_SHP_",
-    ],  # Share of population living in areas exposed to floods (10 yrp)
+    ],
     "CLIMATE": [
         "CL_WDS_CUR_",  # Share of days exceeding the historical 90th percentile of maximum temperature for that calendar day
         "CL_B01_CUR_",  # Annual Mean Temperature in the decade
@@ -91,7 +90,6 @@ COLUMN_MAPPING = {
     "CL_REN_PVO_": "Average daily photovoltaic potential",
     "SD_POP_HGR_": "Share of population living in the high green area",
     "IN_ROA_DEN_": "Road network density",
-    "EX_010_SHP_": "Share of population living in areas exposed to floods (10 yrp)",
 }
 # Define a public-friendly mapping to simplify LCZ descriptive categories
 LCZ_CATEGORY_MAPPING = {
