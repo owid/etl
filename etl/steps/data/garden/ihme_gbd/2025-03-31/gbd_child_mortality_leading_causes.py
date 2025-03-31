@@ -1,11 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Any, List
-
-import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
-from owid.catalog.utils import underscore
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -52,10 +46,13 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_garden = paths.load_dataset("gbd_child_mortality")
+    ds_garden = paths.load_dataset("gbd_cause")
 
     # Read table from meadow dataset.
-    tb = ds_garden.read("gbd_child_mortality_deaths")
+    tb = ds_garden.read("gbd_cause_deaths")
+    # Only keep the number of deaths for this calculation and children under five
+    tb = tb[(tb["age"] == "<5 years") & (tb["metric"] == "Number")]
+    tb = tb.drop(columns=["metric", "age"])
 
     # Exclude higher level causes of death but keep the subcategories
     tb = tb[tb["cause"].isin(OWID_HIERARCHY)]
@@ -68,17 +65,13 @@ def run(dest_dir: str) -> None:
     }
 
     tb["cause"] = tb["cause"].replace(disease_dict)
-    # Only keep the number of deaths for this calculation
-    tb = tb[tb["metric"] == "Number"]
 
-    # Replace values in "sex" column more descriptive values
-    tb["sex"] = tb["sex"].replace({"Both": "children", "Male": "boys", "Female": "girls"})
     # Group by 'country', 'year', 'sex', and 'age_group' and find the cause with the maximum number of deaths
-    tb = tb.loc[tb.groupby(["country", "year", "sex", "age"])["value"].idxmax()]
-    tb = tb.drop(columns=["value", "metric"])
+    tb = tb.loc[tb.groupby(["country", "year"])["value"].idxmax()]
+    tb = tb.drop(columns=["value"])
 
     # Format the table
-    tb = tb.format(["country", "year", "age", "sex"])
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

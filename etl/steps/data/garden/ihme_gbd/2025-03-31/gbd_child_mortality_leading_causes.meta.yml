@@ -8,7 +8,6 @@ definitions:
     processing_level: minor
 
   description_key: |-
-    - Neonatal disorders include complications from preterm birth, lack of oxygen at birth, infections, jaundice, and other conditions affecting newborns.
     - Lower respiratory infections are defined in the study as pneumonia or bronchiolitis.
   description_processing: |-
     All forms of violence were calculated by summing deaths from Interpersonal violence, Conflict and terrorism, and Police conflict and executions.
@@ -19,13 +18,13 @@ definitions:
 dataset:
   update_period_days: 1460
   non_redistributable: true
-  title: Leading causes of child mortality
+  title: Leading causes of child mortality in children under 5
 tables:
-  gbd_child_mortality_deaths:
+  gbd_cause_deaths:
     variables:
       cause:
         title: |-
-          Leading cause of child mortality among << sex.lower() >> aged << age >>
+          Leading cause of child mortality among children under 5
         unit: ''
         description_short: |-
-          Leading cause of child mortality based on the estimated number of deaths among << sex >> aged << age >>.
+          Leading cause of child mortality based on the estimated number of deaths among children aged less than five.

@@ -13,7 +13,7 @@ def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("gbd_child_mortality_leading_causes")
     # Read table from garden dataset.
-    tb = ds_garden.read("gbd_child_mortality_deaths", reset_index=False)
+    tb = ds_garden.read("gbd_cause_deaths", reset_index=False)
     # Save outputs .
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
