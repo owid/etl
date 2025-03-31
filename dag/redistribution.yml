@@ -5,6 +5,18 @@ steps:
   # GENERAL
   ############################################################
 
+  #
+  # OECD Government at a Glance
+  #
+  data://meadow/oecd/2025-03-26/government_at_a_glance:
+    - snapshot://oecd/2025-03-26/govt_glance_public_finance.csv
+    - snapshot://oecd/2025-03-26/govt_glance_size_public_procurement.csv
+    - snapshot://oecd/2025-03-26/govt_glance_public_finance_economic_transaction.csv
+  data://garden/oecd/2025-03-26/government_at_a_glance:
+    - data://meadow/oecd/2025-03-26/government_at_a_glance
+  data://grapher/oecd/2025-03-26/government_at_a_glance:
+    - data://garden/oecd/2025-03-26/government_at_a_glance
+
   # UNU-WIDER Government Revenue Dataset
   data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
     - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
