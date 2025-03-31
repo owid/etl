@@ -21,8 +21,6 @@ COLUMNS_TO_KEEP = {
 # Define index columns
 INDEX_COLUMNS = ["country", "year", "indicator", "unit"]
 
-# Define new names for some of the indicators in the economic transaction table
-
 
 def run() -> None:
     #
@@ -92,10 +90,10 @@ def filter_columns_and_format(tb: Table, short_name: str) -> Table:
     tb = tb[columns_to_keep.keys()]
 
     # Rename columns.
-    tb = tb.rename(columns=columns_to_keep)
+    tb = tb.rename(columns=columns_to_keep, errors="raise")
 
     # Drop status column.
-    tb = tb.drop(columns=["status"])
+    tb = tb.drop(columns=["status"], errors="raise")
 
     # Format tables
     tb = tb.format(index_columns, short_name=short_name)

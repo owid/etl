@@ -104,7 +104,7 @@ definitions:
 
   key_government_investment: General government investment mainly includes gross fixed capital formation, which is infrastructure for transport, office buildings, housing, schools and hospitals. It also includes expenditures in research and development.
 
-  key_government_net_interest_spending: Net interest spending is the difference between interest payments and interest receipts on general government debt. It is an inflexible part of public budgeting and have to be honoured to guarantee access to international financial markets and multilateral funds.
+  key_government_net_interest_spending: Net interest spending is the difference between interest payments and interest receipts on general government debt. It is an inflexible part of public budgeting and has to be honoured to guarantee access to international financial markets and multilateral funds.
 
   key_government_primary_balance: The primary balance is the difference between revenues and expenditures, excluding interest payments. It is a measure of the government's capacity to meet its obligations without borrowing.
 
@@ -174,7 +174,7 @@ definitions:
     agreed concepts, definitions, classifications and rules
     for national accounting. The 2008 SNA framework
     has been implemented by all OECD countries
-    . Using Sna terminology, general government
+    . Using SNA terminology, general government
     consists of central government, state government,
     local government and social security funds.
 
@@ -203,14 +203,14 @@ definitions:
     Data are derived from the OECD National Accounts
     Statistics (database) and the Eurostat Government
     Finance Statistics (database), which are based on the
-    System of National Accounts (SNA). the 2008 SNA
+    System of National Accounts (SNA). The 2008 SNA
     framework has been implemented by all OECD
     countries. Debt is defined as a specific
     subset of liabilities identified according to the types of
     financial instruments included or excluded. Generally,
     it is defined as all liabilities that require payment or
     payments of interest or principal by the debtor to
-    the creditor at a date or dates in the future. all debt
+    the creditor at a date or dates in the future. All debt
     instruments are liabilities but some liabilities, such as
     shares, equity, and financial derivatives, are not debt.
     Debt is thus the sum of the following liability categories,
@@ -223,7 +223,7 @@ definitions:
     debt instruments are valued at market prices, when
     appropriate (although some countries might not
     apply this valuation, particularly for debt securities).
-    countries’ treatment of government liabilities in
+    Countries’ treatment of government liabilities in
     respect of their employee pension plans varies,
     making international comparability difficult. Some
     OECD countries, such as Australia, Canada, Colombia,
@@ -235,7 +235,7 @@ definitions:
     here is recorded on a gross basis, not adjusted by
     the value of government-held assets. The SNA debt
     definition used here differs from the definition applied
-    under the Maastricht Treaty, which is used to assess eU
+    under the Maastricht Treaty, which is used to assess EU
     fiscal positions.
 
   description_from_producer_government_investment: >-
@@ -313,7 +313,7 @@ definitions:
     National Accounts Statistics (database), which are based
     on the System of National Accounts (SNA). the 2008
     SNA framework has been implemented by all OECD
-    countries. revenues include taxes
+    countries. Revenues include taxes
     (e.g. on consumption, income, wealth, property and
     capital), net social contributions (i.e. contributions for
     pensions, health and social security after deduction
@@ -486,8 +486,8 @@ tables:
       government_revenues:
         title: Government revenues ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
-        short_unit: Total amount of money a government collects. {definitions.short_unit}
-        description_short: "{definitions.short_description_unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Total amount of money a government collects. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_revenue}"
           - "{definitions.key_general_government}"
@@ -564,7 +564,7 @@ tables:
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditures_on_government_outsourcing}"
         display:
-          name: Expenditures on government outsourcing by economic transaction ({definitions.unit_human_readable})
+          name: Expenditures on government outsourcing by economic transaction - <<economic_transaction>>
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -578,7 +578,7 @@ tables:
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditure}"
         display:
-          name: Government expenditure by economic transaction ({definitions.unit_human_readable})
+          name: Government expenditure by economic transaction - <<economic_transaction>>
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -592,7 +592,7 @@ tables:
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_revenue}"
         display:
-          name: Government revenues by economic transaction ({definitions.unit_human_readable})
+          name: Government revenues by economic transaction - <<economic_transaction>>
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -606,7 +606,7 @@ tables:
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_production_costs}"
         display:
-          name: Production costs by economic transaction ({definitions.unit_human_readable})
+          name: Production costs by economic transaction - <<economic_transaction>>
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
 
@@ -620,6 +620,6 @@ tables:
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_tax_revenues}"
         display:
-          name: Tax revenues by economic transaction ({definitions.unit_human_readable})
+          name: Tax revenues by economic transaction - <<economic_transaction>>
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
