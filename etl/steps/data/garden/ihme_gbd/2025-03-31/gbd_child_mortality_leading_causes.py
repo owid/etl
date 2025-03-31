@@ -15,7 +15,7 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_garden.read("gbd_child_mortality_deaths")
-    # Exclude rows where the cause is "All causes"
+    # Exclude rows where the cause is "All causes" and only keep total number of deaths for each cause
     tb = tb[tb["cause"] != "All causes"]
     tb = tb[tb["metric"] != "Number"]
 

@@ -24,7 +24,7 @@ tables:
     variables:
       cause:
         title: |-
-          Leading cause of deaths among << sex.lower() >> aged << age >>
+          Leading cause of child mortality among << sex.lower() >> aged << age >>
         unit: ''
         description_short: |-
-          Leading cause of deaths based on the estimated number of deaths among << sex >> aged << age >>.
+          Leading cause of child mortality based on the estimated number of deaths among << sex >> aged << age >>.
