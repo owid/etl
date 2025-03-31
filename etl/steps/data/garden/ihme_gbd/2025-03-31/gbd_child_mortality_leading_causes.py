@@ -12,6 +12,41 @@ from etl.helpers import PathFinder, create_dataset
 paths = PathFinder(__file__)
 
 
+# At OWID we use a mixture of level 2 and 3 GBD causes of death, to limit the number of causes shown on a chart.
+# These are the causes of death we show in our causes of death charts e.g. https://ourworldindata.org/grapher/causes-of-death-in-children-under-5
+OWID_HIERARCHY = [
+    "Lower respiratory infections",
+    "Invasive Non-typhoidal Salmonella (iNTS)",
+    "Interpersonal violence",
+    "Nutritional deficiencies",
+    "Acute hepatitis",
+    "Neoplasms",
+    "Measles",
+    "Digestive diseases",
+    "Cirrhosis and other chronic liver diseases",
+    "Chronic kidney disease",
+    "Cardiovascular diseases",
+    "Congenital birth defects",
+    "Neonatal preterm birth",
+    "Environmental heat and cold exposure",
+    "Neonatal sepsis and other neonatal infections",
+    "Exposure to forces of nature",
+    "Diabetes mellitus",
+    "Neonatal encephalopathy due to birth asphyxia and trauma",
+    "Meningitis",
+    "Other neonatal disorders",
+    "Whooping cough",
+    "Diarrheal diseases",
+    "Fire, heat, and hot substances",
+    "Road injuries",
+    "Tuberculosis",
+    "HIV/AIDS",
+    "Drowning",
+    "Malaria",
+    "Syphilis",
+]
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -21,41 +56,9 @@ def run(dest_dir: str) -> None:
 
     # Read table from meadow dataset.
     tb = ds_garden.read("gbd_child_mortality_deaths")
-    # At OWID we use a mixture of level 2 and 3 GBD causes of death, to limit the number of causes shown on a chart.
-    # These are the causes of death we show in our causes of death charts e.g. https://ourworldindata.org/grapher/causes-of-death-in-children-under-5
-    under_five = [
-        "Lower respiratory infections",
-        "Invasive Non-typhoidal Salmonella (iNTS)",
-        "Interpersonal violence",
-        "Nutritional deficiencies",
-        "Acute hepatitis",
-        "Neoplasms",
-        "Measles",
-        "Digestive diseases",
-        "Cirrhosis and other chronic liver diseases",
-        "Chronic kidney disease",
-        "Cardiovascular diseases",
-        "Congenital birth defects",
-        "Neonatal preterm birth",
-        "Environmental heat and cold exposure",
-        "Neonatal sepsis and other neonatal infections",
-        "Exposure to forces of nature",
-        "Diabetes mellitus",
-        "Neonatal encephalopathy due to birth asphyxia and trauma",
-        "Meningitis",
-        "Other neonatal disorders",
-        "Whooping cough",
-        "Diarrheal diseases",
-        "Fire, heat, and hot substances",
-        "Road injuries",
-        "Tuberculosis",
-        "HIV/AIDS",
-        "Drowning",
-        "Malaria",
-        "Syphilis",
-    ]
+
     # Exclude higher level causes of death but keep the subcategories
-    tb = tb[tb["cause"].isin(under_five)]
+    tb = tb[tb["cause"].isin(OWID_HIERARCHY)]
     # Add more succinct disease names
     disease_dict = {
         "Neonatal encephalopathy due to birth asphyxia and trauma": "Asphyxia and trauma",
@@ -73,15 +76,7 @@ def run(dest_dir: str) -> None:
     # Group by 'country', 'year', 'sex', and 'age_group' and find the cause with the maximum number of deaths
     tb = tb.loc[tb.groupby(["country", "year", "sex", "age"])["value"].idxmax()]
     tb = tb.drop(columns=["value", "metric"])
-    # Filter rows where cause is "Malaria" and year is 2021
-    malaria_2021 = tb[
-        (tb["cause"] == "Malaria") & (tb["year"] == 2021) & (tb["sex"] == "children") & (tb["age"] == "<5 years")
-    ]
 
-    # Print the unique countries
-    print("Countries where cause is 'Malaria' in 2021:")
-    for malaria in malaria_2021["country"].unique():
-        print(malaria)
     # Format the table
     tb = tb.format(["country", "year", "age", "sex"])
 
