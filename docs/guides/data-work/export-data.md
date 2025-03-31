@@ -14,7 +14,7 @@ TSV files for explorers are created using the `create_explorer` function, usuall
 
 ```py
 # Create a new explorers dataset and tsv file.
-ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+ds_explorer = paths.create_explorer(config=config, df_graphers=df_graphers)
 ds_explorer.save()
 ```
 
@@ -76,7 +76,7 @@ You can also combine manually defined views with generated ones. See the `etl.co
 The export step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
 
 ```python title="etl/steps/export/multidim/energy/latest/energy_prices.py"
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
