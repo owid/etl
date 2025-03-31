@@ -1,10 +1,10 @@
 """This schema was generated using https://github.com/agronholm/sqlacodegen library with the following command:
 ```
-sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@localhost:3306/owid
+sqlacodegen --generator dataclasses --options use_inflect mysql+pymysql://root:owid@localhost:3306/owid
 ```
 or
 ```
-sqlacodegen --generator dataclasses --options use_inflect mysql://owid:@staging-site-branch:3306/owid
+sqlacodegen --generator dataclasses --options use_inflect mysql+pymysql://owid:@staging-site-branch:3306/owid
 ```
 
 If you want to add a new table to ORM, add --tables mytable to the command above.
@@ -1905,6 +1905,38 @@ class Anomaly(Base):
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
         return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+
+
+class Explorer(Base):
+    __tablename__ = "explorers"
+
+    slug: Mapped[str] = mapped_column(VARCHAR(150), primary_key=True)
+    tsv: Mapped[str] = mapped_column(LONGTEXT)
+    lastEditedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
+    lastEditedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    commitMessage: Mapped[Optional[str]] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
+    createdAt: Mapped[Optional[datetime]] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    )
+
+    # isPublished is a virtual column and depends `isPublished\tTrue` string in TSV, it'll be soon treated
+    #   as a real column
+    isPublished: Mapped[Optional[int]] = mapped_column(
+        TINYINT(1), Computed("((`tsv` like _utf8mb4'%isPublished\ttrue%'))", persisted=False)
+    )
+    # TODO: this field is set by the mirror_explorers.py in automation, it'll be soon moved elsewhere
+    config: Mapped[dict] = mapped_column(JSON)
+
+    @classmethod
+    def load_explorer(cls, session: Session, slug: Optional[str] = None) -> Optional["Explorer"]:
+        cond = cls.slug == slug
+        return session.scalars(select(cls).where(cond)).first()
+
+    @classmethod
+    def load_explorers(cls, session: Session, columns: Optional[List[str]] = None) -> List["Explorer"]:
+        execute = session.execute if columns else session.scalars
+        return execute(_select_columns(cls, columns)).all()  # type: ignore
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
