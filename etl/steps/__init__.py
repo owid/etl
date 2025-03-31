@@ -11,7 +11,6 @@ import re
 import subprocess
 import sys
 import tempfile
-import time
 import warnings
 from collections import defaultdict
 from collections.abc import Generator
@@ -804,6 +803,9 @@ class GrapherStep(Step):
             verbose = True
             i = 0
 
+            # Get checksums for all variables in a dataset
+            preloaded_checksums = db.load_dataset_variables(dataset_upsert_results.dataset_id, engine)
+
             # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
@@ -820,6 +822,13 @@ class GrapherStep(Step):
 
                 table = gh._adapt_table_for_grapher(table, engine)
 
+                # Validation
+                db.check_table(table)
+
+                # Upsert origins
+                with Session(engine, expire_on_commit=False) as session:
+                    db_origins = db.upsert_origins(session, table)
+
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
                     assert len(t.columns) == 1
@@ -829,9 +838,7 @@ class GrapherStep(Step):
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
                         verbose = False
-                        thread_pool.submit(
-                            lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
-                        )
+                        log.info("upsert_dataset.continue_without_logging")
 
                     # generate table with entity_id, year and value for every column
                     futures.append(
@@ -843,6 +850,8 @@ class GrapherStep(Step):
                             dataset_upsert_results,
                             catalog_path=catalog_path,
                             dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                            checksums=preloaded_checksums.get(catalog_path, {}),
+                            db_origins=[db_origins[origin] for origin in t.iloc[:, 0].origins],
                             verbose=verbose,
                         )
                     )
@@ -908,7 +917,7 @@ class GrapherStep(Step):
 class ExportStep(DataStep):
     """
     A step which exports something once. For instance committing to a Github repository
-    or creating a TSV file for owid-content.
+    or upserting an Explorer to DB.
     """
 
     path: str

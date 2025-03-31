@@ -1,10 +1,10 @@
 """This schema was generated using https://github.com/agronholm/sqlacodegen library with the following command:
 ```
-sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@localhost:3306/owid
+sqlacodegen --generator dataclasses --options use_inflect mysql+pymysql://root:owid@localhost:3306/owid
 ```
 or
 ```
-sqlacodegen --generator dataclasses --options use_inflect mysql://owid:@staging-site-branch:3306/owid
+sqlacodegen --generator dataclasses --options use_inflect mysql+pymysql://owid:@staging-site-branch:3306/owid
 ```
 
 If you want to add a new table to ORM, add --tables mytable to the command above.
@@ -1425,14 +1425,13 @@ class Variable(Base):
         """
         assert self.id
 
-        # establish relationships between variables and origins
+        # Establish relationships between variables and origins.
         OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])
 
-        # establish relationships between variables and posts
+        # Establish relationships between variables and posts.
         required_gdoc_ids = {faq.gdoc_id for faq in faqs}
-        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))
-        gdoc_posts = session.scalars(query).all()
-        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+        query = select(PostsGdocs.id).where(PostsGdocs.id.in_(required_gdoc_ids))
+        existing_gdoc_ids = set(session.scalars(query).all())
         missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
         if missing_gdoc_ids:
             log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
@@ -1440,9 +1439,8 @@ class Variable(Base):
             session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
         )
 
-        # establish relationships between variables and tags
+        # Establish relationships between variables and tags.
         tags = Tag.load_tags_by_names(session, tag_names)
-
         TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])
 
     def s3_data_path(self, typ: S3_PATH_TYP = "s3") -> str:
@@ -1907,6 +1905,38 @@ class Anomaly(Base):
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
         return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+
+
+class Explorer(Base):
+    __tablename__ = "explorers"
+
+    slug: Mapped[str] = mapped_column(VARCHAR(150), primary_key=True)
+    tsv: Mapped[str] = mapped_column(LONGTEXT)
+    lastEditedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
+    lastEditedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    commitMessage: Mapped[Optional[str]] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
+    createdAt: Mapped[Optional[datetime]] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    )
+
+    # isPublished is a virtual column and depends `isPublished\tTrue` string in TSV, it'll be soon treated
+    #   as a real column
+    isPublished: Mapped[Optional[int]] = mapped_column(
+        TINYINT(1), Computed("((`tsv` like _utf8mb4'%isPublished\ttrue%'))", persisted=False)
+    )
+    # TODO: this field is set by the mirror_explorers.py in automation, it'll be soon moved elsewhere
+    config: Mapped[dict] = mapped_column(JSON)
+
+    @classmethod
+    def load_explorer(cls, session: Session, slug: Optional[str] = None) -> Optional["Explorer"]:
+        cond = cls.slug == slug
+        return session.scalars(select(cls).where(cond)).first()
+
+    @classmethod
+    def load_explorers(cls, session: Session, columns: Optional[List[str]] = None) -> List["Explorer"]:
+        execute = session.execute if columns else session.scalars
+        return execute(_select_columns(cls, columns)).all()  # type: ignore
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
