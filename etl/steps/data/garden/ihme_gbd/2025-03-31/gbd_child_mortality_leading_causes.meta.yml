@@ -8,7 +8,9 @@ definitions:
     processing_level: minor
 
   description_key: |-
-    When precise data are unavailable, IHME distributes the impacts of conflict and terrorism evenly across years, and across countries based on population size.
+    - Neonatal disorders include complications from preterm birth, lack of oxygen at birth, infections, jaundice, and other conditions affecting newborns.
+    - Lower respiratory infections are defined in the study as pneumonia or bronchiolitis.
+
   description_processing: |-
     All forms of violence were calculated by summing deaths from Interpersonal violence, Conflict and terrorism, and Police conflict and executions.
     Infectious diseases were calculated by subtracting Maternal and neonatal disorders and Nutritional deficiencies from the broader category of Communicable, maternal, neonatal, and nutritional diseases.
