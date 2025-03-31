@@ -126,3 +126,13 @@ steps:
   #
   data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
     - data://garden/animal_welfare/2025-03-26/animals_used_for_food
+  #
+  # Total number of slaughtered animals (grouped into main animals and "other").
+  #
+  data://grapher/animal_welfare/2025-03-26/animals_used_for_food_grouped:
+    - data://garden/animal_welfare/2025-03-26/animals_used_for_food
+  #
+  # Animal welfare data explorer.
+  #
+  export://explorers/animal_welfare/latest/animal_welfare:
+    - data://grapher/animal_welfare/2025-03-26/animals_used_for_food

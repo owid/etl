@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from owid.datautils.dataframes import map_series
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -52,18 +54,24 @@ STOCK_ITEM_CODES = {
     "00001181": "bees",  # Bees
     "00001126": "camels",  # Camels
     "00001072": "geese",  # Geese
-    "00001150": "other_rodents",  # Other rodents
-    "00001157": "other_camelids",  # Other camelids
+    "00001150": "other rodents",  # Other rodents
+    "00001157": "other camelids",  # Other camelids
 }
 
 # List of element codes for "Producing or slaughtered animals" (they have different items assigned).
 SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
+
+# List of element codes for "Producing or slaughtered animals" (they have different items assigned).
+SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT_CODES = ["5320pc", "5321pc"]
 
 # Element code for the stocks of animals.
 STOCK_ANIMALS_ELEMENT_CODES = ["005111", "005112", "005114"]
 
 # Item code for "Meat, total" (used only for sanity checks).
 MEAT_TOTAL_ITEM_CODE = "00001765"
+
+# Name of index columns in the final table.
+INDEX_COLUMNS = ["country", "year", "animal"]
 
 
 def sanity_check_inputs(tb_killed, tb_stock, tb_qcl):
@@ -119,29 +127,32 @@ def run() -> None:
     # Sanity checks.
     sanity_check_inputs(tb_killed=tb_killed, tb_stock=tb_stock, tb_qcl=tb_qcl)
 
-    # Make one column per item for the table of slaughtered animals.
+    tb_killed["animal"] = map_series(
+        tb_killed["item_code"],
+        mapping=MEAT_TOTAL_ITEM_CODES,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
     tb_killed = (
-        tb_killed[["country", "year", "item_code", "value"]]
-        .pivot(index=["country", "year"], columns="item_code", values="value")
-        .reset_index()
-        .rename(
-            columns={column: f"{animal}_killed" for column, animal in MEAT_TOTAL_ITEM_CODES.items()}, errors="raise"
-        )
+        tb_killed[INDEX_COLUMNS + ["value"]]
+        .rename(columns={"value": "n_animals_killed"}, errors="raise")
+        .astype({"n_animals_killed": "Int64"})
     )
 
-    # Make one column per item for the table of live animals.
+    tb_stock["animal"] = map_series(
+        tb_stock["item_code"], mapping=STOCK_ITEM_CODES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
+    )
     tb_stock = (
-        tb_stock[["country", "year", "item_code", "value"]]
-        .pivot(index=["country", "year"], columns="item_code", values="value")
-        .reset_index()
-        .rename(columns={column: f"{animal}_alive" for column, animal in STOCK_ITEM_CODES.items()}, errors="raise")
+        tb_stock[INDEX_COLUMNS + ["value"]]
+        .rename(columns={"value": "n_animals_alive"}, errors="raise")
+        .astype({"n_animals_alive": "Int64"})
     )
 
     # Combine both tables.
-    tb = tb_killed.merge(tb_stock, on=["country", "year"], how="outer")
+    tb = tb_killed.merge(tb_stock, on=INDEX_COLUMNS, how="outer")
 
     # Format table conveniently.
-    tb = tb.format(short_name=paths.short_name)
+    tb = tb.format(keys=INDEX_COLUMNS, short_name=paths.short_name)
 
     #
     # Save outputs.
