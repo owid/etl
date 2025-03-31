@@ -826,6 +826,10 @@ class GrapherStep(Step):
                 # Validation
                 db.check_table(table)
 
+                # Upsert origins
+                with Session(engine, expire_on_commit=False) as session:
+                    db_origins = db.upsert_origins(session, table)
+
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
                     assert len(t.columns) == 1
@@ -835,9 +839,7 @@ class GrapherStep(Step):
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
                         verbose = False
-                        thread_pool.submit(
-                            lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
-                        )
+                        log.info("upsert_dataset.continue_without_logging")
 
                     # generate table with entity_id, year and value for every column
                     futures.append(
@@ -850,6 +852,7 @@ class GrapherStep(Step):
                             catalog_path=catalog_path,
                             dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
                             checksums=preloaded_checksums.get(catalog_path, {}),
+                            db_origins=[db_origins[origin] for origin in t.iloc[:, 0].origins],
                             verbose=verbose,
                         )
                     )

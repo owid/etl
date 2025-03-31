@@ -1425,14 +1425,13 @@ class Variable(Base):
         """
         assert self.id
 
-        # establish relationships between variables and origins
+        # Establish relationships between variables and origins.
         OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])
 
-        # establish relationships between variables and posts
+        # Establish relationships between variables and posts.
         required_gdoc_ids = {faq.gdoc_id for faq in faqs}
-        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))
-        gdoc_posts = session.scalars(query).all()
-        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+        query = select(PostsGdocs.id).where(PostsGdocs.id.in_(required_gdoc_ids))
+        existing_gdoc_ids = set(session.scalars(query).all())
         missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
         if missing_gdoc_ids:
             log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
@@ -1440,9 +1439,8 @@ class Variable(Base):
             session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
         )
 
-        # establish relationships between variables and tags
+        # Establish relationships between variables and tags.
         tags = Tag.load_tags_by_names(session, tag_names)
-
         TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])
 
     def s3_data_path(self, typ: S3_PATH_TYP = "s3") -> str:

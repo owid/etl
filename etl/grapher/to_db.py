@@ -40,7 +40,6 @@ log = structlog.get_logger()
 
 
 source_table_lock = Lock()
-origins_table_lock = Lock()
 
 
 CURRENT_DIR = os.path.dirname(__file__)
@@ -162,14 +161,6 @@ def _add_or_update_source(
     return source_id
 
 
-def _add_or_update_origins(session: Session, origins: list[catalog.Origin]) -> list[gm.Origin]:
-    out = []
-    assert len(origins) == len(set(origins)), "origins must be unique"
-    for origin in origins:
-        out.append(gm.Origin.from_origin(origin).upsert(session))
-    return out
-
-
 def _update_variables_metadata(table: catalog.Table) -> None:
     """Update variables metadata."""
     for col in table.columns:
@@ -200,6 +191,9 @@ def check_table(table: Table) -> None:
 
     for col in table.columns:
         assert table[col].title, f"Column `{col}` must have a title in metadata"
+
+        origins = table[col].m.origins
+        assert len(origins) == len(set(origins)), "origins must be unique"
 
         if len(table[col].metadata.sources) > 1:
             raise NotImplementedError(
@@ -242,6 +236,7 @@ def upsert_table(
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: str,
     checksums: dict,
+    db_origins: list[gm.Origin],
     dimensions: Optional[gm.Dimensions] = None,
     verbose: bool = True,
 ) -> None:
@@ -290,6 +285,7 @@ def upsert_table(
                 variable_meta=variable_meta,
                 column_name=column_name,
                 dataset_upsert_result=dataset_upsert_result,
+                db_origins=db_origins,
                 catalog_path=catalog_path,
                 dimensions=dimensions,
                 admin_api=admin_api,
@@ -330,12 +326,23 @@ def upload_metadata(session: Session, variable_id: int, df: pd.DataFrame, s3_met
     upload_gzip_string(var_metadata_str, s3_metadata_path)
 
 
+def upsert_origins(session: Session, table: Table) -> dict[catalog.Origin, gm.Origin]:
+    db_origins = {}
+    for col in table.columns:
+        for origin in table[col].m.origins:
+            if origin not in db_origins:
+                db_origins[origin] = gm.Origin.from_origin(origin).upsert(session)
+    session.commit()
+    return db_origins
+
+
 def upsert_metadata(
     session: Session,
     df: pd.DataFrame,
     variable_meta: VariableMeta,
     column_name: str,
     dataset_upsert_result: DatasetUpsertResult,
+    db_origins: list[gm.Origin],
     catalog_path: str,
     dimensions: Optional[gm.Dimensions],
     admin_api: AdminAPI,
@@ -343,11 +350,6 @@ def upsert_metadata(
     timespan = _get_timespan(df, variable_meta)
 
     source_id = _add_or_update_source(session, variable_meta, column_name, dataset_upsert_result)
-
-    with origins_table_lock:
-        db_origins = _add_or_update_origins(session, variable_meta.origins)
-        # commit within the lock to make sure other threads get the latest sources
-        session.commit()
 
     # pop grapher_config from variable metadata, later we send it to Admin API
     if variable_meta.presentation and variable_meta.presentation.grapher_config:
