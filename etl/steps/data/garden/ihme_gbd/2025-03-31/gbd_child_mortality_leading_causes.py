@@ -27,16 +27,16 @@ def run(dest_dir: str) -> None:
             ]
         )
     ]
-    tb = tb[tb["metric"] != "Number"]
+    # Only keep the number of deaths for this calculation
+    tb = tb[tb["metric"] == "Number"]
 
-    # Replace with more descriptive values
+    # Replace values in "sex" column more descriptive values
     tb["sex"] = tb["sex"].replace({"Both": "children", "Male": "boys", "Female": "girls"})
-    # Group by 'country', 'year', 'sex', and 'age_group' and find the cause with the maximum death rate
+    # Group by 'country', 'year', 'sex', and 'age_group' and find the cause with the maximum number of deaths
     tb = tb.loc[tb.groupby(["country", "year", "sex", "age"])["value"].idxmax()]
     tb = tb.drop(columns=["value", "metric"])
-    print(tb)
 
-    # Format the tables
+    # Format the table
     tb = tb.format(["country", "year", "age", "sex"])
 
     #
