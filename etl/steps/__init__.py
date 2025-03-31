@@ -804,6 +804,9 @@ class GrapherStep(Step):
             verbose = True
             i = 0
 
+            # Get checksums for all variables in a dataset
+            preloaded_checksums = db.load_dataset_variables(dataset_upsert_results.dataset_id, engine)
+
             # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
@@ -819,6 +822,9 @@ class GrapherStep(Step):
                     table = table.loc[:, cols]
 
                 table = gh._adapt_table_for_grapher(table, engine)
+
+                # Validation
+                db.check_table(table)
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
@@ -843,6 +849,7 @@ class GrapherStep(Step):
                             dataset_upsert_results,
                             catalog_path=catalog_path,
                             dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                            checksums=preloaded_checksums.get(catalog_path, {}),
                             verbose=verbose,
                         )
                     )

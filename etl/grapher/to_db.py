@@ -13,7 +13,6 @@ import datetime
 import json
 import os
 import warnings
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from threading import Lock
 from typing import Dict, List, Optional, cast
@@ -21,11 +20,10 @@ from typing import Dict, List, Optional, cast
 import pandas as pd
 import structlog
 from owid import catalog
-from owid.catalog import Table, VariableMeta, utils
+from owid.catalog import Table, Variable, VariableMeta, utils
 from owid.catalog.utils import hash_any
 from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from apps.backport.datasync import data_metadata as dm
@@ -33,7 +31,7 @@ from apps.backport.datasync.datasync import upload_gzip_string
 from apps.chart_sync.admin_api import AdminAPI
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl import config
-from etl.db import get_engine, production_or_master_engine
+from etl.db import get_engine, production_or_master_engine, read_sql
 from etl.grapher import helpers as gh
 
 from . import model as gm
@@ -194,18 +192,22 @@ def _update_variables_metadata(table: catalog.Table) -> None:
             meta.description_key = [k for k in meta.description_key if k.strip()]
 
 
-def _check_upserted_table(table: Table) -> None:
+def check_table(table: Table) -> None:
     assert set(table.index.names) == {"year", "entityId", "entityCode", "entityName"}, (
-        "Tables to be upserted must have 4 indices: year, entityId, entityCode, entityName. Instead"
+        "Table to be upserted must have 4 indices: year, entityId, entityCode, entityName. Instead"
         f" they have: {table.index.names}"
     )
-    assert len(table.columns) == 1, (
-        "Tables to be upserted must have only 1 column. Instead they have:" f" {table.columns.names}"
-    )
-    assert table[table.columns[0]].title, f"Column `{table.columns[0]}` must have a title in metadata"
-    assert table.iloc[:, 0].notnull().all(), (
-        "Tables to be upserted must have no null values. Instead they" f" have:\n{table.loc[table.iloc[:, 0].isnull()]}"
-    )
+
+    for col in table.columns:
+        assert table[col].title, f"Column `{col}` must have a title in metadata"
+
+        if len(table[col].metadata.sources) > 1:
+            raise NotImplementedError(
+                "only a single source is supported for grapher datasets, use"
+                " `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to"
+                " join multiple sources"
+            )
+
     utils.validate_underscore(table.metadata.short_name, "Table's short_name")
     utils.validate_underscore(table.columns[0], "Variable's name")
 
@@ -216,14 +218,21 @@ def _check_upserted_table(table: Table) -> None:
         duplicates = vc[vc > 1].index.tolist()
         raise AssertionError(f"Duplicates (entityName, year):\n {duplicates}")
 
-    if len(table.iloc[:, 0].metadata.sources) > 1:
-        raise NotImplementedError(
-            "only a single source is supported for grapher datasets, use"
-            " `combine_metadata_sources` or `adapt_dataset_metadata_for_grapher` to"
-            " join multiple sources"
-        )
 
-    assert not gh.contains_inf(table.iloc[:, 0]), f"Column `{table.columns[0]}` has inf values"
+def _check_upserted_variable(variable: Variable) -> None:
+    assert variable.notnull().all(), (
+        "Tables to be upserted must have no null values. Instead they" f" have:\n{variable[variable.isnull()]}"
+    )
+    assert not gh.contains_inf(variable), f"Column `{variable.name}` has inf values"
+
+
+def load_dataset_variables(dataset_id: int, engine: Engine) -> Dict[str, dict]:
+    q = """
+    select catalogPath, id, dataChecksum, metadataChecksum from variables where datasetId = %(dataset_id)s
+    """
+    return (
+        read_sql(q, engine=engine, params={"dataset_id": dataset_id}).set_index("catalogPath").to_dict(orient="index")
+    )  # type: ignore
 
 
 def upsert_table(
@@ -232,6 +241,7 @@ def upsert_table(
     table: Table,
     dataset_upsert_result: DatasetUpsertResult,
     catalog_path: str,
+    checksums: dict,
     dimensions: Optional[gm.Dimensions] = None,
     verbose: bool = True,
 ) -> None:
@@ -244,7 +254,7 @@ def upsert_table(
     # Passing a BlockManager to Table is deprecated and will raise in a future version. Use public APIs instead.
     warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-    _check_upserted_table(table)
+    _check_upserted_variable(table.iloc[:, 0])
 
     _update_variables_metadata(table)
 
@@ -261,60 +271,36 @@ def upsert_table(
     checksum_data = calculate_checksum_data(df)
     checksum_metadata = calculate_checksum_metadata(variable_meta, df)
 
+    if config.FORCE_UPLOAD:
+        checksums["dataChecksum"] = None
+        checksums["metadataChecksum"] = None
+
+    # Both checksums match
+    if checksums.get("dataChecksum") == checksum_data and checksums.get("metadataChecksum") == checksum_metadata:
+        if verbose:
+            log.info("upsert_table.skipped_no_changes", size=len(df), catalog_path=catalog_path)
+        return
+
     with Session(engine) as session:
-        # compare checksums
-        try:
-            db_variable = gm.Variable.from_catalog_path(session, catalog_path)
-        except NoResultFound:
-            db_variable = None
-
-        upsert_metadata_kwargs = dict(
-            session=session,
-            df=df,
-            variable_meta=variable_meta,
-            column_name=column_name,
-            dataset_upsert_result=dataset_upsert_result,
-            catalog_path=catalog_path,
-            dimensions=dimensions,
-            admin_api=admin_api,
-        )
-
-        # create variable if it doesn't exist
-        if not db_variable:
-            db_variable = upsert_metadata(**upsert_metadata_kwargs)
-            upsert_data(df, db_variable.s3_data_path())
-
-        # variable exists
+        # Upsert & upload metadata
+        if checksums.get("metadataChecksum") != checksum_metadata:
+            db_variable = upsert_metadata(
+                session=session,
+                df=df,
+                variable_meta=variable_meta,
+                column_name=column_name,
+                dataset_upsert_result=dataset_upsert_result,
+                catalog_path=catalog_path,
+                dimensions=dimensions,
+                admin_api=admin_api,
+            )
+            upload_metadata(session, db_variable.id, df, db_variable.s3_metadata_path())
         else:
-            if (
-                not config.FORCE_UPLOAD
-                and db_variable.dataChecksum == checksum_data
-                and db_variable.metadataChecksum == checksum_metadata
-            ):
-                if verbose:
-                    log.info("upsert_table.skipped_no_changes", size=len(df), variable_id=db_variable.id)
-                return
+            db_variable = gm.Variable.from_catalog_path(session, catalog_path)
 
-            # NOTE: sequantial upserts are slower than parallel, but they will be useful once we switch to asyncio
-            # if db_variable.dataChecksum != checksum_data:
-            #     upsert_data(df, db_variable.s3_data_path())
-            # if db_variable.metadataChecksum != checksum_metadata:
-            #     db_variable = upsert_metadata(**upsert_metadata_kwargs)
-
-            futures = {}
-            with ThreadPoolExecutor() as executor:
-                if config.FORCE_UPLOAD or db_variable.dataChecksum != checksum_data:
-                    futures["data"] = executor.submit(upsert_data, df, db_variable.s3_data_path())
-
-                if config.FORCE_UPLOAD or db_variable.metadataChecksum != checksum_metadata:
-                    futures["metadata"] = executor.submit(upsert_metadata, **upsert_metadata_kwargs)
-
-            if futures:
-                # Wait for futures to complete in case exceptions are raised
-                if "data" in futures:
-                    futures["data"].result()
-                if "metadata" in futures:
-                    db_variable = futures["metadata"].result()
+        # Upload data
+        if checksums.get("dataChecksum") != checksum_data:
+            upload_data(df, db_variable.s3_data_path())
 
         # Update checksums
         db_variable.dataChecksum = checksum_data
@@ -325,14 +311,23 @@ def upsert_table(
         session.commit()
 
         if verbose:
-            log.info("upsert_table.uploaded_to_s3", size=len(df), variable_id=db_variable.id)
+            log.info("upsert_table.uploaded_to_s3", size=len(df), variable=catalog_path.split("#")[1])
 
 
-def upsert_data(df: pd.DataFrame, s3_data_path: str):
+def upload_data(df: pd.DataFrame, s3_data_path: str) -> None:
     # upload data to R2
     var_data = dm.variable_data(df)
     var_data_str = json.dumps(var_data, default=str)
     upload_gzip_string(var_data_str, s3_data_path)
+
+
+def upload_metadata(session: Session, variable_id: int, df: pd.DataFrame, s3_metadata_path: str) -> None:
+    # get metadata from MySQL
+    var_metadata = dm.variable_metadata(session, variable_id, df)
+
+    # upload metadata to R2
+    var_metadata_str = json.dumps(var_metadata, default=str)
+    upload_gzip_string(var_metadata_str, s3_metadata_path)
 
 
 def upsert_metadata(
@@ -398,13 +393,6 @@ def upsert_metadata(
     # grapher_config does not exist, but it's still in the database -> delete it
     elif not grapher_config and db_variable.grapherConfigIdETL:
         admin_api.delete_grapher_config(db_variable_id)
-
-    # upload metadata to R2
-    var_metadata = dm.variable_metadata(session, db_variable.id, df)
-    var_metadata_str = json.dumps(var_metadata, default=str)
-
-    # upload them to R2
-    upload_gzip_string(var_metadata_str, db_variable.s3_metadata_path())
 
     return db_variable
 
