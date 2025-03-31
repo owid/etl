@@ -520,6 +520,12 @@ steps:
   data-private://grapher/ihme_gbd/2024-05-20/gbd_child_mortality:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_child_mortality
 
+  # GBD 2021 - GBD Child Mortality Leading Causes
+  data-private://garden/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_child_mortality
+  data-private://grapher/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes:
+    - data-private://garden/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes
+
   # GBD 2021 - GBD Health-adjusted Life Expectancy and Life Expectancy
   data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy:
     - snapshot-private://ihme_gbd/2024-07-02/gbd_life_expectancy.zip
