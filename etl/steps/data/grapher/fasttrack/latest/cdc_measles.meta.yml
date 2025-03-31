@@ -10,20 +10,23 @@ tables:
         title: Indigenous measles cases
         unit: cases
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: Reported indigenous measles cases, cases where the infection happened in the United States.
       import_measles_cases:
         title: Imported measles cases
         unit: ''
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: Reported imported measles cases, cases where the infection happened outside of the United States.
       total_measles_cases:
         title: Measles cases
         unit: ''
         display:
-          numDecimalPlaces: 0
+          numDecimalPlaces: 0.0
         description: Total reported measles cases.
+      source:
+        title: Source of data
+        unit: ''
     dimensions:
       - name: country
         slug: country

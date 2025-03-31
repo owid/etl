@@ -21,6 +21,6 @@ meta:
   license:
     url: https://wonder.cdc.gov/wonder/help/faq.html#8
 outs:
-  - md5: f22a05e7e8d8ba595d1bee232d61089c
-    size: 5997
+  - md5: 3d23774a3648472b513e3724fdf5e7fc
+    size: 21362
     path: cdc_measles.csv
