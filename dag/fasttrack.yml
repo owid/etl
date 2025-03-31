@@ -228,3 +228,5 @@ steps:
     - snapshot://fasttrack/latest/combined_housing_indices_2010.csv
   data://grapher/fasttrack/latest/lives_saved_measles_vaccination_who:
     - snapshot://fasttrack/latest/lives_saved_measles_vaccination_who.csv
+  data://grapher/fasttrack/latest/cdc_measles:
+    - snapshot://fasttrack/latest/cdc_measles.csv

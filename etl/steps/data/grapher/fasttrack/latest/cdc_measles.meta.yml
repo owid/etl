@@ -24,3 +24,8 @@ tables:
         display:
           numDecimalPlaces: 0
         description: Total reported measles cases.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
