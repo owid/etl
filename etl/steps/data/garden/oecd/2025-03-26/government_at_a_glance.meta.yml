@@ -356,7 +356,7 @@ tables:
         title: Government expenditure ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: Total expenditure from central, state and local governments and social security funds. {definitions.short_description_unit}
+        description_short: The total amount of money the general government spends. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_general_government}"
@@ -370,7 +370,7 @@ tables:
         title: Government expenditure per capita ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: Total expenditure from central, state and local governments and social security funds per capita. {definitions.short_description_unit}
+        description_short: The total amount of money the general government spends per capita. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_general_government}"
@@ -384,7 +384,7 @@ tables:
         title: Government fiscal balance ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: "{definitions.short_description_unit}"
+        description_short: "The difference between general government revenues and expenditure. {definitions.short_description_unit}"
         description_key:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_government_revenue}"
@@ -487,7 +487,7 @@ tables:
         title: Government revenues ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: Total amount of money a government collects. {definitions.short_description_unit}
+        description_short: Total amount of money the general government collects. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_revenue}"
           - "{definitions.key_general_government}"
@@ -501,7 +501,7 @@ tables:
         title: Government revenues per capita ({definitions.unit_human_readable})
         unit: "{definitions.unit}"
         short_unit: "{definitions.short_unit}"
-        description_short: Total amount of money a government collects per capita. {definitions.short_description_unit}
+        description_short: Total amount of money the general government collects per capita. {definitions.short_description_unit}
         description_key:
           - "{definitions.key_government_revenue}"
           - "{definitions.key_general_government}"
