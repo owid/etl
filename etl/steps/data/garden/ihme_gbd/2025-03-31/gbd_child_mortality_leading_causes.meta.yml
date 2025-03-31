@@ -24,19 +24,7 @@ tables:
     variables:
       cause:
         title: |-
-          <% if metric == "Number" %>
-            Leading cause of deaths among << sex >> aged << age >>
-          <% elif metric == "Rate" %>
-            Leading cause of  deaths  among << sex >> aged << age >> per 100,000 people
-          <% elif metric == "Percent" %>
-            Share of total deaths among << sex >> aged << age >>
-          <% endif %>
+          Leading cause of deaths among << sex.lower() >> aged << age >>
         unit: ''
         description_short: |-
-          <% if metric == "Number" %>
-              Leading cause of deaths based on the estimated number of deaths among << sex >> aged << age >>.
-          <% elif metric == "Rate" %>
-              Leading cause of deaths based on the estimated number of deaths among << sex >> aged << age >>, per 100,000 people.
-          <% elif metric == "Percent" %>
-              Leading cause of deaths based on the estimated share of deaths among << sex >> aged << age >>.
-          <% endif %>
+          Leading cause of deaths based on the estimated number of deaths among << sex >> aged << age >>.

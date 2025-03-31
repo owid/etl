@@ -17,13 +17,14 @@ def run(dest_dir: str) -> None:
     tb = ds_garden.read("gbd_child_mortality_deaths")
     # Exclude rows where the cause is "All causes"
     tb = tb[tb["cause"] != "All causes"]
+    tb = tb[tb["metric"] != "Number"]
 
     # Group by 'country', 'year', 'sex', and 'age_group' and find the cause with the maximum death rate
-    tb = tb.loc[tb.groupby(["country", "year", "sex", "age", "metric"])["value"].idxmax()]
-    tb = tb.drop(columns=["value"])
+    tb = tb.loc[tb.groupby(["country", "year", "sex", "age"])["value"].idxmax()]
+    tb = tb.drop(columns=["value", "metric"])
 
     # Format the tables
-    tb = tb.format(["country", "year", "metric", "age", "sex"])
+    tb = tb.format(["country", "year", "age", "sex"])
 
     #
     # Save outputs.
