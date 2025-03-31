@@ -215,7 +215,7 @@ def check_table(table: Table) -> None:
 
 def _check_upserted_variable(variable: Variable) -> None:
     assert variable.notnull().all(), (
-        "Tables to be upserted must have no null values. Instead they" f" have:\n{variable[variable.isnull()]}"
+        "Tables to be upserted must have no null values. Instead they" f" have:\n{variable.loc[variable.isnull()]}"
     )
     assert not gh.contains_inf(variable), f"Column `{variable.name}` has inf values"
 
