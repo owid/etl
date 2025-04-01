@@ -29,3 +29,13 @@ tables:
           title_public: Self-reported life satisfaction
         display:
           numDecimalPlaces: 2
+      rank:
+        title: Life satisfaction rank
+        unit: ""
+        short_unit: ""
+        description_short: Rank of the country based on their average life satisfaction score.
+        description_key:
+          - The rank is based on the self-reported life satisfaction of each country, with 1 being the country with the highest score.
+          - The rankings at the lower end can change between years if less countries are surveyed.
+        display:
+          numDecimalPlaces: 0
