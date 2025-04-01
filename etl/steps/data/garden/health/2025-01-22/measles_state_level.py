@@ -57,7 +57,6 @@ def run(dest_dir: str) -> None:
     tb["case_count"].metadata.origins = origins
     tb["case_rate"].metadata.origins = origins
     tb["source"].metadata.origins = origins
-    # tb.metadata = metadata
     tb = tb.format(["country", "year"], short_name="measles")
     #
     # Save outputs.
