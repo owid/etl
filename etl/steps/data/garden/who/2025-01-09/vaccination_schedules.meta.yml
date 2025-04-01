@@ -118,5 +118,5 @@ tables:
         description_key:
           - "{definitions.vaccine_description_key}"
         display:
-          name: "{definitions.vaccine_name}"
+          name: "{definitions.vaccine_name.capitalize()}"
           numDecimalPlaces: 0
