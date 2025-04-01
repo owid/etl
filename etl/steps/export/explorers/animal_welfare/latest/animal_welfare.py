@@ -99,6 +99,7 @@ def run() -> None:
                     {"slug": "fur_farming_status", "name": "Bans on fur farming", "description": None},
                     {"slug": "fur_trading_status", "name": "Bans on fur trading", "description": None},
                     {"slug": "bullfighting_status", "name": "Bans on bullfighting", "description": None},
+                    {"slug": "chick_culling_status", "name": "Bans on chick culling", "description": None},
                 ]
             )
         elif dimension["slug"] == "animal":
@@ -111,7 +112,7 @@ def run() -> None:
         {
             "dimensions": {"metric": "fur_farming_status", "animal": "-", "per_capita": "False"},
             "indicators": {
-                "y": [{"catalogPath": "fur_laws#fur_farming_status", "display": {"colorScaleScheme": "owid-distinct"}}]
+                "y": [{"catalogPath": "fur_laws#fur_farming_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
             },
             "config": {
                 "title": "Which countries have banned fur farming?",
@@ -138,7 +139,7 @@ def run() -> None:
         {
             "dimensions": {"metric": "fur_trading_status", "animal": "-", "per_capita": "False"},
             "indicators": {
-                "y": [{"catalogPath": "fur_laws#fur_trading_status", "display": {"colorScaleScheme": "owid-distinct"}}]
+                "y": [{"catalogPath": "fur_laws#fur_trading_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
             },
             "config": {
                 "title": "Which countries have banned fur trading?",
@@ -162,7 +163,7 @@ def run() -> None:
         {
             "dimensions": {"metric": "bullfighting_status", "animal": "-", "per_capita": "False"},
             "indicators": {
-                "y": [{"catalogPath": "bullfighting_laws#status", "display": {"colorScaleScheme": "owid-distinct"}}]
+                "y": [{"catalogPath": "bullfighting_laws#status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
             },
             "config": {
                 "title": "Which countries have banned bullfighting?",
@@ -172,6 +173,31 @@ def run() -> None:
                     "colorScale": {
                         "customCategoryColors": {
                             "Banned": "#759AC8",
+                            "Not banned": "#AE2E3F",
+                            "Partially banned": "#A46F49",
+                            "No data": "#CCCCCC",
+                        },
+                    }
+                },
+            },
+        }
+    )
+    # Add view with map chart for chick culling laws.
+    config["views"].append(
+        {
+            "dimensions": {"metric": "chick_culling_status", "animal": "-", "per_capita": "False"},
+            "indicators": {
+                "y": [{"catalogPath": "chick_culling_laws#status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
+            },
+            "config": {
+                "title": "Which countries have banned chick culling?",
+                "subtitle": "Chick culling is the process of separating and killing unwanted male and unhealthy female chicks that cannot produce eggs in industrialized egg facilities.",
+                "hasMapTab": True,
+                "map": {
+                    "colorScale": {
+                        "customCategoryColors": {
+                            "Banned": "#759AC8",
+                            "Banned but not yet in effect": "#058580",
                             "Not banned": "#AE2E3F",
                             "Partially banned": "#A46F49",
                             "No data": "#CCCCCC",
