@@ -117,17 +117,18 @@ steps:
   data://grapher/animal_welfare/2024-12-17/fur_laws:
     - data://garden/animal_welfare/2024-12-17/fur_laws
   #
-  # Total number of slaughtered animals.
+  # Total number of animals used for food.
   #
   data://garden/animal_welfare/2025-03-26/animals_used_for_food:
     - data://garden/faostat/2025-03-17/faostat_qcl
+    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
   #
-  # Total number of slaughtered animals.
+  # Total number of animals used for food.
   #
   data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
     - data://garden/animal_welfare/2025-03-26/animals_used_for_food
   #
-  # Total number of slaughtered animals (grouped into main animals and "other").
+  # Total number of animals used for food (grouped into main animals and "other").
   #
   data://grapher/animal_welfare/2025-03-26/animals_used_for_food_grouped:
     - data://garden/animal_welfare/2025-03-26/animals_used_for_food

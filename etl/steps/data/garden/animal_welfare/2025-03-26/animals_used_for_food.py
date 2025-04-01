@@ -117,9 +117,28 @@ def run() -> None:
     ds_qcl = paths.load_dataset("faostat_qcl")
     tb_qcl = ds_qcl.read("faostat_qcl")
 
+    # Load number of wild-caught fish.
+    ds_wild_fish = paths.load_dataset("number_of_wild_fish_killed_for_food")
+    tb_wild_fish = ds_wild_fish.read("number_of_wild_fish_killed_for_food")
+
     #
     # Process data.
     #
+    # Prepare wild-caught fish data.
+    # TODO: Add dimension for estimate (low, midpoint or high).
+    with pr.ignore_warnings():
+        tb_fish = pr.concat(
+            [
+                tb_wild_fish[["country", "year", "n_wild_fish"]]
+                .assign(**{"per_capita": False, "animal": "wild-caught fish"})
+                .rename(columns={"n_wild_fish": "n_wild_fish_killed"}),
+                tb_wild_fish[["country", "year", "n_wild_fish_per_capita"]]
+                .assign(**{"per_capita": True, "animal": "wild-caught fish"})
+                .rename(columns={"n_wild_fish_per_capita": "n_wild_fish_killed"}),
+            ],
+            ignore_index=True,
+        )
+
     # Create a table for the number of killed animals of each kind.
     tb_killed = (
         tb_qcl[
@@ -196,7 +215,7 @@ def run() -> None:
     # Combine tables.
     tb_killed_all = pr.concat([tb_killed, tb_killed_per_capita], ignore_index=True)
     tb_stock_all = pr.concat([tb_stock, tb_stock_per_capita], ignore_index=True)
-    tb = pr.multi_merge([tb_killed_all, tb_stock_all], on=INDEX_COLUMNS, how="outer")
+    tb = pr.multi_merge([tb_killed_all, tb_stock_all, tb_fish], on=INDEX_COLUMNS, how="outer")
 
     # Format table conveniently.
     tb = tb.format(keys=INDEX_COLUMNS, short_name=paths.short_name)

@@ -48,7 +48,7 @@ def run() -> None:
 
     config_new = expand_config(
         tb,
-        indicator_names=["n_animals_killed", "n_animals_alive"],
+        indicator_names=["n_animals_killed", "n_animals_alive", "n_wild_fish_killed"],
         indicators_slug="metric",
         dimensions=["animal", "per_capita"],
         indicator_as_dimension=True,
@@ -60,8 +60,9 @@ def run() -> None:
     config = improve_config_names(
         config,
         replacements={
-            "n_animals_killed": "Animals slaughtered for meat",
-            "n_animals_alive": "Live animals used for meat",
+            "n_animals_killed": "Land animals killed for meat",
+            "n_animals_alive": "Land animals alive for meat",
+            "n_wild_fish_killed": "Wild-caught fish killed",
         },
     )
 

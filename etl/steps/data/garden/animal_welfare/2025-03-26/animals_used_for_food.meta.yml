@@ -32,3 +32,11 @@ tables:
           name: << animal.capitalize() >>
         presentation:
           title_public: Number of << animal >> alive used to produce meat<% if per_capita == True %> per capita<% endif %>
+      n_wild_fish_killed:
+        title: Number of fishes caught from the wild<% if per_capita == True %> per capita<% endif %>
+        unit: fish<% if per_capita == True %> per person<% endif %>
+        short_unit: ""
+        display:
+          name: Fish
+        presentation:
+          title_public: Number of fishes caught from the wild<% if per_capita == True %> per capita<% endif %>
