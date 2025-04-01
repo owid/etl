@@ -128,51 +128,6 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
     - data://garden/technology/2023-03-16/hcctad
 
-  # Happiness report
-  data://meadow/happiness/2024-06-09/happiness:
-    - snapshot://happiness/2024-06-09/happiness.xls
-  data://meadow/happiness/2023-03-20/happiness:
-    - snapshot://happiness/2023-03-20/happiness.xls
-  data://meadow/happiness/2022-03-20/happiness:
-    - snapshot://happiness/2022-03-20/happiness.xls
-  data://meadow/happiness/2021-03-20/happiness:
-    - snapshot://happiness/2021-03-20/happiness.xls
-  data://meadow/happiness/2020-03-20/happiness:
-    - snapshot://happiness/2020-03-20/happiness.xls
-  data://meadow/happiness/2019-03-20/happiness:
-    - snapshot://happiness/2019-03-20/happiness.xls
-  data://meadow/happiness/2018-03-20/happiness:
-    - snapshot://happiness/2018-03-20/happiness.xls
-  data://meadow/happiness/2017-03-20/happiness:
-    - snapshot://happiness/2017-03-20/happiness.xlsx
-  data://meadow/happiness/2016-03-20/happiness:
-    - snapshot://happiness/2016-03-20/happiness.xlsx
-  data://meadow/happiness/2015-03-20/happiness:
-    - snapshot://happiness/2015-03-20/happiness.xlsx
-  data://meadow/happiness/2012-03-20/happiness:
-    - snapshot://happiness/2012-03-20/happiness.xlsx
-
-  ## TODO ARCHIVE
-  data://garden/happiness/2023-03-20/happiness:
-    - data://meadow/happiness/2023-03-20/happiness
-    - data://meadow/happiness/2022-03-20/happiness
-    - data://meadow/happiness/2021-03-20/happiness
-    - data://meadow/happiness/2020-03-20/happiness
-    - data://meadow/happiness/2019-03-20/happiness
-    - data://meadow/happiness/2018-03-20/happiness
-    - data://meadow/happiness/2017-03-20/happiness
-    - data://meadow/happiness/2016-03-20/happiness
-    - data://meadow/happiness/2015-03-20/happiness
-    - data://meadow/happiness/2012-03-20/happiness
-
-  data://garden/happiness/2024-06-09/happiness:
-    - data://meadow/happiness/2024-06-09/happiness
-    - data://garden/happiness/2023-03-20/happiness
-    - data://garden/demography/2023-03-31/population
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
-  data://grapher/happiness/2024-06-09/happiness:
-    - data://garden/happiness/2024-06-09/happiness
 
   # World Happiness report (2025)
   data://meadow/happiness/2025-03-28/happiness:
@@ -685,7 +640,7 @@ steps:
     - data://garden/ggdc/2022-11-28/penn_world_table
     - data://garden/wb/2024-11-04/edstats
     - data://garden/unesco/2024-06-25/education_sdgs
-    - data://garden/happiness/2024-06-09/happiness
+    - data://garden/happiness/2025-03-28/happiness
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
 
