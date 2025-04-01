@@ -44,7 +44,7 @@ definitions:
     <%- elif description == 'Typhoid' %>
     typhoid vaccine
     <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
-    human papilloma virus vaccine (HPV)
+    human papillomavirus vaccine (HPV)
     <%- elif description == "Rotavirus vaccine" %>
     rotavirus vaccine
     <%- elif description == "Malaria vaccine" %>
@@ -90,7 +90,7 @@ definitions:
     <%- elif description == 'Typhoid vaccine' %>
     Typhoid vaccine
     <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
-    Human papilloma virus  (HPV)
+    Human papillomavirus  (HPV)
     <%- elif description == "Rotavirus vaccine" %>
     Rotavirus
     <%- elif description == "Malaria vaccine" %>
