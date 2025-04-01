@@ -7,6 +7,35 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
+def _improve_dimension_names(dimension, transformation, replacements):
+    for field, value in dimension.items():
+        if field == "name":
+            if value in replacements:
+                dimension["name"] = replacements[value]
+            else:
+                dimension["name"] = transformation(value)
+        if field == "choices":
+            for choice in value:
+                _improve_dimension_names(choice, transformation=transformation, replacements=replacements)
+
+
+def improve_config_names(config, transformation=None, replacements=None):
+    """Create human-readable names out of slugs."""
+    if transformation is None:
+
+        def transformation(slug):
+            return slug.replace("_", " ").capitalize()
+
+    if replacements is None:
+        replacements = dict()
+
+    config_new = config.copy()
+    for dimension in config_new["dimensions"]:
+        _improve_dimension_names(dimension, transformation=transformation, replacements=replacements)
+
+    return config_new
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -24,8 +53,11 @@ def run() -> None:
         dimensions=["animal"],
         indicator_as_dimension=True,
     )
+    # TODO: expand_config could ingest 'config' as well, and extend dimensions and views in it (in case there were already some in the yaml).
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
+    # TODO: this could also happen inside expand_config.
+    config = improve_config_names(config, replacements={"n_animals_killed": "Animals slaughtered"})
 
     #
     # Save outputs.
