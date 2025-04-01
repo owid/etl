@@ -87,7 +87,7 @@ definitions:
     Pertussis vaccine (aP)
     <%- elif description == "Hepatitis A vaccine" %>
     Hepatitis A vaccine
-    <%- elif description == 'Typhoid' %>
+    <%- elif description == 'Typhoid vaccine' %>
     Typhoid vaccine
     <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
     Human papilloma virus  (HPV)
