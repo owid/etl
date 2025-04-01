@@ -422,7 +422,6 @@ steps:
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
-
   ######################################################################################################################
   # Map (Natural Earth)
   data://meadow/geography/2023-11-28/nat_earth_110:
@@ -577,6 +576,17 @@ steps:
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
+  # Child Mortality Estimates - UN IGME
+  data://meadow/un/2025-03-25/igme:
+    - snapshot://un/2025-03-25/igme.zip
+  data://garden/un/2025-03-25/igme:
+    - data://meadow/un/2025-03-25/igme
+    - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2025-03-25/igme:
+    - data://garden/un/2025-03-25/igme
+
   # Long-run child mortality, Gapminder + UN IGME
   data://garden/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-11/igme
@@ -649,7 +659,6 @@ steps:
     - data-private://meadow/owid/latest/ig_countries
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
-
 
   # IMF World Economic Outlook
   data://meadow/imf/2024-11-25/world_economic_outlook:
