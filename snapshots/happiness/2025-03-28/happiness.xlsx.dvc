@@ -1,0 +1,33 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "World Happiness Report"
+    description: |-
+      The World Happiness Report is a partnership of Gallup, the Oxford Wellbeing Research Centre, the UN Sustainable Development Solutions Network, and the WHR’s Editorial Board.
+
+      It reviews the state of happiness in the world today and shows how the science of happiness explains personal and national variations in happiness.
+    date_published: "2025-03-13"
+    version_producer: 2025
+
+    # Citation
+    producer: Wellbeing Research Centre
+    citation_full: |-
+      Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2025). World Happiness Report 2025. University of Oxford: Wellbeing Research Centre.
+    attribution_short: WHR
+
+    # Files
+    url_main: https://worldhappiness.report/ed/2025/
+    url_download: https://happiness-report.s3.us-east-1.amazonaws.com/2025/Data+for+Figure+2.1+(2011%E2%80%932024).xlsx
+    date_accessed: 2025-03-28
+
+    # License
+    license:
+      name: ""
+      url: https://worldhappiness.report/faq/
+
+outs:
+  - md5: e88b5498c85ee43e68f623c7e34e1717
+    size: 148164
+    path: happiness.xlsx

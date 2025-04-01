@@ -152,6 +152,7 @@ steps:
   data://meadow/happiness/2012-03-20/happiness:
     - snapshot://happiness/2012-03-20/happiness.xlsx
 
+  ## TODO ARCHIVE
   data://garden/happiness/2023-03-20/happiness:
     - data://meadow/happiness/2023-03-20/happiness
     - data://meadow/happiness/2022-03-20/happiness
@@ -172,6 +173,20 @@ steps:
     - data://garden/wb/2024-03-11/income_groups
   data://grapher/happiness/2024-06-09/happiness:
     - data://garden/happiness/2024-06-09/happiness
+
+  # World Happiness report (2025)
+  data://meadow/happiness/2025-03-28/happiness:
+    - snapshot://happiness/2025-03-28/happiness.xlsx
+
+  data://garden/happiness/2025-03-28/happiness:
+    - data://meadow/happiness/2025-03-28/happiness
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+
+  data://grapher/happiness/2025-03-28/happiness:
+    - data://garden/happiness/2025-03-28/happiness
+
 
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
@@ -701,6 +716,7 @@ steps:
 
   data://grapher/atus/2025-01-06/atus_who:
     - data://garden/atus/2025-01-06/atus_who
+
 
 include:
   - dag/open_numbers.yml
