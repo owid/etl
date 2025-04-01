@@ -217,5 +217,4 @@ def main():
     st_show_diff(diff_str)
 
 
-if __name__ == "__main__":
-    main()
+main()
