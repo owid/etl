@@ -22,6 +22,6 @@ meta:
       url: https://datacatalog.worldbank.org/public-licenses#cc-by
 
 outs:
-  - md5: 00b9ebf78a14adb43a6688c1db173bcb
-    size: 27035706
+  - md5: 6b2d44252ed94f5f7075cbdf68eaa137
+    size: 26537122
     path: gender_statistics.feather
