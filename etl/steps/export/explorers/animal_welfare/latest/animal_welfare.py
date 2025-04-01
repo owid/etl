@@ -48,7 +48,7 @@ def run() -> None:
 
     config_new = expand_config(
         tb,
-        indicator_names=["n_animals_killed"],
+        indicator_names=["n_animals_killed", "n_animals_alive"],
         indicators_slug="metric",
         dimensions=["animal"],
         indicator_as_dimension=True,
@@ -57,7 +57,13 @@ def run() -> None:
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
     # TODO: this could also happen inside expand_config.
-    config = improve_config_names(config, replacements={"n_animals_killed": "Animals slaughtered"})
+    config = improve_config_names(
+        config,
+        replacements={
+            "n_animals_killed": "Animals slaughtered for meat",
+            "n_animals_alive": "Live animals used for meat",
+        },
+    )
 
     #
     # Save outputs.

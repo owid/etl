@@ -19,15 +19,15 @@ MEAT_TOTAL_ITEM_CODES = {
     "00001080": "turkeys",  # 'Meat of turkeys, fresh or chilled',
     "00001017": "goats",  # 'Meat of goat, fresh or chilled',
     "00000867": "cattle",  # 'Meat of cattle with the bone, fresh or chilled',
-    "00001151": "other_rodents",  # 'Meat of other domestic rodents, fresh or chilled',
+    "00001151": "other rodents",  # 'Meat of other domestic rodents, fresh or chilled',
     "00001089": "pigeons",  # 'Meat of pigeons and other birds n.e.c., fresh, chilled or frozen',
     "00000947": "buffaloes",  # 'Meat of buffalo, fresh or chilled',
     "00001097": "horses",  # 'Horse meat, fresh or chilled',
     "00001127": "camels",  # 'Meat of camels, fresh or chilled',
     "00001108": "donkeys",  # 'Meat of asses, fresh or chilled',
-    "00001158": "other_camelids",  # 'Meat of other domestic camelids, fresh or chilled',
-    "00001111": "mule",  # 'Meat of mules, fresh or chilled',
-    "00001166": "other_non_mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
+    "00001158": "other camelids",  # 'Meat of other domestic camelids, fresh or chilled',
+    "00001111": "mules",  # 'Meat of mules, fresh or chilled',
+    "00001166": "other non mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
     "00001163": "game",  # 'Game meat, fresh, chilled or frozen',
     # "00001176": "snails",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
     # Items that were in the list of "Meat, Total", but were not in the data:
@@ -37,7 +37,7 @@ MEAT_TOTAL_ITEM_CODES = {
 # List of item codes that should add up to the total stocks of animals.
 STOCK_ITEM_CODES = {
     "00000866": "cattle",  # Cattle
-    "00000946": "buffalo",  # Buffalo
+    "00000946": "buffaloes",  # Buffalo
     # '00001746': 'cattle_and_buffaloes',  # Cattle and Buffaloes
     "00001057": "chickens",  # Chickens
     "00001068": "ducks",  # Ducks
