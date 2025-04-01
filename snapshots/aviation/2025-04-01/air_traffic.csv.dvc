@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "World Airlines Traffic and Capacity"
+    description: |-
+      Traffic and operations data on the systemwide scheduled activity of passenger and cargo airlines operating worldwide, as recorded by International Civil Aviation Organization (ICAO).
+    date_published: "2025-03-26"
+
+    # Citation
+    producer: International Civil Aviation Organization via Airlines for America
+    citation_full: |-
+      World Airlines Traffic and Capacity (2025). International Civil Aviation Organization via Airlines for America. 
+
+    # Files
+    url_main: https://www.airlines.org/dataset/world-airlines-traffic-and-capacity/
+    date_accessed: 2025-04-01
+
+    # License
+    license:
+      name: © 2025 Airlines for America (A4A)
+      url: https://www.airlines.org/dataset/world-airlines-traffic-and-capacity/
+
+outs:
+  - md5: 0370e4715620f683f315460730a75a04
+    size: 13940
+    path: air_traffic.csv
