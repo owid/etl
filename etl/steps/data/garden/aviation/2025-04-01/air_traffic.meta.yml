@@ -68,6 +68,12 @@ tables:
         short_unit: "%"
         description_short: The percentage of available passenger seats that are filled with passengers.
 
+      plf_empty:
+        title: Share of seats not filled with passengers
+        unit: "%"
+        short_unit: "%"
+        description_short:  The percentage of available passenger seats that are not filled with passengers.
+
       rpks:
         title: Revenue passenger kilometers (RPKs)
         unit: kilometers
