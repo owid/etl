@@ -43,8 +43,14 @@ def run(dest_dir: str) -> None:
     tb["intro"] = tb["intro"].replace(SCHEDULE_MAPPING)
     tb = tb.drop(columns=["iso_3_code", "who_region"])
 
-    tb = tb.format(["country", "year", "description"])
+    # Calculate the number of countries administering the vaccine.
+    tb_sum = tb[tb["intro"].isin(["Entire country", "Regions of the country", "Specific risk groups", "Adolescents"])]
+    tb_sum = tb_sum.groupby(["year", "description"])["intro"].count().reset_index()
+    tb_sum["country"] = "World"
+    tb_sum = tb_sum.rename(columns={"intro": "countries"})
 
+    tb = tb.format(["country", "year", "description"])
+    tb_sum = tb_sum.format(["country", "year", "description"], short_name="vaccination_schedules_sum")
     #
     # Save outputs.
     #
