@@ -96,7 +96,7 @@ def _fetch_explorer_slugs(hide_unchanged_explorers: bool) -> list[str]:
         return read_sql(q, engine=SOURCE_ENGINE)["slug"].tolist()
     else:
         q = """
-        select slug, md5(tsv) as tsv_hash from explorers where isPublished = 1 order by updatedAt desc
+        select slug, md5(trim(both '\n' from tsv)) as tsv_hash from explorers where isPublished = 1 order by updatedAt desc
         """
         df_source = read_sql(q, engine=SOURCE_ENGINE)
         df_target = read_sql(q, engine=TARGET_ENGINE)

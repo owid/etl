@@ -632,8 +632,8 @@ def compare_strings(s1: str, s2: str, fromfile: str, tofile: str = "staging"):
     Useful for chart config diffs, indicator metadata diffs, etc.
     """
     diff = difflib.unified_diff(
-        s1.splitlines(keepends=True),
-        s2.splitlines(keepends=True),
+        s1.strip().splitlines(keepends=True),
+        s2.strip().splitlines(keepends=True),
         fromfile=fromfile,
         tofile=tofile,
     )
