@@ -21,3 +21,6 @@ tables:
         description_short: The number of measles cases per 100,000 population.
         unit: cases per 100,000 population
         processing_level: major
+      source:
+        title: Source of the data
+        unit: ""
