@@ -161,7 +161,7 @@ tables:
     variables:
       countries:
         title: Number of countries that are administering {definitions.vaccine_name}
-        description_short: The number of countries that are administering {definitions.vaccine_name} to either the entire country, regions of the country, adolescents or specific risk group.
+        description_short: The number of countries that are administering {definitions.vaccine_name} to either the entire country, regions of the country, adolescents or specific risk groups.
         unit: ""
         description_key:
           - "{definitions.vaccine_description_key}"
