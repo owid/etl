@@ -43,7 +43,10 @@ MEAT_TOTAL_ITEM_CODES = {
 WILD_FISH_LABEL = "wild-caught fish"
 
 # Label for farmed fish.
-FARMED_FISH_LABEL = "Farmed fish"
+FARMED_FISH_LABEL = "farmed fish"
+
+# Label for farmed crustaceans.
+FARMED_CRUSTACEANS_LABEL = "farmed crustaceans"
 
 # List of item codes that should add up to the total stocks of animals.
 STOCK_ITEM_CODES = {
@@ -131,6 +134,10 @@ def run() -> None:
     ds_farmed_fish = paths.load_dataset("number_of_farmed_fish")
     tb_farmed_fish = ds_farmed_fish.read("number_of_farmed_fish")
 
+    # Load number of farmed crustaceans.
+    ds_farmed_crustaceans = paths.load_dataset("number_of_farmed_crustaceans")
+    tb_farmed_crustaceans = ds_farmed_crustaceans.read("number_of_farmed_crustaceans")
+
     #
     # Process data.
     #
@@ -151,6 +158,12 @@ def run() -> None:
                 tb_farmed_fish[["country", "year", "n_farmed_fish_per_capita"]]
                 .assign(**{"per_capita": True, "animal": FARMED_FISH_LABEL})
                 .rename(columns={"n_farmed_fish_per_capita": "n_animals_killed"}),
+                tb_farmed_crustaceans[["country", "year", "n_farmed_crustaceans"]]
+                .assign(**{"per_capita": False, "animal": FARMED_CRUSTACEANS_LABEL})
+                .rename(columns={"n_farmed_crustaceans": "n_animals_killed"}),
+                tb_farmed_crustaceans[["country", "year", "n_farmed_crustaceans_per_capita"]]
+                .assign(**{"per_capita": True, "animal": FARMED_CRUSTACEANS_LABEL})
+                .rename(columns={"n_farmed_crustaceans_per_capita": "n_animals_killed"}),
             ],
             ignore_index=True,
         )
@@ -246,6 +259,7 @@ def run() -> None:
             "MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL,
             "WILD_FISH_LABEL": WILD_FISH_LABEL,
             "FARMED_FISH_LABEL": FARMED_FISH_LABEL,
+            "FARMED_CRUSTACEANS_LABEL": FARMED_CRUSTACEANS_LABEL,
         },
     )
     ds_garden.save()
