@@ -2,7 +2,6 @@
 definitions:
   common:
     display: &common-display
-      numDecimalPlaces: 1
       tolerance: 5
     description_from_producer: |-
       We construct individual income by adding all income sources together. Whenever possible we distinguish among income from salaried work, self-employment and salaries assigned to owners. Whenever possible we compute labor income from the main activity. Individual non-labor income is divided into three categories: (i) pensions; (ii) capital and benefits; and (iii) transfers. Countries ask different questions to capture data on capital income, interests, profits, rents and dividends. For comparison purposes, we prefer to gather all these questions into a single category. The same criterion applies to transfers, although we also construct a variable that identifies those transfers made by the government, and another that captures transfers clearly associated to poverty-alleviation programs.
@@ -68,6 +67,7 @@ tables:
         short_unit: '%'
         display:
           name: <<table>> - Share of population in poverty
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: <<table>> - Share of population in poverty
@@ -83,6 +83,7 @@ tables:
         short_unit: '%'
         display:
           name: <<table>> - Poverty gap index
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: <<table>> - Poverty gap index
@@ -98,6 +99,7 @@ tables:
         short_unit: '%'
         display:
           name: <<table>> - Poverty severity index
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: <<table>> - Poverty severity index
@@ -111,6 +113,7 @@ tables:
         short_unit: ''
         display:
           name: Gini coefficient (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Gini coefficient (<<table>>)
@@ -124,6 +127,7 @@ tables:
         short_unit: ''
         display:
           name: Theil index (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Theil index (<<table>>)
@@ -137,6 +141,7 @@ tables:
         short_unit: ''
         display:
           name: Coefficient of variation (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Coefficient of variation (<<table>>)
@@ -151,6 +156,7 @@ tables:
         short_unit: ''
         display:
           name: Atkinson index (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Atkinson index - ε = 0.5 (<<table>>)
@@ -165,6 +171,7 @@ tables:
         short_unit: ''
         display:
           name: Atkinson index (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Atkinson index - ε = 1 (<<table>>)
@@ -179,6 +186,7 @@ tables:
         short_unit: ''
         display:
           name: Atkinson index (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Atkinson index - ε = 2 (<<table>>)
@@ -192,6 +200,7 @@ tables:
         short_unit: ''
         display:
           name: Mean log deviation (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Mean log deviation (<<table>>)
@@ -205,6 +214,7 @@ tables:
         short_unit: '%'
         display:
           name: Poorest decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: Poorest decile - Share (<<table>>)
@@ -218,6 +228,7 @@ tables:
         short_unit: '%'
         display:
           name: 2nd decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 2nd decile - Share (<<table>>)
@@ -231,6 +242,7 @@ tables:
         short_unit: '%'
         display:
           name: 3rd decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 3rd decile - Share (<<table>>)
@@ -244,6 +256,7 @@ tables:
         short_unit: '%'
         display:
           name: 4th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 4th decile - Share (<<table>>)
@@ -257,6 +270,7 @@ tables:
         short_unit: '%'
         display:
           name: 5th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 5th decile - Share (<<table>>)
@@ -270,6 +284,7 @@ tables:
         short_unit: '%'
         display:
           name: 6th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 6th decile - Share (<<table>>)
@@ -283,6 +298,7 @@ tables:
         short_unit: '%'
         display:
           name: 7th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 7th decile - Share (<<table>>)
@@ -296,6 +312,7 @@ tables:
         short_unit: '%'
         display:
           name: 8th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 8th decile - Share (<<table>>)
@@ -309,6 +326,7 @@ tables:
         short_unit: '%'
         display:
           name: 9th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 9th decile - Share (<<table>>)
@@ -322,6 +340,7 @@ tables:
         short_unit: '%'
         display:
           name: Richest decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: Richest decile - Share (<<table>>)
@@ -335,6 +354,7 @@ tables:
         short_unit: ''
         display:
           name: A10/A1 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A10/A1 ratio (<<table>>)
@@ -348,6 +368,7 @@ tables:
         short_unit: ''
         display:
           name: A90/A10 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A90/A10 ratio (<<table>>)
@@ -361,6 +382,7 @@ tables:
         short_unit: ''
         display:
           name: A95/A5 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A95/A5 ratio (<<table>>)
@@ -374,6 +396,7 @@ tables:
         short_unit: ''
         display:
           name: A95/A50 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A95/A50 ratio (<<table>>)
@@ -387,6 +410,7 @@ tables:
         short_unit: ''
         display:
           name: A50/A5 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A50/A5 ratio (<<table>>)
@@ -400,6 +424,7 @@ tables:
         short_unit: ''
         display:
           name: A95/A80 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A95/A80 ratio (<<table>>)
@@ -423,6 +448,7 @@ tables:
         short_unit: '%'
         display:
           name: <<table>> - Share of population in poverty
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: <<table>> - Share of population in poverty
@@ -438,6 +464,7 @@ tables:
         short_unit: '%'
         display:
           name: <<table>> - Poverty gap index
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: <<table>> - Poverty gap index
@@ -453,6 +480,7 @@ tables:
         short_unit: '%'
         display:
           name: <<table>> - Poverty severity index
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: <<table>> - Poverty severity index
@@ -466,6 +494,7 @@ tables:
         short_unit: ''
         display:
           name: Gini coefficient (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: "Income inequality: Gini coefficient in Latin America"
@@ -479,6 +508,7 @@ tables:
         short_unit: ''
         display:
           name: Theil index (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Theil index (<<table>>)
@@ -492,6 +522,7 @@ tables:
         short_unit: ''
         display:
           name: Coefficient of variation (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Coefficient of variation (<<table>>)
@@ -506,6 +537,7 @@ tables:
         short_unit: ''
         display:
           name: Atkinson index (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Atkinson index - ε = 0.5 (<<table>>)
@@ -520,6 +552,7 @@ tables:
         short_unit: ''
         display:
           name: Atkinson index (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Atkinson index - ε = 1 (<<table>>)
@@ -534,6 +567,7 @@ tables:
         short_unit: ''
         display:
           name: Atkinson index (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Atkinson index - ε = 2 (<<table>>)
@@ -547,6 +581,7 @@ tables:
         short_unit: ''
         display:
           name: Mean log deviation (<<table>>)
+          numDecimalPlaces: 2
           <<: *common-display
         presentation:
           title_public: Mean log deviation (<<table>>)
@@ -560,6 +595,7 @@ tables:
         short_unit: '%'
         display:
           name: Poorest decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: Poorest decile - Share (<<table>>)
@@ -573,6 +609,7 @@ tables:
         short_unit: '%'
         display:
           name: 2nd decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 2nd decile - Share (<<table>>)
@@ -586,6 +623,7 @@ tables:
         short_unit: '%'
         display:
           name: 3rd decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 3rd decile - Share (<<table>>)
@@ -599,6 +637,7 @@ tables:
         short_unit: '%'
         display:
           name: 4th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 4th decile - Share (<<table>>)
@@ -612,6 +651,7 @@ tables:
         short_unit: '%'
         display:
           name: 5th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 5th decile - Share (<<table>>)
@@ -625,6 +665,7 @@ tables:
         short_unit: '%'
         display:
           name: 6th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 6th decile - Share (<<table>>)
@@ -638,6 +679,7 @@ tables:
         short_unit: '%'
         display:
           name: 7th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 7th decile - Share (<<table>>)
@@ -651,6 +693,7 @@ tables:
         short_unit: '%'
         display:
           name: 8th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 8th decile - Share (<<table>>)
@@ -664,6 +707,7 @@ tables:
         short_unit: '%'
         display:
           name: 9th decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: 9th decile - Share (<<table>>)
@@ -677,6 +721,7 @@ tables:
         short_unit: '%'
         display:
           name: Richest decile - Share (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: Richest decile - Share (<<table>>)
@@ -690,6 +735,7 @@ tables:
         short_unit: ''
         display:
           name: A10/A1 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A10/A1 ratio (<<table>>)
@@ -703,6 +749,7 @@ tables:
         short_unit: ''
         display:
           name: A90/A10 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A90/A10 ratio (<<table>>)
@@ -716,6 +763,7 @@ tables:
         short_unit: ''
         display:
           name: A95/A5 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A95/A5 ratio (<<table>>)
@@ -729,6 +777,7 @@ tables:
         short_unit: ''
         display:
           name: A95/A50 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A95/A50 ratio (<<table>>)
@@ -742,6 +791,7 @@ tables:
         short_unit: ''
         display:
           name: A50/A5 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A50/A5 ratio (<<table>>)
@@ -755,6 +805,7 @@ tables:
         short_unit: ''
         display:
           name: A95/A80 ratio (<<table>>)
+          numDecimalPlaces: 1
           <<: *common-display
         presentation:
           title_public: A95/A80 ratio (<<table>>)
