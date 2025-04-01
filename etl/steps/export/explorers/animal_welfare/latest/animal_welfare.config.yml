@@ -20,30 +20,30 @@ config:
   hasMapTab: true
   # hideAnnotationFieldsInTitle: true
 
-dimensions:
-  - slug: metric
-    name: Metric
-    choices:
-      - slug: n_animals_killed
-        name: Animals slaughtered
-    presentation:
-      type: dropdown
-  - slug: animal
-    name: Animal
-    choices:
-      - slug: chicken
-        name: Chickens
-      - slug: pig
-        name: Pigs
-      - slug: sheep
-        name: Sheep
-      - slug: goat
-        name: Goats
-      - slug: cattle
-        name: Cows
-      # TODO: Either continue, or fill out programmatically.
-    presentation:
-      type: dropdown
+# dimensions:
+#   - slug: metric
+#     name: Metric
+#     choices:
+#       - slug: n_animals_killed
+#         name: Animals slaughtered
+#     presentation:
+#       type: dropdown
+#   - slug: animal
+#     name: Animal
+#     choices:
+#       - slug: chicken
+#         name: Chickens
+#       - slug: pig
+#         name: Pigs
+#       - slug: sheep
+#         name: Sheep
+#       - slug: goat
+#         name: Goats
+#       - slug: cattle
+#         name: Cows
+#       # TODO: Either continue, or fill out programmatically.
+#     presentation:
+#       type: dropdown
 
 # views:
 #   - dimensions:

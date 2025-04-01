@@ -36,6 +36,9 @@ def run() -> None:
     #
     # Process data.
     #
+    # Keep only non-per capita rows.
+    tb = tb[~tb["per_capita"]].reset_index(drop=True)
+
     # Group less frequently slaughtered animals into an "other" category.
     tb_other = (
         tb[~tb["animal"].isin(MAIN_ANIMALS_KILLED)]
@@ -46,7 +49,7 @@ def run() -> None:
     tb = pr.concat([tb, tb_other], ignore_index=True)
 
     # Improve table format.
-    tb = tb.format(["country", "year", "animal"])
+    tb = tb.format(["country", "year", "animal", "per_capita"])
 
     #
     # Save outputs.

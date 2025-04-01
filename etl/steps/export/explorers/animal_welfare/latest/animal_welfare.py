@@ -50,7 +50,7 @@ def run() -> None:
         tb,
         indicator_names=["n_animals_killed", "n_animals_alive"],
         indicators_slug="metric",
-        dimensions=["animal"],
+        dimensions=["animal", "per_capita"],
         indicator_as_dimension=True,
     )
     # TODO: expand_config could ingest 'config' as well, and extend dimensions and views in it (in case there were already some in the yaml).
@@ -64,6 +64,12 @@ def run() -> None:
             "n_animals_alive": "Live animals used for meat",
         },
     )
+
+    # Make per capita a checkbox.
+    # TODO: This could be part of expand_config.
+    for dimension in config["dimensions"]:
+        if dimension["slug"] == "per_capita":
+            dimension["presentation"] = {"type": "checkbox", "choice_slug_true": "True"}
 
     #
     # Save outputs.

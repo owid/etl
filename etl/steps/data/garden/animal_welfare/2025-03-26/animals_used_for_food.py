@@ -75,7 +75,7 @@ STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES = ["5111pc", "5112pc", "5114pc"]
 MEAT_TOTAL_ITEM_CODE = "00001765"
 
 # Name of index columns in the final table.
-INDEX_COLUMNS = ["country", "year", "animal"]
+INDEX_COLUMNS = ["country", "year", "animal", "per_capita"]
 
 
 def sanity_check_inputs(tb_killed, tb_stock, tb_qcl):
@@ -118,26 +118,41 @@ def run() -> None:
     # Process data.
     #
     # Create a table for the number of killed animals of each kind.
-    tb_killed = tb_qcl[
-        tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)
-        & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
-    ].reset_index(drop=True)
+    tb_killed = (
+        tb_qcl[
+            tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)
+            & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
+        ]
+        .assign(**{"per_capita": False})
+        .reset_index(drop=True)
+    )
 
     # Create a table for the number of killed animals of each kind per person.
-    tb_killed_per_capita = tb_qcl[
-        tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT_CODES)
-        & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
-    ].reset_index(drop=True)
+    tb_killed_per_capita = (
+        tb_qcl[
+            tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT_CODES)
+            & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
+        ]
+        .assign(**{"per_capita": True})
+        .reset_index(drop=True)
+    )
 
     # Create a table for the number of animals in stock.
-    tb_stock = tb_qcl[
-        tb_qcl["element_code"].isin(STOCK_ANIMALS_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
-    ].reset_index(drop=True)
+    tb_stock = (
+        tb_qcl[tb_qcl["element_code"].isin(STOCK_ANIMALS_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)]
+        .assign(**{"per_capita": False})
+        .reset_index(drop=True)
+    )
 
     # Create a table for the number of animals in stock per person.
-    tb_stock_per_capita = tb_qcl[
-        tb_qcl["element_code"].isin(STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
-    ].reset_index(drop=True)
+    tb_stock_per_capita = (
+        tb_qcl[
+            tb_qcl["element_code"].isin(STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES)
+            & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
+        ]
+        .assign(**{"per_capita": True})
+        .reset_index(drop=True)
+    )
 
     # Sanity checks.
     sanity_check_inputs(tb_killed=tb_killed, tb_stock=tb_stock, tb_qcl=tb_qcl)
@@ -148,11 +163,7 @@ def run() -> None:
         warn_on_missing_mappings=True,
         warn_on_unused_mappings=True,
     )
-    tb_killed = (
-        tb_killed[INDEX_COLUMNS + ["value"]]
-        .rename(columns={"value": "n_animals_killed"}, errors="raise")
-        .astype({"n_animals_killed": "Int64"})
-    )
+    tb_killed = tb_killed[INDEX_COLUMNS + ["value"]].rename(columns={"value": "n_animals_killed"}, errors="raise")
 
     tb_killed_per_capita["animal"] = map_series(
         tb_killed_per_capita["item_code"],
@@ -161,17 +172,13 @@ def run() -> None:
         warn_on_unused_mappings=True,
     )
     tb_killed_per_capita = tb_killed_per_capita[INDEX_COLUMNS + ["value"]].rename(
-        columns={"value": "n_animals_killed_per_capita"}, errors="raise"
+        columns={"value": "n_animals_killed"}, errors="raise"
     )
 
     tb_stock["animal"] = map_series(
         tb_stock["item_code"], mapping=STOCK_ITEM_CODES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
     )
-    tb_stock = (
-        tb_stock[INDEX_COLUMNS + ["value"]]
-        .rename(columns={"value": "n_animals_alive"}, errors="raise")
-        .astype({"n_animals_alive": "Int64"})
-    )
+    tb_stock = tb_stock[INDEX_COLUMNS + ["value"]].rename(columns={"value": "n_animals_alive"}, errors="raise")
 
     tb_stock_per_capita["animal"] = map_series(
         tb_stock_per_capita["item_code"],
@@ -180,11 +187,13 @@ def run() -> None:
         warn_on_unused_mappings=True,
     )
     tb_stock_per_capita = tb_stock_per_capita[INDEX_COLUMNS + ["value"]].rename(
-        columns={"value": "n_animals_alive_per_capita"}, errors="raise"
+        columns={"value": "n_animals_alive"}, errors="raise"
     )
 
-    # Combine both tables.
-    tb = pr.multi_merge([tb_killed, tb_killed_per_capita, tb_stock, tb_stock_per_capita], on=INDEX_COLUMNS, how="outer")
+    # Combine tables.
+    tb_killed_all = pr.concat([tb_killed, tb_killed_per_capita], ignore_index=True)
+    tb_stock_all = pr.concat([tb_stock, tb_stock_per_capita], ignore_index=True)
+    tb = pr.multi_merge([tb_killed_all, tb_stock_all], on=INDEX_COLUMNS, how="outer")
 
     # Format table conveniently.
     tb = tb.format(keys=INDEX_COLUMNS, short_name=paths.short_name)
