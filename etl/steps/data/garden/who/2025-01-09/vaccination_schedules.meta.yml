@@ -119,6 +119,8 @@ tables:
         unit: ""
         description_key:
           - "{definitions.vaccine_description_key}"
+        presentation:
+          title_public: Number of countries administering {definitions.vaccine_name}
         display:
-          name: "{definitions.vaccine_name.capitalize()}"
+          name: "{definitions.vaccine_name.capitalize}"
           numDecimalPlaces: 0
