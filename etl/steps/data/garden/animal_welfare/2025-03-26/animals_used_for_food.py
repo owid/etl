@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder
@@ -61,11 +62,14 @@ STOCK_ITEM_CODES = {
 # List of element codes for "Producing or slaughtered animals" (they have different items assigned).
 SLAUGHTERED_ANIMALS_ELEMENT_CODES = ["005320", "005321"]
 
-# List of element codes for "Producing or slaughtered animals" (they have different items assigned).
+# List of element codes for "Producing or slaughtered animals" per capita.
 SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT_CODES = ["5320pc", "5321pc"]
 
 # Element code for the stocks of animals.
 STOCK_ANIMALS_ELEMENT_CODES = ["005111", "005112", "005114"]
+
+# Element code for the stock of animals per capita.
+STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES = ["5111pc", "5112pc", "5114pc"]
 
 # Item code for "Meat, total" (used only for sanity checks).
 MEAT_TOTAL_ITEM_CODE = "00001765"
@@ -97,7 +101,7 @@ def sanity_check_inputs(tb_killed, tb_stock, tb_qcl):
     assert ((100 * (compared["value_sum"] - compared["value_global"]) / compared["value_global"]) < 0.001).all(), error
 
     # Sanity check for stock.
-    assert set(tb_stock["unit"]) == {"Number", "animals"}, "Units may have changed."
+    assert set(tb_stock["unit"]) == {"animals"}, "Units may have changed."
 
     # TODO: It would be good to check that the sum of all values for Stocks (for all animals) agrees (within a certain percentage) with the Stocks for "Meat, Total". However, it doesn't. I just checked directly on https://www.fao.org/faostat/en/#data/QCL that Stocks for Meat, Total for World is 23449 in 2023 (in 1000 An). This means 23 million animals. This number is at least a factor of 1000 too small! I will try to figure out what this number means.
 
@@ -119,9 +123,20 @@ def run() -> None:
         & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
     ].reset_index(drop=True)
 
+    # Create a table for the number of killed animals of each kind per person.
+    tb_killed_per_capita = tb_qcl[
+        tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT_CODES)
+        & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
+    ].reset_index(drop=True)
+
     # Create a table for the number of animals in stock.
     tb_stock = tb_qcl[
         tb_qcl["element_code"].isin(STOCK_ANIMALS_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
+    ].reset_index(drop=True)
+
+    # Create a table for the number of animals in stock per person.
+    tb_stock_per_capita = tb_qcl[
+        tb_qcl["element_code"].isin(STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
     ].reset_index(drop=True)
 
     # Sanity checks.
@@ -139,6 +154,16 @@ def run() -> None:
         .astype({"n_animals_killed": "Int64"})
     )
 
+    tb_killed_per_capita["animal"] = map_series(
+        tb_killed_per_capita["item_code"],
+        mapping=MEAT_TOTAL_ITEM_CODES,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
+    tb_killed_per_capita = tb_killed_per_capita[INDEX_COLUMNS + ["value"]].rename(
+        columns={"value": "n_animals_killed_per_capita"}, errors="raise"
+    )
+
     tb_stock["animal"] = map_series(
         tb_stock["item_code"], mapping=STOCK_ITEM_CODES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
     )
@@ -148,8 +173,18 @@ def run() -> None:
         .astype({"n_animals_alive": "Int64"})
     )
 
+    tb_stock_per_capita["animal"] = map_series(
+        tb_stock_per_capita["item_code"],
+        mapping=STOCK_ITEM_CODES,
+        warn_on_missing_mappings=True,
+        warn_on_unused_mappings=True,
+    )
+    tb_stock_per_capita = tb_stock_per_capita[INDEX_COLUMNS + ["value"]].rename(
+        columns={"value": "n_animals_alive_per_capita"}, errors="raise"
+    )
+
     # Combine both tables.
-    tb = tb_killed.merge(tb_stock, on=INDEX_COLUMNS, how="outer")
+    tb = pr.multi_merge([tb_killed, tb_killed_per_capita, tb_stock, tb_stock_per_capita], on=INDEX_COLUMNS, how="outer")
 
     # Format table conveniently.
     tb = tb.format(keys=INDEX_COLUMNS, short_name=paths.short_name)

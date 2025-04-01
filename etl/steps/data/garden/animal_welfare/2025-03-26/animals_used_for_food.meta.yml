@@ -2,8 +2,6 @@ definitions:
   title_killed: |-
       Number of << animal >> slaughtered to produce meat
   common:
-    unit: animals
-    short_unit: ""
     presentation:
       topic_tags:
       - Animal Welfare
@@ -20,13 +18,33 @@ tables:
     variables:
       n_animals_killed:
         title: Number of << animal >> slaughtered to produce meat
+        unit: animals
+        short_unit: ""
         display:
           name: << animal.capitalize() >>
         presentation:
           title_public: Number of << animal >> slaughtered for meat
       n_animals_alive:
         title: Number of << animal >> alive used to produce meat
+        unit: animals
+        short_unit: ""
         display:
           name: << animal.capitalize() >>
         presentation:
           title_public: Number of << animal >> alive used to produce meat
+      n_animals_killed_per_capita:
+        title: Number of << animal >> slaughtered to produce meat per person
+        unit: animals per person
+        short_unit: ""
+        display:
+          name: << animal.capitalize() >>
+        presentation:
+          title_public: Number of << animal >> slaughtered to produce meat per person
+      n_animals_alive_per_capita:
+        title: Number of << animal >> alive used to produce meat per person
+        unit: animals per person
+        short_unit: ""
+        display:
+          name: << animal.capitalize() >>
+        presentation:
+          title_public: Number of << animal >> alive used to produce meat per person
