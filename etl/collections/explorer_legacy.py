@@ -22,7 +22,7 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher import model as gm
 from etl.grapher.io import get_variables_data
-from etl.paths import EXPLORERS_DIR, EXPORT_DIR
+from etl.paths import EXPORT_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -192,12 +192,6 @@ class ExplorerLegacy:
 
         return explorer
 
-    def export(self, path: Union[str, Path]):
-        """Export file."""
-        path = Path(path)
-        # Write parsed content to file.
-        path.write_text(self.content)
-
     def save(self, owid_env: Optional[OWIDEnv] = None) -> None:
         # Ensure we have an environment set
         if owid_env is None:
@@ -205,7 +199,7 @@ class ExplorerLegacy:
 
         # Export content to local directory in addition to uploading it to MySQL for debugging.
         log.info(f"Exporting explorer to {self.local_tsv_path}")
-        self.export(self.local_tsv_path)
+        self.local_tsv_path.write_text(self.content)
 
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)

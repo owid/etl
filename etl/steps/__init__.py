@@ -838,7 +838,7 @@ class GrapherStep(Step):
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
                         verbose = False
-                        log.info("upsert_dataset.continue_without_logging")
+                        log.info("showing only the first 20 logs")
 
                     # generate table with entity_id, year and value for every column
                     futures.append(

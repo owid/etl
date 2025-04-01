@@ -4,12 +4,15 @@ from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
+from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
 from apps.wizard.utils.components import explorer_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
+from etl.grapher import model as gm
 
 log = get_logger()
 
@@ -173,5 +176,18 @@ def main():
         assert OWID_ENV.site
         explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
 
+    st.subheader("TSV Diff")
 
-main()
+    with Session(SOURCE_ENGINE) as session:
+        tsv_source = gm.Explorer.load_explorer(session, explorer_slug).tsv
+
+    with Session(TARGET_ENGINE) as session:
+        tsv_target = gm.Explorer.load_explorer(session, explorer_slug).tsv
+
+    # DRY with chart_diff_show.py
+    diff_str = compare_strings(tsv_target, tsv_source, fromfile="production", tofile="staging")
+    st_show_diff(diff_str)
+
+
+if __name__ == "__main__":
+    main()

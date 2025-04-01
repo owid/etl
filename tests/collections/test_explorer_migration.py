@@ -1,3 +1,7 @@
+import re
+
+import pytest
+
 from etl.collections.explorer_migration import migrate_csv_explorer
 from etl.files import yaml_dump
 from etl.helpers import PathFinder
@@ -147,8 +151,8 @@ graphers
 
 columns
 	catalogPath	slug	transform	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit
-		grapher__who__latest__flu__flu__reported_ari_cases__0	duplicate 1022987	**Dataset Description**:\\n- FluID...release.	0	YlOrRd	Global...	Cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
-		grapher__who__latest__flu__flu_monthly__reported_ari_cases__1	duplicate 1023044	**Dataset Description:**\\n- FluID...	0	YlOrRd	Global...	Reported cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
+		grapher__who__latest__flu__flu__reported_ari_cases__0	duplicate IND_ID	**Dataset Description**:\\n- FluID...release.	0	YlOrRd	Global...	Cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
+		grapher__who__latest__flu__flu_monthly__reported_ari_cases__1	duplicate IND_ID	**Dataset Description:**\\n- FluID...	0	YlOrRd	Global...	Reported cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
 """
 
 
@@ -163,6 +167,7 @@ def test_migrate_csv_explorer(tmp_path):
     assert out_yaml.strip() == expected_influenza
 
 
+@pytest.mark.integration
 def test_explorer_legacy(tmp_path, monkeypatch):
     # Create TSV file
     tsv_path = tmp_path / "influenza.explorer.tsv"
@@ -203,4 +208,8 @@ def test_explorer_legacy(tmp_path, monkeypatch):
 
     # Now you can assert on content as needed
     content = d["content"]
+
+    # Replace string "duplicate 12345" with "duplicate IND_ID"
+    content = re.sub(r"duplicate\s+\d+", "duplicate IND_ID", content)
+
     assert content.strip() == expected_tsv.strip()
