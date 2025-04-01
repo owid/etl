@@ -100,10 +100,12 @@ def run() -> None:
                     {"slug": "fur_trading_status", "name": "Bans on fur trading", "description": None},
                     {"slug": "bullfighting_status", "name": "Bans on bullfighting", "description": None},
                     {"slug": "chick_culling_status", "name": "Bans on chick culling", "description": None},
+                    {"slug": "caged_hens", "name": "Cage and cage-free hens", "description": None},
                 ]
             )
         elif dimension["slug"] == "animal":
             dimension["choices"].append({"slug": "-", "name": "-", "description": None})
+    # TODO: Instead of adding views like this, they could be defined in the yaml, and then the function to expand views would append those.
     # TODO: Is there a way to hide the chart tab?
     # TODO: The colors defined for the map brackets are not respected!
     # TODO: Why are title and subtitle not automatically fetched for indicators?
@@ -112,7 +114,9 @@ def run() -> None:
         {
             "dimensions": {"metric": "fur_farming_status", "animal": "-", "per_capita": "False"},
             "indicators": {
-                "y": [{"catalogPath": "fur_laws#fur_farming_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
+                "y": [
+                    {"catalogPath": "fur_laws#fur_farming_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}
+                ]
             },
             "config": {
                 "title": "Which countries have banned fur farming?",
@@ -139,7 +143,9 @@ def run() -> None:
         {
             "dimensions": {"metric": "fur_trading_status", "animal": "-", "per_capita": "False"},
             "indicators": {
-                "y": [{"catalogPath": "fur_laws#fur_trading_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
+                "y": [
+                    {"catalogPath": "fur_laws#fur_trading_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}
+                ]
             },
             "config": {
                 "title": "Which countries have banned fur trading?",
@@ -204,6 +210,37 @@ def run() -> None:
                         },
                     }
                 },
+            },
+        }
+    )
+    # Add view with bar chart on cage-free hens.
+    config["views"].append(
+        {
+            "dimensions": {"metric": "caged_hens", "animal": "-", "per_capita": "False"},
+            "indicators": {
+                "y": [
+                    {
+                        "catalogPath": "global_hen_inventory#number_of_hens_in_cages",
+                        "display": {
+                            "tolerance": 10,
+                        },
+                    },
+                    {
+                        "catalogPath": "global_hen_inventory#number_of_hens_cage_free",
+                        "display": {
+                            "tolerance": 10,
+                        },
+                    },
+                ]
+            },
+            "config": {
+                "title": "Number of laying hens in cages and cage-free housing",
+                "hasMapTab": False,
+                "tab": "chart",
+                # "chartTypes": ["StackedDiscreteBar"],
+                "type": "StackedDiscreteBar",
+                # TODO: How can I add the Settings button, to allow for relative?
+                # "stackMode": "absolute",
             },
         }
     )
