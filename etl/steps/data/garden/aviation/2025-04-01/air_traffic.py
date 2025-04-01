@@ -29,6 +29,9 @@ def run() -> None:
         tb[col.replace("__000", "")] = tb[col] * 1000
         tb = tb.drop(columns=[col])
 
+    # Convert passenger load factor from fraction to percentage
+    tb["plf"] = tb["plf"] * 100
+
     # Improve table format.
     tb = tb.format(["country", "year"])
 
