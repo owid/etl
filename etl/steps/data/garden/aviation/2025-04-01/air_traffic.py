@@ -31,6 +31,7 @@ def run() -> None:
 
     # Convert passenger load factor from fraction to percentage
     tb["plf"] = tb["plf"] * 100
+    tb["plf_empty"] = 100 - tb["plf"]
 
     # Improve table format.
     tb = tb.format(["country", "year"])
