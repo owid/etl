@@ -17,13 +17,13 @@ tables:
     title: Animals used for food
     variables:
       n_animals_killed:
-        title: Number of << animal >> slaughtered to produce meat<% if per_capita == True %> per capita<% endif %>
+        title: <% if animal == "{MEAT_TOTAL_LABEL}" %>Total number of land animals <% else %>Number of << animal >> <% endif %>slaughtered to produce meat<% if per_capita == True %> per capita<% endif %>
         unit: animals<% if per_capita == True %> per person<% endif %>
         short_unit: ""
         display:
           name: << animal.capitalize() >>
         presentation:
-          title_public: Number of << animal >> slaughtered for meat<% if per_capita == True %> per capita<% endif %>
+          title_public: <% if animal == "{MEAT_TOTAL_LABEL}" %>Total number of land animals <% else %>Number of << animal >> <% endif %>slaughtered to produce meat<% if per_capita == True %> per capita<% endif %>
       n_animals_alive:
         title: Number of << animal >> alive used to produce meat<% if per_capita == True %> per capita<% endif %>
         unit: animals<% if per_capita == True %> per person<% endif %>

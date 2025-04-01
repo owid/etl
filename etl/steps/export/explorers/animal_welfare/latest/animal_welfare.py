@@ -71,6 +71,8 @@ def run() -> None:
         if dimension["slug"] == "per_capita":
             dimension["presentation"] = {"type": "checkbox", "choice_slug_true": "True"}
 
+    # TODO: Is there any way to sort the elements of the dropdowns?
+
     #
     # Save outputs.
     #

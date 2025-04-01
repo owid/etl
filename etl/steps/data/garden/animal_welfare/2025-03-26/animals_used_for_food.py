@@ -8,9 +8,13 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Item codes that should add up to "Meat, Total".
-# NOTE: These should coincide with those defined in the garden faostat_qcl step.
+# Item code for "Meat, total" (used only for sanity checks).
+MEAT_TOTAL_ITEM_CODE = "00001765"
+MEAT_TOTAL_LABEL = "all land animals"
+
+# Item codes that should add up to "Meat, Total", as well as meat total itself.
 MEAT_TOTAL_ITEM_CODES = {
+    MEAT_TOTAL_ITEM_CODE: MEAT_TOTAL_LABEL,  # Meat, total.
     "00001058": "chickens",  # 'Meat of chickens, fresh or chilled',
     "00001069": "ducks",  # 'Meat of ducks, fresh or chilled',
     "00001035": "pigs",  # 'Meat of pig with the bone, fresh or chilled',
@@ -71,9 +75,6 @@ STOCK_ANIMALS_ELEMENT_CODES = ["005111", "005112", "005114"]
 # Element code for the stock of animals per capita.
 STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES = ["5111pc", "5112pc", "5114pc"]
 
-# Item code for "Meat, total" (used only for sanity checks).
-MEAT_TOTAL_ITEM_CODE = "00001765"
-
 # Name of index columns in the final table.
 INDEX_COLUMNS = ["country", "year", "animal", "per_capita"]
 
@@ -85,7 +86,9 @@ def sanity_check_inputs(tb_killed, tb_stock, tb_qcl):
     # NOTE: This should be true by construction, as the "Meat, total" was created in the faostat_qcl garden step.
     # If this is not fulfilled, it may be because the list of items in that step differs from the one defined here.
     tb_killed_global_sum = (
-        tb_killed[(tb_killed["country"] == "World")].groupby("year", as_index=False).agg({"value": "sum"})
+        tb_killed[(tb_killed["item_code"] != MEAT_TOTAL_ITEM_CODE) & (tb_killed["country"] == "World")]
+        .groupby("year", as_index=False)
+        .agg({"value": "sum"})
     )
     tb_killed_global = (
         tb_qcl[
@@ -202,5 +205,5 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb], yaml_params={"MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL})
     ds_garden.save()
