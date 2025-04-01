@@ -9,11 +9,6 @@ definitions:
 
   description_key: |-
     - Lower respiratory infections are defined in the study as pneumonia or bronchiolitis.
-  description_processing: |-
-    All forms of violence were calculated by summing deaths from Interpersonal violence, Conflict and terrorism, and Police conflict and executions.
-    Infectious diseases were calculated by subtracting Maternal and neonatal disorders and Nutritional deficiencies from the broader category of Communicable, maternal, neonatal, and nutritional diseases.
-    Other cancers include all cancers that caused fewer than 200,000 deaths in the most recent year of available data.
-
 
 dataset:
   update_period_days: 1460
