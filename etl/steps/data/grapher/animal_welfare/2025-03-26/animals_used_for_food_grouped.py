@@ -42,7 +42,7 @@ def run() -> None:
     # Group less frequently slaughtered animals into an "other" category.
     tb_other = (
         tb[~tb["animal"].isin(MAIN_ANIMALS_KILLED)]
-        .groupby(["country", "year"], as_index=False)
+        .groupby(["country", "year", "per_capita"], as_index=False)
         .agg({"n_animals_killed": "sum", "n_animals_alive": "sum"})
         .assign(**{"animal": OTHER_ANIMALS_KILLED_LABEL})
     )
