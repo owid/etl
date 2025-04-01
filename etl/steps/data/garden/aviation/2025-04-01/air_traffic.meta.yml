@@ -60,7 +60,7 @@ tables:
       pax:
         title: Passengers
         unit: passengers
-        description_short: The total number of passengers transported by airlines.
+        description_short: This represents total, not unique, passenger activity—so a person taking multiple trips is counted multiple times.
 
       plf:
         title: Passenger load factor (PLF)
