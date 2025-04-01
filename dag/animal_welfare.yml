@@ -122,6 +122,7 @@ steps:
   data://garden/animal_welfare/2025-03-26/animals_used_for_food:
     - data://garden/faostat/2025-03-17/faostat_qcl
     - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
   #
   # Total number of animals used for food.
   #

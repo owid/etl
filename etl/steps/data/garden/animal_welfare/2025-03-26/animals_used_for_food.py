@@ -42,6 +42,9 @@ MEAT_TOTAL_ITEM_CODES = {
 # Label for wild-caught fish.
 WILD_FISH_LABEL = "wild-caught fish"
 
+# Label for farmed fish.
+FARMED_FISH_LABEL = "Farmed fish"
+
 # List of item codes that should add up to the total stocks of animals.
 STOCK_ITEM_CODES = {
     "00000866": "cattle",  # Cattle
@@ -124,6 +127,10 @@ def run() -> None:
     ds_wild_fish = paths.load_dataset("number_of_wild_fish_killed_for_food")
     tb_wild_fish = ds_wild_fish.read("number_of_wild_fish_killed_for_food")
 
+    # Load number of farmed fish.
+    ds_farmed_fish = paths.load_dataset("number_of_farmed_fish")
+    tb_farmed_fish = ds_farmed_fish.read("number_of_farmed_fish")
+
     #
     # Process data.
     #
@@ -138,6 +145,12 @@ def run() -> None:
                 tb_wild_fish[["country", "year", "n_wild_fish_per_capita"]]
                 .assign(**{"per_capita": True, "animal": WILD_FISH_LABEL})
                 .rename(columns={"n_wild_fish_per_capita": "n_animals_killed"}),
+                tb_farmed_fish[["country", "year", "n_farmed_fish"]]
+                .assign(**{"per_capita": False, "animal": FARMED_FISH_LABEL})
+                .rename(columns={"n_farmed_fish": "n_animals_killed"}),
+                tb_farmed_fish[["country", "year", "n_farmed_fish_per_capita"]]
+                .assign(**{"per_capita": True, "animal": FARMED_FISH_LABEL})
+                .rename(columns={"n_farmed_fish_per_capita": "n_animals_killed"}),
             ],
             ignore_index=True,
         )
@@ -228,6 +241,11 @@ def run() -> None:
     #
     # Create a new garden dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb], yaml_params={"MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL, "WILD_FISH_LABEL": WILD_FISH_LABEL}
+        tables=[tb],
+        yaml_params={
+            "MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL,
+            "WILD_FISH_LABEL": WILD_FISH_LABEL,
+            "FARMED_FISH_LABEL": FARMED_FISH_LABEL,
+        },
     )
     ds_garden.save()
