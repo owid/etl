@@ -39,6 +39,9 @@ MEAT_TOTAL_ITEM_CODES = {
     # "00001083",  # 'Other birds',
 }
 
+# Label for wild-caught fish.
+WILD_FISH_LABEL = "wild-caught fish"
+
 # List of item codes that should add up to the total stocks of animals.
 STOCK_ITEM_CODES = {
     "00000866": "cattle",  # Cattle
@@ -130,11 +133,11 @@ def run() -> None:
         tb_fish = pr.concat(
             [
                 tb_wild_fish[["country", "year", "n_wild_fish"]]
-                .assign(**{"per_capita": False, "animal": "wild-caught fish"})
-                .rename(columns={"n_wild_fish": "n_wild_fish_killed"}),
+                .assign(**{"per_capita": False, "animal": WILD_FISH_LABEL})
+                .rename(columns={"n_wild_fish": "n_animals_killed"}),
                 tb_wild_fish[["country", "year", "n_wild_fish_per_capita"]]
-                .assign(**{"per_capita": True, "animal": "wild-caught fish"})
-                .rename(columns={"n_wild_fish_per_capita": "n_wild_fish_killed"}),
+                .assign(**{"per_capita": True, "animal": WILD_FISH_LABEL})
+                .rename(columns={"n_wild_fish_per_capita": "n_animals_killed"}),
             ],
             ignore_index=True,
         )
@@ -213,9 +216,9 @@ def run() -> None:
     )
 
     # Combine tables.
-    tb_killed_all = pr.concat([tb_killed, tb_killed_per_capita], ignore_index=True)
+    tb_killed_all = pr.concat([tb_killed, tb_killed_per_capita, tb_fish], ignore_index=True)
     tb_stock_all = pr.concat([tb_stock, tb_stock_per_capita], ignore_index=True)
-    tb = pr.multi_merge([tb_killed_all, tb_stock_all, tb_fish], on=INDEX_COLUMNS, how="outer")
+    tb = pr.multi_merge([tb_killed_all, tb_stock_all], on=INDEX_COLUMNS, how="outer")
 
     # Format table conveniently.
     tb = tb.format(keys=INDEX_COLUMNS, short_name=paths.short_name)
@@ -224,5 +227,7 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], yaml_params={"MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL})
+    ds_garden = paths.create_dataset(
+        tables=[tb], yaml_params={"MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL, "WILD_FISH_LABEL": WILD_FISH_LABEL}
+    )
     ds_garden.save()
