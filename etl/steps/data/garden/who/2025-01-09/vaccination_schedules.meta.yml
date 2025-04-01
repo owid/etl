@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+      grapher_config:
+        originUrl: ourworldindata.org/vaccination
   vaccine_name: |-
     <% if description == "Seasonal Influenza vaccine" %>
     seasonal influenza vaccine
