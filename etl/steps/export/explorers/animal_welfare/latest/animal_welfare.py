@@ -96,14 +96,16 @@ def run() -> None:
         if dimension["slug"] == "metric":
             dimension["choices"].extend(
                 [
-                    {"slug": "fur_farming_status", "name": "Fur farming status", "description": None},
-                    {"slug": "fur_trading_status", "name": "Fur trading status", "description": None},
+                    {"slug": "fur_farming_status", "name": "Bans on fur farming", "description": None},
+                    {"slug": "fur_trading_status", "name": "Bans on fur trading", "description": None},
+                    {"slug": "bullfighting_status", "name": "Bans on bullfighting", "description": None},
                 ]
             )
         elif dimension["slug"] == "animal":
             dimension["choices"].append({"slug": "-", "name": "-", "description": None})
     # TODO: Is there a way to hide the chart tab?
     # TODO: The colors defined for the map brackets are not respected!
+    # TODO: Why are title and subtitle not automatically fetched for indicators?
     # Add view with map chart for fur banning laws.
     config["views"].append(
         {
@@ -141,6 +143,30 @@ def run() -> None:
             "config": {
                 "title": "Which countries have banned fur trading?",
                 "subtitle": "Countries that have banned fur trading at a national level.",
+                "hasMapTab": True,
+                "map": {
+                    "colorScale": {
+                        "customCategoryColors": {
+                            "Banned": "#759AC8",
+                            "Not banned": "#AE2E3F",
+                            "Partially banned": "#A46F49",
+                            "No data": "#CCCCCC",
+                        },
+                    }
+                },
+            },
+        }
+    )
+    # Add view with map chart for bullfighting laws.
+    config["views"].append(
+        {
+            "dimensions": {"metric": "bullfighting_status", "animal": "-", "per_capita": "False"},
+            "indicators": {
+                "y": [{"catalogPath": "bullfighting_laws#status", "display": {"colorScaleScheme": "owid-distinct"}}]
+            },
+            "config": {
+                "title": "Which countries have banned bullfighting?",
+                "subtitle": "Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.",
                 "hasMapTab": True,
                 "map": {
                     "colorScale": {
