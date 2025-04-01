@@ -72,7 +72,7 @@ tables:
         title: Revenue passenger kilometers (RPKs)
         unit: kilometers
         short_unit: km
-        description_short: Passenger seat kilometers measure the actual number of kilometers flown by paying customers—they are calculated by multiplying the total distance flown by passenger airlines by the number of paying passengers on board.
+        description_short: Passenger-seat kilometers measure the actual number of kilometers flown by paying customers—they are calculated by multiplying the total distance flown by passenger airlines by the number of paying passengers on board.
         description_key:
           - A passenger is someone whose travel generates income for the airline.
           - This includes people traveling under promotional offers, loyalty programs, as compensation for denied boarding, or using corporate and discounted fares such as those for government, military, or students.
