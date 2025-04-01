@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+      grapher_config:
+        originUrl: ourworldindata.org/vaccination
   vaccine_name: |-
     <% if description == "Seasonal Influenza vaccine" %>
     seasonal influenza vaccine
@@ -42,11 +44,57 @@ definitions:
     <%- elif description == 'Typhoid' %>
     typhoid vaccine
     <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
-    human papilloma virus vaccine (HPV)
+    human papillomavirus vaccine (HPV)
     <%- elif description == "Rotavirus vaccine" %>
     rotavirus vaccine
     <%- elif description == "Malaria vaccine" %>
     malaria vaccine
+    <%- else %>
+    <<description.lower()>>
+    <%- endif %>
+  vaccine_display_name: |-
+    <% if description == "Seasonal Influenza vaccine" %>
+    Seasonal influenza
+    <%- elif description == "IPV (Inactivated polio vaccine)" %>
+    Inactivated polio vaccine
+    <%- elif description == "Measles-containing vaccine 2nd dose" %>
+    Measles (second dose)
+    <%- elif description == "YF (Yellow fever) vaccine" %>
+    Yellow fever
+    <%- elif description == "Mumps vaccine" %>
+    Mumps vaccine
+    <%- elif description == "Rubella vaccine" %>
+    Rubella
+    <%- elif description == "Hepatitis B vaccine" %>
+    Hepatitis B
+    <%- elif description == "Hib (Haemophilus influenzae type B) vaccine" %>
+    Haemophilus influenzae type B (Hib)
+    <%- elif description == "HepB birth dose" %>
+    Hepatitis B birth dose
+    <%- elif description == "IPV (Inactivated polio vaccine) 2nd dose" %>
+    Inactivated polio vaccine second dose
+    <%- elif description == "Meningococcal meningitis vaccines (all strains)" %>
+    Meningococcal meningitis
+    <%- elif description == "PPV (Pneumococcal polysaccharide vaccine)" %>
+    Pneumococcal polysaccharide
+    <%- elif description == "PCV (Pneumococcal conjugate vaccine)" %>
+    Pneumococcal conjugate
+    <%- elif description == "Japanese Encephalitis" %>
+    Japanese encephalitis vaccine
+    <%- elif description == "Varicella vaccine" %>
+    Chickenpox vaccine (Varicella)
+    <%- elif description == "aP (acellular pertussis) vaccine" %>
+    Pertussis vaccine (aP)
+    <%- elif description == "Hepatitis A vaccine" %>
+    Hepatitis A vaccine
+    <%- elif description == 'Typhoid vaccine' %>
+    Typhoid vaccine
+    <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
+    Human papillomavirus  (HPV)
+    <%- elif description == "Rotavirus vaccine" %>
+    Rotavirus
+    <%- elif description == "Malaria vaccine" %>
+    Malaria
     <%- else %>
     <<description.lower()>>
     <%- endif %>
@@ -109,3 +157,16 @@ tables:
         unit: ""
         description_key:
           - "{definitions.vaccine_description_key}"
+  vaccination_schedules_sum:
+    variables:
+      countries:
+        title: Number of countries that are administering {definitions.vaccine_name}
+        description_short: The number of countries that are administering {definitions.vaccine_name} to either the entire country, regions of the country, adolescents or specific risk groups.
+        unit: "countries"
+        description_key:
+          - "{definitions.vaccine_description_key}"
+        presentation:
+          title_public: Number of countries administering {definitions.vaccine_name}
+        display:
+          name: "{definitions.vaccine_display_name}"
+          numDecimalPlaces: 0
