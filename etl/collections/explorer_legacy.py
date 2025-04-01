@@ -414,9 +414,9 @@ class ExplorerLegacy:
         """Based on modified config, graphers and column, build the raw content text."""
         df_clean = self.df.copy()
 
-        # Replace actual newline characters with literal "\n"
+        # Replace actual newline characters with literal "\n", but only in string values
         for col in df_clean.select_dtypes(include=["object"]).columns:
-            df_clean[col] = df_clean[col].str.replace("\n", "\\n", regex=False)
+            df_clean[col] = df_clean[col].apply(lambda x: x.replace("\n", "\\n") if isinstance(x, str) else x)
 
         content = df_clean.to_csv(sep="\t", index=False, header=False)
 

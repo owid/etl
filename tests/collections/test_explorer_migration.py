@@ -187,6 +187,8 @@ def test_explorer_legacy(tmp_path, monkeypatch):
 
     # Dump config to YAML file
     config = migrate_csv_explorer(tsv_path)
+    # Make sure explorer can deal with int values
+    config["config"]["wpBlockId"] = int(config["config"]["wpBlockId"])
     config_path = tmp_path / "influenza.config.yml"
     with open(config_path, "w") as f:
         yaml_dump(config, f)

@@ -42,6 +42,12 @@ def _show_options():
     with st.popover("⚙️ Options", use_container_width=True):
         col1, col2, col3 = st.columns(3)
         with col1:
+            url_persist(st.toggle)(
+                "**Hide** explorers with no change",
+                key="hide_unchanged_explorers",
+                value=True,
+                help="Show only explorers with different TSV config.",
+            )
             url_persist(st.selectbox)(
                 "Explorer Display", value="Default", options=["Default", "Map", "Table", "Chart"], key="default_display"
             )
@@ -81,12 +87,25 @@ def _fetch_explorer_views(slug: str) -> list[dict]:
     return views
 
 
-def _fetch_explorer_slugs() -> list[str]:
+def _fetch_explorer_slugs(hide_unchanged_explorers: bool) -> list[str]:
     """Fetch all published explorer slugs."""
-    q = """
-    select slug from explorers where isPublished = 1 order by updatedAt desc
-    """
-    return read_sql(q)["slug"].tolist()
+    if not hide_unchanged_explorers:
+        q = """
+        select slug from explorers where isPublished = 1 order by updatedAt desc
+        """
+        return read_sql(q, engine=SOURCE_ENGINE)["slug"].tolist()
+    else:
+        q = """
+        select slug, md5(tsv) as tsv_hash from explorers where isPublished = 1 order by updatedAt desc
+        """
+        df_source = read_sql(q, engine=SOURCE_ENGINE)
+        df_target = read_sql(q, engine=TARGET_ENGINE)
+
+        # Get slugs with different tsv hashes
+        df = pd.merge(df_source, df_target, on="slug", suffixes=("_source", "_target"))
+        df = df[df["tsv_hash_source"] != df["tsv_hash_target"]]
+        df = df[["slug"]]
+        return df["slug"].tolist()
 
 
 def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
@@ -112,7 +131,9 @@ def main():
 
     _show_options()
 
-    explorer_slugs = _fetch_explorer_slugs()
+    hide_unchanged_explorers: bool = st.session_state.get("hide_unchanged_explorers")  # type: ignore
+
+    explorer_slugs = _fetch_explorer_slugs(hide_unchanged_explorers=hide_unchanged_explorers)
 
     # Select explorer to compare
     explorer_slug = url_persist(st.selectbox)(
@@ -122,6 +143,13 @@ def main():
         # cleanup query params on explorer change
         on_change=st.query_params.clear,
     )
+
+    if not explorer_slug:
+        if hide_unchanged_explorers:
+            st.info('No explorers with changes. Turn off "Hide explorers with no change" in the options to see them.')
+        else:
+            st.info("Select an explorer.")
+        return
 
     explorer_views = _fetch_explorer_views(explorer_slug)
 
@@ -179,10 +207,10 @@ def main():
     st.subheader("TSV Diff")
 
     with Session(SOURCE_ENGINE) as session:
-        tsv_source = gm.Explorer.load_explorer(session, explorer_slug).tsv
+        tsv_source = gm.Explorer.load_explorer(session, explorer_slug).tsv  # type: ignore
 
     with Session(TARGET_ENGINE) as session:
-        tsv_target = gm.Explorer.load_explorer(session, explorer_slug).tsv
+        tsv_target = gm.Explorer.load_explorer(session, explorer_slug).tsv  # type: ignore
 
     # DRY with chart_diff_show.py
     diff_str = compare_strings(tsv_target, tsv_source, fromfile="production", tofile="staging")
