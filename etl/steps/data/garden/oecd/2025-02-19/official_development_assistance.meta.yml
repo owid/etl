@@ -9,7 +9,7 @@ definitions:
       tolerance: 5
       # NOTE: I also define another entity annotations map for the cases where Multilateral organizations is just EU institutions.
       entityAnnotationsMap: |-
-        DAC countries: Major aid donors in the OECD plus EU institutions
+        DAC countries: Major aid donors in the OECD
         Non-DAC countries: Qatar, Saudi Arabia, Turkey, UAE, among others
         G7 countries: Canada, France, Germany, Italy, Japan, UK and US
         Multilateral organizations: e.g. World Bank and UN agencies
@@ -21,7 +21,7 @@ definitions:
 
   # NOTE: These annotations only differ from the default one on the definition of multilateral organizations.
   entity_annotations_alternative: &entity_annotations_alternative |-
-    DAC countries: Major aid donors in the OECD plus EU institutions
+    DAC countries: Major aid donors in the OECD
     Non-DAC countries: Qatar, Saudi Arabia, Turkey, UAE, among others
     G7 countries: Canada, France, Germany, Italy, Japan, UK and US
     Multilateral organizations: EU institutions

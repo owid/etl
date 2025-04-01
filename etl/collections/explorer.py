@@ -113,7 +113,6 @@ class Explorer(Collection):
         df_grapher, df_columns = extract_explorers_tables(self)
 
         # Transform to legacy format
-        # TODO: this part is responsible for interacting with owid-content. Instead, it should be replaced with DB-interaction code, as with MDIMs.
         explorer_legacy = _create_explorer_legacy(
             explorer_path=f"export://explorers/{self.catalog_path}",
             explorer_name=self.explorer_name,
