@@ -100,6 +100,7 @@ def combine_state_tables(tb: Table, tb_cdc_historical: Table, tb_cdc_archive: Ta
     # tb_cdc_historical = tb_cdc_historical[tb_cdc_historical["year"] < 2002]
     tb_cdc_historical = tb_cdc_historical.dropna(subset=["case_count"])
     tb_cdc_historical["type"] = "historical"
+
     # Drop national data and type of case (indigenous vs imported) from the CDC archive
     tb_cdc_archive = tb_cdc_archive[["country", "year", "total_measles_cases", "source"]]
     tb_cdc_archive = tb_cdc_archive.rename(columns={"total_measles_cases": "case_count"})

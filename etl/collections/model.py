@@ -19,6 +19,7 @@ import yaml
 from owid.catalog.meta import GrapherConfig, MetaBase
 
 from etl.collections.utils import merge_common_metadata_by_dimension
+from etl.files import yaml_dump
 from etl.paths import SCHEMAS_DIR
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
@@ -506,7 +507,7 @@ class Collection(MDIMBase):
                 # Check that dimension is defined in the view!
                 assert (
                     dim_slug in view.dimensions
-                ), f"Dimension {dim_slug} not found in dimensions! View: {view.to_dict()}"
+                ), f"Dimension {dim_slug} not found in dimensions! View:\n{yaml_dump(view.to_dict())}"
                 # Check that choices defined in the view are valid!
                 assert (
                     view.dimensions[dim_slug] in choice_slugs
