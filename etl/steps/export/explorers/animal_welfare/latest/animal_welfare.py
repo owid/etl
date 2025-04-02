@@ -96,7 +96,6 @@ def run() -> None:
                 {"slug": EMPTY_DIMENSION_LABEL, "name": EMPTY_DIMENSION_LABEL, "description": None}
             )
     # TODO: Instead of adding views like this, they could be defined in the yaml, and then the function to expand views would append those.
-    # TODO: The colors defined for the map brackets are not respected!
     # TODO: Why are title and subtitle not automatically fetched for indicators?
     # Add view with map chart for fur banning laws.
     config["views"].append(
@@ -109,7 +108,13 @@ def run() -> None:
             },
             "indicators": {
                 "y": [
-                    {"catalogPath": "fur_laws#fur_farming_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}
+                    {
+                        "catalogPath": "fur_laws#fur_farming_status",
+                        "display": {
+                            "colorScaleScheme": "OwidCategoricalC",
+                            "colorScaleCategoricalBins": "Banned,#759AC8,;Banned but not yet in effect,#058580,;No active farms reported,#99D8C9,;Not banned,#AE2E3F,;Partially banned,#A46F49,;Phased out due to stricter regulation,#6D3E91,;No data,,",
+                        },
+                    }
                 ]
             },
             "config": {
@@ -118,19 +123,6 @@ def run() -> None:
                 "hasMapTab": True,
                 # TODO: I suppose the following should be None, instead of "None", but the former doesn't work.
                 "type": "None",
-                "map": {
-                    "colorScale": {
-                        "customCategoryColors": {
-                            "Banned": "#759AC8",
-                            "Banned (not yet effective)": "#058580",
-                            "No active farms reported": "#99D8C9",
-                            "Not banned": "#AE2E3F",
-                            "Partially banned": "#A46F49",
-                            "Phased out due to stricter regulation": "#6D3E91",
-                            "No data": "#CCCCCC",
-                        },
-                    }
-                },
             },
         }
     )
@@ -145,7 +137,13 @@ def run() -> None:
             },
             "indicators": {
                 "y": [
-                    {"catalogPath": "fur_laws#fur_trading_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}
+                    {
+                        "catalogPath": "fur_laws#fur_trading_status",
+                        "display": {
+                            "colorScaleScheme": "OwidCategoricalC",
+                            "colorScaleCategoricalBins": "Banned,#759AC8,;Not banned,#AE2E3F,;Partially banned,#A46F49,",
+                        },
+                    }
                 ]
             },
             "config": {
@@ -153,16 +151,6 @@ def run() -> None:
                 "subtitle": "Countries that have banned fur trading at a national level.",
                 "hasMapTab": True,
                 "type": "None",
-                "map": {
-                    "colorScale": {
-                        "customCategoryColors": {
-                            "Banned": "#759AC8",
-                            "Not banned": "#AE2E3F",
-                            "Partially banned": "#A46F49",
-                            "No data": "#CCCCCC",
-                        },
-                    }
-                },
             },
         }
     )
@@ -176,23 +164,21 @@ def run() -> None:
                 "estimate": EMPTY_DIMENSION_LABEL,
             },
             "indicators": {
-                "y": [{"catalogPath": "bullfighting_laws#status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
+                "y": [
+                    {
+                        "catalogPath": "bullfighting_laws#status",
+                        "display": {
+                            "colorScaleScheme": "OwidCategoricalC",
+                            "colorScaleCategoricalBins": "Banned,#759AC8,;Not banned,#AE2E3F,;Partially banned,#A46F49,;No data,,",
+                        },
+                    }
+                ]
             },
             "config": {
                 "title": "Which countries have banned bullfighting?",
                 "subtitle": "Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.",
                 "hasMapTab": True,
                 "type": "None",
-                "map": {
-                    "colorScale": {
-                        "customCategoryColors": {
-                            "Banned": "#759AC8",
-                            "Not banned": "#AE2E3F",
-                            "Partially banned": "#A46F49",
-                            "No data": "#CCCCCC",
-                        },
-                    }
-                },
             },
         }
     )
@@ -206,24 +192,21 @@ def run() -> None:
                 "estimate": EMPTY_DIMENSION_LABEL,
             },
             "indicators": {
-                "y": [{"catalogPath": "chick_culling_laws#status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
+                "y": [
+                    {
+                        "catalogPath": "chick_culling_laws#status",
+                        "display": {
+                            "colorScaleScheme": "OwidCategoricalC",
+                            "colorScaleCategoricalBins": "Banned,#759AC8,;Banned but not yet in effect,#058580,;Not banned,#AE2E3F,;Partially banned,#A46F49,;No data,,",
+                        },
+                    }
+                ]
             },
             "config": {
                 "title": "Which countries have banned chick culling?",
                 "subtitle": "Chick culling is the process of separating and killing unwanted male and unhealthy female chicks that cannot produce eggs in industrialized egg facilities.",
                 "hasMapTab": True,
                 "type": "None",
-                "map": {
-                    "colorScale": {
-                        "customCategoryColors": {
-                            "Banned": "#759AC8",
-                            "Banned but not yet in effect": "#058580",
-                            "Not banned": "#AE2E3F",
-                            "Partially banned": "#A46F49",
-                            "No data": "#CCCCCC",
-                        },
-                    }
-                },
             },
         }
     )
