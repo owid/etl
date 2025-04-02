@@ -48,6 +48,11 @@ FARMED_FISH_LABEL = "farmed fish"
 # Label for farmed crustaceans.
 FARMED_CRUSTACEANS_LABEL = "farmed crustaceans"
 
+# Labels for the three estimate dimensions (relevant for fish and crustacean data).
+ESTIMATE_MIDPOINT_LABEL = "mid-point"
+ESTIMATE_LOW_LABEL = "lower"
+ESTIMATE_HIGH_LABEL = "higher"
+
 # List of item codes that should add up to the total stocks of animals.
 STOCK_ITEM_CODES = {
     "00000866": "cattle",  # Cattle
@@ -85,7 +90,7 @@ STOCK_ANIMALS_ELEMENT_CODES = ["005111", "005112", "005114"]
 STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES = ["5111pc", "5112pc", "5114pc"]
 
 # Name of index columns in the final table.
-INDEX_COLUMNS = ["country", "year", "animal", "per_capita"]
+INDEX_COLUMNS = ["country", "year", "animal", "per_capita", "estimate"]
 
 
 def sanity_check_inputs(tb_killed, tb_stock, tb_qcl):
@@ -142,31 +147,30 @@ def run() -> None:
     # Process data.
     #
     # Prepare wild-caught fish data.
-    # TODO: Add dimension for estimate (low, midpoint or high).
     with pr.ignore_warnings():
-        tb_fish = pr.concat(
-            [
-                tb_wild_fish[["country", "year", "n_wild_fish"]]
-                .assign(**{"per_capita": False, "animal": WILD_FISH_LABEL})
-                .rename(columns={"n_wild_fish": "n_animals_killed"}),
-                tb_wild_fish[["country", "year", "n_wild_fish_per_capita"]]
-                .assign(**{"per_capita": True, "animal": WILD_FISH_LABEL})
-                .rename(columns={"n_wild_fish_per_capita": "n_animals_killed"}),
-                tb_farmed_fish[["country", "year", "n_farmed_fish"]]
-                .assign(**{"per_capita": False, "animal": FARMED_FISH_LABEL})
-                .rename(columns={"n_farmed_fish": "n_animals_killed"}),
-                tb_farmed_fish[["country", "year", "n_farmed_fish_per_capita"]]
-                .assign(**{"per_capita": True, "animal": FARMED_FISH_LABEL})
-                .rename(columns={"n_farmed_fish_per_capita": "n_animals_killed"}),
-                tb_farmed_crustaceans[["country", "year", "n_farmed_crustaceans"]]
-                .assign(**{"per_capita": False, "animal": FARMED_CRUSTACEANS_LABEL})
-                .rename(columns={"n_farmed_crustaceans": "n_animals_killed"}),
-                tb_farmed_crustaceans[["country", "year", "n_farmed_crustaceans_per_capita"]]
-                .assign(**{"per_capita": True, "animal": FARMED_CRUSTACEANS_LABEL})
-                .rename(columns={"n_farmed_crustaceans_per_capita": "n_animals_killed"}),
-            ],
-            ignore_index=True,
-        )
+        tables = []
+        for estimate in [ESTIMATE_MIDPOINT_LABEL, ESTIMATE_LOW_LABEL, ESTIMATE_HIGH_LABEL]:
+            suffix = {
+                ESTIMATE_MIDPOINT_LABEL: "",
+                ESTIMATE_LOW_LABEL: "_low",
+                ESTIMATE_HIGH_LABEL: "_high",
+            }[estimate]
+            for per_capita in [True, False]:
+                suffix += "_per_capita" if per_capita else ""
+                tables.extend(
+                    [
+                        tb_wild_fish[["country", "year", f"n_wild_fish{suffix}"]]
+                        .assign(**{"per_capita": per_capita, "animal": WILD_FISH_LABEL, "estimate": estimate})
+                        .rename(columns={f"n_wild_fish{suffix}": "n_animals_killed"}),
+                        tb_farmed_fish[["country", "year", f"n_farmed_fish{suffix}"]]
+                        .assign(**{"per_capita": per_capita, "animal": FARMED_FISH_LABEL, "estimate": estimate})
+                        .rename(columns={f"n_farmed_fish{suffix}": "n_animals_killed"}),
+                        tb_farmed_crustaceans[["country", "year", f"n_farmed_crustaceans{suffix}"]]
+                        .assign(**{"per_capita": per_capita, "animal": FARMED_CRUSTACEANS_LABEL, "estimate": estimate})
+                        .rename(columns={f"n_farmed_crustaceans{suffix}": "n_animals_killed"}),
+                    ]
+                )
+        tb_fish = pr.concat(tables, ignore_index=True)
 
     # Create a table for the number of killed animals of each kind.
     tb_killed = (
@@ -174,7 +178,8 @@ def run() -> None:
             tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)
             & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
         ]
-        .assign(**{"per_capita": False})
+        # TODO: Decide whether it's better to use midpoint label, or no label (or something like "-").
+        .assign(**{"per_capita": False, "estimate": ESTIMATE_MIDPOINT_LABEL})
         .reset_index(drop=True)
     )
 
@@ -184,14 +189,14 @@ def run() -> None:
             tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT_CODES)
             & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
         ]
-        .assign(**{"per_capita": True})
+        .assign(**{"per_capita": True, "estimate": ESTIMATE_MIDPOINT_LABEL})
         .reset_index(drop=True)
     )
 
     # Create a table for the number of animals in stock.
     tb_stock = (
         tb_qcl[tb_qcl["element_code"].isin(STOCK_ANIMALS_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)]
-        .assign(**{"per_capita": False})
+        .assign(**{"per_capita": False, "estimate": ESTIMATE_MIDPOINT_LABEL})
         .reset_index(drop=True)
     )
 
@@ -201,7 +206,7 @@ def run() -> None:
             tb_qcl["element_code"].isin(STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES)
             & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
         ]
-        .assign(**{"per_capita": True})
+        .assign(**{"per_capita": True, "estimate": ESTIMATE_MIDPOINT_LABEL})
         .reset_index(drop=True)
     )
 
@@ -260,6 +265,9 @@ def run() -> None:
             "WILD_FISH_LABEL": WILD_FISH_LABEL,
             "FARMED_FISH_LABEL": FARMED_FISH_LABEL,
             "FARMED_CRUSTACEANS_LABEL": FARMED_CRUSTACEANS_LABEL,
+            "ESTIMATE_MIDPOINT_LABEL": ESTIMATE_MIDPOINT_LABEL,
+            "ESTIMATE_LOW_LABEL": ESTIMATE_LOW_LABEL,
+            "ESTIMATE_HIGH_LABEL": ESTIMATE_HIGH_LABEL,
         },
     )
     ds_garden.save()

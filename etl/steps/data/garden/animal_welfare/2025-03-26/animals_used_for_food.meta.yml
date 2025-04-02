@@ -17,7 +17,7 @@ tables:
     title: Animals used for food
     variables:
       n_animals_killed:
-        title: &title-animals-killed <% if animal == "{MEAT_TOTAL_LABEL}" %>Total number of land animals slaughtered to produce meat<% elif animal == "{WILD_FISH_LABEL}"%>Number of fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Number of farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Number of farmed crustaceans killed for food<% else %>Number of << animal >> slaughtered to produce meat<% endif %><% if per_capita == True %> per capita<% endif %>
+        title: &title-animals-killed <% if animal == "{MEAT_TOTAL_LABEL}" %>Total number of land animals slaughtered to produce meat<% elif animal == "{WILD_FISH_LABEL}"%>Number of fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Number of farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Number of farmed crustaceans killed for food<% else %>Number of << animal >> slaughtered to produce meat<% endif %><% if per_capita == True %> per capita<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>
         unit: animals<% if per_capita == True %> per person<% endif %>
         short_unit: ""
         display:

@@ -6,6 +6,10 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Label to assign to the list choices of a dimension when that dimension is irrelevant.
+# This is what the dropdown will show, greyed out.
+EMPTY_DIMENSION_LABEL = ""
+
 
 def _improve_dimension_names(dimension, transformation, replacements):
     for field, value in dimension.items():
@@ -67,7 +71,7 @@ def run() -> None:
         tb,
         indicator_names=["n_animals_killed", "n_animals_alive"],
         indicators_slug="metric",
-        dimensions=["animal", "per_capita"],
+        dimensions=["animal", "estimate", "per_capita"],
         indicator_as_dimension=True,
     )
     # TODO: expand_config could ingest 'config' as well, and extend dimensions and views in it (in case there were already some in the yaml).
@@ -91,7 +95,7 @@ def run() -> None:
     # TODO: Is there any way to sort the elements of the dropdowns?
     # TODO: Set the defalt view (by adding "config": {"defaultView": True} in the corresponding view, which should be animals killed for meat total).
     # Include additional views.
-    # TODO: Create function add views. If dimension is not specified, create a choice "-" for each unspecified dimension in "dimensions".
+    # TODO: Create function add views. If dimension is not specified, create an empty choice for each unspecified dimension in "dimensions".
     for dimension in config["dimensions"]:
         if dimension["slug"] == "metric":
             dimension["choices"].extend(
@@ -104,7 +108,13 @@ def run() -> None:
                 ]
             )
         elif dimension["slug"] == "animal":
-            dimension["choices"].append({"slug": "-", "name": "-", "description": None})
+            dimension["choices"].append(
+                {"slug": EMPTY_DIMENSION_LABEL, "name": EMPTY_DIMENSION_LABEL, "description": None}
+            )
+        elif dimension["slug"] == "estimate":
+            dimension["choices"].append(
+                {"slug": EMPTY_DIMENSION_LABEL, "name": EMPTY_DIMENSION_LABEL, "description": None}
+            )
     # TODO: Instead of adding views like this, they could be defined in the yaml, and then the function to expand views would append those.
     # TODO: Is there a way to hide the chart tab?
     # TODO: The colors defined for the map brackets are not respected!
@@ -112,7 +122,12 @@ def run() -> None:
     # Add view with map chart for fur banning laws.
     config["views"].append(
         {
-            "dimensions": {"metric": "fur_farming_status", "animal": "-", "per_capita": "False"},
+            "dimensions": {
+                "metric": "fur_farming_status",
+                "animal": EMPTY_DIMENSION_LABEL,
+                "per_capita": "False",
+                "estimate": EMPTY_DIMENSION_LABEL,
+            },
             "indicators": {
                 "y": [
                     {"catalogPath": "fur_laws#fur_farming_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}
@@ -141,7 +156,12 @@ def run() -> None:
     # Add view with map chart for fur trading laws.
     config["views"].append(
         {
-            "dimensions": {"metric": "fur_trading_status", "animal": "-", "per_capita": "False"},
+            "dimensions": {
+                "metric": "fur_trading_status",
+                "animal": EMPTY_DIMENSION_LABEL,
+                "per_capita": "False",
+                "estimate": EMPTY_DIMENSION_LABEL,
+            },
             "indicators": {
                 "y": [
                     {"catalogPath": "fur_laws#fur_trading_status", "display": {"colorScaleScheme": "OwidCategoricalC"}}
@@ -167,7 +187,12 @@ def run() -> None:
     # Add view with map chart for bullfighting laws.
     config["views"].append(
         {
-            "dimensions": {"metric": "bullfighting_status", "animal": "-", "per_capita": "False"},
+            "dimensions": {
+                "metric": "bullfighting_status",
+                "animal": EMPTY_DIMENSION_LABEL,
+                "per_capita": "False",
+                "estimate": EMPTY_DIMENSION_LABEL,
+            },
             "indicators": {
                 "y": [{"catalogPath": "bullfighting_laws#status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
             },
@@ -191,7 +216,12 @@ def run() -> None:
     # Add view with map chart for chick culling laws.
     config["views"].append(
         {
-            "dimensions": {"metric": "chick_culling_status", "animal": "-", "per_capita": "False"},
+            "dimensions": {
+                "metric": "chick_culling_status",
+                "animal": EMPTY_DIMENSION_LABEL,
+                "per_capita": "False",
+                "estimate": EMPTY_DIMENSION_LABEL,
+            },
             "indicators": {
                 "y": [{"catalogPath": "chick_culling_laws#status", "display": {"colorScaleScheme": "OwidCategoricalC"}}]
             },
@@ -216,7 +246,12 @@ def run() -> None:
     # Add view with bar chart on cage-free hens.
     config["views"].append(
         {
-            "dimensions": {"metric": "caged_hens", "animal": "-", "per_capita": "False"},
+            "dimensions": {
+                "metric": "caged_hens",
+                "animal": EMPTY_DIMENSION_LABEL,
+                "per_capita": "False",
+                "estimate": EMPTY_DIMENSION_LABEL,
+            },
             "indicators": {
                 "y": [
                     {
