@@ -949,7 +949,8 @@ steps:
     - data://garden/demography/2025-01-23/us_state_population
     - data://garden/demography/2024-07-15/population
     - snapshot://fasttrack/latest/cdc_measles.csv
-    - snapshot://cdc/2025-03-25/measles_state_level.csv
+    - snapshot://fasttrack/latest/measles_cases.csv
+    #- snapshot://cdc/2025-03-25/measles_state_level.csv
     - data://garden/cdc/2025-01-26/measles_state_level
   data://grapher/health/2025-01-22/measles_state_level:
     - data://garden/health/2025-01-22/measles_state_level

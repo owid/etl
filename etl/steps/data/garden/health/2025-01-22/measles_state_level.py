@@ -107,6 +107,7 @@ def combine_state_tables(tb: Table, tb_cdc_historical: Table, tb_cdc_archive: Ta
     tb_cdc_archive["type"] = "archive"
 
     tb_cdc_combined = pr.concat([tb_cdc_archive, tb_cdc_historical])
+    tb_cdc_combined = tb_cdc_combined.drop(columns="type")
     # Remove duplicate rows, keep just the 'archive' type
     tb_cdc_combined = tb_cdc_combined.drop_duplicates(subset=["country", "year"], keep="last")
     # Format the CDC current data to match
