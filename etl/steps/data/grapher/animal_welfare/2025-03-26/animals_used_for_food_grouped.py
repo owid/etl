@@ -21,10 +21,10 @@ MAIN_ANIMALS_KILLED = [
     "cattle",
 ]
 
-# Label for meat total and for mid-point estimate.
+# Label for meat total and for empty estimate dimension (which is relevant only for fish and crustaceans).
 # NOTE: These labels should coincide with the ones defined in the garden step of animals_used_for_food (otherwise, an assertion will fail below).
 MEAT_TOTAL_LABEL = "all land animals"
-ESTIMATE_MIDPOINT_LABEL = "mid-point"
+EMPTY_DIMENSION_LABEL = ""
 
 # Label for all other animals.
 OTHER_ANIMALS_KILLED_LABEL = "other animals"
@@ -42,13 +42,13 @@ def run() -> None:
     # Process data.
     #
     # Sanity checks.
-    error = "Label for mid-point estimate may have changed. Update it in the code."
-    assert ESTIMATE_MIDPOINT_LABEL in set(tb["estimate"]), error
+    error = "Label for empty estimate dimension may have changed. Update it in the code."
+    assert EMPTY_DIMENSION_LABEL in set(tb["estimate"]), error
     error = "Label for all animals (item assigned to total meat) may have changed. Update it in the code."
     assert MEAT_TOTAL_LABEL in set(tb["animal"]), error
 
     # Keep only non-per capita, mid-point estimate rows.
-    tb = tb[(~tb["per_capita"]) & (tb["estimate"] == ESTIMATE_MIDPOINT_LABEL)].reset_index(drop=True)
+    tb = tb[(~tb["per_capita"]) & (tb["estimate"] == EMPTY_DIMENSION_LABEL)].reset_index(drop=True)
 
     # Group less frequently slaughtered animals into an "other" category.
     tb_other = (

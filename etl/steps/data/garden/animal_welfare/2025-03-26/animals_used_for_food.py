@@ -53,6 +53,9 @@ ESTIMATE_MIDPOINT_LABEL = "mid-point"
 ESTIMATE_LOW_LABEL = "lower"
 ESTIMATE_HIGH_LABEL = "higher"
 
+# Label for the estimate dimension for land animals data (where this dimension is irrelevant).
+EMPTY_DIMENSION_LABEL = ""
+
 # List of item codes that should add up to the total stocks of animals.
 STOCK_ITEM_CODES = {
     "00000866": "cattle",  # Cattle
@@ -167,14 +170,14 @@ def prepare_land_animals_data(tb_qcl, killed_or_alive):
     # Create a table for the number of killed/alive animals of each kind.
     tb = (
         tb_qcl[tb_qcl["element_code"].isin(element_codes) & tb_qcl["item_code"].isin(item_codes.keys())]
-        .assign(**{"per_capita": False, "estimate": ESTIMATE_MIDPOINT_LABEL})
+        .assign(**{"per_capita": False, "estimate": EMPTY_DIMENSION_LABEL})
         .reset_index(drop=True)
     )
 
     # Create a table for the number of animals of each kind per person.
     tb_per_capita = (
         tb_qcl[tb_qcl["element_code"].isin(element_codes_per_capita) & tb_qcl["item_code"].isin(item_codes.keys())]
-        .assign(**{"per_capita": True, "estimate": ESTIMATE_MIDPOINT_LABEL})
+        .assign(**{"per_capita": True, "estimate": EMPTY_DIMENSION_LABEL})
         .reset_index(drop=True)
     )
 

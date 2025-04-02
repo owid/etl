@@ -111,10 +111,6 @@ def run() -> None:
             dimension["choices"].append(
                 {"slug": EMPTY_DIMENSION_LABEL, "name": EMPTY_DIMENSION_LABEL, "description": None}
             )
-        elif dimension["slug"] == "estimate":
-            dimension["choices"].append(
-                {"slug": EMPTY_DIMENSION_LABEL, "name": EMPTY_DIMENSION_LABEL, "description": None}
-            )
     # TODO: Instead of adding views like this, they could be defined in the yaml, and then the function to expand views would append those.
     # TODO: Is there a way to hide the chart tab?
     # TODO: The colors defined for the map brackets are not respected!
