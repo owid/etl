@@ -149,15 +149,15 @@ dataset:
   update_period_days: 365
 
 tables:
-  vaccination_schedules:
+  vaccination_introductions:
     variables:
       intro:
-        title: Vaccination schedule for the {definitions.vaccine_name}
+        title: Vaccination introduction for the {definitions.vaccine_name}
         description_short: The introduction status of {definitions.vaccine_name} vaccination schedule.
         unit: ""
         description_key:
           - "{definitions.vaccine_description_key}"
-  vaccination_schedules_sum:
+  vaccination_introductions_sum:
     variables:
       countries:
         title: Number of countries that are administering {definitions.vaccine_name}

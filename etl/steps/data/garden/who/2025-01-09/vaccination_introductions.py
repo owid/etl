@@ -30,10 +30,10 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("vaccination_schedules")
+    ds_meadow = paths.load_dataset("vaccination_introductions")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("vaccination_schedules")
+    tb = ds_meadow.read("vaccination_introductions")
 
     #
     # Process data.
@@ -50,7 +50,7 @@ def run(dest_dir: str) -> None:
     tb_sum = tb_sum.rename(columns={"intro": "countries"})
 
     tb = tb.format(["country", "year", "description"])
-    tb_sum = tb_sum.format(["country", "year", "description"], short_name="vaccination_schedules_sum")
+    tb_sum = tb_sum.format(["country", "year", "description"], short_name="vaccination_introductions_sum")
     #
     # Save outputs.
     #
