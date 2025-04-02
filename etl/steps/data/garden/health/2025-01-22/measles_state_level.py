@@ -20,7 +20,7 @@ def run(dest_dir: str) -> None:
     # Load the fast track of the CDC archive for 2002-2015
     ds_measles_cdc_archive = paths.load_snapshot("cdc_measles")
     # Load in the CDC historical dataset for missing data < 2001
-    ds_measles_cdc_historical = paths.load_snapshot("measles_state_level", namespace="cdc")
+    ds_measles_cdc_historical = paths.load_snapshot("measles_cases")
     # Load the CDC dataset for 2016-2022
     ds_measles_cdc = paths.load_dataset("measles_state_level", namespace="cdc")
     ds_pop = paths.load_dataset("us_state_population")
@@ -29,10 +29,9 @@ def run(dest_dir: str) -> None:
     tb = ds_meadow.read("measles_state_level")
 
     origins = tb["countvalue"].metadata.origins
-    tb_cdc_historical = ds_measles_cdc_historical.read_csv().drop(columns=["Unnamed: 0"])
+    tb_cdc_historical = ds_measles_cdc_historical.read_csv()
     tb_cdc_historical = tb_cdc_historical[tb_cdc_historical["cases"] != "NN"].dropna(subset=["cases"])
     tb_cdc_archive = ds_measles_cdc_archive.read_csv()
-    tb_cdc_archive["source"] = ""
     tb_cdc_state = ds_measles_cdc.read("state_measles")
     tb_cdc_state["source"] = "CDC WONDER - https://wonder.cdc.gov/controller/datarequest/D130"
     tb_pop = ds_pop.read("us_state_population")
@@ -98,18 +97,24 @@ def combine_state_tables(tb: Table, tb_cdc_historical: Table, tb_cdc_archive: Ta
 
     #
     tb_cdc_historical = tb_cdc_historical.rename(columns={"cases": "case_count"})
-
+    # tb_cdc_historical = tb_cdc_historical[tb_cdc_historical["year"] < 2002]
+    tb_cdc_historical = tb_cdc_historical.dropna(subset=["case_count"])
+    tb_cdc_historical["type"] = "historical"
     # Drop national data and type of case (indigenous vs imported) from the CDC archive
     tb_cdc_archive = tb_cdc_archive[["country", "year", "total_measles_cases", "source"]]
     tb_cdc_archive = tb_cdc_archive.rename(columns={"total_measles_cases": "case_count"})
     tb_cdc_archive = tb_cdc_archive[tb_cdc_archive["country"] != "United States"]
+    tb_cdc_archive["type"] = "archive"
 
+    tb_cdc_combined = pr.concat([tb_cdc_archive, tb_cdc_historical])
+    # Remove duplicate rows, keep just the 'archive' type
+    tb_cdc_combined = tb_cdc_combined.drop_duplicates(subset=["country", "year"], keep="last")
     # Format the CDC current data to match
     tb_cdc_state = combine_new_yorks(tb_cdc_state)
     tb_cdc_state = tb_cdc_state[tb_cdc_state["disease"] == "Total"]
     tb_cdc_state = tb_cdc_state[["country", "year", "case_count", "source"]]
 
-    combined_tb = pr.concat([tb, tb_cdc_historical, tb_cdc_archive, tb_cdc_state])
+    combined_tb = pr.concat([tb, tb_cdc_combined, tb_cdc_state])
     # Check there aren't duplicate rows
     combined_tb.set_index(["country", "year"], verify_integrity=True)
 
