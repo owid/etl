@@ -96,7 +96,6 @@ def run() -> None:
                 {"slug": EMPTY_DIMENSION_LABEL, "name": EMPTY_DIMENSION_LABEL, "description": None}
             )
     # TODO: Instead of adding views like this, they could be defined in the yaml, and then the function to expand views would append those.
-    # TODO: Is there a way to hide the chart tab?
     # TODO: The colors defined for the map brackets are not respected!
     # TODO: Why are title and subtitle not automatically fetched for indicators?
     # Add view with map chart for fur banning laws.
@@ -117,6 +116,8 @@ def run() -> None:
                 "title": "Which countries have banned fur farming?",
                 "subtitle": "Countries that have banned fur farming at a national level.",
                 "hasMapTab": True,
+                # TODO: I suppose the following should be None, instead of "None", but the former doesn't work.
+                "type": "None",
                 "map": {
                     "colorScale": {
                         "customCategoryColors": {
@@ -151,6 +152,7 @@ def run() -> None:
                 "title": "Which countries have banned fur trading?",
                 "subtitle": "Countries that have banned fur trading at a national level.",
                 "hasMapTab": True,
+                "type": "None",
                 "map": {
                     "colorScale": {
                         "customCategoryColors": {
@@ -180,6 +182,7 @@ def run() -> None:
                 "title": "Which countries have banned bullfighting?",
                 "subtitle": "Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.",
                 "hasMapTab": True,
+                "type": "None",
                 "map": {
                     "colorScale": {
                         "customCategoryColors": {
@@ -209,6 +212,7 @@ def run() -> None:
                 "title": "Which countries have banned chick culling?",
                 "subtitle": "Chick culling is the process of separating and killing unwanted male and unhealthy female chicks that cannot produce eggs in industrialized egg facilities.",
                 "hasMapTab": True,
+                "type": "None",
                 "map": {
                     "colorScale": {
                         "customCategoryColors": {
@@ -251,8 +255,6 @@ def run() -> None:
             "config": {
                 "title": "Number of laying hens in cages and cage-free housing",
                 "hasMapTab": False,
-                "tab": "chart",
-                # "chartTypes": ["StackedDiscreteBar"],
                 "type": "StackedDiscreteBar",
                 # TODO: How can I add the Settings button, to allow for relative?
                 # "stackMode": "absolute",
