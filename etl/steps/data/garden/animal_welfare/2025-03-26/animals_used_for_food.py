@@ -93,7 +93,7 @@ STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES = ["5111pc", "5112pc", "5114pc"]
 INDEX_COLUMNS = ["country", "year", "animal", "per_capita", "estimate"]
 
 
-def sanity_check_inputs(tb_killed, tb_stock, tb_qcl):
+def sanity_check_animals_killed(tb_killed, tb_qcl):
     assert set(tb_killed["unit"]) == {"animals"}, "Units may have changed."
 
     # Check that the sum of the different animals killed for food adds up to the total.
@@ -117,36 +117,15 @@ def sanity_check_inputs(tb_killed, tb_stock, tb_qcl):
     error = "The sum of the different animals killed for food do not add up to the total."
     assert ((100 * (compared["value_sum"] - compared["value_global"]) / compared["value_global"]) < 0.001).all(), error
 
+
+def sanity_check_animals_alive(tb_stock):
     # Sanity check for stock.
     assert set(tb_stock["unit"]) == {"animals"}, "Units may have changed."
 
     # TODO: It would be good to check that the sum of all values for Stocks (for all animals) agrees (within a certain percentage) with the Stocks for "Meat, Total". However, it doesn't. I just checked directly on https://www.fao.org/faostat/en/#data/QCL that Stocks for Meat, Total for World is 23449 in 2023 (in 1000 An). This means 23 million animals. This number is at least a factor of 1000 too small! I will try to figure out what this number means.
 
 
-def run() -> None:
-    #
-    # Load inputs.
-    #
-    # Load faostat qcl dataset, and read its main table.
-    ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl.read("faostat_qcl")
-
-    # Load number of wild-caught fish.
-    ds_wild_fish = paths.load_dataset("number_of_wild_fish_killed_for_food")
-    tb_wild_fish = ds_wild_fish.read("number_of_wild_fish_killed_for_food")
-
-    # Load number of farmed fish.
-    ds_farmed_fish = paths.load_dataset("number_of_farmed_fish")
-    tb_farmed_fish = ds_farmed_fish.read("number_of_farmed_fish")
-
-    # Load number of farmed crustaceans.
-    ds_farmed_crustaceans = paths.load_dataset("number_of_farmed_crustaceans")
-    tb_farmed_crustaceans = ds_farmed_crustaceans.read("number_of_farmed_crustaceans")
-
-    #
-    # Process data.
-    #
-    # Prepare wild-caught fish data.
+def prepare_fish_and_crustaceans_data(tb_wild_fish, tb_farmed_fish, tb_farmed_crustaceans):
     with pr.ignore_warnings():
         tables = []
         for estimate in [ESTIMATE_MIDPOINT_LABEL, ESTIMATE_LOW_LABEL, ESTIMATE_HIGH_LABEL]:
@@ -172,79 +151,95 @@ def run() -> None:
                 )
         tb_fish = pr.concat(tables, ignore_index=True)
 
-    # Create a table for the number of killed animals of each kind.
-    tb_killed = (
-        tb_qcl[
-            tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_ELEMENT_CODES)
-            & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
-        ]
-        # TODO: Decide whether it's better to use midpoint label, or no label (or something like "-").
+    return tb_fish
+
+
+def prepare_land_animals_data(tb_qcl, killed_or_alive):
+    if killed_or_alive == "killed":
+        element_codes = SLAUGHTERED_ANIMALS_ELEMENT_CODES
+        element_codes_per_capita = SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT_CODES
+        item_codes = MEAT_TOTAL_ITEM_CODES
+    elif killed_or_alive == "alive":
+        element_codes = STOCK_ANIMALS_ELEMENT_CODES
+        element_codes_per_capita = STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES
+        item_codes = STOCK_ITEM_CODES
+
+    # Create a table for the number of killed/alive animals of each kind.
+    tb = (
+        tb_qcl[tb_qcl["element_code"].isin(element_codes) & tb_qcl["item_code"].isin(item_codes.keys())]
         .assign(**{"per_capita": False, "estimate": ESTIMATE_MIDPOINT_LABEL})
         .reset_index(drop=True)
     )
 
-    # Create a table for the number of killed animals of each kind per person.
-    tb_killed_per_capita = (
-        tb_qcl[
-            tb_qcl["element_code"].isin(SLAUGHTERED_ANIMALS_PER_CAPITA_ELEMENT_CODES)
-            & tb_qcl["item_code"].isin(MEAT_TOTAL_ITEM_CODES.keys())
-        ]
-        .assign(**{"per_capita": True, "estimate": ESTIMATE_MIDPOINT_LABEL})
-        .reset_index(drop=True)
-    )
-
-    # Create a table for the number of animals in stock.
-    tb_stock = (
-        tb_qcl[tb_qcl["element_code"].isin(STOCK_ANIMALS_ELEMENT_CODES) & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)]
-        .assign(**{"per_capita": False, "estimate": ESTIMATE_MIDPOINT_LABEL})
-        .reset_index(drop=True)
-    )
-
-    # Create a table for the number of animals in stock per person.
-    tb_stock_per_capita = (
-        tb_qcl[
-            tb_qcl["element_code"].isin(STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES)
-            & tb_qcl["item_code"].isin(STOCK_ITEM_CODES)
-        ]
+    # Create a table for the number of animals of each kind per person.
+    tb_per_capita = (
+        tb_qcl[tb_qcl["element_code"].isin(element_codes_per_capita) & tb_qcl["item_code"].isin(item_codes.keys())]
         .assign(**{"per_capita": True, "estimate": ESTIMATE_MIDPOINT_LABEL})
         .reset_index(drop=True)
     )
 
     # Sanity checks.
-    sanity_check_inputs(tb_killed=tb_killed, tb_stock=tb_stock, tb_qcl=tb_qcl)
+    if killed_or_alive == "killed":
+        sanity_check_animals_killed(tb_killed=tb, tb_qcl=tb_qcl)
+    else:
+        sanity_check_animals_alive(tb_stock=tb)
 
-    tb_killed["animal"] = map_series(
-        tb_killed["item_code"],
-        mapping=MEAT_TOTAL_ITEM_CODES,
+    # Rename animals appropriately.
+    tb["animal"] = map_series(
+        tb["item_code"],
+        mapping=item_codes,
         warn_on_missing_mappings=True,
         warn_on_unused_mappings=True,
     )
-    tb_killed = tb_killed[INDEX_COLUMNS + ["value"]].rename(columns={"value": "n_animals_killed"}, errors="raise")
-
-    tb_killed_per_capita["animal"] = map_series(
-        tb_killed_per_capita["item_code"],
-        mapping=MEAT_TOTAL_ITEM_CODES,
+    tb_per_capita["animal"] = map_series(
+        tb_per_capita["item_code"],
+        mapping=item_codes,
         warn_on_missing_mappings=True,
         warn_on_unused_mappings=True,
     )
-    tb_killed_per_capita = tb_killed_per_capita[INDEX_COLUMNS + ["value"]].rename(
-        columns={"value": "n_animals_killed"}, errors="raise"
+
+    # Select and rename columns.
+    tb = tb[INDEX_COLUMNS + ["value"]].rename(columns={"value": f"n_animals_{killed_or_alive}"}, errors="raise")
+    tb_per_capita = tb_per_capita[INDEX_COLUMNS + ["value"]].rename(
+        columns={"value": f"n_animals_{killed_or_alive}"}, errors="raise"
     )
 
-    tb_stock["animal"] = map_series(
-        tb_stock["item_code"], mapping=STOCK_ITEM_CODES, warn_on_missing_mappings=True, warn_on_unused_mappings=True
-    )
-    tb_stock = tb_stock[INDEX_COLUMNS + ["value"]].rename(columns={"value": "n_animals_alive"}, errors="raise")
+    return tb, tb_per_capita
 
-    tb_stock_per_capita["animal"] = map_series(
-        tb_stock_per_capita["item_code"],
-        mapping=STOCK_ITEM_CODES,
-        warn_on_missing_mappings=True,
-        warn_on_unused_mappings=True,
+
+def run() -> None:
+    #
+    # Load inputs.
+    #
+    # Load faostat qcl dataset, and read its main table.
+    ds_qcl = paths.load_dataset("faostat_qcl")
+    tb_qcl = ds_qcl.read("faostat_qcl")
+
+    # Load number of wild-caught fish.
+    ds_wild_fish = paths.load_dataset("number_of_wild_fish_killed_for_food")
+    tb_wild_fish = ds_wild_fish.read("number_of_wild_fish_killed_for_food")
+
+    # Load number of farmed fish.
+    ds_farmed_fish = paths.load_dataset("number_of_farmed_fish")
+    tb_farmed_fish = ds_farmed_fish.read("number_of_farmed_fish")
+
+    # Load number of farmed crustaceans.
+    ds_farmed_crustaceans = paths.load_dataset("number_of_farmed_crustaceans")
+    tb_farmed_crustaceans = ds_farmed_crustaceans.read("number_of_farmed_crustaceans")
+
+    #
+    # Process data.
+    #
+    # Prepare fish and crustaceans data.
+    tb_fish = prepare_fish_and_crustaceans_data(
+        tb_wild_fish=tb_wild_fish, tb_farmed_fish=tb_farmed_fish, tb_farmed_crustaceans=tb_farmed_crustaceans
     )
-    tb_stock_per_capita = tb_stock_per_capita[INDEX_COLUMNS + ["value"]].rename(
-        columns={"value": "n_animals_alive"}, errors="raise"
-    )
+
+    # Prepare land animals slaughtered data.
+    tb_killed, tb_killed_per_capita = prepare_land_animals_data(tb_qcl=tb_qcl, killed_or_alive="killed")
+
+    # Prepare land animals alive data.
+    tb_stock, tb_stock_per_capita = prepare_land_animals_data(tb_qcl=tb_qcl, killed_or_alive="alive")
 
     # Combine tables.
     tb_killed_all = pr.concat([tb_killed, tb_killed_per_capita, tb_fish], ignore_index=True)
