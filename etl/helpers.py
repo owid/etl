@@ -25,7 +25,7 @@ from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstring
 
 from etl import paths
 from etl.collections.explorer import Explorer, create_explorer
-from etl.collections.explorer_legacy import ExplorerLegacy, create_explorer_legacy
+from etl.collections.explorer_legacy import ExplorerLegacy, _create_explorer_legacy
 from etl.collections.multidim import Multidim, create_mdim
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks
@@ -623,20 +623,6 @@ class PathFinder:
             repack=repack,
         )
 
-    def create_explorer_legacy(
-        self,
-        config: Dict[str, Any],
-        df_graphers: pd.DataFrame,
-        df_columns: Optional[pd.DataFrame] = None,
-    ) -> ExplorerLegacy:
-        """Create an Explorer using legacy configuration."""
-        return create_explorer_legacy(
-            dest_dir=self.dest_dir,
-            config=config,
-            df_graphers=df_graphers,
-            df_columns=df_columns,
-        )
-
     def create_mdim(self, config, mdim_name: Optional[str] = None) -> Multidim:
         """Create a Multidim object.
 
@@ -675,6 +661,43 @@ class PathFinder:
 
         # Get and set catalog path
         explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}"
+        explorer.catalog_path = explorer_catalog_path
+
+        return explorer
+
+    def create_explorer_legacy(
+        self,
+        config: Dict[str, Any],
+        df_graphers: pd.DataFrame,
+        df_columns: Optional[pd.DataFrame] = None,
+    ) -> ExplorerLegacy:
+        """This function is used to create an Explorer object using the legacy configuration.
+
+        To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
+        """
+        log.warning(
+            "This function is operative, but relies on legacy configuration. To use latest tools, consider migrating your explorer to use MDIM-based configuration."
+        )
+        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{self.short_name}"
+
+        # If the name of the explorer is specified in config, take that, otherwise use the step's short_name.
+        # NOTE: This is the expected name of the explorer tsv file.
+        if "name" in config:
+            explorer_name = config["name"]
+        else:
+            explorer_name = self.short_name
+        assert isinstance(explorer_name, str)
+
+        explorer = _create_explorer_legacy(
+            catalog_path=explorer_catalog_path,
+            config=config,
+            df_graphers=df_graphers,
+            explorer_name=explorer_name,
+            df_columns=df_columns,
+        )
+
+        # Get and set catalog path
+        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name}"
         explorer.catalog_path = explorer_catalog_path
 
         return explorer
