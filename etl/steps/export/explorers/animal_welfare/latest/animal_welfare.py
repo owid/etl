@@ -48,22 +48,6 @@ def run() -> None:
     ds = paths.load_dataset("animals_used_for_food")
     tb = ds.read("animals_used_for_food")
 
-    # # Load dataset of global hen inventory.
-    # ds_hens = paths.load_dataset("global_hen_inventory")
-    # tb_hens = ds_hens.read("global_hen_inventory")
-
-    # # Load dataset of chick culling laws.
-    # ds_chicks = paths.load_dataset("chick_culling_laws")
-    # tb_chicks = ds_chicks.read("chick_culling_laws")
-
-    # # Load dataset of bullfighting laws.
-    # ds_bullfighting = paths.load_dataset("bullfighting_laws")
-    # tb_bullfighting = ds_bullfighting.read("bullfighting_laws")
-
-    # # Load dataset of fur farming and trading laws.
-    # ds_fur = paths.load_dataset("fur_laws")
-    # tb_fur = ds_fur.read("fur_laws")
-
     # Load grapher config from YAML.
     config = paths.load_explorer_config()
 
@@ -92,7 +76,7 @@ def run() -> None:
         if dimension["slug"] == "per_capita":
             dimension["presentation"] = {"type": "checkbox", "choice_slug_true": "True"}
 
-    # TODO: Is there any way to sort the elements of the dropdowns?
+    # TODO: Is there any way to sort the elements of the dropdowns? Currently, I achieve this by sorting the corresponding data from garden, but there should be an easy way to sort dimensions from here.
     # TODO: Set the defalt view (by adding "config": {"defaultView": True} in the corresponding view, which should be animals killed for meat total).
     # Include additional views.
     # TODO: Create function add views. If dimension is not specified, create an empty choice for each unspecified dimension in "dimensions".

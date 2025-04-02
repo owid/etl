@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+import pandas as pd
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder
@@ -248,6 +249,15 @@ def run() -> None:
     tb_killed_all = pr.concat([tb_killed, tb_killed_per_capita, tb_fish], ignore_index=True)
     tb_stock_all = pr.concat([tb_stock, tb_stock_per_capita], ignore_index=True)
     tb = pr.multi_merge([tb_killed_all, tb_stock_all], on=INDEX_COLUMNS, how="outer")
+
+    # Sort rows conveniently.
+    tb["estimate"] = pd.Categorical(
+        tb["estimate"],
+        categories=[EMPTY_DIMENSION_LABEL, ESTIMATE_MIDPOINT_LABEL, ESTIMATE_LOW_LABEL, ESTIMATE_HIGH_LABEL],
+        ordered=True,
+    )
+    tb["animal"]
+    tb = tb.sort_values(["country", "year", "animal", "per_capita", "estimate"]).reset_index(drop=True)
 
     # Format table conveniently.
     tb = tb.format(keys=INDEX_COLUMNS, short_name=paths.short_name)
