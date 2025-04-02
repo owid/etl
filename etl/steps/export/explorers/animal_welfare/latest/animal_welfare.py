@@ -90,7 +90,7 @@ def run() -> None:
         # TODO: The following changes the coloring of the chart tab. How do I change the color of the map tab?
         # common_view_config={"baseColorScheme": "YlOrBr"},
     )
-    
+
     # Update original configuration of dimensions and views.
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
