@@ -29,7 +29,9 @@ log = get_logger()
 
 # Fields in config section that are lists and need to be tabbed.
 # NOTE: Can we do this for all fields that are lists instead of hardcoding it?
-LIST_CONFIG_FIELDS = ["selection", "pickerColumnSlugs"]
+LIST_CONFIG_FIELDS = [
+    "selection",
+]
 
 
 class ExplorerLegacy:
@@ -385,6 +387,14 @@ class ExplorerLegacy:
         df_config = self._add_empty_row(df_config)
         # True, False -> 'true', 'false'
         df_config[1] = df_config[1].apply(lambda x: str(x).lower() if str(x) in {"False", "True"} else x)
+
+        # Fix pickerColumnSlugs - it is a list, but TSV only accepts space separated values.
+        if "pickerColumnSlugs" in df_config[0].values:
+            pos = df_config[0].tolist().index("pickerColumnSlugs")
+            val = df_config[1][pos]
+            if isinstance(val, list):
+                df_config.iloc[pos, 1] = " ".join(val)
+
         dfs.append(df_config)
 
         # 2/ GRAPHERS
@@ -403,7 +413,7 @@ class ExplorerLegacy:
             ignore_index=True,
         )
 
-        # Fix config.selection and config.pickerColumnSlugs (should be tabbed!)
+        # Fix config.selection
         for col in LIST_CONFIG_FIELDS:
             sub_df = df.loc[df[0] == col, 1]
             if sub_df.empty:

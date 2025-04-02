@@ -670,10 +670,14 @@ class PathFinder:
         config: Dict[str, Any],
         df_graphers: pd.DataFrame,
         df_columns: Optional[pd.DataFrame] = None,
+        reset: bool = False,
     ) -> ExplorerLegacy:
         """This function is used to create an Explorer object using the legacy configuration.
 
         To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
+
+        Param `reset` is False by default, because many explorers have manually set map brackets or fields like
+        pickerColumnSlugs. Ideally, everything should be set in ETL.
         """
         log.warning(
             "This function is operative, but relies on legacy configuration. To use latest tools, consider migrating your explorer to use MDIM-based configuration."
@@ -694,6 +698,7 @@ class PathFinder:
             df_graphers=df_graphers,
             explorer_name=explorer_name,
             df_columns=df_columns,
+            reset=reset,
         )
 
         # Get and set catalog path
