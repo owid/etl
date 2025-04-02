@@ -702,6 +702,20 @@ steps:
   data://grapher/atus/2025-01-06/atus_who:
     - data://garden/atus/2025-01-06/atus_who
 
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/happiness/2025-04-01/happiness_by_age:
+    - snapshot://happiness/2025-04-01/happiness_by_age.csv
+  data://garden/happiness/2025-04-01/happiness_by_age:
+    - data://meadow/happiness/2025-04-01/happiness_by_age
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/demography/2024-07-15/population
+  data://grapher/happiness/2025-04-01/happiness_by_age:
+    - data://garden/happiness/2025-04-01/happiness_by_age
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
