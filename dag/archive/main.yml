@@ -481,3 +481,4 @@ include:
   - dag/archive/space.yml
   - dag/archive/survey.yml
   - dag/archive/migration.yml
+  - dag/archive/redistribution.yml
