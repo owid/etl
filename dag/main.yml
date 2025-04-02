@@ -702,10 +702,9 @@ steps:
   data://grapher/atus/2025-01-06/atus_who:
     - data://garden/atus/2025-01-06/atus_who
 
-  
-  #
-  # TODO: add step name (just something recognizable)
-  #
+
+
+  # Happiness by age groups (World Happiness Report 2024)
   data://meadow/happiness/2025-04-01/happiness_by_age:
     - snapshot://happiness/2025-04-01/happiness_by_age.csv
   data://garden/happiness/2025-04-01/happiness_by_age:
