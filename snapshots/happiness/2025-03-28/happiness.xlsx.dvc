@@ -24,8 +24,8 @@ meta:
 
     # License
     license:
-      name: ""
-      url: https://worldhappiness.report/faq/
+      name: "World Happiness Report - Data sharing policy"
+      url: https://worldhappiness.report/data-sharing/
 
 outs:
   - md5: e88b5498c85ee43e68f623c7e34e1717

@@ -17,7 +17,7 @@ def run() -> None:
     ds_meadow = paths.load_dataset("happiness")
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
-    ds_population = paths.load_dataset("population", channel="garden")
+    ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("happiness")
