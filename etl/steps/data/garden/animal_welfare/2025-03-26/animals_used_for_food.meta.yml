@@ -23,7 +23,7 @@ tables:
         presentation:
           title_public: *title-animals-killed
       n_animals_alive:
-        title: Number of << animal >> alive used to produce meat<% if per_capita == True %> per capita<% endif %>
+        title: &title-animals-alive Number of << animal >> alive used to produce meat<% if per_capita == True %> per capita<% endif %>
         description_key:
           - The number of live animals is based on the country of production, not consumption.
         unit: animals<% if per_capita == True %> per person<% endif %>
@@ -31,4 +31,4 @@ tables:
         display:
           name: << animal.capitalize() >>
         presentation:
-          title_public: Number of << animal >> alive used to produce meat<% if per_capita == True %> per capita<% endif %>
+          title_public: *title-animals-alive
