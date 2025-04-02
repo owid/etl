@@ -1,31 +1,31 @@
 dataset:
-  title: CDC Summary of Notifiable Infectious Diseases - Measles
+  title: CDC Summary of Notifiable Infectious Diseases - Measles (2002-2015)
   description: ''
   licenses:
     - url: https://wonder.cdc.gov/wonder/help/faq.html#8
 tables:
   cdc_measles:
     variables:
+      total_measles_cases:
+        title: total_measles_cases
+        unit: cases
+        display:
+          numDecimalPlaces: 0.0
+        description: Reported cases of measles, the sum of indigenous and imported cases.
       indig_measles_cases:
-        title: Indigenous measles cases
+        title: indig_measles_cases
         unit: cases
         display:
           numDecimalPlaces: 0.0
         description: Reported indigenous measles cases, cases where the infection happened in the United States.
       import_measles_cases:
-        title: Imported measles cases
-        unit: ''
+        title: import_measles_cases
+        unit: cases
         display:
           numDecimalPlaces: 0.0
         description: Reported imported measles cases, cases where the infection happened outside of the United States.
-      total_measles_cases:
-        title: Measles cases
-        unit: ''
-        display:
-          numDecimalPlaces: 0.0
-        description: Total reported measles cases.
       source:
-        title: Source of data
+        title: source
         unit: ''
     dimensions:
       - name: country

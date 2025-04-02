@@ -11,17 +11,18 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("vaccination_schedules")
+    ds_garden = paths.load_dataset("vaccination_introductions")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("vaccination_schedules", reset_index=False)
+    tb = ds_garden.read("vaccination_introductions", reset_index=False)
+    tb_sum = ds_garden.read("vaccination_introductions_sum", reset_index=False)
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        dest_dir, tables=[tb, tb_sum], check_variables_metadata=True, default_metadata=ds_garden.metadata
     )
 
     # Save changes in the new grapher dataset.

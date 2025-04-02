@@ -11,7 +11,7 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("vaccination_schedules.xlsx")
+    snap = paths.load_snapshot("vaccination_introductions.xlsx")
 
     # Load data from snapshot.
     tb = snap.read()

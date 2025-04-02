@@ -4,12 +4,12 @@ meta:
     title: Reported measles cases - CDC
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRF5C042urCAOfIfFHhAGhvPEYZJGLX_HrX8l4mxrpZnZg5hl8vWtAQwiPP14QOShNN6ewnZuUWGXOx/pub?output=csv
-    date_accessed: '2025-03-24'
+    date_accessed: '2025-04-02'
   name: Measles cases by state (CDC)
   description: Reported measles cases by state from CDC reports. Used to supplement Project Tycho dataset.
   license:
     url: Public resource
 outs:
-  - md5: ce5a562320fa9430fef21b16a0b44dea
-    size: 33680
+  - md5: 83c3a5a143d7408cc3a6473d6e54e88d
+    size: 61900
     path: measles_cases.csv

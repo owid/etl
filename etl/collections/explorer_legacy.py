@@ -22,10 +22,14 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher import model as gm
 from etl.grapher.io import get_variables_data
-from etl.paths import EXPLORERS_DIR
+from etl.paths import EXPORT_DIR
 
 # Initialize logger.
 log = get_logger()
+
+# Fields in config section that are lists and need to be tabbed.
+# NOTE: Can we do this for all fields that are lists instead of hardcoding it?
+LIST_CONFIG_FIELDS = ["selection", "pickerColumnSlugs"]
 
 
 class ExplorerLegacy:
@@ -64,6 +68,7 @@ class ExplorerLegacy:
         df_graphers: Optional[pd.DataFrame] = None,
         df_columns: Optional[pd.DataFrame] = None,
         comments: Optional[List[str]] = None,
+        explorer_path: Optional[str] = None,
     ):
         """Build Explorer object from `content`.
 
@@ -97,6 +102,7 @@ class ExplorerLegacy:
 
         # Others
         self.name = name
+        self.explorer_path = explorer_path
         self.content_raw = None
 
     @classmethod
@@ -105,6 +111,7 @@ class ExplorerLegacy:
         content: Optional[str] = None,
         sep: str = ",",
         name: Optional[str] = None,
+        explorer_path: Optional[str] = None,
     ):
         """Build Explorer object from `content`.
 
@@ -117,7 +124,7 @@ class ExplorerLegacy:
         if content is None:
             log.info("Initializing a new explorer file from scratch.")
 
-            explorer = cls(name=name)
+            explorer = cls(name=name, explorer_path=explorer_path)
         else:
             # Text content of an explorer file. (this is given by the user)
             assert isinstance(content, str), "content should be a string!"
@@ -160,6 +167,7 @@ class ExplorerLegacy:
                 df_graphers=df_graphers,
                 df_columns=df_columns,
                 comments=comments,
+                explorer_path=explorer_path,
             )
 
             explorer.content_raw = content_raw
@@ -189,15 +197,19 @@ class ExplorerLegacy:
         if owid_env is None:
             owid_env = OWID_ENV
 
-        # Update TSV in owid-content, this is only temporary to see a diff.
-        # TODO: Get rid of this and show diff in explorer-diff
-        if EXPLORERS_DIR.exists():
-            explorer_path = (Path(EXPLORERS_DIR) / self.name).with_suffix(".explorer.tsv")
-            explorer_path.write_text(self.content)
+        # Export content to local directory in addition to uploading it to MySQL for debugging.
+        log.info(f"Exporting explorer to {self.local_tsv_path}")
+        self.local_tsv_path.write_text(self.content)
 
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
         admin_api.put_explorer_config(self.name, self.content)
+
+    @property
+    def local_tsv_path(self) -> Path:
+        # export://explorers/who/latest/influenza#influenza -> explorers/who/latest/influenza/influenza.tsv
+        assert self.explorer_path
+        return EXPORT_DIR / (self.explorer_path.split("://")[1].replace("#", "/") + ".tsv")
 
     @staticmethod
     def _parse_config(config_raw, sep) -> Dict[str, Any]:
@@ -382,13 +394,17 @@ class ExplorerLegacy:
             ignore_index=True,
         )
 
-        # Fix config.selection (should be tabbed!)
-        selections = df.loc[df[0] == "selection", 1].item()
-        for i, selection in enumerate(selections):
-            if i + 1 > df.shape[1] - 1:
-                # Add column
-                df[i + 1] = ""
-            df.loc[df[0] == "selection", i + 1] = selection
+        # Fix config.selection and config.pickerColumnSlugs (should be tabbed!)
+        for col in LIST_CONFIG_FIELDS:
+            sub_df = df.loc[df[0] == col, 1]
+            if sub_df.empty:
+                continue
+            selections = sub_df.item()
+            for i, selection in enumerate(selections):
+                if i + 1 > df.shape[1] - 1:
+                    # Add column
+                    df[i + 1] = ""
+                df.loc[df[0] == col, i + 1] = selection
 
         assert isinstance(df, pd.DataFrame), "df should be a dataframe!"
         return df  # type: ignore
@@ -396,7 +412,14 @@ class ExplorerLegacy:
     @property
     def content(self) -> str:
         """Based on modified config, graphers and column, build the raw content text."""
-        content = self.df.to_csv(sep="\t", index=False, header=False)
+        df_clean = self.df.copy()
+
+        # Replace actual newline characters with literal "\n", but only in string values
+        for col in df_clean.select_dtypes(include=["object"]).columns:
+            df_clean[col] = df_clean[col].apply(lambda x: x.replace("\n", "\\n") if isinstance(x, str) else x)
+
+        content = df_clean.to_csv(sep="\t", index=False, header=False)
+
         assert isinstance(content, str), "content should be a string!"
         content = [c.rstrip() for c in content.splitlines()]
         content = "\n".join(content)
@@ -664,17 +687,19 @@ def _create_explorer_legacy(
     df_graphers: pd.DataFrame,
     explorer_name: str,
     df_columns: Optional[pd.DataFrame] = None,
-    reset: bool = False,
+    reset: bool = True,
 ) -> ExplorerLegacy:
     """This function is used to create an Explorer object using the legacy configuration.
 
     To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
 
-    :param reset: If True, create explorer from scratch. If False, update explorer in database.
+    :param reset: If True, create explorer from scratch. If False, load the explorer from DB and update its config.
     """
     if reset:
         # Create explorer from scratch.
-        explorer = ExplorerLegacy.from_raw_string(name=explorer_name)
+        explorer = ExplorerLegacy.from_raw_string(
+            content=None, sep="\t", name=explorer_name, explorer_path=explorer_path
+        )
     else:
         # Load explorer from database.
         explorer = ExplorerLegacy.from_db(explorer_name)
