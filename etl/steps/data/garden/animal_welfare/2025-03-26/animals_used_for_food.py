@@ -49,9 +49,9 @@ FARMED_FISH_LABEL = "farmed fish"
 FARMED_CRUSTACEANS_LABEL = "farmed crustaceans"
 
 # Labels for the three estimate dimensions (relevant for fish and crustacean data).
-ESTIMATE_MIDPOINT_LABEL = "mid-point"
-ESTIMATE_LOW_LABEL = "lower"
-ESTIMATE_HIGH_LABEL = "higher"
+ESTIMATE_MIDPOINT_LABEL = "midpoint"
+ESTIMATE_LOW_LABEL = "lower limit"
+ESTIMATE_HIGH_LABEL = "upper limit"
 
 # Label for the estimate dimension for land animals data (where this dimension is irrelevant).
 EMPTY_DIMENSION_LABEL = ""
