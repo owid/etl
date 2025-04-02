@@ -11,11 +11,11 @@ def run(dest_dir: str) -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("vaccination_schedules")
+    ds_garden = paths.load_dataset("vaccination_introductions")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("vaccination_schedules", reset_index=False)
-    tb_sum = ds_garden.read("vaccination_schedules_sum", reset_index=False)
+    tb = ds_garden.read("vaccination_introductions", reset_index=False)
+    tb_sum = ds_garden.read("vaccination_introductions_sum", reset_index=False)
 
     #
     # Save outputs.
