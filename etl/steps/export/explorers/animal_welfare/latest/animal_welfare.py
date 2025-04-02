@@ -1,5 +1,7 @@
 """Load grapher datasets and create an explorer tsv file."""
 
+from copy import deepcopy
+
 from etl.collections.explorer import expand_config
 from etl.helpers import PathFinder
 
@@ -33,9 +35,20 @@ def improve_config_names(config, transformation=None, replacements=None):
     if replacements is None:
         replacements = dict()
 
-    config_new = config.copy()
+    config_new = deepcopy(config)
     for dimension in config_new["dimensions"]:
         _improve_dimension_names(dimension, transformation=transformation, replacements=replacements)
+
+    return config_new
+
+
+def set_default_view(config, default_view):
+    config_new = deepcopy(config)
+    error = "Default view not found"
+    assert sum([default_view == view["dimensions"] for view in config_new["views"]]) == 1, error
+    for view in config_new["views"]:
+        if view["dimensions"] == default_view:
+            view["default_view"] = True
 
     return config_new
 
@@ -51,17 +64,35 @@ def run() -> None:
     # Load grapher config from YAML.
     config = paths.load_explorer_config()
 
+    #
+    # Process data.
+    #
+    # Create additional dimensions and views from input table.
     config_new = expand_config(
         tb,
         indicator_names=["n_animals_killed", "n_animals_alive"],
         indicators_slug="metric",
-        dimensions=["animal", "estimate", "per_capita"],
+        dimensions={
+            # NOTE: Here it is convenient that total meat is the first choice. If that changes, manually change the list below.
+            "animal": sorted(
+                set(
+                    [
+                        tb[column].metadata.dimensions["animal"]
+                        for column in tb.columns
+                        if column not in tb.metadata.primary_key
+                    ]
+                )
+            ),
+            "estimate": [EMPTY_DIMENSION_LABEL, "midpoint", "lower limit", "upper limit"],
+            "per_capita": ["False", "True"],
+        },
         indicator_as_dimension=True,
+        # TODO: The following doesn't seem to work, and all maps have the default green color scheme.
+        common_view_config={"baseColorScheme": "YlOrBr"},
     )
-    # TODO: expand_config could ingest 'config' as well, and extend dimensions and views in it (in case there were already some in the yaml).
+    # Update original configuration of dimensions and views.
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
-    # TODO: this could also happen inside expand_config.
     config = improve_config_names(
         config,
         replacements={
@@ -71,15 +102,12 @@ def run() -> None:
     )
 
     # Make per capita a checkbox.
-    # TODO: This could be part of expand_config.
     for dimension in config["dimensions"]:
         if dimension["slug"] == "per_capita":
             dimension["presentation"] = {"type": "checkbox", "choice_slug_true": "True"}
 
-    # TODO: Is there any way to sort the elements of the dropdowns? Currently, I achieve this by sorting the corresponding data from garden, but there should be an easy way to sort dimensions from here.
-    # TODO: Set the defalt view (by adding "config": {"defaultView": True} in the corresponding view, which should be animals killed for meat total).
     # Include additional views.
-    # TODO: Create function add views. If dimension is not specified, create an empty choice for each unspecified dimension in "dimensions".
+    # NOTE: First we need to create additional dimensions.
     for dimension in config["dimensions"]:
         if dimension["slug"] == "metric":
             dimension["choices"].extend(
@@ -95,8 +123,7 @@ def run() -> None:
             dimension["choices"].append(
                 {"slug": EMPTY_DIMENSION_LABEL, "name": EMPTY_DIMENSION_LABEL, "description": None}
             )
-    # TODO: Instead of adding views like this, they could be defined in the yaml, and then the function to expand views would append those.
-    # TODO: Why are title and subtitle not automatically fetched for indicators?
+
     # Add view with map chart for fur banning laws.
     config["views"].append(
         {
@@ -119,6 +146,7 @@ def run() -> None:
             },
             "config": {
                 "title": "Which countries have banned fur farming?",
+                # TODO: Why are title and subtitle not automatically fetched for indicators?
                 "subtitle": "Countries that have banned fur farming at a national level.",
                 "hasMapTab": True,
                 # TODO: I suppose the following should be None, instead of "None", but the former doesn't work.
@@ -126,6 +154,7 @@ def run() -> None:
             },
         }
     )
+
     # Add view with map chart for fur trading laws.
     config["views"].append(
         {
@@ -154,6 +183,7 @@ def run() -> None:
             },
         }
     )
+
     # Add view with map chart for bullfighting laws.
     config["views"].append(
         {
@@ -182,6 +212,7 @@ def run() -> None:
             },
         }
     )
+
     # Add view with map chart for chick culling laws.
     config["views"].append(
         {
@@ -210,6 +241,7 @@ def run() -> None:
             },
         }
     )
+
     # Add view with bar chart on cage-free hens.
     config["views"].append(
         {
@@ -244,6 +276,18 @@ def run() -> None:
             },
         }
     )
+
+    # Set the defalt view.
+    config_new = set_default_view(
+        config=config,
+        default_view={
+            "metric": "n_animals_killed",
+            "animal": "all land animals",
+            "estimate": "",
+            "per_capita": "False",
+        },
+    )
+
     #
     # Save outputs.
     #
