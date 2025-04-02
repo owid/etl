@@ -130,10 +130,10 @@ steps:
   data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
     - data://garden/animal_welfare/2025-03-26/animals_used_for_food
   #
-  # Total number of animals used for food (grouped into main animals and "other").
+  # Land animals killed for food (grouped into main animals and "other").
   #
-  data://grapher/animal_welfare/2025-03-26/animals_used_for_food_grouped:
-    - data://garden/animal_welfare/2025-03-26/animals_used_for_food
+  data://grapher/animal_welfare/2025-03-26/land_animals_killed_for_food:
+    - data://garden/faostat/2025-03-17/faostat_qcl
   #
   # Animal welfare data explorer.
   #
