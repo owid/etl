@@ -7,6 +7,7 @@
 
 from copy import deepcopy
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
 from owid.catalog import Table
@@ -21,7 +22,8 @@ from etl.collections.utils import (
     validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.paths import SCHEMAS_DIR
+from etl.files import yaml_dump
+from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -59,6 +61,12 @@ class Multidim(Collection):
         assert "#" in value, "Catalog path should be in the format `path#name`."
         self._catalog_path = value
 
+    @property
+    def local_config_path(self) -> Path:
+        # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
+        assert self.catalog_path
+        return EXPORT_DIR / "multidim" / self.catalog_path.split("#")[0] / "config.yml"
+
     def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
         # Ensure we have an environment set
         if owid_env is None:
@@ -74,6 +82,11 @@ class Multidim(Collection):
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # Export config to local directory in addition to uploading it to MySQL for debugging.
+        log.info(f"Exporting config to {self.local_config_path}")
+        with open(self.local_config_path, "w") as f:
+            yaml_dump(config, f)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
