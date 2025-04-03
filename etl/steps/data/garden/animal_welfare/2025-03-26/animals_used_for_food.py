@@ -275,9 +275,7 @@ def run() -> None:
         tb[column].metadata.unit = """animals<% if per_capita == True %> per person<% endif %>"""
         tb[column].metadata.short_unit = ""
         if "_alive" in column:
-            title = (
-                """Live << animal >> raised for meat<% if per_capita == True %> per person<% endif %>"""
-            )
+            title = """Live << animal >> raised for meat<% if per_capita == True %> per person<% endif %>"""
             tb[
                 column
             ].metadata.description_short = """Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year."""
