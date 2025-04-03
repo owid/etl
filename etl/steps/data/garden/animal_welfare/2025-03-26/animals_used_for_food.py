@@ -234,6 +234,58 @@ def prepare_land_animals_data(tb_qcl, killed_or_alive):
     return tb, tb_per_capita
 
 
+def improve_metadata(tb, tb_qcl_flat):
+    # Firstly, get the original description from producer (from the original wide-format table).
+    descriptions_from_producer_killed = {
+        animal: tb_qcl_flat[column].metadata.description_from_producer
+        for column in tb_qcl_flat.columns
+        for item_code, animal in MEAT_TOTAL_ITEM_CODES.items()
+        for element_code in SLAUGHTERED_ANIMALS_ELEMENT_CODES
+        if item_code in column and element_code in column
+    }
+    descriptions_from_producer_alive = {
+        animal: tb_qcl_flat[column].metadata.description_from_producer
+        for column in tb_qcl_flat.columns
+        for item_code, animal in STOCK_ITEM_CODES.items()
+        for element_code in STOCK_ANIMALS_ELEMENT_CODES
+        if item_code in column and element_code in column
+    }
+
+    for column in tb.columns:
+        tb[column].metadata.unit = """animals<% if per_capita == True %> per person<% endif %>"""
+        tb[column].metadata.short_unit = ""
+        if "_alive" in column:
+            title = """Live << animal >> raised for meat<% if per_capita == True %> per person<% endif %>"""
+            tb[
+                column
+            ].metadata.description_short = """Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year."""
+            description_from_producer = ""
+            for animal, description in descriptions_from_producer_alive.items():
+                if animal == list(descriptions_from_producer_alive)[0]:
+                    description_from_producer += f"""<% if animal == "{animal}" %>{description}"""
+                else:
+                    description_from_producer += f"""<% elif animal == "{animal}" %>{description}"""
+            description_from_producer += "<% endif %>"
+        else:
+            title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered for meat<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food<% else %><< animal.capitalize() >> slaughtered for meat<% endif %><% if per_capita == True %> per person<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
+            tb[column].metadata.description_short = """Based on the country of production, not consumption."""
+            tb[column].metadata.description_key = [
+                """Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.""",
+                """<% if animal == "chickens" %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
+            ]
+            description_from_producer = ""
+            for animal, description in descriptions_from_producer_killed.items():
+                if animal == list(descriptions_from_producer_killed)[0]:
+                    description_from_producer += f"""<% if animal == "{animal}" %>{description}"""
+                else:
+                    description_from_producer += f"""<% elif animal == "{animal}" %>{description}"""
+            description_from_producer += "<% endif %>"
+        tb[column].metadata.title = title
+        tb[column].metadata.display = {"name": """<< animal.capitalize() >>"""}
+        tb[column].metadata.presentation = VariablePresentationMeta(title_public=title)
+        tb[column].metadata.description_from_producer = description_from_producer
+
+
 def run() -> None:
     #
     # Load inputs.
@@ -241,6 +293,10 @@ def run() -> None:
     # Load faostat qcl dataset, and read its main table.
     ds_qcl = paths.load_dataset("faostat_qcl")
     tb_qcl = ds_qcl.read("faostat_qcl")
+
+    # Load the wide-format table, to get the already prepared descriptions from producer.
+    # NOTE: In hindsight, I think it would have been much easier to work with flat tables from the start, to keep all the original metadata.
+    tb_qcl_flat = ds_qcl.read("faostat_qcl_flat")
 
     # Load number of wild-caught fish.
     ds_wild_fish = paths.load_dataset("number_of_wild_fish_killed_for_food")
@@ -276,40 +332,14 @@ def run() -> None:
     # Format table conveniently.
     tb = tb.format(keys=INDEX_COLUMNS, short_name=paths.short_name)
 
-    # Improve metadata programmatically.
-    for column in tb.columns:
-        tb[column].metadata.unit = """animals<% if per_capita == True %> per person<% endif %>"""
-        tb[column].metadata.short_unit = ""
-        if "_alive" in column:
-            title = """Live << animal >> raised for meat<% if per_capita == True %> per person<% endif %>"""
-            tb[
-                column
-            ].metadata.description_short = """Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year."""
-        else:
-            title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered for meat<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food<% else %><< animal.capitalize() >> slaughtered for meat<% endif %><% if per_capita == True %> per person<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
-            tb[column].metadata.description_short = """Based on the country of production, not consumption."""
-            tb[column].metadata.description_key = [
-                """Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.""",
-                """<% if animal == "chickens" %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
-            ]
-        tb[column].metadata.title = title
-        tb[column].metadata.display = {"name": """<< animal.capitalize() >>"""}
-        tb[column].metadata.presentation = VariablePresentationMeta(title_public=title)
+    # Improve metadata programmatically (using some metadata from the old wide-format table).
+    improve_metadata(tb=tb, tb_qcl_flat=tb_qcl_flat)
 
     #
     # Save outputs.
     #
-    # Create a new garden dataset.
-    ds_garden = paths.create_dataset(
-        tables=[tb],
-        # yaml_params={
-        #     "MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL,
-        #     "WILD_FISH_LABEL": WILD_FISH_LABEL,
-        #     "FARMED_FISH_LABEL": FARMED_FISH_LABEL,
-        #     "FARMED_CRUSTACEANS_LABEL": FARMED_CRUSTACEANS_LABEL,
-        #     "ESTIMATE_MIDPOINT_LABEL": ESTIMATE_MIDPOINT_LABEL,
-        #     "ESTIMATE_LOW_LABEL": ESTIMATE_LOW_LABEL,
-        #     "ESTIMATE_HIGH_LABEL": ESTIMATE_HIGH_LABEL,
-        # },
-    )
+    # Initialize a new garden dataset.
+    ds_garden = paths.create_dataset(tables=[tb])
+
+    # Save garden dataset.
     ds_garden.save()
