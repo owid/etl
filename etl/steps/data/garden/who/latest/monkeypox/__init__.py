@@ -139,7 +139,7 @@ def explode_dates(tb: Table) -> Table:
 def get_last_date_with_more_than_ten_countries_reporting(tb: Table) -> str:
     # Experiment to _not_ add world data for recent dates when there is a lag in reporting
     tb["date"] = pd.to_datetime(tb.date).astype(str)
-    tb_reporting = tb[tb["report"] == True]
+    tb_reporting = tb[tb["report"]]
     # how many countries reporting each day
     num_reporting = tb_reporting.groupby("date").country.nunique().reset_index(name="countries_reporting")
     last_date_with_more_than_ten_countries_reporting = num_reporting[num_reporting["countries_reporting"] > 10][
