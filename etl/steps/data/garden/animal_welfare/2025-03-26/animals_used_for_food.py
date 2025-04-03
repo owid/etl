@@ -33,8 +33,8 @@ MEAT_TOTAL_ITEM_CODES = {
     "00001108": "donkeys",  # 'Meat of asses, fresh or chilled',
     "00001158": "other camelids",  # 'Meat of other domestic camelids, fresh or chilled',
     "00001111": "mules",  # 'Meat of mules, fresh or chilled',
-    "00001166": "other non mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
-    "00001163": "game",  # 'Game meat, fresh, chilled or frozen',
+    "00001166": "other non-mammals",  # 'Other meat n.e.c. (excluding mammals), fresh, chilled or frozen',
+    "00001163": "game animals",  # 'Game meat, fresh, chilled or frozen',
     # "00001176": "snails",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
     # Items that were in the list of "Meat, Total", but were not in the data:
     # "00001083",  # 'Other birds',
