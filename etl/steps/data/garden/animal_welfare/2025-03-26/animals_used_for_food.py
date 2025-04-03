@@ -12,6 +12,8 @@ paths = PathFinder(__file__)
 # Item code for "Meat, total" (used only for sanity checks).
 MEAT_TOTAL_ITEM_CODE = "00001765"
 MEAT_TOTAL_LABEL = "all land animals"
+# Item code for total poultry meat.
+MEAT_POULTRY_ITEM_CODE = "00001808"
 
 # Item codes that should add up to "Meat, Total", as well as meat total itself.
 MEAT_TOTAL_ITEM_CODES = {
@@ -38,6 +40,7 @@ MEAT_TOTAL_ITEM_CODES = {
     # "00001176": "snails",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
     # Items that were in the list of "Meat, Total", but were not in the data:
     # "00001083",  # 'Other birds',
+    MEAT_POULTRY_ITEM_CODE: "poultry",  # Meat, Poultry
 }
 
 # Label for wild-caught fish.
@@ -65,7 +68,6 @@ STOCK_ITEM_CODES = {
     "00001057": "chickens",  # Chickens
     "00001068": "ducks",  # Ducks
     "00001079": "turkeys",  # Turkeys
-    # '00002029': 'poultry',  # Poultry
     "00000976": "sheep",  # Sheep
     "00001016": "goats",  # Goats
     # '00001749': 'sheep_and_goats',  # Sheep and goats
@@ -79,6 +81,7 @@ STOCK_ITEM_CODES = {
     "00001072": "geese",  # Geese
     "00001150": "other rodents",  # Other rodents
     "00001157": "other camelids",  # Other camelids
+    "00002029": "poultry",  # Poultry Birds
 }
 
 # List of element codes for "Producing or slaughtered animals" (they have different items assigned).
@@ -104,7 +107,10 @@ def sanity_check_animals_killed(tb_killed, tb_qcl):
     # NOTE: This should be true by construction, as the "Meat, total" was created in the faostat_qcl garden step.
     # If this is not fulfilled, it may be because the list of items in that step differs from the one defined here.
     tb_killed_global_sum = (
-        tb_killed[(tb_killed["item_code"] != MEAT_TOTAL_ITEM_CODE) & (tb_killed["country"] == "World")]
+        tb_killed[
+            (~tb_killed["item_code"].isin([MEAT_TOTAL_ITEM_CODE, MEAT_POULTRY_ITEM_CODE]))
+            & (tb_killed["country"] == "World")
+        ]
         .groupby("year", as_index=False)
         .agg({"value": "sum"})
     )
