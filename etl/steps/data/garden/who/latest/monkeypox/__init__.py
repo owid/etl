@@ -136,12 +136,28 @@ def explode_dates(tb: Table) -> Table:
     return tb
 
 
+def get_last_date_with_more_than_ten_countries_reporting(tb: Table) -> str:
+    # Experiment to _not_ add world data for recent dates when there is a lag in reporting
+    tb["date"] = pd.to_datetime(tb.date).astype(str)
+    tb_reporting = tb[tb["report"] == True]
+    # how many countries reporting each day
+    num_reporting = tb_reporting.groupby("date").country.nunique().reset_index(name="countries_reporting")
+    last_date_with_more_than_ten_countries_reporting = num_reporting[num_reporting["countries_reporting"] > 10][
+        "date"
+    ].max()
+
+    return last_date_with_more_than_ten_countries_reporting
+
+
 def add_world(tb: Table) -> Table:
+    last_date = get_last_date_with_more_than_ten_countries_reporting(tb)
+
     tb[["total_cases", "total_deaths"]] = (
         tb[["country", "total_cases", "total_deaths"]].groupby("country", observed=True).ffill().fillna(0)
     )
+
     world = (
-        tb[["date", "total_cases", "total_deaths"]]
+        tb[["date", "total_cases", "total_deaths"]][tb["date"] >= last_date]
         .groupby("date", as_index=False, observed=True)
         .sum()
         .assign(country="World", report=True)
@@ -152,7 +168,7 @@ def add_world(tb: Table) -> Table:
 
 def add_regions(tb: Table) -> Table:
     ds_regions = paths.load_dataset("regions")
-
+    last_date = get_last_date_with_more_than_ten_countries_reporting(tb)
     # Add region for each country
     for region in REGIONS_TO_ADD:
         countries_in_region = geo.list_members_of_region(
@@ -163,7 +179,9 @@ def add_regions(tb: Table) -> Table:
 
     # Calculate regional aggregates
     regions = (
-        tb[tb.region.notnull()][["region", "date", "total_cases", "total_deaths", "report"]]
+        tb[(tb.region.notnull()) & (tb["date"] >= last_date)][
+            ["region", "date", "total_cases", "total_deaths", "report"]
+        ]
         .groupby(["region", "date"], as_index=False, observed=True)
         .agg({"total_cases": "sum", "total_deaths": "sum", "report": "max"})
         .rename(columns={"region": "country"})
