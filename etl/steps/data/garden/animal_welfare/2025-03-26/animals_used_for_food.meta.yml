@@ -1,6 +1,4 @@
 definitions:
-  title_killed: |-
-      Number of << animal >> slaughtered to produce meat
   common:
     presentation:
       topic_tags:
