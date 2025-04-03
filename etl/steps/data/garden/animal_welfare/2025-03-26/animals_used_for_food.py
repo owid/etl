@@ -276,13 +276,13 @@ def run() -> None:
         tb[column].metadata.short_unit = ""
         if "_alive" in column:
             title = (
-                """Live << animal >> raised for meat production<% if per_capita == True %> per person<% endif %>"""
+                """Live << animal >> raised for meat<% if per_capita == True %> per person<% endif %>"""
             )
             tb[
                 column
             ].metadata.description_short = """Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year."""
         else:
-            title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered to produce meat<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food<% else %><< animal.capitalize() >> slaughtered to produce meat<% endif %><% if per_capita == True %> per person<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
+            title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered for meat<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food<% else %><< animal.capitalize() >> slaughtered for meat<% endif %><% if per_capita == True %> per person<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
             tb[
                 column
             ].metadata.description_short = """This data is based on the country of production, not consumption."""

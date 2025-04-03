@@ -105,8 +105,8 @@ def run() -> None:
     config = improve_config_names(
         config,
         replacements={
-            "n_animals_killed": "Animals killed to produce food",
-            "n_animals_alive": "Animals alive to produce food",
+            "animals_killed": "Animals slaughtered",
+            "animals_alive": "Live animals",
         },
     )
 
