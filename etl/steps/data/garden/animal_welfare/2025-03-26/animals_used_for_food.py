@@ -132,24 +132,24 @@ def prepare_fish_and_crustaceans_data(tb_wild_fish, tb_farmed_fish, tb_farmed_cr
     with pr.ignore_warnings():
         tables = []
         for estimate in [ESTIMATE_MIDPOINT_LABEL, ESTIMATE_LOW_LABEL, ESTIMATE_HIGH_LABEL]:
-            suffix = {
+            suffix_estimate = {
                 ESTIMATE_MIDPOINT_LABEL: "",
                 ESTIMATE_LOW_LABEL: "_low",
                 ESTIMATE_HIGH_LABEL: "_high",
             }[estimate]
             for per_capita in [True, False]:
-                suffix += "_per_capita" if per_capita else ""
+                suffix_pc = "_per_capita" if per_capita else ""
                 tables.extend(
                     [
-                        tb_wild_fish[["country", "year", f"n_wild_fish{suffix}"]]
+                        tb_wild_fish[["country", "year", f"n_wild_fish{suffix_estimate}{suffix_pc}"]]
                         .assign(**{"per_capita": per_capita, "animal": WILD_FISH_LABEL, "estimate": estimate})
-                        .rename(columns={f"n_wild_fish{suffix}": "n_animals_killed"}),
-                        tb_farmed_fish[["country", "year", f"n_farmed_fish{suffix}"]]
+                        .rename(columns={f"n_wild_fish{suffix_estimate}{suffix_pc}": "n_animals_killed"}),
+                        tb_farmed_fish[["country", "year", f"n_farmed_fish{suffix_estimate}{suffix_pc}"]]
                         .assign(**{"per_capita": per_capita, "animal": FARMED_FISH_LABEL, "estimate": estimate})
-                        .rename(columns={f"n_farmed_fish{suffix}": "n_animals_killed"}),
-                        tb_farmed_crustaceans[["country", "year", f"n_farmed_crustaceans{suffix}"]]
+                        .rename(columns={f"n_farmed_fish{suffix_estimate}{suffix_pc}": "n_animals_killed"}),
+                        tb_farmed_crustaceans[["country", "year", f"n_farmed_crustaceans{suffix_estimate}{suffix_pc}"]]
                         .assign(**{"per_capita": per_capita, "animal": FARMED_CRUSTACEANS_LABEL, "estimate": estimate})
-                        .rename(columns={f"n_farmed_crustaceans{suffix}": "n_animals_killed"}),
+                        .rename(columns={f"n_farmed_crustaceans{suffix_estimate}{suffix_pc}": "n_animals_killed"}),
                     ]
                 )
         tb_fish = pr.concat(tables, ignore_index=True)
