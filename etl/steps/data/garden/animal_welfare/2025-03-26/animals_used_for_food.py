@@ -1,6 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
+from owid.catalog import VariablePresentationMeta
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder
@@ -93,7 +94,7 @@ STOCK_ANIMALS_ELEMENT_CODES = ["005111", "005112", "005114"]
 STOCK_ANIMALS_PER_CAPITA_ELEMENT_CODES = ["5111pc", "5112pc", "5114pc"]
 
 # Name of index columns in the final table.
-INDEX_COLUMNS = ["country", "year", "animal", "per_capita", "estimate"]
+INDEX_COLUMNS = ["country", "year", "metric", "animal", "per_capita", "estimate"]
 
 
 def sanity_check_animals_killed(tb_killed, tb_qcl):
@@ -141,18 +142,35 @@ def prepare_fish_and_crustaceans_data(tb_wild_fish, tb_farmed_fish, tb_farmed_cr
                 suffix_pc = "_per_capita" if per_capita else ""
                 tables.extend(
                     [
-                        tb_wild_fish[["country", "year", f"n_wild_fish{suffix_estimate}{suffix_pc}"]]
-                        .assign(**{"per_capita": per_capita, "animal": WILD_FISH_LABEL, "estimate": estimate})
-                        .rename(columns={f"n_wild_fish{suffix_estimate}{suffix_pc}": "n_animals_killed"}),
-                        tb_farmed_fish[["country", "year", f"n_farmed_fish{suffix_estimate}{suffix_pc}"]]
-                        .assign(**{"per_capita": per_capita, "animal": FARMED_FISH_LABEL, "estimate": estimate})
-                        .rename(columns={f"n_farmed_fish{suffix_estimate}{suffix_pc}": "n_animals_killed"}),
-                        tb_farmed_crustaceans[["country", "year", f"n_farmed_crustaceans{suffix_estimate}{suffix_pc}"]]
-                        .assign(**{"per_capita": per_capita, "animal": FARMED_CRUSTACEANS_LABEL, "estimate": estimate})
-                        .rename(columns={f"n_farmed_crustaceans{suffix_estimate}{suffix_pc}": "n_animals_killed"}),
+                        tb_wild_fish[["country", "year", f"n_wild_fish{suffix_estimate}{suffix_pc}"]].assign(
+                            **{
+                                "metric": "animals_killed",
+                                "per_capita": per_capita,
+                                "animal": WILD_FISH_LABEL,
+                                "estimate": estimate,
+                            }
+                        ),
+                        tb_farmed_fish[["country", "year", f"n_farmed_fish{suffix_estimate}{suffix_pc}"]].assign(
+                            **{
+                                "metric": "animals_killed",
+                                "per_capita": per_capita,
+                                "animal": FARMED_FISH_LABEL,
+                                "estimate": estimate,
+                            }
+                        ),
+                        tb_farmed_crustaceans[
+                            ["country", "year", f"n_farmed_crustaceans{suffix_estimate}{suffix_pc}"]
+                        ].assign(
+                            **{
+                                "metric": "animals_killed",
+                                "per_capita": per_capita,
+                                "animal": FARMED_CRUSTACEANS_LABEL,
+                                "estimate": estimate,
+                            }
+                        ),
                     ]
                 )
-        tb_fish = pr.concat(tables, ignore_index=True)
+        tb_fish = pr.multi_merge(tables, on=INDEX_COLUMNS, how="outer")
 
     return tb_fish
 
@@ -170,14 +188,14 @@ def prepare_land_animals_data(tb_qcl, killed_or_alive):
     # Create a table for the number of killed/alive animals of each kind.
     tb = (
         tb_qcl[tb_qcl["element_code"].isin(element_codes) & tb_qcl["item_code"].isin(item_codes.keys())]
-        .assign(**{"per_capita": False, "estimate": EMPTY_DIMENSION_LABEL})
+        .assign(**{"metric": f"animals_{killed_or_alive}", "per_capita": False, "estimate": EMPTY_DIMENSION_LABEL})
         .reset_index(drop=True)
     )
 
     # Create a table for the number of animals of each kind per person.
     tb_per_capita = (
         tb_qcl[tb_qcl["element_code"].isin(element_codes_per_capita) & tb_qcl["item_code"].isin(item_codes.keys())]
-        .assign(**{"per_capita": True, "estimate": EMPTY_DIMENSION_LABEL})
+        .assign(**{"metric": f"animals_{killed_or_alive}", "per_capita": True, "estimate": EMPTY_DIMENSION_LABEL})
         .reset_index(drop=True)
     )
 
@@ -204,7 +222,7 @@ def prepare_land_animals_data(tb_qcl, killed_or_alive):
     # Select and rename columns.
     tb = tb[INDEX_COLUMNS + ["value"]].rename(columns={"value": f"n_animals_{killed_or_alive}"}, errors="raise")
     tb_per_capita = tb_per_capita[INDEX_COLUMNS + ["value"]].rename(
-        columns={"value": f"n_animals_{killed_or_alive}"}, errors="raise"
+        columns={"value": f"n_animals_{killed_or_alive}_per_capita"}, errors="raise"
     )
 
     return tb, tb_per_capita
@@ -245,12 +263,36 @@ def run() -> None:
     tb_stock, tb_stock_per_capita = prepare_land_animals_data(tb_qcl=tb_qcl, killed_or_alive="alive")
 
     # Combine tables.
-    tb_killed_all = pr.concat([tb_killed, tb_killed_per_capita, tb_fish], ignore_index=True)
-    tb_stock_all = pr.concat([tb_stock, tb_stock_per_capita], ignore_index=True)
-    tb = pr.multi_merge([tb_killed_all, tb_stock_all], on=INDEX_COLUMNS, how="outer")
+    tb = pr.multi_merge(
+        [tb_fish, tb_killed, tb_killed_per_capita, tb_stock, tb_stock_per_capita], on=INDEX_COLUMNS, how="outer"
+    )
 
     # Format table conveniently.
     tb = tb.format(keys=INDEX_COLUMNS, short_name=paths.short_name)
+
+    # Improve metadata programmatically.
+    for column in tb.columns:
+        tb[column].metadata.unit = """animals<% if per_capita == True %> per person<% endif %>"""
+        tb[column].metadata.short_unit = ""
+        if "_alive" in column:
+            title = (
+                """Number of << animal >> alive used to produce meat<% if per_capita == True %> per capita<% endif %>"""
+            )
+            tb[
+                column
+            ].metadata.description_short = """Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year."""
+        else:
+            title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Number of land animals slaughtered to produce meat<% elif animal == "{WILD_FISH_LABEL}" %>Number of fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Number of farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Number of farmed crustaceans killed for food<% else %>Number of << animal >> slaughtered to produce meat<% endif %><% if per_capita == True %> per capita<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
+            tb[
+                column
+            ].metadata.description_short = """This data is based on the country of production, not consumption."""
+            tb[column].metadata.description_key = [
+                """Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.""",
+                """<% if animal == "chickens" %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
+            ]
+        tb[column].metadata.title = title
+        tb[column].metadata.display = {"name": """<< animal.capitalize() >>"""}
+        tb[column].metadata.presentation = VariablePresentationMeta(title_public=title)
 
     #
     # Save outputs.
@@ -258,14 +300,14 @@ def run() -> None:
     # Create a new garden dataset.
     ds_garden = paths.create_dataset(
         tables=[tb],
-        yaml_params={
-            "MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL,
-            "WILD_FISH_LABEL": WILD_FISH_LABEL,
-            "FARMED_FISH_LABEL": FARMED_FISH_LABEL,
-            "FARMED_CRUSTACEANS_LABEL": FARMED_CRUSTACEANS_LABEL,
-            "ESTIMATE_MIDPOINT_LABEL": ESTIMATE_MIDPOINT_LABEL,
-            "ESTIMATE_LOW_LABEL": ESTIMATE_LOW_LABEL,
-            "ESTIMATE_HIGH_LABEL": ESTIMATE_HIGH_LABEL,
-        },
+        # yaml_params={
+        #     "MEAT_TOTAL_LABEL": MEAT_TOTAL_LABEL,
+        #     "WILD_FISH_LABEL": WILD_FISH_LABEL,
+        #     "FARMED_FISH_LABEL": FARMED_FISH_LABEL,
+        #     "FARMED_CRUSTACEANS_LABEL": FARMED_CRUSTACEANS_LABEL,
+        #     "ESTIMATE_MIDPOINT_LABEL": ESTIMATE_MIDPOINT_LABEL,
+        #     "ESTIMATE_LOW_LABEL": ESTIMATE_LOW_LABEL,
+        #     "ESTIMATE_HIGH_LABEL": ESTIMATE_HIGH_LABEL,
+        # },
     )
     ds_garden.save()

@@ -67,12 +67,24 @@ def run() -> None:
     #
     # Process data.
     #
+    #######################
+    # TODO: Is this necessary?
+    for c in tb.drop(columns=tb.metadata.primary_key).columns:
+        if tb[c].dimensions["per_capita"]:
+            tb[c].dimensions["per_capita"] = "True"
+        else:
+            tb[c].dimensions["per_capita"] = "False"
+    #######################
+
     # Create additional dimensions and views from input table.
     config_new = expand_config(
         tb,
-        indicator_names=["n_animals_killed", "n_animals_alive"],
-        indicators_slug="metric",
+        indicator_names=sorted(
+            set([column.split("__")[0] for column in tb.columns if column not in tb.metadata.primary_key])
+        ),
+        # indicators_slug="n_animals_killed",
         dimensions={
+            "metric": ["animals_killed", "animals_alive"],
             # NOTE: Here it is convenient that total meat is the first choice. If that changes, manually change the list below.
             "animal": sorted(
                 set(
@@ -90,7 +102,12 @@ def run() -> None:
         # TODO: The following changes the coloring of the chart tab. How do I change the color of the map tab?
         # common_view_config={"baseColorScheme": "YlOrBr"},
     )
-
+    ####################################################################################################################
+    # TODO: For some reason, a new dimension "indicator" is added. Manually remove it:
+    for view in config_new["views"]:
+        view["dimensions"].pop("indicator", None)
+    config_new["dimensions"] = [dimension for dimension in config_new["dimensions"] if dimension["slug"] != "indicator"]
+    ####################################################################################################################
     # Update original configuration of dimensions and views.
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
@@ -279,10 +296,10 @@ def run() -> None:
     )
 
     # Set the defalt view.
-    config_new = set_default_view(
+    config = set_default_view(
         config=config,
         default_view={
-            "metric": "n_animals_killed",
+            "metric": "animals_killed",
             "animal": "all land animals",
             "estimate": "",
             "per_capita": "False",
