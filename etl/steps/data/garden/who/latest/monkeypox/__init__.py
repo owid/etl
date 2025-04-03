@@ -157,7 +157,7 @@ def add_world(tb: Table) -> Table:
     )
 
     world = (
-        tb[["date", "total_cases", "total_deaths"]][tb["date"] >= last_date]
+        tb[["date", "total_cases", "total_deaths"]][tb["date"] <= last_date]
         .groupby("date", as_index=False, observed=True)
         .sum()
         .assign(country="World", report=True)
@@ -179,7 +179,7 @@ def add_regions(tb: Table) -> Table:
 
     # Calculate regional aggregates
     regions = (
-        tb[(tb.region.notnull()) & (tb["date"] >= last_date)][
+        tb[(tb.region.notnull()) & (tb["date"] <= last_date)][
             ["region", "date", "total_cases", "total_deaths", "report"]
         ]
         .groupby(["region", "date"], as_index=False, observed=True)
