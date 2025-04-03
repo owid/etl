@@ -1,0 +1,17 @@
+config:
+  explorerTitle: Animal Welfare
+  isPublished: true
+  entityType: country
+  explorerSubtitle: Explore the number of animals slaughtered and welfare impacts.
+  selection:
+    - World
+    - United States
+    - China
+    - India
+    - Brazil
+    - United Kingdom
+  # subNavId:
+  # subNavCurrentId:
+  # wpBlockId: "58184"  # TODO: Is this needed?
+  hasMapTab: true
+  # hideAnnotationFieldsInTitle: true
