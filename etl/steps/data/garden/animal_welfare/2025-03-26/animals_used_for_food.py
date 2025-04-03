@@ -276,13 +276,13 @@ def run() -> None:
         tb[column].metadata.short_unit = ""
         if "_alive" in column:
             title = (
-                """Number of << animal >> alive used to produce meat<% if per_capita == True %> per capita<% endif %>"""
+                """Number of << animal >> alive used to produce meat<% if per_capita == True %> per person<% endif %>"""
             )
             tb[
                 column
             ].metadata.description_short = """Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year."""
         else:
-            title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Number of land animals slaughtered to produce meat<% elif animal == "{WILD_FISH_LABEL}" %>Number of fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Number of farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Number of farmed crustaceans killed for food<% else %>Number of << animal >> slaughtered to produce meat<% endif %><% if per_capita == True %> per capita<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
+            title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Number of land animals slaughtered to produce meat<% elif animal == "{WILD_FISH_LABEL}" %>Number of fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Number of farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Number of farmed crustaceans killed for food<% else %>Number of << animal >> slaughtered to produce meat<% endif %><% if per_capita == True %> per person<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
             tb[
                 column
             ].metadata.description_short = """This data is based on the country of production, not consumption."""
