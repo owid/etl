@@ -67,15 +67,6 @@ def run() -> None:
     #
     # Process data.
     #
-    #######################
-    # TODO: Is this necessary?
-    for c in tb.drop(columns=tb.metadata.primary_key).columns:
-        if tb[c].dimensions["per_capita"]:
-            tb[c].dimensions["per_capita"] = "True"
-        else:
-            tb[c].dimensions["per_capita"] = "False"
-    #######################
-
     # Create additional dimensions and views from input table.
     config_new = expand_config(
         tb,
