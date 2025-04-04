@@ -380,70 +380,121 @@ tables:
         title: Barley attainable yield
         description_short: "{definitions.description_short_attainable_yields}"
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       cassava_attainable_yield:
         title: Cassava attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       cotton_attainable_yield:
         title: Cotton attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       groundnut_attainable_yield:
         title: Groundnut attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       maize_attainable_yield:
         title: Corn attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       millet_attainable_yield:
         title: Millet attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       oilpalm_attainable_yield:
         title: Oil palm attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       potato_attainable_yield:
         title: Potato attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       rapeseed_attainable_yield:
         title: Rapeseed attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       rice_attainable_yield:
         title: Rice attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       rye_attainable_yield:
         title: Rye attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       sorghum_attainable_yield:
         title: Sorghum attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       soybean_attainable_yield:
         title: Soybean attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       sugarbeet_attainable_yield:
         title: Sugar beet attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       sugarcane_attainable_yield:
         title: Sugar cane attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       sunflower_attainable_yield:
         title: Sunflower seed attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       wheat_attainable_yield:
         title: Wheat attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
+        presentation:
+          grapher_config:
+            note: "{definitions.description_key_attainable_yields_2}"
       barley_yield_gap:
         title: Barley yield gap
         description_short: *description_short_yield_gaps
