@@ -29,6 +29,7 @@ class Explorer(Collection):
     views: List[ExplorerView]
     config: Dict[str, str]
     definitions: Optional[Definitions] = None
+    avoid_duplicate_hack: bool = False
 
     # Internal use. For save() method.
     _catalog_path: Optional[str] = None
@@ -110,7 +111,7 @@ class Explorer(Collection):
 
         # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
-        df_grapher, df_columns = extract_explorers_tables(self)
+        df_grapher, df_columns = extract_explorers_tables(self, avoid_duplicate_hack=self.avoid_duplicate_hack)
 
         # Transform to legacy format
         explorer_legacy = _create_explorer_legacy(
@@ -127,10 +128,12 @@ class Explorer(Collection):
 def create_explorer(
     config: dict,
     dependencies: Set[str],
+    avoid_duplicate_hack: bool = False,
 ) -> Explorer:
     """Create an explorer object."""
     # Read configuration as structured data
     explorer = Explorer.from_dict(config)
+    explorer.avoid_duplicate_hack = avoid_duplicate_hack
 
     # Edit views
     process_views(explorer, dependencies)
@@ -169,6 +172,7 @@ def process_views(
 
 def extract_explorers_tables(
     explorer: Explorer,
+    avoid_duplicate_hack: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     1. Obtain `dimensions_display` dictionary. This helps later when remixing the Explorer configuration.
@@ -191,7 +195,9 @@ def extract_explorers_tables(
         dimensions_display=dimensions_display,
     )
     # 4. Adapt tables for view-level indicator display settings
-    df_grapher, df_columns = _add_indicator_display_settings(df_grapher, df_columns, columns_widgets)
+    df_grapher, df_columns = _add_indicator_display_settings(
+        df_grapher, df_columns, columns_widgets, avoid_duplicate_hack=avoid_duplicate_hack
+    )
 
     # 5. Order columns
     df_grapher = _order_columns(df_grapher, columns_widgets)
@@ -207,7 +213,8 @@ def extract_explorers_tables(
     df_columns = df_columns.drop_duplicates()
 
     # Sanity check (even if all-NA, we keep it because otherwise Grapher complains!)
-    assert df_columns["catalogPath"].isna().all(), "catalogPath should be all NA in df_columns."
+    if not avoid_duplicate_hack:
+        assert df_columns["catalogPath"].isna().all(), "catalogPath should be all NA in df_columns."
 
     return df_grapher, df_columns
 
@@ -270,7 +277,7 @@ def _extract_explorers_tables(
     return df_grapher, df_columns
 
 
-def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
+def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avoid_duplicate_hack=False):
     """Add indicator display settings.
 
     Since we want to support different display settings for the same indicator across different views, we need to use some 'hacks' (transform column, slugs instead of paths, etc.).
@@ -347,20 +354,25 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
                     # Sanity check
                     assert (col_id in row) and isinstance(row[col_id], list) and (len(row[col_id]) == 1)
 
-                # Get new values
-                slugs = [renames_axis.get(p) for p in row[col_id] if p in renames_axis]
-                paths = [p for p in row[col_id] if p not in renames_axis]
-                # Set new values
-                df_grapher.at[idx, col_slug] = slugs if slugs != [] else np.nan
-                df_grapher.at[idx, col_id] = paths if paths != [] else np.nan
+                if not avoid_duplicate_hack:
+                    # Get new values
+                    slugs = [renames_axis.get(p) for p in row[col_id] if p in renames_axis]
+                    paths = [p for p in row[col_id] if p not in renames_axis]
+                    # Set new values
+                    df_grapher.at[idx, col_slug] = slugs if slugs != [] else np.nan
+                    df_grapher.at[idx, col_id] = paths if paths != [] else np.nan
 
         # 3. Finalize df_columns and df_grapher
         # COLUMNS
         # Reorder
-        columns_first = ["catalogPath", "slug", "transform"]
+        if avoid_duplicate_hack:
+            columns_first = ["catalogPath"]
+        else:
+            columns_first = ["catalogPath", "slug", "transform"]
         df_columns = df_columns[[*columns_first, *df_columns.columns.difference(columns_first)]]
         # Set catalogPath to None
-        df_columns.loc[:, "catalogPath"] = None
+        if not avoid_duplicate_hack:
+            df_columns.loc[:, "catalogPath"] = None
         # Drop auxiliary columns
         df_columns = df_columns.drop(columns=["_variableId", "_slug_id"])
 
