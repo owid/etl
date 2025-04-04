@@ -1,6 +1,6 @@
 definitions:
   description_short_attainable_yields: &description_short_attainable_yields |-
-    Attainable yields are estimates of feasible crop yields calculated from high-yielding areas of similar climate.
+    Attainable yields are estimates of feasible crop yields calculated from high-yielding areas of similar climate. Yields are measured in tonnes per hectare.
   description_key_attainable_yields_1: |-
     Attainable yields are more conservative than biophysical 'potential yields', but should be achievable using current technologies and management (e.g. fertilizers and irrigation).
   description_key_attainable_yields_2: |-
@@ -9,7 +9,7 @@ definitions:
     - "{definitions.description_key_attainable_yields_1}"
     - "{definitions.description_key_attainable_yields_2}"
   description_short_yield_gaps: &description_short_yield_gaps |-
-    Yield gaps are the difference between attainable yields and actual yields. Negative values have been replaced by zero, meaning that the attainable yield has been reached.
+    Yield gaps are the difference between attainable yields and actual yields, measured in tonnes per hectare. Negative values have been replaced by zero, meaning that the attainable yield has been reached.
   description_key_yield_gaps: &description_key_yield_gaps
     - "{definitions.description_short_attainable_yields}"
     - "{definitions.description_key_attainable_yields_1}"
@@ -157,7 +157,7 @@ tables:
       grapes_yield:
         title: Grapes yield
       green_maize_yield:
-        title: Green maize yield
+        title: Green corn yield
       groundnut_yield:
         title: Groundnut yield
       hazelnuts_yield:
@@ -197,7 +197,7 @@ tables:
       lupins_yield:
         title: Lupins yield
       maize_yield:
-        title: Maize yield
+        title: Corn yield
       mangoes_yield:
         title: Mangoes yield
       mate_leaves_yield:
@@ -393,7 +393,7 @@ tables:
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
       maize_attainable_yield:
-        title: Maize attainable yield
+        title: Corn attainable yield
         description_short: *description_short_attainable_yields
         description_key: *description_key_attainable_yields
       millet_attainable_yield:
@@ -465,7 +465,7 @@ tables:
         description_key: *description_key_yield_gaps
         description_processing: *description_processing_yield_gaps
       maize_yield_gap:
-        title: Maize yield gap
+        title: Corn yield gap
         description_short: *description_short_yield_gaps
         description_key: *description_key_yield_gaps
         description_processing: *description_processing_yield_gaps

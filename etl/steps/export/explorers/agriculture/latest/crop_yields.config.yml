@@ -1,3 +1,10 @@
+definitions:
+  common_views:
+    # NOTE: Not sure if the following are needed (or they are the default values anyway).
+    - config:
+        toleranceStrategy: backwards
+        colorScaleEqualSizeBins: 'true'
+
 config:
   explorerTitle: Crop Yields
   explorerSubtitle: Explore crop yields across the world.
@@ -21,7 +28,6 @@ config:
   # downloadDataLink: https://catalog.ourworldindata.org/explorers/agriculture/latest/crop_yields/crop_yields.csv
   hideAnnotationFieldsInTitle: 'true'
   pickerColumnSlugs: []
-
 dimensions:
   - slug: crop
     name: Crop
@@ -104,17 +110,13 @@ views:
         - catalogPath: attainable_yields#almond_yield
           display:
             colorScaleNumericBins: 0.5;1;2;5;10;20
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
-    # config:
-    #   title: 'Almond: Yield'
-    #   subtitle: Yields are measured in tonnes per hectare.
-    #   yScaleToggle: 'false'
-    #   type: LineChart
-    #   hasMapTab: 'true'
-    #   sourceDesc: Food and Agriculture Organization of the United Nations
-    #   tab: map
+    config:
+      yScaleToggle: 'false'
+      type: LineChart
+      hasMapTab: 'true'
+      sourceDesc: Food and Agriculture Organization of the United Nations
+      tab: map
   - dimensions:
       crop: bananas
       metric: actual_yield
@@ -123,12 +125,8 @@ views:
         - catalogPath: attainable_yields#banana_yield
           display:
             colorScaleNumericBins: 10;20;30;40;50;60;70
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Banana: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -140,12 +138,8 @@ views:
         - catalogPath: attainable_yields#barley_yield
           display:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Barley: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -161,13 +155,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 2,,;3,,;4,,;5,,;6,,;7,,;8,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Reds
-            toleranceStrategy: backwards
     config:
-      title: 'Barley: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -185,13 +174,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrRd
-            toleranceStrategy: backwards
     config:
-      title: 'Barley: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -205,12 +189,8 @@ views:
         - catalogPath: attainable_yields#bean_yield
           display:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Bean: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -226,13 +206,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 10,,;12.5,,;15,,;17.5,,;20,,;30,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: OrRd
-            toleranceStrategy: backwards
     config:
-      title: 'Cassava: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -246,12 +221,8 @@ views:
         - catalogPath: attainable_yields#cassava_yield
           display:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Cassava: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -267,13 +238,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;4,,;6,,;8,,;10,,;15,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Oranges
-            toleranceStrategy: backwards
     config:
-      title: 'Cassava: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -287,11 +253,8 @@ views:
         - catalogPath: attainable_yields#cereal_yield
           display:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8;9;10
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Cereal: Yield'
       subtitle: |-
         Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed\n grains.
       yScaleToggle: 'false'
@@ -305,12 +268,8 @@ views:
         - catalogPath: attainable_yields#cocoa_yield
           display:
             colorScaleNumericBins: 0.1;0.2;0.5;1;2;5
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Cocoa bean: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -322,12 +281,8 @@ views:
         - catalogPath: attainable_yields#coffee_yield
           display:
             colorScaleNumericBins: 0.4;0.8;1.2;1.6;2;2.4;2.8
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Coffee bean: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -343,13 +298,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 2,,;4,,;6,,;8,,;10,,;12,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBuGn
-            toleranceStrategy: backwards
     config:
-      title: 'Corn: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Corn (maize) yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -363,11 +313,8 @@ views:
         - catalogPath: attainable_yields#maize_yield
           display:
             colorScaleNumericBins: 1;2;5;10;20;50
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Corn: Yield'
       subtitle: Corn (maize) yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
@@ -384,13 +331,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;8,,;10,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrRd
-            toleranceStrategy: backwards
     config:
-      title: 'Corn: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Corn (maize) yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -408,13 +350,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Purples
-            toleranceStrategy: backwards
     config:
-      title: 'Cotton: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -428,12 +365,8 @@ views:
         - catalogPath: attainable_yields#cotton_yield
           display:
             colorScaleNumericBins: 0.5;1;2;5;10
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Cotton: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -449,13 +382,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Purples
-            toleranceStrategy: backwards
     config:
-      title: 'Cotton: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -473,13 +401,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrBr
-            toleranceStrategy: backwards
     config:
-      title: 'Groundnut: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -493,12 +416,8 @@ views:
         - catalogPath: attainable_yields#groundnut_yield
           display:
             colorScaleNumericBins: 0.2;0.5;1;2;5;10
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Groundnut: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -514,13 +433,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrBr
-            toleranceStrategy: backwards
     config:
-      title: 'Groundnut: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -534,12 +448,8 @@ views:
         - catalogPath: attainable_yields#lettuce_yield
           display:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Lettuce: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -555,13 +465,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 0.5,,;0.75,,;1,,;1.25,,;1.5,,;1.75,,;2,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
-            toleranceStrategy: backwards
     config:
-      title: 'Millet: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -575,12 +480,8 @@ views:
         - catalogPath: attainable_yields#millet_yield
           display:
             colorScaleNumericBins: 0.5;1;2;5;10;20
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Millet: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -596,13 +497,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrBr
-            toleranceStrategy: backwards
     config:
-      title: 'Millet: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -616,12 +512,8 @@ views:
         - catalogPath: attainable_yields#oats_yield
           display:
             colorScaleNumericBins: 1;2;3;4;5;6;7
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Oat: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -637,13 +529,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 10,,;12.5,,;15,,;17.5,,;20,,;25,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrRd
-            toleranceStrategy: backwards
     config:
-      title: 'Oil palm: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -657,12 +544,8 @@ views:
         - catalogPath: attainable_yields#oilpalm_yield
           display:
             colorScaleNumericBins: 4;8;12;16;20
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Oil palm: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -678,13 +561,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 5,,;10,,;15,,;20,,;25,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: OrRd
-            toleranceStrategy: backwards
     config:
-      title: 'Oil palm: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -698,12 +576,8 @@ views:
         - catalogPath: attainable_yields#orange_yield
           display:
             colorScaleNumericBins: 10;20;30;40;50;60
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Orange: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -715,12 +589,8 @@ views:
         - catalogPath: attainable_yields#pea_yield
           display:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Pea: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -736,13 +606,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 20,,;25,,;30,,;35,,;40,,;45,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
-            toleranceStrategy: backwards
     config:
-      title: 'Potato: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -756,12 +621,8 @@ views:
         - catalogPath: attainable_yields#potato_yield
           display:
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Potato: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -777,13 +638,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 5,,;10,,;15,,;20,,;25,,;30,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuRd
-            toleranceStrategy: backwards
     config:
-      title: 'Potato: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -801,13 +657,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGnBu
-            toleranceStrategy: backwards
     config:
-      title: 'Rapeseed: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -821,12 +672,8 @@ views:
         - catalogPath: attainable_yields#rapeseed_yield
           display:
             colorScaleNumericBins: 1;1.5;2;2.5;3;3.5;4
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Rapeseed: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -842,13 +689,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Oranges
-            toleranceStrategy: backwards
     config:
-      title: 'Rapeseed: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -866,13 +708,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 5,,;6,,;7,,;8,,;9,,;10,,;15
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGnBu
-            toleranceStrategy: backwards
     config:
-      title: 'Rice: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -886,12 +723,8 @@ views:
         - catalogPath: attainable_yields#rice_yield
           display:
             colorScaleNumericBins: 2;4;6;8;10;12
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Rice: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -907,13 +740,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;4,,;6,,;8,,;10,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Reds
-            toleranceStrategy: backwards
     config:
-      title: 'Rice: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -931,13 +759,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 2,,;3,,;4,,;5,,;6,,;7,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: BuGn
-            toleranceStrategy: backwards
     config:
-      title: 'Rye: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -951,12 +774,8 @@ views:
         - catalogPath: attainable_yields#rye_yield
           display:
             colorScaleNumericBins: 1;2;3;4;5;6
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Rye: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -972,13 +791,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: OrRd
-            toleranceStrategy: backwards
     config:
-      title: 'Rye: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -996,13 +810,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;7,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Purples
-            toleranceStrategy: backwards
     config:
-      title: 'Sorghum: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -1016,12 +825,8 @@ views:
         - catalogPath: attainable_yields#sorghum_yield
           display:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4;4.5;5;5.5
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Sorghum: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1037,13 +842,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuRd
-            toleranceStrategy: backwards
     config:
-      title: 'Sorghum: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1061,13 +861,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;2.5,,;3,,;3.5,,;4,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
-            toleranceStrategy: backwards
     config:
-      title: 'Soybean: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -1081,12 +876,8 @@ views:
         - catalogPath: attainable_yields#soybean_yield
           display:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Soybean: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1102,13 +893,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBuGn
-            toleranceStrategy: backwards
     config:
-      title: 'Soybean: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1126,13 +912,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 50,,;55,,;60,,;65,,;70,,;75,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGnBu
-            toleranceStrategy: backwards
     config:
-      title: 'Sugar beet: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -1146,12 +927,8 @@ views:
         - catalogPath: attainable_yields#sugarbeet_yield
           display:
             colorScaleNumericBins: 20;40;60;80;100
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Sugar beet: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1167,13 +944,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60,,;70,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Oranges
-            toleranceStrategy: backwards
     config:
-      title: 'Sugar beet: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1191,13 +963,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 80,,;85,,;90,,;95,,;100,,;110,,;120,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
-            toleranceStrategy: backwards
     config:
-      title: 'Sugarcane: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -1211,12 +978,8 @@ views:
         - catalogPath: attainable_yields#sugarcane_yield
           display:
             colorScaleNumericBins: 20;40;60;80;100;120
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Sugarcane: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1232,13 +995,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60,,;70,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Oranges
-            toleranceStrategy: backwards
     config:
-      title: 'Sugarcane: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1256,13 +1014,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;1.5,;2,,;2.5,,;3,,;3.5,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
-            toleranceStrategy: backwards
     config:
-      title: 'Sunflower seed: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -1276,12 +1029,8 @@ views:
         - catalogPath: attainable_yields#sunflower_yield
           display:
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Sunflower seed: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1297,13 +1046,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrRd
-            toleranceStrategy: backwards
     config:
-      title: 'Sunflower seed: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1317,12 +1061,8 @@ views:
         - catalogPath: attainable_yields#tomato_yield
           display:
             colorScaleNumericBins: 10;20;50;100;200;500
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Tomato: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1338,13 +1078,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;7,,;8,,;9,,;10,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGnBu
-            toleranceStrategy: backwards
     config:
-      title: 'Wheat: Attainable yield'
-      subtitle: |-
-        Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
@@ -1358,12 +1093,8 @@ views:
         - catalogPath: attainable_yields#wheat_yield
           display:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
-            toleranceStrategy: backwards
     config:
-      title: 'Wheat: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
@@ -1379,13 +1110,8 @@ views:
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;8,,
-            colorScaleEqualSizeBins: 'true'
             colorScaleScheme: OrRd
-            toleranceStrategy: backwards
     config:
-      title: 'Wheat: Yield gap'
-      subtitle: |-
-        Yield gaps measure the difference between actual and attainable yields. Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation). Yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
