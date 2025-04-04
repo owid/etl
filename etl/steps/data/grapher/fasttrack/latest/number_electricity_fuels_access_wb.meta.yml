@@ -1,0 +1,65 @@
+dataset:
+  title: Number with and without electricity and clean fuels (WB)
+  description: ''
+  licenses:
+    - {}
+tables:
+  number_electricity_fuels_access_wb:
+    variables:
+      electricity_access:
+        title: With electricity
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: The share of the population with access to electricity.
+      share_without_electricity:
+        title: Without electricity
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: The share of the population without access to electricity.
+      number_with_electricity:
+        title: Number with electricity
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: The number of people with access to electricity.
+      number_without_electricity:
+        title: Number without electricity
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: The number of people without access to electricity.
+      clean_fuels_access:
+        title: With clean cooking fuels
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: The share of the population with access to clean fuels for cooking and heating.
+      share_without_clean_fuels:
+        title: Without clean cooking fuels
+        unit: '%'
+        short_unit: '%'
+        display:
+          numDecimalPlaces: 1
+        description: The share of the population without access to clean fuels for cooking and heating.
+      number_with_clean_fuels:
+        title: Number with clean cooking fuels
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: The number of people with access to clean fuels for cooking and heating.
+      number_without_clean_fuels:
+        title: Number without clean cooking fuels
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+        description: The number of people without access to clean fuels for cooking and heating.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

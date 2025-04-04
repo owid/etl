@@ -10,13 +10,14 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, TypeVar, Union
+from typing import Any, Dict, List, Literal, NewType, Optional, TypedDict, TypeVar, Union
 
 import mistune
 import pandas as pd
 from dataclasses_json import DataClassJsonMixin
-from typing_extensions import Self
+from typing_extensions import NotRequired, Required, Self
 
+from . import jinja
 from .processing_log import ProcessingLog
 from .utils import dataclass_from_dict, hash_any, pruned_json
 
@@ -256,6 +257,14 @@ class VariableMeta(MetaBase):
     # List of categories for ordinal type indicators
     sort: List[str] = field(default_factory=list)
 
+    # Dimensions
+    # Dictionary of dimensions
+    dimensions: Optional[Dict[str, Any]] = None
+    # Original short name and title of the indicator before flattening
+    original_short_name: Optional[str] = None
+    # TODO: it's possible that we might not need `original_title` at all
+    original_title: Optional[str] = None
+
     @property
     def schema_version(self) -> int:
         """Schema version is used to easily understand everywhere what metadata standard was used
@@ -276,6 +285,33 @@ class VariableMeta(MetaBase):
              {}
         """.format(getattr(self, "_name", None), to_html(record))
 
+    def render(self, dim_dict: Dict[str, Any], remove_dods: bool = False) -> "VariableMeta":
+        """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
+
+        :param dim_dict: dictionary of dimensions to render
+        :param remove_dods: remove references to details on demand from a text
+
+        Usage:
+            from owid.catalog import Dataset
+            from etl import paths
+
+            ds = Dataset(paths.DATA_DIR / "garden/emissions/2025-02-12/ceds_air_pollutants")
+            tb = ds['ceds_air_pollutants']
+            tb.emissions.m.render({'pollutant': 'CO', 'sector': 'Transport'})
+        """
+        meta = jinja._expand_jinja(self.copy(), dim_dict, remove_dods=remove_dods)
+
+        # Prune empty description keys
+        if meta.description_key:
+            meta.description_key = [x for x in meta.description_key if x]
+
+        return meta
+
+    def copy(self, deep=True) -> Self:
+        m = super().copy(deep)
+        m._name = getattr(self, "_name", None)  # type: ignore
+        return m
+
 
 @pruned_json
 @dataclass(eq=False)
@@ -284,7 +320,7 @@ class DatasetMeta(MetaBase):
     The metadata for this entire dataset kept in JSON (e.g. mydataset/index.json).
 
     The number of fields is limited, but should handle everything that we get from
-    Walden. There is a lot more opportunity to store more metadata at the table and
+    Snapshot. There is a lot more opportunity to store more metadata at the table and
     the variable level.
     """
 
@@ -378,6 +414,12 @@ class DatasetMeta(MetaBase):
         return f"{self.channel}/{self.namespace}/{self.version}/{self.short_name}"
 
 
+class TableDimension(TypedDict):
+    name: Required[str]
+    slug: Required[str]
+    description: NotRequired[Optional[str]]
+
+
 @pruned_json
 @dataclass(eq=False)
 class TableMeta(MetaBase):
@@ -389,6 +431,9 @@ class TableMeta(MetaBase):
     # a reference back to the dataset
     dataset: Optional[DatasetMeta] = field(compare=False, default=None)
     primary_key: List[str] = field(default_factory=list)
+
+    # table dimensions
+    dimensions: Optional[List[TableDimension]] = None
 
     @property
     def checked_name(self) -> str:

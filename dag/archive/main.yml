@@ -207,6 +207,16 @@ steps:
   data://grapher/oecd/2024-08-21/co2_air_transport:
     - data://garden/oecd/2024-08-21/co2_air_transport
 
+  data://meadow/oecd/2024-12-30/co2_air_transport:
+    - snapshot://oecd/2024-12-30/co2_air_transport.csv
+  data://garden/oecd/2024-12-30/co2_air_transport:
+    - data://meadow/oecd/2024-12-30/co2_air_transport
+    - data://garden/tourism/2024-08-17/unwto
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/oecd/2024-12-30/co2_air_transport:
+    - data://garden/oecd/2024-12-30/co2_air_transport
+
   # Tourism datasets
   # UNWTO key indicators
   data://meadow/tourism/2023-05-05/unwto:
@@ -386,6 +396,67 @@ steps:
   data://grapher/missing_data/2024-03-26/children_out_of_school:
     - data://garden/missing_data/2024-03-26/children_out_of_school
 
+  # Switched to external/owid_grapher/latest/regions for external (e.g. owid-grapher) use-cases.
+  data://grapher/regions/latest/regions:
+    - data://garden/regions/2023-01-01/regions
+
+  # OECD Official Development Assistance (ODA)
+  data://meadow/oecd/2024-08-21/official_development_assistance:
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac1.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac2a.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_dac5.zip
+    - snapshot://oecd/2024-08-21/official_development_assistance_crs.zip
+  data://garden/oecd/2024-08-21/official_development_assistance:
+    - data://meadow/oecd/2024-08-21/official_development_assistance
+    - data://garden/demography/2024-07-15/population
+  data://grapher/oecd/2024-08-21/official_development_assistance:
+    - data://garden/oecd/2024-08-21/official_development_assistance
+
+  # World Happiness Report (2012-2024)
+  data://meadow/happiness/2024-06-09/happiness:
+    - snapshot://happiness/2024-06-09/happiness.xls
+  data://meadow/happiness/2023-03-20/happiness:
+    - snapshot://happiness/2023-03-20/happiness.xls
+  data://meadow/happiness/2022-03-20/happiness:
+    - snapshot://happiness/2022-03-20/happiness.xls
+  data://meadow/happiness/2021-03-20/happiness:
+    - snapshot://happiness/2021-03-20/happiness.xls
+  data://meadow/happiness/2020-03-20/happiness:
+    - snapshot://happiness/2020-03-20/happiness.xls
+  data://meadow/happiness/2019-03-20/happiness:
+    - snapshot://happiness/2019-03-20/happiness.xls
+  data://meadow/happiness/2018-03-20/happiness:
+    - snapshot://happiness/2018-03-20/happiness.xls
+  data://meadow/happiness/2017-03-20/happiness:
+    - snapshot://happiness/2017-03-20/happiness.xlsx
+  data://meadow/happiness/2016-03-20/happiness:
+    - snapshot://happiness/2016-03-20/happiness.xlsx
+  data://meadow/happiness/2015-03-20/happiness:
+    - snapshot://happiness/2015-03-20/happiness.xlsx
+  data://meadow/happiness/2012-03-20/happiness:
+    - snapshot://happiness/2012-03-20/happiness.xlsx
+
+  data://garden/happiness/2023-03-20/happiness:
+    - data://meadow/happiness/2023-03-20/happiness
+    - data://meadow/happiness/2022-03-20/happiness
+    - data://meadow/happiness/2021-03-20/happiness
+    - data://meadow/happiness/2020-03-20/happiness
+    - data://meadow/happiness/2019-03-20/happiness
+    - data://meadow/happiness/2018-03-20/happiness
+    - data://meadow/happiness/2017-03-20/happiness
+    - data://meadow/happiness/2016-03-20/happiness
+    - data://meadow/happiness/2015-03-20/happiness
+    - data://meadow/happiness/2012-03-20/happiness
+
+  data://garden/happiness/2024-06-09/happiness:
+    - data://meadow/happiness/2024-06-09/happiness
+    - data://garden/happiness/2023-03-20/happiness
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+  data://grapher/happiness/2024-06-09/happiness:
+    - data://garden/happiness/2024-06-09/happiness
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -400,9 +471,14 @@ include:
   - dag/archive/fasttrack.yml
   - dag/archive/climate.yml
   - dag/archive/environment.yml
+  - dag/archive/poverty_inequality.yml
   - dag/archive/equality.yml
   - dag/archive/plastic_use.yml
   - dag/archive/artificial_intelligence.yml
   - dag/archive/urbanization.yml
   - dag/archive/education.yml
   - dag/archive/biodiversity.yml
+  - dag/archive/space.yml
+  - dag/archive/survey.yml
+  - dag/archive/migration.yml
+  - dag/archive/redistribution.yml

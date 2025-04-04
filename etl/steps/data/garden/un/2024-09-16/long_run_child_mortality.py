@@ -3,10 +3,13 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+REGIONS = geo.REGIONS
 
 
 def run(dest_dir: str) -> None:
@@ -40,6 +43,7 @@ def run(dest_dir: str) -> None:
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
     tb_gap_full["source"] = "gapminder"
     tb_gap_full["under_five_mortality"] = tb_gap_full["under_five_mortality"].div(10)
+
     # Load Gapminder data v7 - has the source of the data (unlike v11)
     # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()

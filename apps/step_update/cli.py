@@ -9,7 +9,7 @@ import structlog
 from rapidfuzz import fuzz
 from rich_click.rich_command import RichCommand
 
-from etl.helpers import (
+from etl.dag_helpers import (
     create_dag_archive_file,
     get_comments_above_step_in_dag,
     remove_steps_from_dag_file,
@@ -178,7 +178,9 @@ class StepUpdater:
         step_info = self.get_step_info(step=step)
 
         # Define the folder of the old step files.
-        folder = STEP_DIR / "data" / step_info["channel"] / step_info["namespace"] / step_info["version"]
+        folder = (
+            STEP_DIR / step_info["step_type"] / step_info["channel"] / step_info["namespace"] / step_info["version"]
+        )
 
         if ((folder / step_info["name"]).with_suffix(".py")).is_file():
             # Gather all relevant files from this folder.
@@ -379,7 +381,7 @@ class StepUpdater:
             return
 
         # Skip snapshots (since they do not appear as steps in the dag).
-        if step_info["channel"] in ["snapshot", "walden"]:
+        if step_info["channel"] in ["snapshot"]:
             log.info(f"Skipping snapshot: {step}")
             return
 

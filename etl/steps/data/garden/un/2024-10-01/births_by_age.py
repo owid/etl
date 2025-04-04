@@ -29,15 +29,15 @@ def run(dest_dir: str) -> None:
     tb = tb[~msk]
     # Move each age-group to a decade
     dict_age = {
-        "10-14": "Teenage",
-        "15-19": "Teenage",
-        "20-24": "Twenties",
-        "25-29": "Twenties",
-        "30-34": "Thirties",
-        "35-39": "Thirties",
-        "40-44": "Forties",
-        "45-49": "Forties",
-        "50-54": "Fifties",
+        "10-14": "10-19",
+        "15-19": "10-19",
+        "20-24": "20-29",
+        "25-29": "20-29",
+        "30-34": "30-39",
+        "35-39": "30-39",
+        "40-44": "40-49",
+        "45-49": "40-49",
+        "50-54": "50-54",
     }
     tb["decadal_age"] = tb["age"].map(dict_age)
     tb = tb.groupby(["country", "year", "decadal_age"])["births"].sum().reset_index()

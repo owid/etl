@@ -2,8 +2,9 @@ meta:
   origin:
     producer: World Health Organization
     title: COVID-19 Dashboard
-    description: Daily COVID-19 cases and deaths by date reported to WHO
-    description_snapshot: |-
+    description: |-
+      Daily COVID-19 cases and deaths by date reported to WHO.
+
       From the 31 December 2019 to the 21 March 2020, WHO collected the numbers of confirmed COVID-19 cases and deaths through official communications under the International Health Regulations (IHR, 2005), complemented by monitoring the official ministries of health websites and social media accounts. Since 22 March 2020, global data is compiled through WHO region-specific dashboards, and/or aggregate count data reported to WHO headquarters.
 
       WHO COVID-19 Dashboard is updated every Friday for the period of two weeks prior.
@@ -22,12 +23,12 @@ meta:
     version_producer: WHO COVID-19 Dashboard - Daily cases and deaths
     url_main: https://covid19.who.int/
     url_download: https://srhdpeuwpubsa.blob.core.windows.net/whdh/COVID/WHO-COVID-19-global-daily-data.csv
-    date_accessed: 2025-02-05
-    date_published: '2024-07-07'
+    date_accessed: 2025-04-04
+    date_published: '2025'
     license:
       name: CC BY 4.0
       url: https://data.who.int/dashboards/covid19/
 outs:
-  - md5: ba949c80c6751f2c863a2695c16b2e26
-    size: 20146281
+  - md5: 2e6f826cba9f87c79dbdc068c1d19e8b
+    size: 20778262
     path: cases_deaths.csv

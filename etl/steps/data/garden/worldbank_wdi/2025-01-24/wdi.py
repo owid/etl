@@ -23,6 +23,26 @@ memory = Memory(CACHE_DIR, verbose=0)
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define GDP/GDP per capita indicators in current US$ and their counterpart in constant LCU
+GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
+
+# Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
+BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
+
+# Define regions for population weighted aggregations of GDP
+REGIONS = [
+    "Asia",
+    "Europe",
+    "Africa",
+    "North America",
+    "South America",
+    "Oceania",
+    "World",
+]
+
+# Define the fraction of allowed NaNs per year for the population weighted aggregations
+FRAC_ALLOWED_NANS_PER_YEAR = 0.2
+
 
 def run(dest_dir: str) -> None:
     log.info("wdi.start")
@@ -73,6 +93,17 @@ def run(dest_dir: str) -> None:
 
     # add regions to remittance data
     tb_garden = add_regions_to_remittance_data(tb_garden, ds_regions, ds_income_groups)
+
+    # Adjust GDP indicators in current US$ to constant US$ using the growth of the same indicator in LCU
+    for gdp_current_usd, gdp_constant_lcu in GDP_INDICATORS.items():
+        tb_garden = adjust_current_to_constant_usd(
+            tb=tb_garden,
+            indicator_current_usd=gdp_current_usd,
+            indicator_constant_lcu=gdp_constant_lcu,
+            base_year=BASE_YEAR_FOR_CONSTANT_USD_GDP,
+            ds_regions=ds_regions,
+            ds_population=ds_population,
+        )
 
     ####################################################################################################################
 
@@ -604,5 +635,130 @@ def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset
 
     # Set index again
     tb = tb.format(["country", "year"])
+
+    return tb
+
+
+def adjust_current_to_constant_usd(
+    tb: Table,
+    indicator_current_usd: str,
+    indicator_constant_lcu: str,
+    base_year: int,
+    ds_regions: Dataset,
+    ds_population: Dataset,
+) -> Table:
+    """
+    Adjust current LCU indicators to constant US$/int-$ using a deflator indicator and the base year.
+    The indicators to use have to be in local currency units for this to work.
+    The function works equally if the deflator is CPI or a GDP deflator, or any other deflator.
+
+    Available deflator indicators in WDI:
+
+    GDP deflators
+        ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
+        ny_gdp_defl_zs, GDP deflator (base year varies by country)
+
+    CPI deflators
+        fp_cpi_totl, Consumer price index (2010 = 100)
+
+    Available conversion indicators in WDI:
+
+    Exchange rates
+        pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+        pa_nus_atls, DEC alternative conversion factor (LCU per US$)
+
+    PPP conversion factors
+        pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
+        pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
+    """
+
+    tb = tb.reset_index()
+
+    tb_adjusted = tb[["country", "year"] + [indicator_current_usd] + [indicator_constant_lcu]].copy()
+
+    # Create a new table with the data only for the base year
+    tb_base_year = tb_adjusted[tb_adjusted["year"] == base_year].reset_index(drop=True)
+
+    # Merge the two tables
+    tb_adjusted = pr.merge(
+        tb_adjusted,
+        tb_base_year[["country", indicator_current_usd, indicator_constant_lcu]],
+        on="country",
+        how="left",
+        suffixes=("", "_base_year"),
+    )
+
+    # Divide the indicator in constant LCU by the indicator in constant LCU in the base year
+    tb_adjusted[f"{indicator_constant_lcu}_ratio"] = (
+        tb_adjusted[indicator_constant_lcu] / tb_adjusted[f"{indicator_constant_lcu}_base_year"]
+    )
+
+    # Adjust the indicator to constant US$
+    tb_adjusted[f"{indicator_current_usd}_adjusted"] = (
+        tb_adjusted[f"{indicator_current_usd}_base_year"] * tb_adjusted[f"{indicator_constant_lcu}_ratio"]
+    )
+
+    tb_adjusted = add_population_weighted_aggregations(
+        tb=tb_adjusted,
+        indicator=f"{indicator_current_usd}_adjusted",
+        ds_regions=ds_regions,
+        ds_population=ds_population,
+    )
+
+    # Merge the adjusted indicators back to the original table
+    tb = pr.merge(
+        tb,
+        tb_adjusted[["country", "year"] + [f"{indicator_current_usd}_adjusted"]],
+        on=["country", "year"],
+        how="outer",
+    )
+
+    # Reformat again
+    tb = tb.format()
+
+    return tb
+
+
+def add_population_weighted_aggregations(
+    tb: Table, indicator: str, ds_regions: Dataset, ds_population: Dataset
+) -> Table:
+    """
+    Add population weighted aggregations for the given indicator.
+    This is used together with the adjust_current_to_constant_usd function to calculate constant US$ indicators.
+    """
+    tb = tb.copy()
+
+    # Remove regions from table
+    tb = tb[~tb["country"].isin(REGIONS)].reset_index(drop=True)
+
+    # Add population to the table
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+
+    # Multiply the indicator by the population to get the weighted value
+    tb[f"{indicator}_weighted"] = tb[indicator] * tb["population"]
+
+    # Add regional aggregates for these indicators
+    tb_regions = geo.add_regions_to_table(
+        tb=tb,
+        aggregations={
+            f"{indicator}_weighted": "sum",
+            "population": "sum",
+        },
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    )
+
+    # Filter only by regions
+    tb_regions = tb_regions[tb_regions["country"].isin(REGIONS)].reset_index(drop=True)
+
+    # Divide the weighted indicator by the population to get the weighted average
+    tb_regions[indicator] = tb_regions[f"{indicator}_weighted"] / tb_regions["population"]
+
+    # Keep only the columns we need
+    tb_regions = tb_regions[["country", "year", indicator]]
+
+    # Merge the regional data back to the original table
+    tb = pr.concat([tb, tb_regions], ignore_index=True)
 
     return tb

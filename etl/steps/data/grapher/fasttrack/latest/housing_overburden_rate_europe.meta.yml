@@ -1,0 +1,20 @@
+dataset:
+  title: DRAFT Housing Overburden Rate Europe
+  description: ''
+tables:
+  housing_overburden_rate_europe:
+    variables:
+      housing_cost_overburden_rate_cities:
+        title: Housing cost overburden rate cities
+        unit: ''
+      housing_cost_overburden_rate_towns_and_suburbs:
+        title: Housing cost overburden rate towns and suburbs
+        unit: ''
+      housing_cost_overburden_rate_rural_areas:
+        title: Housing cost overburden rate rural areas
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

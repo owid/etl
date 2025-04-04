@@ -11,11 +11,10 @@ GDP are included.
 
 """
 
-import re
-
 import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Origin, Table
+from owid.catalog.utils import remove_details_on_demand
 from structlog import get_logger
 
 from etl.helpers import PathFinder, create_dataset
@@ -303,16 +302,6 @@ def prepare_outputs(combined: Table, ds_regions: Dataset) -> Table:
     combined = combined.format()
 
     return combined
-
-
-def remove_details_on_demand(text: str) -> str:
-    # Remove references to details on demand from a text.
-    # Example: "This is a [description](#dod:something)." -> "This is a description."
-    regex = r"\(\#dod\:.*\)"
-    if "(#dod:" in text:
-        text = re.sub(regex, "", text).replace("[", "").replace("]", "")
-
-    return text
 
 
 def prepare_codebook(tb: Table) -> pd.DataFrame:

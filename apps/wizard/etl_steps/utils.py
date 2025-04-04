@@ -3,9 +3,9 @@ import os
 import streamlit as st
 
 from apps.wizard.utils import WIZARD_DIR
-from etl.helpers import read_json_schema
+from etl.dag_helpers import load_dag
+from etl.files import read_json_schema
 from etl.paths import DAG_DIR, SCHEMAS_DIR
-from etl.steps import load_dag
 
 # Step icons
 STEP_ICONS = {
@@ -27,18 +27,17 @@ def load_datasets(included_str) -> list[str]:
 
 
 # Get list of available tags from DB (only those used as topic pages)
-# If can't connect to DB, use TAGS_DEFAULT instead
-TAGS_DEFAULT = [
-    "Uncategorized",
+# If can't connect to DB, and for some reason can't access the schema (set TAGS_DEFAULT)
+TAGS_DEFAULT_FALLBACK = [
     "Access to Energy",
     "Age Structure",
     "Agricultural Production",
     "Air Pollution",
     "Alcohol Consumption",
     "Animal Welfare",
+    "Antibiotics & Antibiotic Resistance",
     "Artificial Intelligence",
     "Biodiversity",
-    "Biological & Chemical Weapons",
     "Books",
     "Burden of Disease",
     "CO2 & Greenhouse Gas Emissions",
@@ -70,10 +69,10 @@ TAGS_DEFAULT = [
     "Farm Size",
     "Fertility Rate",
     "Fertilizers",
-    "Financing Healthcare",
     "Fish & Overfishing",
     "Food Prices",
     "Food Supply",
+    "Foreign Aid",
     "Forests & Deforestation",
     "Fossil Fuels",
     "Gender Ratio",
@@ -82,6 +81,7 @@ TAGS_DEFAULT = [
     "Government Spending",
     "HIV/AIDS",
     "Happiness & Life Satisfaction",
+    "Healthcare Spending",
     "Homelessness",
     "Homicides",
     "Human Development Index (HDI)",
@@ -104,13 +104,13 @@ TAGS_DEFAULT = [
     "Maternal Mortality",
     "Meat & Dairy Production",
     "Mental Health",
+    "Metals & Minerals",
     "Micronutrient Deficiency",
     "Migration",
     "Military Personnel & Spending",
     "Mpox (monkeypox)",
     "Natural Disasters",
     "Neglected Tropical Diseases",
-    "Neurodevelopmental Disorders",
     "Nuclear Energy",
     "Nuclear Weapons",
     "Obesity",
@@ -124,9 +124,6 @@ TAGS_DEFAULT = [
     "Polio",
     "Population Growth",
     "Poverty",
-    "Pre-Primary Education",
-    "Primary & Secondary Education",
-    "Quality of Education",
     "Renewable Energy",
     "Research & Development",
     "Sanitation",
@@ -138,7 +135,6 @@ TAGS_DEFAULT = [
     "Taxation",
     "Technological Change",
     "Terrorism",
-    "Tertiary Education",
     "Tetanus",
     "Time Use",
     "Tourism",
@@ -146,6 +142,7 @@ TAGS_DEFAULT = [
     "Transport",
     "Trust",
     "Tuberculosis",
+    "Uncategorized",
     "Urbanization",
     "Vaccination",
     "Violence Against Children & Children's Rights",
@@ -185,5 +182,13 @@ ADD_DAG_OPTIONS = [dag_not_add_option] + dag_files
 
 # Read schema
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")
+DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")
 # Get properties for origin in schema
 SCHEMA_ORIGIN = SNAPSHOT_SCHEMA["properties"]["meta"]["properties"]["origin"]["properties"]
+# Tags
+try:
+    TAGS_DEFAULT = DATASET_SCHEMA["properties"]["tables"]["additionalProperties"]["properties"]["variables"][
+        "additionalProperties"
+    ]["properties"]["presentation"]["properties"]["topic_tags"]["items"]["enum"]
+except Exception:
+    TAGS_DEFAULT = TAGS_DEFAULT_FALLBACK

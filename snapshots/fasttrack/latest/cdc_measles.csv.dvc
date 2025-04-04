@@ -11,16 +11,16 @@ meta:
     attribution_short: CDC
     url_main: https://www.cdc.gov/mmwr/mmwr_nd/index.html
     url_download: |-
-      https://docs.google.com/spreadsheets/d/e/2PACX-1vSlDQPLtCteA_s1eNjTu1ZphTnuva0Zfs5zGs34BlFQuanv8I25tEpRKdzwMPMpcmKq99MVxysaqT4p/pub?output=csv
-    date_accessed: '2025-01-27'
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vTcu_WI1TdrToo3ZXgdz-SMt9hatTEsiRcMXGVNZ5gGqTmGofV2b_-6_T6CSYRaT_qKpsm_Sup_rOlf/pub?output=csv
+    date_accessed: '2025-04-02'
     date_published: '2016'
     license:
       url: https://wonder.cdc.gov/wonder/help/faq.html#8
-  name: CDC Summary of Notifiable Infectious Diseases - Measles
+  name: CDC Summary of Notifiable Infectious Diseases - Measles (2002-2015)
   description: ''
   license:
     url: https://wonder.cdc.gov/wonder/help/faq.html#8
 outs:
-  - md5: f22a05e7e8d8ba595d1bee232d61089c
-    size: 5997
+  - md5: 9534db6d3240e384e12ff410a8aa1b33
+    size: 21080
     path: cdc_measles.csv

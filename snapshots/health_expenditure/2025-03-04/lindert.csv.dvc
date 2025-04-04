@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: The rise of social spending (1880-1930)
+    description: |-
+      A closer look at the dawn of social spending before 1930 reinterprets the timing, sources, and effects of its rise. New data and tests suggest that income growth played less of a role in shaping the rise of social transfers than did democracy, demography, and religion. Even in that early half-century the aging of the adult population was a leading force raising government transfers, especially pensions, and cutting support for schooling.
+    date_published: "1994-01-01"
+    title_snapshot: The rise of social spending (1880-1930) - Table 1D
+    description_snapshot: |-
+      Government subsidies for health care, 1880-1930, as percentage of national product at current prices.
+
+    # Citation
+    producer: Lindert
+    citation_full: |-
+      Lindert, P. H. (1994). The Rise of Social Spending, 1880-1930. Table 1D. Explorations in Economic History, 31(1), 1-37. https://doi.org/10.1006/exeh.1994.1001
+    attribution_short: Lindert
+
+    # Files
+    url_main: https://www.sciencedirect.com/science/article/abs/pii/S0014498384710011
+    date_accessed: 2025-03-04
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.sciencedirect.com/science/article/abs/pii/S0014498384710011
+
+outs:
+  - md5: 1cfea82a3a891732901a3fbf441a9260
+    size: 944
+    path: lindert.csv

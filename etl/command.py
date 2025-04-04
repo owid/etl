@@ -25,13 +25,13 @@ import structlog
 from ipdb import launch_ipdb_on_exception
 
 from etl import config, files, paths
+from etl.dag_helpers import load_dag
 from etl.steps import (
     DAG,
     DataStep,
     GrapherStep,
     Step,
     compile_steps,
-    load_dag,
     parse_step,
     select_dirty_steps,
 )
@@ -79,7 +79,7 @@ log = structlog.get_logger()
     "--export/--no-export",
     default=False,
     type=bool,
-    help="Run export steps like writing explorer TSV file to owid-content repository _(OWID staff only, access required)_",
+    help="Run export steps like saving explorer _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -292,8 +292,29 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # if export is not set, remove all steps
-    if not export:
+    if export:
+        # If there were any "export://multidim" or "export://explorers" steps, keep them in the dag, to be executed.
+        for step in list(dag.keys()):
+            if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
+                # If private is false and any of the dependencies are private, continue
+                if not private and any(_is_private_step(dep) for dep in dag[step]):
+                    continue
+
+                # We want to execute export steps after any grapher://grapher steps,
+                # to ensure that any indicators required by the mdim step are already pushed to DB.
+                # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
+                dag[step] = {
+                    re.sub(r"^(data|data-private)://", "grapher://", dep)
+                    if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)
+                    else dep
+                    for dep in dag[step]
+                }
+
+        # Finally, ensure that the added grapher://grapher steps will be executed,
+        # by activating the "grapher" flag.
+        grapher = True
+    else:
+        # If there were any "export://" steps in the dag, remove them.
         dag = {step: deps for step, deps in dag.items() if not step.startswith("export://")}
 
     # If --grapher is set, add all steps for upserting to DB
@@ -680,10 +701,10 @@ def _check_dag_completeness(dag: DAG) -> None:
     """Make sure the DAG is complete, i.e. all dependencies are there."""
     for step, deps in dag.items():
         for dep in deps:
-            if re.match(r"^(snapshot|walden|snapshot-private|walden-private|github|etag)://", dep):
+            if re.match(r"^(snapshot|snapshot-private|github|etag)://", dep):
                 pass
             elif dep not in dag:
-                raise ValueError(f"Step {step} depends {dep} which is not in the DAG.")
+                raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")
 
 
 if __name__ == "__main__":

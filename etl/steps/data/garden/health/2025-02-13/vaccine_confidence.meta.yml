@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+    unit: "%"
+    short_unit: "%"
+    display:
+      numDecimalPlaces: 1
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  vaccine_confidence:
+    variables:
+      children:
+        title: Share who agree vaccines are important for children to have
+        description_short: The share of people who responded that they "strongly agree" or "somewhat agree" with the statement 'I think vaccines are important for children to have'.
+      safe:
+        title: Share who agree vaccines are safe
+        description_short: The share of people who responded that they "strongly agree" or "somewhat agree" with the statement 'I think vaccines are safe'.
+      effective:
+        title: Share who agree vaccines are effective
+        description_short: The share of people who responded that they "strongly agree" or "somewhat agree" with the statement 'I think vaccines are effective'.
+      beliefs:
+        title: Share who agree vaccines are compatible with their religious beliefs
+        description_short: The share of people who responded that they "strongly agree" or "somewhat agree" with the statement 'I think vaccines are compatible with my religious beliefs'.

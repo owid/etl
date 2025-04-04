@@ -55,6 +55,9 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
   data://grapher/un/2024-07-12/un_wpp_full:
     - data://garden/un/2024-07-12/un_wpp
+  export://explorers/un/latest/un_wpp:
+    - data://grapher/un/2024-07-12/un_wpp
+    - data://grapher/un/2024-07-12/un_wpp_full
 
   # UN WPP (2022)
   data://meadow/un/2022-07-11/un_wpp:
@@ -62,8 +65,6 @@ steps:
   data://garden/un/2022-07-11/un_wpp:
     - data://meadow/un/2022-07-11/un_wpp
   data://grapher/un/2022-07-11/un_wpp:
-    - data://garden/un/2022-07-11/un_wpp
-  data://explorers/un/2022/un_wpp:
     - data://garden/un/2022-07-11/un_wpp
 
   # WPP Historical comparison
@@ -343,3 +344,11 @@ steps:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital_proj
   data://grapher/demography/2024-12-06/wittgenstein_human_capital:
     - data://garden/demography/2024-12-06/wittgenstein_human_capital
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/demography/2025-01-23/us_state_population:
+    - snapshot://demography/2025-01-23/us_state_population.csv
+  data://garden/demography/2025-01-23/us_state_population:
+    - data://meadow/demography/2025-01-23/us_state_population

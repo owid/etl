@@ -3,7 +3,8 @@
 import numpy as np
 import owid.catalog.processing as pr
 
-from etl.helpers import PathFinder, create_dataset, last_date_accessed
+from etl.catalog_helpers import last_date_accessed
+from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -58,7 +59,12 @@ def run(dest_dir: str) -> None:
     # Replace the decadal values with NaN for all years except the start of each decade
     combined.loc[combined["year"] % 10 != 0, ["temperature_anomaly_decadal", "temperature_2m_decadal"]] = np.nan
     combined = combined.drop(columns=["decade"])
-    # Filter rows where the year is less than or equal to 2024
+    # Remove the latest as it's often not representation of the full year
+    latest_year = combined["year"].max()
+    combined = combined[combined["year"] != latest_year]
+
+    # Set decadal values to NaN for non-decadal years
+    combined.loc[combined["year"] % 10 != 0, ["temperature_anomaly_decadal", "temperature_2m_decadal"]] = np.nan
     combined = combined.set_index(["year", "country"], verify_integrity=True)
 
     # Save outputs.

@@ -6,6 +6,8 @@ definitions:
         - Marriages & Divorces
     display:
       numDecimalPlaces: 1
+    description_processing: The UN's country profiles show different household subtypes across years because their data sources use varying classification systems. For example, in the US, one of the data sources categorizes households that include extended families and non-relatives, whereas another source appears to classify these households as "unknown." As a result, when the total share of household types does not sum to 100%, we assign the remaining share as "unknown."
+
 
 
 # Learn more about the available fields:
@@ -17,16 +19,6 @@ dataset:
 tables:
   households:
     variables:
-       average_household_size__number_of_members:
-         title: The average number members per household
-         unit: people
-         short_unit: ''
-         description_short: The average number of usual residents per household.
-
-       female_head_of_household__percentage_of_households:
-          title: Percentage of households with a female head of household
-          unit: "%"
-          short_unit: "%"
 
        one_person:
          title: One person households
@@ -46,29 +38,27 @@ tables:
           short_unit: "%"
           description_short: Percentage of households comprised of a married or in-partnership couple and their children (biological, step, and adopted/foster children), irrespective of children’s ages, and no one else.
 
+       single_parent_with_children_separate:
+          title: Single parent with children households (for grapher)
+          unit: "%"
+          short_unit: "%"
+          description_short: Percentage of households comprised of a single parent and his or her children (biological, step, and adopted/foster children), irrespective of children’s ages, and no one else
+          presentation:
+            title_public: Single parent with children households
+          display:
+            name: Single parent with children households
+
        single_parent_with_children:
           title: Single parent with children households
           unit: "%"
           short_unit: "%"
           description_short: Percentage of households comprised of a single parent and his or her children (biological, step, and adopted/foster children), irrespective of children’s ages, and no one else
 
-       single_mother_with_children:
-          title: Single mother with children households
-          unit: "%"
-          short_unit: "%"
-          description_short: Percentage of households comprised of a single mother and her children (biological, step, and adopted/foster children), irrespective of children’s ages, and no one else.
-
-       single_father_with_children:
-          title: Single father with children households
-          unit: "%"
-          short_unit: "%"
-          description_short: Percentage of households comprised of a single father and his children (biological, step, and adopted/foster children), irrespective of children’s ages, and no one else.
-
        extended_family:
           title: Extended family households
           unit: "%"
           short_unit: "%"
-          description_short: Percentage of households that are not couple only, couple with children or single parent with children households and in which all household members are related to each other
+          description_short: Percentage of households that are not couple only, couple with children or single parent with children households and in which all household members are related to each other.
 
        non_relatives:
           title: Non-relatives households
@@ -82,26 +72,3 @@ tables:
           short_unit: "%"
           description_short: Percentage of households that include one or more members whose relationship to the head of household is unknown or not reported.
 
-       nuclear:
-          title: Nuclear households
-          unit: "%"
-          short_unit: "%"
-          description_short: Sum of the percentages of couple only households, couple with children households, and single parent with children households.
-
-       multi_generation:
-          title: Multi-generation households
-          unit: "%"
-          short_unit: "%"
-          description_short: Percentage of households that include two or more generations of related members aged 20 years or over.
-
-       three_generation:
-          title: Three-generation households
-          unit: "%"
-          short_unit: "%"
-          description_short: Percentage of households that include three or more generations of related members, irrespective of age.
-
-       skip_generation:
-         title: Skip-generation households
-         unit: "%"
-         short_unit: "%"
-         description_short: Percentage of households that consist of grandparents and their grandchildren, but none of the parents of the grandchildren.

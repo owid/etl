@@ -1,14 +1,23 @@
 definitions:
-  table_econ: grapher/excess_mortality/latest/excess_mortality_economist/excess_mortality_economist
-  table_who: grapher/covid/latest/xm_who/xm_who
-  indicator_confirmed: grapher/covid/latest/cases_deaths/cases_deaths#total_deaths
-
+  common_indicators:
+    confirmed: &confirmed
+      catalogPath: "cases_deaths#total_deaths"
+      display:
+        name: "Confirmed deaths"
+        color: "#000000"
+  common_views:
+    - config:
+        title: "Estimated cumulative excess deaths during COVID-19"
+        subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
+        originUrl: ourworldindata.org/coronavirus
+        hideAnnotationFieldsInTitle:
+          time: true
 title:
   title: Estimated cumulative excess deaths during COVID-19
-  titleVariant: "by model"
-defaultSelection:
+  title_variant: "by model"
+default_selection:
   - World
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:
@@ -21,85 +30,114 @@ dimensions:
       - slug: econ
         name: The Economist
         description: null
-      - slug: econ2
-        name: The Economist (per 100k)
-        description: null
       - slug: who
         name: WHO
         description: null
+  - slug: normalize
+    name: Normalization
+    choices:
+      - slug: total
+        name: Absolute number
+        description: null
+      - slug: per_100k
+        name: Per 100,000 people
+        description: Normalize by 100,000 people living in the country or region
 
 views:
   # The Economist + WHO
   - dimensions:
       model: all
+      normalize: total
     indicators:
       y:
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths"
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_top"
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_bot"
-        - "{definitions.table_who}#cumul_excess_mean"
-        - "{definitions.table_who}#cumul_excess_high"
-        - "{definitions.table_who}#cumul_excess_low"
-        - "{definitions.indicator_confirmed}"
-
-    config:
-      title: "Estimated cumulative excess deaths during COVID-19"
-      subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
-      originUrl: ourworldindata.org/coronavirus
-      hideAnnotationFieldsInTitle:
-        time: true
-
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths"
+          display:
+            name: "The Economist (central)"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top"
+          display:
+            name: "The Economist (high)"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+          display:
+            name: "The Economist (low)"
+            color: "#DAAE9E"
+        - catalogPath: "xm_who#cumul_excess_mean"
+          display:
+            name: "WHO (mean)"
+            color: "#4C6A9C"
+        - catalogPath: "xm_who#cumul_excess_high"
+          display:
+            name: "WHO (high)"
+            color: "#AABBDA"
+        - catalogPath: "xm_who#cumul_excess_low"
+          display:
+            name: "WHO (low)"
+            color: "#AABBDA"
+        - *confirmed
 
   # The Economist
   - dimensions:
       model: econ
+      normalize: total
     indicators:
       y:
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths"
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_top"
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_bot"
-        - "{definitions.indicator_confirmed}"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths"
+          display:
+            name: "Central estimate"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top"
+          display:
+            name: "95% CI top"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot"
+          display:
+            name: "95% CI bottom"
+            color: "#DAAE9E"
+        - *confirmed
 
-    config:
-      title: "Estimated cumulative excess deaths during COVID-19"
-      subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
-      originUrl: ourworldindata.org/coronavirus
-      hideAnnotationFieldsInTitle:
-        time: true
-
-  # The Economist
+  # The Economist (100k)
   - dimensions:
-      model: econ2
+      model: econ
+      normalize: per_100k
     indicators:
       y:
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_per_100k"
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k"
-        - "{definitions.table_econ}#cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k"
-        - "{definitions.indicator_confirmed}"
-
-    config:
-      title: "Estimated cumulative excess deaths during COVID-19"
-      subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
-      originUrl: ourworldindata.org/coronavirus
-      hideAnnotationFieldsInTitle:
-        time: true
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_per_100k"
+          display:
+            name: "Central estimate"
+            color: "#B13507"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_top_per_100k"
+          display:
+            name: "95% CI top"
+            color: "#DAAE9E"
+        - catalogPath: "excess_mortality_economist#cumulative_estimated_daily_excess_deaths_ci_95_bot_per_100k"
+          display:
+            name: "95% CI bottom"
+            color: "#DAAE9E"
+        - catalogPath: "cases_deaths#total_deaths_per_100k"
+          display:
+            name: "Confirmed deaths"
+            color: "#000000"
 
   # WHO
   - dimensions:
       model: who
+      normalize: total
     indicators:
       y:
-        - "{definitions.table_who}#cumul_excess_mean"
-        - "{definitions.table_who}#cumul_excess_high"
-        - "{definitions.table_who}#cumul_excess_low"
-        - "{definitions.indicator_confirmed}"
-
-    config:
-      title: "Estimated cumulative excess deaths during COVID-19"
-      subtitle: For countries that have not reported all-cause mortality data for a given week, an estimate is shown, with uncertainty interval. If reported data is available, that value only is shown. For comparison, cumulative confirmed COVID-19 deaths are shown.
-      originUrl: ourworldindata.org/coronavirus
-      hideAnnotationFieldsInTitle:
-        time: true
+        - catalogPath: "xm_who#cumul_excess_mean"
+          display:
+            name: "Mean estimate"
+            color: "#4C6A9C"
+        - catalogPath: "xm_who#cumul_excess_high"
+          display:
+            name: "High estimate"
+            color: "#AABBDA"
+        - catalogPath: "xm_who#cumul_excess_low"
+          display:
+            name: "Low estimate"
+            color: "#AABBDA"
+        - *confirmed
 
   # # IHME
   # - dimensions:

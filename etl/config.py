@@ -1,5 +1,5 @@
 #
-#  config.py
+#  NOTE: only allowed etl-dependency is etl.paths.
 #
 
 """
@@ -21,14 +21,17 @@ import pandas as pd
 import sentry_sdk
 import structlog
 from dotenv import dotenv_values, load_dotenv
+from joblib import Memory
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
-from etl.paths import BASE_DIR
+from etl.paths import BASE_DIR, CACHE_DIR
 
 log = structlog.get_logger()
 
 ENV_FILE = Path(env.get("ENV_FILE", BASE_DIR / ".env"))
+
+memory = Memory(CACHE_DIR, verbose=0)
 
 
 def get_username():
@@ -187,6 +190,9 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
 
+# if set, always upload grapher data & metadata JSON files even if checksums match
+FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
+
 # if set, don't delete indicators from MySQL, only append / update new ones
 # you can use this to only process subset of indicators in your step to
 # speed up development. It's up to you how you define filtering logic in your step
@@ -240,7 +246,7 @@ GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.006.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.007.json"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -586,3 +592,14 @@ OWID_ENV = OWIDEnv(
         DB_HOST=DB_HOST,
     )
 )
+
+
+# Validate config
+def no_trailing_slash(url: str | None) -> None:
+    if url is not None and url.endswith("/"):
+        raise ValueError(f"Env {url} should not have a trailing slash.")
+
+
+env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
+for env_var in env_vars:
+    no_trailing_slash(env_var)

@@ -1,47 +1,28 @@
 import copy
-from dataclasses import dataclass, field, is_dataclass
-from functools import lru_cache
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Literal, Optional, Set, Union, cast
 
-import jinja2
 import numpy as np
 import pandas as pd
 import pymysql
 import sqlalchemy
 import structlog
+from jsonschema import validate
 from owid import catalog
-from owid.catalog import warnings
+from owid.catalog import Table, jinja, warnings
 from owid.catalog.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
+from owid.catalog.yaml_metadata import merge_with_shared_meta
 from sqlalchemy import text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
+from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.db import get_engine, read_sql
-from etl.files import yaml_dump
+from etl.files import get_schema_from_url, yaml_dump
 from etl.grapher.io import add_entity_code_and_name, trim_long_variable_name
 
 log = structlog.get_logger()
-
-jinja_env = jinja2.Environment(
-    block_start_string="<%",
-    block_end_string="%>",
-    variable_start_string="<<",
-    variable_end_string=">>",
-    comment_start_string="<#",
-    comment_end_string="#>",
-    trim_blocks=True,
-    lstrip_blocks=True,
-    undefined=jinja2.StrictUndefined,
-)
-
-
-# Helper function to raise an error with << raise("uh oh...") >>
-def raise_helper(msg):
-    raise Exception(msg)
-
-
-jinja_env.globals["raise"] = raise_helper
 
 # this might work too pd.api.types.is_integer_dtype(col)
 INT_TYPES = tuple(
@@ -122,11 +103,9 @@ def _yield_wide_table(
             # Silence - DeprecationWarning: Passing a BlockManager to Table is deprecated and will raise
             # in a future version. Use public APIs instead.
             with warnings.ignore_warnings([DeprecationWarning]):
+                mask = table_to_yield[column].notna() if na_action == "drop" else slice(None)
                 # NOTE: this copy is important, otherwise we'd ruin metadata
-                tab = table_to_yield.loc[:, [column]].copy(deep=False)
-
-            # Drop NA values
-            tab = tab.dropna() if na_action == "drop" else tab
+                tab = table_to_yield.loc[mask, [column]].copy(deep=False)
 
             # Create underscored name of a new column from the combination of column and dimensions
             short_name = _underscore_column_and_dimensions(
@@ -146,8 +125,13 @@ def _yield_wide_table(
 
 def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any], column: str) -> catalog.VariableMeta:
     """Add dimensions to metadata and expand Jinja in metadata fields."""
-    # add info about dimensions to metadata
+    # Add info about dimensions to metadata
     if dim_dict:
+        meta.dimensions = {dim_name: sanitize_numpy(dim_value) for dim_name, dim_value in dim_dict.items()}
+        meta.original_short_name = column
+        meta.original_title = meta.title
+
+        # Soon to be deprecated
         meta.additional_info = {
             "dimensions": {
                 "originalShortName": column,
@@ -158,27 +142,18 @@ def _metadata_for_dimensions(meta: catalog.VariableMeta, dim_dict: Dict[str, Any
             }
         }
 
-    # Add dimensions to title (which will be used as variable name in grapher)
-    if meta.title:
-        # We use template as a title
-        if _uses_jinja(meta.title):
-            title_with_dims = _expand_jinja_text(meta.title, dim_dict)
-        # Otherwise use default
-        else:
-            title_with_dims = _title_column_and_dimensions(meta.title, dim_dict)
+    # If title doesn't contain Jinja, use default title with dimensions
+    if meta.title and not jinja._uses_jinja(meta.title):
+        meta.title = _title_column_and_dimensions(meta.title, dim_dict)
 
-        meta.title = str(title_with_dims)
-
-    # traverse metadata and expand Jinja
+    # Render Jinja template with dimensions
     try:
-        meta = _expand_jinja(meta, dim_dict)
+        return meta.render(dim_dict)
     except Exception as e:
         # Reraise with more context
         raise ValueError(
             f"Error expanding Jinja in metadata for column '{column}' with dim values: {dim_dict}.\n\nVariable metadata:\n\n{yaml_dump(meta.to_dict())}"
         ) from e
-
-    return meta
 
 
 def _create_dim_dict(dim_names: List[str], dim_values: List[Any]) -> Dict[str, Any]:
@@ -232,81 +207,19 @@ def long_to_wide(long_tb: catalog.Table) -> catalog.Table:
     return wide_tb
 
 
-def _uses_jinja(text: Optional[str]):
-    if not text:
-        return False
-    return "<%" in text or "<<" in text
-
-
-@lru_cache(maxsize=None)
-def _cached_jinja_template(text: str) -> jinja2.environment.Template:
-    return jinja_env.from_string(text)
-
-
-def _expand_jinja_text(text: str, dim_dict: Dict[str, str]) -> Union[str, bool]:
-    if not _uses_jinja(text):
-        return text
-
-    try:
-        # NOTE: we're stripping the result to avoid trailing newlines
-        out = _cached_jinja_template(text).render(dim_dict).strip()
-        # Convert strings to booleans. Getting boolean directly from Jinja is not possible
-        if out in ("false", "False", "FALSE"):
-            return False
-        elif out in ("true", "True", "TRUE"):
-            return True
-        return out
-    except jinja2.exceptions.TemplateSyntaxError as e:
-        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
-        raise e.__class__(new_message, e.lineno, e.name, e.filename) from e
-    except jinja2.exceptions.UndefinedError as e:
-        new_message = f"{e.message}\n\nDimensions:\n{dim_dict}\n\nTemplate:\n{text}\n"
-        raise e.__class__(new_message) from e
-
-
-def _expand_jinja(obj: Any, dim_dict: Dict[str, str]) -> Any:
-    """Expand Jinja in all metadata fields. This modifies the original object in place."""
-    if obj is None:
-        return None
-    elif isinstance(obj, str):
-        return _expand_jinja_text(obj, dim_dict)
-    elif is_dataclass(obj):
-        for k, v in obj.__dict__.items():
-            setattr(obj, k, _expand_jinja(v, dim_dict))
-        return obj
-    elif isinstance(obj, list):
-        return type(obj)([_expand_jinja(v, dim_dict) for v in obj])
-    elif isinstance(obj, dict):
-        return {k: _expand_jinja(v, dim_dict) for k, v in obj.items()}
-    else:
-        return obj
-
-
 def render_yaml_file(path: Union[str, Path], dim_dict: Dict[str, str]) -> Dict[str, Any]:
     """Load YAML file and render Jinja in all fields. Return a dictionary.
 
     Usage:
-        from etl.grapher import helpers as gh
-        from etl import paths
-
-        tb = Dataset(paths.DATA_DIR / "garden/who/2024-07-30/ghe")['ghe']
-        gh.render_variable_meta(tb.my_col.m, dim_dict={"sex": "male"})
-    """
-    meta = dynamic_yaml_to_dict(dynamic_yaml_load(path))
-    return _expand_jinja(meta, dim_dict)
-
-
-def render_variable_meta(meta: catalog.VariableMeta, dim_dict: Dict[str, str]) -> catalog.VariableMeta:
-    """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
-
-    Usage:
         # Create a playground.ipynb next to YAML file and run this in notebook
         from etl.grapher import helpers as gh
+
         m = gh.render_yaml_file("ghe.meta.yml", dim_dict={"sex": "male"})
         m['tables']['ghe']['variables']['death_count']
     """
-    # TODO: move this as a method to VariableMeta class
-    return _expand_jinja(meta.copy(), dim_dict)
+    path_or_io = merge_with_shared_meta(Path(path))
+    meta = dynamic_yaml_to_dict(dynamic_yaml_load(path_or_io))
+    return jinja._expand_jinja(meta, dim_dict)
 
 
 def _title_column_and_dimensions(title: str, dim_dict: Dict[str, Any]) -> str:
@@ -884,3 +797,86 @@ def adapt_table_with_dates_to_grapher(
         tb = tb.drop(columns=[date_column])
 
     return tb
+
+
+# TODO: Move to etl.grapher.helpers
+def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
+    """Check that the table is in the correct format for Grapher."""
+    from etl.grapher import helpers as gh
+
+    assert ds.metadata.title, "Dataset must have a title."
+
+    for tab in ds:
+        if {"year", "country"} <= set(tab.all_columns):
+            if "year" in tab.columns:
+                year = tab["year"]
+            else:
+                year = tab.index.get_level_values("year")
+            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
+        elif {"date", "country"} <= set(tab.all_columns):
+            pass
+        else:
+            raise AssertionError("Table must have columns country and year or date.")
+
+        for col in tab:
+            if col in ("year", "country"):
+                continue
+            catalog.utils.validate_underscore(col)
+            assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
+            assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
+            assert (
+                tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
+            ), f"Column `{col}` must have either sources or origins"
+
+            _validate_description_key(tab[col].m.description_key, col)
+            _validate_ordinal_variables(tab, col)
+            _validate_grapher_config(tab, col)
+
+            # Data Page title uses the following fallback
+            # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
+            # the Table tab
+            # [title_public > display.name > title] - [title_variant] - [attribution_short]
+            # and chart heading
+            # [grapher_config.title > title_public > display.name > title] - [grapher_config.subtitle > description_short]
+            #
+            # Warn if display.name (which is used for legend) exists and there's no title_public set. This
+            # would override the indicator title in the Data Page.
+            display_name = (tab[col].m.display or {}).get("name")
+            title_public = getattr(tab[col].m.presentation, "title_public", None)
+            if warn_title_public and display_name and not title_public:
+                warnings.warn(
+                    f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
+                    warnings.DisplayNameWarning,
+                )
+
+
+def _validate_grapher_config(tab: Table, col: str) -> None:
+    """Validate grapher config against given schema or against the default schema."""
+    grapher_config = getattr(tab[col].m.presentation, "grapher_config", None)
+    if grapher_config:
+        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
+
+        # Load schema and remove properties that are not relevant for the validation
+        schema = get_schema_from_url(grapher_config["$schema"])
+        # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
+        schema["required"] = []
+
+        validate(grapher_config, schema)
+
+
+def _validate_description_key(description_key: list[str], col: str) -> None:
+    if description_key:
+        assert not all(
+            len(x) == 1 for x in description_key
+        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+
+
+def _validate_ordinal_variables(tab: Table, col: str) -> None:
+    if tab[col].m.sort:
+        # Exclude NaN values, these will be dropped before inserting to the database.
+        vals = tab[col].dropna()
+
+        extra_values = set(vals) - set(vals.m.sort)
+        assert (
+            not extra_values
+        ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"

@@ -3,13 +3,14 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Antibiotics
+        - Antibiotics & Antibiotic Resistance
   pathogen_type: <% if pathogen_type == "Fungi" %>fungus<% elif pathogen_type == "Viruses" %>virus<% else  %><< pathogen_type.lower() >><% endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  non_redistributable: true
 
 tables:
   microbe_total_pathogens:

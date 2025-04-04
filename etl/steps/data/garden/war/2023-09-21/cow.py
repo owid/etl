@@ -121,7 +121,13 @@ END_YEAR_MAX_EXTRA = 2007
 END_YEAR_MAX_INTRA = 2014
 END_YEAR_MAX_INTER = 2003
 END_YEAR_MAX_NONSTATE = 2005
-END_YEAR_MAX = min([END_YEAR_MAX_EXTRA, END_YEAR_MAX_INTRA, END_YEAR_MAX_INTER, END_YEAR_MAX_NONSTATE])
+# The following parameter defines the last year that we allow for combined data.
+# All combined data after that year will be removed.
+# A priori, it seems reasonable that this year should be the minimum of the years defined above (since we shouldn't combine data from different sources on years where not all sources are informed).
+# However, it seems that inter-state data does *not* end in 2003, but later than 2007 (unclear when exactly, but it does not matter for now). There has simply been no interstate conflict between 2003 and 2007.
+# Therefore, instead of setting this limit to the minimum of the years above, we manually set it to 2007.
+# END_YEAR_MAX = min([END_YEAR_MAX_EXTRA, END_YEAR_MAX_INTRA, END_YEAR_MAX_INTER, END_YEAR_MAX_NONSTATE])
+END_YEAR_MAX = 2007
 # Conflict types
 CTYPE_EXTRA = "extra-state"
 CTYPE_INTRA = "intra-state"

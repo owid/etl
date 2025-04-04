@@ -5,10 +5,6 @@ steps:
   data://garden/regions/2023-01-01/regions:
   data://grapher/regions/2023-01-01/regions:
     - data://garden/regions/2023-01-01/regions
-  # WARNING: The following step exists for backward compatibility and should eventually be removed.
-  # Consider using external/owid_grapher/latest/regions instead.
-  data://grapher/regions/latest/regions:
-    - data://garden/regions/2023-01-01/regions
   # Create a step with regions data used by the owid-grapher repository.
   data://external/owid_grapher/latest/regions:
     - data://garden/regions/2023-01-01/regions
@@ -25,7 +21,7 @@ steps:
 
   # Others
   data://meadow/wb/2021-07-01/wb_income:
-    - walden://wb/2021-07-01/wb_income
+    - snapshot://wb/2021-07-01/wb_income.xlsx
   data://garden/wb/2021-07-01/wb_income:
     - data://meadow/wb/2021-07-01/wb_income
 
@@ -33,9 +29,6 @@ steps:
     - snapshot://ggdc/2020-10-01/ggdc_maddison.xlsx
   data://grapher/ggdc/2020-10-01/ggdc_maddison:
     - data://garden/ggdc/2020-10-01/ggdc_maddison
-
-  data://meadow/oecd/2016-06-01/regional_wellbeing:
-    - walden://oecd/2016-06-01/regional_wellbeing
 
   # Malnutrition
   data://grapher/malnutrition/2024-12-16/malnutrition:
@@ -92,23 +85,15 @@ steps:
 
   # Penn World Table
   data://meadow/ggdc/2022-11-28/penn_world_table:
-    - walden://ggdc/2021-06-18/penn_world_table
+    - snapshot://ggdc/2021-06-18/penn_world_table.xlsx
   data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts:
-    - walden://ggdc/2021-06-18/penn_world_table_national_accounts
+    - snapshot://ggdc/2021-06-18/penn_world_table_national_accounts.xlsx
     - data://garden/regions/2023-01-01/regions
   data://garden/ggdc/2022-11-28/penn_world_table:
     - data://meadow/ggdc/2022-11-28/penn_world_table
     - data://meadow/ggdc/2022-11-28/penn_world_table_national_accounts
   data://grapher/ggdc/2022-11-28/penn_world_table:
     - data://garden/ggdc/2022-11-28/penn_world_table
-
-  # Democracy and Human rights - V-Dem index
-  data://meadow/democracy/2023-03-02/vdem:
-    - snapshot://democracy/2023-03-02/vdem.csv
-  data://garden/democracy/2023-03-02/vdem:
-    - data://meadow/democracy/2023-03-02/vdem
-  data://grapher/democracy/2023-03-02/vdem:
-    - data://garden/democracy/2023-03-02/vdem
 
   # Microprocessor trend data
   data://meadow/technology/2023-03-08/microprocessor_trend:
@@ -143,50 +128,20 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
     - data://garden/technology/2023-03-16/hcctad
 
-  # Happiness report
-  data://meadow/happiness/2024-06-09/happiness:
-    - snapshot://happiness/2024-06-09/happiness.xls
-  data://meadow/happiness/2023-03-20/happiness:
-    - snapshot://happiness/2023-03-20/happiness.xls
-  data://meadow/happiness/2022-03-20/happiness:
-    - snapshot://happiness/2022-03-20/happiness.xls
-  data://meadow/happiness/2021-03-20/happiness:
-    - snapshot://happiness/2021-03-20/happiness.xls
-  data://meadow/happiness/2020-03-20/happiness:
-    - snapshot://happiness/2020-03-20/happiness.xls
-  data://meadow/happiness/2019-03-20/happiness:
-    - snapshot://happiness/2019-03-20/happiness.xls
-  data://meadow/happiness/2018-03-20/happiness:
-    - snapshot://happiness/2018-03-20/happiness.xls
-  data://meadow/happiness/2017-03-20/happiness:
-    - snapshot://happiness/2017-03-20/happiness.xlsx
-  data://meadow/happiness/2016-03-20/happiness:
-    - snapshot://happiness/2016-03-20/happiness.xlsx
-  data://meadow/happiness/2015-03-20/happiness:
-    - snapshot://happiness/2015-03-20/happiness.xlsx
-  data://meadow/happiness/2012-03-20/happiness:
-    - snapshot://happiness/2012-03-20/happiness.xlsx
 
-  data://garden/happiness/2023-03-20/happiness:
-    - data://meadow/happiness/2023-03-20/happiness
-    - data://meadow/happiness/2022-03-20/happiness
-    - data://meadow/happiness/2021-03-20/happiness
-    - data://meadow/happiness/2020-03-20/happiness
-    - data://meadow/happiness/2019-03-20/happiness
-    - data://meadow/happiness/2018-03-20/happiness
-    - data://meadow/happiness/2017-03-20/happiness
-    - data://meadow/happiness/2016-03-20/happiness
-    - data://meadow/happiness/2015-03-20/happiness
-    - data://meadow/happiness/2012-03-20/happiness
+  # World Happiness report (2025)
+  data://meadow/happiness/2025-03-28/happiness:
+    - snapshot://happiness/2025-03-28/happiness.xlsx
 
-  data://garden/happiness/2024-06-09/happiness:
-    - data://meadow/happiness/2024-06-09/happiness
-    - data://garden/happiness/2023-03-20/happiness
-    - data://garden/demography/2023-03-31/population
+  data://garden/happiness/2025-03-28/happiness:
+    - data://meadow/happiness/2025-03-28/happiness
+    - data://garden/demography/2024-07-15/population
+    - data://garden/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-03-11/income_groups
-  data://grapher/happiness/2024-06-09/happiness:
-    - data://garden/happiness/2024-06-09/happiness
+
+  data://grapher/happiness/2025-03-28/happiness:
+    - data://garden/happiness/2025-03-28/happiness
+
 
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
@@ -338,18 +293,9 @@ steps:
     - data://meadow/un/2023-10-30/un_members
     - data://garden/wb/2021-07-01/wb_income
     - data://garden/regions/2023-01-01/regions
-    - data://grapher/regions/latest/regions
     - data://garden/demography/2023-03-31/population
   data://grapher/un/2023-10-30/un_members:
     - data://garden/un/2023-10-30/un_members
-
-  # UNU-WIDER Government Revenue Dataset
-  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
-    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
-  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
-    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
-  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
-    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
 
   # World Bank - Worldwide Bureaucracy Indicators
   data://meadow/wb/2023-11-21/worldwide_bureaucracy_indicators:
@@ -393,13 +339,6 @@ steps:
   data://grapher/technology/2024-05-13/computer_memory_storage:
     - data://garden/technology/2024-05-13/computer_memory_storage
 
-  # European Social Survey - Trust questions
-  data://meadow/ess/2023-08-02/ess_trust:
-    - snapshot://ess/2023-08-02/ess_trust.csv
-    - data://garden/regions/2023-01-01/regions
-  data://garden/ess/2023-08-02/ess_trust:
-    - data://meadow/ess/2023-08-02/ess_trust
-
   # Latinobarómetro survey - Trust
   data://meadow/survey/2023-08-04/latinobarometro_trust:
     - snapshot://survey/2023-08-04/latinobarometro_trust.csv
@@ -419,6 +358,13 @@ steps:
     - data://garden/ess/2023-08-02/ess_trust
   data://grapher/survey/2023-08-04/trust_surveys:
     - data://garden/survey/2023-08-04/trust_surveys
+
+  # European Social Survey - Trust questions
+  data://meadow/ess/2023-08-02/ess_trust:
+    - snapshot://ess/2023-08-02/ess_trust.csv
+    - data://garden/regions/2023-01-01/regions
+  data://garden/ess/2023-08-02/ess_trust:
+    - data://meadow/ess/2023-08-02/ess_trust
 
   # Missing Data - Suicides
   data://garden/missing_data/2024-03-26/who_md_suicides:
@@ -446,14 +392,6 @@ steps:
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
-  # Refugee, Asylum and Migration Explorer:
-  export://explorers/migration/2024-08-05/migration:
-    - data://grapher/unicef/2024-07-30/child_migration
-    - data://grapher/un/2024-07-25/refugee_data
-    - data://grapher/un/2024-07-16/migrant_stock
-    - data://grapher/un/2024-07-12/un_wpp_full
-    - data://grapher/worldbank_wdi/2024-05-20/wdi
-    - data://grapher/idmc/2024-08-02/internal_displacement
 
   ######################################################################################################################
   # Map (Natural Earth)
@@ -529,14 +467,6 @@ steps:
   data://grapher/aviation_safety_network/2024-06-05/aviation_statistics:
     - data://garden/aviation_safety_network/2024-06-05/aviation_statistics
 
-  # Public Finances in Modern History dataset (IMF)
-  data://meadow/imf/2024-06-12/public_finances_modern_history:
-    - snapshot://imf/2024-06-12/public_finances_modern_history.xlsx
-  data://garden/imf/2024-06-12/public_finances_modern_history:
-    - data://meadow/imf/2024-06-12/public_finances_modern_history
-  data://grapher/imf/2024-06-12/public_finances_modern_history:
-    - data://garden/imf/2024-06-12/public_finances_modern_history
-
   # Same-Sex Marriage Around the World from Pew Research Center
   data://meadow/pew/2024-06-03/same_sex_marriage:
     - snapshot://pew/2024-06-03/same_sex_marriage.csv
@@ -602,7 +532,6 @@ steps:
     - snapshot-private://language/2024-07-17/ethnologue.zip
   data-private://garden/language/2024-07-17/ethnologue:
     - data-private://meadow/language/2024-07-17/ethnologue
-    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
@@ -635,18 +564,6 @@ steps:
     - snapshot://un/2024-08-27/un_sdg_dimension.json
   data://grapher/un/2024-08-27/un_sdg:
     - data://garden/un/2024-08-27/un_sdg
-
-  # OECD Official Development Assistance (ODA)
-  data://meadow/oecd/2024-08-21/official_development_assistance:
-    - snapshot://oecd/2024-08-21/official_development_assistance_dac1.zip
-    - snapshot://oecd/2024-08-21/official_development_assistance_dac2a.zip
-    - snapshot://oecd/2024-08-21/official_development_assistance_dac5.zip
-    - snapshot://oecd/2024-08-21/official_development_assistance_crs.zip
-  data://garden/oecd/2024-08-21/official_development_assistance:
-    - data://meadow/oecd/2024-08-21/official_development_assistance
-    - data://garden/demography/2024-07-15/population
-  data://grapher/oecd/2024-08-21/official_development_assistance:
-    - data://garden/oecd/2024-08-21/official_development_assistance
 
   # Oil Spills
   data://meadow/itopf/2024-10-16/oil_spills:
@@ -713,21 +630,6 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
-  # Migration distances
-  data://garden/migration/2024-11-19/migration_distance:
-    - data://garden/un/2024-07-16/migrant_stock
-    - data://garden/geography/2023-11-28/nat_earth_110
-  data://grapher/migration/2024-11-19/migration_distance:
-    - data://garden/migration/2024-11-19/migration_distance
-
-  # Migration between regions, based on UN DESA flows
-  data://garden/migration/2024-11-18/migration_between_regions:
-    - data://garden/un/2024-07-16/migrant_stock
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-07-29/income_groups
-
-  data://grapher/migration/2024-11-18/migration_between_regions:
-    - data://garden/migration/2024-11-18/migration_between_regions
 
   # IMF World Economic Outlook
   data://meadow/imf/2024-11-25/world_economic_outlook:
@@ -748,16 +650,44 @@ steps:
     - data://garden/ggdc/2022-11-28/penn_world_table
     - data://garden/wb/2024-11-04/edstats
     - data://garden/unesco/2024-06-25/education_sdgs
-    - data://garden/happiness/2024-06-09/happiness
+    - data://garden/happiness/2025-03-28/happiness
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
+
+  # OECD Official Development Assistance (ODA)
+  data://meadow/oecd/2025-02-19/official_development_assistance:
+    - snapshot://oecd/2025-02-19/official_development_assistance_crs.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac5.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac1.zip
+    - snapshot://oecd/2025-02-19/official_development_assistance_dac2a.zip
+
+  data://garden/oecd/2025-02-19/official_development_assistance:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/oecd/2025-02-19/official_development_assistance
+
+  data://grapher/oecd/2025-02-19/official_development_assistance:
+    - data://garden/oecd/2025-02-19/official_development_assistance
+
+  # ATUS - American Time Use Survey
+  data://meadow/atus/2024-12-10/atus_0323:
+    - snapshot://atus/2024-12-10/atus_who.zip
+    - snapshot://atus/2024-12-10/atus_activities.zip
+    - snapshot://atus/2024-12-10/atus_summary.zip
+    - snapshot://atus/2024-12-10/activity_codes_2023.xls
+    - snapshot://atus/2024-12-10/atus_respondent.zip
+
+  data://garden/atus/2025-01-06/atus_who:
+    - data://meadow/atus/2024-12-10/atus_0323
+
+  data://grapher/atus/2025-01-06/atus_who:
+    - data://garden/atus/2025-01-06/atus_who
+
 
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
   - dag/energy.yml
   - dag/wizard.yml
-  - dag/examples.yml
   - dag/emissions.yml
   - dag/papers.yml
   - dag/demography.yml
@@ -791,3 +721,4 @@ include:
   - dag/equality.yml
   - dag/families.yml
   - dag/technology.yml
+  - dag/redistribution.yml

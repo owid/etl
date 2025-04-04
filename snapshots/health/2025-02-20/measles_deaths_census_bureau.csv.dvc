@@ -1,0 +1,73 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical measless deaths in the United States - US Census Bureau
+    description: |-
+      Data on reported measles deaths in the United States, from the United States Census Bureau.
+
+      Sources for each year are as follows:
+
+      * 1922-23: [US Census Bureau “Statistical Abstract of the United States: 1924"](https://www.census.gov/library/publications/1925/compendia/statab/47ed.html)
+
+      * 1926: [US Census Bureau “Statistical Abstract of the United States: 1928”](https://www.census.gov/library/publications/1928/compendia/statab/50ed.html)
+
+      * 1927: [US Census Bureau “Statistical Abstract of the United States: 1929”](https://www.census.gov/library/publications/1929/compendia/statab/50ed.html)
+
+      * 1928: [US Census Bureau “Statistical Abstract of the United States: 1930”](https://www.census.gov/library/publications/1930/compendia/statab/52ed.html)
+
+      * 1929: [US Census Bureau “Statistical Abstract of the United States: 1931”](https://www.census.gov/library/publications/1931/compendia/statab/53ed.html)
+
+      * 1931: [US Census Bureau “Statistical Abstract of the United States: 1933”](https://www.census.gov/library/publications/1933/compendia/statab/55ed.html)
+
+      * 1932: [US Census Bureau “Statistical Abstract of the United States: 1934”](https://www.census.gov/library/publications/1934/compendia/statab/56ed.html)
+
+      * 1933: [US Census Bureau “Statistical Abstract of the United States: 1935”](https://www.census.gov/library/publications/1935/compendia/statab/57ed.html)
+
+      * 1934: [US Census Bureau “Statistical Abstract of the United States: 1936”](https://www.census.gov/library/publications/1936/compendia/statab/58ed.html)
+
+      * 1935: [US Census Bureau “Statistical Abstract of the United States: 1937”](https://www.census.gov/library/publications/1938/compendia/statab/59ed.html)
+
+      * 1936: [US Census Bureau “Statistical Abstract of the United States: 1938”](https://www.census.gov/library/publications/1939/compendia/statab/60ed.html)
+
+      * 1949: [US Census Bureau “Statistical Abstract of the United States: 1952”](https://www.census.gov/library/publications/1952/compendia/statab/73ed.html)
+    date_published: "1952-09-01"
+    # Citation
+    producer: US Census Bureau
+    citation_full: |-
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1924.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1928.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1929.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1930.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1931.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1933.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1934.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1935.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1936.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1937.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1938.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1952.
+
+    # Files
+    url_main: https://www.census.gov/library/publications/1952/compendia/statab/73ed.html
+    date_accessed: 2025-02-20
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 9cdbce897c4f30c8b11661f3b8ae299c
+    size: 1327
+    path: measles_deaths_census_bureau.csv

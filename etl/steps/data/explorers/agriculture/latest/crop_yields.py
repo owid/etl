@@ -4,19 +4,19 @@ The output csv file will feed our Crop Yields explorer:
 https://ourworldindata.org/explorers/crop-yields
 """
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("attainable_yields")
-    tb_garden = ds_garden["attainable_yields"].reset_index()
+    tb_garden = ds_garden.read("attainable_yields")
 
     #
     # Process data.
@@ -33,5 +33,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create explorer dataset, with garden table and metadata in csv format
-    ds_explorer = create_dataset(dest_dir, tables=[tb_garden], check_variables_metadata=True, formats=["csv"])
+    ds_explorer = paths.create_dataset(tables=[tb_garden], formats=["csv"])
     ds_explorer.save()

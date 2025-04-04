@@ -1,0 +1,13 @@
+dataset:
+  title: Pre-term births (Eurostat and US CDC)
+  description: ''
+  licenses:
+    - {}
+tables:
+  pre_term_births_europe_usa:
+    variables:
+      share_births_preterm:
+        title: Pre-term births
+        unit: '%'
+        short_unit: '%'
+        description: The share of live births that are pre-term. This is defined as being born between 22 and 37 weeks.

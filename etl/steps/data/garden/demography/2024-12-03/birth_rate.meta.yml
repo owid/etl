@@ -3,11 +3,14 @@ definitions:
   common:
     presentation:
       title_public: Birth rate
+      title_variant: total
+      attribution_short: HMD, UN WPP
       topic_tags:
         - Fertility Rate
     display:
       name: |-
         Birth rate
+      numDecimalPlaces: 1
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -23,6 +26,13 @@ tables:
         unit: births per 1,000 people
         description_short: |-
           The total number of births per 1,000 people in a given year.
+        description_key:
+          - |-
+            This indicator has been constructed by combining data from two sources:
+              - Before 1950: Historical estimates by Human Mortality Database (2024).
+              - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
+              - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
+
         description_processing: |-
           The birth data is constructed by combining data from multiple sources:
 
@@ -37,6 +47,11 @@ tables:
         unit: births per 1,000 people
         description_short: |-
           The total number of births per 1,000 people in a given year.
+        description_key:
+          - |-
+            This indicator has been constructed by combining data from two sources:
+              - Before 1950: Historical estimates by Human Mortality Database (2024).
+              - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
         description_processing: |-
           The birth data is constructed by combining data from multiple sources:
 

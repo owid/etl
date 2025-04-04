@@ -1,0 +1,79 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Economic Inequality
+    description_processing: |-
+      We obtained the series for each indicator by extracting the closest observations to <<reference_years>>, respectively. The maximum distance between the year available and the year of reference is 5 years.
+
+      We have also included some exclusions for the years we could extract. We excluded the years 2020, 2021, 2022, 2023 and 2024 to avoid capturing the effects of the COVID-19 pandemic and its aftermath. We also excluded years before 1990 to avoid capturing data for countries in socialist regimes.
+
+      Additionally, for the World Bank Poverty and Inequality Platform dataset, we rank multiple matchings following this order of preference:
+        1. The same welfare concept (first income, then consumption).
+        2. The same reporting level (first national, then urban, then rural, then different).
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: Inequality comparisons across time and datasets
+  update_period_days: 365
+
+tables:
+  inequality_comparison:
+    variables:
+      gini_pip_disposable_percapita:
+        title: Gini coefficient (World Bank PIP) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>>
+        display:
+          name: Gini coefficient around <<ref_year>>
+
+      gini_wid_pretaxnational_peradult:
+        title: Gini coefficient (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (pre-tax)
+        display:
+          name: Gini coefficient around <<ref_year>>
+
+      p90p100share_pip_disposable_percapita:
+        title: Income share of the richest 10% (World Bank PIP) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>>
+        display:
+          name: Income share of the richest 10% around <<ref_year>>
+
+      palmaratio_pip_disposable_percapita:
+        title: Palma ratio (World Bank PIP) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>>
+        display:
+          name: Palma ratio around <<ref_year>>
+
+      p90p100share_wid_pretaxnational_peradult:
+        title: Income share of the richest 10% (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (pre-tax)
+        display:
+          name: Income share of the richest 10% around <<ref_year>>
+
+      p99p100share_wid_pretaxnational_peradult:
+        title: Income share of the richest 1% (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (pre-tax)
+        display:
+          name: Income share of the richest 1% around <<ref_year>>
+
+      palmaratio_wid_pretaxnational_peradult:
+        title: Palma ratio (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (pre-tax)
+        display:
+          name: Palma ratio around <<ref_year>>
+
+      # gini_wid_posttaxnational_peradult:
+      #   title: Gini coefficient (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (post-tax)
+      #   display:
+      #     name: Gini coefficient around <<ref_year>>
+
+      # p90p100share_wid_posttaxnational_peradult:
+      #   title: Income share of the richest 10% (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (post-tax)
+      #   display:
+      #     name: Income share of the richest 10% around <<ref_year>>
+
+      # p99p100share_wid_posttaxnational_peradult:
+      #   title: Income share of the richest 1% (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (post-tax)
+      #   display:
+      #     name: Income share of the richest 1% around <<ref_year>>
+
+      # palmaratio_wid_posttaxnational_peradult:
+      #   title: Palma ratio (WID) for the year <<ref_year>> (<<reference_years>> comparison) - <<only_all_series>> (post-tax)
+      #   display:
+      #     name: Palma ratio around <<ref_year>>

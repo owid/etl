@@ -15,7 +15,7 @@ from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.components import st_toast_error, st_wizard_page_link
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.helpers import get_schema_from_url
+from etl.files import get_schema_from_url
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
 
 # Logger
@@ -132,6 +132,7 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
         st.success(
             "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
         )
+        st_wizard_page_link("anomalist")
         st_wizard_page_link("chart-diff")
 
 

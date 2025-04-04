@@ -1,0 +1,140 @@
+# This one includes datasets on spending and revenue, for the government spending and taxes topic pages
+
+steps:
+  ############################################################
+  # GENERAL
+  ############################################################
+
+  #
+  # OECD Government at a Glance
+  #
+  data://meadow/oecd/2025-03-26/government_at_a_glance:
+    - snapshot://oecd/2025-03-26/govt_glance_public_finance.csv
+    - snapshot://oecd/2025-03-26/govt_glance_size_public_procurement.csv
+    - snapshot://oecd/2025-03-26/govt_glance_public_finance_economic_transaction.csv
+  data://garden/oecd/2025-03-26/government_at_a_glance:
+    - data://meadow/oecd/2025-03-26/government_at_a_glance
+  data://grapher/oecd/2025-03-26/government_at_a_glance:
+    - data://garden/oecd/2025-03-26/government_at_a_glance
+
+  # UNU-WIDER Government Revenue Dataset
+  data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
+    - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
+  data://garden/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://meadow/unu_wider/2023-11-01/government_revenue_dataset
+  data://grapher/unu_wider/2023-11-01/government_revenue_dataset:
+    - data://garden/unu_wider/2023-11-01/government_revenue_dataset
+
+  # Public Finances in Modern History dataset (IMF)
+  data://meadow/imf/2025-04-02/public_finances_modern_history:
+    - snapshot://imf/2025-04-02/public_finances_modern_history.xlsx
+  data://garden/imf/2025-04-02/public_finances_modern_history:
+    - data://meadow/imf/2025-04-02/public_finances_modern_history
+  data://grapher/imf/2025-04-02/public_finances_modern_history:
+    - data://garden/imf/2025-04-02/public_finances_modern_history
+
+  # OECD Social Expenditure Database
+  data://meadow/oecd/2025-02-25/social_expenditure:
+    - snapshot://oecd/2025-02-25/social_expenditure.csv
+  data://garden/oecd/2025-02-25/social_expenditure:
+    - data://meadow/oecd/2025-02-25/social_expenditure
+  data://grapher/oecd/2025-02-25/social_expenditure:
+    - data://garden/oecd/2025-02-25/social_expenditure
+
+  #
+  # Social expenditure OMM
+  #
+  data://garden/social_expenditure/2025-03-07/social_expenditure_omm:
+    - data://garden/oecd/2025-02-25/social_expenditure
+    - data://garden/oecd/2025-03-07/social_expenditure_1985
+    - data://garden/social_expenditure/2025-03-07/lindert
+  data://grapher/social_expenditure/2025-03-07/social_expenditure_omm:
+    - data://garden/social_expenditure/2025-03-07/social_expenditure_omm
+
+  #
+  # Social transfers 1880-1930 (Lindert, 1994)
+  #
+  data://meadow/social_expenditure/2025-03-07/lindert:
+    - snapshot://social_expenditure/2025-03-07/lindert.csv
+  data://garden/social_expenditure/2025-03-07/lindert:
+    - data://meadow/social_expenditure/2025-03-07/lindert
+
+  #
+  # OECD social expenditure data (1985)
+  #
+  data://meadow/oecd/2025-03-07/social_expenditure_1985:
+    - snapshot://oecd/2025-03-07/social_expenditure_1985.xlsx
+  data://garden/oecd/2025-03-07/social_expenditure_1985:
+    - data://meadow/oecd/2025-03-07/social_expenditure_1985
+
+  ############################################################
+  # HEALTH
+  ############################################################
+
+  # OECD Health Expenditure and Financing Database
+  data://meadow/oecd/2025-02-25/health_expenditure:
+    - snapshot://oecd/2025-02-25/health_expenditure.csv
+  data://garden/oecd/2025-02-25/health_expenditure:
+    - data://meadow/oecd/2025-02-25/health_expenditure
+  data://grapher/oecd/2025-02-25/health_expenditure:
+    - data://garden/oecd/2025-02-25/health_expenditure
+
+  #
+  # Health expenditure as a share of GDP (OMM)
+  #
+  data://garden/health_expenditure/2025-03-04/health_expenditure_omm:
+    - data://garden/oecd/2025-02-25/health_expenditure
+    - data://garden/oecd/2025-03-04/health_expenditure_1993
+    - data://garden/health_expenditure/2025-03-04/lindert
+  data://grapher/health_expenditure/2025-03-04/health_expenditure_omm:
+    - data://garden/health_expenditure/2025-03-04/health_expenditure_omm
+
+  #
+  # Government subsidies for health care 1880-1930 (Lindert, 1994)
+  #
+  data://meadow/health_expenditure/2025-03-04/lindert:
+    - snapshot://health_expenditure/2025-03-04/lindert.csv
+  data://garden/health_expenditure/2025-03-04/lindert:
+    - data://meadow/health_expenditure/2025-03-04/lindert
+
+  #
+  # OECD health expenditure (1960-1991) (1993)
+  #
+  data://meadow/oecd/2025-03-04/health_expenditure_1993:
+    - snapshot://oecd/2025-03-04/health_expenditure_1993.xlsx
+  data://garden/oecd/2025-03-04/health_expenditure_1993:
+    - data://meadow/oecd/2025-03-04/health_expenditure_1993
+
+  ############################################################
+  # MILITARY
+  ############################################################
+
+  # SIPRI Military Expenditure Database
+  data://meadow/sipri/2024-07-08/military_expenditure:
+    - snapshot://sipri/2024-07-08/military_expenditure.xlsx
+  data://garden/sipri/2024-07-08/military_expenditure:
+    - data://meadow/sipri/2024-07-08/military_expenditure
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+  data://grapher/sipri/2024-07-08/military_expenditure:
+    - data://garden/sipri/2024-07-08/military_expenditure
+
+  # Global Military Spending Dataset
+  data://meadow/harvard/2024-11-26/global_military_spending_dataset:
+    - snapshot://harvard/2024-07-22/global_military_spending_dataset.rds
+    - snapshot://harvard/2024-11-26/global_military_spending_dataset_burden.rds
+  data://garden/harvard/2024-11-26/global_military_spending_dataset:
+    - data://meadow/harvard/2024-11-26/global_military_spending_dataset
+    - data://garden/demography/2024-07-15/population
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://garden/cow/2024-07-26/national_material_capabilities
+  data://grapher/harvard/2024-11-26/global_military_spending_dataset:
+    - data://garden/harvard/2024-11-26/global_military_spending_dataset
+
+  # Correlates of War - National Material Capabilities
+  data://meadow/cow/2024-07-26/national_material_capabilities:
+    - snapshot://cow/2024-07-26/national_material_capabilities.csv
+  data://garden/cow/2024-07-26/national_material_capabilities:
+    - data://meadow/cow/2024-07-26/national_material_capabilities
+    - data://garden/countries/2023-09-29/cow_ssm
+  data://grapher/cow/2024-07-26/national_material_capabilities:
+    - data://garden/cow/2024-07-26/national_material_capabilities

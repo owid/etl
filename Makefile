@@ -2,7 +2,7 @@
 #  Makefile
 #
 
-.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate
+.PHONY: etl docs full lab test-default publish grapher dot watch clean clobber deploy api activate vscode-exclude-archived
 
 include default.mk
 
@@ -31,6 +31,7 @@ help:
 	@echo '  make chart-sync 	Start Chart-sync on port 8083'
 	@echo '  make test      	Run all linting and unit tests'
 	@echo '  make test-all  	Run all linting and unit tests (including for modules in lib/)'
+	@echo '  make vscode-exclude-archived  Exclude archived steps from VSCode user settings'
 	@echo '  make watch     	Run all tests, watching for changes'
 	@echo '  make watch-all 	Run all tests, watching for changes (including for modules in lib/)'
 	@echo
@@ -145,3 +146,36 @@ fasttrack: .venv
 wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	.venv/bin/etlwiz
+
+# If VSCode exists, install a list of published extensions (defined in EXTENSIONS) and a list of custom extensions (defined in CUSTOM_EXTENSIONS).
+# Custom extensions are expected to be in the vscode_extensions folder, with a subfolder for each extension containing a folder install/ with a VSIX file.
+# The latest VSIX file in each install/ folder will be installed.
+install-vscode-extensions:
+	@echo '==> Checking and installing required VS Code extensions'
+	@if command -v code > /dev/null; then \
+		EXTENSIONS="ms-toolsai.jupyter"; \
+		CUSTOM_EXTENSIONS="run-until-cursor find-latest-etl-step"; \
+		EXTENSIONS_PATH="vscode_extensions"; \
+		for EXT in $$EXTENSIONS; do \
+			if ! code --list-extensions | grep -q "$$EXT"; then \
+				code --install-extension $$EXT; \
+			fi; \
+		done; \
+		for EXT in $$CUSTOM_EXTENSIONS; do \
+			if ! code --list-extensions | grep -q "owid.$$EXT"; then \
+				VSIX_FILE=$$(ls -v $$EXTENSIONS_PATH/$$EXT/install/$$EXT-*.vsix 2>/dev/null | tail -n 1); \
+				if [ -n "$$VSIX_FILE" ]; then \
+					echo "Installing owid.$$EXT from $$VSIX_FILE"; \
+					code --install-extension "$$VSIX_FILE"; \
+				else \
+					echo "⚠️ No VSIX file found for owid.$$EXT. Skipping."; \
+				fi; \
+			fi; \
+		done; \
+	else \
+		echo "⚠️ VS Code CLI (code) is not installed. Skipping extension installation."; \
+	fi
+
+vscode-exclude-archived: .venv
+	@echo '==> Excluding archived steps from VSCode user settings'
+	.venv/bin/python scripts/exclude_archived_steps.py --settings-scope user

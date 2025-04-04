@@ -30,6 +30,14 @@ Making this documentation public is part of our commitment to **transparency** a
 
     Learn the fundamentals.
 
+-   __[:material-sign-direction: &nbsp; Guides](../guides/index.md)__
+
+    ---
+    - [Data work](../guides/data-work): Learn how to add, update data, etc.
+    - [Wizard](../guides/wizard.md): Use our ETL admin tool!
+
+    And much more!
+
 -   __[:fontawesome-solid-book: &nbsp; Metadata reference](../architecture/metadata/reference/)__
 
     ---
@@ -37,12 +45,6 @@ Making this documentation public is part of our commitment to **transparency** a
     Data alone is not enough.
 
     Learn more about our [metadata](../architecture/metadata/index.md).
-
--   __[:fontawesome-solid-hat-wizard: &nbsp; Wizard](../guides/wizard.md)__
-
-    ---
-
-    Create datasets using Wizard.
 
 -   __[:fontawesome-solid-users: &nbsp; Contributing](../contributing.md)__
 

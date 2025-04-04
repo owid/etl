@@ -10,8 +10,9 @@ from streamlit_agraph import Config, ConfigBuilder, Edge, Node, agraph
 
 from apps.wizard.utils import metadata_export_basic, set_states
 from etl.config import ENV_IS_REMOTE
+from etl.dag_helpers import load_dag
 from etl.paths import DATA_DIR
-from etl.steps import extract_step_attributes, filter_to_subgraph, load_dag
+from etl.steps import extract_step_attributes, filter_to_subgraph
 
 # CONFIG
 st.set_page_config(
@@ -26,7 +27,6 @@ st.title(":material/search: Dataset Explorer")
 
 COLORS = {
     "snapshot": "#FC9090",
-    "walden": "#FC9090",
     "meadow": "#F5DB49",
     "garden": "#87E752",
     "grapher": "#67AAE1",
@@ -77,11 +77,11 @@ def generate_graph(
         return title
 
     def _collapse_node(attributes: Dict[str, str]) -> bool:
-        if collapse_snapshot and (attributes["channel"] in ["snapshot", "walden"]):
+        if collapse_snapshot and (attributes["channel"] in ["snapshot"]):
             return True
         if collapse_meadow and (attributes["channel"] in ["meadow"]):
             return True
-        if collapse_others and (attributes["channel"] not in ["snapshot", "walden", "meadow", "garden", "grapher"]):
+        if collapse_others and (attributes["channel"] not in ["snapshot", "meadow", "garden", "grapher"]):
             return True
         return False
 
@@ -208,9 +208,7 @@ with st.form("form"):
     # Add toggles
     help_template = "Show nodes of type '{channel}' as dots, without text. This can make the visualisation cleaner.The step URI will still be visible on hover."
     collapse_others = st.toggle("Collapse others", value=True, help=help_template.format(channel="other"))
-    collapse_snapshot = st.toggle(
-        "Collapse snapshot/walden", value=True, help=help_template.format(channel="snapshot/walden")
-    )
+    collapse_snapshot = st.toggle("Collapse snapshot", value=True, help=help_template.format(channel="snapshot"))
     collapse_meadow = st.toggle("Collapse meadow", value=False, help=help_template.format(channel="meadow"))
     downstream = st.toggle("Show downstream", value=False, help="Show nodes that depend on the selected node.")
     # Form submit button

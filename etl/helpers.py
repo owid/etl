@@ -2,27 +2,16 @@
 #  helpers.py
 #  etl
 #
-
-import datetime as dt
 import re
-import sys
-import tempfile
 import time
-from collections.abc import Generator
-from contextlib import contextmanager
 from functools import cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, List, Literal, Optional, Union, cast
-from urllib.parse import urljoin
+from typing import Any, Dict, Iterable, List, Literal, Optional, Union
 
-import jsonref
 import pandas as pd
-import requests
 import structlog
-import yaml
-from jsonschema import validate
 from owid import catalog
-from owid.catalog import CHANNEL, DatasetMeta, Table, warnings
+from owid.catalog import CHANNEL, DatasetMeta, Table
 from owid.catalog.datasets import DEFAULT_FORMATS, FileFormat
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 from owid.catalog.tables import (
@@ -33,118 +22,19 @@ from owid.catalog.tables import (
     get_unique_sources_from_tables,
 )
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden import Dataset as WaldenDataset
-from sqlalchemy.orm import Session
 
-import etl.grapher.model as gm
 from etl import paths
-from etl.config import DEFAULT_GRAPHER_SCHEMA, TLS_VERIFY
-from etl.db import get_engine
-from etl.explorer import Explorer
+from etl.collections.explorer import Explorer, create_explorer
+from etl.collections.explorer_legacy import ExplorerLegacy, _create_explorer_legacy
+from etl.collections.multidim import Multidim, create_mdim
+from etl.dag_helpers import load_dag
+from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
-from etl.steps import load_dag
 
 log = structlog.get_logger()
 
 
-@contextmanager
-def downloaded(url: str) -> Iterator[str]:
-    """
-    Download the url to a temporary file and yield the filename.
-    """
-    import requests
-
-    with tempfile.NamedTemporaryFile() as tmp:
-        with requests.get(url, stream=True, verify=TLS_VERIFY) as r:
-            r.raise_for_status()
-            chunk_size = 2**16  # 64k
-            for chunk in r.iter_content(chunk_size=chunk_size):
-                tmp.write(chunk)
-
-        yield tmp.name
-
-
-def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
-    """Check that the table is in the correct format for Grapher."""
-    from etl.grapher import helpers as gh
-
-    assert ds.metadata.title, "Dataset must have a title."
-
-    for tab in ds:
-        if {"year", "country"} <= set(tab.all_columns):
-            if "year" in tab.columns:
-                year = tab["year"]
-            else:
-                year = tab.index.get_level_values("year")
-            assert year.dtype in gh.INT_TYPES, f"year must be of an integer type but was: {year.dtype}"
-        elif {"date", "country"} <= set(tab.all_columns):
-            pass
-        else:
-            raise AssertionError("Table must have columns country and year or date.")
-
-        for col in tab:
-            if col in ("year", "country"):
-                continue
-            catalog.utils.validate_underscore(col)
-            assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
-            assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
-            assert (
-                tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
-            ), f"Column `{col}` must have either sources or origins"
-
-            _validate_description_key(tab[col].m.description_key, col)
-            _validate_ordinal_variables(tab, col)
-            _validate_grapher_config(tab, col)
-
-            # Data Page title uses the following fallback
-            # [title_public > grapher_config.title > display.name > title] - [attribution_short] - [title_variant]
-            # the Table tab
-            # [title_public > display.name > title] - [title_variant] - [attribution_short]
-            # and chart heading
-            # [grapher_config.title > title_public > display.name > title] - [grapher_config.subtitle > description_short]
-            #
-            # Warn if display.name (which is used for legend) exists and there's no title_public set. This
-            # would override the indicator title in the Data Page.
-            display_name = (tab[col].m.display or {}).get("name")
-            title_public = getattr(tab[col].m.presentation, "title_public", None)
-            if warn_title_public and display_name and not title_public:
-                warnings.warn(
-                    f"Column {col} uses display.name but no presentation.title_public. Ensure the latter is also defined, otherwise display.name will be used as the indicator's title.",
-                    warnings.DisplayNameWarning,
-                )
-
-
-def _validate_grapher_config(tab: Table, col: str) -> None:
-    """Validate grapher config against given schema or against the default schema."""
-    grapher_config = getattr(tab[col].m.presentation, "grapher_config", None)
-    if grapher_config:
-        grapher_config.setdefault("$schema", DEFAULT_GRAPHER_SCHEMA)
-
-        # Load schema and remove properties that are not relevant for the validation
-        schema = get_schema_from_url(grapher_config["$schema"])
-        # schema["required"] = [f for f in schema["required"] if f not in ("dimensions", "version", "title")]
-        schema["required"] = []
-
-        validate(grapher_config, schema)
-
-
-def _validate_description_key(description_key: list[str], col: str) -> None:
-    if description_key:
-        assert not all(
-            len(x) == 1 for x in description_key
-        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
-
-
-def _validate_ordinal_variables(tab: Table, col: str) -> None:
-    if tab[col].m.sort:
-        # Exclude NaN values, these will be dropped before inserting to the database.
-        vals = tab[col].dropna()
-
-        extra_values = set(vals) - set(vals.m.sort)
-        assert (
-            not extra_values
-        ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
+__all__ = ["grapher_checks"]
 
 
 def _set_metadata_from_dest_dir(ds: catalog.Dataset, dest_dir: Union[str, Path]) -> catalog.Dataset:
@@ -179,7 +69,7 @@ def create_dataset(
     camel_to_snake: bool = False,
     long_to_wide: Optional[bool] = None,
     formats: List[FileFormat] = DEFAULT_FORMATS,
-    check_variables_metadata: bool = False,
+    check_variables_metadata: bool = True,
     run_grapher_checks: bool = True,
     yaml_params: Optional[Dict[str, Any]] = None,
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
@@ -313,104 +203,6 @@ def get_metadata_path(dest_dir: str) -> Path:
     return N.metadata_path
 
 
-def create_dataset_with_combined_metadata(
-    dest_dir: Union[str, Path],
-    datasets: List[catalog.Dataset],
-    tables: List[catalog.Table],
-    default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,  # type: ignore
-    underscore_table: bool = True,
-    formats: List[FileFormat] = DEFAULT_FORMATS,
-) -> catalog.Dataset:
-    """Create a new catalog Dataset with the combination of sources and licenses of a list of datasets.
-
-    This function will:
-    * Gather all sources and licenses of a list of datasets (`datasets`).
-    * Assign the combined sources and licenses to all variables in a list of tables (`tables`).
-    * Create a new dataset (using the function `create_dataset`) with the combined sources and licenses.
-
-    NOTES:
-      * The sources and licenses of the default_metadata will be ignored (and the combined sources and licenses of all
-        `datasets` will be used instead).
-      * If a metadata yaml file exists and contains sources and licenses, the content of the metadata file will
-        override the combined sources and licenses.
-
-    Parameters
-    ----------
-    dest_dir : Union[str, Path]
-        Destination directory for the dataset, usually argument of `run` function.
-    datasets : List[catalog.Dataset]
-        Datasets whose sources and licenses will be gathered and passed on to the new dataset.
-    tables : List[catalog.Table]
-        Tables to add to the new dataset.
-    default_metadata : Optional[Union[SnapshotMeta, catalog.DatasetMeta]]
-        Default metadata for the new dataset. If it contains sources and licenses, they will be ignored (and the
-        combined sources of the list of datasets passed will be used).
-    underscore_table : bool
-        Whether to underscore the table name before adding it to the dataset.
-
-    Returns
-    -------
-    catalog.Dataset
-        New dataset with combined metadata.
-
-    """
-    from etl.steps.data.converters import convert_snapshot_metadata
-
-    # Gather unique sources from the original datasets.
-    sources = []
-    licenses = []
-    for dataset_i in datasets:
-        # Get metadata from this dataset or snapshot.
-        if isinstance(dataset_i.metadata, SnapshotMeta):
-            metadata = convert_snapshot_metadata(dataset_i.metadata)
-        else:
-            metadata = dataset_i.metadata
-
-        # Gather sources and licenses from this dataset or snapshot.
-        for source in metadata.sources:
-            if source.name not in [known_source.name for known_source in sources]:
-                sources.append(source)
-        for license in metadata.licenses:
-            if license.name not in [known_license.name for known_license in licenses]:
-                licenses.append(license)
-
-    # Assign combined sources and licenses to each of the variables in each of the tables.
-    for table in tables:
-        index_columns = table.metadata.primary_key
-        # If the table has an index, reset it, so that sources and licenses can also be assigned to index columns.
-        if len(index_columns) > 0:
-            table = table.reset_index()
-        # Assign sources and licenses to the metadata of each variable in the table.
-        for variable in table.columns:
-            table[variable].metadata.sources = sources
-            table[variable].metadata.licenses = licenses
-        # Bring original index back.
-        if len(index_columns) > 0:
-            table = table.set_index(index_columns)
-
-    if default_metadata is None:
-        # If no default metadata is passed, create new empty dataset metadata.
-        default_metadata = catalog.DatasetMeta()
-    elif isinstance(default_metadata, SnapshotMeta):
-        # If a snapshot metadata is passed as default metadata, convert it to a dataset metadata.
-        default_metadata: catalog.DatasetMeta = convert_snapshot_metadata(default_metadata)
-
-    # Assign combined sources and licenses to the new dataset metadata.
-    default_metadata.sources = sources
-    default_metadata.licenses = licenses
-
-    # Create a new dataset.
-    ds = create_dataset(
-        dest_dir=dest_dir,
-        tables=tables,
-        default_metadata=default_metadata,
-        underscore_table=underscore_table,
-        formats=formats,
-    )
-
-    return ds
-
-
 class CurrentFileMustBeAStep(ExceptionFromDocstring):
     """Current file must be an ETL step."""
 
@@ -420,7 +212,8 @@ class CurrentStepMustBeInDag(ExceptionFromDocstring):
 
 
 class NoMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
-    """No steps found among dependencies of current ETL step, that match the given specifications."""
+    """No steps found among dependencies of current ETL step, that match the given specifications.
+    Add those missing datasets as dependencies of the current step in the DAG."""
 
 
 class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
@@ -428,7 +221,7 @@ class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
 
 
 class UnknownChannel(ExceptionFromDocstring):
-    """Unknown channel name. Valid channels are 'examples', 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
+    """Unknown channel name. Valid channels are 'examples', 'snapshot', 'meadow', 'garden', or 'grapher'."""
 
 
 class WrongStepName(ExceptionFromDocstring):
@@ -515,8 +308,15 @@ class PathFinder:
 
     @property
     def mdim_path(self) -> Path:
+        """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
         assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
         return self.directory / (self.short_name + ".yml")
+
+    @property
+    def config_path(self) -> Path:
+        """Config file. Used in `multidim` and `explorer` ETL steps."""
+        # assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
+        return self.directory / (self.short_name + ".config.yml")
 
     @property
     def directory(self) -> Path:
@@ -533,10 +333,6 @@ class PathFinder:
     @property
     def garden_dataset(self) -> catalog.Dataset:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
-
-    @property
-    def walden_dataset(self) -> WaldenDataset:
-        return WaldenCatalog().find_one(namespace=self.namespace, version=self.version, short_name=self.short_name)
 
     @property
     def snapshot_dir(self) -> Path:
@@ -584,10 +380,8 @@ class PathFinder:
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
         elif channel in CHANNEL.__args__:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
-        elif channel == "walden":
-            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
+            step_name = rf"(?:snapshot{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
@@ -607,7 +401,7 @@ class PathFinder:
     def _get_attributes_from_step_name(step_name: str) -> Dict[str, str]:
         """Get attributes (channel, namespace, version, short name and is_private) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
-        if channel_type.startswith(("walden", "snapshot")):
+        if channel_type.startswith(("snapshot",)):
             channel = channel_type
             namespace, version, short_name = path.split("/")
         elif channel_type.startswith(("data", "export")):
@@ -647,7 +441,16 @@ class PathFinder:
                 return _step
 
     @property
-    def dependencies(self) -> List[str]:
+    def dest_dir(self) -> Path:
+        # Local destination folder, where the data generated by this step will be saved.
+        # For typical data steps, this folder will be "data/..." (from the base ETL folder).
+        return paths.BASE_DIR / self.f.relative_to(paths.STEP_DIR).with_suffix("")
+
+    def side_file(self, filename: str) -> Path:
+        return self.directory / filename
+
+    @property
+    def dependencies(self) -> set[str]:
         # Current step should be in the dag.
         if self.step not in self.dag:
             raise CurrentStepMustBeInDag
@@ -705,7 +508,7 @@ class PathFinder:
         elif len(matches) > 1:
             raise MultipleMatchingStepsAmongDependencies(step_name=self.step_name)
 
-        dependency = matches[0]
+        dependency = next(iter(matches))
 
         return dependency
 
@@ -717,7 +520,7 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
         is_private: Optional[bool] = None,
-    ) -> Union[catalog.Dataset, Snapshot, WaldenCatalog]:
+    ) -> Union[catalog.Dataset, Snapshot]:
         """Load a dataset dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
             step_type=step_type,
@@ -728,11 +531,7 @@ class PathFinder:
             is_private=is_private,
         )
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
-        if dependency["channel"] == "walden":
-            dataset = WaldenCatalog().find_one(
-                namespace=dependency["namespace"], version=dependency["version"], short_name=dependency["short_name"]
-            )
-        elif dependency["channel"] == "snapshot":
+        if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
         else:
             dataset_path = (
@@ -775,450 +574,136 @@ class PathFinder:
         assert len(deps) == 1
         return deps[0].replace("etag://", "https://")
 
-    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, str]:
+    def load_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
         if filename is not None:
             path = self.directory / Path(filename)
         elif path is None:
-            path = self.mdim_path
+            path = self.config_path
         config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
         return config
 
+    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+        """Replace code to use `self.load_config`."""
+        return self.load_config(filename, path)
 
-def _match_dependencies(pattern: str, dependencies: List[str]) -> List[str]:
+    def load_explorer_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+        return self.load_config(filename, path)
+        # Check that it can be loaded as an Explorer object.
+        # explorer = Explorer.from_dict(config)
+        # return explorer.to_dict(drop_definitions=False)
+
+    def create_dataset(
+        self,
+        tables: Iterable[catalog.Table],
+        default_metadata: Optional[Union[SnapshotMeta, catalog.DatasetMeta]] = None,
+        underscore_table: bool = True,
+        camel_to_snake: bool = False,
+        long_to_wide: Optional[bool] = None,
+        formats: List[FileFormat] = DEFAULT_FORMATS,
+        check_variables_metadata: bool = True,
+        run_grapher_checks: bool = True,
+        yaml_params: Optional[Dict[str, Any]] = None,
+        if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
+        errors: Literal["ignore", "warn", "raise"] = "raise",
+        repack: bool = True,
+    ) -> catalog.Dataset:
+        return create_dataset(
+            dest_dir=self.dest_dir,
+            tables=tables,
+            default_metadata=default_metadata,
+            underscore_table=underscore_table,
+            camel_to_snake=camel_to_snake,
+            long_to_wide=long_to_wide,
+            formats=formats,
+            check_variables_metadata=check_variables_metadata,
+            run_grapher_checks=run_grapher_checks,
+            yaml_params=yaml_params,
+            if_origins_exist=if_origins_exist,
+            errors=errors,
+            repack=repack,
+        )
+
+    def create_mdim(self, config, mdim_name: Optional[str] = None) -> Multidim:
+        """Create a Multidim object.
+
+        Args:
+        -----
+
+        config: dict
+            MDIM configuration.
+        mdim_name: str
+            Name of the MDIM page. Default is short_name from mdim catalog path.
+        """
+        # Create Multidim
+        mdim = create_mdim(config, self.dependencies)
+
+        # Get and set catalog path
+        mdim_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}"
+        mdim.catalog_path = mdim_catalog_path
+
+        return mdim
+
+    def create_explorer(self, config, explorer_name: Optional[str] = None) -> Explorer:
+        """Create an Explorer object.
+
+        Args:
+        -----
+        config: Dict[str, Any]
+            Configuration of the explorer.
+        explorer_name: str
+            Name of the explorer. If none is provided, it will use the short_name from the explorer catalog path.
+        """
+        # Create Explorer object
+        explorer = create_explorer(
+            config=config,
+            dependencies=self.dependencies,
+        )
+
+        # Get and set catalog path
+        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}"
+        explorer.catalog_path = explorer_catalog_path
+
+        return explorer
+
+    def create_explorer_legacy(
+        self,
+        config: Dict[str, Any],
+        df_graphers: pd.DataFrame,
+        df_columns: Optional[pd.DataFrame] = None,
+        reset: bool = False,
+    ) -> ExplorerLegacy:
+        """This function is used to create an Explorer object using the legacy configuration.
+
+        To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
+
+        Param `reset` is False by default, because many explorers have manually set map brackets or fields like
+        pickerColumnSlugs. Ideally, everything should be set in ETL.
+        """
+        log.warning(
+            "This function is operative, but relies on legacy configuration. To use latest tools, consider migrating your explorer to use MDIM-based configuration."
+        )
+        # If the name of the explorer is specified in config, take that, otherwise use the step's short_name.
+        # NOTE: This is the expected name of the explorer tsv file.
+        if "name" in config:
+            explorer_name = config["name"]
+        else:
+            explorer_name = self.short_name
+        assert isinstance(explorer_name, str)
+
+        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name}"
+
+        explorer = _create_explorer_legacy(
+            catalog_path=explorer_catalog_path,
+            config=config,
+            df_graphers=df_graphers,
+            explorer_name=explorer_name,
+            df_columns=df_columns,
+            reset=reset,
+        )
+
+        return explorer
+
+
+def _match_dependencies(pattern: str, dependencies: set[str]) -> set[str]:
     regex = re.compile(pattern)
-    return [dependency for dependency in dependencies if regex.match(dependency)]
-
-
-def print_tables_metadata_template(tables: List[Table], fields: Optional[List[str]] = None) -> None:
-    # This function is meant to be used when creating code in an interactive window (or a notebook).
-    # It prints a template for the metadata of the tables in the list.
-    # The template can be copied and pasted into the corresponding yaml file.
-    # In the future, we should have an interactive tool to add or edit the content of the metadata yaml files, using
-    # AI-generated texts when possible.
-
-    if fields is None:
-        fields = ["title", "unit", "short_unit", "description_short"]
-
-    # Initialize output dictionary.
-    dict_tables = {}
-    for tb in tables:
-        dict_variables = {}
-        for column in tb.columns:
-            dict_values = {}
-            for field in fields:
-                if field.startswith("presentation"):
-                    field = field.replace("presentation.", "")
-                    value = getattr(tb[column].metadata.presentation, field) or ""
-                    if "presentation" not in dict_values:
-                        dict_values["presentation"] = {}
-                    dict_values["presentation"][field] = value
-                else:
-                    value = getattr(tb[column].metadata, field) or ""
-
-                    # Add some simple rules to simplify some common cases.
-
-                    # If title is empty, or if title is underscore (probably because it is taken from the column name),
-                    # create a custom title.
-                    if (field == "title") and ((value == "") or ("_" in value)):
-                        value = column.capitalize().replace("_", " ")
-
-                    # If unit or short_unit is empty, and the column name contains 'pct', set it to '%'.
-                    if (value == "") and (field in ["unit", "short_unit"]) and "pct" in column:
-                        value = "%"
-
-                    if field == "processing_level":
-                        # Assume a minor processing level (it will be manually overwritten, if needed).
-                        value = "minor"
-
-                    dict_values[field] = value
-            dict_variables[column] = dict_values
-        dict_tables[tb.metadata.short_name] = {"variables": dict_variables}
-    dict_output = {"tables": dict_tables}
-
-    # print(yaml.dump(dict_output, default_flow_style=False, sort_keys=False))
-    print(yaml.dump(dict_output, default_flow_style=False, sort_keys=False, width=float("inf")))
-
-
-@contextmanager
-def isolated_env(
-    working_dir: Path,
-    keep_modules: str = r"openpyxl|pyarrow|lxml|PIL|pydantic|sqlalchemy|sqlmodel|pandas|frictionless|numpy",
-) -> Generator[None, None, None]:
-    """Add given directory to pythonpath, run code in context, and
-    then remove from pythonpath and unimport modules imported in context.
-
-    Note that unimporting modules means they'll have to be imported again, but
-    it has minimal impact on performance (ms).
-
-    :param keep_modules: regex of modules to keep imported
-    """
-    # add module dir to pythonpath
-    sys.path.append(working_dir.as_posix())
-
-    # remember modules that were imported before
-    imported_modules = set(sys.modules.keys())
-
-    yield
-
-    # unimport modules imported during execution unless they match `keep_modules`
-    for module_name in set(sys.modules.keys()) - imported_modules:
-        if not re.search(keep_modules, module_name):
-            sys.modules.pop(module_name)
-
-    # remove module dir from pythonpath
-    sys.path.remove(working_dir.as_posix())
-
-
-def read_json_schema(path: Union[Path, str]) -> Dict[str, Any]:
-    """Read JSON schema with resolved references."""
-    path = Path(path)
-
-    # pathlib does not append trailing slashes, but jsonref needs that.
-    base_dir_url = path.parent.absolute().as_uri() + "/"
-    base_file_url = urljoin(base_dir_url, path.name)
-    with path.open("r") as f:
-        dix = jsonref.loads(f.read(), base_uri=base_file_url, lazy_load=False)
-        return cast(Dict[str, Any], dix)
-
-
-def get_comments_above_step_in_dag(step: str, dag_file: Path) -> str:
-    """Get the comment lines right above a step in the dag file."""
-
-    # Read the content of the dag file.
-    with open(dag_file, "r") as _dag_file:
-        lines = _dag_file.readlines()
-
-    # Initialize a list to store the header lines.
-    header_lines = []
-    for line in lines:
-        if line.strip().startswith("-") or (
-            line.strip().endswith(":") and (not line.strip().startswith("#")) and (step not in line)
-        ):
-            # Restart the header if the current line:
-            # * Is a dependency.
-            # * Is a step that is not the current step.
-            # * Is a special line like "steps:" or "include:".
-            header_lines = []
-        elif step in line and line.strip().endswith(":"):
-            # If the current line is the step, stop reading the rest of the file.
-            return "\n".join([line.strip() for line in header_lines]) + "\n" if len(header_lines) > 0 else ""
-        elif line.strip() == "":
-            # If the current line is empty, ignore it.
-            continue
-        else:
-            # Any line that is not a dependency,
-            header_lines.append(line)
-
-    # If the step has not been found, raise an error and return nothing.
-    log.error(f"Step {step} not found in dag file {dag_file}.")
-
-    return ""
-
-
-def write_to_dag_file(
-    dag_file: Path,
-    dag_part: Dict[str, Any],
-    comments: Optional[Dict[str, str]] = None,
-    indent_step=2,
-    indent_dependency=4,
-):
-    """Update the content of a dag file, respecting the comments above the steps.
-
-    NOTE: A simpler implementation of function may be possible using ruamel. However, I couldn't find out how to respect
-    comments that are above steps.
-
-    Parameters
-    ----------
-    dag_file : Path
-        Path to dag file.
-    dag_part : Dict[str, Any]
-        Partial dag, containing the steps that need to be updated.
-        This partial dag is a dictionary with steps as keys and the set of dependencies as values.
-    comments : Optional[Dict[str, str]], optional
-        Comments to add above the steps in the partial dag. The keys are the steps, and the values are the comments.
-    indent_step : int, optional
-        Number of spaces to use as indentation for steps in the dag.
-    indent_dependency : int, optional
-        Number of spaces to use as indentation for dependencies in the dag.
-
-    """
-
-    # If comments is not defined, assume an empty dictionary.
-    if comments is None:
-        comments = {}
-
-    for step in comments:
-        if len(comments[step]) > 0 and comments[step][-1] != "\n":
-            # Ensure all comments end in a line break, otherwise add it.
-            comments[step] = comments[step] + "\n"
-
-    # Read the lines in the original dag file.
-    with open(dag_file, "r") as file:
-        lines = file.readlines()
-
-    # Separate that content into the "steps" section (always given) and the "include" section (sometimes given).
-    section_steps = []
-    section_include = []
-    inside_section_steps = True
-    for line in lines:
-        if line.strip().startswith("include"):
-            inside_section_steps = False
-        if inside_section_steps:
-            section_steps.append(line)
-        else:
-            section_include.append(line)
-
-    # Now the "steps" section will be updated, and at the end the "include" section will be appended.
-
-    # Initialize a list with the new lines that will be written to the dag file.
-    updated_lines = []
-    # Initialize a list of comments preceding the next step after a given step.
-    comments_next_step = []
-    # Initialize a flag to skip lines until the next step.
-    skip_until_next_step = False
-    # Initialize a set to keep track of the steps that were found in the original dag file.
-    steps_found = set()
-    for line in section_steps:
-        # Remove leading and trailing whitespace from the line.
-        stripped_line = line.strip()
-
-        # Identify the start of a step, e.g. "  data://meadow/temp/latest/step:".
-        if stripped_line.endswith(":") and not stripped_line.startswith("-") and not stripped_line.startswith("steps:"):
-            if comments_next_step:
-                updated_lines.extend(comments_next_step)
-                comments_next_step = []
-            # Extract the name of the step (without the ":" at the end).
-            current_step = ":".join(stripped_line.split(":")[:-1])
-            if current_step in dag_part:
-                # This step was in dag_part, which means it needs to be updated.
-                # First add the step itself.
-                updated_lines.append(line)
-                # Now add each of its dependencies.
-                for dep in dag_part[current_step]:
-                    updated_lines.append(" " * indent_dependency + f"- {dep}\n")
-                # Skip the following lines until the next step is found.
-                skip_until_next_step = True
-                # Start tracking possible comments of the next step.
-                comments_next_step = []
-                # Add the current step to the set of steps found in the dag file.
-                steps_found.add(current_step)
-                continue
-            else:
-                # This step was not in dag_part, so it will be copied as is.
-                skip_until_next_step = False
-
-        # Skip dependencies and comments among dependencies of the step being updated.
-        if skip_until_next_step:
-            if stripped_line.startswith("-"):
-                # Remove comments among dependencies.
-                comments_next_step = []
-                continue
-            elif stripped_line.startswith("#"):
-                # Add comments that may potentially be related to the next step.
-                comments_next_step.append(line)
-                continue
-
-        # Add lines that should not be skipped.
-        updated_lines.append(line)
-
-    # Append new steps that weren't found in the original content.
-    for step, dependencies in dag_part.items():
-        if step not in steps_found:
-            # Add the comment for this step, if any was given.
-            if step in comments:
-                updated_lines.append(
-                    " " * indent_step + ("\n" + " " * indent_step).join(comments[step].split("\n")[:-1]) + "\n"
-                    if len(comments[step]) > 0
-                    else ""
-                )
-            # Add the step itself.
-            updated_lines.append(" " * indent_step + f"{step}:\n")
-            # Add each of its dependencies.
-            for dep in dependencies:
-                updated_lines.append(" " * indent_dependency + f"- {dep}\n")
-
-    if len(section_include) > 0:
-        # Append the include section, ensuring there is only one line break in between.
-        for i in range(len(updated_lines) - 1, -1, -1):
-            if updated_lines[i] != "\n":
-                # Slice the list to remove trailing line breaks
-                updated_lines = updated_lines[: i + 1]
-                break
-        # Add a single line break before the include section, and then add the include section.
-        updated_lines.extend(["\n"] + section_include)
-
-    # Write the updated content back to the dag file.
-    with open(dag_file, "w") as file:
-        file.writelines(updated_lines)
-
-
-def _remove_step_from_dag_file(dag_file: Path, step: str) -> None:
-    with open(dag_file, "r") as file:
-        lines = file.readlines()
-
-    new_lines = []
-    _number_of_comment_lines = 0
-    _step_detected = False
-    _continue_until_the_end = False
-    num_spaces_indent = 0
-    for line in lines:
-        if line.startswith("include"):
-            # Nothing should be removed from here onwards, so, skip until the end of the file.
-            _continue_until_the_end = True
-
-            # Ensure there is a space before the include section starts.
-            if new_lines[-1].strip() != "":
-                new_lines.append("\n")
-
-        if line.startswith("steps:"):
-            # Store this special line and move on.
-            new_lines.append(line)
-            # If there were comments above "steps", keep them.
-            _number_of_comment_lines = 0
-            continue
-
-        if _continue_until_the_end:
-            new_lines.append(line)
-            continue
-
-        if not _step_detected:
-            if line.strip().startswith("#") or line.strip() == "":
-                _number_of_comment_lines += 1
-                new_lines.append(line)
-                continue
-            elif line.strip().startswith(step):
-                if _number_of_comment_lines > 0:
-                    # Remove the previous comment lines and ignore the current line.
-                    new_lines = new_lines[:-_number_of_comment_lines]
-                # Find the number of spaces on the left of the step name.
-                # We need this to know if the next comments are indented (as comments within dependencies).
-                num_spaces_indent = len(line) - len(line.lstrip())
-                _step_detected = True
-                continue
-            else:
-                # This line corresponds to any other step or step dependency.
-                new_lines.append(line)
-                _number_of_comment_lines = 0
-                continue
-        else:
-            if line.strip().startswith("- "):
-                # Ignore the dependencies of the step.
-                continue
-            elif (line.strip().startswith("#")) and (len(line) - len(line.lstrip()) > num_spaces_indent):
-                # Ignore comments that are indented (as comments within dependencies).
-                continue
-            elif line.strip() == "":
-                # Ignore empty lines.
-                continue
-            else:
-                # The step dependencies have ended. Append current line and continue until the end of the dag file.
-                new_lines.append(line)
-                _continue_until_the_end = True
-                continue
-
-    # Write the new content to the active dag file.
-    with open(dag_file, "w") as file:
-        file.writelines(new_lines)
-
-
-def remove_steps_from_dag_file(dag_file: Path, steps_to_remove: List[str]) -> None:
-    """Remove specific steps from a dag file, including their comments.
-
-    Parameters
-    ----------
-    dag_file : Path
-        Path to dag file.
-    steps_to_remove : List[str]
-        List of steps to be removed from the DAG file.
-        Their dependencies do not need to be specified (they will also be removed).
-
-    """
-    for step in steps_to_remove:
-        _remove_step_from_dag_file(dag_file=dag_file, step=step)
-
-
-def create_dag_archive_file(dag_file_archive: Path) -> None:
-    """Create an empty dag archive file, and add it to the main dag archive file.
-
-    Parameters
-    ----------
-    dag_file_archive : Path
-        Path to a specific dag archive file that does not exist yet.
-
-    """
-    # Create a new archive dag file.
-    dag_file_archive.write_text("steps:\n")
-    # Find the number of spaces in the indentation of the main dag archive file.
-    n_spaces_include_section = 2
-    with open(paths.DAG_ARCHIVE_FILE, "r") as file:
-        lines = file.readlines()
-    for i, line in enumerate(lines):
-        if line.strip().startswith("include"):
-            n_spaces_include_section = [
-                len(_line) - len(_line.lstrip()) for _line in lines[i + 1 :] if _line.strip().startswith("- ")
-            ][0]
-    # Add this archive dag file to the main dag archive file.
-    dag_file_archive_relative = dag_file_archive.relative_to(Path(paths.DAG_DIR).parent)
-    with open(paths.DAG_ARCHIVE_FILE, "a") as file:
-        file.write(f"{' ' * n_spaces_include_section}- {dag_file_archive_relative}\n")
-
-
-def create_explorer(
-    dest_dir: Union[str, Path],
-    config: Dict[str, Any],
-    df_graphers: pd.DataFrame,
-    df_columns: Optional[pd.DataFrame] = None,
-) -> Explorer:
-    # Extract information about this step from dest_dir.
-    channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
-    # Initialize explorer.
-    explorer = Explorer.from_owid_content(short_name)
-    # Add a comment to avoid manual edits.
-    explorer.comments = [
-        f"# DO NOT EDIT THIS FILE MANUALLY. IT WAS GENERATED BY ETL step '{channel}/{namespace}/{version}/{short_name}'."
-    ]
-    # Update its config.
-    explorer.config.update(config)
-    # Update its graphers and columns tables.
-    explorer.df_graphers = df_graphers
-    if df_columns is not None:
-        explorer.df_columns = df_columns
-
-    return explorer
-
-
-def map_indicator_path_to_id(catalog_path: str) -> str | int:
-    # Check if given path is actually an ID
-    if str(catalog_path).isdigit():
-        return catalog_path
-
-    # Get ID, assuming given path is a catalog path
-    engine = get_engine()
-    with Session(engine) as session:
-        db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
-        assert db_indicator.id is not None
-        return db_indicator.id
-
-
-@cache
-def get_schema_from_url(schema_url: str) -> dict:
-    """Get the schema of a chart configuration. Schema URL is saved in config["$schema"] and looks like:
-
-    https://files.ourworldindata.org/schemas/grapher-schema.006.json
-
-    More details on available versions can be found
-    at https://github.com/owid/owid-grapher/tree/master/packages/%40ourworldindata/grapher/src/schema.
-
-    Returns
-    -------
-    Dict[str, Any]
-        Schema of a chart configuration.
-    """
-    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()
-
-
-def last_date_accessed(tb: Table) -> str:
-    """Get maximum date_accessed from all origins in the table and display it in a specific format. This
-    should be a replacement for {TODAY} in YAML templates."""
-    date_accessed = max([origin.date_accessed for col in tb.columns for origin in tb[col].m.origins])
-    return dt.datetime.strptime(date_accessed, "%Y-%m-%d").strftime("%d %B %Y")
+    return {dependency for dependency in dependencies if regex.match(dependency)}

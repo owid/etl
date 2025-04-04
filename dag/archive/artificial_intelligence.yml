@@ -359,6 +359,50 @@ steps:
     - data://meadow/artificial_intelligence/2025-01-08/epoch_compute_intensive
   data://grapher/artificial_intelligence/2025-01-08/epoch_compute_intensive_domain:
     - data://garden/artificial_intelligence/2025-01-08/epoch_compute_intensive_domain
+  # Main EPOCH dataset
+  data://meadow/artificial_intelligence/2025-02-04/epoch:
+    - snapshot://artificial_intelligence/2025-02-04/epoch.csv
+  data://garden/artificial_intelligence/2025-02-04/epoch:
+    - data://meadow/artificial_intelligence/2025-02-04/epoch
+  data://grapher/artificial_intelligence/2025-02-04/epoch:
+    - data://garden/artificial_intelligence/2025-02-04/epoch
+
+  # Main EPOCH dataset regression lines
+  data://garden/artificial_intelligence/2025-02-04/epoch_regressions:
+     - data://garden/artificial_intelligence/2025-02-04/epoch
+  data://grapher/artificial_intelligence/2025-02-04/epoch_regressions:
+    - data://garden/artificial_intelligence/2025-02-04/epoch_regressions
+
+  # EPOCH aggregates by domain
+  data://garden/artificial_intelligence/2025-02-04/epoch_aggregates_domain:
+    - data://meadow/artificial_intelligence/2025-02-04/epoch
+  data://grapher/artificial_intelligence/2025-02-04/epoch_aggregates_domain:
+    - data://garden/artificial_intelligence/2025-02-04/epoch_aggregates_domain
+
+  # EPOCH aggregates by researcher affiliaiton
+  data://garden/artificial_intelligence/2025-02-04/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2025-02-04/epoch
+  data://grapher/artificial_intelligence/2025-02-04/epoch_aggregates_affiliation:
+    - data://garden/artificial_intelligence/2025-02-04/epoch_aggregates_affiliation
+
+ # EPOCH dataset on Compute Intensive AI
+  data://meadow/artificial_intelligence/2025-02-04/epoch_compute_intensive:
+    - snapshot://artificial_intelligence/2025-02-04/epoch_compute_intensive.csv
+  data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive:
+    - data://meadow/artificial_intelligence/2025-02-04/epoch_compute_intensive
+
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by country
+  data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_countries:
+    - data://meadow/artificial_intelligence/2025-02-04/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2025-02-04/epoch_compute_intensive_countries:
+    - data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_countries
+
+  # EPOCH dataset on Compute Intensive AI, aggregates by domain
+  data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_domain:
+    - data://meadow/artificial_intelligence/2025-02-04/epoch_compute_intensive
+  data://grapher/artificial_intelligence/2025-02-04/epoch_compute_intensive_domain:
+    - data://garden/artificial_intelligence/2025-02-04/epoch_compute_intensive_domain
 
 ##############################################################################################################
 
@@ -536,3 +580,48 @@ steps:
     - data://meadow/artificial_intelligence/2023-06-08/yougov_end_of_humanity
   data://grapher/artificial_intelligence/2023-06-08/yougov_end_of_humanity:
     - data://garden/artificial_intelligence/2023-06-08/yougov_end_of_humanity
+
+  # YouGov AI surveys
+  data://meadow/artificial_intelligence/2024-07-23/yougov_robots:
+    - snapshot://artificial_intelligence/2024-07-23/yougov_robots.xlsx
+  data://garden/artificial_intelligence/2024-07-23/yougov_robots:
+    - data://meadow/artificial_intelligence/2024-07-23/yougov_robots
+  data://grapher/artificial_intelligence/2024-07-23/yougov_robots:
+    - data://garden/artificial_intelligence/2024-07-23/yougov_robots
+
+  data://meadow/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - snapshot://artificial_intelligence/2024-07-23/yougov_job_automation.xlsx
+  data://garden/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - data://meadow/artificial_intelligence/2024-07-23/yougov_job_automation
+  data://grapher/artificial_intelligence/2024-07-23/yougov_job_automation:
+    - data://garden/artificial_intelligence/2024-07-23/yougov_job_automation
+
+  # Artificial Intelligence Papers with Code (benchmarks) - 2024
+  data://meadow/artificial_intelligence/2024-03-22/papers_with_code_coding:
+    - snapshot://artificial_intelligence/2024-03-22/papers_with_code_coding.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_coding:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_coding
+  data://grapher/artificial_intelligence/2024-03-22/papers_with_code_coding:
+    - data://garden/artificial_intelligence/2024-03-22/papers_with_code_coding
+
+  data://meadow/artificial_intelligence/2024-03-22/papers_with_code_language:
+    - snapshot://artificial_intelligence/2024-03-22/papers_with_code_language.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_language:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_language
+  data://grapher/artificial_intelligence/2024-03-22/papers_with_code_language:
+    - data://garden/artificial_intelligence/2024-03-22/papers_with_code_language
+
+  data://meadow/artificial_intelligence/2024-03-22/papers_with_code_math:
+    - snapshot://artificial_intelligence/2024-03-22/papers_with_code_math.html
+  data://garden/artificial_intelligence/2024-03-22/papers_with_code_math:
+    - data://meadow/artificial_intelligence/2024-03-22/papers_with_code_math
+  data://grapher/artificial_intelligence/2024-03-22/papers_with_code_math:
+    - data://garden/artificial_intelligence/2024-03-22/papers_with_code_math
+
+  # ImageNet
+  data://meadow/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - snapshot://artificial_intelligence/2024-07-23/papers_with_code_imagenet.html
+  data://garden/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - data://meadow/artificial_intelligence/2024-07-23/papers_with_code_imagenet
+  data://grapher/artificial_intelligence/2024-07-23/papers_with_code_imagenet:
+    - data://garden/artificial_intelligence/2024-07-23/papers_with_code_imagenet

@@ -47,7 +47,7 @@ steps:
   data://grapher/war/2024-08-26/ucdp:
     - data://garden/war/2024-08-26/ucdp
 
-  # UCDP (with candidate data, latest available)
+  # [TODO: ARCHIVE] UCDP (with candidate data, latest available)
   data://meadow/war/2024-11-22/ucdp_ced:
     - snapshot://war/2024-11-22/ucdp_ced_v24_0_10.csv
     - snapshot://war/2024-11-22/ucdp_ced_v24_01_24_09.csv
@@ -59,6 +59,18 @@ steps:
     - data://garden/countries/2024-08-27/gleditsch
   data://grapher/war/2024-11-22/ucdp_preview:
     - data://garden/war/2024-11-22/ucdp_preview
+
+  # UCDP (with candidate data, latest available)
+  data://meadow/war/latest/ucdp_ced:
+    - snapshot://war/latest/ucdp_ced_v24_01_24_12.csv
+  data://garden/war/latest/ucdp_preview:
+    - data://meadow/war/latest/ucdp_ced
+    - data://garden/demography/2024-07-15/population
+    - data://garden/geography/2023-11-28/nat_earth_110
+    - data://meadow/war/2024-08-26/ucdp
+    - data://garden/countries/2024-08-27/gleditsch
+  data://grapher/war/latest/ucdp_preview:
+    - data://garden/war/latest/ucdp_preview
 
   # PRIO v3.1
   data://meadow/war/2023-09-21/prio_v31:
@@ -210,36 +222,6 @@ steps:
     - data://garden/war/2024-01-23/nuclear_weapons_treaties
   data://grapher/war/2024-01-23/nuclear_weapons_treaties_country_counts:
     - data://garden/war/2024-01-23/nuclear_weapons_treaties
-
-  # SIPRI Military Expenditure Database
-  data://meadow/sipri/2024-07-08/military_expenditure:
-    - snapshot://sipri/2024-07-08/military_expenditure.xlsx
-  data://garden/sipri/2024-07-08/military_expenditure:
-    - data://meadow/sipri/2024-07-08/military_expenditure
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-  data://grapher/sipri/2024-07-08/military_expenditure:
-    - data://garden/sipri/2024-07-08/military_expenditure
-
-  # Global Military Spending Dataset
-  data://meadow/harvard/2024-11-26/global_military_spending_dataset:
-    - snapshot://harvard/2024-07-22/global_military_spending_dataset.rds
-    - snapshot://harvard/2024-11-26/global_military_spending_dataset_burden.rds
-  data://garden/harvard/2024-11-26/global_military_spending_dataset:
-    - data://meadow/harvard/2024-11-26/global_military_spending_dataset
-    - data://garden/demography/2024-07-15/population
-    - data://garden/countries/2024-08-27/gleditsch
-    - data://garden/cow/2024-07-26/national_material_capabilities
-  data://grapher/harvard/2024-11-26/global_military_spending_dataset:
-    - data://garden/harvard/2024-11-26/global_military_spending_dataset
-
-    # Correlates of War - National Material Capabilities
-  data://meadow/cow/2024-07-26/national_material_capabilities:
-    - snapshot://cow/2024-07-26/national_material_capabilities.csv
-  data://garden/cow/2024-07-26/national_material_capabilities:
-    - data://meadow/cow/2024-07-26/national_material_capabilities
-    - data://garden/countries/2023-09-29/cow_ssm
-  data://grapher/cow/2024-07-26/national_material_capabilities:
-    - data://garden/cow/2024-07-26/national_material_capabilities
 
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.

@@ -1,0 +1,19 @@
+# This one includes datasets on spending and revenue, for the government spending and taxes topic pages
+
+steps:
+  # OECD Health Expenditure and Financing Database
+  data://meadow/oecd/2024-02-23/health_expenditure:
+    - snapshot://oecd/2024-02-23/health_expenditure.csv
+  data://garden/oecd/2024-02-23/health_expenditure:
+    - data://meadow/oecd/2024-02-23/health_expenditure
+  data://grapher/oecd/2024-02-23/health_expenditure:
+    - data://garden/oecd/2024-02-23/health_expenditure
+
+  # Public Finances in Modern History dataset (IMF)
+  data://meadow/imf/2024-06-12/public_finances_modern_history:
+    - snapshot://imf/2024-06-12/public_finances_modern_history.xlsx
+  data://garden/imf/2024-06-12/public_finances_modern_history:
+    - data://meadow/imf/2024-06-12/public_finances_modern_history
+  data://grapher/imf/2024-06-12/public_finances_modern_history:
+    - data://garden/imf/2024-06-12/public_finances_modern_history
+

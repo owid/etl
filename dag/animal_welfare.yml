@@ -43,13 +43,6 @@ steps:
   data://grapher/animal_welfare/2023-09-01/chick_culling_laws:
     - data://garden/animal_welfare/2023-09-01/chick_culling_laws
   #
-  # Total number of slaughtered animals.
-  #
-  data://garden/animal_welfare/2024-05-20/animals_used_for_food:
-    - data://garden/faostat/2024-03-14/faostat_qcl
-  data://grapher/animal_welfare/2024-05-20/animals_used_for_food:
-    - data://garden/animal_welfare/2024-05-20/animals_used_for_food
-  #
   # Various sources - Bullfighting laws.
   #
   data://meadow/animal_welfare/2024-06-04/bullfighting_laws:
@@ -123,3 +116,30 @@ steps:
   #
   data://grapher/animal_welfare/2024-12-17/fur_laws:
     - data://garden/animal_welfare/2024-12-17/fur_laws
+  #
+  # Total number of animals used for food.
+  #
+  data://garden/animal_welfare/2025-03-26/animals_used_for_food:
+    - data://garden/faostat/2025-03-17/faostat_qcl
+    - data://garden/animal_welfare/2024-12-12/number_of_wild_fish_killed_for_food
+    - data://garden/animal_welfare/2024-12-12/number_of_farmed_fish
+    - data://garden/animal_welfare/2025-01-23/number_of_farmed_crustaceans
+  #
+  # Total number of animals used for food.
+  #
+  data://grapher/animal_welfare/2025-03-26/animals_used_for_food:
+    - data://garden/animal_welfare/2025-03-26/animals_used_for_food
+  #
+  # Land animals killed for food (grouped into main animals and "other").
+  #
+  data://grapher/animal_welfare/2025-03-26/land_animals_killed_for_food:
+    - data://garden/faostat/2025-03-17/faostat_qcl
+  #
+  # Animal welfare data explorer.
+  #
+  export://explorers/animal_welfare/latest/animal_welfare:
+    - data://grapher/animal_welfare/2025-03-26/animals_used_for_food
+    - data://grapher/animal_welfare/2023-08-01/global_hen_inventory
+    - data://grapher/animal_welfare/2023-09-01/chick_culling_laws
+    - data://grapher/animal_welfare/2024-06-04/bullfighting_laws
+    - data://grapher/animal_welfare/2024-12-17/fur_laws

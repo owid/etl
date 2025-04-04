@@ -3,7 +3,7 @@
 #
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import pytest
 import yaml
@@ -121,3 +121,51 @@ def test_hash():
     var_c = meta.VariableMeta(display={"d": {"a": 1, "b": 2, "c": 3}})
     assert var_a == var_b
     assert var_a != var_c
+
+
+def test_from_dict():
+    @dataclass
+    class X(meta.MetaBase):
+        a: int
+
+    @dataclass
+    class Y(meta.MetaBase):
+        x_list: Optional[List[X]] = None
+
+    # list of objects should be correctly loaded as that object
+    y = Y.from_dict({"x_list": [{"a": 1}]})
+    assert isinstance(y.x_list[0], X)
+
+
+def test_render():
+    jinja_title = """
+    <% if dim_a == "x" %>Title X<% elif dim_a == "y" %>Title Y<% else %>Default Title<% endif %>
+    """.strip()
+
+    var_meta = meta.VariableMeta(title=jinja_title)  # type: ignore
+    rendered_meta = var_meta.render(dim_dict={"dim_a": "x"})
+    assert isinstance(rendered_meta, meta.VariableMeta)
+    assert rendered_meta.title == "Title X"
+
+
+def test_render_description_key():
+    jinja_description_key = [
+        "<% if dim_a == 'x' %> Desc x <% endif %>  ",
+        "<% if dim_a == 'y' %>  Desc y <% endif %>",
+        "Desc z",
+    ]
+
+    var_meta = meta.VariableMeta(description_key=jinja_description_key)  # type: ignore
+    rendered_meta = var_meta.render(dim_dict={"dim_a": "x"})
+    assert isinstance(rendered_meta, meta.VariableMeta)
+    assert rendered_meta.description_key == ["Desc x", "Desc z"]
+
+
+def test_render_with_error():
+    jinja_title = """
+    <% if dim_a == "x" %>Title X<% elif dim_a == "y" %>Title Y<% else %>Default Title<% endif %>
+    """.strip()
+
+    var_meta = meta.VariableMeta(title=jinja_title)  # type: ignore
+    with pytest.raises(Exception):
+        var_meta.render(dim_dict={"dim_b": "x"})

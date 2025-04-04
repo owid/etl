@@ -1,0 +1,10 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+      - Animal Welfare
+
+tables:
+  animals_used_for_food:
+    title: Animals used for food
+    # Metadata is set programmatically.

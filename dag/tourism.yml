@@ -33,13 +33,13 @@ steps:
     - data://meadow/oecd/2024-08-19/ppp_exchange_rates
 
 # OECD CO2 emissions from air transport
-  data://meadow/oecd/2024-12-30/co2_air_transport:
-    - snapshot://oecd/2024-12-30/co2_air_transport.csv
-  data://garden/oecd/2024-12-30/co2_air_transport:
-    - data://meadow/oecd/2024-12-30/co2_air_transport
+  data://meadow/oecd/2025-03-11/co2_air_transport:
+    - snapshot://oecd/2025-03-11/co2_air_transport.csv
+  data://garden/oecd/2025-03-11/co2_air_transport:
+    - data://meadow/oecd/2025-03-11/co2_air_transport
     - data://garden/tourism/2024-08-17/unwto
     - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-  data://grapher/oecd/2024-12-30/co2_air_transport:
-    - data://garden/oecd/2024-12-30/co2_air_transport
+  data://grapher/oecd/2025-03-11/co2_air_transport:
+    - data://garden/oecd/2025-03-11/co2_air_transport
 

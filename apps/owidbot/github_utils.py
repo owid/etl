@@ -67,7 +67,7 @@ def generate_jwt(client_id: str, private_key_path: str) -> str:
     return token
 
 
-def github_app_access_token():
+def github_app_access_token(max_retries=3) -> str:
     assert config.OWIDBOT_APP_CLIENT_ID, "OWIDBOT_APP_CLIENT_ID is not set"
     assert config.OWIDBOT_APP_PRIVATE_KEY_PATH, "OWIDBOT_APP_PRIVATE_KEY_PATH is not set"
     assert config.OWIDBOT_APP_INSTALLATION_ID, "OWIDBOT_APP_INSTALLATION_ID is not set"
@@ -76,15 +76,25 @@ def github_app_access_token():
 
     # Use the JWT to get an installation access token
     headers = {"Authorization": f"Bearer {jwt_token}", "Accept": "application/vnd.github.v3+json"}
-
     installation_access_token_url = (
         f"https://api.github.com/app/installations/{config.OWIDBOT_APP_INSTALLATION_ID}/access_tokens"
     )
-    response = requests.post(installation_access_token_url, headers=headers)
-    response.raise_for_status()
-    access_token = response.json()["token"]
 
-    return access_token
+    backoff = 2
+    for attempt in range(1, max_retries + 1):
+        response = requests.post(installation_access_token_url, headers=headers)
+        if response.status_code != 504:
+            response.raise_for_status()
+            access_token = response.json()["token"]
+            return access_token
+        else:
+            if attempt == max_retries:
+                response.raise_for_status()
+            else:
+                time.sleep(backoff)
+                backoff *= 2  # Exponential backoff
+
+    raise AssertionError("Failed to get installation access token.")
 
 
 def compute_git_blob_sha1(content: bytes) -> str:

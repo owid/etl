@@ -1,6 +1,7 @@
 import hashlib
 import json
 import random
+import urllib.parse
 from contextlib import contextmanager
 from copy import deepcopy
 from functools import wraps
@@ -143,6 +144,36 @@ def grapher_chart_from_url(chart_url: str, height=600):
             allow="web-share; clipboard-write"></iframe>
     """
     return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
+
+
+def explorer_chart(
+    base_url: str, explorer_slug: str, view: dict, height: int = 600, default_display: Optional[str] = None
+):
+    # First HTML definition with parameters
+    url = f"{base_url}/{explorer_slug}"
+
+    params = {
+        # "Metric": "Confirmed cases",
+        # "Frequency": "7-day average",
+        # "Relative to population": "false",
+        # "country": "COD~BDI~UGA~CAF",
+        "hideControls": "true",
+        **view,
+    }
+    if default_display is not None:
+        dd = default_display.lower()
+        if dd in ["map", "table", "chart"]:
+            params["tab"] = dd
+
+    query_string = "?" + urllib.parse.urlencode(params)
+
+    HTML = f"""
+    <!-- Redirect to the external URL -->
+    <meta http-equiv="refresh" content="0; url={url}{query_string}">
+    """
+
+    # Render the HTML
+    return st.components.v1.html(HTML, height=height)  # type: ignore
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
@@ -437,13 +468,16 @@ def st_toast_success(message: str) -> None:
     st.toast(f"✅ :green[{message}]")
 
 
-def update_query_params(key):
+def update_query_params(key: str, side_effect: Optional[Callable[[], None]] = None):
     def _update_query_params():
         value = st.session_state[key]
         if value is not None:
             st.query_params.update({key: value})
         else:
             st.query_params.pop(key, None)
+
+        if side_effect is not None:
+            side_effect()
 
     return _update_query_params
 
@@ -468,10 +502,10 @@ def url_persist(component: Any) -> Any:
 
     def _persist(*args, **kwargs):
         assert "key" in kwargs, "key should be passed to persist"
-        # TODO: we could wrap on_change too to make it work
-        assert "on_change" not in kwargs, "on_change should not be passed to persist"
 
         key = kwargs["key"]
+
+        on_change = kwargs.pop("on_change", None)
 
         # Get default from `value` field
         default = kwargs.pop("value", None)
@@ -499,7 +533,7 @@ def url_persist(component: Any) -> Any:
             elif st.session_state[key] == default:
                 remove_query_params(key)
 
-        kwargs["on_change"] = update_query_params(key)
+        kwargs["on_change"] = update_query_params(key, side_effect=on_change)
 
         return component(*args, **kwargs)
 
@@ -548,7 +582,14 @@ def _get_params(component, key):
             return params
 
 
-def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, **cache_kwargs):
+def st_cache_data(
+    func: Optional[Callable] = None,
+    *,
+    custom_text: str = "Running...",
+    show_spinner: bool = False,
+    show_time: bool = False,
+    **cache_kwargs,
+):
     """
     A custom decorator that wraps `st.cache_data` and adds support for a `custom_text` argument.
 
@@ -556,6 +597,7 @@ def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, **
         func: The function to be cached.
         custom_text (str): The custom spinner text to display.
         show_spinner (bool): Whether to show the default Streamlit spinner message. Defaults to False.
+        show_time (bool): Whether to show the elapsed time. Defaults to False.
         **cache_kwargs: Additional arguments passed to `st.cache_data`.
     """
 
@@ -565,7 +607,7 @@ def st_cache_data(func=None, *, custom_text="Running...", show_spinner=False, **
 
         @wraps(f)
         def wrapper(*args, **kwargs):
-            with st.spinner(custom_text):
+            with st.spinner(custom_text, show_time=show_time):
                 return cached_func(*args, **kwargs)
 
         return wrapper

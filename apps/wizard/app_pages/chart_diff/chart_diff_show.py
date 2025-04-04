@@ -7,8 +7,9 @@ If you want to learn more about it, start from its `show` method.
 import difflib
 import json
 import os
-from typing import Any, Dict, List, Optional, cast
+from typing import Any, Dict, List, Optional, Tuple, cast
 
+import pandas as pd
 import streamlit as st
 from sqlalchemy.orm import Session
 
@@ -29,20 +30,20 @@ DISPLAY_STATE_OPTIONS = {
     gm.ChartStatus.APPROVED.value: {
         "label": "Approve",
         "color": "green",
-        # "icon": ":material/done_outline:",
+        "material_icon": ":material/done_outline:",
         "icon": "✅",
-    },
-    gm.ChartStatus.REJECTED.value: {
-        "label": "Reject",
-        "color": "red",
-        # "icon": ":material/delete:",
-        "icon": "❌",
     },
     gm.ChartStatus.PENDING.value: {
         "label": "Pending",
         "color": "gray",
-        # "icon": ":material/schedule:",
+        "material_icon": ":material/schedule:",
         "icon": "⏳",
+    },
+    gm.ChartStatus.REJECTED.value: {
+        "label": "Reject",
+        "color": "red",
+        "material_icon": ":material/delete:",
+        "icon": "❌",
     },
 }
 DISPLAY_STATE_OPTIONS_BINARY = {
@@ -135,7 +136,7 @@ class ChartDiffShow:
         if session is None:
             session = self.source_session
         with st.spinner():
-            status = st.session_state[f"radio-{self.diff.chart_id}"]
+            status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
             self.diff.set_status(session=session, status=status)
 
             # Notify user
@@ -153,7 +154,7 @@ class ChartDiffShow:
         if session is None:
             session = self.source_session
         with st.spinner():
-            status = st.session_state[f"radio-{self.diff.chart_id}"]
+            status = st.session_state[f"status-ctrl-{self.diff.chart_id}"]
             self.diff.set_status(session=session, status=status)
 
             # Notify user
@@ -177,10 +178,22 @@ class ChartDiffShow:
         """Header for the production chart."""
         # Everything is fine
         if not self.diff.in_conflict:
-            text_production = f"Production ┃ _{prettify_date(self.diff.target_chart)}_"
+            text_production = f"**Production** :material/event: {prettify_date(self.diff.target_chart)}"
         # Conflict with live
         else:
-            text_production = f":red[Production ┃ _{prettify_date(self.diff.target_chart)}_] ⚠️"
+            text_production = f":red[**Production** :material/event: {prettify_date(self.diff.target_chart)}] ⚠️"
+
+        return text_production
+
+    @property
+    def _header_production_chart_plain(self):
+        """Header for the production chart."""
+        # Everything is fine
+        if not self.diff.in_conflict:
+            text_production = f"Production ({prettify_date(self.diff.target_chart)})"
+        # Conflict with live
+        else:
+            text_production = f"Production ({prettify_date(self.diff.target_chart)}) -- CONFLICT ⚠️"
 
         return text_production
 
@@ -189,10 +202,10 @@ class ChartDiffShow:
         """Header for staging chart."""
         # Everything is fine
         if not self.diff.in_conflict:
-            text_staging = f":green[New version ┃ _{prettify_date(self.diff.source_chart)}_]"
+            text_staging = f":green[**New version** :material/today: {prettify_date(self.diff.source_chart)}]"
         # Conflict with live
         else:
-            text_staging = f"New version ┃ _{prettify_date(self.diff.source_chart)}_"
+            text_staging = f"**New version** :material/today: {prettify_date(self.diff.source_chart)}"
 
         return text_staging
 
@@ -248,7 +261,7 @@ class ChartDiffShow:
 
     def _show_chart_diff_controls(self):
         # Three columns: status, refresh, link
-        col1, col2, col3 = st.columns([2, 1, 3])
+        col1, col2, col3 = st.columns([2, 1, 3], vertical_alignment="bottom")
 
         # Status of chart diff: approve, pending, reject
         with col1:
@@ -259,7 +272,7 @@ class ChartDiffShow:
             ):
                 st.radio(
                     label="Did you review the chart?",
-                    key=f"radio-{self.diff.chart_id}",
+                    key=f"status-ctrl-{self.diff.chart_id}",
                     options=self.status_names_binary,
                     horizontal=True,
                     format_func=lambda x: f":{DISPLAY_STATE_OPTIONS_BINARY[x]['color']}-background[{DISPLAY_STATE_OPTIONS_BINARY[x]['label']}]",
@@ -271,39 +284,54 @@ class ChartDiffShow:
                 if self.diff.in_conflict:
                     help_text = "Resolve chart config conflicts before proceeding!"
                 else:
-                    help_text = "Approve or reject the chart. If you are not sure, please leave it as pending."
-                st.radio(
+                    help_text = (
+                        "Charts need to be reviewed before merging your work, otherwise CI/CD will fail in your PR.\n\n"
+                        "- **Approve chart**: After merging your PR, the chart in production will be updated with your edits.\n"
+                        "- **Reject chart**: Your changes will be discarded and the chart in production will remain as is.\n"
+                        "- **Pending**: You can come back later to approve or reject the chart.\n\n"
+                        "Note that CI/CD will fail if any of the chart diffs is pending."
+                    )
+
+                def _format_status(x):
+                    return f":{DISPLAY_STATE_OPTIONS[x]['color']}[{DISPLAY_STATE_OPTIONS[x]['material_icon']}] {DISPLAY_STATE_OPTIONS[x]['label']}"
+
+                st.segmented_control(
                     label="Approve or reject chart",
-                    key=f"radio-{self.diff.chart_id}",
+                    key=f"status-ctrl-{self.diff.chart_id}",
                     options=self.status_names,
-                    horizontal=True,
-                    format_func=lambda x: f":{DISPLAY_STATE_OPTIONS[x]['color']}-background[{DISPLAY_STATE_OPTIONS[x]['label']}]",
-                    index=self.status_names.index(self.diff.approval_status),  # type: ignore
+                    format_func=lambda x: _format_status(x),
+                    default=self.diff.approval_status,  # type: ignore
                     on_change=self._push_status,
                     disabled=self.diff.in_conflict,
                     help=help_text,
+                    # label_visibility="collapsed",
                 )
 
         # Refresh chart
         with col2:
             st.button(
-                label="🔄 Refresh",
+                label=":material/refresh: Refresh charts",
                 key=f"refresh-btn-{self.diff.chart_id}",
                 help="Get the latest version of the chart from the staging server.",
                 on_click=self._refresh_chart_diff,
+                type="secondary",
             )
-        # Copy link
-        if self.show_link:
-            with col3:
+
+        with col3:
+            # Copy link
+            if self.show_link:
+                # with col3:
                 query_params = f"chart_id={self.diff.chart_id}"
                 # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
                 if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
+                    url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
                     st.caption(
-                        f"**{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}**",
+                        body=url,
                         help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
                     )
                 else:
-                    st.caption(f"**{OWID_ENV.wizard_url}/chart-diff?{query_params}**")
+                    url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
+                    st.caption(body=url)
 
     def _show_metadata_diff(self) -> None:
         """Show metadata diff (if applicable).
@@ -401,45 +429,76 @@ class ChartDiffShow:
             cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
             st.info(cost_msg)
 
-    def _show_chart_comparison(self) -> None:
+    def _show_chart_comparison(self) -> Tuple[Any, bool]:
         """Show charts (horizontally or vertically)."""
 
-        def _show_charts_comparison_v():
-            """Show charts on top of each other."""
-            # Chart production
-            if self.diff.in_conflict:
-                help_text = CONFLICT_HELP_MESSAGE
-                st.markdown(self._header_production_chart, help=help_text)
-            else:
-                st.markdown(self._header_production_chart)
-            assert self.diff.target_chart is not None
-            grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
+        def _show_chart_old():
+            if (self.diff.last_chart_revision_approved is not None) and (not self.diff.in_conflict):
+                with st.container(height=40, border=False):
+                    options = {
+                        "prod": self._header_production_chart_plain,
+                        "last": f"Last approved on staging ({prettify_date(self.diff.last_chart_revision_approved)} - REV {self.diff.last_chart_revision_approved.id})",
+                    }
+                    option = st.selectbox(
+                        "Chart revision",
+                        options=options.keys(),
+                        format_func=lambda x: options[x],
+                        key=f"prod-review-{self.diff.chart_id}",
+                        label_visibility="collapsed",
+                    )
 
-            # Chart staging
-            st.markdown(self._header_staging_chart)
+                if option == "prod":
+                    assert self.diff.target_chart is not None
+                    grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
+                elif option == "last":
+                    grapher_chart(chart_config=self.diff.last_chart_revision_approved.config, owid_env=SOURCE)
+                    return self.diff.last_chart_revision_approved.config, False
+            else:
+                if self.diff.in_conflict:
+                    st.markdown(self._header_production_chart, help=CONFLICT_HELP_MESSAGE)
+                else:
+                    st.markdown(self._header_production_chart)
+                assert self.diff.target_chart is not None
+                grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
+
+            assert self.diff.target_chart is not None
+            return self.diff.target_chart.config, True
+
+        def _show_chart_new():
+            if self.diff.last_chart_revision_approved is None:
+                st.markdown(self._header_staging_chart)
+            else:
+                with st.container(height=40, border=False):
+                    st.markdown(self._header_staging_chart)
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
 
-        def _show_charts_comparison_h():
+        def _show_charts_comparison_v() -> Tuple[Any, bool]:
+            """Show charts on top of each other."""
+            # Chart production
+            config_ref, is_prod = _show_chart_old()
+
+            # Chart staging
+            _show_chart_new()
+
+            return config_ref, is_prod
+
+        def _show_charts_comparison_h() -> Tuple[Any, bool]:
             """Show charts next to each other."""
             # Create two columns for the iframes
             col1, col2 = st.columns(2)
 
             with col1:
-                if self.diff.in_conflict:
-                    help_text = CONFLICT_HELP_MESSAGE
-                    st.markdown(self._header_production_chart, help=help_text)
-                else:
-                    st.markdown(self._header_production_chart)
-                assert self.diff.target_chart is not None
-                grapher_chart(chart_config=self.diff.target_chart.config, owid_env=TARGET)
+                config_ref, is_prod = _show_chart_old()
             with col2:
-                st.markdown(self._header_staging_chart)
-                grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
+                _show_chart_new()
+            return config_ref, is_prod
 
         # Only one chart: new chart
+        is_prod = True
         if self.diff.target_chart is None:
             st.markdown(f"New version ┃ _{prettify_date(self.diff.source_chart)}_")
             grapher_chart(chart_config=self.diff.source_chart.config, owid_env=SOURCE)
+            config_ref = self.diff.source_chart.config
         # Two charts, actual diff
         else:
             # Detect arrangement type
@@ -449,9 +508,9 @@ class ChartDiffShow:
 
             # Show charts
             if arrange_vertical:
-                _show_charts_comparison_v()
+                config_ref, is_prod = _show_charts_comparison_v()
             else:
-                _show_charts_comparison_h()
+                config_ref, is_prod = _show_charts_comparison_h()
 
             # Enable/disable vertical arrangement
             st.toggle(
@@ -460,32 +519,41 @@ class ChartDiffShow:
                 # on_change=None,
             )
 
-    def _show_config_diff(self) -> None:
+        return config_ref, is_prod
+
+    def _show_config_diff(self, config_ref, fromfile: str = "production") -> None:
         assert (
             self.diff.target_chart is not None
         ), "We detected this diff to be a chart modification, but couldn't find target chart!"
 
-        config_1 = self.diff.target_chart.config
+        # config_1 = self.diff.target_chart.config
         config_2 = self.diff.source_chart.config
 
-        _show_dict_diff(config_1, config_2)
+        _show_dict_diff(config_ref, config_2, fromfile=fromfile)
 
-    def _show_approval_history(self):
+    def _show_approval_history(self, df: pd.DataFrame):
         """Show history of approvals of a chart-diff."""
-        approvals = self.diff.get_all_approvals(self.source_session)
-        # Get text
-        text = ""
-        for counter, approval in enumerate(approvals):
-            emoji = DISPLAY_STATE_OPTIONS[str(approval.status)]["icon"]
-            color = DISPLAY_STATE_OPTIONS[str(approval.status)]["color"]
-            text_ = f"{approval.updatedAt}: {emoji} :{color}[{approval.status}]"
+        df = df.sort_values("updatedAt", ascending=False)
+        df["status"] = df["status"].apply(lambda x: f"{DISPLAY_STATE_OPTIONS[str(x)]['icon']} {x}")
 
-            if counter == 0:
-                text_ = f"**{text_}**"
-
-            text += text_ + "\n\n"
-
-        st.markdown(text)
+        if df.empty:
+            st.markdown("No approval history found!")
+        else:
+            st.dataframe(
+                df,
+                column_order=["updatedAt", "status"],
+                column_config={
+                    "updatedAt": st.column_config.DatetimeColumn(
+                        "Updated",
+                        format="D MMM YYYY, hh:mm:ss",
+                        step=60,
+                    ),
+                    "status": st.column_config.Column(
+                        "Status",
+                    ),
+                },
+                hide_index=True,
+            )
 
     def _show(self) -> None:
         """Show chart diff.
@@ -513,23 +581,35 @@ class ChartDiffShow:
         if "metadata" in self.diff.change_types:
             self._show_metadata_diff()
 
+        # Get approval history
+        # df_approvals = self.diff.get_all_approvals_df()
+
+        # Get latest approved revision
+        # chart_revision_last_approved = None
+        # if not self.diff.is_approved and not df_approvals.empty:
+        #     df_approvals_past = df_approvals.loc[df_approvals["status"] == "approved"]
+        #     if not df_approvals_past.empty:
+        #         timestamp = df_approvals_past["updatedAt"].max()
+        #         # Find the revision that was approved
+        #         chart_revision_last_approved = self.diff.get_last_chart_revision(self.source_session, timestamp)
+
         # SHOW MODIFIED CHART
         if self.diff.is_modified:
             tab1, tab2, tab3 = st.tabs(["Charts", "Config diff", "Status log"])
             with tab1:
-                self._show_chart_comparison()
+                config_ref, is_prod = self._show_chart_comparison()
             with tab2:
-                self._show_config_diff()
+                self._show_config_diff(config_ref, "production" if is_prod else "last revision")
             with tab3:
-                self._show_approval_history()
+                self._show_approval_history(self.diff.df_approvals)
 
         # SHOW NEW CHART
         elif self.diff.is_new:
             tab1, tab2 = st.tabs(["Chart", "Status log"])
             with tab1:
-                self._show_chart_comparison()
+                _ = self._show_chart_comparison()
             with tab2:
-                self._show_approval_history()
+                self._show_approval_history(self.diff.df_approvals)
 
     @st.fragment
     def show(self):
@@ -546,19 +626,16 @@ class ChartDiffShow:
             self._show()
 
 
-def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
-    """Get diff of two dictionaries.
+def compare_strings(s1: str, s2: str, fromfile: str, tofile: str = "staging"):
+    """Get diff of two multi-line strings.
 
     Useful for chart config diffs, indicator metadata diffs, etc.
     """
-    d1 = json.dumps(dix_1, indent=4)
-    d2 = json.dumps(dix_2, indent=4)
-
     diff = difflib.unified_diff(
-        d1.splitlines(keepends=True),
-        d2.splitlines(keepends=True),
-        fromfile="production",
-        tofile="staging",
+        s1.strip().splitlines(keepends=True),
+        s2.strip().splitlines(keepends=True),
+        fromfile=fromfile,
+        tofile=tofile,
     )
 
     diff_string = "".join(diff)
@@ -566,17 +643,25 @@ def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
     return diff_string
 
 
+def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str, tofile: str = "staging"):
+    """Get diff of two dictionaries.
+
+    Useful for chart config diffs, indicator metadata diffs, etc.
+    """
+    return compare_strings(json.dumps(dix_1, indent=4), json.dumps(dix_2, indent=4), fromfile=fromfile, tofile=tofile)
+
+
 def st_show_diff(diff_str):
     """Display diff."""
     st.code(diff_str, line_numbers=True, language="diff")
 
 
-def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any]):
+def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str):
     """Show diff of two dictionaries.
 
     Used to show chart config diffs, indicator metadata diffs, etc.
     """
-    diff_str = compare_dictionaries(dix_1, dix_2)
+    diff_str = compare_dictionaries(dix_1, dix_2, fromfile=fromfile)
     st_show_diff(diff_str)
 
 

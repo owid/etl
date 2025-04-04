@@ -6,7 +6,8 @@ from typing import Optional
 
 import rich_click as click
 
-from etl.steps import filter_to_subgraph, load_dag
+from etl.dag_helpers import load_dag
+from etl.steps import filter_to_subgraph
 
 
 @click.command(name="graphviz")
@@ -54,7 +55,6 @@ def to_graphviz(output_file: str, filter: Optional[str] = None, targets: bool = 
             node(n)
 
         p("subgraph { rank=same")
-        node("Walden")
         node("Snapshot")
         node("Github")
         p("}")
@@ -100,16 +100,13 @@ def to_graphviz(output_file: str, filter: Optional[str] = None, targets: bool = 
         link("Reference", "Data catalog")
 
         for n in nodes:
-            if n.startswith("walden://"):
-                link("Walden", n)
-
             if n.startswith("snapshot://"):
                 link("Snapshot", n)
 
             if n.startswith("github://"):
                 link("Github", n)
 
-        for prefix in ["walden://", "snapshot://", "data://grapher", "data://garden/", "data://meadow"]:
+        for prefix in ["snapshot://", "data://grapher", "data://garden/", "data://meadow"]:
             p("subgraph {")
             p("rank = same;")
             for n in nodes:

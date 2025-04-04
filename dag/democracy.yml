@@ -9,6 +9,16 @@ steps:
   data://grapher/democracy/2024-03-07/bmr:
     - data://garden/democracy/2024-03-07/bmr
 
+  # Varieties of Democracy (2025)
+  data://meadow/democracy/2025-03-17/vdem:
+    - snapshot://democracy/2025-03-17/vdem.zip
+  data://garden/democracy/2025-03-17/vdem:
+    - data://meadow/democracy/2025-03-17/vdem
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/democracy/2025-03-17/vdem:
+    - data://garden/democracy/2025-03-17/vdem
+
   # Varieties of Democracy (2024)
   data://meadow/democracy/2024-03-07/vdem:
     - snapshot://democracy/2024-03-18/vdem.zip
@@ -29,7 +39,7 @@ steps:
   data://grapher/democracy/2024-05-01/ert:
     - data://garden/democracy/2024-03-07/ert
 
-  # Lexcial Index (2023)
+  # Lexical Index (2023)
   data://meadow/democracy/2024-05-09/lexical_index:
     - snapshot://democracy/2024-05-09/lexical_index.xlsx
   data://garden/democracy/2024-03-07/lexical_index:
@@ -76,15 +86,16 @@ steps:
   data://grapher/democracy/2024-05-22/claassen_satisfaction:
     - data://garden/democracy/2024-03-07/claassen_satisfaction
 
-  # EIU (2024)
-  data://meadow/democracy/2024-05-22/eiu:
+  # EIU (2025)
+  data://meadow/democracy/2025-03-05/eiu:
     - snapshot://democracy/2024-05-22/eiu_gapminder.csv
     - snapshot://democracy/2024-05-22/eiu_2021.csv
     - snapshot://democracy/2024-05-22/eiu_2022.csv
     - snapshot://democracy/2024-05-22/eiu_2023.csv
-  data://garden/democracy/2024-03-07/eiu:
-    - data://meadow/democracy/2024-05-22/eiu
+    - snapshot://democracy/2025-03-05/eiu_2024.csv
+  data://garden/democracy/2025-03-05/eiu:
+    - data://meadow/democracy/2025-03-05/eiu
+    - data://garden/demography/2024-07-15/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/democracy/2024-05-22/eiu:
-    - data://garden/democracy/2024-03-07/eiu
+  data://grapher/democracy/2025-03-05/eiu:
+    - data://garden/democracy/2025-03-05/eiu

@@ -1,8 +1,0 @@
-# note: other metadata fields not listed here are filled using metadata retrieved from the external source
-namespace: worldbank_wdi
-short_name: wdi
-source_name: World Bank
-url: https://datacatalog.worldbank.org/search/dataset/0037712/World-Development-Indicators
-file_extension: zip
-license_url: https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
-source_data_url: http://databank.worldbank.org/data/download/WDI_csv.zip

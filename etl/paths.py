@@ -1,3 +1,7 @@
+#
+# NOTE: There should not be any etl dependency in this module.
+#
+
 import os
 from pathlib import Path
 
@@ -67,5 +71,6 @@ DEFAULT_DAG_FILE = DAG_FILE
 # Hidden ETL file that will keep the time it took to execute each step.
 EXECUTION_TIME_FILE = BASE_DIR / ".execution_time.json"
 
+# TODO: Remove this once we fully deprecate owid-content
 # Default path to the explorers folder.
 EXPLORERS_DIR = Path(os.environ.get("EXPLORERS_DIR", BASE_DIR.parent / "owid-content/explorers"))

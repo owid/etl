@@ -1,15 +1,4 @@
 steps:
-  # Migration UN DESA
-  data://meadow/un/2024-07-16/migrant_stock:
-    - snapshot://un/2024-07-16/migrant_stock_dest_origin.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_origin.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_dest.xlsx
-    - snapshot://un/2024-07-16/migrant_stock_age_sex.xlsx
-  data://garden/un/2024-07-16/migrant_stock:
-    - data://meadow/un/2024-07-16/migrant_stock
-  data://grapher/un/2024-07-16/migrant_stock:
-    - data://garden/un/2024-07-16/migrant_stock
-
   # Internal displacement monitoring centre
   data://meadow/idmc/2024-08-02/internal_displacement:
     - snapshot://idmc/2024-08-02/internal_displacement.xlsx
@@ -52,3 +41,54 @@ steps:
     - data://garden/wb/2024-07-29/income_groups
   data://grapher/wb/2024-12-17/bilateral_remittance:
     - data://garden/wb/2024-12-17/bilateral_remittance
+
+  # Migration distances
+  data://garden/migration/2024-11-19/migration_distance:
+    - data://garden/un/2025-03-12/migrant_stock
+    - data://garden/geography/2023-11-28/nat_earth_110
+  data://grapher/migration/2024-11-19/migration_distance:
+    - data://garden/migration/2024-11-19/migration_distance
+
+  # Migration between regions, based on UN DESA flows
+  data://garden/migration/2024-11-18/migration_between_regions:
+    - data://garden/un/2025-03-12/migrant_stock
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+  data://grapher/migration/2024-11-18/migration_between_regions:
+    - data://garden/migration/2024-11-18/migration_between_regions
+
+  # Refugee, Asylum and Migration Explorer:
+  export://explorers/migration/2024-08-05/migration:
+    - data://grapher/unicef/2024-07-30/child_migration
+    - data://grapher/un/2024-07-25/refugee_data
+    - data://grapher/un/2025-03-12/migrant_stock
+    - data://grapher/un/2024-07-12/un_wpp_full
+    - data://grapher/worldbank_wdi/2024-05-20/wdi
+    - data://grapher/idmc/2024-08-02/internal_displacement
+
+  # UN DESA migrant stock (2024)
+  data://meadow/un/2025-03-12/migrant_stock:
+    - snapshot://un/2025-03-12/migrant_stock_dest.xlsx
+    - snapshot://un/2025-03-12/migrant_stock_origin.xlsx
+    - snapshot://un/2025-03-12/migrant_stock_dest_origin.xlsx
+  data://garden/un/2025-03-12/migrant_stock:
+    - data://meadow/un/2025-03-12/migrant_stock
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/un/2025-03-12/migrant_stock:
+    - data://garden/un/2025-03-12/migrant_stock
+
+  # UN DESA migrant stock flows (2024)
+  data://garden/un/2025-03-18/migration_stock_flows:
+    - data://garden/un/2025-03-12/migrant_stock
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/un/2025-03-18/migration_stock_flows:
+    - data://garden/un/2025-03-18/migration_stock_flows
+    - data://garden/regions/2023-01-01/regions
+
+  # UN DESA multidim migration flows (2024)
+  export://multidim/migration/latest/migration_flows:
+    - data://grapher/un/2025-03-18/migration_stock_flows
+  export://explorers/migration/latest/migration_flows:
+    - data://grapher/un/2025-03-18/migration_stock_flows

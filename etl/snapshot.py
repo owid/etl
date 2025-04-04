@@ -25,9 +25,8 @@ from owid.catalog.meta import (
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
-from owid.walden import files
 
-from etl import config, paths
+from etl import config, download_helpers, paths
 from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump
 
 log = structlog.get_logger()
@@ -83,7 +82,7 @@ class Snapshot:
             # TODO: temporarily download files from R2 instead of public link to prevent
             # issues with cached snapshots. Remove this when convenient
             download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-            files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            download_helpers.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
             download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
@@ -161,23 +160,40 @@ class Snapshot:
         if download_url.startswith("s3://") or download_url.startswith("r2://"):
             s3_utils.download(download_url, str(self.path))
         else:
-            files.download(download_url, str(self.path))
+            download_helpers.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
-        """Add file to DVC and upload to S3."""
+        """Add a file to DVC and upload it to S3.
+
+        This method only handles uploading the file. Ensure that the file is in the correct location,
+        usually by calling:
+
+        ```
+        snap.download_from_source()
+        snap.dvc_add(upload=upload)
+        ```
+
+        It is recommended to use `snap.create_snapshot`, which handles all of these steps.
+        """
         if not upload:
             log.warn("Skipping upload", snapshot=self.uri)
             return
+        # Calculate md5
+        md5 = checksum_file(self.path)
+
+        # Get metadata file
+        with open(self.metadata_path, "r") as f:
+            meta = ruamel_load(f)
+
+        # If the file already exists with the same md5, skip the upload
+        if meta.get("outs") and meta["outs"][0]["md5"] == md5:
+            log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
+            return
 
         # Upload to S3
-        md5 = checksum_file(self.path)
         bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
         assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
-
-        # Update metadata file
-        with open(self.metadata_path, "r") as f:
-            meta = ruamel_load(f)
 
         meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
 
@@ -190,7 +206,9 @@ class Snapshot:
         data: Optional[Union[Table, pd.DataFrame]] = None,
         upload: bool = False,
     ) -> None:
-        """Create a new snapshot from a local file, or from data in memory, or from a download link."""
+        """Create a new snapshot from a local file, or from data in memory, or from a download link.
+        Then upload it to S3. This is the recommended way to create a snapshot.
+        """
         if (filename is not None) or (data is not None):
             # Create snapshot from either a local file or from data in memory.
             add_snapshot(uri=self.uri, filename=filename, dataframe=data, upload=upload)
@@ -202,14 +220,14 @@ class Snapshot:
     def to_table_metadata(self) -> TableMeta:
         return self.metadata.to_table_metadata()
 
-    def read(self, *args, **kwargs) -> Table:
+    def read(self, file_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read file based on its Snapshot extension."""
         return read_table_from_snapshot(
             *args,
             path=self.path,
             table_metadata=self.to_table_metadata(),
             snapshot_origin=self.metadata.origin,
-            file_extension=self.metadata.file_extension,
+            file_extension=file_extension if file_extension is not None else self.metadata.file_extension,
             **kwargs,
         )
 
@@ -301,15 +319,21 @@ class Snapshot:
         # Return temporary directory
         return temp_dir
 
-    def read_in_archive(self, filename: str, *args, **kwargs) -> Table:
+    def read_in_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read data from file inside a zip/tar archive.
 
         If the relevant data file is within a zip/tar archive, this method will read this file and return it as a table.
 
         To do so, this method first unzips/untars the archive to a temporary directory, and then reads the file. Note that the file should have a supported extension (see `read` method).
+
+        The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
         """
         with self.extract_to_tempdir() as tmpdir:
-            new_extension = filename.split(".")[-1]
+            if force_extension is None:
+                new_extension = filename.split(".")[-1]
+            else:
+                new_extension = force_extension
+
             # Read
             tb = read_table_from_snapshot(
                 *args,
@@ -346,15 +370,21 @@ class Snapshot:
             temp_dir.cleanup()
             self._unarchived_dir = None
 
-    def read_from_archive(self, filename: str, *args, **kwargs) -> Table:
+    def read_from_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read a file in an archive.
 
         Use this function within a context manager. Otherwise it'll raise a RuntimeError, since `_unarchived_dir` will be None.
+
+        The read method is inferred based on the file extension of `filename`. Use `force_extension` if you want to override this.
         """
         if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
             raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
 
-        new_extension = filename.split(".")[-1]
+        if force_extension is None:
+            new_extension = filename.split(".")[-1]
+        else:
+            new_extension = force_extension
+
         tb = read_table_from_snapshot(
             *args,
             path=self._unarchived_dir / filename,
@@ -396,6 +426,30 @@ class SnapshotMeta(MetaBase):
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _meta_to_dict(self):
+        d = self.to_dict()
+
+        # exclude `outs` with md5, we reset it when saving new metadata
+        d.pop("outs", None)
+
+        # remove default values
+        if d["is_public"]:
+            del d["is_public"]
+
+        # remove namespace/version/short_name/file_extension if they match path
+        if _parse_snapshot_path(self.path) == (
+            d["namespace"],
+            str(d["version"]),
+            d["short_name"],
+            d["file_extension"],
+        ):
+            del d["namespace"]
+            del d["version"]
+            del d["short_name"]
+            del d["file_extension"]
+
+        return d
+
     def to_yaml(self) -> str:
         """Convert to YAML string."""
         d = self.to_dict()
@@ -425,6 +479,29 @@ class SnapshotMeta(MetaBase):
         self.path.parent.mkdir(exist_ok=True, parents=True)
         with open(self.path, "w") as f:
             f.write(self.to_yaml())
+
+    # def save(self) -> None:  # type: ignore
+    #     self.path.parent.mkdir(exist_ok=True, parents=True)
+
+    #     # Create new file
+    #     if not self.path.exists():
+    #         with open(self.path, "w") as f:
+    #             f.write(self.to_yaml())
+    #     # Edit existing file, keep outs
+    #     else:
+    #         # Load outs from existing file
+    #         with open(self.path, "r") as f:
+    #             yaml = ruamel_load(f)
+    #             outs = yaml.get("outs", None)
+    #             wdir = yaml.get("wdir", None)
+
+    #         # Save metadata to file
+    #         meta = self._meta_to_dict()
+    #         with open(self.path, "w") as f:
+    #             d = {"meta": meta, "outs": outs}
+    #             if wdir:
+    #                 d["wdir"] = wdir
+    #             f.write(yaml_dump(d))
 
     @property
     def uri(self):
@@ -619,7 +696,7 @@ def add_snapshot(
             `namespace/version/short_name.ext.dvc` must exist!
         filename (str or None): Path to local data file (if dataframe is not given).
         dataframe (Table or pd.DataFrame or None): Data to upload (if filename is not given).
-        upload (bool): True to upload data to Walden bucket.
+        upload (bool): True to upload data to bucket.
     """
     snap = Snapshot(uri)
 

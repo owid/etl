@@ -1,0 +1,66 @@
+definitions:
+  common_views:
+    - config:
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
+        originUrl: ourworldindata.org/coronavirus
+
+title:
+  title: COVID-19 vaccines administered
+  title_variant: ""
+default_selection:
+  - Belgium
+  - Canada
+  - France
+  - Israel
+  - Italy
+  - Netherlands
+  - Spain
+  - United Kingdom
+  - United States
+topic_tags:
+  - COVID-19
+
+dimensions:
+  - slug: indicator
+    name: Indicator
+    choices:
+      - slug: total
+        name: All doses
+        description: All doses, including booster doses
+      - slug: booster
+        name: Booster doses
+        description: null
+  - slug: normalize
+    name: Normalize
+    choices:
+      - slug: absolute
+        name: Absolute number
+        description: null
+      - slug: per_capita
+        name: Per hundred people
+        description: Normalized by hundred people living in the country or region
+
+views:
+  - dimensions:
+      indicator: total
+      normalize: absolute
+    indicators:
+      y: "vaccinations_global#total_vaccinations"
+  - dimensions:
+      indicator: total
+      normalize: per_capita
+    indicators:
+      y: "vaccinations_global#total_vaccinations_per_hundred"
+  - dimensions:
+      indicator: booster
+      normalize: absolute
+    indicators:
+      y: "vaccinations_global#total_boosters"
+  - dimensions:
+      indicator: booster
+      normalize: per_capita
+    indicators:
+      y: "vaccinations_global#total_boosters_per_hundred"

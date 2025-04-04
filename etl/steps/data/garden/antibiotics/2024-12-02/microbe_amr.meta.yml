@@ -3,7 +3,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Antibiotics
+        - Antibiotics & Antibiotic Resistance
     description_key:
       - The pathogen and antimicrobial pairs that were tested for resistance can be found on pages 51-52 in the [Supplementary Materials (part 1)](#https://www.thelancet.com/cms/10.1016/S0140-6736(24)01867-1/attachment/005e2559-204f-46d7-b2e3-27b2091209aa/mmc1.pdf) of the original publication.
 
@@ -11,6 +11,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  non_redistributable: true
 
 tables:
   microbe_amr:

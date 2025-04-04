@@ -22,11 +22,11 @@ definitions:
         baseColorScheme: RdYlBu
         customNumericValues:
           - -50
-          - -25
+          - -20
           - -10
           - 0
           - 10
-          - 25
+          - 20
           - 50
           - 100
   origins:
@@ -68,8 +68,10 @@ definitions:
       - *origin_hmd
       - *origin_wmd
     description_key:
+      - Excess deaths is estimated as _Excess deaths = Number of reported deaths - Number of expected deaths_. Excess mortality goes beyond confirmed COVID-19 fatalities by capturing all deaths above a projected baseline, including indirect deaths from pandemic-related disruptions.
       - All-cause mortality data is from the Human Mortality Database (HMD) Short-term Mortality Fluctuations project and the World Mortality Dataset (WMD). Both sources are updated weekly.
-      - "We do not use the data from some countries in WMD because they fail to meet the following data quality criteria: 1) at least three years of historical data; and 2) data published either weekly or monthly. The full list of excluded countries and reasons for exclusion can be found in this spreadsheet: https://docs.google.com/spreadsheets/d/1JPMtzsx-smO3_K4ReK_HMeuVLEzVZ71qHghSuAfG788/edit?usp=sharing."
+      - We use the baseline estimates by [Ariel Karlinsky and Dmitry Kobak (2021)](https://elifesciences.org/articles/69336) as part of their World Mortality Dataset (WMD).
+      - "We do not use the data from some countries in WMD because they fail to meet the following data quality criteria: 1) at least three years of historical data; and 2) data published either weekly or monthly. The full list of excluded countries and reasons for exclusion can be found in [this spreadsheet](https://docs.google.com/spreadsheets/d/1JPMtzsx-smO3_K4ReK_HMeuVLEzVZ71qHghSuAfG788/edit?usp=sharing)."
 
 dataset:
   title: Excess Mortality (various sources)
@@ -354,6 +356,14 @@ tables:
         display:
           includeInTable: true
           numDecimalPlaces: 0
+      deaths_2025_all_ages:
+        title: deaths_2025_all_ages
+        # title: Number of deaths (weekly or monthly, 2022)
+        unit: "deaths"
+        description_short: The reported number of weekly or monthly deaths from all causes for all ages in 2025.
+        display:
+          includeInTable: true
+          numDecimalPlaces: 0
       deaths_since_2020_all_ages:
         title: deaths_since_2020_all_ages
         # title: Number of deaths (weekly or monthly, 2020–2022)
@@ -379,7 +389,7 @@ tables:
         title: excess_per_million_proj_all_ages
         # title: Excess deaths per million people (projected, all ages)
         unit: ""
-        description_short: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths
+        description_short: The number of excess deaths per million people in the population; calculated as reported deaths minus projected deaths.
         display:
           includeInTable: true
         origins:
@@ -408,7 +418,7 @@ tables:
         title: cum_excess_proj_all_ages
         # title: Cumulative excess of deaths (projected, all ages)
         unit: "deaths"
-        description_short: The cumulative number of excess deaths; cumulated starting 1 January 2020
+        description_short: The cumulative number of excess deaths; cumulated starting 1 January 2020.
         display:
           numDecimalPlaces: 0
           includeInTable: true
@@ -425,6 +435,7 @@ tables:
             map:
               colorScale:
                 <<: *color_scale_counts
+                customNumericMinValue: 0
                 customNumericValues:
                   - 0
                   - 100000
@@ -450,7 +461,7 @@ tables:
         # title: Cumulative p-score (projected, all ages)
         unit: "%"
         short_unit: "%"
-        description_short: Cumulative P-scores using projected baseline for all ages
+        description_short: Cumulative P-scores using projected baseline for all ages.
         display:
           name: Excess mortality cumulative P-scores, projected baseline, all ages
           numDecimalPlaces: 0
@@ -470,7 +481,7 @@ tables:
         title: cum_excess_per_million_proj_all_ages
         # title: Cumulative excess deaths per million people (projected, all ages)
         unit: "deaths per million people"
-        description_short: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020
+        description_short: The cumulative number of excess deaths per million people in the population; cumulated starting 1 January 2020.
         display:
           numDecimalPlaces: 0
           includeInTable: true
@@ -501,7 +512,7 @@ tables:
       time:
         title: Time
         unit: ""
-        description_short: The week or month number in the year
+        description_short: The week or month number in the year.
         display:
           includeInTable: true
         origins:
@@ -511,7 +522,7 @@ tables:
       time_unit:
         title: Time unit
         unit: ""
-        description_short: Denotes whether the “time” column values are weekly or monthly
+        description_short: Denotes whether the “time” column values are weekly or monthly.
         display:
           includeInTable: true
         origins:

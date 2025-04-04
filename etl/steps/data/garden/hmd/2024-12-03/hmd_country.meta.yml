@@ -2,6 +2,7 @@
 definitions:
   common:
     presentation:
+      attribution_short: HMD
       topic_tags:
         - Fertility Rate
 
@@ -58,6 +59,7 @@ tables:
         description_short: |-
           The total number of births per 1,000 people in <<month>>.
         display:
+          numDecimalPlaces: 1
           name: |-
             Birth rate
 
@@ -89,7 +91,7 @@ tables:
           The highest average daily number of births, per million people, recorded in the given year.
         display:
           name: |-
-            Maximum birth rate, per day
+            Daily birth rate in the peak month
 
       month_max_lead_9months:
         title: Month ordinal with peak daily birth rate in 9 months

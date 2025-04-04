@@ -8,7 +8,6 @@ from owid.catalog import (
     Table,
     TableMeta,
     VariableMeta,
-    VariablePresentationMeta,
 )
 
 from etl.grapher import helpers as gh
@@ -213,28 +212,6 @@ def test_adapt_table_for_grapher_multiindex():
             assert out_table.columns.tolist() == ["deaths"]
 
 
-def test_expand_jinja():
-    m = VariableMeta(
-        title="Title << foo >>",
-        description_key=[
-            '<% if foo == "bar" %>This is bar<% else %>This is not bar<% endif %>',
-        ],
-        presentation=VariablePresentationMeta(
-            title_variant="Variant << foo >>",
-        ),
-        display={
-            "isProjection": "<% if foo == 'bar' %>true<% else %>false<% endif %>",
-        },
-    )
-    out = gh._expand_jinja(m, dim_dict={"foo": "bar"})
-    assert out.to_dict() == {
-        "title": "Title bar",
-        "description_key": ["This is bar"],
-        "presentation": {"title_variant": "Variant bar"},
-        "display": {"isProjection": True},
-    }
-
-
 def test_underscore_column_and_dimensions():
     short_name = "a" * 200
     dims = {"age": "1" * 100}
@@ -268,3 +245,23 @@ def test_long_to_wide():
     assert wide["deaths__age_10_18"].m.title == "Deaths - Age: 10-18"
     assert wide["deaths__age_19_25"].m.title == "Deaths - Age: 19-25"
     assert wide["deaths__age_26_30"].m.title == "Deaths - Age: 26-30"
+
+
+def test__validate_description_key():
+    # Test case 2: description_key with all single-character strings
+    description_key = ["a", "b", "c"]
+    col = "column2"
+    try:
+        gh._validate_description_key(description_key, col)
+    except AssertionError as e:
+        assert str(e) == f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+    else:
+        assert False, "AssertionError not raised for description_key with all single-character strings"
+
+    # Test case 3: Valid description_key
+    description_key = ["key1", "key2", "key3"]
+    col = "column3"
+    try:
+        gh._validate_description_key(description_key, col)
+    except AssertionError:
+        assert False, f"AssertionError raised for valid description_key: {description_key}"

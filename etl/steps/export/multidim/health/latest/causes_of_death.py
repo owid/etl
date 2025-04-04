@@ -1,31 +1,35 @@
-from pathlib import Path
-
-import yaml
-
-from etl import multidim
-from etl.db import get_engine
+from etl.collections import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-CURRENT_DIR = Path(__file__).parent
 
-
-def run(dest_dir: str) -> None:
-    engine = get_engine()
-
-    # Load YAML file
-    with open(CURRENT_DIR / "causes_of_death.yml") as istream:
-        config = yaml.safe_load(istream)
+def run() -> None:
+    # Load configuration from adjacent yaml file.
+    config = paths.load_mdim_config()
 
     # Add views for all dimensions
-    table = "grapher/ihme_gbd/2024-05-20/gbd_cause/gbd_cause_deaths"
-    # Individual causes
-    config["views"] += multidim.expand_views(config, {"metric": "*", "age": "*", "cause": "*"}, table, engine)
-    # Show all causes in a single view
-    config["views"] += multidim.expand_views(
-        config, {"metric": "*", "age": "*", "cause": "Side-by-side comparison of causes"}, table, engine
+    # NOTE: using load_data=False which only loads metadata significantly speeds this up
+    table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths", load_data=False)
+
+    # Get all combinations of dimensions
+    config_new = multidim.expand_config(table)
+
+    # Fill choices from TableMeta and VariableMeta dimensions info
+    config["dimensions"] = multidim.combine_config_dimensions(
+        config_dimensions=config_new["dimensions"],
+        config_dimensions_yaml=config["dimensions"],
     )
 
-    multidim.upsert_multidim_data_page("mdd-causes-of-death", config, engine)
+    # Group age and metric views under "Side-by-side comparison of causes"
+    grouped_views = multidim.group_views(config_new["views"], by=["age", "metric"])
+    for view in grouped_views:
+        view["dimensions"]["cause"] = "Side-by-side comparison of causes"
+
+    # Add views to config
+    config["views"] += config_new["views"]
+    config["views"] += grouped_views
+
+    mdim = paths.create_mdim(config=config)
+    mdim.save()
