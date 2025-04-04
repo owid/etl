@@ -117,7 +117,6 @@ views:
             colorScaleScheme: PuBu
     config:
       type: LineChart
-      tab: map
   - dimensions:
       crop: bananas
       metric: actual_yield
