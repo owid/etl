@@ -289,18 +289,26 @@ def reverse_score(tb, col):
         return tb[col]
 
 
+def wmean(x, variable_name, weight_col):
+    x = x.dropna(subset=[variable_name])
+    return (x[variable_name] * x[weight_col]).sum() / x[weight_col].sum()
+
+
 def average_scored(tb, groups=["country"], cols=SCORED_10_COLS):
     tb_avg = tb[groups + cols + ["annual_weight1"]].copy()
+    means = []
     for col in cols:
         tb_avg[col] = tb_avg[col].astype("Int64")
         tb_avg[col] = tb_avg[col] * tb_avg["annual_weight1"]
+        means.append(
+            tb_avg.groupby(groups).apply(wmean, variable_name=col, weight_col="annual_weight1").reset_index(name=col)
+        )
 
-    tb_na = get_na_share(tb, groups, cols)
-
-    tb_avg = tb_avg.groupby(groups).apply(lambda x: x[cols].sum() / x["annual_weight1"].sum())
-
+    tb_avg = pr.multi_merge(tables=means, on=groups)
     tb_avg.columns = [f"{col}_mean" for col in cols]
     tb_avg = tb_avg.reset_index()
+
+    tb_na = get_na_share(tb, groups, cols)
 
     tb_avg = pr.merge(tb_avg, tb_na, on=groups)
 
