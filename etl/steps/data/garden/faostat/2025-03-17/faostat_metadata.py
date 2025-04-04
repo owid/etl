@@ -1062,11 +1062,13 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Create a new garden dataset.
+    # Initialize a new garden dataset.
     ds_grapher = paths.create_dataset(
         tables=[datasets_table, items_table, elements_table, countries_table, amendments_table],
         repack=False,
         default_metadata=metadata.metadata,
         check_variables_metadata=False,
     )
+
+    # Save garden dataset.
     ds_grapher.save()
