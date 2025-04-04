@@ -323,8 +323,9 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
             + "__"
             + df_columns["_slug_id"].astype(str)
         )
-        # Add transform column
-        df_columns.loc[:, "transform"] = "duplicate " + df_columns["_variableId"].astype(str)
+        if not avoid_duplicate_hack:
+            # Add transform column
+            df_columns.loc[:, "transform"] = "duplicate " + df_columns["_variableId"].astype(str)
 
         # 3. Tweak df_grapher
         # Get dictionary for re-mapping
@@ -383,6 +384,8 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
         df_grapher = df_grapher.dropna(how="all", axis=1)
         df_grapher.loc[:, cols_variables] = df_grapher_ids
         df_grapher = df_grapher.drop(columns=["_slug_renames"])
+        if avoid_duplicate_hack:
+            df_columns = df_columns.drop(columns=["slug"])
 
     return df_grapher, df_columns
 
