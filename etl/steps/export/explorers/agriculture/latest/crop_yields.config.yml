@@ -2,11 +2,6 @@ definitions:
   # NOTE: The following is in presentation.grapher_config.note of the relevant indicators, but for some reason it's not propagated (I think this is a common issue with footnotes metadata from ETL).
   attainable_yield_footnote: &attainable_yield_footnote |-
     Attainable yields are based on assessments for the year 2000. Real attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-  common_views:
-    # NOTE: Not sure if the following are needed (or they are the default values anyway).
-    - config:
-        toleranceStrategy: backwards
-        colorScaleEqualSizeBins: 'true'
 
 config:
   explorerTitle: Crop Yields
@@ -794,7 +789,7 @@ views:
       y:
         - catalogPath: attainable_yields#wheat_attainable_yield
           display:
-            colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;7,,;8,,;9,,;10,,
+            colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;7,,;8,,
             colorScaleScheme: YlGnBu
     config:
       type: DiscreteBar
@@ -810,6 +805,8 @@ views:
             colorScaleScheme: PuBu
     config:
       type: LineChart
+      tab: 'map'
+      defaultView: 'true'
   - dimensions:
       crop: wheat
       metric: yield_gap
@@ -817,7 +814,7 @@ views:
       y:
         - catalogPath: attainable_yields#wheat_yield_gap
           display:
-            colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;8,,
+            colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleScheme: OrRd
     config:
       type: LineChart
