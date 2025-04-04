@@ -21,6 +21,7 @@ config:
   # downloadDataLink: https://catalog.ourworldindata.org/explorers/agriculture/latest/crop_yields/crop_yields.csv
   hideAnnotationFieldsInTitle: 'true'
   pickerColumnSlugs: []
+
 dimensions:
   - slug: crop
     name: Crop

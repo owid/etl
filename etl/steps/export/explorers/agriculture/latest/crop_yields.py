@@ -17,7 +17,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new explorer.
-    ds_explorer = paths.create_explorer(config=config, explorer_name="crop-yields")
+    ds_explorer = paths.create_explorer(config=config, explorer_name="crop-yields", avoid_duplicate_hack=True)
 
     # Save explorer.
     ds_explorer.save(tolerate_extra_indicators=True)
