@@ -117,8 +117,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
       tab: map
   - dimensions:
       crop: bananas
@@ -132,7 +130,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: barley
       metric: actual_yield
@@ -145,7 +142,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: barley
       metric: attainable_yield
@@ -160,7 +156,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: barley
@@ -176,7 +171,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: beans
@@ -190,7 +184,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: cassava
       metric: attainable_yield
@@ -205,7 +198,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: cassava
@@ -219,7 +211,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: cassava
       metric: yield_gap
@@ -234,7 +225,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: cereals
@@ -246,11 +236,8 @@ views:
             colorScaleNumericBins: 1;2;3;4;5;6;7;8;9;10
             colorScaleScheme: PuBu
     config:
-      subtitle: |-
-        Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed\n grains.
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: cocoa_beans
       metric: actual_yield
@@ -263,7 +250,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: coffee_beans
       metric: actual_yield
@@ -276,7 +262,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: corn__maize
       metric: attainable_yield
@@ -291,7 +276,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: corn__maize
@@ -303,10 +287,8 @@ views:
             colorScaleNumericBins: 1;2;5;10;20;50
             colorScaleScheme: PuBu
     config:
-      subtitle: Corn (maize) yields are measured in tonnes per hectare.
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: corn__maize
       metric: yield_gap
@@ -321,7 +303,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: cotton
@@ -337,7 +318,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: cotton
@@ -351,7 +331,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: cotton
       metric: yield_gap
@@ -366,7 +345,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: groundnut
@@ -382,7 +360,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: groundnut
@@ -396,7 +373,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: groundnut
       metric: yield_gap
@@ -411,7 +387,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: lettuce
@@ -425,7 +400,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: millet
       metric: attainable_yield
@@ -440,7 +414,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: millet
@@ -454,7 +427,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: millet
       metric: yield_gap
@@ -469,7 +441,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: oats
@@ -483,7 +454,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: oil_palm
       metric: attainable_yield
@@ -498,7 +468,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: oil_palm
@@ -512,7 +481,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: oil_palm
       metric: yield_gap
@@ -527,7 +495,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: oranges
@@ -541,7 +508,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: peas
       metric: actual_yield
@@ -554,7 +520,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: potato
       metric: attainable_yield
@@ -569,7 +534,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: potato
@@ -583,7 +547,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: potato
       metric: yield_gap
@@ -598,7 +561,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: rapeseed
@@ -614,7 +576,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: rapeseed
@@ -628,7 +589,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: rapeseed
       metric: yield_gap
@@ -643,7 +603,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: rice
@@ -659,7 +618,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: rice
@@ -673,7 +631,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: rice
       metric: yield_gap
@@ -688,7 +645,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: rye
@@ -704,7 +660,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: rye
@@ -718,7 +673,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: rye
       metric: yield_gap
@@ -733,7 +687,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: sorghum
@@ -749,7 +702,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: sorghum
@@ -763,7 +715,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: sorghum
       metric: yield_gap
@@ -778,7 +729,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: soybean
@@ -794,7 +744,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: soybean
@@ -808,7 +757,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: soybean
       metric: yield_gap
@@ -823,7 +771,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: sugar_beet
@@ -839,7 +786,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: sugar_beet
@@ -853,7 +799,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: sugar_beet
       metric: yield_gap
@@ -868,7 +813,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: sugar_cane
@@ -884,7 +828,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: sugar_cane
@@ -898,7 +841,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: sugar_cane
       metric: yield_gap
@@ -913,7 +855,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: sunflower_seed
@@ -929,7 +870,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: sunflower_seed
@@ -943,7 +883,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: sunflower_seed
       metric: yield_gap
@@ -958,7 +897,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: tomato
@@ -972,7 +910,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: wheat
       metric: attainable_yield
@@ -987,7 +924,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: DiscreteBar
-      hasMapTab: 'true'
       note: *attainable_yield_footnote
   - dimensions:
       crop: wheat
@@ -1001,7 +937,6 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
   - dimensions:
       crop: wheat
       metric: yield_gap
@@ -1016,5 +951,4 @@ views:
     config:
       yScaleToggle: 'false'
       type: LineChart
-      hasMapTab: 'true'
       note: *attainable_yield_footnote

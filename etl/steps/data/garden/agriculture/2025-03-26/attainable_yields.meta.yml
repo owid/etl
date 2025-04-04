@@ -96,6 +96,8 @@ tables:
         title: Cereals n.e.c. yield
       cereal_yield:
         title: Cereal yield
+        description_short: |-
+          Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.
       cherries_yield:
         title: Cherries yield
       chestnut_yield:
@@ -198,6 +200,8 @@ tables:
         title: Lupins yield
       maize_yield:
         title: Corn yield
+        description_short: |-
+          Corn (maize) yields are measured in tonnes per hectare.
       mangoes_yield:
         title: Mangoes yield
       mate_leaves_yield:
