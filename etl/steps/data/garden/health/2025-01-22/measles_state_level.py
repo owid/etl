@@ -32,7 +32,6 @@ def run(dest_dir: str) -> None:
     tb_cdc_historical = ds_measles_cdc_historical.read_csv()
     tb_cdc_historical = tb_cdc_historical[tb_cdc_historical["cases"] != "NN"].dropna(subset=["cases"])
     tb_cdc_archive = ds_measles_cdc_archive.read_csv()
-    tb_cdc_archive["source"] = ""
     tb_cdc_state = ds_measles_cdc.read("state_measles")
     tb_cdc_state["source"] = "CDC WONDER - https://wonder.cdc.gov/controller/datarequest/D130"
     tb_pop = ds_pop.read("us_state_population")
