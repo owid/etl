@@ -177,7 +177,7 @@ def run() -> None:
         "hasMapTab": True,
         "tab": "map",
         "map": {
-            "projection": "Europe",
+            "region": "Europe",
             "colorScale": {"baseColorScheme": "YlOrBr"},
         },
     }
