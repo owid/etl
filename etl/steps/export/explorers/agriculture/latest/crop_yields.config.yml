@@ -2,7 +2,6 @@ config:
   explorerTitle: Crop Yields
   explorerSubtitle: Explore crop yields across the world.
   isPublished: 'true'
-  googleSheet: https://docs.google.com/spreadsheets/d/14QrLM9sRajoIZywaAttPt-Fm44-iyINIQwFC-VKlTyk/edit#gid=0
   selection:
     - Austria
     - Brazil
@@ -19,7 +18,7 @@ config:
   subNavCurrentId: crop-yields
   hasMapTab: 'true'
   yAxisMin: '0'
-  downloadDataLink: https://catalog.ourworldindata.org/explorers/agriculture/latest/crop_yields/crop_yields.csv
+  # downloadDataLink: https://catalog.ourworldindata.org/explorers/agriculture/latest/crop_yields/crop_yields.csv
   hideAnnotationFieldsInTitle: 'true'
   pickerColumnSlugs: []
 dimensions:
@@ -103,26 +102,18 @@ views:
       y:
         - catalogPath: attainable_yields#almond_yield
           display:
-            name: 'Almond: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.5;1;2;5;10;20
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
             toleranceStrategy: backwards
-    config:
-      title: 'Almond: Yield'
-      subtitle: Yields are measured in tonnes per hectare.
-      yScaleToggle: 'false'
-      type: LineChart
-      hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
-      tab: map
+    # config:
+    #   title: 'Almond: Yield'
+    #   subtitle: Yields are measured in tonnes per hectare.
+    #   yScaleToggle: 'false'
+    #   type: LineChart
+    #   hasMapTab: 'true'
+    #   sourceDesc: Food and Agriculture Organization of the United Nations
+    #   tab: map
   - dimensions:
       crop: bananas
       metric: actual_yield
@@ -130,10 +121,6 @@ views:
       y:
         - catalogPath: attainable_yields#banana_yield
           display:
-            name: 'Banana: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -156,10 +143,6 @@ views:
       y:
         - catalogPath: attainable_yields#barley_yield
           display:
-            name: 'Barley: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
             sourceLink: |-
               http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
@@ -184,10 +167,6 @@ views:
       y:
         - catalogPath: attainable_yields#barley_attainable_yield
           display:
-            name: 'Barley: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -218,10 +197,6 @@ views:
       y:
         - catalogPath: attainable_yields#barley_yield_gap
           display:
-            name: 'Barley: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: |-
@@ -255,10 +230,6 @@ views:
       y:
         - catalogPath: attainable_yields#bean_yield
           display:
-            name: 'Bean: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -281,10 +252,6 @@ views:
       y:
         - catalogPath: attainable_yields#cassava_attainable_yield
           display:
-            name: 'Cassava: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -315,10 +282,6 @@ views:
       y:
         - catalogPath: attainable_yields#cassava_yield
           display:
-            name: 'Cassava: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -341,10 +304,6 @@ views:
       y:
         - catalogPath: attainable_yields#cassava_yield_gap
           display:
-            name: 'Cassava: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -375,10 +334,6 @@ views:
       y:
         - catalogPath: attainable_yields#cereal_yield
           display:
-            name: 'Cereal: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -402,10 +357,6 @@ views:
       y:
         - catalogPath: attainable_yields#cocoa_yield
           display:
-            name: 'Cocoa: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -428,10 +379,6 @@ views:
       y:
         - catalogPath: attainable_yields#coffee_yield
           display:
-            name: 'Coffee: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -454,10 +401,6 @@ views:
       y:
         - catalogPath: attainable_yields#maize_attainable_yield
           display:
-            name: 'Corn: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -488,10 +431,6 @@ views:
       y:
         - catalogPath: attainable_yields#maize_yield
           display:
-            name: 'Corn: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations; USDA National Agricultural Statistics Service
               (NASS)
             sourceLink: http://www.fao.org/faostat/en/#data/QCL ; https://quickstats.nass.usda.gov/
@@ -516,10 +455,6 @@ views:
       y:
         - catalogPath: attainable_yields#maize_yield_gap
           display:
-            name: 'Corn: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: |-
@@ -553,10 +488,6 @@ views:
       y:
         - catalogPath: attainable_yields#cotton_attainable_yield
           display:
-            name: 'Cotton: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -587,10 +518,6 @@ views:
       y:
         - catalogPath: attainable_yields#cotton_yield
           display:
-            name: 'Cotton: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -613,10 +540,6 @@ views:
       y:
         - catalogPath: attainable_yields#cotton_yield_gap
           display:
-            name: 'Cotton: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -647,10 +570,6 @@ views:
       y:
         - catalogPath: attainable_yields#groundnut_attainable_yield
           display:
-            name: 'Groundnut: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -681,10 +600,6 @@ views:
       y:
         - catalogPath: attainable_yields#groundnut_yield
           display:
-            name: 'Groundnut: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -707,10 +622,6 @@ views:
       y:
         - catalogPath: attainable_yields#groundnut_yield_gap
           display:
-            name: 'Groundnut: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -741,10 +652,6 @@ views:
       y:
         - catalogPath: attainable_yields#lettuce_yield
           display:
-            name: 'Lettuce: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -767,10 +674,6 @@ views:
       y:
         - catalogPath: attainable_yields#millet_attainable_yield
           display:
-            name: 'Millet: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -801,10 +704,6 @@ views:
       y:
         - catalogPath: attainable_yields#millet_yield
           display:
-            name: 'Millet: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -827,10 +726,6 @@ views:
       y:
         - catalogPath: attainable_yields#millet_yield_gap
           display:
-            name: 'Millet: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -861,10 +756,6 @@ views:
       y:
         - catalogPath: attainable_yields#oats_yield
           display:
-            name: 'Oat: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
             sourceLink: |-
               http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
@@ -889,10 +780,6 @@ views:
       y:
         - catalogPath: attainable_yields#oilpalm_attainable_yield
           display:
-            name: 'Oil palm: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -923,10 +810,6 @@ views:
       y:
         - catalogPath: attainable_yields#oilpalm_yield
           display:
-            name: 'Oil palm: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -949,10 +832,6 @@ views:
       y:
         - catalogPath: attainable_yields#oilpalm_yield_gap
           display:
-            name: 'Oil palm: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -983,10 +862,6 @@ views:
       y:
         - catalogPath: attainable_yields#orange_yield
           display:
-            name: 'Orange: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1009,10 +884,6 @@ views:
       y:
         - catalogPath: attainable_yields#pea_yield
           display:
-            name: 'Pea: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1035,10 +906,6 @@ views:
       y:
         - catalogPath: attainable_yields#potato_attainable_yield
           display:
-            name: 'Potato: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1069,10 +936,6 @@ views:
       y:
         - catalogPath: attainable_yields#potato_yield
           display:
-            name: 'Potato: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
             sourceLink: |-
               http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
@@ -1097,10 +960,6 @@ views:
       y:
         - catalogPath: attainable_yields#potato_yield_gap
           display:
-            name: 'Potato: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: |-
@@ -1134,10 +993,6 @@ views:
       y:
         - catalogPath: attainable_yields#rapeseed_attainable_yield
           display:
-            name: 'Rapeseed: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1168,10 +1023,6 @@ views:
       y:
         - catalogPath: attainable_yields#rapeseed_yield
           display:
-            name: 'Rapeseed: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1194,10 +1045,6 @@ views:
       y:
         - catalogPath: attainable_yields#rapeseed_yield_gap
           display:
-            name: 'Rapeseed: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -1228,10 +1075,6 @@ views:
       y:
         - catalogPath: attainable_yields#rice_attainable_yield
           display:
-            name: 'Rice: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1262,10 +1105,6 @@ views:
       y:
         - catalogPath: attainable_yields#rice_yield
           display:
-            name: 'Rice: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1288,10 +1127,6 @@ views:
       y:
         - catalogPath: attainable_yields#rice_yield_gap
           display:
-            name: 'Rice: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -1322,10 +1157,6 @@ views:
       y:
         - catalogPath: attainable_yields#rye_attainable_yield
           display:
-            name: 'Rye: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1356,10 +1187,6 @@ views:
       y:
         - catalogPath: attainable_yields#rye_yield
           display:
-            name: 'Rye: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
             sourceLink: |-
               http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
@@ -1384,10 +1211,6 @@ views:
       y:
         - catalogPath: attainable_yields#rye_yield_gap
           display:
-            name: 'Rye: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: |-
@@ -1421,10 +1244,6 @@ views:
       y:
         - catalogPath: attainable_yields#sorghum_attainable_yield
           display:
-            name: 'Sorghum: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1455,10 +1274,6 @@ views:
       y:
         - catalogPath: attainable_yields#sorghum_yield
           display:
-            name: 'Sorghum: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1481,10 +1296,6 @@ views:
       y:
         - catalogPath: attainable_yields#sorghum_yield_gap
           display:
-            name: 'Sorghum: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -1515,10 +1326,6 @@ views:
       y:
         - catalogPath: attainable_yields#soybean_attainable_yield
           display:
-            name: 'Soybean: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1549,10 +1356,6 @@ views:
       y:
         - catalogPath: attainable_yields#soybean_yield
           display:
-            name: 'Soybean: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1575,10 +1378,6 @@ views:
       y:
         - catalogPath: attainable_yields#soybean_yield_gap
           display:
-            name: 'Soybean: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -1609,10 +1408,6 @@ views:
       y:
         - catalogPath: attainable_yields#sugarbeet_attainable_yield
           display:
-            name: 'Sugar beet: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1643,10 +1438,6 @@ views:
       y:
         - catalogPath: attainable_yields#sugarbeet_yield
           display:
-            name: 'Sugar beet: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
             sourceLink: |-
               http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
@@ -1671,10 +1462,6 @@ views:
       y:
         - catalogPath: attainable_yields#sugarbeet_yield_gap
           display:
-            name: 'Sugar beet: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: |-
@@ -1708,10 +1495,6 @@ views:
       y:
         - catalogPath: attainable_yields#sugarcane_attainable_yield
           display:
-            name: 'Sugarcane: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1742,10 +1525,6 @@ views:
       y:
         - catalogPath: attainable_yields#sugarcane_yield
           display:
-            name: 'Sugarcane: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1768,10 +1547,6 @@ views:
       y:
         - catalogPath: attainable_yields#sugarcane_yield_gap
           display:
-            name: 'Sugarcane: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -1802,10 +1577,6 @@ views:
       y:
         - catalogPath: attainable_yields#sunflower_attainable_yield
           display:
-            name: 'Sunflower seed: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1836,10 +1607,6 @@ views:
       y:
         - catalogPath: attainable_yields#sunflower_yield
           display:
-            name: 'Sunflower seed: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1862,10 +1629,6 @@ views:
       y:
         - catalogPath: attainable_yields#sunflower_yield_gap
           display:
-            name: 'Sunflower seed: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
@@ -1896,10 +1659,6 @@ views:
       y:
         - catalogPath: attainable_yields#tomato_yield
           display:
-            name: 'Tomato: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: Food and Agriculture Organization of the United Nations
             sourceLink: https://www.fao.org/faostat/en/#data/QCL
             dataPublishedBy: Food and Agriculture Organization of the United Nations
@@ -1922,10 +1681,6 @@ views:
       y:
         - catalogPath: attainable_yields#wheat_attainable_yield
           display:
-            name: 'Wheat: Attainable yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: Mueller et al. (2012)
@@ -1956,10 +1711,6 @@ views:
       y:
         - catalogPath: attainable_yields#wheat_yield
           display:
-            name: 'Wheat: Yield'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             sourceName: |-
               Food and Agriculture Organization of the United Nations; Bayliss-Smith & Wanmali (1984); Brassley (2000); Broadberry et al. (2015)
             sourceLink: |-
@@ -1986,10 +1737,6 @@ views:
       y:
         - catalogPath: attainable_yields#wheat_yield_gap
           display:
-            name: 'Wheat: Yield gap'
-            type: Numeric
-            unit: tonnes per hectare
-            shortUnit: t
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
             sourceName: |-

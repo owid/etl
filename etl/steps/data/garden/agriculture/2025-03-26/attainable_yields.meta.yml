@@ -1,11 +1,4 @@
 definitions:
-  common:
-    processing_level: major
-    unit: tonnes per hectare
-    short_unit: t/ha
-    presentation:
-      topic_tags:
-        - Crop Yields
   description_short_attainable_yields: &description_short_attainable_yields |-
     Attainable yields are estimates of feasible crop yields calculated from high-yielding areas of similar climate.
   description_key_attainable_yields_1: |-
@@ -23,6 +16,20 @@ definitions:
     - "{definitions.description_key_attainable_yields_2}"
   description_processing_yield_gaps: &description_processing_yield_gaps |-
     - Yield gaps have been calculated by Our World in Data as the attainable yields, as reported by Mueller et al. (2012), minus the actual observed yields, as reported by the UN FAO. Negative values have been clipped to zero, meaning that the attainable yield has been reached.
+  description_short_yields: &description_short_yields |-
+    Yields are the amount of crop harvested per unit area of land. They are measured in tonnes per hectare.
+  common:
+    processing_level: major
+    unit: tonnes per hectare
+    short_unit: t/ha
+    # NOTE: By default, I will assign the short description of yields to all indicators (since they are the majority). But attainable yields and yield gaps will override this with their own short description.
+    description_short: *description_short_yields
+    display:
+      shortUnit: t
+      tolerance: 5
+    presentation:
+      topic_tags:
+        - Crop Yields
 
 dataset:
   update_period_days: 365
