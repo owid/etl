@@ -18,7 +18,8 @@ config:
   subNavCurrentId:
   hasMapTab: true
   yAxisMin: 0
-  pickerColumnSlugs: entityName
+  pickerColumnSlugs:
+    - entityName
   hideAnnotationFieldsInTitle: true
   tab: map
 

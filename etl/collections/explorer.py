@@ -115,7 +115,7 @@ class Explorer(Collection):
 
         # Transform to legacy format
         explorer_legacy = _create_explorer_legacy(
-            explorer_path=f"export://explorers/{self.catalog_path}",
+            catalog_path=self.catalog_path,
             explorer_name=self.explorer_name,
             config=self.config,
             df_graphers=df_grapher,

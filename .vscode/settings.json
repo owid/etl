@@ -10,7 +10,8 @@
       "**/*.meta.yml",
       "**/*.meta.override.yml"
     ],
-    "schemas/multidim-schema.json": "export/multidim/**/*.yml"
+    "schemas/multidim-schema.json": "export/multidim/**/*.yml",
+    "schemas/explorer-schema.json": "export/explorers/**/*.yml",
   },
   "[python]": {
     "editor.formatOnSave": true,

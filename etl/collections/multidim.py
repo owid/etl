@@ -65,7 +65,7 @@ class Multidim(Collection):
     def local_config_path(self) -> Path:
         # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
         assert self.catalog_path
-        return EXPORT_DIR / "multidim" / self.catalog_path.split("#")[0] / "config.yml"
+        return EXPORT_DIR / "multidim" / (self.catalog_path.replace("#", "/") + ".config.yml")
 
     def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
         # Ensure we have an environment set
