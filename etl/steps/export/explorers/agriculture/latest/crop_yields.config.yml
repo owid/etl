@@ -121,10 +121,6 @@ views:
       y:
         - catalogPath: attainable_yields#banana_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 10;20;30;40;50;60;70
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -135,7 +131,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: barley
       metric: actual_yield
@@ -143,12 +138,6 @@ views:
       y:
         - catalogPath: attainable_yields#barley_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603
-            tolerance: '5'
             colorScaleNumericBins: 1;2;3;4;5;6;7;8
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -159,7 +148,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
   - dimensions:
       crop: barley
       metric: attainable_yield
@@ -169,13 +157,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 2,,;3,,;4,,;5,,;6,,;7,,;8,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Reds
@@ -187,7 +170,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -199,15 +181,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: |-
-              Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56 ; https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603; Mueller, N., Gerber, J., Johnston, M. et al. Closing yield gaps through nutrient and water management. Nature 490, 254–257 (2012). https://doi.org/10.1038/nature11420
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrRd
@@ -219,8 +194,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: |-
-        Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -230,10 +203,6 @@ views:
       y:
         - catalogPath: attainable_yields#bean_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -244,7 +213,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: cassava
       metric: attainable_yield
@@ -254,13 +222,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 10,,;12.5,,;15,,;17.5,,;20,,;30,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: OrRd
@@ -272,7 +235,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -282,10 +244,6 @@ views:
       y:
         - catalogPath: attainable_yields#cassava_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 5;10;15;20;25;30;35;40
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -296,7 +254,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: cassava
       metric: yield_gap
@@ -306,13 +263,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;4,,;6,,;8,,;10,,;15,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Oranges
@@ -324,7 +276,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -334,10 +285,6 @@ views:
       y:
         - catalogPath: attainable_yields#cereal_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 1;2;3;4;5;6;7;8;9;10
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -349,7 +296,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: cocoa_beans
       metric: actual_yield
@@ -357,10 +303,6 @@ views:
       y:
         - catalogPath: attainable_yields#cocoa_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.1;0.2;0.5;1;2;5
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -371,7 +313,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: coffee_beans
       metric: actual_yield
@@ -379,10 +320,6 @@ views:
       y:
         - catalogPath: attainable_yields#coffee_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.4;0.8;1.2;1.6;2;2.4;2.8
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -393,7 +330,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: corn__maize
       metric: attainable_yield
@@ -403,13 +339,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 2,,;4,,;6,,;8,,;10,,;12,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBuGn
@@ -421,7 +352,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -431,12 +361,6 @@ views:
       y:
         - catalogPath: attainable_yields#maize_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations; USDA National Agricultural Statistics Service
-              (NASS)
-            sourceLink: http://www.fao.org/faostat/en/#data/QCL ; https://quickstats.nass.usda.gov/
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; National Agricultural Statistics Service of the United States Department of Agriculture (USDA/NASS)
-            tolerance: '5'
             colorScaleNumericBins: 1;2;5;10;20;50
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -447,7 +371,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations; USDA National Agricultural Statistics Service (NASS)
   - dimensions:
       crop: corn__maize
       metric: yield_gap
@@ -457,15 +380,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: |-
-              Food and Agriculture Organization of the United Nations; USDA National Agricultural Statistics Service (NASS); Mueller et al. (2012)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://quickstats.nass.usda.gov/ ; https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; National Agricultural Statistics Service of the United States Department of Agriculture (USDA/NASS); Mueller, N., Gerber, J., Johnston, M. et al. Closing yield gaps through nutrient and water management. Nature 490, 254–257 (2012). https://doi.org/10.1038/nature11420
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;8,,;10,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrRd
@@ -477,8 +393,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: |-
-        Food and Agriculture Organization of the United Nations; USDA National Agricultural Statistics Service (NASS); Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -490,13 +404,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Purples
@@ -508,7 +417,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -518,10 +426,6 @@ views:
       y:
         - catalogPath: attainable_yields#cotton_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.5;1;2;5;10
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -532,7 +436,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: cotton
       metric: yield_gap
@@ -542,13 +445,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Purples
@@ -560,7 +458,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -572,13 +469,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrBr
@@ -590,7 +482,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -600,10 +491,6 @@ views:
       y:
         - catalogPath: attainable_yields#groundnut_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.2;0.5;1;2;5;10
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -614,7 +501,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: groundnut
       metric: yield_gap
@@ -624,13 +510,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrBr
@@ -642,7 +523,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -652,10 +532,6 @@ views:
       y:
         - catalogPath: attainable_yields#lettuce_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 5;10;15;20;25;30;35;40
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -666,7 +542,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: millet
       metric: attainable_yield
@@ -676,13 +551,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 0.5,,;0.75,,;1,,;1.25,,;1.5,,;1.75,,;2,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
@@ -694,7 +564,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -704,10 +573,6 @@ views:
       y:
         - catalogPath: attainable_yields#millet_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.5;1;2;5;10;20
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -718,7 +583,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: millet
       metric: yield_gap
@@ -728,13 +592,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrBr
@@ -746,7 +605,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -756,12 +614,6 @@ views:
       y:
         - catalogPath: attainable_yields#oats_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603
-            tolerance: '5'
             colorScaleNumericBins: 1;2;3;4;5;6;7
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -772,7 +624,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
   - dimensions:
       crop: oil_palm
       metric: attainable_yield
@@ -782,13 +633,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 10,,;12.5,,;15,,;17.5,,;20,,;25,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrRd
@@ -800,7 +646,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -810,10 +655,6 @@ views:
       y:
         - catalogPath: attainable_yields#oilpalm_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 4;8;12;16;20
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -824,7 +665,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: oil_palm
       metric: yield_gap
@@ -834,13 +674,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 5,,;10,,;15,,;20,,;25,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: OrRd
@@ -852,7 +687,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -862,10 +696,6 @@ views:
       y:
         - catalogPath: attainable_yields#orange_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 10;20;30;40;50;60
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -876,7 +706,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: peas
       metric: actual_yield
@@ -884,10 +713,6 @@ views:
       y:
         - catalogPath: attainable_yields#pea_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -898,7 +723,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: potato
       metric: attainable_yield
@@ -908,13 +732,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 20,,;25,,;30,,;35,,;40,,;45,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
@@ -926,7 +745,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -936,12 +754,6 @@ views:
       y:
         - catalogPath: attainable_yields#potato_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603
-            tolerance: '5'
             colorScaleNumericBins: 5;10;15;20;25;30;35;40;45;50
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -952,7 +764,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
   - dimensions:
       crop: potato
       metric: yield_gap
@@ -962,15 +773,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: |-
-              Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56 ; https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603; Mueller, N., Gerber, J., Johnston, M. et al. Closing yield gaps through nutrient and water management. Nature 490, 254–257 (2012). https://doi.org/10.1038/nature11420
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 5,,;10,,;15,,;20,,;25,,;30,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuRd
@@ -982,8 +786,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: |-
-        Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -995,13 +797,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGnBu
@@ -1013,7 +810,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1023,10 +819,6 @@ views:
       y:
         - catalogPath: attainable_yields#rapeseed_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 1;1.5;2;2.5;3;3.5;4
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1037,7 +829,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: rapeseed
       metric: yield_gap
@@ -1047,13 +838,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Oranges
@@ -1065,7 +851,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1077,13 +862,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 5,,;6,,;7,,;8,,;9,,;10,,;15
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGnBu
@@ -1095,7 +875,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1105,10 +884,6 @@ views:
       y:
         - catalogPath: attainable_yields#rice_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 2;4;6;8;10;12
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1119,7 +894,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: rice
       metric: yield_gap
@@ -1129,13 +903,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;4,,;6,,;8,,;10,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Reds
@@ -1147,7 +916,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1159,13 +927,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 2,,;3,,;4,,;5,,;6,,;7,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: BuGn
@@ -1177,7 +940,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1187,12 +949,6 @@ views:
       y:
         - catalogPath: attainable_yields#rye_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603
-            tolerance: '5'
             colorScaleNumericBins: 1;2;3;4;5;6
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1203,7 +959,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
   - dimensions:
       crop: rye
       metric: yield_gap
@@ -1213,15 +968,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: |-
-              Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56 ; https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603; Mueller, N., Gerber, J., Johnston, M. et al. Closing yield gaps through nutrient and water management. Nature 490, 254–257 (2012). https://doi.org/10.1038/nature11420
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: OrRd
@@ -1233,8 +981,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: |-
-        Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1246,13 +992,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;7,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Purples
@@ -1264,7 +1005,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1274,10 +1014,6 @@ views:
       y:
         - catalogPath: attainable_yields#sorghum_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4;4.5;5;5.5
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1288,7 +1024,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: sorghum
       metric: yield_gap
@@ -1298,13 +1033,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuRd
@@ -1316,7 +1046,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1328,13 +1057,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;2.5,,;3,,;3.5,,;4,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
@@ -1346,7 +1070,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1356,10 +1079,6 @@ views:
       y:
         - catalogPath: attainable_yields#soybean_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5;4
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1370,7 +1089,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: soybean
       metric: yield_gap
@@ -1380,13 +1098,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBuGn
@@ -1398,7 +1111,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1410,13 +1122,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 50,,;55,,;60,,;65,,;70,,;75,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGnBu
@@ -1428,7 +1135,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1438,12 +1144,6 @@ views:
       y:
         - catalogPath: attainable_yields#sugarbeet_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603
-            tolerance: '5'
             colorScaleNumericBins: 20;40;60;80;100
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1454,7 +1154,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015)
   - dimensions:
       crop: sugar_beet
       metric: yield_gap
@@ -1464,15 +1163,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: |-
-              Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56 ; https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603; Mueller, N., Gerber, J., Johnston, M. et al. Closing yield gaps through nutrient and water management. Nature 490, 254–257 (2012). https://doi.org/10.1038/nature11420
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60,,;70,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Oranges
@@ -1484,8 +1176,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: |-
-        Food and Agriculture Organization of the United Nations; Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1497,13 +1187,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 80,,;85,,;90,,;95,,;100,,;110,,;120,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
@@ -1515,7 +1200,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1525,10 +1209,6 @@ views:
       y:
         - catalogPath: attainable_yields#sugarcane_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 20;40;60;80;100;120
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1539,7 +1219,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: sugar_cane
       metric: yield_gap
@@ -1549,13 +1228,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60,,;70,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: Oranges
@@ -1567,7 +1241,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1579,13 +1252,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;1.5,;2,,;2.5,,;3,,;3.5,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGn
@@ -1597,7 +1265,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1607,10 +1274,6 @@ views:
       y:
         - catalogPath: attainable_yields#sunflower_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 0.5;1;1.5;2;2.5;3;3.5
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1621,7 +1284,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: sunflower_seed
       metric: yield_gap
@@ -1631,13 +1293,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.nature.com/articles/nature11420 ; https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257; Food and Agriculture Organization of the United Nations
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 0.5,,;1,,;2,,;3,,;4,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlOrRd
@@ -1649,7 +1306,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012); Food and Agriculture Organization of the United Nations
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1659,10 +1315,6 @@ views:
       y:
         - catalogPath: attainable_yields#tomato_yield
           display:
-            sourceName: Food and Agriculture Organization of the United Nations
-            sourceLink: https://www.fao.org/faostat/en/#data/QCL
-            dataPublishedBy: Food and Agriculture Organization of the United Nations
-            tolerance: '5'
             colorScaleNumericBins: 10;20;50;100;200;500
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1673,7 +1325,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: Food and Agriculture Organization of the United Nations
   - dimensions:
       crop: wheat
       metric: attainable_yield
@@ -1683,13 +1334,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: Mueller et al. (2012)
-            sourceLink: https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. Nature, 490(7419), 254-257.
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;7,,;8,,;9,,;10,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: YlGnBu
@@ -1701,7 +1347,6 @@ views:
       yScaleToggle: 'false'
       type: DiscreteBar
       hasMapTab: 'true'
-      sourceDesc: Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
   - dimensions:
@@ -1711,13 +1356,6 @@ views:
       y:
         - catalogPath: attainable_yields#wheat_yield
           display:
-            sourceName: |-
-              Food and Agriculture Organization of the United Nations; Bayliss-Smith & Wanmali (1984); Brassley (2000); Broadberry et al. (2015)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://www.cambridge.org/core/books/understanding-green-revolutions/761959C5635C85DB4C36E6B44C19A5EF ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Understading Green Revolutions, Tim P. Bayliss-Smith and Sudhir Wanmali (1984); Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603
-            tolerance: '5'
             colorScaleNumericBins: 1;2;3;4;5;6;7;8
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: PuBu
@@ -1728,8 +1366,6 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: |-
-        Food and Agriculture Organization of the United Nations; Bayliss-Smith & Wanmali (1984); Brassley (2000); Broadberry et al. (2015)
   - dimensions:
       crop: wheat
       metric: yield_gap
@@ -1739,15 +1375,8 @@ views:
           display:
             notes: |-
               Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            sourceName: |-
-              Food and Agriculture Organization of the United Nations; Bayliss-Smith & Wanmali (1984); Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
-            sourceLink: |-
-              http://www.fao.org/faostat/en/#data/QCL ; https://www.cambridge.org/core/books/understanding-green-revolutions/761959C5635C85DB4C36E6B44C19A5EF ; https://bahs.org.uk/AGHR/ARTICLES/48n1a4.pdf ; https://www.cambridge.org/core/books/british-economic-growth-12701870/A270234C137117C8E0F1D1E7E6F0DA56 ; https://www.nature.com/articles/nature11420
-            dataPublishedBy: |-
-              Food and Agriculture Organization of the United Nations; Understading Green Revolutions, Tim P. Bayliss-Smith and Sudhir Wanmali (1984); Brassley, P. (2000). Output and technical change in twentieth-century British agriculture. The Agricultural History Review, 60-84.; Broadberry, S., Campbell, B., Klein, A., Overton, M., & Van Leeuwen, B. (2015). British Economic Growth, 1270–1870. Cambridge: Cambridge University Press. doi:10.1017/CBO9781107707603; Mueller, N., Gerber, J., Johnston, M. et al. Closing yield gaps through nutrient and water management. Nature 490, 254–257 (2012). https://doi.org/10.1038/nature11420
             additionalInfo: |-
               Attainable yields are defined as feasible crop yields based on high-yielding areas of similar climate. They are more conservative than biophysical ‘potential yields’, but are achievable using current technologies and management (e.g. fertilizers and irrigation).\nYield gaps have been calculated by Our World in Data as the difference between actual observed yields (as reported by the UN FAO: http://www.fao.org/faostat/en/) and attainable yields, as reported by Mueller et al. (2012).\nAttainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
-            tolerance: '5'
             colorScaleNumericBins: 1,,;2,,;3,,;4,,;5,,;6,,;8,,
             colorScaleEqualSizeBins: 'true'
             colorScaleScheme: OrRd
@@ -1759,7 +1388,5 @@ views:
       yScaleToggle: 'false'
       type: LineChart
       hasMapTab: 'true'
-      sourceDesc: |-
-        Food and Agriculture Organization of the United Nations; Bayliss-Smith & Wanmali (1984); Brassley (2000); Broadberry et al. (2015); Mueller et al. (2012)
       note: |-
         Attainable yields are based on assessments for the year 2000. Attainable yield pre-2000 may be lower; and post-2000 may be higher than these values.
