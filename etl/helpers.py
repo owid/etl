@@ -658,7 +658,7 @@ class PathFinder:
         return mdim
 
     def create_explorer(
-        self, config, explorer_name: Optional[str] = None, avoid_duplicate_hack: bool = True
+        self, config, explorer_name: Optional[str] = None, avoid_duplicate_hack: bool = False
     ) -> Explorer:
         """Create an Explorer object.
 
