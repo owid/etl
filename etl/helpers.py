@@ -682,8 +682,6 @@ class PathFinder:
         log.warning(
             "This function is operative, but relies on legacy configuration. To use latest tools, consider migrating your explorer to use MDIM-based configuration."
         )
-        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{self.short_name}"
-
         # If the name of the explorer is specified in config, take that, otherwise use the step's short_name.
         # NOTE: This is the expected name of the explorer tsv file.
         if "name" in config:
@@ -691,6 +689,8 @@ class PathFinder:
         else:
             explorer_name = self.short_name
         assert isinstance(explorer_name, str)
+
+        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name}"
 
         explorer = _create_explorer_legacy(
             catalog_path=explorer_catalog_path,
@@ -700,10 +700,6 @@ class PathFinder:
             df_columns=df_columns,
             reset=reset,
         )
-
-        # Get and set catalog path
-        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name}"
-        explorer.catalog_path = explorer_catalog_path
 
         return explorer
 
