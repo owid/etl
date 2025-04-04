@@ -74,6 +74,7 @@ class ExplorerLegacy:
         df_graphers: Optional[pd.DataFrame] = None,
         df_columns: Optional[pd.DataFrame] = None,
         comments: Optional[List[str]] = None,
+        explorer_path: Optional[str] = None,
     ):
         """Build Explorer object from `content`.
 
@@ -107,6 +108,7 @@ class ExplorerLegacy:
 
         # Others
         self.name = name
+        self.explorer_path = explorer_path
         self.content_raw = None
 
     @property
@@ -124,6 +126,7 @@ class ExplorerLegacy:
         content: Optional[str] = None,
         sep: str = ",",
         name: Optional[str] = None,
+        explorer_path: Optional[str] = None,
     ):
         """Build Explorer object from `content`.
 
@@ -136,7 +139,7 @@ class ExplorerLegacy:
         if content is None:
             log.info("Initializing a new explorer file from scratch.")
 
-            explorer = cls(name=name)
+            explorer = cls(name=name, explorer_path=explorer_path)
         else:
             # Text content of an explorer file. (this is given by the user)
             assert isinstance(content, str), "content should be a string!"
@@ -179,6 +182,7 @@ class ExplorerLegacy:
                 df_graphers=df_graphers,
                 df_columns=df_columns,
                 comments=comments,
+                explorer_path=explorer_path,
             )
 
             explorer.content_raw = content_raw
