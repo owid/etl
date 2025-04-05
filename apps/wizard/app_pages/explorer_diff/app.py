@@ -1,5 +1,6 @@
 import json
 import random
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pandas as pd
@@ -35,6 +36,9 @@ CURRENT_DIR = Path(__file__).resolve().parent
 # DB access
 # Create connections to DB
 SOURCE_ENGINE, TARGET_ENGINE = get_engines()
+
+# Params
+MAX_DIFF_LINES = 100
 
 
 def _show_options():
@@ -206,15 +210,39 @@ def main():
 
     st.subheader("TSV Diff")
 
-    with Session(SOURCE_ENGINE) as session:
-        tsv_source = gm.Explorer.load_explorer(session, explorer_slug).tsv  # type: ignore
+    # NOTE: loading TSV for some explorers can take >10s!
+    def load_tsv(engine):
+        with Session(engine) as session:
+            return gm.Explorer.load_explorer(session, explorer_slug, columns=["tsv"]).tsv  # type: ignore
 
-    with Session(TARGET_ENGINE) as session:
-        tsv_target = gm.Explorer.load_explorer(session, explorer_slug).tsv  # type: ignore
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        future_source = executor.submit(load_tsv, SOURCE_ENGINE)
+        future_target = executor.submit(load_tsv, TARGET_ENGINE)
 
-    # DRY with chart_diff_show.py
+        tsv_source = future_source.result()
+        tsv_target = future_target.result()
+
     diff_str = compare_strings(tsv_target, tsv_source, fromfile="production", tofile="staging")
-    st_show_diff(diff_str)
+    st_show_diff(_truncate_lines(diff_str, MAX_DIFF_LINES))
+
+    # Create columns to show TSV files side by side
+    st.subheader("TSV Files")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.code(_truncate_lines(tsv_target, MAX_DIFF_LINES), line_numbers=True, language="diff")
+    with col2:
+        st.code(_truncate_lines(tsv_source, MAX_DIFF_LINES), line_numbers=True, language="diff")
+
+
+def _truncate_lines(s: str, max_lines: int) -> str:
+    """
+    Truncate a string to a maximum number of lines.
+    """
+    lines = s.splitlines()
+    if len(lines) > max_lines:
+        st.warning(f"The diff is too long to display in full. Showing only the first {max_lines} lines.")
+        return "\n".join(lines[:max_lines]) + "\n... (truncated)"
+    return s
 
 
 main()

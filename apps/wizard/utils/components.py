@@ -569,7 +569,7 @@ def _get_params(component, key):
         params = st.query_params.get_all(key)
         # convert to int if digit
         return [int(q) if q.isdigit() else q for q in params]
-    elif component == st.checkbox:
+    elif component == st.checkbox or component == st.toggle:
         params = st.query_params.get(key)
         return params == "True"
     else:

@@ -1929,9 +1929,14 @@ class Explorer(Base):
     config: Mapped[dict] = mapped_column(JSON)
 
     @classmethod
-    def load_explorer(cls, session: Session, slug: Optional[str] = None) -> Optional["Explorer"]:
+    def load_explorer(
+        cls, session: Session, slug: Optional[str] = None, columns: Optional[List[str]] = None
+    ) -> Optional["Explorer"]:
         cond = cls.slug == slug
-        return session.scalars(select(cls).where(cond)).first()
+        if columns:
+            return session.execute(_select_columns(cls, columns).where(cond)).one()  # type: ignore
+        else:
+            return session.scalars(select(cls).where(cond)).first()
 
     @classmethod
     def load_explorers(cls, session: Session, columns: Optional[List[str]] = None) -> List["Explorer"]:
