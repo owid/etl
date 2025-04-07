@@ -37,9 +37,11 @@ steps:
     - snapshot://who/latest/fluid.csv
   data://garden/who/latest/fluid:
     - data://meadow/who/latest/fluid
-  data://explorers/who/latest/flu:
+  data://grapher/who/latest/flu:
     - data://garden/who/latest/fluid
     - data://garden/who/latest/flunet
+  export://explorers/who/latest/influenza:
+    - data://grapher/who/latest/flu
 
   # Flu vaccine policy - https://immunizationdata.who.int/pages/indicators-by-category/influenza.html?YEAR=
   data://meadow/who/2023-04-03/flu_vaccine_policy:
@@ -463,6 +465,7 @@ steps:
   data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
     - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
   data-private://grapher/ihme_gbd/2024-05-20/gbd_incidence:
@@ -518,6 +521,12 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2024-05-20/gbd_child_mortality:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_child_mortality
+
+  # GBD 2021 - GBD Child Mortality Leading Causes
+  data-private://garden/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+  data-private://grapher/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes:
+    - data-private://garden/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes
 
   # GBD 2021 - GBD Health-adjusted Life Expectancy and Life Expectancy
   data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy:
@@ -906,12 +915,12 @@ steps:
   #
   # WHO Vaccine Introductions
   #
-  data://meadow/who/2025-01-09/vaccination_schedules:
-    - snapshot://who/2025-01-09/vaccination_schedules.xlsx
-  data://garden/who/2025-01-09/vaccination_schedules:
-    - data://meadow/who/2025-01-09/vaccination_schedules
-  data://grapher/who/2025-01-09/vaccination_schedules:
-    - data://garden/who/2025-01-09/vaccination_schedules
+  data://meadow/who/2025-01-09/vaccination_introductions:
+    - snapshot://who/2025-01-09/vaccination_introductions.xlsx
+  data://garden/who/2025-01-09/vaccination_introductions:
+    - data://meadow/who/2025-01-09/vaccination_introductions
+  data://grapher/who/2025-01-09/vaccination_introductions:
+    - data://garden/who/2025-01-09/vaccination_introductions
 
   #
   # WHO vaccine stock out
@@ -942,6 +951,14 @@ steps:
     - data://garden/demography/2025-01-23/us_state_population
     - data://garden/demography/2024-07-15/population
     - snapshot://fasttrack/latest/cdc_measles.csv
+    - snapshot://fasttrack/latest/measles_cases.csv
+    - data://garden/cdc/2025-01-26/measles_state_level
+  data://external/health/latest/measles_state_level:
+    - data://meadow/health/2025-01-22/measles_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+    - data://garden/demography/2024-07-15/population
+    - snapshot://fasttrack/latest/cdc_measles.csv
+    - snapshot://fasttrack/latest/measles_cases.csv
     - data://garden/cdc/2025-01-26/measles_state_level
   data://grapher/health/2025-01-22/measles_state_level:
     - data://garden/health/2025-01-22/measles_state_level
@@ -1256,3 +1273,11 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/cdc/2025-03-19/rubella_cases:
     - data://garden/cdc/2025-03-19/rubella_cases
+
+  #
+  # B Yamagata flu strain - from Flunet
+  #
+  data://garden/who/2025-03-19/flu_yamagata:
+    - data://garden/who/latest/flunet
+  data://grapher/who/2025-03-19/flu_yamagata:
+    - data://garden/who/2025-03-19/flu_yamagata

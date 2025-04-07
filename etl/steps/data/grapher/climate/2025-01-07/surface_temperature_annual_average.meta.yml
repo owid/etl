@@ -49,7 +49,7 @@ tables:
       temperature_anomaly:
         title: Temperature anomaly
         description_short: |-
-          The deviation of a specific year's average surface temperature from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
+          The difference of a specific year's average surface temperature from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -57,7 +57,7 @@ tables:
       anomaly_below_0:
         title: Anomaly below 0
         description_short: |-
-          The deviation of a specific year's average surface temperature when it falls below the historical average from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
+          The difference of a specific year's average surface temperature when it falls below the historical average from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -66,7 +66,7 @@ tables:
       anomaly_above_0:
         title: Anomaly above 0
         description_short: |-
-          The deviation of a specific year's average surface temperature when it exceeds the historical average from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
+          The difference of a specific year's average surface temperature when it exceeds the historical average from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
@@ -75,7 +75,7 @@ tables:
       temperature_anomaly_decadal:
         title: Decadal temperature anomaly
         description_short: |-
-          The deviation of a specific decade's average surface temperature from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
+          The difference of a specific decade's average surface temperature from the 1991-2020 mean, in degrees Celsius. {definitions.desc_update}
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}

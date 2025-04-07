@@ -1,6 +1,6 @@
 # Biodiversity - cherry blossom dataset
 steps:
-  # Cherry blossom
+  # Cherry blossom - to archive
   data://meadow/biodiversity/2025-01-29/cherry_blossom:
     - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
     - snapshot://biodiversity/2025-01-29/cherry_blossom.csv
@@ -8,6 +8,15 @@ steps:
     - data://meadow/biodiversity/2025-01-29/cherry_blossom
   data://grapher/biodiversity/2025-01-29/cherry_blossom:
     - data://garden/biodiversity/2025-01-29/cherry_blossom
+
+  # Cherry blossom
+  data://meadow/biodiversity/2025-04-07/cherry_blossom:
+    - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
+    - snapshot://biodiversity/2025-04-07/cherry_blossom.csv
+  data://garden/biodiversity/2025-04-07/cherry_blossom:
+    - data://meadow/biodiversity/2025-04-07/cherry_blossom
+  data://grapher/biodiversity/2025-04-07/cherry_blossom:
+    - data://garden/biodiversity/2025-04-07/cherry_blossom
 
   # Invasive species -  Seebens et al
   data://meadow/biodiversity/2024-08-12/invasive_species:

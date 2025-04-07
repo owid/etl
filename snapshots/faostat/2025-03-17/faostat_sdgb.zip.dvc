@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: Food and Agriculture Organization of the United Nations
+    title: 'SDG Indicators: SDG Indicators'
+    description: |-
+      This dataset complements the global SDG database administered by the United Nations Statistical Division, as well as FAO's SDG indicators portal, by providing access to the available data for each of these indicators.
+
+      As the custodian agency of 21 SDG indicators, the Food and Agriculture Organization of the United Nations (FAO) is responsible for curating and refining the methodologies of these indicators, collecting data from national sources, ensuring their quality and compatibility with applicable standards and classifications, and disseminating data at global level.
+    citation_full: 'Food and Agriculture Organization of the United Nations - SDG Indicators: SDG Indicators (2025).'
+    attribution: Food and Agriculture Organization of the United Nations (2025)
+    attribution_short: FAOSTAT
+    url_main: http://www.fao.org/faostat/en/#data/SDGB
+    url_download: https://bulks-faostat.fao.org/production/SDG_BulkDownloads_E_All_Data_(Normalized).zip
+    date_accessed: '2025-03-17'
+    date_published: '2025-03-10'
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: http://www.fao.org/contact-us/terms/db-terms-of-use/en
+
+outs:
+  - md5: a2ecc32f3434c384e791becbe098cab4
+    size: 3622325
+    path: faostat_sdgb.zip

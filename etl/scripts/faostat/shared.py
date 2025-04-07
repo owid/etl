@@ -10,7 +10,7 @@ from etl.paths import DAG_DIR
 # Initialize logger.
 log = get_logger()
 
-# Version tag to assign to new walden folders (both in S3 bucket and in index).
+# Version tag to assign to new folders (both in S3 bucket and in index).
 VERSION = str(dt.date.today())
 # Global namespace for datasets.
 NAMESPACE = "faostat"
@@ -34,62 +34,61 @@ N_CHARACTERS_ITEM_CODE = 8
 N_CHARACTERS_ITEM_CODE_EXTENDED = 15
 # Maximum number of characters for element_code (integers will be prepended with zeros).
 N_CHARACTERS_ELEMENT_CODE = 6
-# Codes of FAOSTAT domains to download from FAO and upload to walden bucket.
+# Codes of FAOSTAT domains to download from FAO and upload to bucket.
 # This is the list that will determine the datasets (faostat_*) to be created in all further etl data steps.
 INCLUDED_DATASETS_CODES = [
-    # Cost and Affordability of a Healthy Diet.
-    "cahd",
-    # Climate Change: Emissions intensities.
-    "ei",
-    # Land, Inputs and Sustainability: Livestock Patterns.
-    "ek",
-    # Land, Inputs and Sustainability: Livestock Manure.
-    "emn",
-    # Land, Inputs and Sustainability: Soil nutrient budget.
-    "esb",
-    # Discontinued archives and data series: Food Aid Shipments (WFP).
-    "fa",
+    # Country Investment Statistics Profile
+    "cisp",
     # Food Balances: Food Balances (2010-).
     "fbs",
     # Food Balances: Food Balances (-2013, old methodology and population).
     "fbsh",
-    # Forestry: Forestry Production and Trade.
-    "fo",
     # Food Security and Nutrition: Suite of Food Security Indicators.
     "fs",
-    # Credit to Agriculture.
-    "ic",
     # Land, Inputs and Sustainability: Land Cover.
     "lc",
     # Production: Crops and livestock products.
     "qcl",
     # Production: Production Indices.
+    # NOTE: This dataset is not used in grapher charts directly or in explorers, but it's used by the additional_variables dataset (and used in a chart).
     "qi",
     # Production: Value of Agricultural Production.
     "qv",
-    # Land, Inputs and Sustainability: Fertilizers by Product.
-    "rfb",
     # Land, Inputs and Sustainability: Fertilizers by Nutrient.
     "rfn",
     # Land, Inputs and Sustainability: Land Use.
     "rl",
     # Land, Inputs and Sustainability: Pesticides Use.
     "rp",
-    # Land, Inputs and Sustainability: Pesticides Trade.
-    "rt",
-    # Food Balances: Supply Utilization Accounts.
-    "scl",
     # SDG Indicators: SDG Indicators.
     "sdgb",
-    # Trade: Crops and livestock products.
-    "tcl",
-    # Trade: Trade Indices.
-    "ti",
     # Removed from the list (as they have not been used and were causing issues).
-    # World Census of Agriculture.
-    # "wcad",
+    # Cost and Affordability of a Healthy Diet.
+    # "cahd",
+    # Land, Inputs and Sustainability: Livestock Patterns.
+    # "ek",
+    # Climate Change: Emissions intensities.
+    # "ei",
+    # Land, Inputs and Sustainability: Livestock Manure.
+    # "emn",
+    # Land, Inputs and Sustainability: Soil nutrient budget.
+    # "esb",
+    # Discontinued archives and data series: Food Aid Shipments (WFP).
+    # "fa",
+    # Forestry: Forestry Production and Trade.
+    # "fo",
     # Energy use.
     # "gn",
+    # Land, Inputs and Sustainability: Fertilizers by Product.
+    # "rfb",
+    # Land, Inputs and Sustainability: Pesticides Trade.
+    # "rt",
+    # Trade: Crops and livestock products.
+    # "tcl",
+    # Trade: Trade Indices.
+    # "ti",
+    # World Census of Agriculture.
+    # "wcad",
     # The following domains used to exist in FAOSTAT, but they have been removed.
     # Land, Inputs and Sustainability: Fertilizers indicators.
     # "ef",
@@ -97,13 +96,20 @@ INCLUDED_DATASETS_CODES = [
     # "el",
     # Land, Inputs and Sustainability: Pesticides indicators.
     # "ep",
+    # The following were used in the past, but they are not used anymore in charts.
+    # Credit to Agriculture.
+    # "ic",
+    # Food Balances: Supply Utilization Accounts.
+    # "scl",
 ]
 # URL for dataset codes in FAOSTAT catalog.
 # This is the URL used to get the remote location of the actual data files to be downloaded, and the date of their
 # latest update.
 FAO_CATALOG_URL = "http://fenixservices.fao.org/faostat/static/bulkdownloads/datasets_E.json"
 # Base URL of API, used to download metadata (about countries, elements, items, etc.).
-API_BASE_URL = "https://fenixservices.fao.org/faostat/api/v1/en/definitions/domain"
+# NOTE: It seems that the following link doesn't work for fenixservices, but it does work for faostatservices.
+# Maybe they are transitioning towards the latter?
+API_BASE_URL = "https://faostatservices.fao.org/api/v1/en/definitions/domain"
 # Name of additional metadata step file (without extension).
 ADDITIONAL_METADATA_FILE_NAME = f"{NAMESPACE}_metadata"
 # Path to dag file for FAOSTAT steps.
@@ -119,8 +125,9 @@ ADDITIONAL_DEPENDENCIES: Dict[str, List[Tuple[str, str, str]]] = {
     "meadow": [],
     "garden": [
         (NAMESPACE, "garden", f"{NAMESPACE}_metadata"),
-        ("owid", "garden", "key_indicators"),
-        ("wb", "garden", "wb_income"),
+        ("demography", "garden", "population"),
+        ("regions", "garden", "regions"),
+        ("wb", "garden", "income_groups"),
     ],
     "grapher": [],
 }

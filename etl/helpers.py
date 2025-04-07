@@ -22,12 +22,10 @@ from owid.catalog.tables import (
     get_unique_sources_from_tables,
 )
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden import Dataset as WaldenDataset
 
 from etl import paths
 from etl.collections.explorer import Explorer, create_explorer
-from etl.collections.explorer_legacy import ExplorerLegacy, create_explorer_legacy
+from etl.collections.explorer_legacy import ExplorerLegacy, _create_explorer_legacy
 from etl.collections.multidim import Multidim, create_mdim
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks
@@ -223,7 +221,7 @@ class MultipleMatchingStepsAmongDependencies(ExceptionFromDocstringWithKwargs):
 
 
 class UnknownChannel(ExceptionFromDocstring):
-    """Unknown channel name. Valid channels are 'examples', 'walden', 'snapshot', 'meadow', 'garden', or 'grapher'."""
+    """Unknown channel name. Valid channels are 'examples', 'snapshot', 'meadow', 'garden', or 'grapher'."""
 
 
 class WrongStepName(ExceptionFromDocstring):
@@ -337,10 +335,6 @@ class PathFinder:
         return catalog.Dataset(paths.DATA_DIR / f"garden/{self.namespace}/{self.version}/{self.short_name}")
 
     @property
-    def walden_dataset(self) -> WaldenDataset:
-        return WaldenCatalog().find_one(namespace=self.namespace, version=self.version, short_name=self.short_name)
-
-    @property
     def snapshot_dir(self) -> Path:
         return paths.SNAPSHOTS_DIR / self.namespace / self.version
 
@@ -386,10 +380,8 @@ class PathFinder:
             step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}(.\\w+)?"
         elif channel in CHANNEL.__args__:
             step_name = f"data{is_private_suffix}://{channel}/{namespace}/{version}/{short_name}"
-        elif channel == "walden":
-            step_name = f"{channel}{is_private_suffix}://{namespace}/{version}/{short_name}"
         elif channel is None:
-            step_name = rf"(?:snapshot{is_private_suffix}:/|walden{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
+            step_name = rf"(?:snapshot{is_private_suffix}:/|data{is_private_suffix}://meadow|data{is_private_suffix}://garden|data{is_private_suffix}://grapher|data://explorers)/{namespace}/{version}/{short_name}$"
         else:
             raise UnknownChannel
 
@@ -409,7 +401,7 @@ class PathFinder:
     def _get_attributes_from_step_name(step_name: str) -> Dict[str, str]:
         """Get attributes (channel, namespace, version, short name and is_private) from the step name (as it appears in the dag)."""
         channel_type, path = step_name.split("://")
-        if channel_type.startswith(("walden", "snapshot")):
+        if channel_type.startswith(("snapshot",)):
             channel = channel_type
             namespace, version, short_name = path.split("/")
         elif channel_type.startswith(("data", "export")):
@@ -528,7 +520,7 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
         is_private: Optional[bool] = None,
-    ) -> Union[catalog.Dataset, Snapshot, WaldenCatalog]:
+    ) -> Union[catalog.Dataset, Snapshot]:
         """Load a dataset dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
             step_type=step_type,
@@ -539,11 +531,7 @@ class PathFinder:
             is_private=is_private,
         )
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
-        if dependency["channel"] == "walden":
-            dataset = WaldenCatalog().find_one(
-                namespace=dependency["namespace"], version=dependency["version"], short_name=dependency["short_name"]
-            )
-        elif dependency["channel"] == "snapshot":
+        if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
         else:
             dataset_path = (
@@ -635,20 +623,6 @@ class PathFinder:
             repack=repack,
         )
 
-    def create_explorer_legacy(
-        self,
-        config: Dict[str, Any],
-        df_graphers: pd.DataFrame,
-        df_columns: Optional[pd.DataFrame] = None,
-    ) -> ExplorerLegacy:
-        """Create an Explorer using legacy configuration."""
-        return create_explorer_legacy(
-            dest_dir=self.dest_dir,
-            config=config,
-            df_graphers=df_graphers,
-            df_columns=df_columns,
-        )
-
     def create_mdim(self, config, mdim_name: Optional[str] = None) -> Multidim:
         """Create a Multidim object.
 
@@ -669,7 +643,9 @@ class PathFinder:
 
         return mdim
 
-    def create_explorer(self, config, explorer_name: Optional[str] = None) -> Explorer:
+    def create_explorer(
+        self, config, explorer_name: Optional[str] = None, avoid_duplicate_hack: bool = False
+    ) -> Explorer:
         """Create an Explorer object.
 
         Args:
@@ -678,16 +654,57 @@ class PathFinder:
             Configuration of the explorer.
         explorer_name: str
             Name of the explorer. If none is provided, it will use the short_name from the explorer catalog path.
+        avoid_duplicate_hack: bool
+            True to avoid creating duplicate transformations. These transformations are needed when indicators are used multiple times with different metadata configurations. But otherwise, these transformations are unnecessary, and they interrupt metadata propagation. Ideally, these parameter should not exist, and the code should know whether the duplicate transformations are needed. But for now, this lets the user avoid them when they are not needed.
         """
         # Create Explorer object
         explorer = create_explorer(
             config=config,
             dependencies=self.dependencies,
+            avoid_duplicate_hack=avoid_duplicate_hack,
         )
 
         # Get and set catalog path
         explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}"
         explorer.catalog_path = explorer_catalog_path
+
+        return explorer
+
+    def create_explorer_legacy(
+        self,
+        config: Dict[str, Any],
+        df_graphers: pd.DataFrame,
+        df_columns: Optional[pd.DataFrame] = None,
+        reset: bool = False,
+    ) -> ExplorerLegacy:
+        """This function is used to create an Explorer object using the legacy configuration.
+
+        To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
+
+        Param `reset` is False by default, because many explorers have manually set map brackets or fields like
+        pickerColumnSlugs. Ideally, everything should be set in ETL.
+        """
+        log.warning(
+            "This function is operative, but relies on legacy configuration. To use latest tools, consider migrating your explorer to use MDIM-based configuration."
+        )
+        # If the name of the explorer is specified in config, take that, otherwise use the step's short_name.
+        # NOTE: This is the expected name of the explorer tsv file.
+        if "name" in config:
+            explorer_name = config["name"]
+        else:
+            explorer_name = self.short_name
+        assert isinstance(explorer_name, str)
+
+        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name}"
+
+        explorer = _create_explorer_legacy(
+            catalog_path=explorer_catalog_path,
+            config=config,
+            df_graphers=df_graphers,
+            explorer_name=explorer_name,
+            df_columns=df_columns,
+            reset=reset,
+        )
 
         return explorer
 

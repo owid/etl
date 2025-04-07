@@ -1,5 +1,6 @@
 """Common tooling for MDIMs/Explorers."""
 
+from copy import deepcopy
 from typing import Any, Dict, List, Literal, Optional, Union
 
 import pandas as pd
@@ -10,9 +11,10 @@ from sqlalchemy.orm import Session
 import etl.grapher.model as gm
 from etl.collections.model import Collection
 from etl.collections.utils import (
+    records_to_dictionary,
     validate_indicators_in_db,
 )
-from etl.db import get_engine
+from etl.config import OWID_ENV, OWIDEnv
 
 INDICATORS_SLUG = "indicator"
 
@@ -37,17 +39,34 @@ def validate_collection_config(collection: Collection, engine: Engine, tolerate_
     validate_indicators_in_db(indicators, engine)
 
 
-def map_indicator_path_to_id(catalog_path: str) -> str | int:
+def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = None) -> str | int:
     # Check if given path is actually an ID
     if str(catalog_path).isdigit():
         return catalog_path
 
     # Get ID, assuming given path is a catalog path
-    engine = get_engine()
+    if owid_env is None:
+        engine = OWID_ENV.engine
+    else:
+        engine = owid_env.engine
     with Session(engine) as session:
         db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
         assert db_indicator.id is not None
         return db_indicator.id
+
+
+def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> Dict[str, str]:
+    # Check if given path is actually an ID
+    # Get ID, assuming given path is a catalog path
+    if owid_env is None:
+        engine = OWID_ENV.engine
+    else:
+        engine = owid_env.engine
+    with Session(engine) as session:
+        db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # type: ignore
+        # scores = dict(zip(catalog_paths, range(len(catalog_paths))))
+        # db_indicators.sort(key=lambda x: scores[x.catalogPath], reverse=True)
+        return {indicator.catalogPath: indicator.id for indicator in db_indicators}
 
 
 def expand_config(
@@ -55,8 +74,8 @@ def expand_config(
     indicator_names: Optional[Union[str, List[str]]] = None,
     dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
     common_view_config: Optional[Dict[str, Any]] = None,
-    indicators_slug: Optional[str] = None,
     indicator_as_dimension: bool = False,
+    indicators_slug: Optional[str] = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
@@ -119,8 +138,10 @@ def expand_config(
     common_view_config : Dict[str, Any] | None
         Additional config fields to add to each view, e.g.
         {"chartTypes": ["LineChart"], "hasMapTab": True, "tab": "map"}
+    indicator_as_dimension: bool
+        Set to True to keep the indicator as a dimension. For instance, if you expand a table with multiple - dimensional - indicators (e.g. 'population', 'population_density'), a dimension is added in the config that specifies the indicator. If there are more than one indicators being expanded, the indicator information is kept as a dimension regardless of this flag.
     indicators_slug: str
-        Name of the slug for the indicator. Default is 'indicator'.
+        Name to use as the slug for the indicator dimension. Default is 'indicator'. This is used to identify the indicator in a view using dimensional information.
 
     EXAMPLES
     --------
@@ -251,7 +272,7 @@ class CollectionConfigExpander:
         if dimensions is None:
             # If table defines dimensions, use them
             if self.tb_dims:
-                dimensions = [d["slug"] for d in self.tb_dims]
+                dimensions = [str(d["slug"]) for d in self.tb_dims]
             else:
                 # If dimensions is None, use a list with all dimension names (in no particular order)
                 dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
@@ -298,8 +319,8 @@ class CollectionConfigExpander:
                 # Build choices for given dimension
                 choices = [
                     {
-                        "slug": val,
-                        "name": val,
+                        "slug": str(val),
+                        "name": str(val),
                         "description": None,
                     }
                     for val in dim_values
@@ -312,14 +333,15 @@ class CollectionConfigExpander:
                         dim_name = next(d["name"] for d in self.tb_dims if d["slug"] == dim)
                     except StopIteration:
                         dim_name = dim
+                    dim_name = dim_name
                 else:
                     # Otherwise use slug
                     dim_name = dim
 
                 # Build dimension
                 dimension = {
-                    "slug": dim,
-                    "name": dim_name,
+                    "slug": str(dim),
+                    "name": str(dim_name),
                     "choices": choices,
                 }
 
@@ -438,6 +460,10 @@ class CollectionConfigExpander:
         # Re-order columns
         cols_dims = [col for col in df_dims.columns if col not in [self.indicators_slug, "short_name"]]
         df_dims = df_dims[[self.indicators_slug] + sorted(cols_dims) + ["short_name"]]
+
+        # Set df_dims as string!
+        df_dims = df_dims.astype(str)
+
         return df_dims
 
     def _sanity_checks_df_dims(self, indicator_names: Optional[List[str]], df_dims: pd.DataFrame):
@@ -496,3 +522,125 @@ def _check_intersection_iters(
         raise ValueError(
             f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`, available are {items_expected}!"
         )
+
+
+def combine_config_dimensions(
+    config_dimensions: List[Dict[str, Any]],
+    config_dimensions_yaml: List[Dict[str, Any]],
+    choices_top: bool = False,
+    dimensions_top: bool = False,
+):
+    """Combine the dimension configuration from the YAML file with the one generated programmatically.
+
+    There are various strategies that we could follow here, but currently:
+
+    - We consider the union of config_dimensions (returned by expander.build_dimensions) nad config_dimensions_yaml.
+    - These are kept as-is, unless they are in the YML config, in which case they are overwritten.
+
+    Other possible strategies:
+
+    - We could do the reverse, and only consider the fields from config_dimensions_yaml. I'm personally unsure when this could be valuable.
+
+
+    Arguments
+    ---------
+    config_dimensions: List[Dict[str, Any]]
+        Generated by expander.build_dimensions.
+    config_dimensions_yaml:  List[Dict[str, Any]]
+        From the YAML file.
+    choices_top: bool
+        Set to True to place the choices from `config_dimensions` first.
+    dimensions_top: bool
+        Set to True to place the dimensions from `config_dimensions` first.
+
+    TODO:
+
+        - I think we need to add more checks to ensure that there is nothing weird being produced here.
+    """
+
+    config_dimensions_combined = deepcopy(config_dimensions)
+    dims_overwrite = records_to_dictionary(config_dimensions_yaml, "slug")
+
+    # Overwrite dimensions
+    for dim in config_dimensions_combined:
+        slug_dim = dim["slug"]
+        if slug_dim in dims_overwrite:
+            # Get dimension data to overwrite, remove it from dictionary
+            dim_overwrite = dims_overwrite.pop(slug_dim)
+
+            # Overwrite dimension name
+            dim["name"] = dim_overwrite.get("name", dim["name"])
+
+            # Overwrite presentation
+            if "presentation" in dim_overwrite:
+                dim["presentation"] = dim_overwrite["presentation"]
+
+            # Overwrite choices
+            if "choices" in dim_overwrite:
+                choices_overwrite = records_to_dictionary(
+                    dim_overwrite["choices"],
+                    "slug",
+                )
+                assert (
+                    "choices" in dim
+                ), f"Choices not found in dimension: {dim}! This is rare, please report this issue!"
+                for choice in dim["choices"]:
+                    slug_choice = choice["slug"]
+                    if slug_choice in choices_overwrite:
+                        # Get dimension data to overwrite, remove it from dictionary
+                        choice_overwrite = choices_overwrite.pop(slug_choice)
+
+                        # Overwrite choice name
+                        choice["name"] = choice_overwrite.get("name", dim["name"])
+                        # Overwrite choice description
+                        choice["description"] = choice_overwrite.get("description", choice["description"])
+
+                # Handle choices from YAML not present in config_dimensions
+                if choices_overwrite:
+                    missing_choices = []
+                    for slug, values in choices_overwrite.items():
+                        choice = {"slug": slug, **values}
+                        missing_choices.append(choice)
+
+                    if choices_top:
+                        dim["choices"] += missing_choices
+                    else:
+                        dim["choices"] = missing_choices + dim["choices"]
+
+                # Sort choices based on how these appear in the YAML file (only if dimensions_top is False)
+                if not choices_top:
+                    dim["choices"] = _order(dim_overwrite["choices"], dim["choices"])
+
+    # Handle dimensions from YAML not present in config_dimensions
+    if dims_overwrite:
+        missing_dims = []
+        for slug, values in dims_overwrite.items():
+            dim = {"slug": slug, **values}
+            missing_dims.append(dim)
+
+        if dimensions_top:
+            config_dimensions_combined += missing_dims
+        else:
+            config_dimensions_combined = missing_dims + config_dimensions_combined
+
+    # Sort dimensions based on how these appear in the YAML file (only if dimensions_top is False)
+    if not dimensions_top:
+        config_dimensions_combined = _order(config_dimensions_yaml, config_dimensions_combined)
+
+    return config_dimensions_combined
+
+
+def _order(config_yaml, config_combined):
+    # Build score
+    score = {record["slug"]: i for i, record in enumerate(config_yaml)}
+    # Split: those that need ordering, those that don't
+    config_sort = [record for record in config_combined if record["slug"] in score]
+    config_others = [record for record in config_combined if record["slug"] not in score]
+
+    # Order if applicable
+    config_sort = sorted(
+        config_sort,
+        key=lambda x: score.get(x["slug"], 100),
+    )
+
+    return config_sort + config_others

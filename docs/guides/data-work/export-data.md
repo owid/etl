@@ -1,8 +1,4 @@
----
-status: new
----
-
-!!! warning "Export steps are a work in progress"
+# Export steps
 
 Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. They are run with the `--export` flag:
 
@@ -10,7 +6,7 @@ Export steps are defined in `etl/steps/export` directory and have similar struct
 etlr export://explorers/minerals/latest/minerals --export
 ```
 
-The `def run(dest_dir):` function doesn't save a dataset, but calls a method that performs the action. For instance `create_explorer(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
+The `def run():` function doesn't save a dataset, but calls a method that performs the action. For instance `create_explorer(...)` or `gh.commit_file_to_github(...)`. Once the step is executed successfully, it won't be run again unless its code or dependencies change (it won't be "dirty").
 
 ## Creating explorers
 
@@ -18,11 +14,13 @@ TSV files for explorers are created using the `create_explorer` function, usuall
 
 ```py
 # Create a new explorers dataset and tsv file.
-ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+ds_explorer = paths.create_explorer(config=config, df_graphers=df_graphers)
 ds_explorer.save()
 ```
 
 !!! info "Creating explorers on staging servers"
+
+    TODO: how do we push explorers to production?
 
     Explorers can be created or edited on staging servers and then manually migrated to production. Each staging server creates a branch in the `owid-content` repository. Editing explorers in Admin or running the `create_explorer` function pushes changes to that branch. Once the PR is merged, the branch gets pushed to the `owid-content` repository (not to the `master` branch, but its own branch). You then need to manually create a PR from that branch and merge it into `master`.
 
@@ -78,7 +76,7 @@ You can also combine manually defined views with generated ones. See the `etl.co
 The export step loads the data dependencies and the config YAML file, adds `views` to the config, and then pushes the configuration to the database.
 
 ```python title="etl/steps/export/multidim/energy/latest/energy_prices.py"
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #

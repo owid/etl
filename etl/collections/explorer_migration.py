@@ -2,6 +2,7 @@
 
 import re
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -39,6 +40,7 @@ FLAGS = {
     "wpBlockId",
     "yAxisMin",
     "ySlugs",
+    "hideAnnotationFieldsInTitle",
 }
 PATTERN_CSV = r"https://catalog\.ourworldindata\.org/(?P<group>[^/]+/[^/]+/[^/]+/[^/]+/[^/]+)\.csv"
 
@@ -306,8 +308,6 @@ class ExplorerMigration:
                     _display_settings = {k: v for k, v in indicator.items() if k != "slug"}
                     display_settings[indicator_uri] = _display_settings
 
-        # return display_settings
-
         # Get graphers information
         dimension_slug_to_raw_name = {}
         dimensions = []
@@ -338,8 +338,14 @@ class ExplorerMigration:
                         "false",
                     }, f"{self.slug}: Checkbox must have 'true' and 'false' choices"
 
+                # Missing dimension value transaltes into empty string in TSV
+                if pd.isna(choice_name):
+                    choice_name = ""
+                    choice_slug = ""
+                else:
+                    choice_slug = underscore(str(choice_name))
+
                 # Define choice
-                choice_slug = underscore(str(choice_name))
                 choices.append(
                     {
                         "slug": choice_slug,
@@ -376,8 +382,8 @@ class ExplorerMigration:
                 "catalogPath": indicator_uri,
             }
             if indicator_uri in display_settings:
-                indicator["display"] = display_settings[indicator_uri]
-
+                # Use deepcopy so each indicator gets an independent display copy.
+                indicator["display"] = deepcopy(display_settings[indicator_uri])
             return indicator
 
         for block in self.grapher_block["block"]:
@@ -411,8 +417,9 @@ class ExplorerMigration:
             dimensions_view = {}
             for dim in dimensions:
                 raw_name = dimension_slug_to_raw_name[dim["slug"]]
+                # NOTE: Missing dimension value should translate into empty string, right?
                 if raw_name not in block:
-                    dimensions_view[dim["slug"]] = None
+                    dimensions_view[dim["slug"]] = ""
                 else:
                     choice_slug = underscore(block[raw_name])
                     if dim["presentation"]["type"] == "checkbox":
@@ -451,13 +458,33 @@ class ExplorerMigration:
             "views": views,
         }
 
+    def _postprocess_config(self, config: dict) -> dict:
+        """Process the configuration object by converting string values to appropriate Python types
+        and cleaning up the config dictionary.
+
+        This method:
+        1. Converts string values like 'true', 'false', 'null', and numeric strings to their
+           respective Python types (bool, None, int, float)
+        2. Removes any key-value pairs with None values from the 'config' key to avoid
+           cluttering the output with null values
+        """
+        config = _convert_strings_to_types(config)
+
+        for k, v in list(config["config"].items()):
+            if v is None:
+                del config["config"][k]
+
+        return config
+
     def run(self):
         if self.types == {"csv"}:
-            return self.run_csv()
+            config = self.run_csv()
         elif self.types == {"indicator"}:
             raise NotSupportedException("Not supported. Soon will be.")
         else:
             raise NotSupportedException("Not supported")
+
+        return self._postprocess_config(config)
 
 
 class NotSupportedException(Exception):
@@ -476,7 +503,50 @@ def _extract_table_uri(catalog_url: str):
     else:
         raise TableURLNotInCataloException(f"{catalog_url}")
 
+    # Don't keep full path like `explorers/who/latest/flu/flu`, but only keep the table name
+    extracted_fragment = extracted_fragment.split("/")[-1]
+
     return f"{extracted_fragment}"
+
+
+def _convert_strings_to_types(config: Any) -> Any:
+    """Recursively process data structures to convert string representations
+    of booleans ('true', 'false'), null ('null', 'None'), and numbers
+    to their Python equivalents (True, False, None, int, float).
+
+    This function handles nested dictionaries and lists, processing each element
+    to ensure proper type conversion throughout the entire data structure.
+    """
+    if isinstance(config, dict):
+        return {k: _convert_strings_to_types(v) for k, v in config.items()}
+    elif isinstance(config, list):
+        return [_convert_strings_to_types(item) for item in config]
+    elif isinstance(config, str):
+        # Convert string representations to actual values
+        if config.lower() == "true":
+            return True
+        elif config.lower() == "false":
+            return False
+        elif config.lower() in ("null", "none"):
+            return None
+        else:
+            # Try to convert to numeric types
+            try:
+                # First try to convert to int
+                int_val = int(config)
+                # If successful and the string representation matches the int,
+                # it's a proper integer, not a float like "1.0"
+                if str(int_val) == config:
+                    return int_val
+
+                # Otherwise try float
+                return float(config)
+            except ValueError:
+                # If conversion fails, return the original string
+                return config
+    else:
+        # Return other types (int, float, bool, None) as is
+        return config
 
 
 def migrate_csv_explorer(explorer_path: Union[Path, str]):
@@ -486,7 +556,8 @@ def migrate_csv_explorer(explorer_path: Union[Path, str]):
         - Only works for CSV-based explorers which use ETL data (i.e. have a catalog URL for all tables)
         - The output config is not fully functional yet. It might use a catalog path from a table that is not in Grapher (e.g. an 'explorer' table). Modify it so it points to a table in Grapher.
 
-    Local path to explorer."""
+    Local path to explorer.
+    """
     if isinstance(explorer_path, str):
         explorer_path = Path(explorer_path)
     name = Path(explorer_path.stem).stem

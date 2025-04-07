@@ -19,5 +19,4 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Write explorer tsv file to owid-content.
     ds_explorer.save(tolerate_extra_indicators=True)

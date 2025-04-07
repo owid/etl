@@ -3,6 +3,7 @@
 from typing import List
 
 import owid.catalog.processing as pr
+import pandas as pd
 import shared
 from owid.catalog import Dataset, Table
 from owid.catalog.utils import underscore
@@ -18,7 +19,6 @@ REGIONS = [
     "Europe",
     "Africa",
     "Asia",
-    "Oceania",
     "World",
 ]
 
@@ -130,6 +130,12 @@ def run(dest_dir: str) -> None:
 
     # Set metadata and format the dataframe for saving.
     tb_merged_wb.metadata.short_name = paths.short_name
+    # Remove the value for United States in 1975 in the specified column
+    tb_merged_wb.loc[
+        (tb_merged_wb["country"] == "United States") & (tb_merged_wb["year"] == 1975),
+        "m_primary_enrollment_rates_combined_wb",
+    ] = pd.NA
+
     tb_merged_wb = tb_merged_wb.underscore().set_index(["country", "year"], verify_integrity=True)
 
     columns_to_use = [

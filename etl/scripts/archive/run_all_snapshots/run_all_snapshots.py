@@ -11,6 +11,7 @@ All results are stored in the accompanying file: snapshot_execution_times.json
 """
 
 import json
+import random
 import subprocess
 import time
 
@@ -23,6 +24,7 @@ from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 log = get_logger()
 
 SNAPSHOT_SCRIPTS = sorted(list((BASE_DIR / "snapshots").glob("*/*/*.py")))
+random.shuffle(SNAPSHOT_SCRIPTS)
 # Kill a subprocess if it takes longer than this many seconds.
 TIMEOUT = 100
 OUTPUT_FILE = BASE_DIR / "etl" / "scripts" / "archive" / "run_all_snapshots" / "snapshot_execution_times.json"
@@ -62,19 +64,31 @@ def main():
             log.info(f"Skipping {snapshot_script} because it requires a local file.")
             continue
 
+        execution_results[snapshot_script_relative] = {}
+
         try:
             # Try to execute snapshot.
-            _ = subprocess.run(["python", snapshot_script, "--skip-upload"], check=True, timeout=TIMEOUT)
+            result = subprocess.run(
+                ["python", snapshot_script, "--upload"], check=True, capture_output=True, timeout=TIMEOUT, text=True
+            )
+
+            execution_results[snapshot_script_relative]["status"] = "SUCCESS"
+
+            # Data is not new, MD5 is identical.
+            execution_results[snapshot_script_relative]["identical"] = (
+                "File already exists with the same md5" in result.stdout
+            )
+
             # Add duration time for successfully executed snapshot.
             duration = time.time() - start_time
-            execution_results[snapshot_script_relative] = duration
+            execution_results[snapshot_script_relative]["duration"] = duration
         except subprocess.TimeoutExpired:
             # Stop snapshot that is taking too long and mark it as timeout.
-            execution_results[snapshot_script_relative] = "TIMEOUT"
+            execution_results[snapshot_script_relative]["status"] = "TIMEOUT"
             log.error(f"Timeout expired for {snapshot_script_relative}. Marking as 'TIMEOUT'.")
         except subprocess.CalledProcessError:
             # Mark snapshot as failed.
-            execution_results[snapshot_script_relative] = "FAILED"
+            execution_results[snapshot_script_relative]["status"] = "FAILED"
             log.error(f"Error executing {snapshot_script_relative}. Marking as 'FAILED'.")
 
         # Save the current results to a JSON file.

@@ -79,7 +79,7 @@ log = structlog.get_logger()
     "--export/--no-export",
     default=False,
     type=bool,
-    help="Run export steps like writing explorer TSV file to owid-content repository _(OWID staff only, access required)_",
+    help="Run export steps like saving explorer _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -293,9 +293,9 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
     _check_public_private_steps(dag)
 
     if export:
-        # If there were any "export://multidim" steps, keep them in the dag, to be executed.
+        # If there were any "export://multidim" or "export://explorers" steps, keep them in the dag, to be executed.
         for step in list(dag.keys()):
-            if step.startswith("export://multidim/"):
+            if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
                 # If private is false and any of the dependencies are private, continue
                 if not private and any(_is_private_step(dep) for dep in dag[step]):
                     continue
@@ -701,7 +701,7 @@ def _check_dag_completeness(dag: DAG) -> None:
     """Make sure the DAG is complete, i.e. all dependencies are there."""
     for step, deps in dag.items():
         for dep in deps:
-            if re.match(r"^(snapshot|walden|snapshot-private|walden-private|github|etag)://", dep):
+            if re.match(r"^(snapshot|snapshot-private|github|etag)://", dep):
                 pass
             elif dep not in dag:
                 raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")

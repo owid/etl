@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: USDA Economic Research Service (ERS)
+    title: Food expenditure in United States
+    citation_full: |-
+      Economic Research Service of the United States Department of Agriculture (USDA/ERS) - Food expenditure in United States (2023).
+    attribution_short: USDA/ERS
+    url_main: https://www.ers.usda.gov/data-products/food-expenditure-series/
+    url_download: https://ers.usda.gov/sites/default/files/_laserfiche/DataFiles/105933/normalized_food_expenditures.xlsx?v=60222
+    date_accessed: '2025-03-26'
+    date_published: '2024-06-03'
+    license:
+      name: Public domain
+      url: https://www.ers.usda.gov/data-products/food-expenditure-series/
+outs:
+  - md5: b154a7ff5f3470636e4a1f50054e8659
+    size: 17124
+    path: food_expenditure_in_us.xlsx

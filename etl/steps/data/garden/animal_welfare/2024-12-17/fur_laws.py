@@ -48,7 +48,8 @@ FUR_FARMING_BAN_STATUS = {
     NO_DATA_LABEL: NO_DATA_LABEL,
 }
 # Define label for fur farming status that are not yet effective.
-BANNED_NOT_EFFECTIVE = "Banned (not yet effective)"
+# NOTE: For consistency, ensure definitions are like in bullfighting_laws and chick_culling_laws datasets.
+BANNED_NOT_EFFECTIVE = "Banned but not yet in effect"
 
 # Rename fur trading status:
 FUR_TRADING_BAN_STATUS = {

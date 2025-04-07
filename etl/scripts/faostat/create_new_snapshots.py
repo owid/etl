@@ -164,7 +164,7 @@ class FAODataset:
 def load_faostat_catalog() -> List[Dict[str, Any]]:
     # Some of the texts returned have special characters that seem to require CP-1252 decoding.
     # datasets = requests.get(FAO_CATALOG_URL).json()["Datasets"]["Dataset"]
-    datasets = json.loads(requests.get(FAO_CATALOG_URL).content.decode("cp1252"))["Datasets"]["Dataset"]
+    datasets = json.loads(requests.get(FAO_CATALOG_URL).content.decode("utf-8"))["Datasets"]["Dataset"]
     return datasets
 
 
@@ -185,6 +185,7 @@ def is_dataset_already_up_to_date(
     """
     dataset_up_to_date = False
     for snapshot in existing_snapshots:
+        # NOTE: This is still necessary (in the current implementation) to be able to handle old snapshots.
         assert snapshot.metadata.source or snapshot.metadata.origin
         if snapshot.metadata.source:
             snapshot_source_data_url = snapshot.metadata.source.source_data_url
@@ -194,7 +195,7 @@ def is_dataset_already_up_to_date(
             snapshot_date_accessed = parser.parse(str(snapshot.metadata.origin.date_accessed)).date()
         else:
             raise ValueError(f"Snapshot {snapshot.metadata.short_name} does not have source or origin.")
-        if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed > source_modification_date):
+        if (snapshot_source_data_url == source_data_url) and (snapshot_date_accessed >= source_modification_date):
             dataset_up_to_date = True
 
     return dataset_up_to_date
@@ -312,7 +313,7 @@ def main(read_only: bool = False) -> None:
             else:
                 log.warning(f"Dataset {dataset_code} needs to be updated.")
                 if not read_only:
-                    # Download dataset, upload file to walden bucket and add metadata file to walden index.
+                    # Download dataset, upload file and add metadata file to index.
                     faostat_dataset.to_snapshot()
                 any_dataset_was_updated = True
 
@@ -321,7 +322,7 @@ def main(read_only: bool = False) -> None:
         log.warning("Additional metadata needs to be fetched.")
         if not read_only:
             additional_metadata = FAOAdditionalMetadata()
-            # Fetch additional metadata from FAO API, upload file to S3 and add metadata file to walden index.
+            # Fetch additional metadata from FAO API, upload file to S3 and add metadata file to index.
             additional_metadata.to_snapshot()
     else:
         log.info("No need to fetch additional metadata, since all datasets are up-to-date.")

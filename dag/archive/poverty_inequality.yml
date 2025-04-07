@@ -22,8 +22,6 @@ steps:
     - data://meadow/lis/2023-08-30/luxembourg_income_study
   data://grapher/lis/2023-08-30/luxembourg_income_study:
     - data://garden/lis/2023-08-30/luxembourg_income_study
-  data://explorers/lis/latest/luxembourg_income_study:
-    - data://garden/lis/2023-08-30/luxembourg_income_study
 
   data://meadow/lis/2024-06-13/luxembourg_income_study:
     - snapshot://lis/2024-06-13/lis_keyvars.csv
@@ -57,6 +55,19 @@ steps:
   data://grapher/ophi/2023-07-05/multidimensional_poverty_index:
     - data://garden/ophi/2023-07-05/multidimensional_poverty_index
 
+  # World Inequality Database
+  data://meadow/wid/2024-05-24/world_inequality_database:
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://wid/2024-05-24/world_inequality_database.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_with_extrapolations.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_distribution.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_distribution_with_extrapolations.csv
+    - snapshot://wid/2024-05-24/world_inequality_database_fiscal.csv
+  data://garden/wid/2024-05-24/world_inequality_database:
+    - data://meadow/wid/2024-05-24/world_inequality_database
+  data://grapher/wid/2024-05-24/world_inequality_database:
+    - data://garden/wid/2024-05-24/world_inequality_database
+
   # Poverty projections from the World Bank
   data://meadow/wb/2024-06-26/poverty_projections:
     - snapshot://wb/2024-06-26/poverty_projections_number_global.csv
@@ -79,3 +90,13 @@ steps:
     - snapshot://wb/2024-01-22/thousand_bins_distribution.dta
   data://garden/wb/2024-01-22/thousand_bins_distribution:
     - data://meadow/wb/2024-01-22/thousand_bins_distribution
+
+  # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
+  data://meadow/cedlas/2024-03-08/sedlac:
+    - snapshot://cedlas/2024-03-08/sedlac_incomes.xlsx
+    - snapshot://cedlas/2024-03-08/sedlac_poverty.xlsx
+    - snapshot://cedlas/2024-03-08/sedlac_inequality.xlsx
+  data://garden/cedlas/2024-03-08/sedlac:
+    - data://meadow/cedlas/2024-03-08/sedlac
+  data://grapher/cedlas/2024-03-08/sedlac:
+    - data://garden/cedlas/2024-03-08/sedlac

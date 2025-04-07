@@ -14,7 +14,6 @@ Most of the time, the prefix will either be `snapshot` or `data`. The former is 
 | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `snapshot` | Used for [`snapshot`](../../workflow/#snapshot) steps.                                                                                                                                                                                   |
 | `data`     | Used for [`meadow`](../../workflow/#meadow), [`garden`](../../workflow/#garden), [`grapher`](../../workflow/#grapher) and most of the ETL steps where we operate with curated [Datasets](../common-format/#datasets-owidcatalogdataset). |
-| `walden`   | :warning: Deprecated. Used before the introduction of `snapshot`.                                                                                                                                                                        |
 | `backport` | Used to import datasets from the OWID database that are not present in the ETL.                                                                                                                                                          |
 
 ## Path
@@ -64,22 +63,15 @@ where
     - **Grapher**: `data://grapher/nasa/2023-03-06/ozone_hole_area`
     - **Explorers**: `data://explorers/faostat/2023-02-22/food_explorer`
 
-### Path for `walden://`
-
-!!! warning "`walden` steps are no longer used. Use `snapshot` instead."
+### Path for `export://`
+Export steps are defined in `etl/steps/export` directory and have similar structure to regular steps. Their URI begins with the prefix `export://` and use the following format:
 
 ```
-walden://<namespace>/<version>/<dataset-name>
+export://<channel>/<namespace>/<version>/<filename>
 ```
 
-where
+where channel is typically one of the following:
 
-| Prefix         | Description                                                                                                                          |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `namespace`    | Used to group files from similar topics or sources. Namespace are typically source names (e.g. `un`) or topic names (e.g. `health`). |
-| `version`      | Version of the file. Typically, we use the date the file was downloaded in the format `YYYY-mm-dd`.                                  |
-| `dataset-name` | Short name of the curated dataset (e.g. `un_wpp`).                                                                                   |
-
-!!! example
-
-    `walden://irena/2022-10-07/renewable_electricity_capacity_and_generation`
+- `multidim`: For multidimensional indicators.
+- `explorers`: For explorers.
+- `github`: For exports to GitHub.

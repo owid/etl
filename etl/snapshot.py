@@ -25,9 +25,8 @@ from owid.catalog.meta import (
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
-from owid.walden import files
 
-from etl import config, paths
+from etl import config, download_helpers, paths
 from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump
 
 log = structlog.get_logger()
@@ -83,7 +82,7 @@ class Snapshot:
             # TODO: temporarily download files from R2 instead of public link to prevent
             # issues with cached snapshots. Remove this when convenient
             download_url = f"{config.R2_SNAPSHOTS_PUBLIC_READ}/{md5[:2]}/{md5[2:]}"
-            files.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
+            download_helpers.download(download_url, str(self.path), progress_bar_min_bytes=2**100)
         else:
             download_url = f"s3://{config.R2_SNAPSHOTS_PRIVATE}/{md5[:2]}/{md5[2:]}"
             s3_utils.download(download_url, str(self.path))
@@ -161,7 +160,7 @@ class Snapshot:
         if download_url.startswith("s3://") or download_url.startswith("r2://"):
             s3_utils.download(download_url, str(self.path))
         else:
-            files.download(download_url, str(self.path))
+            download_helpers.download(download_url, str(self.path))
 
     def dvc_add(self, upload: bool) -> None:
         """Add a file to DVC and upload it to S3.
@@ -179,16 +178,22 @@ class Snapshot:
         if not upload:
             log.warn("Skipping upload", snapshot=self.uri)
             return
+        # Calculate md5
+        md5 = checksum_file(self.path)
+
+        # Get metadata file
+        with open(self.metadata_path, "r") as f:
+            meta = ruamel_load(f)
+
+        # If the file already exists with the same md5, skip the upload
+        if meta.get("outs") and meta["outs"][0]["md5"] == md5:
+            log.info("File already exists with the same md5, skipping upload", snapshot=self.uri)
+            return
 
         # Upload to S3
-        md5 = checksum_file(self.path)
         bucket = config.R2_SNAPSHOTS_PUBLIC if self.metadata.is_public else config.R2_SNAPSHOTS_PRIVATE
         assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
-
-        # Update metadata file
-        with open(self.metadata_path, "r") as f:
-            meta = ruamel_load(f)
 
         meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
 
@@ -421,6 +426,30 @@ class SnapshotMeta(MetaBase):
         """Path to metadata file."""
         return Path(f"{paths.SNAPSHOTS_DIR / self.uri}.dvc")
 
+    def _meta_to_dict(self):
+        d = self.to_dict()
+
+        # exclude `outs` with md5, we reset it when saving new metadata
+        d.pop("outs", None)
+
+        # remove default values
+        if d["is_public"]:
+            del d["is_public"]
+
+        # remove namespace/version/short_name/file_extension if they match path
+        if _parse_snapshot_path(self.path) == (
+            d["namespace"],
+            str(d["version"]),
+            d["short_name"],
+            d["file_extension"],
+        ):
+            del d["namespace"]
+            del d["version"]
+            del d["short_name"]
+            del d["file_extension"]
+
+        return d
+
     def to_yaml(self) -> str:
         """Convert to YAML string."""
         d = self.to_dict()
@@ -450,6 +479,29 @@ class SnapshotMeta(MetaBase):
         self.path.parent.mkdir(exist_ok=True, parents=True)
         with open(self.path, "w") as f:
             f.write(self.to_yaml())
+
+    # def save(self) -> None:  # type: ignore
+    #     self.path.parent.mkdir(exist_ok=True, parents=True)
+
+    #     # Create new file
+    #     if not self.path.exists():
+    #         with open(self.path, "w") as f:
+    #             f.write(self.to_yaml())
+    #     # Edit existing file, keep outs
+    #     else:
+    #         # Load outs from existing file
+    #         with open(self.path, "r") as f:
+    #             yaml = ruamel_load(f)
+    #             outs = yaml.get("outs", None)
+    #             wdir = yaml.get("wdir", None)
+
+    #         # Save metadata to file
+    #         meta = self._meta_to_dict()
+    #         with open(self.path, "w") as f:
+    #             d = {"meta": meta, "outs": outs}
+    #             if wdir:
+    #                 d["wdir"] = wdir
+    #             f.write(yaml_dump(d))
 
     @property
     def uri(self):
@@ -644,7 +696,7 @@ def add_snapshot(
             `namespace/version/short_name.ext.dvc` must exist!
         filename (str or None): Path to local data file (if dataframe is not given).
         dataframe (Table or pd.DataFrame or None): Data to upload (if filename is not given).
-        upload (bool): True to upload data to Walden bucket.
+        upload (bool): True to upload data to bucket.
     """
     snap = Snapshot(uri)
 
