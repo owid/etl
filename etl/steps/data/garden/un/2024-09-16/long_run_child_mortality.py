@@ -89,7 +89,7 @@ def remove_early_years_austria(tb: Table) -> Table:
     Remove years prior to 1830 for Austria - there is a signicant jump in the data in 1830 which suggests an incongruency in method or data availability
     """
     # Remove years prior to 1830 for Austria
-    msk = (tb["country"] == "Austria") & (tb["year"] <= 1830)
+    msk = (tb["country"] == "Austria") & (tb["year"] < 1830)
     tb = tb[~msk]
 
     return tb
