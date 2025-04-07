@@ -779,3 +779,13 @@ tables:
           topic_tags:
             - Hunger & Undernourishment
         processing_level: minor
+
+      ne_trd_gnfs_zs:
+        title: Trade (% of GDP)
+        unit: '% of GDP'
+        short_unit: '%'
+        description_short: |-
+          Trade in goods and services as a share of GDP, shown as a percentage.
+        description_key:
+          - This indicator measures a country’s total trade (exports and imports) relative to the size of its economy.
+          - Exports of goods and services represent the value of all goods and other market services provided to the rest of the world. Imports represent the value of all goods and other market services received from the rest of the world. In both cases, they include the value of merchandise, freight, insurance, transport, travel, royalties, license fees, and other services, such as communication, construction, financial, information, business, personal, and government services.
