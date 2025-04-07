@@ -1,24 +1,22 @@
-"""Dataset feeding the global food explorer.
+"""This step will load the qcl and fbsc (combination of fbsh and fbs) datasets and create a csv file for each food product, which will be read by the [global food explorer](https://ourworldindata.org/explorers/global-food).
 
-Load the qcl and fbsc (combination of fbsh and fbs) datasets, and create a combined dataset of food items (now called
-products).
-
-The resulting dataset will later be loaded by the `explorer/food_explorer` which feeds our
-[Global food explorer](https://ourworldindata.org/explorers/global-food).
+NOTE: The global-food explorer is now an export explorers step, but it still reads csv files. Ideally, the current dataset will not export csv files, and the explorer will become an indicator-based explorer.
+Also, note that the current step is a combination of two old steps, so it is not optimal. This can be greatly optimized.
 
 """
 
+import sys
+from typing import List
+
 import owid.catalog.processing as pr
-from owid.catalog import Dataset, Table
-from shared import (
-    CURRENT_DIR,
-    FAO_POPULATION_ELEMENT_NAME,
-    FAO_POPULATION_ITEM_NAME,
-    FAO_POPULATION_UNIT_NAME,
-)
+from owid.catalog import Dataset, Table, utils
+from tqdm.auto import tqdm
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
+
+# Get paths and naming conventions for current data step.
+paths = PathFinder(__file__)
 
 # Dataset name and title.
 DATASET_TITLE = "Food Explorer"
@@ -28,6 +26,11 @@ DATASET_DESCRIPTION = (
     "FBS) datasets. Each row contains all the metrics for a specific combination of (country, "
     "product, year). The metrics may come from different datasets."
 )
+
+# Name of item, element and unit of FAO population (used to select population in the data).
+FAO_POPULATION_ITEM_NAME = "Population"
+FAO_POPULATION_ELEMENT_NAME = "Total Population - Both sexes"
+FAO_POPULATION_UNIT_NAME = "thousand Number"
 
 # The names of the products to include in the food explorer will be further edited in owid-content, following to the
 # following file:
@@ -344,6 +347,38 @@ ELEMENT_CODES_FBSC = [
     "000511",
 ]
 
+# Rename columns to be used by the food explorer.
+# Note: Include here all columns, even if the name is not changed.
+EXPECTED_COLUMNS = {
+    "population": "population",
+    "area_harvested__hectares": "area_harvested__ha",
+    "area_harvested__hectares_per_capita": "area_harvested__ha__per_capita",
+    "domestic_supply__tonnes": "domestic_supply__tonnes",
+    "domestic_supply__tonnes_per_capita": "domestic_supply__tonnes__per_capita",
+    "exports__tonnes": "exports__tonnes",
+    "exports__tonnes_per_capita": "exports__tonnes__per_capita",
+    "feed__tonnes": "feed__tonnes",
+    "feed__tonnes_per_capita": "feed__tonnes__per_capita",
+    "food__tonnes": "food__tonnes",
+    "food__tonnes_per_capita": "food__tonnes__per_capita",
+    "food_available_for_consumption__grams_of_fat_per_day_per_capita": "food_available_for_consumption__fat_g_per_day__per_capita",
+    "food_available_for_consumption__kilocalories_per_day_per_capita": "food_available_for_consumption__kcal_per_day__per_capita",
+    "food_available_for_consumption__kilograms_per_year_per_capita": "food_available_for_consumption__kg_per_year__per_capita",
+    "food_available_for_consumption__grams_of_protein_per_day_per_capita": "food_available_for_consumption__protein_g_per_day__per_capita",
+    "imports__tonnes": "imports__tonnes",
+    "imports__tonnes_per_capita": "imports__tonnes__per_capita",
+    "other_uses__tonnes": "other_uses__tonnes",
+    "other_uses__tonnes_per_capita": "other_uses__tonnes__per_capita",
+    "producing_or_slaughtered_animals__animals": "producing_or_slaughtered_animals__animals",
+    "producing_or_slaughtered_animals__animals_per_capita": "producing_or_slaughtered_animals__animals__per_capita",
+    "production__tonnes": "production__tonnes",
+    "production__tonnes_per_capita": "production__tonnes__per_capita",
+    "waste_in_supply_chain__tonnes": "waste_in_supply_chain__tonnes",
+    "waste_in_supply_chain__tonnes_per_capita": "waste_in_supply_chain__tonnes__per_capita",
+    "yield__kilograms_per_animal": "yield__kg_per_animal",
+    "yield__tonnes_per_hectare": "yield__tonnes_per_ha",
+}
+
 
 def combine_qcl_and_fbsc(tb_qcl: Table, tb_fbsc: Table) -> Table:
     """Combine garden `faostat_qcl` and `faostat_fbsc` datasets.
@@ -507,16 +542,52 @@ def process_combined_data(tb: Table, ds_population: Dataset) -> Table:
     return tb_wide
 
 
+def create_table_for_each_product(tb_garden: Table) -> List[Table]:
+    """Create a list of tables, one for each product found in a garden table.
+
+    Parameters
+    ----------
+    tb_garden : Table
+        Table of products from garden dataset.
+
+    Returns
+    -------
+    tables : List[Table]
+        List of tables, one for each product.
+
+    """
+    # List all products in table
+    products = sorted(tb_garden.index.get_level_values("product").unique().tolist())
+
+    tables = []
+    for product in tqdm(products, file=sys.stdout):
+        # Save a table for each food product.
+        table_product = tb_garden.loc[product].copy()
+
+        # Update table metadata.
+        table_product.title = product
+
+        # Rename columns, select the required ones, and sort columns and rows conveniently.
+        table_product = table_product[list(EXPECTED_COLUMNS)].rename(columns=EXPECTED_COLUMNS)
+        table_product = table_product[
+            ["population"] + [column for column in sorted(table_product.columns) if column not in ["population"]]
+        ]
+        table_product = table_product.sort_index()
+
+        table_product.metadata.short_name = (
+            utils.underscore(name=product, validate=True).replace("__", "_").replace("_e_g_", "_eg_")
+        )
+
+        # Add table to list of all tables to include in the explorers dataset.
+        tables.append(table_product)
+
+    return tables
+
+
 def run() -> None:
     #
     # Load data.
     #
-    # Define path to current step file.
-    current_step_file = (CURRENT_DIR / "faostat_food_explorer").with_suffix(".py")
-
-    # Get paths and naming conventions for current data step.
-    paths = PathFinder(current_step_file.as_posix())
-
     # Load latest qcl and fbsc datasets from garden.
     ds_qcl = paths.load_dataset("faostat_qcl")
     ds_fbsc = paths.load_dataset("faostat_fbsc")
@@ -540,15 +611,14 @@ def run() -> None:
     # Improve table format.
     tb = tb.format(keys=["product", "country", "year"], short_name=paths.short_name)
 
+    # Split table into individual csv files.
+    tables = create_table_for_each_product(tb_garden=tb)
+
     #
     # Save outputs.
     #
-    # Initialise new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_fbsc.metadata)
+    # Initialize new garden dataset.
+    ds_explorers = paths.create_dataset(tables=tables, default_metadata=ds_qcl.metadata, formats=["csv"])
 
-    # Update dataset metadata and combine sources from qcl and fbsc datasets.
-    ds_garden.metadata.title = DATASET_TITLE
-    ds_garden.metadata.description = DATASET_DESCRIPTION
-
-    # Create new dataset in garden.
-    ds_garden.save()
+    # Create new explorers dataset.
+    ds_explorers.save()
