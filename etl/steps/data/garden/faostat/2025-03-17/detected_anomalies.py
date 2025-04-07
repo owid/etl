@@ -861,6 +861,71 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
         return tb_fixed
 
 
+class ConstantInsecticidesForAgricultureInAustraliaAnomaly(DataAnomaly):
+    description = (  # type: ignore
+        "The use of insecticides for agriculture in Australia becomes constant from 2018 onwards. "
+        "When inspecting the data in the FAOSTAT page (https://www.fao.org/faostat/en/#data/RP) we can see that "
+        "Those values have the flag 'Imputed value' from 2018 until 2022 (whereas 2017 had the flag 'Official figure'). "
+        "So, we remove the imputed values from 2018 onwards. "
+    )
+
+    affected_item_codes = [
+        "00001309",  # Insecticides.
+    ]
+    affected_element_codes = [
+        "005157",  # Agricultural use.
+    ]
+    affected_years = [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+    ]
+    # Countries affected by the anomaly.
+    affected_countries = ["Australia"]
+
+    def check(self, tb):
+        # Check that the data has only one value from 2018 onwards.
+        assert set(
+            tb[
+                (tb["country"].isin(["Australia"]))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
+            ]["value"].astype(int)
+        ) == {11059}
+
+    def inspect(self, tb):
+        log.info(
+            "The insecticide use for agriculture in Australia causes: "
+            f"\n* The value remains constant for years {', '.join(map(str, self.affected_years))}."
+        )
+        for element_code in self.affected_element_codes:
+            selection = (
+                (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"] == element_code)
+                & (tb["country"].isin(self.affected_countries))
+            )
+            tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
+            title = _split_long_title(self.description)
+            fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
+            fig.show()
+
+    def fix(self, tb):
+        indexes_to_drop = tb[
+            (
+                (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
+                & (tb["country"].isin(self.affected_countries))
+            )
+        ].index
+        tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
+
+        return tb_fixed
+
+
 detected_anomalies = {
     "faostat_qcl": [
         SpinachAreaHarvestedAnomaly,
@@ -876,6 +941,9 @@ detected_anomalies = {
         UnstableNumberOfPoultryBirdsInEurope,
     ],
     "faostat_fbsc": [],
+    "faostat_rp": [
+        ConstantInsecticidesForAgricultureInAustraliaAnomaly,
+    ],
 }
 
 
