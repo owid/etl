@@ -12,6 +12,7 @@ NOTE: This script has been migrated and adapted from the original one in owid-co
 """
 
 import textwrap
+from pathlib import Path
 from string import Template
 
 import click
@@ -27,6 +28,8 @@ from etl.paths import BASE_DIR
 
 # Initialize log.
 log = get_logger()
+
+CURRENT_DIR = Path(__file__).parent
 
 
 @click.command()
@@ -47,10 +50,10 @@ def run(ready_to_merge: bool = False):
     def table_def(food):
         return f"table\t{DATA_FILES_URL}{food}.csv\t{food}"
 
-    with open("global-food-explorer.template.tsv", "r") as templateFile:
+    with open(CURRENT_DIR / "global-food-explorer.template.tsv", "r") as templateFile:
         template = Template(templateFile.read())
-    foods_df = pd.read_csv("foods.csv", index_col="slug", dtype=str)
-    views_df = pd.read_csv("views-per-food.csv", dtype=str)
+    foods_df = pd.read_csv(CURRENT_DIR / "foods.csv", index_col="slug", dtype=str)
+    views_df = pd.read_csv(CURRENT_DIR / "views-per-food.csv", dtype=str)
 
     # convert space-separated list of tags to an actual list, such that we can explode and merge by tag
     views_df["_tags"] = views_df["_tags"].apply(lambda x: x.split(" "))
