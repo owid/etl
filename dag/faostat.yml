@@ -136,13 +136,6 @@ steps:
     - data://meadow/faostat/2025-03-17/faostat_fbsh
     - data://garden/regions/2023-01-01/regions
     - data://garden/faostat/2025-03-17/faostat_metadata
-  data://garden/faostat/2025-03-17/faostat_food_explorer:
-    - data://garden/demography/2024-07-15/population
-    - data://garden/faostat/2025-03-17/faostat_qcl
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://garden/wb/2024-07-29/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/faostat/2025-03-17/faostat_metadata
   data://garden/faostat/2025-03-17/faostat_fs:
     - data://garden/demography/2024-07-15/population
     - data://meadow/faostat/2025-03-17/faostat_fs
@@ -253,7 +246,12 @@ steps:
   # FAOSTAT food explorer step.
   #
   data://explorers/faostat/latest/food_explorer:
-    - data://garden/faostat/2025-03-17/faostat_food_explorer
+    - data://garden/demography/2024-07-15/population
+    - data://garden/faostat/2025-03-17/faostat_qcl
+    - data://garden/faostat/2025-03-17/faostat_fbsc
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/faostat/2025-03-17/faostat_metadata
   #
   # Global food explorer.
   #
