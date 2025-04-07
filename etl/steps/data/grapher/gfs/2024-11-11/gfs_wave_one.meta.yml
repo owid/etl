@@ -309,8 +309,7 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              The full question text is "Is there any one special person you know that you feel very close to?
-              For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
+              The full question text is: "Is there any one special person you know that you feel very close to? For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes.""
       close_to_yes_share:
         title: Share of people who feel close to at least one person
         unit: "%"
@@ -320,8 +319,7 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              The full question text is "Is there any one special person you know that you feel very close to?
-              For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
+              The full question text is "Is there any one special person you know that you feel very close to? For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
       close_to_na_share:
         title: Share of respondents who did not answer the question about feeling close to someone
         unit: "%"
@@ -333,8 +331,7 @@ tables:
         presentation:
           grapher_config:
             note: |-
-              The full question text is "Is there any one special person you know that you feel very close to?
-              For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
+              The full question text is "Is there any one special person you know that you feel very close to? For example someone you can confide in and share your feelings with. If you feel very close to more than one person, select Yes."
       content_mean:
         title: Self-reported satisfaction with friendships and relationships
         unit: ""

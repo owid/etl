@@ -219,7 +219,7 @@ def run(dest_dir: str) -> None:
 
     # cleaning nan values
     for val in ["-98", "98", "99", -98, 98, 99, " ", ""]:
-        tb = tb.replace(val, np.nan)
+        tb = tb.replace(val, np.nan)  # type: ignore
 
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
@@ -289,9 +289,12 @@ def reverse_score(tb, col):
         return tb[col]
 
 
-def wmean(x, variable_name, weight_col):
-    x = x.dropna(subset=[variable_name])
-    return (x[variable_name] * x[weight_col]).sum() / x[weight_col].sum()
+def wmean(x, wtd_variable_col, weight_col):
+    idx = ~x[wtd_variable_col].isna()
+    weight_sum = x[idx][weight_col].sum()
+    if weight_sum == 0:
+        return np.nan  # Return NaN if the sum of weights is zero
+    return x[idx][wtd_variable_col].sum() / weight_sum
 
 
 def average_scored(tb, groups=["country"], cols=SCORED_10_COLS):
@@ -300,12 +303,11 @@ def average_scored(tb, groups=["country"], cols=SCORED_10_COLS):
     for col in cols:
         tb_avg[col] = tb_avg[col].astype("Int64")
         tb_avg[col] = tb_avg[col] * tb_avg["annual_weight1"]
-        means.append(
-            tb_avg.groupby(groups).apply(wmean, variable_name=col, weight_col="annual_weight1").reset_index(name=col)
-        )
+        g_by = tb_avg.groupby(groups).apply(wmean, wtd_variable_col=col, weight_col="annual_weight1").reset_index()
+        g_by.columns = ["country", f"{col}_mean"]
+        means.append(g_by)
 
     tb_avg = pr.multi_merge(tables=means, on=groups)
-    tb_avg.columns = [f"{col}_mean" for col in cols]
     tb_avg = tb_avg.reset_index()
 
     tb_na = get_na_share(tb, groups, cols)
