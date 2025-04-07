@@ -15,7 +15,6 @@ import textwrap
 from pathlib import Path
 from string import Template
 
-import click
 import numpy as np
 import pandas as pd
 from owid.catalog import find
@@ -30,7 +29,6 @@ log = get_logger()
 CURRENT_DIR = Path(__file__).parent
 
 
-@click.command()
 def run():
     # Determine whether the script is executed on staging or production.
     if OWID_ENV.name == "production":
@@ -171,7 +169,3 @@ def run():
     # Upsert config via Admin API
     admin_api = AdminAPI(OWID_ENV)
     admin_api.put_explorer_config("global-food", explorer_content)
-
-
-if __name__ == "__main__":
-    run()
