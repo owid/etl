@@ -106,7 +106,8 @@ def run(dest_dir: str) -> None:
     tb["decadal_famine_deaths_rate"] = tb["decadal_famine_deaths"] / (tb["population"] / 100000)
 
     tb = tb.drop(columns=["population"])
-
+    # Add cumulative sums for each region across years
+    tb["cumulative_famine_deaths"] = tb.groupby(["country"])["famine_deaths"].cumsum()
     tb = tb.format(["year", "country"], short_name=paths.short_name)
     tb = Table(tb, short_name=paths.short_name)
     for col in [

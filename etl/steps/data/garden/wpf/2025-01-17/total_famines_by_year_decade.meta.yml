@@ -35,6 +35,13 @@ tables:
           display:
             numDecimalPlaces: 0
 
+       cumulative_famine_deaths:
+        title: Cumulative deaths from famines
+        unit: 'deaths'
+        description_short: Cumulative deaths in famines that are estimated to have killed 100,000 people or more.
+        display:
+          numDecimalPlaces: 0
+
        decadal_famine_deaths:
           title: Deaths from famines by decade
           unit: 'deaths'
