@@ -115,6 +115,7 @@ def run(dest_dir: str) -> None:
         "decadal_famine_deaths",
         "famine_deaths_per_rate",
         "decadal_famine_deaths_rate",
+        "cumulative_famine_deaths",
     ]:
         tb[col].metadata.origins = origins
     #
