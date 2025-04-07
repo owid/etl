@@ -18,13 +18,11 @@ from string import Template
 import click
 import numpy as np
 import pandas as pd
-from git import Repo
 from owid.catalog import find
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV
-from etl.paths import BASE_DIR
 
 # Initialize log.
 log = get_logger()
@@ -33,19 +31,20 @@ CURRENT_DIR = Path(__file__).parent
 
 
 @click.command()
-@click.option(
-    "--ready-to-merge",
-    default=False,
-    type=bool,
-    help="Use production catalog paths, if the work is ready to be merged to master. Otherwise, use staging links.",
-)
-def run(ready_to_merge: bool = False):
-    if ready_to_merge:
+def run():
+    # Determine whether the script is executed on staging or production.
+    if OWID_ENV.name == "production":
         DATA_FILES_URL = "https://catalog.ourworldindata.org/explorers/faostat/latest/food_explorer/"
     else:
-        repo = Repo(BASE_DIR)
-        current_branch = repo.active_branch.name
-        DATA_FILES_URL = f"http://staging-site-{current_branch}:8881/explorers/faostat/latest/food_explorer/"
+        # Instead of getting the name of the current staging server from the git branch, get it from the environment.
+        # from git import Repo
+        # from etl.paths import BASE_DIR
+        # repo = Repo(BASE_DIR)
+        # current_branch = repo.active_branch.name
+        # DATA_FILES_URL = f"http://staging-site-{current_branch}:8881/explorers/faostat/latest/food_explorer/"
+        DATA_FILES_URL = f"http://{OWID_ENV.name}:8881/explorers/faostat/latest/food_explorer/"
+
+    log.info(f"Creating csv-based explorer that will read files like, e.g. {DATA_FILES_URL + 'almonds.csv'}")
 
     def table_def(food):
         return f"table\t{DATA_FILES_URL}{food}.csv\t{food}"
@@ -144,7 +143,7 @@ def run(ready_to_merge: bool = False):
             )
         graphers["defaultView"] = np.where(default_view_mask, "true", None)  # type: ignore
 
-    # TODO: Drop the _tag column?
+    # Prepare graphers table.
     graphers_tsv = graphers.to_csv(sep="\t", index=False)
     graphers_tsv_indented = textwrap.indent(graphers_tsv, "\t")  # type: ignore
 
