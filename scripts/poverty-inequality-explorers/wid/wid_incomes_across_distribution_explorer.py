@@ -1,19 +1,14 @@
-# %% [markdown]
 # # Incomes Across the Distribution Explorer of the World Inequality Database
 # This code creates the tsv file for the incomes across the distribution explorer from the WID data, available [here](https://owid.cloud/admin/explorers/preview/wid-keymetrics)
 
 import numpy as np
-
-# %%
 import pandas as pd
 
 from ..common_parameters import *
 
-# %% [markdown]
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each type of welfare measure or tables considered.
 
-# %%
 # Read Google sheets
 sheet_id = "18T5IGnpyJwb8KL9USYvME6IaLEcYIo26ioHCpkDnwRQ"
 
@@ -47,11 +42,9 @@ sheet_name = "income_aggregation"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 income_aggregation = pd.read_csv(url, keep_default_na=False, dtype={"multiplier": "str"})
 
-# %% [markdown]
 # ## Header
 # General settings of the explorer are defined here, like the title, subtitle, default country selection, publishing status and others.
 
-# %%
 # The header is defined as a dictionary first and then it is converted into a index-oriented dataframe
 header_dict = {
     "explorerTitle": "Incomes Across the Distribution - World Inequality Database",
@@ -76,13 +69,11 @@ df_header = pd.DataFrame.from_dict(header_dict, orient="index", columns=None)
 # Assigns a cell for each entity separated by comma (like in `selection`)
 df_header = df_header[0].apply(pd.Series)
 
-# %% [markdown]
 # ## Tables
 # Variables are grouped by type of welfare to iterate by different survey types at the same time. The output is the list of all the variables being used in the explorer, with metadata.
 # ### Tables for variables not showing breaks between surveys
 # These variables consider a continous series, without breaks due to changes in surveys' methodology
 
-# %%
 # Table generation
 
 sourceName = SOURCE_NAME_WID
@@ -447,11 +438,9 @@ df_tables["tolerance"] = df_tables["tolerance"].astype("Int64")
 # Also make colorScaleNumericMinValue integer
 df_tables["colorScaleNumericMinValue"] = df_tables["colorScaleNumericMinValue"].astype("Int64")
 
-# %% [markdown]
 # ### Grapher views
 # Similar to the tables, this creates the grapher views by grouping by types of variables and then running by welfare type.
 
-# %%
 # Grapher table generation
 
 df_graphers = pd.DataFrame()
@@ -957,10 +946,8 @@ for tab in range(len(tables)):
 
     df_graphers["tableSlug"] = tables["name"][tab]
 
-# %% [markdown]
 # Final adjustments to the graphers table: add `relatedQuestion` link and `defaultView`:
 
-# %%
 # Add related question link
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
@@ -1029,9 +1016,7 @@ df_graphers["metric_dropdown_aux"] = df_graphers["Indicator Dropdown"].map(df_gr
 df_graphers = df_graphers.sort_values(["decile_dropdown_aux", "metric_dropdown_aux"], ignore_index=True)
 df_graphers = df_graphers.drop(columns=["metric_dropdown_aux", "decile_dropdown_aux"])
 
-# %% [markdown]
 # ## Explorer generation
 # Here, the header, tables and graphers dataframes are combined to be shown in for format required for OWID data explorers.
 
-# %%
 save("incomes-across-distribution-wid", tables, df_header, df_graphers, df_tables)  # type: ignore

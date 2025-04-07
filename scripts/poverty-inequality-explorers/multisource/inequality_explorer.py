@@ -1,19 +1,14 @@
-# %% [markdown]
 # # Source-switching Inequality Data Explorer
 # This code creates the tsv file for the main inequality explorer in the inequality topic page, available [here](https://owid.cloud/admin/explorers/preview/inequality)
 
 import numpy as np
-
-# %%
 import pandas as pd
 
 from ..common_parameters import *
 
-# %% [markdown]
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each type of welfare measure or tables considered.
 
-# %%
 # MULTI-SOURCE
 # Read Google sheets
 sheet_id = "1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI"
@@ -53,11 +48,9 @@ sheet_name = "table"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 pip_tables = pd.read_csv(url)
 
-# %% [markdown]
 # ## Header
 # General settings of the explorer are defined here, like the title, subtitle, default country selection, publishing status and others.
 
-# %%
 # The header is defined as a dictionary first and then it is converted into a index-oriented dataframe
 header_dict = {
     "explorerTitle": "Economic Inequality",
@@ -82,13 +75,11 @@ df_header = pd.DataFrame.from_dict(header_dict, orient="index", columns=None)
 # Assigns a cell for each entity separated by comma (like in `selection`)
 df_header = df_header[0].apply(pd.Series)
 
-# %% [markdown]
 # ## Tables
 # Variables are grouped by type of welfare to iterate by different survey types at the same time. The output is the list of all the variables being used in the explorer, with metadata.
 # ### Tables for variables not showing breaks between surveys
 # These variables consider a continous series, without breaks due to changes in surveys' methodology
 
-# %%
 
 ###########################################################################################
 # WORLD BANK POVERTY AND INEQUALITY PLATFORM
@@ -408,11 +399,9 @@ df_tables = pd.concat([df_tables_pip, df_tables_wid], ignore_index=True)
 # Make tolerance integer (to not break the parameter in the platform)
 df_tables["tolerance"] = df_tables["tolerance"].astype("Int64")
 
-# %% [markdown]
 # ### Grapher views
 # Similar to the tables, this creates the grapher views by grouping by types of variables and then running by welfare type.
 
-# %%
 # Grapher table generation
 
 ###########################################################################################
@@ -580,7 +569,6 @@ for tab in range(len(wid_tables)):
 # Keep only pretax national values for WID:
 df_graphers_wid = df_graphers_wid[df_graphers_wid["ySlugs"].str.contains("pretax")].reset_index(drop=True)
 
-# %% [markdown]
 # Add yAxisMin
 df_graphers_wid["yAxisMin"] = yAxisMin
 
@@ -746,10 +734,8 @@ df_graphers_pip["yAxisMin"] = yAxisMin
 # Concatenate all the graphers into one
 df_graphers = pd.concat([df_graphers_wid, df_graphers_pip], ignore_index=True)
 
-# %% [markdown]
 # Final adjustments to the graphers table: add `relatedQuestion` link and `defaultView`:
 
-# %%
 # Add related question link
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
@@ -762,9 +748,7 @@ df_graphers.loc[
 ] = "true"
 
 
-# %% [markdown]
 # ## Explorer generation
 # Here, the header, tables and graphers dataframes are combined to be shown in for format required for OWID data explorers.
 
-# %%
 save("inequality", all_the_tables, df_header, df_graphers, df_tables)  # type: ignore

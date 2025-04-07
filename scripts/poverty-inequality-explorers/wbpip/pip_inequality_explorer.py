@@ -1,21 +1,16 @@
-# %% [markdown]
 # # Inequality Data Explorer of World Bank data
 # This code creates the tsv file for the inequality explorer from the World Bank PIP data, available [here](https://owid.cloud/admin/explorers/preview/pip-inequality-explorer)
 
 import textwrap
 
 import numpy as np
-
-# %%
 import pandas as pd
 
 from ..common_parameters import *
 
-# %% [markdown]
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each relative poverty line or survey type.
 
-# %%
 # Read Google sheets
 sheet_id = "17KJ9YcvfdmO_7-Sv2Ij0vmzAQI6rXSIqHfJtgFHN-a8"
 
@@ -29,11 +24,9 @@ sheet_name = "survey_type"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 survey_type = pd.read_csv(url)
 
-# %% [markdown]
 # ## Header
 # General settings of the explorer are defined here, like the title, subtitle, default country selection, publishing status and others.
 
-# %%
 # The header is defined as a dictionary first and then it is converted into a index-oriented dataframe
 header_dict = {
     "explorerTitle": "Inequality - World Bank",
@@ -58,13 +51,11 @@ df_header = pd.DataFrame.from_dict(header_dict, orient="index", columns=None)
 # Assigns a cell for each entity separated by comma (like in `selection`)
 df_header = df_header[0].apply(pd.Series)
 
-# %% [markdown]
 # ## Tables
 # Variables are grouped by type to iterate by different survey types at the same time. The output is the list of all the variables being used in the explorer, with metadata.
 # ### Tables for variables not showing breaks between surveys
 # These variables consider a continous series, without breaks due to changes in surveys' methodology
 
-# %%
 sourceName = SOURCE_NAME_PIP
 dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
@@ -216,11 +207,9 @@ df_tables["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 # Make tolerance integer (to not break the parameter in the platform)
 df_tables["tolerance"] = df_tables["tolerance"].astype("Int64")
 
-# %% [markdown]
 # ### Tables for variables showing breaks between surveys
 # These variables consider a breaks in the series due to changes in surveys' methodology.
 
-# %%
 # Create master table for line breaks
 df_spells = pd.DataFrame()
 j = 0
@@ -288,11 +277,9 @@ df_spells = df_spells[(df_spells["master_var"] != "country") & (df_spells["maste
 # Make tolerance integer (to not break the parameter in the platform)
 df_spells["tolerance"] = df_spells["tolerance"].astype("Int64")
 
-# %% [markdown]
 # ### Grapher views
 # Similar to the tables, this creates the grapher views by grouping by types of variables and then running by survey type.
 
-# %%
 # Grapher table generation
 
 df_graphers = pd.DataFrame()
@@ -397,10 +384,8 @@ for survey in range(len(survey_type)):
     j += 1
 
 df_graphers["Show breaks between less comparable surveys Checkbox"] = "false"
-# %% [markdown]
 # ### Grapher views to show breaks in the curves
 
-# %%
 df_graphers_spells = pd.DataFrame()
 j = 0
 
@@ -443,10 +428,8 @@ for i in range(len(df_graphers)):
 
 df_graphers = pd.concat([df_graphers, df_graphers_spells], ignore_index=True)
 
-# %% [markdown]
 # Final adjustments to the graphers table: add `relatedQuestion` link and `defaultView`:
 
-# %%
 # Add related question link
 df_graphers["relatedQuestionText"] = np.nan
 df_graphers["relatedQuestionUrl"] = np.nan
@@ -500,11 +483,9 @@ df_graphers.loc[
 ] = "true"
 
 
-# %% [markdown]
 # ## Explorer generation
 # Here, the header, tables and graphers dataframes are combined to be shown in for format required for OWID data explorers.
 
-# %%
 # Define list of variables to iterate: survey types and the list of variables (the latter for spell tables)
 survey_list = list(survey_type["table_name"].unique())
 var_list = list(df_spells["master_var"].unique())
@@ -552,5 +533,4 @@ for var in var_list:
         )
         content += "\ncolumns\t" + i + "_" + var + "\n" + table_tsv_indented
 
-# %%
 upsert_to_db("inequality-wb", content)

@@ -1,21 +1,16 @@
-# %% [markdown]
 # # Poverty Data Explorer of World Bank data: 2011 vs 2017 prices
 # This code creates the tsv file for the PPP comparison explorer from the World Bank PIP data, available [here](https://ourworldindata.org/explorers/poverty-explorer-2011-vs-2017-ppp)
 
 import textwrap
 
 import numpy as np
-
-# %%
 import pandas as pd
 
 from ..common_parameters import *
 
-# %% [markdown]
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each poverty line (from 2011 and 2017 prices), both prices together, relative poverty or survey type.
 
-# %%
 # Read Google sheets
 sheet_id = "1mR0LPEGlY-wCp1q9lNTlDbVIG65JazKvHL16my9tH8Y"
 
@@ -44,11 +39,9 @@ sheet_name = "survey_type"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 survey_type = pd.read_csv(url)
 
-# %% [markdown]
 # ## Header
 # General settings of the explorer are defined here, like the title, subtitle, default country selection, publishing status and others.
 
-# %%
 # The header is defined as a dictionary first and then it is converted into a index-oriented dataframe
 header_dict = {
     "explorerTitle": "Poverty - World Bank 2011 vs. 2017 prices",
@@ -65,11 +58,9 @@ df_header = pd.DataFrame.from_dict(header_dict, orient="index", columns=None)
 # Assigns a cell for each entity separated by comma (like in `selection`)
 df_header = df_header[0].apply(pd.Series)
 
-# %% [markdown]
 # ## Tables
 # Variables are grouped by type to iterate by different poverty lines and survey types at the same time. The output is the list of all the variables being used in the explorer, with metadata.
 
-# %%
 sourceName = SOURCE_NAME_PIP
 dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
@@ -487,11 +478,9 @@ df_tables["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 # Make tolerance integer (to not break the parameter in the platform)
 df_tables["tolerance"] = df_tables["tolerance"].astype("Int64")
 
-# %% [markdown]
 # ## Grapher views
 # Similar to the tables, this creates the grapher views by grouping by types of variables and then running by survey type and poverty lines.
 
-# %%
 # Grapher table generation
 
 df_graphers = pd.DataFrame()
@@ -1041,10 +1030,8 @@ for survey in range(len(survey_type)):
     df_graphers.loc[j, "survey_type"] = survey_type["table_name"][survey]
     j += 1
 
-# %% [markdown]
 # Final adjustments to the graphers table:
 
-# %%
 # Add PPP comparison article as related question link
 df_graphers["relatedQuestionText"] = "From $1.90 to $2.15 a day: the updated International Poverty Line"
 df_graphers["relatedQuestionUrl"] = (
@@ -1119,11 +1106,9 @@ df_graphers["povline_dropdown_aux"] = df_graphers["Poverty line Dropdown"].map(d
 df_graphers = df_graphers.sort_values("povline_dropdown_aux", ignore_index=True)
 df_graphers = df_graphers.drop(columns=["povline_dropdown_aux"])
 
-# %% [markdown]
 # ## Explorer generation
 # Here, the header, tables and graphers dataframes are combined to be shown in for format required for OWID data explorers.
 
-# %%
 # Define list of variables to iterate: survey types
 survey_list = list(survey_type["table_name"].unique())
 
@@ -1157,5 +1142,4 @@ for i in survey_list:
         + table_tsv_indented
     )
 
-# %%
 upsert_to_db("poverty-explorer-2011-vs-2017-ppp", content)
