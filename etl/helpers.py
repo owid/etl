@@ -643,7 +643,9 @@ class PathFinder:
 
         return mdim
 
-    def create_explorer(self, config, explorer_name: Optional[str] = None) -> Explorer:
+    def create_explorer(
+        self, config, explorer_name: Optional[str] = None, avoid_duplicate_hack: bool = False
+    ) -> Explorer:
         """Create an Explorer object.
 
         Args:
@@ -652,11 +654,14 @@ class PathFinder:
             Configuration of the explorer.
         explorer_name: str
             Name of the explorer. If none is provided, it will use the short_name from the explorer catalog path.
+        avoid_duplicate_hack: bool
+            True to avoid creating duplicate transformations. These transformations are needed when indicators are used multiple times with different metadata configurations. But otherwise, these transformations are unnecessary, and they interrupt metadata propagation. Ideally, these parameter should not exist, and the code should know whether the duplicate transformations are needed. But for now, this lets the user avoid them when they are not needed.
         """
         # Create Explorer object
         explorer = create_explorer(
             config=config,
             dependencies=self.dependencies,
+            avoid_duplicate_hack=avoid_duplicate_hack,
         )
 
         # Get and set catalog path
