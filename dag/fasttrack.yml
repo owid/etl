@@ -230,3 +230,5 @@ steps:
     - snapshot://fasttrack/latest/lives_saved_measles_vaccination_who.csv
   data://grapher/fasttrack/latest/cdc_measles:
     - snapshot://fasttrack/latest/cdc_measles.csv
+  data://grapher/fasttrack/latest/world_bank_pip_filled:
+    - snapshot://fasttrack/latest/world_bank_pip_filled.csv

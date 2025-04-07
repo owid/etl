@@ -1,0 +1,14 @@
+meta:
+  origin:
+    producer: World Bank Poverty and Inequality Platform
+    title: World Bank Poverty and Inequality Platform (2024)
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRtpFONlRgRCUmI43nalUAucBKsZwQQ1nYH_tgPYJFSWdIyU9HVpc-5a5u2nmflynU_7Ex3zt3fej07/pub?output=csv
+    date_accessed: '2025-04-07'
+  name: DRAFT World Bank PIP (filled data)
+  description: ''
+  license: {}
+outs:
+  - md5: 9f6dd0614d61ae8dee2b157abd1914c7
+    size: 954867
+    path: world_bank_pip_filled.csv
