@@ -27,7 +27,7 @@ from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
 
 from etl import config, download_helpers, paths
-from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump
+from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump, yaml_load
 
 log = structlog.get_logger()
 
@@ -511,20 +511,24 @@ class SnapshotMeta(MetaBase):
         else:
             # Load outs from existing file
             with open(self.path, "r") as f:
-                yaml = ruamel_load(f)
+                yaml = yaml_load(f)
                 outs = yaml.get("outs", None)
                 # wdir is a legacy field, we just ignore it
 
             # Save metadata to file
             # NOTE: meta does not have `outs` field, it's reset when saving
             meta = self._meta_to_dict()
+
+            # No change, keep the file as is and don't break original formatting
+            if yaml["meta"] == meta:
+                return
+
+            # Otherwise re-save the file and format it
             with open(self.path, "w") as f:
                 # set `outs` back
                 d = {"meta": meta}
                 if outs:
                     d["outs"] = outs
-                # YAML is re-saved in the recommended format, if we wanted to keep the original format
-                # we'd need to use ruamel_dump and update `yaml` variable
                 f.write(yaml_dump(d))
 
     @property

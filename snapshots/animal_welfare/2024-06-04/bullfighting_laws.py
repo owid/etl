@@ -287,7 +287,7 @@ def main(upload: bool) -> None:
             sources_text += f" {row['comments']}"
         sources_text += "\n"
     # Replace the full citation in the metadata.
-    snap.metadata.origin.citation_full = sources_text  # type: ignore
+    snap.metadata.origin.citation_full = sources_text.strip()  # type: ignore
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(data=tb, upload=upload)
