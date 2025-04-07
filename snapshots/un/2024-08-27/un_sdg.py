@@ -19,7 +19,7 @@ import requests
 import yaml
 from structlog import get_logger
 
-from etl.snapshot import Snapshot, SnapshotMeta, add_snapshot
+from etl.snapshot import Snapshot, SnapshotMeta
 
 log = get_logger()
 
@@ -54,7 +54,7 @@ def main(upload: bool) -> None:
         unit_desc = attributes_description(snap)
         unit_desc = pd.DataFrame(unit_desc.items(), columns=["AttCode", "AttValue"])
         log.info("Adding unit descriptions to catalog...")
-        add_snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_unit.csv", dataframe=unit_desc, upload=True)
+        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_unit.csv").create_snapshot(data=unit_desc, upload=True)
 
         log.info("Downloading dimension descriptions...")
         dim_desc = dimensions_description(snap)
@@ -63,13 +63,13 @@ def main(upload: bool) -> None:
             json.dump(dim_desc, fp)
 
         log.info("Adding dimension descriptions to catalog...")
-        add_snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_dimension.json", filename=dim_file, upload=True)  # type: ignore
+        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg_dimension.json").create_snapshot(filename=dim_file, upload=True)
 
         # fetch the file locally
         log.info("Downloading data...")
         all_data = download_data(snap)
         log.info("Adding data to catalog...")
-        add_snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg.feather", dataframe=all_data, upload=True)
+        Snapshot(f"un/{SNAPSHOT_VERSION}/un_sdg.feather").create_snapshot(data=all_data, upload=True)
 
 
 def create_metadata(snap: Snapshot) -> SnapshotMeta:

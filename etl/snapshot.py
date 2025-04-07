@@ -208,14 +208,34 @@ class Snapshot:
     ) -> None:
         """Create a new snapshot from a local file, or from data in memory, or from a download link.
         Then upload it to S3. This is the recommended way to create a snapshot.
+
+        Args:
+            uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
+                `namespace/version/short_name.ext.dvc` must exist!
+            filename (str or None): Path to local data file (if dataframe is not given).
+            data (Table or pd.DataFrame or None): Data to upload (if filename is not given).
+            upload (bool): True to upload data to bucket.
         """
-        if (filename is not None) or (data is not None):
-            # Create snapshot from either a local file or from data in memory.
-            add_snapshot(uri=self.uri, filename=filename, dataframe=data, upload=upload)
+        assert not (filename is not None and data is not None), "Pass either a filename or data, but not both."
+
+        if filename is not None:
+            # Ensure destination folder exists.
+            self.path.parent.mkdir(exist_ok=True, parents=True)
+
+            # Copy local data file to snapshots data folder.
+            self.path.write_bytes(Path(filename).read_bytes())
+        elif data is not None:
+            # Copy dataframe to snapshots data folder.
+            dataframes.to_file(data, file_path=self.path)
         else:
             # Create snapshot by downloading data from a URL.
             self.download_from_source()
-            self.dvc_add(upload=upload)
+
+        # Upload data to R2
+        self.dvc_add(upload=upload)
+
+        # Save metadata to file
+        self.metadata.save()
 
     def to_table_metadata(self) -> TableMeta:
         return self.metadata.to_table_metadata()
@@ -684,38 +704,6 @@ def read_table_from_snapshot(
         tb = cast(Table, to_safe_types(tb))
 
     return tb
-
-
-def add_snapshot(
-    uri: str,
-    filename: Optional[Union[str, Path]] = None,
-    dataframe: Optional[Union[Table, pd.DataFrame]] = None,
-    upload: bool = False,
-) -> None:
-    """Helper function for adding snapshots with metadata, where the data is either
-    a local file, or a dataframe in memory.
-
-    Args:
-        uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
-            `namespace/version/short_name.ext.dvc` must exist!
-        filename (str or None): Path to local data file (if dataframe is not given).
-        dataframe (Table or pd.DataFrame or None): Data to upload (if filename is not given).
-        upload (bool): True to upload data to bucket.
-    """
-    snap = Snapshot(uri)
-
-    if (filename is not None) and (dataframe is None):
-        # Ensure destination folder exists.
-        snap.path.parent.mkdir(exist_ok=True, parents=True)
-
-        # Copy local data file to snapshots data folder.
-        snap.path.write_bytes(Path(filename).read_bytes())
-    elif (dataframe is not None) and (filename is None):
-        dataframes.to_file(dataframe, file_path=snap.path)
-    else:
-        raise ValueError("Pass either a filename or data, but not both.")
-
-    snap.dvc_add(upload=upload)
 
 
 def snapshot_catalog(match: str = r".*") -> Iterator[Snapshot]:
