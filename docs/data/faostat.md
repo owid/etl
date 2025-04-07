@@ -325,7 +325,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
 11. From the ETL Wizard, use Chart Diff to visually inspect changes between the old and new versions of updated charts, and
     accept or reject changes.
 
-12. Update the explorers steps `data://garden/faostat/latest/food_explorer` and `export://explorers/faostat/latest/global_food` (for the moment, this has to be done manually): Edit the versions of their dependencies in the dag, and copy all the additional files in the same folder.
+12. Update the explorers steps `data://garden/faostat/latest/food_explorer` and `export://explorers/faostat/latest/global_food` (for the moment, this has to be done manually): Edit the versions of their dependencies in the dag.
 
 13. Run the new etl explorers step, to generate the csv files for the global food explorer, and the export step.
 
@@ -338,7 +338,7 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
     !!! note
 
-        Sometimes items change in FAOSTAT. If that's the case, you may need to edit the `foods.csv` file adjacent to the `global_food` step.
+        Sometimes items change in FAOSTAT. If that's the case, you may need to edit the `FOODS_CONTENT` defined inside the `global_food` step.
 
 14. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
 
