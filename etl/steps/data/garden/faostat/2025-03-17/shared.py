@@ -348,14 +348,8 @@ NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
 # Additional text to include in the metadata title of the output wide table.
 ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
 
-# Name of item, element and unit of FAO population (used to select population in the data).
-FAO_POPULATION_ITEM_NAME = "Population"
-FAO_POPULATION_ELEMENT_NAME = "Total Population - Both sexes"
-FAO_POPULATION_UNIT_NAME = "thousand Number"
 
 # Shared functions.
-
-
 def check_that_countries_are_well_defined(tb: Table) -> None:
     """Apply sanity checks related to the definition of countries.
 
