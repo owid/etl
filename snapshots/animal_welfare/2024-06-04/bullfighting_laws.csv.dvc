@@ -2,8 +2,7 @@ meta:
   origin:
     producer: Various sources
     title: Bullfighting laws
-    description: |-
-      This dataset lists countries where bullfighting is banned and countries where it is still legal. Note that in some countries bullfighting is legal at a national level, although it may be banned in certain regions.
+    description: This dataset lists countries where bullfighting is banned and countries where it is still legal. Note that in some countries bullfighting is legal at a national level, although it may be banned in certain regions.
     citation_full: |-
       Evidence of laws banning bullfighting, and evidence of bullfighting being practiced without any ban, has been gathered from various sources for different countries.
       - Argentina: Banned. Source: [Law 2786 - Buenos Aires, July 25th, 1891.](https://www.argentina.gob.ar/normativa/nacional/ley-2786-283995/texto) Last bullfight took place [in 1899](https://www.animanaturalis.org/p/883).
