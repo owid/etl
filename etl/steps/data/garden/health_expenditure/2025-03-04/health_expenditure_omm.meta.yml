@@ -20,7 +20,7 @@ tables:
         title: Public health expenditure as a share of GDP
         unit: "% of GDP"
         short_unit: "%"
-        description_short: Public health expenditure divided bt gross domestic product, expressed as a percentage.
+        description_short: Public health expenditure divided by gross domestic product, expressed as a percentage.
         description_key:
           - "This indicator combines three different datasets: Lindert (1994), OECD (1993), and the OECD Health Expenditure and Financing Database. We combine the two OECD datasets by using the implicit growth rate from the older series, so we can extend the series back to 1960. We also use the data from Lindert (1994) to extend the series to 1880."
         description_from_producer: ""
