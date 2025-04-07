@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
 
-from etl.snapshot import add_snapshot
+from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
@@ -433,9 +433,8 @@ def main(upload: bool) -> None:
     energy_data = fetch_all_data_for_all_energy_sources()
 
     # Create a new snapshot.
-    add_snapshot(
-        uri=f"shift/{SNAPSHOT_VERSION}/energy_production_from_fossil_fuels.csv", dataframe=energy_data, upload=upload
-    )
+    snap = Snapshot(f"shift/{SNAPSHOT_VERSION}/energy_production_from_fossil_fuels.csv")
+    snap.create_snapshot(data=energy_data, upload=upload)
 
 
 if __name__ == "__main__":

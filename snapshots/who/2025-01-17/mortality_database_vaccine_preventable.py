@@ -24,7 +24,7 @@ import click
 import pandas as pd
 from structlog import get_logger
 
-from etl.snapshot import Snapshot, add_snapshot
+from etl.snapshot import Snapshot
 
 LIST_OF_CAUSES = {
     "Pertussis": {"icd_codes": "A37"},
@@ -52,13 +52,9 @@ def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"who/{SNAPSHOT_VERSION}/mortality_database_vaccine_preventable.csv")
 
-    # Ensure destination folder exists.
-    snap.path.parent.mkdir(exist_ok=True, parents=True)
     df = combine_datasets(LIST_OF_CAUSES)
-    add_snapshot(f"who/{SNAPSHOT_VERSION}/mortality_database_vaccine_preventable.csv", dataframe=df, upload=upload)
 
-    # Add file to DVC and upload to S3.
-    snap.dvc_add(upload=upload)
+    snap.create_snapshot(data=df, upload=upload)
 
 
 def combine_datasets(list_of_causes: Dict) -> pd.DataFrame:
