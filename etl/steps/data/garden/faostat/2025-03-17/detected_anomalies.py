@@ -106,8 +106,11 @@ class DataAnomaly(abc.ABC):
         tb_fixed = self.fix(tb=tb)
 
         if inspect_anomalies:
+            original_description = self.description
+            self.description = self.description + " *FIXED*"
             log.info("Inspect anomaly after fixing.")
             self.inspect(tb=tb_fixed)
+            self.description = original_description
 
         return tb_fixed
 
@@ -779,17 +782,21 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
     )
 
     affected_item_codes = [
-        "00002029",  # Poultry Birds.
+        "00001057",  # Chickens.
+        "00002029",  # Poultry.
     ]
     affected_element_codes = [
-        "005112",  # Production.
-        # NOTE: There is currently no per capita for this variable.
+        "005112",  # Stocks.
+        "5112pc",  # Stocks per capita.
     ]
     affected_years = [
         2018,
         2019,
+        # NOTE: 2020 is not affected by the issue.
+        # 2020,
         2021,
         2022,
+        2023,
     ]
     # Countries affected by the anomaly.
     affected_countries = [
@@ -804,7 +811,14 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
             (tb["country"].isin(["Germany", "Spain", "Italy"]))
             & (tb["item_code"].isin(self.affected_item_codes))
             & (tb["element_code"].isin(self.affected_element_codes))
-            & (tb["year"].isin(self.affected_years))
+            & (tb["year"].isin([2018, 2019, 2021, 2022]))
+        ].empty
+        assert tb[
+            # NOTE: In 2023, Germany is informed, but not Spain and Italy, which also causes a big dip.
+            (tb["country"].isin(["Spain", "Italy"]))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+            & (tb["year"].isin([2023]))
         ].empty
 
     def inspect(self, tb):
@@ -812,51 +826,63 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
             "The missing data on the number of poultry birds in European countries causes: "
             f"\n* The number of poultry birds in Europe, EU27 and HEC to jump down on {', '.join(map(str, self.affected_years))}."
         )
-        for element_code in self.affected_element_codes:
-            selection = (
-                (tb["item_code"].isin(self.affected_item_codes))
-                & (tb["element_code"] == element_code)
-                & (tb["country"].isin(self.affected_countries))
-            )
-            tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
-            title = _split_long_title(self.description)
-            fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
-            fig.show()
+        for item_code in self.affected_item_codes:
+            for element_code in self.affected_element_codes:
+                selection = (
+                    (tb["item_code"] == item_code)
+                    & (tb["element_code"] == element_code)
+                    & (tb["country"].isin(self.affected_countries))
+                )
+                tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
+                title = _split_long_title(self.description + f" ITEM/ELEMENT: {item_code}/{element_code}")
+                fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
+                fig.show()
 
     def fix(self, tb):
-        # For High-income countries, we should simply drop those values, since we don't have any way to replace them.
-        indexes_to_drop = tb[
+        tb_fixed = tb.copy()
+        # We will first remove all those values (for all affected items, elements, countries and years).
+        # Then, where possible, we will add the original values from FAO.
+        # This is only possible for the total number of animals for EU and Europe.
+        # For High-income countries, we don't have data from FAO.
+        # And we don't keep the original per-capita values from FAO.
+        tb_fixed.loc[
             (
-                (tb["item_code"].isin(self.affected_item_codes))
-                & (tb["element_code"].isin(self.affected_element_codes))
-                & (tb["year"].isin(self.affected_years))
-                & (tb["country"] == "High-income countries")
-            )
-        ].index
-        tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
+                (tb_fixed["item_code"].isin(self.affected_item_codes))
+                & (tb_fixed["element_code"].isin(self.affected_element_codes))
+                & (tb_fixed["year"].isin(self.affected_years))
+                & (tb_fixed["country"].isin(self.affected_countries))
+            ),
+            "value",
+        ] = None
 
-        # For Europe and European Union (27), we can replace them with their corresponding (FAO) versions.
         for country in ["Europe", "European Union (27)"]:
-            for year in self.affected_years:
-                # First identify the value from FAO.
-                country_fao = f"{country} (FAO)"
-                _value_from_fao = tb[
-                    (tb["item_code"].isin(self.affected_item_codes))
-                    & (tb["element_code"].isin(self.affected_element_codes))
-                    & (tb["country"] == country_fao)
-                    & (tb["year"] == year)
-                ]["value"]
-                assert len(_value_from_fao) == 1, "Unexpected error in 'UnstableNumberOfPoultryBirdsInEurope'."
-                value_from_fao = _value_from_fao.item()
+            for item_code in self.affected_item_codes:
+                for element_code in ["005112"]:
+                    for year in self.affected_years:
+                        # First identify the value from FAO.
+                        country_fao = f"{country} (FAO)"
+                        _value_from_fao = tb[
+                            (tb["item_code"] == item_code)
+                            & (tb["element_code"] == element_code)
+                            & (tb["country"] == country_fao)
+                            & (tb["year"] == year)
+                        ]["value"]
+                        assert len(_value_from_fao) == 1, "Unexpected error in 'UnstableNumberOfPoultryBirdsInEurope'."
+                        value_from_fao = _value_from_fao.item()
 
-                # Now replace the current (non-FAO) value, and replace it with the FAO one.
-                current_value_mask = (
-                    (tb["item_code"].isin(self.affected_item_codes))
-                    & (tb["element_code"].isin(self.affected_element_codes))
-                    & (tb["country"] == country)
-                    & (tb["year"] == year)
-                )
-                tb_fixed.loc[current_value_mask, "value"] = value_from_fao
+                        # Now replace the current (non-FAO) value, and replace it with the FAO one.
+                        tb_fixed.loc[
+                            (
+                                (tb_fixed["item_code"] == item_code)
+                                & (tb_fixed["element_code"] == element_code)
+                                & (tb_fixed["country"] == country)
+                                & (tb_fixed["year"] == year)
+                            ),
+                            "value",
+                        ] = value_from_fao
+
+        # Drop rows with no values, if any.
+        tb_fixed = tb_fixed.dropna(subset="value").reset_index(drop=True)
 
         return tb_fixed
 
