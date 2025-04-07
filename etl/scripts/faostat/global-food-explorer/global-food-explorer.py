@@ -97,7 +97,7 @@ def run(ready_to_merge: bool = False):
 
     # merge on column: _tag
     graphers = views_df.merge(foods).apply(substitute_title, axis=1)
-    graphers = graphers.drop(columns="_tag").sort_values(by="Food Dropdown", kind="stable")
+    graphers = graphers.drop(columns="_tag").sort_values(by="Food Dropdown", kind="stable")  # type: ignore
     # drop duplicates introduced by the tag merge
     graphers = graphers.drop_duplicates()
 
@@ -142,11 +142,11 @@ def run(ready_to_merge: bool = False):
             log.error(
                 f"Default view ({default_view}) should match exactly one view, but matches {default_view_count} views: {graphers[default_view_mask]}"
             )
-        graphers["defaultView"] = np.where(default_view_mask, "true", None)
+        graphers["defaultView"] = np.where(default_view_mask, "true", None)  # type: ignore
 
     # TODO: Drop the _tag column?
     graphers_tsv = graphers.to_csv(sep="\t", index=False)
-    graphers_tsv_indented = textwrap.indent(graphers_tsv, "\t")
+    graphers_tsv_indented = textwrap.indent(graphers_tsv, "\t")  # type: ignore
 
     table_defs = "\n".join([table_def(food) for food in foods_df.index])
     food_slugs = "\t".join(foods_df.index)
