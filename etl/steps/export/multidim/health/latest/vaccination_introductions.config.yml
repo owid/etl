@@ -1,8 +1,6 @@
 title:
   title: Vaccination introduction
   title_variant: by vaccine
-default_selection:
-  - World
 dimensions:
   - name: Vaccine
     slug: description
@@ -14,7 +12,7 @@ dimensions:
       - slug: "Hepatitis B vaccine"
         name: "Hepatitis B vaccine"
       - slug: "HepB birth dose"
-        name: "HepB birth dose"
+        name: "Hepatitis B birth dose"
       - slug: "Hib (Haemophilus influenzae type B) vaccine"
         name: "Hib (Haemophilus influenzae type B) vaccine"
       - slug: "HPV (Human Papilloma Virus) vaccine"
@@ -35,10 +33,8 @@ dimensions:
         name: "Mumps vaccine"
       - slug: "PCV (Pneumococcal conjugate vaccine)"
         name: "PCV (Pneumococcal conjugate vaccine)"
-
       - slug: "PPV (Pneumococcal polysaccharide vaccine)"
         name: "PPV (Pneumococcal polysaccharide vaccine)"
-
       - slug: "Rotavirus vaccine"
         name: "Rotavirus vaccine"
       - slug: "Rubella vaccine"
@@ -49,7 +45,6 @@ dimensions:
         name: "Typhoid vaccine"
       - slug: "Varicella vaccine"
         name: "Chickenpox vaccine"
-
       - slug: "YF (Yellow fever) vaccine"
-        name: "YF (Yellow fever) vaccine"
+        name: "Yellow fever vaccine"
 views: []
