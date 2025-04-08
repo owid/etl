@@ -82,7 +82,7 @@ definitions:
     <%- elif description == "Japanese Encephalitis" %>
     Japanese encephalitis vaccine
     <%- elif description == "Varicella vaccine" %>
-    Chickenpox vaccine (Varicella)
+    Chickenpox vaccine
     <%- elif description == "aP (acellular pertussis) vaccine" %>
     Pertussis vaccine (aP)
     <%- elif description == "Hepatitis A vaccine" %>
@@ -153,7 +153,7 @@ tables:
     variables:
       intro:
         title: Vaccination introduction for the {definitions.vaccine_name}
-        description_short: The introduction status of {definitions.vaccine_name} vaccination schedule.
+        description_short: Countries including {definitions.vaccine_name} in their national vaccination program.
         unit: ""
         description_key:
           - "{definitions.vaccine_description_key}"
