@@ -5,7 +5,7 @@ default_selection:
   - World
 dimensions:
   - name: Vaccine
-    slug: vaccine
+    slug: description
     choices:
       - slug: "Seasonal Influenza vaccine"
         name: "Seasonal Influenza vaccine"
