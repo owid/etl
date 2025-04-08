@@ -9,6 +9,20 @@ MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "hasMapTab": True,
     "tab": "map",
+    "map": {
+        "tooltipUseCustomLabels": True,
+        "colorScale": {
+            "customCategoryColors": {
+                "Entire country": "#38AABA",
+                "Not routinely administered": "#E77969",
+                "Regions of the country": "#E9AD6F",
+                "Specific risk groups": "#A2559C",
+                "Demonstration projects": "#D7191C",
+                "Adolescents": "#C8ADF5",
+                "High risk areas": "#286BBB",
+            },
+        },
+    },
 }
 
 
