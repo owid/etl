@@ -5,6 +5,11 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+MULTIDIM_CONFIG = {
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+    "hasMapTab": True,
+    "tab": "map",
+}
 
 
 # etlr multidim
@@ -18,12 +23,14 @@ def run() -> None:
     ds = paths.load_dataset("vaccination_introductions")
     tb = ds.read("vaccination_introductions", load_data=True)
 
+    common_view_config = MULTIDIM_CONFIG
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
         tb,
         indicator_names=["intro"],
         dimensions=["description"],
         indicators_slug="vaccine",
+        common_view_config=common_view_config,
     )
     # 3: Combine both sources (basically dimensions and views)
     config["dimensions"] = multidim.combine_config_dimensions(
