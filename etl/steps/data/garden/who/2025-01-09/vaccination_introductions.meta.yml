@@ -24,7 +24,7 @@ definitions:
     <%- elif description == "Hib (Haemophilus influenzae type B) vaccine" %>
     Haemophilus influenzae type B vaccine (Hib)
     <%- elif description == "HepB birth dose" %>
-    hepatitis B birth dose (HEPB_BD)
+    hepatitis B birth dose
     <%- elif description == "IPV (Inactivated polio vaccine) 2nd dose" %>
     inactivated polio vaccine second dose (IPV2)
     <%- elif description == "Meningococcal meningitis vaccines (all strains)" %>
@@ -36,7 +36,7 @@ definitions:
     <%- elif description == "Japanese Encephalitis" %>
     Japanese encephalitis vaccine
     <%- elif description == "Varicella vaccine" %>
-    chickenpox vaccine (Varicella) vaccine
+    chickenpox vaccine
     <%- elif description == "aP (acellular pertussis) vaccine" %>
     pertussis vaccine (aP)
     <%- elif description == "Hepatitis A vaccine" %>
