@@ -152,7 +152,7 @@ tables:
   vaccination_introductions:
     variables:
       intro:
-        title: Vaccination introduction for the {definitions.vaccine_name}
+        title: Which countries include the {definitions.vaccine_name} in their national vaccination programs?
         description_short: Countries including {definitions.vaccine_name} in their national vaccination program.
         unit: ""
         description_key:

@@ -20,6 +20,7 @@ MULTIDIM_CONFIG = {
                 "Demonstration projects": "#D7191C",
                 "Adolescents": "#C8ADF5",
                 "High risk areas": "#286BBB",
+                "During outbreaks": "#398724",
             },
         },
     },
