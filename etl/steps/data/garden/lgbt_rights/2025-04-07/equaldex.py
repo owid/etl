@@ -286,6 +286,9 @@ def add_population_weighted_aggregations(
 
     tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
 
+    # Remove attribution to avoid issues in propagation
+    tb["population"].m.presentation.attribution = None
+
     columns_pop = []
     for col in columns:
         tb[f"{col}_pop"] = tb[col] * tb["population"]
