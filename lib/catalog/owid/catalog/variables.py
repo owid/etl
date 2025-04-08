@@ -479,11 +479,11 @@ def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str
 
 
 def combine_variables_display(
-    variables: List[Variable], operation: OPERATION, _field_name="display"
+    variables: List[Variable], operation: OPERATION, _field_name="display", _ignore_operations: List[str] = ["/"]
 ) -> Optional[Dict[str, Any]]:
     # Gather displays from all variables that are defined.
     list_of_displays = [getattr(variable.metadata, _field_name) for variable in variables]
-    if operation == "/" and list_of_displays[0] is None:
+    if operation in _ignore_operations and list_of_displays[0] is None:
         # When dividing a variable by another, it only makes sense to keep the display values of the first variable.
         # Therefore, if the first variables doesn't have a display, the resulting variable should have no display.
         return None
@@ -495,7 +495,9 @@ def combine_variables_presentation(
     variables: List[Variable], operation: OPERATION
 ) -> Optional[VariablePresentationMeta]:
     # Apply the same logic as for displays.
-    return combine_variables_display(variables=variables, operation=operation, _field_name="presentation")  # type: ignore
+    return combine_variables_display(
+        variables=variables, operation=operation, _field_name="presentation", _ignore_operations=["/", "*"]
+    )  # type: ignore
 
 
 def combine_variables_processing_level(variables: List[Variable]) -> Optional[PROCESSING_LEVELS]:
