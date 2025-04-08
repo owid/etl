@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: World Bank Poverty and Inequality Platform
+    title: 'World Bank Poverty and Inequality Platform (PIP): Percentiles'
+    description: |-
+      The Poverty and Inequality Platform: Percentiles database reports 100 points ranked according to the consumption or income distributions for country-year survey data available in the World Bank’s Poverty and Inequality Platform (PIP). There are, as of September 19, 2024, a total of 2,456 country-survey-year data points, which include 2,274 distributions based on microdata, binned data, or imputed/synthetic data, and 182 based on grouped data. For the grouped data, the percentiles are derived by fitting a parametric Lorenz distribution following Datt (1998). For ease of communication, all distributions are referred to as survey data henceforth, and the welfare variable is referred to as income.
+
+      We modified the original files available in [World Bank's Databank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles) to include distributions from regions with data available in PIP's API.
+    citation_full: |-
+      - World Bank (2024). Poverty and Inequality Platform: percentiles [Data set]. World Bank Group. https://pip.worldbank.org/.
+      - World Bank (2024). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/.
+    version_producer: Version 12
+    url_main: https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
+    date_accessed: '2025-04-08'
+    date_published: '2024-10-02'
+    license:
+      name: CC0
+      url: https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
