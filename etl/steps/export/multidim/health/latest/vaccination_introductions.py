@@ -36,7 +36,7 @@ def run() -> None:
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("vaccination_introductions")
-    tb = ds.read("vaccination_introductions", load_data=True)
+    tb = ds.read("vaccination_introductions", load_data=False)
 
     common_view_config = MULTIDIM_CONFIG
     # 2: Bake config automatically from table

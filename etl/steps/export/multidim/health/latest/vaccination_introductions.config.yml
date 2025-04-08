@@ -47,7 +47,6 @@ dimensions:
         name: "Seasonal Influenza vaccine"
       - slug: "Typhoid"
         name: "Typhoid vaccine"
-
       - slug: "YF (Yellow fever) vaccine"
         name: "Yellow fever vaccine"
 views: []
