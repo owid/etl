@@ -21,8 +21,8 @@ def run() -> None:
     # 2: Bake config automatically from table
     config_new = multidim.expand_config(
         tb,
-        indicator_names=["description"],
-        dimensions=["intro"],
+        indicator_names=["intro"],
+        dimensions=["description"],
         indicators_slug="vaccine",
     )
     # 3: Combine both sources (basically dimensions and views)
