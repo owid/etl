@@ -589,44 +589,27 @@ tables:
         description_processing: *agricultural_land_use_description_processing
   hypothetical_meat_consumption:
     variables:
-      animals_global:
-        title: Number of slaughtered animals to produce meat worldwide
-        unit: "animals"
-        short_unit: ""
-      animals_global_hypothetical:
-        title: Hypothetical number of slaughtered animals if everyone ate like the average citizen of a given country
-        unit: "animals"
-        short_unit: ""
-        description_short: |
-          Hypothetical number of slaughtered animals worldwide if everyone in the world ate the same quantity as the average citizen of a given country.
-        description_key:
-          - 'This is a hypothetical variable derived by Our World in Data which answers the question: "How many animals would need to be slaughtered if everyone in the world consumed the average per capita amount of a given country?". For example: "How many animals would need to be slaughtered if everyone in the world consumed the same amount of meat as the average UK citizen?".'
-        description_processing: |
-          - This indicator was calculated by multiplying global population by the per capita number of slaughtered animals of a given country.
-      animals_per_capita:
-        title: Number of slaughtered animals per person in each country
-        unit: "animals per person"
-        short_unit: ""
       global_population:
         title: World population
         unit: "people"
         short_unit: ""
-      production_global:
-        title: Total amount of meat produced worldwide
-        unit: "tonnes"
-        short_unit: "t"
-      production_global_hypothetical:
+      meat_global_hypothetical:
         title: Hypothetical global meat demand if everyone ate like the average citizen of a given country
         unit: "tonnes"
         short_unit: "t"
         description_short: |
           Hypothetical global meat demand if everyone in the world ate the same quantity as the average citizen of a given country.
         description_key:
-          - 'This is a hypothetical variable derived by Our World in Data which answers the question: "What would global meat production have to be if everyone in the world consumed the average per capita amount of a given country?". For example: "How much meat would we need to produce if everyone in the world consumed the same amount of meat as the average UK citizen?".'
+          - 'This is a hypothetical variable derived by Our World in Data which answers the question: "What would global meat demand have to be if everyone in the world consumed the average per capita amount of a given country?". For example: "How much meat would need to be provided if everyone in the world consumed as much meat as the average UK citizen?".'
+          - We do not have data on actual individual consumption. Instead, this data reflects the amount of meat available for consumption. It may include food that is wasted at the consumer level and not eaten.
         description_processing: |
           - This indicator was calculated by multiplying global population by per capita meat supply of a given country.
-      production_per_capita:
-        title: Per-capita production of meat in each country
+        presentation:
+          grapher_config:
+            note: |-
+              This data reflects the amount of meat available for consumption, not actual intake. It does not account for food waste at the consumer level.
+      meat_per_capita:
+        title: Per-capita meat supply in each country
         unit: "tonnes per person"
         short_unit: "t/person"
   cereal_allocation:

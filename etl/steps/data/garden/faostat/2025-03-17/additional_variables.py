@@ -912,90 +912,45 @@ def generate_agriculture_land_evolution(tb_rl: Table) -> Table:
     return tb_agriculture_land_use_evolution
 
 
-def generate_hypothetical_meat_consumption(tb_qcl: Table) -> Table:
-    # Element code and unit for "Production".
-    ELEMENT_CODE_FOR_PRODUCTION = "005510"
-    UNIT_FOR_PRODUCTION = "tonnes"
-    # Element code and unit for per-capita "Production".
-    ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA = "5510pc"
+def generate_hypothetical_meat_consumption(tb_fbsc: Table) -> Table:
+    # Element code and unit for "Food per-capita".
+    ELEMENT_CODE_FOR_FOOD_PER_CAPITA = "5142pc"
     UNIT_FOR_PRODUCTION_PER_CAPITA = "tonnes per capita"
-    # Element code and unit for "Producing or slaughtered animals".
-    ELEMENT_CODE_FOR_ANIMALS = "005320"
-    UNIT_FOR_ANIMALS = "animals"
-    # Element code and unit for per-capita "Producing or slaughtered animals".
-    ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA = "5320pc"
-    UNIT_FOR_ANIMALS_PER_CAPITA = "animals per capita"
     # Item code for "Meat, total".
-    ITEM_CODE_FOR_MEAT_TOTAL = "00001765"
+    ITEM_CODE_FOR_MEAT_TOTAL = "00002943"
 
-    # Select the required items/elements/units to get national data on per-capita production and slaughtered animals.
-    meat = tb_qcl[
-        (tb_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
-        & (tb_qcl["element_code"].isin([ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA, ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA]))
-        & (tb_qcl["unit"].isin([UNIT_FOR_PRODUCTION_PER_CAPITA, UNIT_FOR_ANIMALS_PER_CAPITA]))
+    # Select the required items/elements/units to get national data on per-capita consumption.
+    meat = tb_fbsc[
+        (tb_fbsc["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
+        & (tb_fbsc["element_code"].isin([ELEMENT_CODE_FOR_FOOD_PER_CAPITA]))
+        & (tb_fbsc["unit"].isin([UNIT_FOR_PRODUCTION_PER_CAPITA]))
     ].reset_index(drop=True)
+    # Extract global population.
+    # NOTE: I checked that "population_with_data" for World coincides with the global population.
+    global_population = (
+        meat[meat["country"] == "World"]
+        .rename(columns={"population_with_data": "global_population"}, errors="raise")[["year", "global_population"]]
+        .reset_index(drop=True)
+    )
+    # Get food available for consumption for each country.
     meat = meat.pivot(index=["country", "year"], columns="element_code", values="value", join_column_levels_with="_")
     meat = meat.rename(
         columns={
-            ELEMENT_CODE_FOR_ANIMALS_PER_CAPITA: "animals_per_capita",
-            ELEMENT_CODE_FOR_PRODUCTION_PER_CAPITA: "production_per_capita",
+            ELEMENT_CODE_FOR_FOOD_PER_CAPITA: "meat_per_capita",
         },
         errors="raise",
     )
 
-    # Take data for global population from the "population_with_data" column for the production of total meat.
-    # This should coincide with the true world population.
-    # Note that "population_with_data" may differ with the total population for certain items/elements for region
-    # aggregates (e.g. "Africa"). For slaughtered animals, population with data may also differ, since it's
-    # built for all countries (in the garden faostat_qcl step) by aggregating.
-    # But this does not happen with total meat/production for the "World", since this data was extracted directly from FAOSTAT.
-    # TODO: Confirm this by checking qcl code, especially the one about animals slaughtered
-    global_population = (
-        tb_qcl[
-            (tb_qcl["country"] == "World")
-            & (tb_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION)
-            & (tb_qcl["unit"] == UNIT_FOR_PRODUCTION)
-            & (tb_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
-        ][["year", "population_with_data"]]
-        .reset_index(drop=True)
-        .rename(columns={"population_with_data": "global_population"}, errors="raise")
-    ).astype({"global_population": int})
-
-    # Just for reference, extract global production and number of slaughtered animals.
-    global_production = (
-        tb_qcl[
-            (tb_qcl["country"] == "World")
-            & (tb_qcl["element_code"] == ELEMENT_CODE_FOR_PRODUCTION)
-            & (tb_qcl["unit"] == UNIT_FOR_PRODUCTION)
-            & (tb_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
-        ][["year", "value"]]
-        .reset_index(drop=True)
-        .rename(columns={"value": "production_global"}, errors="raise")
-    )
-    global_animals = (
-        tb_qcl[
-            (tb_qcl["country"] == "World")
-            & (tb_qcl["element_code"] == ELEMENT_CODE_FOR_ANIMALS)
-            & (tb_qcl["unit"] == UNIT_FOR_ANIMALS)
-            & (tb_qcl["item_code"] == ITEM_CODE_FOR_MEAT_TOTAL)
-        ][["year", "value"]]
-        .reset_index(drop=True)
-        .rename(columns={"value": "animals_global"}, errors="raise")
-    )
-
     # Combine national with global data.
-    combined = pr.multi_merge(
-        tables=[meat, global_population, global_production, global_animals], on=["year"], how="left"
-    )
+    combined = pr.multi_merge(tables=[meat, global_population], on=["year"], how="left")
 
     # Sanity check.
     error = "Rows have changed after merging national data with global data."
     assert len(combined) == len(meat), error
 
-    # Add columns for hypothetical global production and number of slaughtered animals.
-    # This is the production (or number of slaughtered animals) that would be needed worldwide to meet the demand of a given country.
-    combined["production_global_hypothetical"] = combined["production_per_capita"] * combined["global_population"]
-    combined["animals_global_hypothetical"] = combined["animals_per_capita"] * combined["global_population"]
+    # Add columns for hypothetical global meat consumption (more precisely, meat available for consumption).
+    # This is a proxy for the amount of meat that would be needed worldwide to meet the demand of a given country.
+    combined["meat_global_hypothetical"] = combined["meat_per_capita"] * combined["global_population"]
 
     # Set an appropriate index and sort conveniently.
     tb_hypothetical_meat_consumption = combined.format(
@@ -1348,7 +1303,7 @@ def run() -> None:
     tb_agriculture_land_use_evolution = generate_agriculture_land_evolution(tb_rl=tb_rl)
 
     # Create table for hypothetical meat consumption
-    tb_hypothetical_meat_consumption = generate_hypothetical_meat_consumption(tb_qcl=tb_qcl)
+    tb_hypothetical_meat_consumption = generate_hypothetical_meat_consumption(tb_fbsc=tb_fbsc)
 
     # Create table for cereal allocation.
     tb_cereal_allocation = generate_cereal_allocation(tb_fbsc=tb_fbsc)
