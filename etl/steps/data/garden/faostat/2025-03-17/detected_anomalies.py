@@ -784,6 +784,7 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
     affected_item_codes = [
         "00001057",  # Chickens.
         "00002029",  # Poultry.
+        "00001079",  # Turkeys.
     ]
     affected_element_codes = [
         "005112",  # Stocks.
