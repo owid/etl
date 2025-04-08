@@ -1002,6 +1002,19 @@ def generate_hypothetical_meat_consumption(tb_qcl: Table) -> Table:
         ["country", "year"], sort_columns=True, short_name="hypothetical_meat_consumption"
     )
 
+    ####################################################################################################################
+    # TODO: I noticed a bug (https://github.com/owid/etl/issues/4241) in the way presentation.attribution is propagated.
+    #  It causes that these specific variables show the attribution of the population dataset instead of FAOSTAT.
+    #  So, assert that the issue is happening, and if so, remove that attribution.
+    for column in tb_hypothetical_meat_consumption.columns:
+        if tb_hypothetical_meat_consumption[column].metadata.presentation is not None:
+            assert (
+                tb_hypothetical_meat_consumption[column].metadata.presentation.attribution
+                == "HYDE (2023); Gapminder (2022); UN WPP (2024)"
+            )
+            tb_hypothetical_meat_consumption[column].metadata.presentation.attribution = None
+    ####################################################################################################################
+
     return tb_hypothetical_meat_consumption
 
 
