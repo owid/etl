@@ -2,7 +2,7 @@
   "name": "run-until-cursor",
   "displayName": "Run Until Cursor",
   "description": "Executes lines inside `run()` up to the cursor in the Interactive Window.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "owid",
   "engines": {
     "vscode": "^1.97.0"
