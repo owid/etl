@@ -5,10 +5,14 @@ meta:
     description: |-
       Equaldex is a collaborative knowledge base for the LGBT (lesbian, gay, bisexual, transgender) movement. The site aims to crowdsource every law related to LGBT rights to provide a comprehensive and global view of the LGBT rights movement.
     title_snapshot: Equaldex - Historical data
-    citation_full: LGBT Rights by Country & Travel Guide | Equaldex. (2024). https://www.equaldex.com/
+    citation_full: LGBT Rights by Country & Travel Guide | Equaldex. (2025). https://www.equaldex.com/
     url_main: https://www.equaldex.com/
     date_accessed: '2025-04-07'
-    date_published: '2024'
+    date_published: '2025'
     license:
       name: Equaldex Terms and Conditions of Use
       url: https://www.equaldex.com/terms
+outs:
+  - md5: 3c02d147dc37508ac03fcf225f3af278
+    size: 13111929
+    path: equaldex.csv

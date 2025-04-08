@@ -12,9 +12,9 @@ EQUALDEX_KEY="your_api_key"
 You can obtain your API key by registering at https://www.equaldex.com/ and then copying it from your account settings: https://www.equaldex.com/settings
 
 After running this script, add the long.csv and the current.csv file to snapshots (change the date in the path for future updates):
-    python snapshots/lgbt_rights/2024-06-03/equaldex.py --path-to-file snapshots/lgbt_rights/2024-06-03/long.csv
-    python snapshots/lgbt_rights/2024-06-03/equaldex_current.py --path-to-file snapshots/lgbt_rights/2024-06-03/current.csv
-    python snapshots/lgbt_rights/2024-06-03/equaldex_indices.py --path-to-file snapshots/lgbt_rights/2024-06-03/indices.csv
+    python snapshots/lgbt_rights/2025-04-07/equaldex.py --path-to-file snapshots/lgbt_rights/2025-04-07/long.csv
+    python snapshots/lgbt_rights/2025-04-07/equaldex_current.py --path-to-file snapshots/lgbt_rights/2025-04-07/current.csv
+    python snapshots/lgbt_rights/2025-04-07/equaldex_indices.py --path-to-file snapshots/lgbt_rights/2025-04-07/indices.csv
 
 """
 
@@ -35,11 +35,15 @@ PARENT_DIR = Path(__file__).parent.absolute()
 # Import API key (it is stored in .env file)
 API_KEY = os.getenv("EQUALDEX_KEY")
 
+# Get where is the env file
+
+print(f"API key: {API_KEY}")
+
 # Set parameter to extract data from the API or not (this is useful to avoid running the API query every time)
 GET_DATA_FROM_API = True
 
 # Define regex pattern to find years in the data
-REGEX_PATTERN = "(\d{4})"  # type: ignore
+REGEX_PATTERN = r"(\d{4})"  # type: ignore
 
 # Define current year
 CURRENT_YEAR = datetime.datetime.now().year
