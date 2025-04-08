@@ -9,6 +9,8 @@ dimensions:
     choices:
       - slug: "aP (acellular pertussis) vaccine"
         name: "Acellular pertussis vaccine"
+      - slug: "Varicella vaccine"
+        name: "Chickenpox vaccine"
       - slug: "Hepatitis A vaccine"
         name: "Hepatitis A vaccine"
       - slug: "Hepatitis B vaccine"
@@ -45,8 +47,7 @@ dimensions:
         name: "Seasonal Influenza vaccine"
       - slug: "Typhoid"
         name: "Typhoid vaccine"
-      - slug: "Varicella vaccine"
-        name: "Chickenpox vaccine"
+
       - slug: "YF (Yellow fever) vaccine"
         name: "Yellow fever vaccine"
 views: []
