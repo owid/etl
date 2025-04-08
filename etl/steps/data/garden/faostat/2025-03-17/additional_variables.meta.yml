@@ -612,6 +612,24 @@ tables:
         title: Per-capita meat supply in each country
         unit: "tonnes per person"
         short_unit: "t/person"
+  hypothetical_animals_slaughtered:
+    variables:
+      animals_global:
+        title: Number of slaughtered animals to produce meat worldwide
+        unit: "animals"
+        short_unit: ""
+      animals_global_hypothetical:
+        title: Hypothetical number of land animals that would be slaughtered if all countries produced meat in the same way as a given country
+        unit: "animals"
+        short_unit: ""
+        description_key:
+          - 'This is a hypothetical variable derived by Our World in Data which answers the question: "How many animals would need to be slaughtered if all countries in the world slaughtered the same number of animals per capita?". For example: "How many animals would need to be slaughtered if all countries replicated the per capita meat production of the UK?".'
+        description_processing: |
+          - This indicator was calculated by multiplying global population by the per capita number of slaughtered animals of a given country.
+      animals_per_capita:
+        title: Number of slaughtered animals per person in each country
+        unit: "animals per person"
+        short_unit: ""
   cereal_allocation:
     variables:
       cereals_allocated_to_animal_feed:
