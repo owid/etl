@@ -58,7 +58,4 @@ def run() -> None:
         config=config,
         mdim_name="mdd-vaccination-introductions-who",
     )
-
-    # Edit order of slugs
-    mdim.sort_choices({"description": lambda x: sorted(x)})
     mdim.save()
