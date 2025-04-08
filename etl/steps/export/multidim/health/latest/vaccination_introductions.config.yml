@@ -1,6 +1,8 @@
 title:
   title: Vaccination introduction
   title_variant: by vaccine
+default_selection:
+  - World
 dimensions:
   - name: Vaccine
     slug: description
