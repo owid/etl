@@ -62,7 +62,8 @@ CATEGORIES_RENAMING = {
     },
     "age_of_consent": {
         "Equal": "Equal",
-        "Female equal, male N/A": "Female equal, male illegal",
+        "Female equal, male N/A": "Female equal, male unequal or N/A",
+        "Female equal, male unequal": "Female equal, male unequal or N/A",
         "Varies by Region": "Varies by region",
         "Ambiguous": "Ambiguous",
         "Unequal": "Unequal",
