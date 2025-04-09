@@ -1,7 +1,5 @@
 """Step that pushes the global-food explorer (tsv content) to DB, to create the global-food (indicator-based) explorer."""
 
-from copy import deepcopy
-
 from structlog import get_logger
 
 from etl.collections.explorer import expand_config
@@ -384,15 +382,14 @@ def run():
             columns_to_drop.append(column)
     tb_qcl = tb_qcl.drop(columns=columns_to_drop)
 
-    # Create additional dimensions and views from input table.
-    config_fbsc = expand_config(
-        tb_fbsc,
-        indicator_names=sorted(set([column for column in tb_fbsc.columns if column not in ["country", "year"]])),
-        indicator_as_dimension=False,
-    )
-    config_qcl = expand_config(
-        tb_qcl,
-        indicator_names=sorted(set([column for column in tb_qcl.columns if column not in ["country", "year"]])),
+    config_new = expand_config(
+        [tb_qcl, tb_fbsc],
+        indicator_names=sorted(
+            set(
+                [column for column in tb_fbsc.columns if column not in ["country", "year"]]
+                + [column for column in tb_qcl.columns if column not in ["country", "year"]]
+            )
+        ),
         indicator_as_dimension=False,
         default_view={
             "food": "Apples",
@@ -401,14 +398,9 @@ def run():
             "per_capita": "False",
         },
     )
-    # Update original configuration of dimensions and views.
-    config["dimensions"] = deepcopy(config_fbsc["dimensions"])
-    for i, dimension in enumerate(config["dimensions"]):
-        choices_qcl = config_qcl["dimensions"][i]["choices"]
-        dimension["choices"] = dimension["choices"] + [
-            choice for choice in choices_qcl if choice not in dimension["choices"]
-        ]
-    config["views"] = config_fbsc["views"] + config_qcl["views"]
+
+    config["dimensions"] = config_new["dimensions"]
+    config["views"] = config_new["views"]
 
     # Make per capita a checkbox and unit a radio button.
     for dimension in config["dimensions"]:
