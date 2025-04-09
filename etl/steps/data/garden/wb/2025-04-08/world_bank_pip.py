@@ -36,10 +36,10 @@ POVLINES_DICT = {
 # Define PPP versions from POVLINES_DICT
 PPP_VERSIONS = list(POVLINES_DICT.keys())
 
-# Define International Poverty Line (in cents)
+# Define current International Poverty Line (in cents)
 # NOTE: Modify if poverty lines are updated from source
 # TODO: Modify the lines in 2021 prices
-INTERNATIONAL_POVERTY_LINE = 215
+INTERNATIONAL_POVERTY_LINE_CURRENT = 215
 
 # Define regions in the dataset
 REGIONS_LIST = [
@@ -143,82 +143,94 @@ def run(dest_dir: str) -> None:
     tb = identify_rural_urban(tb)
 
     # Separate out ppp and filled data from the main dataset
-    tb_ppp_1, tb_ppp_2 = separate_ppp_data(tb)
-    tb_percentiles_ppp_1, tb_percentiles_ppp_2 = separate_ppp_data(tb_percentiles)
+    tb_ppp_old, tb_ppp_current = separate_ppp_data(tb)
+    tb_percentiles_ppp_old, tb_percentiles_ppp_current = separate_ppp_data(tb_percentiles)
 
     # Create stacked variables from headcount and headcount_ratio
-    tb_ppp_1, col_stacked_n_ppp_1, col_stacked_pct_ppp_1 = create_stacked_variables(
-        tb_ppp_1, POVLINES_DICT, ppp_version=PPP_VERSIONS[0]
+    tb_ppp_old, col_stacked_n_ppp_old, col_stacked_pct_ppp_old = create_stacked_variables(
+        tb_ppp_old, POVLINES_DICT, ppp_version=PPP_VERSIONS[0]
     )
-    tb_ppp_2, col_stacked_n_ppp_2, col_stacked_pct_ppp_2 = create_stacked_variables(
-        tb_ppp_2, POVLINES_DICT, ppp_version=PPP_VERSIONS[1]
+    tb_ppp_current, col_stacked_n_ppp_current, col_stacked_pct_ppp_current = create_stacked_variables(
+        tb_ppp_current, POVLINES_DICT, ppp_version=PPP_VERSIONS[1]
     )
 
     # Sanity checks. I don't run for percentile tables because that process was done in the extraction
-    tb_ppp_1 = sanity_checks(
-        tb_ppp_1,
+    tb_ppp_old = sanity_checks(
+        tb_ppp_old,
         POVLINES_DICT,
         ppp_version=PPP_VERSIONS[0],
-        col_stacked_n=col_stacked_n_ppp_1,
-        col_stacked_pct=col_stacked_pct_ppp_1,
+        col_stacked_n=col_stacked_n_ppp_old,
+        col_stacked_pct=col_stacked_pct_ppp_old,
     )
-    tb_ppp_2 = sanity_checks(
-        tb_ppp_2,
+    tb_ppp_current = sanity_checks(
+        tb_ppp_current,
         POVLINES_DICT,
         ppp_version=PPP_VERSIONS[1],
-        col_stacked_n=col_stacked_n_ppp_2,
-        col_stacked_pct=col_stacked_pct_ppp_2,
+        col_stacked_n=col_stacked_n_ppp_current,
+        col_stacked_pct=col_stacked_pct_ppp_current,
     )
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb_inc_ppp_1, tb_cons_ppp_1, tb_inc_or_cons_ppp_1_unsmoothed, tb_inc_or_cons_ppp_1 = inc_or_cons_data(tb_ppp_1)
-    tb_inc_ppp_2, tb_cons_ppp_2, tb_inc_or_cons_ppp_2_unsmoothed, tb_inc_or_cons_ppp_2 = inc_or_cons_data(tb_ppp_2)
+    tb_inc_ppp_old, tb_cons_ppp_old, tb_inc_or_cons_ppp_old_unsmoothed, tb_inc_or_cons_ppp_old = inc_or_cons_data(
+        tb_ppp_old
+    )
+    tb_inc_ppp_current, tb_cons_ppp_current, tb_inc_or_cons_ppp_current_unsmoothed, tb_inc_or_cons_ppp_current = (
+        inc_or_cons_data(tb_ppp_current)
+    )
 
     # Create regional headcount variable, by patching missing values with the difference between world and regional headcount
-    tb_inc_or_cons_ppp_2 = regional_headcount(tb_inc_or_cons_ppp_2)
+    tb_inc_or_cons_ppp_current = regional_headcount(tb_inc_or_cons_ppp_current)
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
-    tb_inc_or_cons_ppp_2 = survey_count(tb_inc_or_cons_ppp_2)
+    tb_inc_or_cons_ppp_current = survey_count(tb_inc_or_cons_ppp_current)
 
     # Add region definitions
-    tb_inc_or_cons_ppp_2 = add_region_definitions(tb=tb_inc_or_cons_ppp_2, tb_region_definitions=tb_region_definitions)
+    tb_inc_or_cons_ppp_current = add_region_definitions(
+        tb=tb_inc_or_cons_ppp_current, tb_region_definitions=tb_region_definitions
+    )
 
     # Add metadata by code
-    tb_inc_ppp_1 = add_metadata_vars(tb_garden=tb_inc_ppp_1, ppp_version=PPP_VERSIONS[0], welfare_type="income")
-    tb_cons_ppp_1 = add_metadata_vars(tb_garden=tb_cons_ppp_1, ppp_version=PPP_VERSIONS[0], welfare_type="consumption")
-    tb_inc_or_cons_ppp_1_unsmoothed = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_ppp_1_unsmoothed,
+    tb_inc_ppp_old = add_metadata_vars(tb_garden=tb_inc_ppp_old, ppp_version=PPP_VERSIONS[0], welfare_type="income")
+    tb_cons_ppp_old = add_metadata_vars(
+        tb_garden=tb_cons_ppp_old, ppp_version=PPP_VERSIONS[0], welfare_type="consumption"
+    )
+    tb_inc_or_cons_ppp_old_unsmoothed = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_ppp_old_unsmoothed,
         ppp_version=PPP_VERSIONS[0],
         welfare_type="income_consumption",
     )
-    tb_inc_or_cons_ppp_1_unsmoothed.m.short_name = f"income_consumption_{PPP_VERSIONS[0]}_unsmoothed"
-    tb_inc_or_cons_ppp_1 = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_ppp_1,
+    tb_inc_or_cons_ppp_old_unsmoothed.m.short_name = f"income_consumption_{PPP_VERSIONS[0]}_unsmoothed"
+    tb_inc_or_cons_ppp_old = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_ppp_old,
         ppp_version=PPP_VERSIONS[0],
         welfare_type="income_consumption",
     )
 
-    tb_inc_ppp_2 = add_metadata_vars(tb_garden=tb_inc_ppp_2, ppp_version=PPP_VERSIONS[1], welfare_type="income")
-    tb_cons_ppp_2 = add_metadata_vars(tb_garden=tb_cons_ppp_2, ppp_version=PPP_VERSIONS[1], welfare_type="consumption")
-    tb_inc_or_cons_ppp_2_unsmoothed = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_ppp_2_unsmoothed,
+    tb_inc_ppp_current = add_metadata_vars(
+        tb_garden=tb_inc_ppp_current, ppp_version=PPP_VERSIONS[1], welfare_type="income"
+    )
+    tb_cons_ppp_current = add_metadata_vars(
+        tb_garden=tb_cons_ppp_current, ppp_version=PPP_VERSIONS[1], welfare_type="consumption"
+    )
+    tb_inc_or_cons_ppp_current_unsmoothed = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_ppp_current_unsmoothed,
         ppp_version=PPP_VERSIONS[1],
         welfare_type="income_consumption",
     )
-    tb_inc_or_cons_ppp_2_unsmoothed.m.short_name = f"income_consumption_{PPP_VERSIONS[1]}_unsmoothed"
-    tb_inc_or_cons_ppp_2 = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_ppp_2,
+    tb_inc_or_cons_ppp_current_unsmoothed.m.short_name = f"income_consumption_{PPP_VERSIONS[1]}_unsmoothed"
+    tb_inc_or_cons_ppp_current = add_metadata_vars(
+        tb_garden=tb_inc_or_cons_ppp_current,
         ppp_version=PPP_VERSIONS[1],
         welfare_type="income_consumption",
     )
 
-    tb_percentiles_ppp_1 = add_metadata_vars_percentiles(
-        tb_garden=tb_percentiles_ppp_1,
+    tb_percentiles_ppp_old = add_metadata_vars_percentiles(
+        tb_garden=tb_percentiles_ppp_old,
         ppp_version=PPP_VERSIONS[0],
         welfare_type="income_consumption",
     )
-    tb_percentiles_ppp_2 = add_metadata_vars_percentiles(
-        tb_garden=tb_percentiles_ppp_2,
+    tb_percentiles_ppp_current = add_metadata_vars_percentiles(
+        tb_garden=tb_percentiles_ppp_current,
         ppp_version=PPP_VERSIONS[1],
         welfare_type="income_consumption",
     )
@@ -228,65 +240,69 @@ def run(dest_dir: str) -> None:
     index_cols = ["country", "year"]
     index_cols_unsmoothed = ["country", "year", "reporting_level", "welfare_type"]
     index_cols_percentiles = ["country", "year", "reporting_level", "welfare_type", "percentile"]
-    tb_inc_ppp_1 = tb_inc_ppp_1.format(keys=index_cols)
-    tb_cons_ppp_1 = tb_cons_ppp_1.format(keys=index_cols)
-    tb_inc_or_cons_ppp_1_unsmoothed = tb_inc_or_cons_ppp_1_unsmoothed.format(keys=index_cols_unsmoothed)
-    tb_inc_or_cons_ppp_1 = tb_inc_or_cons_ppp_1.format(keys=index_cols)
+    tb_inc_ppp_old = tb_inc_ppp_old.format(keys=index_cols)
+    tb_cons_ppp_old = tb_cons_ppp_old.format(keys=index_cols)
+    tb_inc_or_cons_ppp_old_unsmoothed = tb_inc_or_cons_ppp_old_unsmoothed.format(keys=index_cols_unsmoothed)
+    tb_inc_or_cons_ppp_old = tb_inc_or_cons_ppp_old.format(keys=index_cols)
 
-    tb_inc_ppp_2 = tb_inc_ppp_2.format(keys=index_cols)
-    tb_cons_ppp_2 = tb_cons_ppp_2.format(keys=index_cols)
-    tb_inc_or_cons_ppp_2_unsmoothed = tb_inc_or_cons_ppp_2_unsmoothed.format(keys=index_cols_unsmoothed)
-    tb_inc_or_cons_ppp_2 = tb_inc_or_cons_ppp_2.format(keys=index_cols)
+    tb_inc_ppp_current = tb_inc_ppp_current.format(keys=index_cols)
+    tb_cons_ppp_current = tb_cons_ppp_current.format(keys=index_cols)
+    tb_inc_or_cons_ppp_current_unsmoothed = tb_inc_or_cons_ppp_current_unsmoothed.format(keys=index_cols_unsmoothed)
+    tb_inc_or_cons_ppp_current = tb_inc_or_cons_ppp_current.format(keys=index_cols)
 
-    tb_percentiles_ppp_1 = tb_percentiles_ppp_1.format(keys=index_cols_percentiles)
-    tb_percentiles_ppp_2 = tb_percentiles_ppp_2.format(keys=index_cols_percentiles)
+    tb_percentiles_ppp_old = tb_percentiles_ppp_old.format(keys=index_cols_percentiles)
+    tb_percentiles_ppp_current = tb_percentiles_ppp_current.format(keys=index_cols_percentiles)
 
     # Create spell tables to separate different survey spells in the explorers
-    spell_tables_inc = create_survey_spells(tb=tb_inc_ppp_2)
-    spell_tables_cons = create_survey_spells(tb=tb_cons_ppp_2)
+    spell_tables_inc = create_survey_spells(tb=tb_inc_ppp_current)
+    spell_tables_cons = create_survey_spells(tb=tb_cons_ppp_current)
 
-    # For income and consumption we combine the tables to not lose information from tb_inc_or_cons_ppp_2
-    spell_tables_inc_or_cons = create_survey_spells_inc_cons(tb_inc=tb_inc_ppp_2, tb_cons=tb_cons_ppp_2)
+    # For income and consumption we combine the tables to not lose information from tb_inc_or_cons_ppp_current
+    spell_tables_inc_or_cons = create_survey_spells_inc_cons(tb_inc=tb_inc_ppp_current, tb_cons=tb_cons_ppp_current)
 
     # Drop columns not needed
-    tb_inc_ppp_1 = drop_columns(tb_inc_ppp_1)
-    tb_cons_ppp_1 = drop_columns(tb_cons_ppp_1)
-    tb_inc_or_cons_ppp_1 = drop_columns(tb_inc_or_cons_ppp_1)
+    tb_inc_ppp_old = drop_columns(tb_inc_ppp_old)
+    tb_cons_ppp_old = drop_columns(tb_cons_ppp_old)
+    tb_inc_or_cons_ppp_old = drop_columns(tb_inc_or_cons_ppp_old)
 
-    tb_inc_ppp_2 = drop_columns(tb_inc_ppp_2)
-    tb_cons_ppp_2 = drop_columns(tb_cons_ppp_2)
-    tb_inc_or_cons_ppp_2 = drop_columns(tb_inc_or_cons_ppp_2)
+    tb_inc_ppp_current = drop_columns(tb_inc_ppp_current)
+    tb_cons_ppp_current = drop_columns(tb_cons_ppp_current)
+    tb_inc_or_cons_ppp_current = drop_columns(tb_inc_or_cons_ppp_current)
 
     # Merge tables for PPP comparison explorer
     tb_inc_ppp_comparison = combine_tables_ppp_comparison(
-        tb_ppp_1=tb_inc_ppp_1, tb_ppp_2=tb_inc_ppp_2, short_name=f"income_{PPP_VERSIONS[0]}_{PPP_VERSIONS[1]}"
+        tb_ppp_old=tb_inc_ppp_old,
+        tb_ppp_current=tb_inc_ppp_current,
+        short_name=f"income_{PPP_VERSIONS[0]}_{PPP_VERSIONS[1]}",
     )
     tb_cons_ppp_comparison = combine_tables_ppp_comparison(
-        tb_ppp_1=tb_cons_ppp_1, tb_ppp_2=tb_cons_ppp_2, short_name=f"consumption_{PPP_VERSIONS[0]}_{PPP_VERSIONS[1]}"
+        tb_ppp_old=tb_cons_ppp_old,
+        tb_ppp_current=tb_cons_ppp_current,
+        short_name=f"consumption_{PPP_VERSIONS[0]}_{PPP_VERSIONS[1]}",
     )
     tb_inc_or_cons_ppp_comparison = combine_tables_ppp_comparison(
-        tb_ppp_1=tb_inc_or_cons_ppp_1,
-        tb_ppp_2=tb_inc_or_cons_ppp_2,
+        tb_ppp_old=tb_inc_or_cons_ppp_old,
+        tb_ppp_current=tb_inc_or_cons_ppp_current,
         short_name=f"income_consumption_{PPP_VERSIONS[0]}_{PPP_VERSIONS[1]}",
     )
 
     # Define tables to upload
-    # The ones we need in Grapher admin would be tb_inc_or_cons_ppp_1, tb_inc_or_cons_ppp_2
+    # The ones we need in Grapher admin would be tb_inc_or_cons_ppp_old, tb_inc_or_cons_ppp_current
     tables = (
         [
-            tb_inc_ppp_1,
-            tb_cons_ppp_1,
-            tb_inc_or_cons_ppp_1_unsmoothed,
-            tb_inc_or_cons_ppp_1,
-            tb_inc_ppp_2,
-            tb_cons_ppp_2,
-            tb_inc_or_cons_ppp_2_unsmoothed,
-            tb_inc_or_cons_ppp_2,
+            tb_inc_ppp_old,
+            tb_cons_ppp_old,
+            tb_inc_or_cons_ppp_old_unsmoothed,
+            tb_inc_or_cons_ppp_old,
+            tb_inc_ppp_current,
+            tb_cons_ppp_current,
+            tb_inc_or_cons_ppp_current_unsmoothed,
+            tb_inc_or_cons_ppp_current,
             tb_inc_ppp_comparison,
             tb_cons_ppp_comparison,
             tb_inc_or_cons_ppp_comparison,
-            tb_percentiles_ppp_1,
-            tb_percentiles_ppp_2,
+            tb_percentiles_ppp_old,
+            tb_percentiles_ppp_current,
         ]
         + spell_tables_inc
         + spell_tables_cons
@@ -850,10 +866,10 @@ def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
 
     # Filter table to include only the right ppp_version
     # Also, drop columns with all NaNs (which are the ones that are not relevant for the ppp_version)
-    tb_ppp_1 = tb[tb["ppp_version"] == PPP_VERSIONS[0]].dropna(axis=1, how="all").reset_index(drop=True).copy()
-    tb_ppp_2 = tb[tb["ppp_version"] == PPP_VERSIONS[1]].dropna(axis=1, how="all").reset_index(drop=True).copy()
+    tb_ppp_old = tb[tb["ppp_version"] == PPP_VERSIONS[0]].dropna(axis=1, how="all").reset_index(drop=True).copy()
+    tb_ppp_current = tb[tb["ppp_version"] == PPP_VERSIONS[1]].dropna(axis=1, how="all").reset_index(drop=True).copy()
 
-    return tb_ppp_1, tb_ppp_2
+    return tb_ppp_old, tb_ppp_current
 
 
 def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
@@ -1071,9 +1087,9 @@ def regional_headcount(tb: Table) -> Table:
     ].reset_index(drop=True)
 
     # Select needed columns and pivot
-    tb_regions = tb_regions[["country", "year", f"headcount_{INTERNATIONAL_POVERTY_LINE}"]]
+    tb_regions = tb_regions[["country", "year", f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}"]]
     tb_regions = tb_regions.pivot(
-        index="year", columns="country", values=f"headcount_{INTERNATIONAL_POVERTY_LINE}"
+        index="year", columns="country", values=f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}"
     ).reset_index()
 
     # Drop rows with more than one region with null headcount
@@ -1120,13 +1136,15 @@ def regional_headcount(tb: Table) -> Table:
     # tb_regions["South Asia excluding India"] = tb_regions["South Asia (PIP)"] - tb_regions["India"]
 
     tb_regions = pr.melt(
-        tb_regions, id_vars=["year"], var_name="country", value_name=f"headcount_{INTERNATIONAL_POVERTY_LINE}"
+        tb_regions, id_vars=["year"], var_name="country", value_name=f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}"
     )
-    tb_regions = tb_regions[["country", "year", f"headcount_{INTERNATIONAL_POVERTY_LINE}"]]
+    tb_regions = tb_regions[["country", "year", f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}"]]
 
-    # Rename headcount_{INTERNATIONAL_POVERTY_LINE} to headcount_{INTERNATIONAL_POVERTY_LINE}_regions, to distinguish it from the original headcount when merging
+    # Rename headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT} to headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}_regions, to distinguish it from the original headcount when merging
     tb_regions = tb_regions.rename(
-        columns={f"headcount_{INTERNATIONAL_POVERTY_LINE}": f"headcount_{INTERNATIONAL_POVERTY_LINE}_regions"}
+        columns={
+            f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}": f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}_regions"
+        }
     )
 
     # Merge with original table
@@ -1243,7 +1261,7 @@ def create_survey_spells(tb: Table) -> list:
             "estimation_type",
             "survey_comparability",
             "comparable_spell",
-            f"headcount_{INTERNATIONAL_POVERTY_LINE}_regions",
+            f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}_regions",
             "surveys_past_decade",
         ]
     ]
@@ -1293,7 +1311,7 @@ def create_survey_spells_inc_cons(tb_inc: Table, tb_cons: Table) -> list:
     return spell_tables
 
 
-def combine_tables_ppp_comparison(tb_ppp_1: Table, tb_ppp_2: Table, short_name: str) -> Table:
+def combine_tables_ppp_comparison(tb_ppp_old: Table, tb_ppp_current: Table, short_name: str) -> Table:
     """
     Combine income and consumption tables from PPP_VERSIONS[0] and PPP_VERSIONS[1] PPPs.
     We will use this table for the Poverty Data Explorer: World Bank data - PPP_VERSIONS[0] vs. PPP_VERSIONS[1] prices.
@@ -1302,16 +1320,20 @@ def combine_tables_ppp_comparison(tb_ppp_1: Table, tb_ppp_2: Table, short_name: 
     # Identify columns to use (ID + indicators)
     id_cols = ["country", "year"]
 
-    tb_ppp_1 = define_columns_for_ppp_comparison(tb=tb_ppp_1, id_cols=id_cols, ppp_version=PPP_VERSIONS[0])
-    tb_ppp_2 = define_columns_for_ppp_comparison(tb=tb_ppp_2, id_cols=id_cols, ppp_version=PPP_VERSIONS[1])
+    tb_ppp_old = define_columns_for_ppp_comparison(tb=tb_ppp_old, id_cols=id_cols, ppp_version=PPP_VERSIONS[0])
+    tb_ppp_current = define_columns_for_ppp_comparison(tb=tb_ppp_current, id_cols=id_cols, ppp_version=PPP_VERSIONS[1])
 
     # Rename all the non-id columns with the suffix _ppp(year)
     # (the suffix option in merge only adds suffix when columns coincide)
-    tb_ppp_1 = tb_ppp_1.rename(columns={c: c + f"_ppp{PPP_VERSIONS[0]}" for c in tb_ppp_1.columns if c not in id_cols})
-    tb_ppp_2 = tb_ppp_2.rename(columns={c: c + f"_ppp{PPP_VERSIONS[1]}" for c in tb_ppp_2.columns if c not in id_cols})
+    tb_ppp_old = tb_ppp_old.rename(
+        columns={c: c + f"_ppp{PPP_VERSIONS[0]}" for c in tb_ppp_old.columns if c not in id_cols}
+    )
+    tb_ppp_current = tb_ppp_current.rename(
+        columns={c: c + f"_ppp{PPP_VERSIONS[1]}" for c in tb_ppp_current.columns if c not in id_cols}
+    )
 
     # Merge the two files (it's OK to have an inner join, because we want to keep country-year pairs that are in both files)
-    tb_ppp_comparison = pr.merge(tb_ppp_1, tb_ppp_2, on=id_cols, validate="one_to_one", short_name=short_name)
+    tb_ppp_comparison = pr.merge(tb_ppp_old, tb_ppp_current, on=id_cols, validate="one_to_one", short_name=short_name)
 
     # Add index and sort
     tb_ppp_comparison = tb_ppp_comparison.format(["country", "year"])

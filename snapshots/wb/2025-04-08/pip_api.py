@@ -168,8 +168,8 @@ POVLINES_DICT = {
     2021: [100, 215, 365, 685, 1000, 2000, 3000, 4000],  # TODO: add lines
 }
 
-# Define International Poverty Line (IPL) in the latest prices
-INTERNATIONAL_POVERTY_LINE = 2.15  # TODO: change to 2021 prices
+# Define current International Poverty Line (IPL) in the latest prices
+INTERNATIONAL_POVERTY_LINE_CURRENT = 2.15  # TODO: change to 2021 prices
 
 # Define PPP versions from POVLINES_DICT
 PPP_VERSIONS = list(POVLINES_DICT.keys())
@@ -394,11 +394,11 @@ def pip_versions(wb_api) -> dict:
     # Set index and convert to dict
     versions = versions.set_index("ppp_version", verify_integrity=True).sort_index().to_dict(orient="index")
 
-    ppp_version_1 = versions[PPP_VERSIONS[0]]["version"]
-    ppp_version_2 = versions[PPP_VERSIONS[1]]["version"]
+    ppp_version_old = versions[PPP_VERSIONS[0]]["version"]
+    ppp_version_current = versions[PPP_VERSIONS[1]]["version"]
 
     log.info(
-        f"PIP dataset versions extracted: {PPP_VERSIONS[0]} = {ppp_version_1}, {PPP_VERSIONS[1]} = {ppp_version_2}"
+        f"PIP dataset versions extracted: {PPP_VERSIONS[0]} = {ppp_version_old}, {PPP_VERSIONS[1]} = {ppp_version_current}"
     )
 
     return versions
@@ -657,7 +657,7 @@ def generate_percentiles_raw(wb_api: WB_API):
         df_reference = pip_query_country(
             wb_api,
             popshare_or_povline="povline",
-            value=INTERNATIONAL_POVERTY_LINE,
+            value=INTERNATIONAL_POVERTY_LINE_CURRENT,
             versions=versions,
             country_code="all",
             year="all",
@@ -896,11 +896,11 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
         df_percentiles = df_percentiles.rename(columns={"headcount": "estimated_percentile", "poverty_line": "thr"})  # type: ignore
 
         # Add official percentiles from the World Bank Databank
-        df_percentiles_published_ppp_version_1 = format_official_percentiles(PPP_VERSIONS[0], wb_api)
-        df_percentiles_published_ppp_version_2 = format_official_percentiles(PPP_VERSIONS[1], wb_api)
+        df_percentiles_published_ppp_old = format_official_percentiles(PPP_VERSIONS[0], wb_api)
+        df_percentiles_published_ppp_current = format_official_percentiles(PPP_VERSIONS[1], wb_api)
 
         df_percentiles = pd.concat(
-            [df_percentiles, df_percentiles_published_ppp_version_1, df_percentiles_published_ppp_version_2],
+            [df_percentiles, df_percentiles_published_ppp_old, df_percentiles_published_ppp_current],
             ignore_index=True,
         )
 
@@ -1330,7 +1330,7 @@ def generate_relative_poverty(wb_api: WB_API):
     df_country = pip_query_country(
         wb_api,
         popshare_or_povline="povline",
-        value=INTERNATIONAL_POVERTY_LINE,
+        value=INTERNATIONAL_POVERTY_LINE_CURRENT,
         versions=versions,
         country_code="all",
         year="all",
@@ -1355,7 +1355,7 @@ def generate_relative_poverty(wb_api: WB_API):
     df_region = pip_query_region(
         wb_api,
         popshare_or_povline="povline",
-        value=INTERNATIONAL_POVERTY_LINE,
+        value=INTERNATIONAL_POVERTY_LINE_CURRENT,
         versions=versions,
         country_code="all",
         year="all",

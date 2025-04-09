@@ -7,7 +7,7 @@ paths = PathFinder(__file__)
 
 # Define PPP version
 # NOTE: Change this in case of new PPP versions in the future
-PPP_VERSION = 2021
+PPP_VERSION_CURRENT = 2021
 
 
 def run(dest_dir: str) -> None:
@@ -18,7 +18,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("world_bank_pip")
 
     # Read tables from garden dataset.
-    tb = ds_garden[f"income_consumption_{PPP_VERSION}"]
+    tb = ds_garden[f"income_consumption_{PPP_VERSION_CURRENT}"]
 
     #
     # Process data.

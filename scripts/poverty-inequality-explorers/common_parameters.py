@@ -34,11 +34,15 @@ Y_AXIS_MIN = 0
 ####################################################################################################
 # WORLD BANK POVERTY AND INEQUALITY PLATFORM
 ####################################################################################################
-SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2024)"
-DATA_PUBLISHED_BY_PIP = "World Bank (2024). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/."
+SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2025)"
+# TODO: Update the PIP versions here
+DATA_PUBLISHED_BY_PIP = "World Bank (2025). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/."
 SOURCE_LINK_PIP = "https://pip.worldbank.org"
 CONSUMPTION_SPELLS_PIP = 7
 INCOME_SPELLS_PIP = 8
+
+# Define PPP versions
+PPP_VERSIONS_PIP = [2011, 2017]
 
 
 INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
@@ -75,40 +79,40 @@ PROCESSING_DESCRIPTION_PIP_BASE = NEW_LINE.join(
 PROCESSING_DESCRIPTION_PIP = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so by selecting _Income surveys only_ or _Consumption surveys only_ in the Household survey data type dropdown or by clicking on _Show breaks between less comparable surveys_. You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so by selecting _Income surveys only_ or _Consumption surveys only_ in the Household survey data type dropdown or by clicking on _Show breaks between less comparable surveys_.",
     ]
 )
 
 PROCESSING_DESCRIPTION_PIP_PPP_COMPARISON = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).",
     ]
 )
 
 PROCESSING_DESCRIPTION_PIP_INCOMES_ACROSS_DISTRIBUTION = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Incomes Across the Distribution - World Bank Data Explorer](https://ourworldindata.org/explorers/incomes-across-distribution-wb?Indicator=Decile+thresholds&Decile=9+%28richest%29&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Period=Day&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Incomes Across the Distribution - World Bank Data Explorer](https://ourworldindata.org/explorers/incomes-across-distribution-wb?Indicator=Decile+thresholds&Decile=9+%28richest%29&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Period=Day&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).",
     ]
 )
 
 PROCESSING_DESCRIPTION_PIP_INEQUALITY = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Inequality - World Bank Data Explorer](https://ourworldindata.org/explorers/inequality-wb?country=ROU~CHN~BLR~PER&Indicator=Gini+coefficient&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Inequality - World Bank Data Explorer](https://ourworldindata.org/explorers/inequality-wb?country=ROU~CHN~BLR~PER&Indicator=Gini+coefficient&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true).",
     ]
 )
 
 PROCESSING_DESCRIPTION_PIP_POVERTY = NEW_LINE.join(
     [
         PROCESSING_DESCRIPTION_PIP_BASE,
-        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty - World Bank Data Explorer](https://ourworldindata.org/explorers/poverty-wb?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.",
+        "If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty - World Bank Data Explorer](https://ourworldindata.org/explorers/poverty-wb?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).",
     ]
 )
 
-PPP_DESCRIPTION_PIP_2017 = "The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in living costs between countries."
-PPP_DESCRIPTION_PIP_2011 = "The data is measured in international-$ at 2011 prices – this adjusts for inflation and for differences in living costs between countries."
+PPP_DESCRIPTION_PIP_OLD = f"The data is measured in international-$ at {PPP_VERSIONS_PIP[0]} prices – this adjusts for inflation and for differences in living costs between countries."
+PPP_DESCRIPTION_PIP_CURRENT = f"The data is measured in international-$ at {PPP_VERSIONS_PIP[1]} prices – this adjusts for inflation and for differences in living costs between countries."
 
 ####################################################################################################
 # WORLD INEQUALITY DATABASE
