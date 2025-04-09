@@ -137,6 +137,7 @@ def create_private_investment_table(tb):
         "semantic_search": "Semantic search",
         "semiconductors": "Semiconductors",
         "supply_chain": "Supply chain",
+        "private_investment": "Total",
     }
     tb = tb[list(industries.keys()) + ["year", "country"]]
 
