@@ -52,7 +52,7 @@ def _show_options():
 
 
 def _fetch_mdim_catalog_paths(hide_unchanged_mdims: bool) -> list[str]:
-    """Fetch all published explorer catalog paths."""
+    """Fetch all published mdim catalog paths."""
     q = """
     select
         catalogPath,
@@ -91,9 +91,9 @@ def main():
     # Select mdims to compare
     mdim_catalog_path = url_persist(st.selectbox)(
         "Select MDIM",
-        key="explorer",
+        key="mdim",
         options=mdim_catalog_paths,
-        # cleanup query params on explorer change
+        # cleanup query params on mdim change
         on_change=st.query_params.clear,
     )
 
