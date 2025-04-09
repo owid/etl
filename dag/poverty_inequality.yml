@@ -54,7 +54,7 @@ steps:
 
   # Poverty and inequality file for inequality comparisons at OWID
   data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
-    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wb/2025-04-08/world_bank_pip
     - data://garden/wid/2025-03-14/world_inequality_database
     - data://garden/lis/2025-01-24/luxembourg_income_study
     - data://garden/wb/2025-03-10/thousand_bins_distribution
@@ -65,7 +65,7 @@ steps:
     - data://garden/poverty_inequality/2025-01-22/poverty_inequality_file
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wb/2025-04-08/world_bank_pip
     - data://garden/wid/2025-03-14/world_inequality_database
     - data://garden/lis/2025-01-24/luxembourg_income_study
   data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
