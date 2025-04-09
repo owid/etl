@@ -35,13 +35,13 @@ To run this code from scratch,
 
 When the code finishes, you will have the following files in the cache folder:
     - world_bank_pip.csv: file with the results of the queries for key indicators (8 for countries and 8 for regions), plus some additional indicators (thresholds, relative poverty).
-    - pip_percentiles.csv: file with the percentiles taken from WB Databank and the ones constructed from the API.
-    - pip_regional_definitions.csv: file with the definitions of the regions used in the API.
+    - world_bank_pip_percentiles.csv: file with the percentiles taken from WB Databank and the ones constructed from the API.
+    - world_bank_pip_percentiles.csv: file with the definitions of the regions used in the API.
 
 Copy these files to this folder and run in the terminal:
     python snapshots/wb/{version}/world_bank_pip.py --path-to-file snapshots/wb/{version}/world_bank_pip.csv
-    python snapshots/wb/{version}/world_bank_pip_percentiles.py --path-to-file snapshots/wb/{version}/pip_percentiles.csv
-    python snapshots/wb/{version}/world_bank_pip_regions.py --path-to-file snapshots/wb/{version}/pip_regional_definitions.csv
+    python snapshots/wb/{version}/world_bank_pip_percentiles.py --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
+    python snapshots/wb/{version}/world_bank_pip_regions.py --path-to-file snapshots/wb/{version}/world_bank_pip_percentiles.csv
 
 You can delete the files after this.
 
@@ -872,7 +872,7 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
     """
     start_time = time.time()
 
-    path_file_percentiles = f"{CACHE_DIR}/pip_percentiles_before_checks.csv"
+    path_file_percentiles = f"{CACHE_DIR}/world_bank_pip_percentiles_before_checks.csv"
 
     if Path(path_file_percentiles).is_file():
         log.info("Percentiles file already exists. No need to consolidate.")
@@ -916,7 +916,7 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
         )
 
         # Save to csv
-        df_percentiles.to_csv(f"{CACHE_DIR}/pip_percentiles_before_checks.csv", index=False)
+        df_percentiles.to_csv(f"{CACHE_DIR}/world_bank_pip_percentiles_before_checks.csv", index=False)
 
     # SANITY CHECKS
     df_percentiles = sanity_checks(df_percentiles)
@@ -928,7 +928,7 @@ def generate_consolidated_percentiles(df, wb_api: WB_API):
     df_percentiles = df_percentiles.rename(columns={"target_percentile": "percentile"})
 
     # Save to csv
-    df_percentiles.to_csv(f"{CACHE_DIR}/pip_percentiles.csv", index=False)
+    df_percentiles.to_csv(f"{CACHE_DIR}/world_bank_pip_percentiles.csv", index=False)
 
     end_time = time.time()
     elapsed_time = round(end_time - start_time, 2)
@@ -1625,7 +1625,7 @@ def median_patch(df, country_or_region):
     """
 
     # Read percentile file
-    df_percentiles = pd.read_csv(f"{CACHE_DIR}/pip_percentiles.csv")
+    df_percentiles = pd.read_csv(f"{CACHE_DIR}/world_bank_pip_percentiles.csv")
 
     # In df_percentiles, keep only the rows with percentile = 50
     df_percentiles = df_percentiles[df_percentiles["percentile"] == 50].reset_index()
@@ -1766,7 +1766,7 @@ def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
     df_regional_definitions["year"] = MAX_YEAR
 
     # Save to csv
-    df_regional_definitions.to_csv(f"{CACHE_DIR}/pip_regional_definitions.csv", index=False)
+    df_regional_definitions.to_csv(f"{CACHE_DIR}/world_bank_pip_percentiles.csv", index=False)
 
     log.info("Regional definitions generated from API.")
 
