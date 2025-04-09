@@ -3,7 +3,7 @@ This file includes functions to get variables metadata in the `world_bank_pip` g
 If new poverty lines or indicators are included, they need to be addressed here
 """
 
-from owid.catalog import Table, VariableMeta, VariablePresentationMeta
+from owid.catalog import Table, VariableMeta
 
 # This is text to include in description_key and description_processing fields
 
