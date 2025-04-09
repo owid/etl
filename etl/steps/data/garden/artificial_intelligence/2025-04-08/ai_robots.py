@@ -71,14 +71,9 @@ def run(dest_dir: str) -> None:
     tb_2023 = tb_2023.rename(columns=column_rename_map)
 
     tb = pr.concat([tb, tb_2023])
+    tb = tb.drop_duplicates(subset=["country", "year"], keep="last")
 
-    tb = tb.set_index(["country", "year"])
-    tb = tb[~tb.index.duplicated(keep="first")]
-
-    tb = tb[~(tb.index.duplicated(keep=False) & tb.isna().all(axis=1))]
-    tb = tb.reset_index()
     tb = tb.format(["country", "year"])
-
     #
     # Save outputs.
     #
