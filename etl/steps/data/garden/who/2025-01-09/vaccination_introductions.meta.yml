@@ -6,6 +6,10 @@ definitions:
         - Vaccination
       grapher_config:
         originUrl: ourworldindata.org/vaccination
+  description_key_common: &description_key_common
+    - Vaccines included in a country’s vaccination program are those that are provided and recommended through routine services.
+    - They may or may not be mandatory and their coverage rates may vary widely.
+    - When countries do not have a vaccine in their schedule, this does not necessarily mean that the vaccine is completely unavailable in those countries, as it may be available commercially.
   vaccine_name: |-
     <% if description == "Seasonal Influenza vaccine" %>
     seasonal influenza vaccine
@@ -157,6 +161,7 @@ tables:
         unit: ""
         description_key:
           - "{definitions.vaccine_description_key}"
+          - "{definitions.description_key_common}"
   vaccination_introductions_sum:
     variables:
       countries:
@@ -165,6 +170,7 @@ tables:
         unit: "countries"
         description_key:
           - "{definitions.vaccine_description_key}"
+          - "{definitions.description_key_common}"
         presentation:
           title_public: Number of countries administering {definitions.vaccine_name}
         display:
