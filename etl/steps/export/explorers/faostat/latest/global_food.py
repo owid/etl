@@ -382,15 +382,9 @@ def run():
             columns_to_drop.append(column)
     tb_qcl = tb_qcl.drop(columns=columns_to_drop)
 
+    # Expand configuration to get all dimensions and views from tables.
     config_new = expand_config(
         [tb_qcl, tb_fbsc],
-        indicator_names=sorted(
-            set(
-                [column for column in tb_fbsc.columns if column not in ["country", "year"]]
-                + [column for column in tb_qcl.columns if column not in ["country", "year"]]
-            )
-        ),
-        indicator_as_dimension=False,
         default_view={
             "food": "Apples",
             "metric": "Area harvested",
@@ -398,7 +392,6 @@ def run():
             "per_capita": "False",
         },
     )
-
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
 

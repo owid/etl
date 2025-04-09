@@ -505,11 +505,12 @@ class CollectionConfigExpander:
 
         # If no indicator name is provided, there should only be one in the table!
         if indicator_names is None:
-            if len(indicator_names_available) != 1:
-                raise ValueError(
-                    "There are multiple indicators, but no `indicator_name` was provided. Please specify at least one!"
-                )
-            # If only one indicator available, set it as the indicator name
+            # TODO: Was there a good reason to raise an error in this case?
+            # if len(indicator_names_available) != 1:
+            #     raise ValueError(
+            #         "There are multiple indicators, but no `indicator_name` was provided. Please specify at least one!"
+            #     )
+            # If indicator_names is not specified, assume all indicators.
             return indicator_names_available
         # Check that given indicator_names are available (i.e. are present in indicator_names_available)
         indicator_names_unknown = set(indicator_names) - set(indicator_names_available)
