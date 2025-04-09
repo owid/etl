@@ -44,7 +44,7 @@ def get_data():
         "13U0Ok9zyQ0xyUqPO7jJFrhPmQnpI0PKI",  # 4.3.10 total private investment by geographic region
         "1JS6vtYQfTR2w1wbDxFT5KGWcxeCBxUkZ",  # 4.3.16 investment by focus area - World
     ]
-
+    df_list = []
     try:
         column_renames = {
             "Geographic Area": "Geographic area",
@@ -79,7 +79,6 @@ def get_data():
                 if original_col in df_add.columns:
                     df_add["variable_name"] = variable_name
                     df_add = df_add.rename(columns={original_col: "value"})
-                    break  # Only one match expected per file
 
             df_list.append(df_add)
 
