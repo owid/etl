@@ -69,10 +69,22 @@ def run(dest_dir: str) -> None:
     }
     # Standardize column names
     tb_2023 = tb_2023.rename(columns=column_rename_map)
-
-    tb = pr.concat([tb, tb_2023])
-    tb = tb.drop_duplicates(subset=["country", "year"], keep="last")
-
+    cols_to_keep = tb_2023.columns
+    tb_professional = pr.concat([tb[tb_2023.columns], tb_2023])
+    tb_professional = tb_professional.drop_duplicates(subset=["country", "year"], keep="last")
+    cols_to_merge = [
+        col
+        for col in tb.columns
+        if col
+        not in [
+            "Agriculture",
+            "Hospitality",
+            "Medical and health care",
+            "Professional cleaning",
+            "Transportation and logistics",
+        ]
+    ]
+    tb = pr.merge(tb[cols_to_merge], tb_professional, on=["country", "year"], how="left")
     tb = tb.format(["country", "year"])
     #
     # Save outputs.
