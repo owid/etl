@@ -15,7 +15,7 @@ paths = PathFinder(__file__)
 # Define regions to aggregate
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
 
-# Define fraction of allowed NaNs per year
+# Define fraction of allowed NaNs per year.
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 # Create a new list of id for each issue, ordered from more liberal to more restrictive (useful for grapher charts)

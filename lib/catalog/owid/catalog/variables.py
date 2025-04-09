@@ -478,12 +478,20 @@ def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str
     return reference_dict.copy() if all(d == reference_dict for d in defined_dicts) else None
 
 
-def combine_variables_display(
-    variables: List[Variable], operation: OPERATION, _field_name="display", _ignore_operations: List[str] = ["/"]
+def _get_dict_from_list_if_all_identical_and_not_none(
+    list_of_objects: List[Optional[Dict[str, Any]]],
 ) -> Optional[Dict[str, Any]]:
+    """Same as _get_dict_from_list_if_all_identical, but if any of the objects it None, return None."""
+    if any(obj is None for obj in list_of_objects):
+        return None
+
+    return _get_dict_from_list_if_all_identical(list_of_objects=list_of_objects)
+
+
+def combine_variables_display(variables: List[Variable], operation: OPERATION) -> Optional[Dict[str, Any]]:
     # Gather displays from all variables that are defined.
-    list_of_displays = [getattr(variable.metadata, _field_name) for variable in variables]
-    if operation in _ignore_operations and list_of_displays[0] is None:
+    list_of_displays = [getattr(variable.metadata, "display") for variable in variables]
+    if operation == "/" and list_of_displays[0] is None:
         # When dividing a variable by another, it only makes sense to keep the display values of the first variable.
         # Therefore, if the first variables doesn't have a display, the resulting variable should have no display.
         return None
@@ -491,13 +499,14 @@ def combine_variables_display(
         return _get_dict_from_list_if_all_identical(list_of_objects=list_of_displays)
 
 
-def combine_variables_presentation(
-    variables: List[Variable], operation: OPERATION
-) -> Optional[VariablePresentationMeta]:
-    # Apply the same logic as for displays.
-    return combine_variables_display(
-        variables=variables, operation=operation, _field_name="presentation", _ignore_operations=["/", "*"]
-    )  # type: ignore
+def combine_variables_presentation(variables: List[Variable]) -> Optional[VariablePresentationMeta]:
+    # Gather presentation from all variables that are defined.
+    list_of_displays = [getattr(variable.metadata, "presentation") for variable in variables]
+    # When two presentations are combined, they must be identical to preserve the result.
+    # NOTE: We changed this on 2025-04-09 from the same logic as `combine_variables_display`
+    #  the problem was that multiplication by population preserved presentation and charts
+    #  were showing presentation.attribution for population which overwrote the original source
+    return _get_dict_from_list_if_all_identical_and_not_none(list_of_objects=list_of_displays)  # type: ignore
 
 
 def combine_variables_processing_level(variables: List[Variable]) -> Optional[PROCESSING_LEVELS]:

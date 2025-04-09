@@ -993,7 +993,7 @@ def generate_hypothetical_meat_consumption(tb_qcl: Table) -> Table:
     assert len(combined) == len(meat), error
 
     # Add columns for hypothetical global production and number of slaughtered animals.
-    # This is the production (or number of slaughtered animals) that would be needed worldwide to meet the demand of a given country
+    # This is the production (or number of slaughtered animals) that would be needed worldwide to meet the demand of a given country.
     combined["production_global_hypothetical"] = combined["production_per_capita"] * combined["global_population"]
     combined["animals_global_hypothetical"] = combined["animals_per_capita"] * combined["global_population"]
 
