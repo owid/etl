@@ -42,7 +42,7 @@ definitions:
     <%- elif description == "Varicella vaccine" %>
     chickenpox vaccine
     <%- elif description == "aP (acellular pertussis) vaccine" %>
-    pertussis vaccine (aP)
+    acellular pertussis vaccine
     <%- elif description == "Hepatitis A vaccine" %>
     hepatitis A vaccine
     <%- elif description == 'Typhoid' %>
@@ -88,13 +88,13 @@ definitions:
     <%- elif description == "Varicella vaccine" %>
     Chickenpox vaccine
     <%- elif description == "aP (acellular pertussis) vaccine" %>
-    Pertussis vaccine (aP)
+    Acellular pertussis vaccine (aP)
     <%- elif description == "Hepatitis A vaccine" %>
     Hepatitis A vaccine
     <%- elif description == 'Typhoid vaccine' %>
     Typhoid vaccine
     <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
-    Human papillomavirus  (HPV)
+    Human papillomavirus (HPV)
     <%- elif description == "Rotavirus vaccine" %>
     Rotavirus
     <%- elif description == "Malaria vaccine" %>
