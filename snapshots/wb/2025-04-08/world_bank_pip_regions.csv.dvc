@@ -1,15 +1,24 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
 meta:
   origin:
-    producer: World Bank Poverty and Inequality Platform
-    title: 'World Bank Poverty and Inequality Platform (PIP): Regional definitions'
+    # Data product / Snapshot
+    title: "World Bank Poverty and Inequality Platform (PIP): Regional definitions"
     description: |-
       This is a dataset of the complete set of regions and their countries as defined by the World Bank Poverty and Inequality Platform (PIP). This is extracted separately from the main dataset using the `country_list` module in the auxiliary tables available at the API.
-    citation_full: |-
-      World Bank (2024). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/.
+    date_published: 2024-09-20
     version_producer: 20240627_2017, 20240627_2011
+
+    # Citation
+    producer: World Bank Poverty and Inequality Platform
+    citation_full: |-
+      World Bank (2025). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/.
+
+    # Files
     url_main: https://pip.worldbank.org
-    date_accessed: '2025-04-08'
-    date_published: '2024-09-20'
+    date_accessed: 2024-10-07
+
+    # License
     license:
       name: CC0
       url: https://datacatalog.worldbank.org/search/dataset/0063646
