@@ -14,7 +14,7 @@ steps:
     - data://meadow/wb/2025-04-08/world_bank_pip
   data://grapher/wb/2025-04-08/world_bank_pip_2017ppp:
     - data://garden/wb/2025-04-08/world_bank_pip
-  data://grapher/wb/2025-04-08/world_bank_pip_2011ppp:
+  data://grapher/wb/2025-04-08/world_bank_pip_2021ppp:
     - data://garden/wb/2025-04-08/world_bank_pip
   data://explorers/wb/latest/world_bank_pip:
     - data://garden/wb/2025-04-08/world_bank_pip
