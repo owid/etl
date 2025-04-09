@@ -171,6 +171,13 @@ steps:
   # AI Index Report 2025 - AI robots
   data://garden/artificial_intelligence/2025-04-08/ai_robots:
     - snapshot://artificial_intelligence/2025-04-08/ai_robots.csv
+    - data://meadow/artificial_intelligence/2023-06-14/ai_robots
+
+  # AI Index Report 2023 - AI robots
+  data://meadow/artificial_intelligence/2023-06-14/ai_robots:
+    - snapshot://artificial_intelligence/2023-06-14/ai_robots.csv
+  data://garden/artificial_intelligence/2023-06-14/ai_robots:
+    - data://meadow/artificial_intelligence/2023-06-14/ai_robots
 
   # AI Index Report 2025 - AI investment trends
   data://garden/artificial_intelligence/2025-04-08/ai_investment:
