@@ -1,3 +1,4 @@
+# TODO: Change the poverty lines
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
@@ -21,7 +22,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  income_consumption_2017:
+  income_consumption_2021:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:

@@ -5,6 +5,10 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define PPP version
+# NOTE: Change this in case of new PPP versions in the future
+PPP_VERSION = 2021
+
 
 def run(dest_dir: str) -> None:
     #
@@ -14,7 +18,7 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("world_bank_pip")
 
     # Read tables from garden dataset.
-    tb = ds_garden["income_consumption_2011"]
+    tb = ds_garden[f"income_consumption_{PPP_VERSION}"]
 
     #
     # Process data.
