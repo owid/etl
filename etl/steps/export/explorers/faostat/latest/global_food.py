@@ -346,41 +346,30 @@ def run():
     #
     # Process data.
     #
-    columns_to_drop = []
-    for column in tb_fbsc.drop(columns=["country", "year"]).columns:
-        item, item_code, element, element_code, unit = sum(
-            [[j.strip() for j in i.split("|")] for i in tb_fbsc[column].metadata.title.split("||")], []
-        )
-        unit = unit.replace(" per capita", "")
-        if (item_code in ITEM_CODES_FBSC) and (element_code in ELEMENT_CODES_FBSC):
-            tb_fbsc[column].metadata.dimensions = {
-                "food": item,
-                "metric": element,
-                "unit": unit,
-                "per_capita": True if "pc" in element_code else False,
-            }
-            tb_fbsc[column].metadata.original_short_name = column
-        else:
-            columns_to_drop.append(column)
-    tb_fbsc = tb_fbsc.drop(columns=columns_to_drop)
+    def prepare_table_with_dimensions(tb, item_codes, element_codes):
+        columns_to_drop = []
+        for column in tb.drop(columns=["country", "year"]).columns:
+            item, item_code, element, element_code, unit = sum(
+                [[j.strip() for j in i.split("|")] for i in tb[column].metadata.title.split("||")], []
+            )
+            unit = unit.replace(" per capita", "")
+            if (item_code in item_codes) and (element_code in element_codes):
+                tb[column].metadata.dimensions = {
+                    "food": item,
+                    "metric": element,
+                    "unit": unit,
+                    "per_capita": True if "pc" in element_code else False,
+                }
+                tb[column].metadata.original_short_name = column
+            else:
+                columns_to_drop.append(column)
 
-    columns_to_drop = []
-    for column in tb_qcl.drop(columns=["country", "year"]).columns:
-        item, item_code, element, element_code, unit = sum(
-            [[j.strip() for j in i.split("|")] for i in tb_qcl[column].metadata.title.split("||")], []
-        )
-        unit = unit.replace(" per capita", "")
-        if (item_code in ITEM_CODES_QCL) and (element_code in ELEMENT_CODES_QCL):
-            tb_qcl[column].metadata.dimensions = {
-                "food": item,
-                "metric": element,
-                "unit": unit,
-                "per_capita": True if "pc" in element_code else False,
-            }
-            tb_qcl[column].metadata.original_short_name = column
-        else:
-            columns_to_drop.append(column)
-    tb_qcl = tb_qcl.drop(columns=columns_to_drop)
+        # Drop unnecessary columns.
+        tb = tb.drop(columns=columns_to_drop)
+
+    # Prepare tables with dimensions.
+    prepare_table_with_dimensions(tb=tb_qcl, item_codes=ITEM_CODES_QCL, element_codes=ELEMENT_CODES_QCL)
+    prepare_table_with_dimensions(tb=tb_fbsc, item_codes=ITEM_CODES_FBSC, element_codes=ELEMENT_CODES_FBSC)
 
     # Expand configuration to get all dimensions and views from tables.
     config_new = expand_config(

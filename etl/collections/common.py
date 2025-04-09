@@ -492,7 +492,7 @@ class CollectionConfigExpander:
         # Set df_dims as string!
         df_dims = df_dims[
             [self.indicators_slug]
-            + sorted(cols_dims)
+            + cols_dims
             + ["short_name", "_table_short_name", "_dataset_short_name", "_dataset_uri"]
         ].astype(str)
 
