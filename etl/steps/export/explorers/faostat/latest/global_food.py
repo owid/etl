@@ -277,14 +277,14 @@ ELEMENT_CODES_QCL = [
     "005320",
     "005321",
     # "005410",
-    "005413",
+    # "005413",
     "005417",
     "005412",
     # "005420",
     # "005422",
     "005424",
     "005510",
-    "005513",
+    # "005513",
     "5312pc",
     "5320pc",
     "5321pc",
@@ -346,14 +346,40 @@ def run():
     #
     # Process data.
     #
+    # TODO: Element "005513" in QCL has only two items, related to eggs. It's currently called "Production" (which clashes with the production in tonnes). Hence:
+    #  * Assert the items found for this element (in the QCL garden step).
+    #  * Rename element to something else, e.g. "Produced eggs", and adjust the unit (multiply by 1000).
+    #  * Then, bring it back to this explorer (uncomment it above).
+    #  * Idem for yield in number per animal ("005413").
     def prepare_table_with_dimensions(tb, item_codes, element_codes):
         columns_to_drop = []
         for column in tb.drop(columns=["country", "year"]).columns:
             item, item_code, element, element_code, unit = sum(
                 [[j.strip() for j in i.split("|")] for i in tb[column].metadata.title.split("||")], []
             )
-            unit = unit.replace(" per capita", "")
             if (item_code in item_codes) and (element_code in element_codes):
+                unit = unit.replace(" per capita", "")
+                if unit in [
+                    "kilograms per year",
+                    "kilocalories per day",
+                    "grams of protein per day",
+                    "grams of fat per day",
+                ]:
+                    pass
+                elif unit in [
+                    "hectares",
+                    "tonnes",
+                    "tonnes per hectare",
+                    "animals",
+                    "thousand Number",
+                    "Number per animal",
+                    "kilograms per animal",
+                ]:
+                    # We remove the unit in these cases, so they don't appear in the dropdown.
+                    # TODO: It seems we don't have all the units that appeared in the old explorer.
+                    unit = ""
+                else:
+                    raise ValueError(f"Unexpected unit {unit}")
                 tb[column].metadata.dimensions = {
                     "food": item,
                     "metric": element,
@@ -377,7 +403,7 @@ def run():
         default_view={
             "food": "Apples",
             "metric": "Area harvested",
-            "unit": "hectares",
+            "unit": "",
             "per_capita": "False",
         },
     )
