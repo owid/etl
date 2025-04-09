@@ -1,3 +1,4 @@
+# TODO: Change the slug of this explorer
 # # Poverty Data Explorer of World Bank data: 2017 vs 2021 prices
 # This code creates the tsv file for the PPP comparison explorer from the World Bank PIP data, available [here](https://ourworldindata.org/explorers/poverty-explorer-ppp-comparison)
 
@@ -1161,4 +1162,4 @@ for i in survey_list:
         + table_tsv_indented
     )
 
-upsert_to_db("poverty-explorer-ppp-comparison", content)
+upsert_to_db("poverty-explorer-2011-vs-2017-ppp", content)
