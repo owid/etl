@@ -62,7 +62,28 @@ steps:
   data://grapher/artificial_intelligence/2024-07-11/epoch_gpus:
     - data://garden/artificial_intelligence/2024-07-11/epoch_gpus
 
+  # Dataset on AI performance across different benchmarks from Dynabench
+  data://meadow/artificial_intelligence/2024-04-02/dynabench:
+    - snapshot://artificial_intelligence/2024-04-02/dynabench.xlsx
+  data://garden/artificial_intelligence/2024-04-02/dynabench:
+    - data://meadow/artificial_intelligence/2024-04-02/dynabench
+  data://grapher/artificial_intelligence/2024-04-02/dynabench:
+    - data://garden/artificial_intelligence/2024-04-02/dynabench
+  data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - snapshot://artificial_intelligence/2024-06-06/epoch_compute_cost.csv
+  data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost
+  data://grapher/artificial_intelligence/2024-06-06/epoch_compute_cost:
+    - data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost
 
+  # Chess dataset (ELO ratings)
+  data://garden/artificial_intelligence/2024-02-05/chess:
+    - snapshot://artificial_intelligence/2024-02-05/chess.csv
+  data://grapher/artificial_intelligence/2024-02-05/chess:
+    - data://garden/artificial_intelligence/2024-02-05/chess
+  #
+  # AI polls
+  #
   # World Risk Poll
   data://meadow/world_risk_poll/2023-06-26/wrp_2021:
     - snapshot://world_risk_poll/2023-06-26/wrp_2021.zip
@@ -75,10 +96,6 @@ steps:
     - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021
   data://grapher/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped:
     - data://garden/artificial_intelligence/2023-06-26/ai_wrp_2021_grouped
-
-
-
-  # AI polls
 
   # YouGov AI surveys
   data://meadow/artificial_intelligence/2025-02-17/yougov_robots:
@@ -94,21 +111,9 @@ steps:
     - data://meadow/artificial_intelligence/2025-02-17/yougov_job_automation
   data://grapher/artificial_intelligence/2025-02-17/yougov_job_automation:
     - data://garden/artificial_intelligence/2025-02-17/yougov_job_automation
-
- # CSET data on semiconductor supply chain
-  data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset:
-    - snapshot://artificial_intelligence/2023-07-07/semiconductors_cset.csv
-  data://garden/artificial_intelligence/2023-07-07/semiconductors_cset:
-    - data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset
-  data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
-    - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
-
-  # Chess dataset (ELO ratings)
-  data://garden/artificial_intelligence/2024-02-05/chess:
-    - snapshot://artificial_intelligence/2024-02-05/chess.csv
-  data://grapher/artificial_intelligence/2024-02-05/chess:
-    - data://garden/artificial_intelligence/2024-02-05/chess
-
+  #
+  # Papers with code
+  #
   # Artificial Intelligence Papers with Code (benchmarks) - 2025
   data://meadow/artificial_intelligence/2025-02-17/papers_with_code_coding:
     - snapshot://artificial_intelligence/2025-02-17/papers_with_code_coding.html
@@ -137,21 +142,6 @@ steps:
     - data://meadow/artificial_intelligence/2025-02-17/papers_with_code_imagenet
   data://grapher/artificial_intelligence/2025-02-17/papers_with_code_imagenet:
     - data://garden/artificial_intelligence/2025-02-17/papers_with_code_imagenet
-
-
-  # Dataset on AI performance across different benchmarks from Dynabench
-  data://meadow/artificial_intelligence/2024-04-02/dynabench:
-    - snapshot://artificial_intelligence/2024-04-02/dynabench.xlsx
-  data://garden/artificial_intelligence/2024-04-02/dynabench:
-    - data://meadow/artificial_intelligence/2024-04-02/dynabench
-  data://grapher/artificial_intelligence/2024-04-02/dynabench:
-    - data://garden/artificial_intelligence/2024-04-02/dynabench
-  data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost:
-    - snapshot://artificial_intelligence/2024-06-06/epoch_compute_cost.csv
-  data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost:
-    - data://meadow/artificial_intelligence/2024-06-06/epoch_compute_cost
-  data://grapher/artificial_intelligence/2024-06-06/epoch_compute_cost:
-    - data://garden/artificial_intelligence/2024-06-06/epoch_compute_cost
 
   ########################
   # AI Index report
@@ -187,8 +177,7 @@ steps:
     - snapshot://artificial_intelligence/2025-04-08/ai_investment.csv
     - data://garden/bls/2024-05-16/us_consumer_prices
 
-
-  # AI Index Report grapher
+  # AI Index Report grapher step
   data://grapher/artificial_intelligence/2025-04-08/ai_index:
     - data://garden/artificial_intelligence/2025-04-08/ai_adoption
     - data://garden/artificial_intelligence/2025-04-08/ai_conferences
@@ -197,7 +186,6 @@ steps:
     - data://garden/artificial_intelligence/2025-04-08/ai_incidents
     - data://garden/artificial_intelligence/2025-04-08/ai_robots
     - data://garden/artificial_intelligence/2025-04-08/ai_investment
-
 
   # AI Index Report 2024 - AI strategies
   data://garden/artificial_intelligence/2024-06-28/ai_strategies:
@@ -211,7 +199,9 @@ steps:
     - snapshot://artificial_intelligence/2024-06-28/ai_phds.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_phds:
     - data://garden/artificial_intelligence/2024-06-28/ai_phds
-
+  #
+  # CSET datasets
+  #
   # CSET data on articles, patents and investment
   data://meadow/artificial_intelligence/2024-07-16/cset:
     - snapshot://artificial_intelligence/2024-07-16/cset.csv
@@ -222,3 +212,11 @@ steps:
     - data://garden/bls/2024-05-16/us_consumer_prices
   data://grapher/artificial_intelligence/2024-07-16/cset:
     - data://garden/artificial_intelligence/2024-07-16/cset
+  # CSET data on semiconductor supply chain
+  data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset:
+    - snapshot://artificial_intelligence/2023-07-07/semiconductors_cset.csv
+  data://garden/artificial_intelligence/2023-07-07/semiconductors_cset:
+    - data://meadow/artificial_intelligence/2023-07-07/semiconductors_cset
+  data://grapher/artificial_intelligence/2023-07-07/semiconductors_cset:
+    - data://garden/artificial_intelligence/2023-07-07/semiconductors_cset
+
