@@ -29,6 +29,6 @@ meta:
       name: CC BY-ND 4.0
       url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
 outs:
-  - md5: 006a91eddf29a493bd9488e7680f368c
-    size: 1697
+  - md5: 3713b05c6c48a94361769e8f6c6eb0fd
+    size: 3189
     path: ai_robots.csv
