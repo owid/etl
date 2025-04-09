@@ -78,7 +78,6 @@ def get_data():
             for col in robot_column_names:
                 if col in df_add.columns:
                     df_add = df_add.rename(columns={col: "Number of robots (in thousands)"})
-                    break  # Only one match expected
 
             df_list.append(df_add)
         # Concatenate the DataFrames from the list
