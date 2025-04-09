@@ -70,20 +70,9 @@ def run(dest_dir: str) -> None:
     # Standardize column names
     tb_2023 = tb_2023.rename(columns=column_rename_map)
 
-    tb = pr.merge(
-        tb,
-        tb_2023,
-        on=[
-            "country",
-            "year",
-            "Agriculture",
-            "Hospitality",
-            "Medical and health care",
-            "Professional cleaning",
-            "Transportation and logistics",
-        ],
-        how="left",
-    )
+    tb = pr.concat([tb, tb_2023])
+    tb = tb.dropna(subset=[col for col in tb.columns if col not in ["country", "year"]])
+
     tb = tb.format(["country", "year"])
 
     #

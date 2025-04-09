@@ -580,7 +580,9 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
     - data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
 
-
+  # AI robots
+  data://garden/artificial_intelligence/2023-06-14/ai_robots:
+    - data://meadow/artificial_intelligence/2023-06-14/ai_robots
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
     - data://garden/artificial_intelligence/2023-06-14/ai_robots
 
