@@ -10,6 +10,7 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
+from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import explorer_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
@@ -223,26 +224,15 @@ def main():
         tsv_target = future_target.result()
 
     diff_str = compare_strings(tsv_target, tsv_source, fromfile="production", tofile="staging")
-    st_show_diff(_truncate_lines(diff_str, MAX_DIFF_LINES))
+    st_show_diff(truncate_lines(diff_str, MAX_DIFF_LINES))
 
     # Create columns to show TSV files side by side
     st.subheader("TSV Files")
     col1, col2 = st.columns(2)
     with col1:
-        st.code(_truncate_lines(tsv_target, MAX_DIFF_LINES), line_numbers=True, language="diff")
+        st.code(truncate_lines(tsv_target, MAX_DIFF_LINES), line_numbers=True, language="diff")
     with col2:
-        st.code(_truncate_lines(tsv_source, MAX_DIFF_LINES), line_numbers=True, language="diff")
-
-
-def _truncate_lines(s: str, max_lines: int) -> str:
-    """
-    Truncate a string to a maximum number of lines.
-    """
-    lines = s.splitlines()
-    if len(lines) > max_lines:
-        st.warning(f"The diff is too long to display in full. Showing only the first {max_lines} lines.")
-        return "\n".join(lines[:max_lines]) + "\n... (truncated)"
-    return s
+        st.code(truncate_lines(tsv_source, MAX_DIFF_LINES), line_numbers=True, language="diff")
 
 
 main()
