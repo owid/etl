@@ -29,7 +29,7 @@ tables:
       cig_smoking_pct:
         title: Share of people who smoke cigarettes
         unit: "% of adults"
-        short_unit: "% of adults"
+        short_unit: "%"
         description_short: Estimated percentage of adults (15 years and older) who currently smoke cigarettes. This includes manufactured and hand-rolled cigarettes, but excludes e-cigarettes and other tobacco products.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
@@ -39,7 +39,7 @@ tables:
       cig_smoking_pct_age_std:
         title: Share of people who smoke cigarettes (age-standardized)
         unit: "% of adults"
-        short_unit: "% of adults"
+        short_unit: "%"
         description_short: Estimated percentage of adults (15 years and older) who currently smoke cigarettes. This includes manufactured and hand-rolled cigarettes, but excludes e-cigarettes and other tobacco products.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
@@ -49,14 +49,14 @@ tables:
       tobacco_smoking_pct:
         title: Share of people who smoke tobacco
         unit: "% of adults"
-        short_unit: "% of adults"
+        short_unit: "%"
         description_short: Estimated percentage of adults (15 years and older) who currently smoke tobacco. This includes all forms of tobacco smoking, such as cigarettes, pipes or heated tobacco products, but excludes e-cigarettes and smokeless tobacco products.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
       tobacco_smoking_pct_age_std:
         title: Share of people who smoke tobacco (age-standardized)
         unit: "% of adults"
-        short_unit: "% of adults"
+        short_unit: "%"
         description_short: Estimated percentage of adults (15 years and older) who currently smoke tobacco. This includes all forms of tobacco smoking, such as cigarettes, pipes or heated tobacco products, but excludes e-cigarettes and smokeless tobacco products.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
@@ -66,14 +66,14 @@ tables:
       tobacco_use_pct:
         title: Share of people who use tobacco
         unit: "% of adults"
-        short_unit: "% of adults"
+        short_unit: "%"
         description_short: Estimated percentage of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
       tobacco_use_pct_age_std:
         title: Share of people who use tobacco (age-standardized)
         unit: "% of adults"
-        short_unit: "% of adults"
+        short_unit: "%"
         description_short: Estimated percentage of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
@@ -83,7 +83,7 @@ tables:
       cig_smokers:
         title: Number of adults who smoke cigarettes
         unit: "people"
-        short_unit: "people"
+        short_unit: ""
         description_short: Estimated number of adults (15 years and older) who currently smoke cigarettes. This includes manufactured and hand-rolled cigarettes, but excludes e-cigarettes and other tobacco products.
         description_processing: |-
           - {definitions.notes.users}
@@ -92,7 +92,7 @@ tables:
       tobacco_smokers:
         title: Number of adults who smoke tobacco
         unit: "people"
-        short_unit: "people"
+        short_unit: ""
         description_short: Estimated number of adults (15 years and older) who currently smoke tobacco. This includes all forms of tobacco smoking, such as cigarettes, pipes or heated tobacco products, but excludes e-cigarettes and smokeless tobacco products.
         description_processing: |-
           - {definitions.notes.users}
@@ -101,7 +101,7 @@ tables:
       tobacco_users:
         title: Number of adults who use tobacco
         unit: "people"
-        short_unit: "people"
+        short_unit: ""
         description_short: Estimated number of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
         description_processing: |-
           - {definitions.notes.users}
