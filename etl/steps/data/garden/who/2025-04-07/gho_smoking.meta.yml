@@ -64,14 +64,14 @@ tables:
           grapher_config:
             note: "{definitions.notes.age_standardization}"
       tobacco_use_pct:
-        title: Share of people who smoke and use tobacco
+        title: Share of people who smoke or use tobacco
         unit: "% of adults"
         short_unit: "%"
         description_short: Estimated percentage of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
       tobacco_use_pct_age_std:
-        title: Share of people who smoke and use tobacco (age-standardized)
+        title: Share of people who smoke or use tobacco (age-standardized)
         unit: "% of adults"
         short_unit: "%"
         description_short: Estimated percentage of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
@@ -99,7 +99,7 @@ tables:
         display:
           numDecimalPlaces: 0
       tobacco_users:
-        title: Number of adults who smoke and use tobacco
+        title: Number of adults who smoke or use tobacco
         unit: "people"
         short_unit: ""
         description_short: Estimated number of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
