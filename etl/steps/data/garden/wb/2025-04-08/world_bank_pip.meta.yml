@@ -22,7 +22,7 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  income_consumption_2021:
+  income_consumption_2017:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:

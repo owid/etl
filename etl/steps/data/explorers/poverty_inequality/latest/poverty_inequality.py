@@ -13,7 +13,7 @@ paths = PathFinder(__file__)
 
 # Define PPP version
 # NOTE: Change this in case of new PPP versions in the future
-PPP_VERSION = 2021
+PPP_VERSION = 2017
 
 
 def run(dest_dir: str) -> None:

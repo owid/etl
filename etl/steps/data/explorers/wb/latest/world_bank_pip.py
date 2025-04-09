@@ -14,7 +14,7 @@ paths = PathFinder(__file__)
 
 # Define PPP versions
 # NOTE: Change this in case of new PPP versions in the future
-PPP_VERSIONS = [2017, 2021]
+PPP_VERSIONS = [2011, 2017]
 
 # Define International Poverty Line (in cents)
 # NOTE: Change this in case of new IPL in the future

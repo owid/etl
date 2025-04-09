@@ -29,8 +29,8 @@ log = get_logger()
 # NOTE: Modify if poverty lines are updated from source
 # TODO: Modify the lines in 2021 prices
 POVLINES_DICT = {
+    2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
-    2021: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
 }
 
 # Define PPP versions from POVLINES_DICT
