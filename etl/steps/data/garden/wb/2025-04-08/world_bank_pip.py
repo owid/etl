@@ -36,6 +36,11 @@ POVLINES_DICT = {
 # Define PPP versions from POVLINES_DICT
 PPP_VERSIONS = list(POVLINES_DICT.keys())
 
+# Define International Poverty Line (in cents)
+# NOTE: Modify if poverty lines are updated from source
+# TODO: Modify the lines in 2021 prices
+INTERNATIONAL_POVERTY_LINE = 215
+
 # Define regions in the dataset
 REGIONS_LIST = [
     "East Asia and Pacific (PIP)",
@@ -1066,8 +1071,10 @@ def regional_headcount(tb: Table) -> Table:
     ].reset_index(drop=True)
 
     # Select needed columns and pivot
-    tb_regions = tb_regions[["country", "year", "headcount_215"]]
-    tb_regions = tb_regions.pivot(index="year", columns="country", values="headcount_215").reset_index()
+    tb_regions = tb_regions[["country", "year", f"headcount_{INTERNATIONAL_POVERTY_LINE}"]]
+    tb_regions = tb_regions.pivot(
+        index="year", columns="country", values=f"headcount_{INTERNATIONAL_POVERTY_LINE}"
+    ).reset_index()
 
     # Drop rows with more than one region with null headcount
     tb_regions["check_total"] = tb_regions[tb_regions.columns].isnull().sum(axis=1)
@@ -1112,11 +1119,15 @@ def regional_headcount(tb: Table) -> Table:
     # )
     # tb_regions["South Asia excluding India"] = tb_regions["South Asia (PIP)"] - tb_regions["India"]
 
-    tb_regions = pr.melt(tb_regions, id_vars=["year"], var_name="country", value_name="headcount_215")
-    tb_regions = tb_regions[["country", "year", "headcount_215"]]
+    tb_regions = pr.melt(
+        tb_regions, id_vars=["year"], var_name="country", value_name=f"headcount_{INTERNATIONAL_POVERTY_LINE}"
+    )
+    tb_regions = tb_regions[["country", "year", f"headcount_{INTERNATIONAL_POVERTY_LINE}"]]
 
-    # Rename headcount_215 to headcount_215_region, to distinguish it from the original headcount_215 when merging
-    tb_regions = tb_regions.rename(columns={"headcount_215": "headcount_215_regions"})
+    # Rename headcount_{INTERNATIONAL_POVERTY_LINE} to headcount_{INTERNATIONAL_POVERTY_LINE}_regions, to distinguish it from the original headcount when merging
+    tb_regions = tb_regions.rename(
+        columns={f"headcount_{INTERNATIONAL_POVERTY_LINE}": f"headcount_{INTERNATIONAL_POVERTY_LINE}_regions"}
+    )
 
     # Merge with original table
     tb = pr.merge(tb, tb_regions, on=["country", "year"], how="outer")
@@ -1232,7 +1243,7 @@ def create_survey_spells(tb: Table) -> list:
             "estimation_type",
             "survey_comparability",
             "comparable_spell",
-            "headcount_215_regions",
+            f"headcount_{INTERNATIONAL_POVERTY_LINE}_regions",
             "surveys_past_decade",
         ]
     ]

@@ -12,23 +12,32 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define PPP versions
+# NOTE: Change this in case of new PPP versions in the future
+PPP_VERSIONS = [2017, 2021]
+
+# Define International Poverty Line (in cents)
+# NOTE: Change this in case of new IPL in the future
+# TODO: Change to 2021 prices
+INTERNATIONAL_POVERTY_LINE = 215
+
 
 def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("world_bank_pip")
 
     # Read table from garden dataset.
-    tb_inc_or_cons_2017 = ds_garden["income_consumption_2017"]
+    tb_inc_or_cons = ds_garden[f"income_consumption_{PPP_VERSIONS[1]}"]
 
     # Drop variables not used in the explorers and rows with missing values
-    tb_inc_or_cons_2017 = drop_columns_and_rows(
-        tb=tb_inc_or_cons_2017,
+    tb_inc_or_cons = drop_columns_and_rows(
+        tb=tb_inc_or_cons,
         drop_list=[
             "above",
             "between",
             "poverty_severity",
             "watts",
-            "headcount_215_regions",
+            f"headcount_{INTERNATIONAL_POVERTY_LINE}_regions",
             "surveys_past_decade",
             "reporting_level",
             "welfare_type",
@@ -37,7 +46,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Create a separate table for PIP inequality data
-    tb_pip_inequality = create_inequality_table(tb=tb_inc_or_cons_2017, short_name="pip_inequality")
+    tb_pip_inequality = create_inequality_table(tb=tb_inc_or_cons, short_name="pip_inequality")
 
     # Import the rest of the tables
     rest_of_tables = import_rest_of_tables(ds_garden=ds_garden)
@@ -45,7 +54,7 @@ def run(dest_dir: str) -> None:
     # Create explorer dataset, with garden table and metadata in csv format
     ds_explorer = create_dataset(
         dest_dir,
-        tables=[tb_inc_or_cons_2017, tb_pip_inequality] + rest_of_tables,
+        tables=[tb_inc_or_cons, tb_pip_inequality] + rest_of_tables,
         default_metadata=ds_garden.metadata,
         formats=["csv"],
     )
@@ -77,12 +86,12 @@ def import_rest_of_tables(ds_garden: Dataset) -> list:
         for t in ds_garden.table_names
         if t
         not in [
-            "income_consumption_2017",
-            "income_consumption_2011",
-            "income_2011",
-            "consumption_2011",
-            "percentiles_income_consumption_2011",
-            "percentiles_income_consumption_2017",
+            f"income_consumption_{PPP_VERSIONS[1]}",
+            f"income_consumption_{PPP_VERSIONS[0]}",
+            f"income_{PPP_VERSIONS[0]}",
+            f"consumption_{PPP_VERSIONS[0]}",
+            f"percentiles_income_consumption_{PPP_VERSIONS[0]}",
+            f"percentiles_income_consumption_{PPP_VERSIONS[1]}",
         ]
     ]:
         tb = ds_garden[table]
