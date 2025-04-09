@@ -39,9 +39,10 @@ def get_data():
     ids = [
         "19TftjXtltd0mWcvrz-dmHKxeekQqJq_U",  # 4.5.1 number of robots installed
         "1EOIw0AlcuRNrEAgILlBo7XvtNHF0yxxo",  # 4.5.2 opearational stock of robots
-        "1TO0E9fuZonjzPRJMPxXkTzVqTulzbsnz",  # 4.5.5 number of robots installed by geographic region (top 5 countries)
+        "1SSF3AOrmqeWUJyvbZbHNd63Z7k1XON3v",  # 4.5.5 number of robots installed by geographic region (top 5 countries)
         "1D_hIfj97-Pehd4P9NVLqqCguhb_gB4op",  # 4.5.8 professional service robots
     ]
+
     df_list = []
 
     try:
