@@ -1,0 +1,125 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+    unit: 'constant 2021 US$'
+    short_unit: '$'
+    display:
+      numDecimalPlaces: 0
+
+  note_inflation: &note_inflation |-
+    This data is expressed in constant 2021 US$. Inflation adjustment is based on the US Consumer Price Index (CPI).
+
+  desc_processing_inflation: &desc_processing_inflation |-
+    - Reporting a time series of AI investments in nominal prices would make it difficult to compare observations across time. To make these comparisons possible, one has to take into account that prices change (inflation).
+    - It is not obvious how to adjust this time series for inflation, and our team discussed the best solutions at our disposal.
+    - It would be straightforward to adjust the time series for price changes if we knew the prices of the specific goods and services purchased through these investments. This would make it possible to calculate a volume measure of AI investments and tell us how much these investments bought. But such a metric is not available. While a comprehensive price index is not available, we know that the cost of some crucial AI technology has fallen rapidly in price.
+    - In the absence of a comprehensive price index that captures the price of AI-specific goods and services, one has to rely on one of the available metrics for the price of a bundle of goods and services. Ultimately, we decided to use the US Consumer Price Index (CPI).
+    - The US CPI does not provide us with a volume measure of AI goods and services, but it does capture the opportunity costs of these investments. The inflation adjustment of this time series of AI investments, therefore, lets us understand the size of these investments relative to whatever else these sums of money could have purchased.
+
+  desc_short_generative: &desc_short_generative |-
+    Generative AI refers to AI systems that can create new content, such as images, text, or music, based on patterns learned from existing data. This data is expressed in US dollars, adjusted for inflation.
+
+  desc_short_private: &desc_short_private |-
+    Includes companies that received more than $1.5 million in investment (not adjusted for inflation). This data is expressed in US dollars, adjusted for inflation.
+
+  desc_short_corporate: &desc_short_corporate |-
+    This data is expressed in US dollars, adjusted for inflation. This data is expressed in US dollars, adjusted for inflation.
+
+  desc_key_corporate: &desc_key_corporate
+    - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
+    - This data focuses on traditional corporate finance deals, but the source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
+    - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
+    - A merger is a corporate strategy involving two companies joining together to form a new company. An acquisition is a corporate strategy involving one company buying another company.
+    - Private investment is defined as investment in AI companies of more than $1.5 million (in current US dollars).
+    - A public offering is the sale of equity shares or other financial instruments to the public in order to raise capital.
+    - A minority stake is an ownership interest of less than 50% of the total shares of a company.
+
+  desc_key_private: &desc_key_private
+      - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
+      - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
+      - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
+
+  desc_key_generative: &desc_key_generative
+      - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
+      - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
+      - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  ai_corporate_investment:
+    variables:
+      world:
+        title: Global corporate investment in AI
+        description_short: *desc_short_corporate
+        description_key: *desc_key_corporate
+        description_processing: *desc_processing_inflation
+        presentation:
+          grapher_config:
+            note: *note_inflation
+
+  ai_private_investment:
+    variables:
+      world:
+        title: Global private investment in AI
+        description_short: *desc_short_private
+        description_key: *desc_key_private
+        description_processing: *desc_processing_inflation
+        presentation:
+          grapher_config:
+            note: *note_inflation
+      china:
+        title: Private investment in AI in China
+        description_short: *desc_short_private
+        description_key: *desc_key_private
+        description_processing: *desc_processing_inflation
+        presentation:
+          grapher_config:
+            note: *note_inflation
+      united_states:
+        title: Private investment in AI in the United States
+        description_short: *desc_short_private
+        description_key: *desc_key_private
+        description_processing: *desc_processing_inflation
+        presentation:
+          grapher_config:
+            note: *note_inflation
+      europe:
+        title: Private investment in AI in the European Union and United Kingdom
+        description_short: *desc_short_private
+        description_key: *desc_key_private
+        description_processing: *desc_processing_inflation
+        presentation:
+          grapher_config:
+            note: *note_inflation
+
+  ai_investment_generative:
+    variables:
+      generative_ai:
+        title: Global investment in generative AI
+        description_short: *desc_short_generative
+        description_key: *desc_key_generative
+        description_processing: *desc_processing_inflation
+        presentation:
+          grapher_config:
+            note: *note_inflation
+
+  ai_new_companies:
+    variables:
+      companies:
+        title: Newly founded AI companies
+        unit: 'companies'
+        short_unit: ""
+        description_short: Newly-funded AI companies in each year that received an investment of more than $1.5 million (not adjusted for inflation).
+        processing_level: minor
+        description_key:
+          - Quid tracks information on over 8 million companies worldwide, updated weekly using data from Capital IQ and Crunchbase.
+          - The data focuses on AI and machine learning companies that raised over $1.5 million between 2014 and 2024 (not adjusted for inflation).

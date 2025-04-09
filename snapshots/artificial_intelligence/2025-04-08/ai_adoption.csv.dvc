@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AI Index Report
+    description: |-
+      The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
+    date_published: "2025"
+    title_snapshot: AI Index Report - AI adoption
+
+    description_snapshot: |-
+      Data from the “The State of AI in Early 2024. Gen AI Adoption Spikes and Starts to Generate Value” and “The State of AI. How Organizations Are Rewiring to Capture Value."
+
+      Two global online surveys conducted in 2024 gathered insights on AI adoption across industries and regions. The first, run from February 22 to March 5, included 1,363 participants, with 981 reporting their organizations had adopted AI in at least one business function and 878 using generative AI regularly. The second, conducted from July 16 to July 31, had 1,491 participants from 101 countries, 42% of whom worked at organizations with over $500 million in annual revenue. To ensure representativeness, responses were weighted by each participant’s country’s share of global GDP.
+    # Citation
+    producer: McKinsey & Company Survey via AI Index
+    citation_full: |-
+      Nestor Maslej, Loredana Fattorini, Raymond Perrault, Yolanda Gil, Vanessa Parli, Njenga Kariuki, Emily Capstick, Anka Reuel, Erik
+      Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald,
+      Tobi Walsh, Armin Hamrah, Lapo Santarlasci, Julia Betts Lotufo, Alexandra Rome, Andrew Shi, Sukrut Oak. “The AI Index 2025
+      Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2025
+    attribution_short: AI Index Report
+
+    # Files
+    url_main: https://hai-production.s3.amazonaws.com/files/hai_ai_index_report_2025.pdf
+    url_download: https://drive.google.com/uc?export=download&id=1io55VJnWqkR7l1A2jiNt3sowDFY4Hd8Z
+    date_accessed: 2025-04-08
+    # License
+    license:
+      name: CC BY-ND 4.0
+      url: https://hai-production.s3.amazonaws.com/files/hai_ai_index_report_2025.pdf
+outs:
+  - md5: c5999d5ee0e4343cde8b4474179f4120
+    size: 483
+    path: ai_adoption.csv
