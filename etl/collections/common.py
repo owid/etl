@@ -7,6 +7,7 @@ import pandas as pd
 from owid.catalog import Table
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
+from structlog import get_logger
 
 import etl.grapher.model as gm
 from etl.collections.model import Collection
@@ -15,6 +16,8 @@ from etl.collections.utils import (
     validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
+
+log = get_logger()
 
 INDICATORS_SLUG = "indicator"
 
@@ -77,6 +80,7 @@ def expand_config(
     indicator_as_dimension: bool = False,
     indicators_slug: Optional[str] = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
+    default_view: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
@@ -142,6 +146,8 @@ def expand_config(
         Set to True to keep the indicator as a dimension. For instance, if you expand a table with multiple - dimensional - indicators (e.g. 'population', 'population_density'), a dimension is added in the config that specifies the indicator. If there are more than one indicators being expanded, the indicator information is kept as a dimension regardless of this flag.
     indicators_slug: str
         Name to use as the slug for the indicator dimension. Default is 'indicator'. This is used to identify the indicator in a view using dimensional information.
+    default_view: Dict[str, Any] | None
+        View in the configuration to set as default. If not found, a warning is raised.
 
     EXAMPLES
     --------
@@ -194,7 +200,7 @@ def expand_config(
     )
 
     # Combine indicator information with dimensions (only when multiple indicators are given)
-    if (len(expander.indicator_names) > 1) or (indicator_as_dimension):
+    if indicator_as_dimension:
         if dimensions is None:
             dimensions = {dim: "*" for dim in expander.dimension_names}
         elif isinstance(dimensions, list):
@@ -219,6 +225,16 @@ def expand_config(
         common_view_config=common_view_config,
         dimension_choices=dimension_choices,
     )
+
+    if default_view is not None:
+        _default_view_set = False
+        for view in config_partial["views"]:
+            if view["dimensions"] == default_view:
+                view["default_view"] = True
+                _default_view_set = True
+                break
+        if not _default_view_set:
+            log.warning("Default view not found.")
 
     return config_partial
 
@@ -423,8 +439,8 @@ class CollectionConfigExpander:
         # Keep dimensions only for relevant indicators
         self.df_dims = df_dims.loc[df_dims[self.indicators_slug].isin(self.indicator_names)]
 
-        # Drop indicator column if indicator_names is of length 1
-        if (len(self.indicator_names) == 1) & (not self.indicator_as_dimension):
+        # Drop indicator column if the user doesn't want to keep it as a dimension
+        if not self.indicator_as_dimension:
             self.df_dims = self.df_dims.drop(columns=[self.indicators_slug])
 
         # Final checks

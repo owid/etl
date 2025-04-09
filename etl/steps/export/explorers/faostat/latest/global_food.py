@@ -335,7 +335,6 @@ def run():
     # Load inputs.
     #
     # Load FAOSTAT QCL dataset, and read its main table.
-    # TODO: Consider using the flat tables, so that metadata is propagated (e.g. description processing).
     ds_qcl = paths.load_dataset("faostat_qcl")
     tb_qcl = ds_qcl.read("faostat_qcl_flat")
 
@@ -395,18 +394,13 @@ def run():
         tb_qcl,
         indicator_names=sorted(set([column for column in tb_qcl.columns if column not in ["country", "year"]])),
         indicator_as_dimension=False,
+        default_view={
+            "food": "Apples",
+            "metric": "Area harvested",
+            "unit": "hectares",
+            "per_capita": "False",
+        },
     )
-    ####################################################################################################################
-    # TODO: For some reason, a new dimension "indicator" is added. Manually remove it:
-    for view in config_fbsc["views"]:
-        view["dimensions"].pop("indicator", None)
-    config_fbsc["dimensions"] = [
-        dimension for dimension in config_fbsc["dimensions"] if dimension["slug"] != "indicator"
-    ]
-    for view in config_qcl["views"]:
-        view["dimensions"].pop("indicator", None)
-    config_qcl["dimensions"] = [dimension for dimension in config_qcl["dimensions"] if dimension["slug"] != "indicator"]
-    ####################################################################################################################
     # Update original configuration of dimensions and views.
     config["dimensions"] = deepcopy(config_fbsc["dimensions"])
     for i, dimension in enumerate(config["dimensions"]):
@@ -423,27 +417,6 @@ def run():
             dimension["presentation"] = {"type": "checkbox", "choice_slug_true": "True"}
         if dimension["slug"] == "unit":
             dimension["presentation"] = {"type": "radio"}
-
-    def set_default_view(config, default_view):
-        config_new = deepcopy(config)
-        error = "Default view not found"
-        assert sum([default_view == view["dimensions"] for view in config_new["views"]]) == 1, error
-        for view in config_new["views"]:
-            if view["dimensions"] == default_view:
-                view["default_view"] = True
-
-        return config_new
-
-    # Set the defalt view.
-    config = set_default_view(
-        config=config,
-        default_view={
-            "food": "Apples",
-            "metric": "Area harvested",
-            "unit": "hectares",
-            "per_capita": "False",
-        },
-    )
 
     #
     # Save outputs.
