@@ -11,6 +11,10 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define PPP version
+# NOTE: Change this in case of new PPP versions in the future
+PPP_VERSION = 2021
+
 
 def run(dest_dir: str) -> None:
     # Load WID explorer step.
@@ -23,7 +27,7 @@ def run(dest_dir: str) -> None:
 
     # Load PIP data
     ds_pip = paths.load_dataset("world_bank_pip")
-    tb_pip = ds_pip["income_consumption_2017"].reset_index()
+    tb_pip = ds_pip[f"income_consumption_{PPP_VERSION}"].reset_index()
 
     # Merge explorer datasets and assign a short name
     tb_explorer = pr.merge(
