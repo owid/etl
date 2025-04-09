@@ -581,7 +581,7 @@ for survey in range(len(survey_type)):
     for p in range(len(povlines_both)):
         df_graphers.loc[j, "title"] = f"{povlines_both.title_share[p]}"
         df_graphers.loc[j, "ySlugs"] = (
-            f"headcount_ratio_{povlines_both.cents_2011[p]}_ppp{ppp_versions[0]} headcount_ratio_{povlines_both.cents_2017[p]}_ppp{ppp_versions[1]}"
+            f"headcount_ratio_{povlines_both.cents_old[p]}_ppp{ppp_versions[0]} headcount_ratio_{povlines_both.cents_current[p]}_ppp{ppp_versions[1]}"
         )
         df_graphers.loc[j, "Indicator Dropdown"] = "Share in poverty"
         df_graphers.loc[j, "International-$ Dropdown"] = f"Compare {ppp_versions[1]} and {ppp_versions[0]} prices"
@@ -604,7 +604,7 @@ for survey in range(len(survey_type)):
     for p in range(len(povlines_both)):
         df_graphers.loc[j, "title"] = f"{povlines_both.title_number[p]}"
         df_graphers.loc[j, "ySlugs"] = (
-            f"headcount_{povlines_both.cents_2011[p]}_ppp{ppp_versions[0]} headcount_{povlines_both.cents_2017[p]}_ppp{ppp_versions[1]}"
+            f"headcount_{povlines_both.cents_old[p]}_ppp{ppp_versions[0]} headcount_{povlines_both.cents_current[p]}_ppp{ppp_versions[1]}"
         )
         df_graphers.loc[j, "Indicator Dropdown"] = "Number in poverty"
         df_graphers.loc[j, "International-$ Dropdown"] = f"Compare {ppp_versions[1]} and {ppp_versions[0]} prices"
