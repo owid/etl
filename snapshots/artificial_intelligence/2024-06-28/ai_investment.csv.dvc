@@ -6,7 +6,7 @@ meta:
     title: AI Index Report
     description: |-
       The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
-    date_published: "2025"
+    date_published: "2024"
     title_snapshot: AI Index Report - Investment Data
     description_snapshot: |-
       Data from Quid via the AI Index Report who analyzed investment data from more than 8 million companies worldwide, both public and private. Employing natural language processing quid sifts through vast unstructured datasets—including news aggregations, blogs, company records, and patent databases—to detect patterns and insights. Additionally, Quid is constantly expanding its database to include more companies, sometimes resulting in higher reported investment volumes for specific years.
