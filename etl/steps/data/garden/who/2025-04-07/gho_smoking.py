@@ -10,6 +10,8 @@ paths = PathFinder(__file__)
 
 REGIONS = [r for r in geo.REGIONS.keys() if r != "European Union (27)"] + ["World"]
 
+LAST_YEAR = 2022
+
 
 def run() -> None:
     #
@@ -94,6 +96,7 @@ def run() -> None:
 
     tb = geo.add_regions_to_table(
         tb=tb,
+        index_columns=["country", "year", "sex"],
         ds_regions=ds_regions,
         ds_income_groups=ds_income,
         regions=REGIONS,
@@ -112,6 +115,9 @@ def run() -> None:
     tb["cig_smokers"] = tb["cig_smokers"].copy_metadata(tb["cig_smoking_pct"])
     tb["tobacco_smokers"] = tb["tobacco_smokers"].copy_metadata(tb["tobacco_smoking_pct"])
     tb["tobacco_users"] = tb["tobacco_users"].copy_metadata(tb["tobacco_use_pct"])
+
+    # filter out predictions
+    tb = tb[(tb["year"] <= LAST_YEAR)]
 
     # Improve table format.
     tb = tb.format(["country", "year", "sex"], short_name="gho_smoking")
