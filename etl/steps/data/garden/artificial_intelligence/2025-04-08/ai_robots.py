@@ -69,7 +69,6 @@ def run(dest_dir: str) -> None:
     }
     # Standardize column names
     tb_2023 = tb_2023.rename(columns=column_rename_map)
-    cols_to_keep = tb_2023.columns
     tb_professional = pr.concat([tb[tb_2023.columns], tb_2023])
     tb_professional = tb_professional.drop_duplicates(subset=["country", "year"], keep="last")
     cols_to_merge = [
