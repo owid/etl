@@ -485,11 +485,8 @@ def add_metadata_vars(tb_garden: Table, ppp_version: int, welfare_type: str) -> 
                     "in poverty", "not in poverty"
                 )
 
-                # Replicate the title in the display name and title_public
+                # Replicate the title in the display name
                 tb_garden[col_name].metadata.display["name"] = tb_garden[col_name].metadata.title
-                tb_garden[col_name].metadata.presentation = VariablePresentationMeta(
-                    title_public=tb_garden[col_name].metadata.title
-                )
 
         for i in range(len(povline_list)):
             if i != 0:
@@ -605,8 +602,6 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
 
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
     elif var in ["top1_thr", "top1_avg", "spl", "spr"]:
         meta = VariableMeta(
             title=f"{var_dict[var]['title']}",
@@ -629,8 +624,6 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "tolerance": TOLERANCE,
             "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
-
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     elif var in ["pg"]:
         meta = VariableMeta(
@@ -656,8 +649,6 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
 
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
     elif var in ["top90_99_share"]:
         meta = VariableMeta(
             title=f"{var_dict[var]['title']}",
@@ -681,8 +672,6 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
 
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
     else:
         meta = VariableMeta(
             title=f"{var_dict[var]['title']}",
@@ -702,8 +691,6 @@ def var_metadata_inequality_mean_median(var, origins, welfare_type) -> VariableM
             "tolerance": TOLERANCE,
             "entityAnnotationsMap": ENTITY_ANNOTATIONS,
         }
-
-        meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
 
@@ -740,8 +727,6 @@ def var_metadata_absolute_povlines(var, povline, origins, ppp_version, welfare_t
         "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
 
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
-
     return meta
 
 
@@ -770,8 +755,6 @@ def var_metadata_between_absolute_povlines(var, povline1, povline2, origins, ppp
         "tolerance": TOLERANCE,
         "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
-
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     meta.description_short = meta.description_short.replace(
         "{povline}",
@@ -812,8 +795,6 @@ def var_metadata_relative_povlines(var, rel, origins, welfare_type) -> VariableM
         "tolerance": TOLERANCE,
         "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
-
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
 
@@ -879,8 +860,6 @@ def var_metadata_percentiles(var, pct, origins, ppp_version, welfare_type) -> Va
         "tolerance": TOLERANCE,
         "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
-
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
 
@@ -988,7 +967,5 @@ def var_metadata_percentile_table(var, origins, welfare_type) -> VariableMeta:
         "tolerance": TOLERANCE,
         "entityAnnotationsMap": ENTITY_ANNOTATIONS,
     }
-
-    meta.presentation = VariablePresentationMeta(title_public=meta.title)
 
     return meta
