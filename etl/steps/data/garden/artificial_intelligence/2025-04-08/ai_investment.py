@@ -40,7 +40,6 @@ def run(dest_dir: str) -> None:
         "AV",
         "Agritech",
         "Business operations",
-        "Companies",
         "Content creation/translation",
         "Creative, music, video content",
         "Cybersecurity, data protection",

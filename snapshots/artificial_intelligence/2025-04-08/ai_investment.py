@@ -45,8 +45,6 @@ def get_data():
         "1JS6vtYQfTR2w1wbDxFT5KGWcxeCBxUkZ",  # 4.3.16 investment by focus area - World
     ]
 
-    df_list = []
-
     try:
         column_renames = {
             "Geographic Area": "Geographic area",
