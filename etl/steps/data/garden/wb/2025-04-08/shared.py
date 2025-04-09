@@ -328,44 +328,44 @@ abs_dict = {
             "title_between": "$40",
             "description_key": "",
         },
-        2021: {
-            100: {"title": "$1 a day", "title_between": "$1", "description_key": ""},
-            # TODO: Change poverty lines for 2021
-            190: {
-                "title": "$1.90 a day",
-                "title_between": "$1.90",
-                "description_key": "Extreme poverty here is defined as living below the International Poverty Line of $1.90 per day.",
-            },
-            320: {
-                "title": "$3.20 a day",
-                "title_between": "$3.20",
-                "description_key": "A poverty line of $3.20 a day represents definitions of national poverty lines in lower-middle-income countries.",
-            },
-            550: {
-                "title": "$5.50 a day",
-                "title_between": "$5.50",
-                "description_key": "A poverty line of $5.50 a day represents definitions of national poverty lines in upper-middle-income countries.",
-            },
-            1000: {
-                "title": "$10 a day",
-                "title_between": "$10",
-                "description_key": "",
-            },
-            2000: {
-                "title": "$20 a day",
-                "title_between": "$20",
-                "description_key": "",
-            },
-            3000: {
-                "title": "$30 a day",
-                "title_between": "$30",
-                "description_key": "A poverty line of $30 a day represents definitions of national poverty lines in high-income countries.",
-            },
-            4000: {
-                "title": "$40 a day",
-                "title_between": "$40",
-                "description_key": "",
-            },
+    },
+    2021: {
+        100: {"title": "$1 a day", "title_between": "$1", "description_key": ""},
+        # TODO: Change poverty lines for 2021
+        190: {
+            "title": "$1.90 a day",
+            "title_between": "$1.90",
+            "description_key": "Extreme poverty here is defined as living below the International Poverty Line of $1.90 per day.",
+        },
+        320: {
+            "title": "$3.20 a day",
+            "title_between": "$3.20",
+            "description_key": "A poverty line of $3.20 a day represents definitions of national poverty lines in lower-middle-income countries.",
+        },
+        550: {
+            "title": "$5.50 a day",
+            "title_between": "$5.50",
+            "description_key": "A poverty line of $5.50 a day represents definitions of national poverty lines in upper-middle-income countries.",
+        },
+        1000: {
+            "title": "$10 a day",
+            "title_between": "$10",
+            "description_key": "",
+        },
+        2000: {
+            "title": "$20 a day",
+            "title_between": "$20",
+            "description_key": "",
+        },
+        3000: {
+            "title": "$30 a day",
+            "title_between": "$30",
+            "description_key": "A poverty line of $30 a day represents definitions of national poverty lines in high-income countries.",
+        },
+        4000: {
+            "title": "$40 a day",
+            "title_between": "$40",
+            "description_key": "",
         },
     },
 }
