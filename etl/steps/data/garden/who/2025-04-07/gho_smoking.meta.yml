@@ -1,0 +1,110 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Smoking
+    display:
+      numDecimalPlaces: 1
+    description_key:
+      - "{definitions.notes.smoking_risks}"
+      - "{definitions.notes.survey_data}"
+  notes:
+    age_standardization: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
+    users: The number of current smokers/ tobacco users is estimated by multiplying the prevalence of smoking/ tobacco use by the population aged 15 years and older.
+    regional_aggregates: We calculate regional aggregates as population weighted averages of the country-level estimates. The populations is based on the UN World Population Prospects 2024, the regions we use are defined [here](https://ourworldindata.org/world-region-map-definitions#our-world-in-data).
+    survey_data: This estimate is based on national surveys conducted within the last 10 years. The WHO uses the survey data as the basis for a statistical regression model to estimate the prevalence of smoking in the adult population for each year and country. Where no or only incomplete survey data is available, the model uses data from similar countries to estimate the prevalence of smoking. You can find more information about the methodology in the [WHO publication](https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(15)60264-1/abstract)
+    smoking_risks: Smoking is a [risk factor](#dod:risk-factor) for chronic complications, including cancers, [cardiovascular disease](#dod:cvd), and premature death.
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+
+dataset:
+  update_period_days: 541
+  title: WHO Global Health Observatory - Smoking indicators
+
+
+
+tables:
+  gho_smoking:
+    variables:
+      cig_smoking_pct:
+        title: Share of people who smoke cigarettes
+        unit: "% of adults"
+        short_unit: "%"
+        description_short: Estimated percentage of adults (15 years and older) who currently smoke cigarettes. This includes manufactured and hand-rolled cigarettes, but excludes e-cigarettes and other tobacco products.
+        description_processing: |-
+          - {definitions.notes.regional_aggregates}
+        presentation:
+          grapher_config:
+            note: "{definitions.notes.age_standardization}"
+      cig_smoking_pct_age_std:
+        title: Share of people who smoke cigarettes (age-standardized)
+        unit: "% of adults"
+        short_unit: "%"
+        description_short: Estimated percentage of adults (15 years and older) who currently smoke cigarettes. This includes manufactured and hand-rolled cigarettes, but excludes e-cigarettes and other tobacco products.
+        description_processing: |-
+          - {definitions.notes.regional_aggregates}
+        presentation:
+          grapher_config:
+            note: "{definitions.notes.age_standardization}"
+      tobacco_smoking_pct:
+        title: Share of people who smoke tobacco
+        unit: "% of adults"
+        short_unit: "%"
+        description_short: Estimated percentage of adults (15 years and older) who currently smoke tobacco. This includes all forms of tobacco smoking, such as cigarettes, pipes or heated tobacco products, but excludes e-cigarettes and smokeless tobacco products.
+        description_processing: |-
+          - {definitions.notes.regional_aggregates}
+      tobacco_smoking_pct_age_std:
+        title: Share of people who smoke tobacco (age-standardized)
+        unit: "% of adults"
+        short_unit: "%"
+        description_short: Estimated percentage of adults (15 years and older) who currently smoke tobacco. This includes all forms of tobacco smoking, such as cigarettes, pipes or heated tobacco products, but excludes e-cigarettes and smokeless tobacco products.
+        description_processing: |-
+          - {definitions.notes.regional_aggregates}
+        presentation:
+          grapher_config:
+            note: "{definitions.notes.age_standardization}"
+      tobacco_use_pct:
+        title: Share of people who smoke or use tobacco
+        unit: "% of adults"
+        short_unit: "%"
+        description_short: Estimated percentage of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
+        description_processing: |-
+          - {definitions.notes.regional_aggregates}
+      tobacco_use_pct_age_std:
+        title: Share of people who smoke or use tobacco (age-standardized)
+        unit: "% of adults"
+        short_unit: "%"
+        description_short: Estimated percentage of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
+        description_processing: |-
+          - {definitions.notes.regional_aggregates}
+        presentation:
+          grapher_config:
+            note: "{definitions.notes.age_standardization}"
+      cig_smokers:
+        title: Number of adults who smoke cigarettes
+        unit: "people"
+        short_unit: ""
+        description_short: Estimated number of adults (15 years and older) who currently smoke cigarettes. This includes manufactured and hand-rolled cigarettes, but excludes e-cigarettes and other tobacco products.
+        description_processing: |-
+          - {definitions.notes.users}
+        display:
+          numDecimalPlaces: 0
+      tobacco_smokers:
+        title: Number of adults who smoke tobacco
+        unit: "people"
+        short_unit: ""
+        description_short: Estimated number of adults (15 years and older) who currently smoke tobacco. This includes all forms of tobacco smoking, such as cigarettes, pipes or heated tobacco products, but excludes e-cigarettes and smokeless tobacco products.
+        description_processing: |-
+          - {definitions.notes.users}
+        display:
+          numDecimalPlaces: 0
+      tobacco_users:
+        title: Number of adults who smoke or use tobacco
+        unit: "people"
+        short_unit: ""
+        description_short: Estimated number of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
+        description_processing: |-
+          - {definitions.notes.users}
+        display:
+          numDecimalPlaces: 0
+
