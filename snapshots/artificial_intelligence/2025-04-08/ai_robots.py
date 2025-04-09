@@ -45,43 +45,41 @@ def get_data():
     df_list = []
 
     try:
-        # Fetch data from Google Drive and store in a list of DataFrames
+        # Mapping for assigning 'Application Area' based on file index
+        application_area_map = {0: "Installations", 1: "Operational stock", 2: "Installations"}
+
+        # Possible original column names to standardize the robot count column
+        robot_column_names = [
+            "Number of Professional Service Robots Installed (in Thousands)",
+            "Number of Industrial Robots Installed (in Thousands)",
+            "Number of industrial robots (in thousands)",
+            "Number of industrial robots installed (in thousands)",
+        ]
+
         for i, drive_id in enumerate(ids):
             df_add = pr.read_csv(common_path + drive_id)
 
+            # Add 'Geographic area' if missing
             if "Geographic area" not in df_add.columns:
                 df_add["Geographic area"] = "World"
-            if "Label" in df_add.columns:
-                df_add = df_add.rename(columns={"Label": "Year"})
-            if "Application Area" not in df_add.columns:
-                if i == 0:
-                    df_add["Application Area"] = "Installations"
-                elif i == 1:
-                    df_add["Application Area"] = "Operational stock"
-                elif i == 2:
-                    df_add["Application Area"] = "Installations"
+
+            # Rename 'Label' to 'Year' if present
+            df_add = df_add.rename(columns={"Label": "Year"}) if "Label" in df_add.columns else df_add
+
+            # Add 'Application Area' based on index if not present
+            if "Application Area" not in df_add.columns and i in application_area_map:
+                df_add["Application Area"] = application_area_map[i]
+
+            # Rename 'Application Area' to 'Indicator'
             df_add = df_add.rename(columns={"Application Area": "Indicator"})
-            if "Number of Professional Service Robots Installed (in Thousands)" in df_add.columns:
-                df_add = df_add.rename(
-                    columns={
-                        "Number of Professional Service Robots Installed (in Thousands)": "Number of robots (in thousands)"
-                    }
-                )
-            elif "Number of Industrial Robots Installed (in Thousands)" in df_add.columns:
-                df_add = df_add.rename(
-                    columns={"Number of industrial robots installed (in thousands)": "Number of robots (in thousands)"}
-                )
-            elif "Number of industrial robots (in thousands)" in df_add.columns:
-                df_add = df_add.rename(
-                    columns={"Number of industrial robots (in thousands)": "Number of robots (in thousands)"}
-                )
-            elif "Number of industrial robots installed (in thousands)" in df_add.columns:
-                df_add = df_add.rename(
-                    columns={"Number of industrial robots installed (in thousands)": "Number of robots (in thousands)"}
-                )
+
+            # Standardize robot count column name
+            for col in robot_column_names:
+                if col in df_add.columns:
+                    df_add = df_add.rename(columns={col: "Number of robots (in thousands)"})
+                    break  # Only one match expected
 
             df_list.append(df_add)
-
         # Concatenate the DataFrames from the list
         all_dfs = pr.concat(df_list)
         return all_dfs
