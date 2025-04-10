@@ -408,7 +408,7 @@ def run():
             "per_capita": "False",
         },
         humanize_dimension_names=True,
-        common_view_config={"tab": "map"}
+        common_view_config={"tab": "map"},
     )
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]

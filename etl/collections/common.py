@@ -277,7 +277,9 @@ def expand_config(
         _default_view_set = False
         for view in config_partial["views"]:
             if view["dimensions"] == default_view:
-                view["default_view"] = True
+                # NOTE: A copy seems to be necessary, otherwise all common configs will be modified to have a default view.
+                view["config"] = deepcopy(view.get("config", {}))
+                view["config"]["defaultView"] = True
                 _default_view_set = True
                 break
         if not _default_view_set:
