@@ -459,6 +459,29 @@ def add_yield_to_aggregate_regions(tb: Table) -> Table:
     return combined_data
 
 
+def sanity_check_qcl_inputs(tb):
+    # A few specific sanity checks for QCL.
+    # The elements for production and yield of eggs are given both in weight, and in numbers (which is unusual).
+    # We will rename the element to avoid confusion between the two Production metrics.
+    # Here, assert that those elements are not used for anything else, so we can rename them appropriately.
+    error = "Expected element 005513 (Production) to have only items related to eggs."
+    assert tb[tb["element_code"] == "005513"][["item_code", "unit"]].drop_duplicates().to_dict(orient="list") == {
+        "item_code": [
+            "00001062",  # Hen eggs in shell, fresh
+            "00001091",  # Eggs from other birds in shell, fresh, n.e.c.
+        ],
+        "unit": ["1000 No", "1000 No"],
+    }, error
+    error = "Expected element 005413 (Yield) to have only items related to eggs."
+    assert tb[tb["element_code"] == "005413"][["item_code", "unit"]].drop_duplicates().to_dict(orient="list") == {
+        "item_code": [
+            "00001062",  # Hen eggs in shell, fresh
+            "00001091",  # Eggs from other birds in shell, fresh, n.e.c.
+        ],
+        "unit": ["No/An", "No/An"],
+    }, error
+
+
 def run() -> None:
     #
     # Load data.
@@ -503,6 +526,9 @@ def run() -> None:
     # Harmonize items and elements, and clean data.
     tb = harmonize_items(tb=tb, dataset_short_name=dataset_short_name)
     tb = harmonize_elements(tb=tb, dataset_short_name=dataset_short_name)
+
+    # A few specific sanity checks for QCL.
+    sanity_check_qcl_inputs(tb=tb)
 
     # Prepare data.
     tb = clean_data(
