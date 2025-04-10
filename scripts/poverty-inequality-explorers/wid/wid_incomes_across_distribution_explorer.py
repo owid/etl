@@ -88,7 +88,7 @@ yAxisMin = Y_AXIS_MIN
 additional_description = ADDITIONAL_DESCRIPTION_WID
 ppp_description = PPP_DESCRIPTION_WID
 
-ppp_year = PPP_YEAR_WID
+ppp_year = PPP_VERSION_WID
 
 df_tables = pd.DataFrame()
 j = 0

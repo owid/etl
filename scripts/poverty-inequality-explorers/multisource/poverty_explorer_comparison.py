@@ -119,6 +119,9 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP_COMPARISON
 
 notes_title = NOTES_TITLE_PIP
 
+# NOTE: Define this for LIS and PIP, to have a common PPP year
+ppp_year_pip_lis = PPP_VERSION_COMPARISON_PIP
+
 processing_description = PROCESSING_DESCRIPTION_PIP_POVERTY
 ppp_description = PPP_DESCRIPTION_PIP_CURRENT
 relative_poverty_description = RELATIVE_POVERTY_DESCRIPTION_PIP
@@ -195,7 +198,7 @@ for tab in range(len(pip_tables)):
                 processing_description,
             ]
         )
-        df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
         df_tables_pip.loc[j, "shortUnit"] = "$"
         df_tables_pip.loc[j, "type"] = "Numeric"
         df_tables_pip.loc[j, "colorScaleNumericBins"] = (
@@ -217,7 +220,7 @@ for tab in range(len(pip_tables)):
                 processing_description,
             ]
         )
-        df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
         df_tables_pip.loc[j, "shortUnit"] = "$"
         df_tables_pip.loc[j, "type"] = "Numeric"
         df_tables_pip.loc[j, "colorScaleNumericBins"] = pip_povlines_abs["scale_total_shortfall"][p]
@@ -238,7 +241,7 @@ for tab in range(len(pip_tables)):
                 processing_description,
             ]
         )
-        df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
         df_tables_pip.loc[j, "shortUnit"] = "$"
         df_tables_pip.loc[j, "type"] = "Numeric"
         df_tables_pip.loc[j, "colorScaleNumericBins"] = pip_povlines_abs.scale_avg_shortfall[p]
@@ -390,7 +393,7 @@ for tab in range(len(pip_tables)):
                 processing_description,
             ]
         )
-        df_tables_pip.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables_pip.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
         df_tables_pip.loc[j, "shortUnit"] = "$"
         df_tables_pip.loc[j, "type"] = "Numeric"
         df_tables_pip.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;20.0001"
@@ -546,7 +549,7 @@ for tab in range(len(merged_tables)):
                         processing_poverty,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 df_tables_lis.loc[j, "colorScaleNumericBins"] = pip_povlines_abs["scale_total_shortfall"][p]
@@ -573,7 +576,7 @@ for tab in range(len(merged_tables)):
                         processing_poverty,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 df_tables_lis.loc[j, "colorScaleNumericBins"] = pip_povlines_abs["scale_avg_shortfall"][p]
@@ -600,7 +603,7 @@ for tab in range(len(merged_tables)):
                         processing_poverty,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 df_tables_lis.loc[j, "colorScaleNumericBins"] = pip_povlines_abs["scale_avg_shortfall"][p]
@@ -763,7 +766,7 @@ for tab in range(len(merged_tables)):
                         processing_poverty,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 df_tables_lis.loc[j, "colorScaleNumericBins"] = "1000;2000;3000;4000;5000"
@@ -790,7 +793,7 @@ for tab in range(len(merged_tables)):
                         processing_poverty,
                     ]
                 )
-                df_tables_lis.loc[j, "unit"] = "international-$ in 2017 prices"
+                df_tables_lis.loc[j, "unit"] = f"international-$ in {ppp_year_pip_lis} prices"
                 df_tables_lis.loc[j, "shortUnit"] = "$"
                 df_tables_lis.loc[j, "type"] = "Numeric"
                 df_tables_lis.loc[j, "colorScaleNumericBins"] = "1000;2000;3000;4000;5000"
@@ -902,7 +905,7 @@ for tab in range(len(merged_tables)):
             df_graphers.loc[j, "Poverty line Dropdown"] = f"{pip_povlines_abs['povline_dropdown'][p]}"
             df_graphers.loc[j, "subtitle"] = datasets_description
             df_graphers.loc[j, "note"] = (
-                f"{pip_povlines_abs['subtitle'][p]} This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices."
+                f"{pip_povlines_abs['subtitle'][p]} This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -916,7 +919,7 @@ for tab in range(len(merged_tables)):
             df_graphers.loc[j, "Poverty line Dropdown"] = f"{pip_povlines_abs['povline_dropdown'][p]}"
             df_graphers.loc[j, "subtitle"] = datasets_description
             df_graphers.loc[j, "note"] = (
-                f"{pip_povlines_abs['subtitle'][p]} This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices."
+                f"{pip_povlines_abs['subtitle'][p]} This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -930,7 +933,7 @@ for tab in range(len(merged_tables)):
             df_graphers.loc[j, "Poverty line Dropdown"] = f"{pip_povlines_abs['povline_dropdown'][p]}"
             df_graphers.loc[j, "subtitle"] = f"{pip_povlines_abs['subtitle_total_shortfall'][p]}"
             df_graphers.loc[j, "note"] = (
-                f"{datasets_description} This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices."
+                f"{datasets_description} This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -944,7 +947,7 @@ for tab in range(len(merged_tables)):
             df_graphers.loc[j, "Poverty line Dropdown"] = f"{pip_povlines_abs['povline_dropdown'][p]}"
             df_graphers.loc[j, "subtitle"] = f"{pip_povlines_abs['subtitle_avg_shortfall'][p]}"
             df_graphers.loc[j, "note"] = (
-                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries."
+                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -958,7 +961,7 @@ for tab in range(len(merged_tables)):
             df_graphers.loc[j, "Poverty line Dropdown"] = f"{pip_povlines_abs.povline_dropdown[p]}"
             df_graphers.loc[j, "subtitle"] = f"{pip_povlines_abs['subtitle_income_gap_ratio'][p]}"
             df_graphers.loc[j, "note"] = (
-                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries."
+                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -974,7 +977,7 @@ for tab in range(len(merged_tables)):
                 f"The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
             )
             df_graphers.loc[j, "note"] = (
-                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries."
+                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -1021,7 +1024,7 @@ for tab in range(len(merged_tables)):
                 f"This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {pip_povlines_rel.text[pct]}"
             )
             df_graphers.loc[j, "note"] = (
-                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries."
+                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -1039,7 +1042,7 @@ for tab in range(len(merged_tables)):
                 f"This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {pip_povlines_rel['text'][pct]} income, averaged across the population in poverty."
             )
             df_graphers.loc[j, "note"] = (
-                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries."
+                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -1057,7 +1060,7 @@ for tab in range(len(merged_tables)):
                 f'This is the average shortfall expressed as a share of the poverty line, sometimes called the "income gap ratio". It captures the depth of poverty of those living on less than {pip_povlines_rel.text[pct]} income.'
             )
             df_graphers.loc[j, "note"] = (
-                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries."
+                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
@@ -1073,7 +1076,7 @@ for tab in range(len(merged_tables)):
                 f"The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
             )
             df_graphers.loc[j, "note"] = (
-                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries."
+                f"{datasets_description} This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year_pip_lis} prices to account for inflation and differences in living costs between countries."
             )
             df_graphers.loc[j, "type"] = np.nan
             j += 1
