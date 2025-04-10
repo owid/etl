@@ -1,5 +1,6 @@
 """Step that pushes the global-food explorer (tsv content) to DB, to create the global-food (indicator-based) explorer."""
 
+from owid.catalog.utils import underscore
 from structlog import get_logger
 
 from etl.collections.explorer import expand_config
@@ -11,10 +12,7 @@ log = get_logger()
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
-# The names of the products to include in the food explorer will be further edited in owid-content, following to the
-# following file:
-# https://github.com/owid/owid-content/blob/master/scripts/global-food-explorer/foods.csv
+# Items from faostat_qcl to include.
 ITEM_CODES_QCL = [
     "00000060",  # From faostat_qcl - 'Maize oil' (previously 'Maize oil').
     "00000567",  # From faostat_qcl - 'Watermelons' (previously 'Watermelons').
@@ -198,6 +196,7 @@ ITEM_CODES_QCL = [
     "00000181",  # From faostat_qcl - 'Broad beans' (previously 'Broad beans').
 ]
 
+# Items from faostat_fbsc to include.
 ITEM_CODES_FBSC = [
     "00002576",  # From faostat_fbsc - 'Palm kernel oil' (previously 'Palm kernel oil').
     "00002516",  # From faostat_fbsc - 'Oats' (previously 'Oats').
@@ -268,59 +267,56 @@ ITEM_CODES_FBSC = [
     "00002908",  # From faostat_fbsc - 'Sugar crops' (previously 'Sugar crops').
 ]
 
-# List of element codes to consider from faostat_qcl.
+# Elements from faostat_qcl to include.
 ELEMENT_CODES_QCL = [
-    "005312",
-    "005313",
-    # "005314",
-    "005318",
-    "005320",
-    "005321",
-    # "005410",
-    "005413",
-    "005417",
-    "005412",
-    # "005420",
-    # "005422",
-    "005424",
-    "005510",
-    "005513",
-    "5312pc",
-    "5320pc",
-    "5321pc",
-    "5510pc",
+    "005312",  # Area harvested (hectares).
+    "5312pc",  # Area harvested per capita (hectares per capita).
+    "005313",  # Laying (animals).
+    "005318",  # Milk animals (animals).
+    "005320",  # Producing or slaughtered animals (animals).
+    "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
+    "005321",  # Producing or slaughtered animals (animals).
+    "5321pc",  # Producing or slaughtered animals per capita (animals per capita).
+    "005413",  # Eggs per bird (eggs per bird).
+    "005412",  # Yield (tonnes per hectare).
+    "005417",  # Yield (kilograms per animal).
+    "005424",  # Yield (kilograms per animal).
+    "005510",  # Production (tonnes).
+    "5510pc",  # Production per capita (tonnes per capita).
+    "005513",  # Eggs produced (eggs).
 ]
-# List of element codes to consider from faostat_fbsc.
+
+# Elements from faostat_fbsc to include.
 ELEMENT_CODES_FBSC = [
-    "005072",
-    "005123",
-    "005131",
-    "005142",
-    "005154",
-    "005170",
-    "005171",
-    "005301",
+    "005072",  # Stock variation (tonnes)
+    "005123",  # Waste in supply chain (tonnes)
+    "5123pc",  # Waste in supply chain (tonnes_per_capita)
+    "005131",  # Processing (tonnes)
+    "005142",  # Food (tonnes)
+    "5142pc",  # Food (tonnes per capita)
+    "005154",  # Other uses (tonnes)
+    "5154pc",  # Other uses (tonnes per capita)
+    "005170",  # Residuals (tonnes)
+    "005171",  # Tourist consumption (tonnes)
+    "005301",  # Domestic supply (tonnes)
+    "5301pc",  # Domestic supply (tonnes per capita)
+    "005521",  # Feed (tonnes)
+    "5521pc",  # Feed (tonnes per capita)
+    "005527",  # Seed (tonnes)
+    "005611",  # Imports (tonnes)
+    "5611pc",  # Imports (tonnes per capita)
+    "005911",  # Exports (tonnes)
+    "5911pc",  # Exports (tonnes per capita)
+    "0645pc",  # Food available for consumption (kilograms per year per capita)
+    "0664pc",  # Food available for consumption (kilocalories per day per capita)
+    "0674pc",  # Food available for consumption (grams of protein per day per capita)
+    "0684pc",  # Food available for consumption (grams of fat per day per capita)
     # Element 'Production' (in tonnes, originally given in 1000 tonnes) is taken from qcl.
     # Although fbsc has items for this element that are not in qcl, they overlap in a number of items with slightly
     # different values. To avoid this issue, we ignore the element from fbsc and use only the one in qcl.
     # '005511',
-    "005521",
-    "005527",
-    "005611",
-    "005911",
-    "0645pc",
-    "0664pc",
-    "0674pc",
-    "0684pc",
-    "5123pc",
-    "5142pc",
-    "5154pc",
-    "5301pc",
-    "5521pc",
-    "5611pc",
-    "5911pc",
     # The following element code is for population.
-    "000511",
+    # "000511",  # Population
     # Indicators initially given by FAOSTAT as per capita, and converted to total by OWID:
     # Food supply quantity (kg/capita/yr).
     # "000645",
@@ -331,6 +327,50 @@ ELEMENT_CODES_FBSC = [
     # Fat supply quantity (g/capita/day).
     # "000684",
 ]
+
+
+def prepare_table_with_dimensions(tb, item_codes, element_codes):
+    columns_to_drop = []
+    UNITS_IN_RADIO_BUTTONS = [
+        "kilograms per year",
+        "kilocalories per day",
+        "grams of protein per day",
+        "grams of fat per day",
+    ]
+    UNITS_NOT_IN_RADIO_BUTTONS = [
+        "hectares",
+        "tonnes",
+        "tonnes per hectare",
+        "animals",
+        "kilograms per animal",
+        "eggs per bird",
+        "eggs",
+    ]
+    for column in tb.drop(columns=["country", "year"]).columns:
+        item, item_code, element, element_code, unit = sum(
+            [[j.strip() for j in i.split("|")] for i in tb[column].metadata.title.split("||")], []
+        )
+        if (item_code in item_codes) and (element_code in element_codes):
+            unit = unit.replace(" per capita", "")
+            if unit in UNITS_IN_RADIO_BUTTONS:
+                pass
+            elif unit in UNITS_NOT_IN_RADIO_BUTTONS:
+                # We remove the unit in these cases, so they don't appear in the dropdown.
+                unit = ""
+            else:
+                raise ValueError(f"Unexpected unit {unit}")
+            tb[column].metadata.dimensions = {
+                "food": underscore(item),
+                "metric": underscore(element),
+                "unit": underscore(unit, validate=False),
+                "per_capita": True if "pc" in element_code else False,
+            }
+            tb[column].metadata.original_short_name = column
+        else:
+            columns_to_drop.append(column)
+
+    # Drop unnecessary columns.
+    tb = tb.drop(columns=columns_to_drop)
 
 
 def run():
@@ -352,53 +392,8 @@ def run():
     # Process data.
     #
     # TODO: Add footnote to all places in fbsc where there is a jump due to methodology change (usually around 2010).
-    def prepare_table_with_dimensions(tb, item_codes, element_codes):
-        columns_to_drop = []
-        UNITS_IN_RADIO_BUTTONS = [
-            "kilograms per year",
-            "kilocalories per day",
-            "grams of protein per day",
-            "grams of fat per day",
-        ]
-        UNITS_NOT_IN_RADIO_BUTTONS = [
-            "hectares",
-            "tonnes",
-            "tonnes per hectare",
-            "animals",
-            "kilograms per animal",
-            "eggs per bird",
-            "eggs",
-        ]
-        from owid.catalog.utils import underscore
-
-        for column in tb.drop(columns=["country", "year"]).columns:
-            item, item_code, element, element_code, unit = sum(
-                [[j.strip() for j in i.split("|")] for i in tb[column].metadata.title.split("||")], []
-            )
-            if (item_code in item_codes) and (element_code in element_codes):
-                unit = unit.replace(" per capita", "")
-                if unit in UNITS_IN_RADIO_BUTTONS:
-                    pass
-                elif unit in UNITS_NOT_IN_RADIO_BUTTONS:
-                    # We remove the unit in these cases, so they don't appear in the dropdown.
-                    # TODO: It seems we don't have all the units that appeared in the old explorer.
-                    #  I think the only missing one is food available, which is given in kg per year, and should also be in grams per day.
-                    unit = ""
-                else:
-                    raise ValueError(f"Unexpected unit {unit}")
-                tb[column].metadata.dimensions = {
-                    "food": underscore(item),
-                    "metric": underscore(element),
-                    "unit": underscore(unit, validate=False),
-                    "per_capita": True if "pc" in element_code else False,
-                }
-                tb[column].metadata.original_short_name = column
-            else:
-                columns_to_drop.append(column)
-
-        # Drop unnecessary columns.
-        tb = tb.drop(columns=columns_to_drop)
-
+    # TODO: It seems we don't have all the units that appeared in the old explorer.
+    #  I think the only missing one is food available, which is given in kg per year, and should also be in grams per day.
     # Prepare tables with dimensions.
     prepare_table_with_dimensions(tb=tb_qcl, item_codes=ITEM_CODES_QCL, element_codes=ELEMENT_CODES_QCL)
     prepare_table_with_dimensions(tb=tb_fbsc, item_codes=ITEM_CODES_FBSC, element_codes=ELEMENT_CODES_FBSC)
@@ -416,6 +411,10 @@ def run():
         common_view_config={"tab": "map"},
         dimension_names_replacements={
             "maize": "Maize (corn)",
+            "area_harvested": "Land use",
+            "feed": "Allocated to animal feed",
+            "food": "Allocated to human food",
+            "other_uses": "Allocated to other uses",
         },
     )
     config["dimensions"] = config_new["dimensions"]
