@@ -1,0 +1,625 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    display: &common_display
+      tolerance: 5
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Government Spending
+      attribution_short: OECD
+
+  unit_human_readable: |-
+    <% if unit == "ppp" %>
+    International-$
+    <%- elif unit == "share_gdp" %>
+    % of GDP
+    <%- elif unit == "share_gov_exp" %>
+    % of government expenditure
+    <%- elif unit == "share_investment" %>
+    % of investment of total economy
+    <%- elif unit == "share_potential_gdp" %>
+    % of potential GDP
+    <%- elif unit == "growth_rate" %>
+    Growth rate
+    <%- elif unit == "share_gov_outsourcing_exp" %>
+    % of government outsourcing expenditures
+    <%- elif unit == "share_gov_revenues" %>
+    % of government revenues
+    <%- elif unit == "share_gov_production_costs" %>
+    % of government production costs
+    <%- elif unit == "share_tax_revenue" %>
+    % of tax revenue
+    <%- endif %>
+
+  unit: |-
+    <% if unit == "ppp" %>
+    current international-$
+    <%- elif unit == "share_gdp" %>
+    % of GDP
+    <%- elif unit == "share_gov_exp" %>
+    % of government expenditure
+    <%- elif unit == "share_investment" %>
+    % of investment of total economy
+    <%- elif unit == "share_potential_gdp" %>
+    % of potential GDP
+    <%- elif unit == "growth_rate" %>
+    %
+    <%- elif unit == "share_gov_outsourcing_exp" %>
+    % of government outsourcing expenditures
+    <%- elif unit == "share_gov_revenues" %>
+    % of government revenues
+    <%- elif unit == "share_gov_production_costs" %>
+    % of government production costs
+    <%- elif unit == "share_tax_revenue" %>
+    % of tax revenue
+    <%- endif %>
+
+  short_unit: |-
+    <% if unit == "ppp" %>
+    $
+    <%- else %>
+    %
+    <%- endif %>
+
+  short_description_unit: |-
+    <% if unit == "ppp" %>
+    This data is adjusted for differences in living costs between countries but not for inflation.
+    <%- elif unit == "share_gdp" %>
+    This data is divided by gross domestic product, expressed as a percentage.
+    <%- elif unit == "share_gov_exp" %>
+    This data is divided by total government expenditure, expressed as a percentage.
+    <%- elif unit == "share_investment" %>
+    This data is divided by total government investment, expressed as a percentage.
+    <%- elif unit == "share_potential_gdp" %>
+    This data is divided by potential GDP (GDP if the economy operated at its full potential), expressed as a percentage.
+    <%- elif unit == "share_gov_outsourcing_exp" %>
+    This data is divided by total government outsourcing expenditures, expressed as a percentage.
+    <%- elif unit == "share_gov_revenues" %>
+    This data is divided by total government revenues, expressed as a percentage.
+    <%- elif unit == "share_gov_production_costs" %>
+    This data is divided by total government production costs, expressed as a percentage.
+    <%- elif unit == "share_tax_revenue" %>
+    This data is divided by total tax revenue, expressed as a percentage.
+    <%- endif %>
+
+  num_decimal_places: |-
+    <% if unit == "ppp" %>
+    0
+    <%- else %>
+    1
+    <%- endif %>
+
+  key_general_government: General government consists of central, state and local governments and social security funds.
+
+  key_government_expenditure: General government expenditure includes goods and services consumed in a production process within the territory, compensation of employees, subsidies, property income, social benefits, capital transfers and investments, and other current expenditures.
+
+  key_government_revenue: General government revenue includes taxes, net social contributions, and grants and other revenues.
+
+  key_fiscal_balance: Fiscal balance is the difference between government revenues and expenditures. It is also referred to as net lending (+) or net borrowing (-) of general government.
+
+  key_gross_debt: General government gross debt refers to the total amount a government owes, including all financial obligations that require future payments, such as loans and bonds, but excluding assets or investments the government owns. It does not include shares, equity, or financial derivatives.
+
+  key_gross_debt_maastricht_definition: Under the Maastricht definition, gross debt is more narrowly defined, excluding pensions, financial derivatives, and other accounts payable, and is measured at nominal value rather than market value. It is named after the Maastricht Treaty, used to assess EU fiscal positions.
+
+  key_government_investment: General government investment mainly includes gross fixed capital formation, which is infrastructure for transport, office buildings, housing, schools and hospitals. It also includes expenditures in research and development.
+
+  key_government_net_interest_spending: Net interest spending is the difference between interest payments and interest receipts on general government debt. It is an inflexible part of public budgeting and has to be honoured to guarantee access to international financial markets and multilateral funds.
+
+  key_government_primary_balance: The primary balance is the difference between revenues and expenditures, excluding interest payments. It is a measure of the government's capacity to meet its obligations without borrowing.
+
+  key_government_structural_balance: The general government structural balance is a measure of the budget balance a government would have with its current policies if the economy was operating at its full potential ("potential GDP").
+
+  key_government_structural_primary_balance: The structural primary balance is the primary balance adjusted for the impact of net interest payments on government debts.
+
+  key_government_procurement_spending: General government procurement spending is the purchase of goods, services and works by the government. It is defined as the sum of the goods and services purchased by the government for its own use, gross fixed capital formation (infrastructure for transport, office buildings, housing, schools and hospitals), and social transfers in kind via market producers. Public corporations are excluded.
+
+  key_expenditures_on_government_outsourcing: Expenditures on general government outsourcing is the portion of government production costs used to buy goods and services from entities outside the government. This includes goods and services used by the government, financed by the government, and other production costs.
+
+  key_production_costs: Production costs of general government are public expenditures on the goods and services the government uses. These costs include wages for government employees and purchases of goods and services, like supplies for schools and hospitals. They do not include government spending that does not involve a purchase of a good or service, such as spending on social welfare, unemployment benefits, and other transfers. It also includes outsourcing, the costs of buying goods and services from entities outside of government, such as private companies and other agencies.
+
+  key_tax_revenues: Tax revenues are the compulsory unrequited payments made by economic entities to the general government. They include taxes on consumption, income, wealth, property and capital.
+
+  description_from_producer_expenditure: >-
+    General government expenditures data are from the
+    OECD National Accounts Statistics (database), which
+    are based on the System of National Accounts (SNA),
+    a set of internationally agreed concepts, definitions,
+    classifications and rules for national accounting. the
+    2008 SNA framework has been implemented by all
+    OECD countries. In SNA terminology, general
+    government consists of central, state and local
+    governments and social security funds. Expenditures
+    encompass intermediate consumption, compensation
+    of employees, subsidies, property income (including
+    interest spending), social benefits, other current
+    expenditures (mainly current transfers) and capital
+    expenditures (capital transfers and investments).
+    Gross domestic product (GDP) is the standard measure
+    of the value of the goods and services produced by
+    a country during a period. Government expenditures
+    per capita were calculated by converting total
+    government expenditures to USD using the OECD/
+    Eurostat purchasing power parities (PPP) for GDP
+    and dividing by population of the country. PPP is the
+    number of units of country B’s currency needed to buy
+    the same quantity of goods and services in country A.
+
+  description_from_producer_revenue: >-
+    Revenues data are derived from the OECD National
+    Account Statistics (database), which is based on the
+    System of National Accounts (SNA). the SNA provides a
+    set of internationally agreed concepts, classifications,
+    definitions and rules for national accounting. The
+    2008 SNA framework has been implemented by all
+    OECD countries. In SNA terminology, general
+    government is composed of central government,
+    state government, local government, and social
+    security funds. Revenues include taxes, net social
+    contributions and grants and other revenues. Gross
+    domestic product (GDP) is the standard measure of
+    the value of goods and services produced by a country
+    during a period. Government revenues per capita
+    were calculated by converting total revenues to USD
+    using the OECD/Eurostat purchasing power parity
+    (PPP) for GDP and dividing them by the population
+    of the country. PPP is the number of units of country
+    B’s currency needed to purchase the same quantity
+    of goods and services in country A.
+
+  description_from_producer_fiscal_balance: >-
+    Fiscal balance data are derived from the OECD National
+    Accounts Statistics (database), based on the System
+    of National Accounts (SNA), a set of internationally
+    agreed concepts, definitions, classifications and rules
+    for national accounting. The 2008 SNA framework
+    has been implemented by all OECD countries
+    . Using SNA terminology, general government
+    consists of central government, state government,
+    local government and social security funds.
+
+
+    Fiscal balance, also referred to as net lending (+) or net
+    borrowing (-) of general government, is calculated as
+    total government revenues minus total government
+    expenditures. Revenues encompass taxes, net social
+    contributions, and grants and other revenues.
+    Expenditures comprise intermediate consumption,
+    compensation of employees, subsidies, property
+    income (including interest spending), social benefits,
+    other current expenditures (mainly current transfers)
+    and capital expenditures (i.e. capital transfers and
+    investments).
+
+
+    The primary balance is the fiscal balance excluding net
+    interest payments on general government liabilities
+    (i.e. interest payments minus interest receipts). Gross
+    domestic product (GDP) is the standard measure of
+    the value of goods and services produced by a country
+    during a period.
+
+  description_from_producer_gross_debt: >-
+    Data are derived from the OECD National Accounts
+    Statistics (database) and the Eurostat Government
+    Finance Statistics (database), which are based on the
+    System of National Accounts (SNA). The 2008 SNA
+    framework has been implemented by all OECD
+    countries. Debt is defined as a specific
+    subset of liabilities identified according to the types of
+    financial instruments included or excluded. Generally,
+    it is defined as all liabilities that require payment or
+    payments of interest or principal by the debtor to
+    the creditor at a date or dates in the future. All debt
+    instruments are liabilities but some liabilities, such as
+    shares, equity, and financial derivatives, are not debt.
+    Debt is thus the sum of the following liability categories,
+    whenever available/applicable in the financial balance
+    sheet of the general government sector: currency and
+    deposits, debt securities, loans, and other liabilities
+    (i.e. insurance, pension and standardised guarantee
+    schemes, other accounts payable and, in some cases,
+    special drawing rights). According to the SNA, most
+    debt instruments are valued at market prices, when
+    appropriate (although some countries might not
+    apply this valuation, particularly for debt securities).
+    Countries’ treatment of government liabilities in
+    respect of their employee pension plans varies,
+    making international comparability difficult. Some
+    OECD countries, such as Australia, Canada, Colombia,
+    Iceland, New Zealand, Sweden and the United States,
+    record employment-related pension liabilities, funded
+    or unfunded, in government debt data. For those
+    countries, the government debt ratio is adjusted by
+    excluding these unfunded pension liabilities. Government debt
+    here is recorded on a gross basis, not adjusted by
+    the value of government-held assets. The SNA debt
+    definition used here differs from the definition applied
+    under the Maastricht Treaty, which is used to assess EU
+    fiscal positions.
+
+  description_from_producer_government_investment: >-
+    Data are from the OECD National Accounts Statistics
+    (database) based on the System of National Accounts
+    (SNA), a set of internationally agreed concepts,
+    definitions, classifications and rules for national
+    accounting. The 2008 SNA framework has been
+    implemented by all OECD countries.
+    General government investment includes gross
+    capital formation and acquisitions, less disposals of
+    non-produced nonfinancial assets. Gross fixed capital
+    formation (also called fixed investment) is the main
+    component of investment. For government, it mainly
+    consists of transport infrastructure but also includes
+    infrastructure such as office buildings, housing,
+    schools and hospitals. In the SNA 2008 framework,
+    expenditures in research and development have
+    also been included in fixed investment. Government
+    investments together with capital transfers
+    constitute the category of government capital
+    expenditures. Government consists of central, state
+    and local governments and social security funds.
+    State government is only applicable to the nine
+    OECD countries that are federal states: Australia,
+    Austria, Belgium, Canada, Germany, Mexico, Spain
+    (considered a quasi-federal country), Switzerland and
+    the United States.
+
+  description_from_producer_structural_balance: >-
+    Data are derived from the OECD Economic Outlook (database). the structural fiscal balance, or
+    underlying balance, represents the fiscal balance
+    as reported in the System of National Accounts (SNA)
+    framework adjusted for two factors: the state of the
+    economic cycle (as measured by the output gap) and
+    one-off fiscal operations. Potential GDP is not directly
+    observable, and estimates are subject to substantial
+    margins of error. One-off factors include both
+    exceptional and irregular fiscal transactions as well
+    as deviations from trend in net capital transfers. For
+    more details, see [Sources and methods of the OECD
+    Economic Outlook](www.oecd.org/eco/outlook/sourcesand-methods.htm).
+
+  description_from_producer_structural_primary_balance: >-
+    The general government structural primary balance is the
+    primary balance adjusted for the impact of net interest
+    payments on general government liabilities (i.e. interest
+    payments minus interest receipts).
+
+  description_from_producer_government_procurement_spending: >-
+    The size of general government procurement
+    spending is estimated using data from the OECD
+    National Accounts Statistics (database), based on the
+    System of National Accounts (SNA). General government
+    procurement is defined as the sum of intermediate
+    consumption (goods and services purchased by
+    governments for their own use, such as accounting or
+    information technology services), gross fixed capital
+    formation (acquisition of capital excluding sales of
+    fixed assets, such as building new roads) and social
+    transfers in kind via market producers (purchases by
+    general government of goods and services produced
+    by market producers and supplied to households).
+    Public corporations were excluded in the estimation of
+    procurement spending.
+
+  description_from_producer_expenditures_on_government_outsourcing: |-
+    The concept and methodology of government outsourcing, which is also part of production costs, builds on the classification of government expenditures in the System of National Accounts (SNA). In detail, government outsourcing costs include: The goods and services used by government. In SNA terms, this includes intermediate consumption (procurement of intermediate products required for government production such as accounting or information technology services). The goods and services financed by government. In SNA terms, this includes social transfers in kind via market producers paid for by government (including those that are initially paid for by citizens but are ultimately refunded by government, such as medical treatments refunded by public social security payments).
+
+  description_from_producer_production_costs: |-
+    The concept and methodology of production costs builds on the classification of government expenditures in the System of National Accounts (SNA). In detail, government production costs include: Compensation costs of government employees including cash and in-kind remuneration plus all mandatory employer (and imputed) contributions to social insurance and voluntary contributions paid on behalf of employees. The goods and services used by government, which are the first component of government outsourcing. In SNA terms, this includes intermediate consumption (procurement of intermediate products required for government production such as accounting or information technology services). The goods and services financed by government, which are the second component of government outsourcing. In SNA terms, this includes social transfers in kind via market producers paid for by government (including those that are initially paid for by citizens but are ultimately refunded by government, such as medical treatments refunded by public social security payments). Other production costs, which include the remaining components of consumption of fixed capital (depreciation of capital) and other taxes on production less other subsidies on production.
+
+  description_from_producer_tax_revenues: >-
+    Data on revenues are computed from the OECD
+    National Accounts Statistics (database), which are based
+    on the System of National Accounts (SNA). the 2008
+    SNA framework has been implemented by all OECD
+    countries. Revenues include taxes
+    (e.g. on consumption, income, wealth, property and
+    capital), net social contributions (i.e. contributions for
+    pensions, health and social security after deduction
+    of social insurance scheme service charges, where
+    applicable), sales of goods and services (e.g. market
+    output of government establishments, entrance
+    fees), and grants and other sources (e.g. current and
+    capital grants, property income, and subsidies). These
+    aggregates were constructed using sub-account
+    items. The definitions of tax
+    revenues differ between SNA and OECD Revenue
+    Statistics, especially regarding compulsory social
+    security contributions. In SNA, taxes are mandatory
+    unrequited payments, in cash or in kind, made by
+    institutional units to the government. Net social
+    contributions are actual or imputed payments to
+    social insurance schemes to make provision for
+    social benefits to be paid. These may be compulsory
+    or voluntary and funded or unfunded. OECD
+    Revenue Statistics treat compulsory social security
+    contributions as taxes, whereas the SNA considers
+    them net social contributions because the receipt of
+    social security benefits depends, in most countries,
+    upon appropriate contributions having been made,
+    even though the size of the benefit is not necessarily
+    related to the amount of the contributions.
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  title: OECD Government at a Glance
+  update_period_days: 365
+
+
+tables:
+  government_at_a_glance:
+    variables:
+      government_expenditure:
+        title: Government expenditure ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: The total amount of money the general government spends. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditure}"
+        display:
+          name: Government expenditure ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_expenditure_per_capita:
+        title: Government expenditure per capita ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: The total amount of money the general government spends per capita. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditure}"
+        display:
+          name: Government expenditure per capita ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_fiscal_balance:
+        title: Government fiscal balance ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "The difference between general government revenues and expenditure. {definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_government_revenue}"
+          - "{definitions.key_fiscal_balance}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_fiscal_balance}"
+        display:
+          name: Government fiscal balance ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_gross_debt:
+        title: Government gross debt ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: The total amount of money that a country's government has borrowed. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_gross_debt}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_gross_debt}"
+        display:
+          name: Government gross debt ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_gross_debt_per_capita:
+        title: Government gross debt per capita ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: The total amount of money that a country's government has borrowed per capita. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_gross_debt}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_gross_debt}"
+        display:
+          name: Government gross debt per capita ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_gross_debt__maastricht_definition:
+        title: Government gross debt (Maastricht definition) ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: The total amount of money that a country's government has borrowed according to the Maastricht definition. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_gross_debt}"
+          - "{definitions.key_gross_debt_maastricht_definition}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_gross_debt}"
+        display:
+          name: Government gross debt (Maastricht definition) ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_investment:
+        title: Government investment ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Government expenditure dedicated to investments. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_investment}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_government_investment}"
+        display:
+          name: Government investment ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_net_interest_spending:
+        title: Government net interest spending ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_net_interest_spending}"
+          - "{definitions.key_general_government}"
+        description_from_producer: ""
+        display:
+          name: Government net interest spending ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_primary_balance:
+        title: Government primary balance ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_government_revenue}"
+          - "{definitions.key_government_primary_balance}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_fiscal_balance}"
+        display:
+          name: Government primary balance ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_revenues:
+        title: Government revenues ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Total amount of money the general government collects. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_revenue}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_revenue}"
+        display:
+          name: Government revenues ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_revenues_per_capita:
+        title: Government revenues per capita ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: Total amount of money the general government collects per capita. {definitions.short_description_unit}
+        description_key:
+          - "{definitions.key_government_revenue}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_revenue}"
+        display:
+          name: Government revenues per capita ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_structural_balance:
+        title: Government structural balance ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_structural_balance}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_structural_balance}"
+        display:
+          name: Government structural balance ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_structural_primary_balance:
+        title: Government structural primary balance ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_primary_balance}"
+          - "{definitions.key_government_structural_primary_balance}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_structural_primary_balance}"
+        display:
+          name: Government structural primary balance ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_procurement_spending:
+        title: Government procurement spending ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_procurement_spending}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_government_procurement_spending}"
+        display:
+          name: Government procurement spending ({definitions.unit_human_readable})
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      expenditures_on_government_outsourcing_by_economic_transaction:
+        title: Expenditures on government outsourcing by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_expenditures_on_government_outsourcing}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditures_on_government_outsourcing}"
+        display:
+          name: Expenditures on government outsourcing by economic transaction - <<economic_transaction>>
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_expenditure_by_economic_transaction:
+        title: Government expenditure by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditure}"
+        display:
+          name: Government expenditure by economic transaction - <<economic_transaction>>
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_revenues_by_economic_transaction:
+        title: Government revenues by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_revenue}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_revenue}"
+        display:
+          name: Government revenues by economic transaction - <<economic_transaction>>
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      production_costs_by_economic_transaction:
+        title: Production costs by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_production_costs}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_production_costs}"
+        display:
+          name: Production costs by economic transaction - <<economic_transaction>>
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      tax_revenues_by_economic_transaction:
+        title: Tax revenues by economic transaction - <<economic_transaction>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "Government revenues that come from taxes. {definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_tax_revenues}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_tax_revenues}"
+        display:
+          name: Tax revenues by economic transaction - <<economic_transaction>>
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display

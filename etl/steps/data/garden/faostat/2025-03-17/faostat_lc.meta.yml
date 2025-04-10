@@ -1,0 +1,41 @@
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+# NOTE: You can modify all indicators' metadata below.
+# However, it is preferrable to change unit and short_unit in the custom_elements_and_units.csv.
+# After any modifications to the `custom_*.csv` files, remember to run the `faostat_metadata` garden step again.
+tables:
+  faostat_lc_flat:
+    variables:
+      artificial_surfaces__including_urban_and_associated_areas__00006970__area_from_cgls__005006__hectares:
+        description_key:
+          - Land cover information is based on maps from the European Copernicus Global Land Service (CGLS), with a spatial resolution of 100m.
+        display:
+          name: Area of artificial surfaces, including urban and associated areas
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Area from artificial surfaces, including urban and associated areas
+      inland_water_bodies__00006981__area_from_cgls__005006__hectares:
+        description_key:
+          - Land cover information is based on maps from the European Copernicus Global Land Service (CGLS), with a spatial resolution of 100m.
+        display:
+          name: Area of inland water bodies
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Area from inland water bodies
+      shrub_covered_areas__00006976__area_from_cci_lc__005008__hectares:
+        description_key:
+          - Land cover information is based on maps from the European Spatial Agency (ESA) Climate Change Initiative (CCI) produced by the Université catholique de Louvain (UCL)-Geomatics and now under the European Copernicus Program.
+        display:
+          name: Area of shrub-covered land
+          numDecimalPlaces: 2
+        presentation:
+          title_public: Area from shrub-covered land

@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: National Notifiable Diseases Surveillance System - Measles Historical
+    description: |-
+      Reported cases of measles by state, for the United States. The cases are split by those that are indigenous (those that were infected in the United States) and imported (those that were infected outside of the United States).
+
+      Cases have been transcribed from CDC Summaries of Notifiable Infectious Diseases and Conditions reports, which are available from the [CDC Stacks online repository](https://stacks.cdc.gov/gsearch?pid=cdc%3A49375&parentId=cdc%3A49375&genre=Annual%20Reports&start=0).
+    date_published: "2015"
+    # Citation
+    producer: Centers for Disease Control and Prevention
+    citation_full: |-
+      Centers for Disease Control and Prevention. National Notifiable Diseases Surveillance System (NNDSS) Annual Summary Data for years 2016-2022, United States, CDC WONDER online database. Accessed at http://wonder.cdc.gov/nndss-annual-summary.html on Jan 26, 2025 5:53:12 AM.
+    attribution_short: CDC
+    # Files
+    url_main: https://wonder.cdc.gov/controller/saved/D130/D422F203
+    date_accessed: 2025-03-26
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://wonder.cdc.gov/wonder/help/faq.html#8
+outs:
+  - md5: 425183f3594159428637846963fe915c
+    size: 58315
+    path: measles_state_level.csv

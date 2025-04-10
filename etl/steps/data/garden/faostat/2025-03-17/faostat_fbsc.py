@@ -31,6 +31,7 @@ from shared import (
     parse_amendments_table,
     prepare_long_table,
     prepare_wide_table,
+    sanity_check_custom_units,
 )
 
 from etl.helpers import PathFinder
@@ -233,6 +234,9 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[tb_long, tb_wide], default_metadata=ds_fbs.metadata, check_variables_metadata=False
     )
+
+    # Sanity check custom units.
+    sanity_check_custom_units(tb_wide=tb_wide, ds_garden=ds_garden)
 
     # Check that the title assigned here coincides with the one in custom_datasets.csv (for consistency).
     error = "Dataset title given to fbsc is different to the one in custom_datasets.csv. Update the latter file."

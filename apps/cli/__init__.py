@@ -167,7 +167,6 @@ GROUPS = (
                 "compare": "etl.compare.cli",
                 "update": "apps.step_update.cli.cli",
                 "archive": "apps.step_update.cli.archive_cli",
-                "explorer-update": "apps.explorer_update.cli.cli",
                 "pr": "apps.pr.cli.cli",
             },
         },

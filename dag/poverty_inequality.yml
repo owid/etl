@@ -108,14 +108,14 @@ steps:
     - data://meadow/wb/2025-03-10/thousand_bins_distribution
 
   # Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
-  data://meadow/cedlas/2024-03-08/sedlac:
-    - snapshot://cedlas/2024-03-08/sedlac_incomes.xlsx
-    - snapshot://cedlas/2024-03-08/sedlac_poverty.xlsx
-    - snapshot://cedlas/2024-03-08/sedlac_inequality.xlsx
-  data://garden/cedlas/2024-03-08/sedlac:
-    - data://meadow/cedlas/2024-03-08/sedlac
-  data://grapher/cedlas/2024-03-08/sedlac:
-    - data://garden/cedlas/2024-03-08/sedlac
+  data://meadow/cedlas/2025-04-01/sedlac:
+    - snapshot://cedlas/2025-04-01/sedlac_poverty.xlsx
+    - snapshot://cedlas/2025-04-01/sedlac_incomes.xlsx
+    - snapshot://cedlas/2025-04-01/sedlac_inequality.xlsx
+  data://garden/cedlas/2025-04-01/sedlac:
+    - data://meadow/cedlas/2025-04-01/sedlac
+  data://grapher/cedlas/2025-04-01/sedlac:
+    - data://garden/cedlas/2025-04-01/sedlac
 
   # OECD Affordable Housing Database - Homelessness
   data://meadow/oecd/2024-04-30/affordable_housing_database:

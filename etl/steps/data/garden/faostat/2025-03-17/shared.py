@@ -348,14 +348,8 @@ NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
 # Additional text to include in the metadata title of the output wide table.
 ADDED_TITLE_TO_WIDE_TABLE = " - Flattened table indexed by country-year."
 
-# Name of item, element and unit of FAO population (used to select population in the data).
-FAO_POPULATION_ITEM_NAME = "Population"
-FAO_POPULATION_ELEMENT_NAME = "Total Population - Both sexes"
-FAO_POPULATION_UNIT_NAME = "thousand Number"
 
 # Shared functions.
-
-
 def check_that_countries_are_well_defined(tb: Table) -> None:
     """Apply sanity checks related to the definition of countries.
 
@@ -632,11 +626,11 @@ def prepare_variable_description(item: str, element: str, item_description: str,
     description : str
         Variable description.
     """
-    description = f"Item: {item}\n"
+    description = f"Item: {item}\n\n"
     if len(item_description) > 0:
         description += f"Description: {item_description}\n"
 
-    description += f"\nMetric: {element}\n"
+    description += f"\nMetric: {element}\n\n"
     if len(element_description) > 0:
         description += f"Description: {element_description}"
 
@@ -1829,6 +1823,33 @@ def parse_amendments_table(amendments: Table, dataset_short_name: str):
     return amendments
 
 
+def sanity_check_custom_units(tb_wide: Table, ds_garden: Dataset) -> None:
+    # Get units and short units from the original wide table.
+    units_old = {c: tb_wide[c].m.unit for c in tb_wide.columns}
+    short_units_old = {c: tb_wide[c].m.short_unit for c in tb_wide.columns}
+
+    # Get new table (where metadata yaml has already been read and applied to each indicator)
+    tb_new = ds_garden[[table_name for table_name in ds_garden.table_names if table_name.endswith("_flat")][0]]
+    # Get units and short units from the new wide table.
+    units_new = {c: tb_new[c].m.unit for c in tb_new.columns}
+    short_units_old = {c: tb_new[c].m.short_unit for c in tb_new.columns}
+    assert units_old.keys() == units_new.keys()
+    assert short_units_old.keys() == short_units_old.keys()
+    for column, unit_old in units_old.items():
+        unit_new = units_new[column]
+        short_unit_old = short_units_old[column]
+        short_unit_new = short_units_old[column]
+        common_message = "Consider adding this custom definition to the `custom_elements_and_units.csv` file, anre then re-running the garden `faostat_metadata` step."
+        if unit_old != unit_new:
+            log.warning(
+                f"\nUnit changed after parsing the meta.yml file.\ncolumn: '{column}'\nold: '{unit_old}'\nnew: '{unit_new}'\n{common_message}"
+            )
+        if short_unit_old != short_unit_new:
+            log.warning(
+                f"\nShort unit changed after parsing the meta.yml file.\ncolumn: '{column}'\nold: '{short_unit_old}'\nnew: '{short_unit_new}'\n{common_message}"
+            )
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -1928,6 +1949,10 @@ def run(dest_dir: str) -> None:
         default_metadata=ds_meadow.metadata,
         check_variables_metadata=False,
     )
+
+    # Sanity check custom units.
+    sanity_check_custom_units(tb_wide=tb_wide, ds_garden=ds_garden)
+
     # Update dataset metadata.
     # The following description is not publicly shown in charts; it is only visible when accessing the catalog.
     ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions

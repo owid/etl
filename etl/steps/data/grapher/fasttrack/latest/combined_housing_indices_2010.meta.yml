@@ -1,0 +1,17 @@
+dataset:
+  title: DRAFT combined_housing_indices_2010
+  description: ''
+tables:
+  combined_housing_indices_2010:
+    variables:
+      rent_index__2010__100:
+        title: Rent index (2010 = 100)
+        unit: ''
+      house_price_index__2010__100:
+        title: House price index (2010 = 100)
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

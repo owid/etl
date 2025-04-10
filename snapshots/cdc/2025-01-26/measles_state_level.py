@@ -1,4 +1,7 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+Go to https://wonder.cdc.gov/controller/saved/D130/D422F203 and download the data to upload here.
+
+"""
 
 from pathlib import Path
 

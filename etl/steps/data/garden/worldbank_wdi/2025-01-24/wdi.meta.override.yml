@@ -405,6 +405,27 @@ tables:
           topic_tags:
             - Economic Growth
 
+      pa_nus_pppc_rf:
+        title: Price level ratio of PPP conversion factor (GDP) to market exchange rate
+        unit: ""
+        short_unit: ""
+        display:
+          name: GDP price levels relative to the US
+          numDecimalPlaces: 2
+          tolerance: 5
+        description_short: |-
+          Ratio of Purchasing Power Parity (PPP) conversion factor to market exchange rate.
+        description_key:
+          - It shows whether a country’s currency has more or less purchasing power than its exchange rate implies, compared to the United States.
+          - A value below one means local goods and services are cheaper than in the US, while a value above one suggests local prices are higher.
+          - These comparisons are based on PPP conversion rates (also called PPP conversion factors or PPP rates). PPP rates estimate how many units of a country’s local currency are needed to buy (roughly) the same basket of goods and services in that country that one US dollar would buy in the United States. For this indicator (at the level of [GDP](#dod:gdp)), the comparison is made using a broad, economy-wide basket of goods and services.
+          - PPP rates are calculated by the [International Comparison Program (ICP)](https://www.worldbank.org/en/programs/icp), which uses the United States as a benchmark country.
+          - This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
+        presentation:
+          attribution_short: World Bank
+          topic_tags:
+            - Economic Growth
+
       ####################################################################################################
 
       it_net_user_zs:
@@ -758,3 +779,13 @@ tables:
           topic_tags:
             - Hunger & Undernourishment
         processing_level: minor
+
+      ne_trd_gnfs_zs:
+        title: Trade (% of GDP)
+        unit: '% of GDP'
+        short_unit: '%'
+        description_short: |-
+          Trade in goods and services as a share of GDP, shown as a percentage.
+        description_key:
+          - This indicator measures a country’s total trade (exports and imports) relative to the size of its economy.
+          - Exports of goods and services represent the value of all goods and other market services provided to the rest of the world. Imports represent the value of all goods and other market services received from the rest of the world. In both cases, they include the value of merchandise, freight, insurance, transport, travel, royalties, license fees, and other services, such as communication, construction, financial, information, business, personal, and government services.

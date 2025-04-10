@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: SEDLAC (CEDLAS and The World Bank)
+    title: Socio-Economic Database for Latin America and the Caribbean (SEDLAC)
+    description: |-
+      The Socio-Economic Database for Latin America and the Caribbean (SEDLAC) includes statistics on poverty and other distributional and social variables from all Latin American and several Caribbean (LAC) countries. All statistics are computed from microdata from major household surveys carried out in these countries using a homogenous methodology (data permitting). Statistics are updated periodically.
+
+      SEDLAC allows users to monitor trends in poverty and other distributional and social indicators in the region. The dataset is available as Excel tables with information for each country/year, accompanied by graphs, maps, and reports.
+
+      The Center for Distributional, Labor and Social Studies (CEDLAS) of the Universidad Nacional de La Plata, in partnership with World Bank’s Poverty and Equity Group, have developed the Socio-Economic Database for Latin America and the Caribbean (SEDLAC) with the purpose of improving the timely access to key socio-economic statistics, including indicators on poverty, inequality, income, employment, access to services, education, health, housing, social programs, and numerous demographics.
+    title_snapshot: Socio-Economic Database for Latin America and the Caribbean (SEDLAC) - Inequality
+    citation_full: Socio-Economic Database for Latin America and the Caribbean (CEDLAS and The World Bank)
+    attribution_short: SEDLAC
+    url_main: https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/
+    url_download: https://www.cedlas.econo.unlp.edu.ar/wp/wp-content/uploads/2024_Act1_inequality_LAC.xlsx
+    date_accessed: '2025-04-01'
+    date_published: '2024-09-01'
+    license:
+      name: CC BY 4.0
+      url: https://www.cedlas.econo.unlp.edu.ar/wp/en/estadisticas/sedlac/estadisticas/
+outs:
+  - md5: 6bc72a4ab9b242b4fe66e0c4e0f14180
+    size: 2805480
+    path: sedlac_inequality.xlsx

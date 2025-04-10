@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Size of public procurement - Government at a glance indicators, Yearly updates"
+    description: |-
+      This dataset represents a selection of indicators as presented in the 2023 edition of the Government at a Glance publication related to the public procurement spending as estimated under the System of National Accounts (SNA). Government at a Glance provides a dashboard of indicators assembled to help decision makers and the public analyse and benchmark governments across OECD members and partner countries. This eighth edition provides internationally comparative data on a range of public governance, tools and practices to help identify both strengths and weaknesses in democratic governance. The Structure and indicators section of the Government at a Glance publication, describes its framework and the structure by chapters, as well as the changes compared to the previous 2021 edition. The 2023 edition presents a new structure around these three broad categories:
+
+      1) Trust and satisfaction with public services (trust in public institutions, satisfaction with public services);
+      2) Achieving results with good governance practices (governance of the policy cycle, regulatory governance, budgeting practices, managing public procurement, infrastructure planning and delivery, digital government and open government data);
+      3) What resources public institutions use and how are they managed (public finance, public employment, managing human resources).
+
+      Further information on Government at a Glance 2023 edition via a dedicated web platform, which includes a Government at a Glance Data dashboard (for a selection of indicators in an interactive format) as well as Country fact sheets (key data by country), can be found at: [Government at a Glance website](https://www.oecd.org/en/publications/2023/06/government-at-a-glance-2023_da193b0d.html).
+    date_published: "2025-02-12"
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2025). Size of public procurement - Government at a glance indicators, Yearly updates. OECD Data Explorer, https://data-explorer.oecd.org/.
+    attribution_short: OECD
+
+    # Files
+    url_main: https://data-explorer.oecd.org/
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.GOV.GIP,DSD_GOV@DF_GOV_PPROC_YU,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: 2025-03-27
+
+    # License
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+
+outs:
+  - md5: b2638067b518d6097413e05a05956169
+    size: 827135
+    path: govt_glance_size_public_procurement.csv

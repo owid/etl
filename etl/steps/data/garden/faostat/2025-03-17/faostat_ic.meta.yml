@@ -1,0 +1,25 @@
+dataset:
+  update_period_days: 365
+
+definitions:
+  common:
+    processing_level: major
+    presentation:
+      topic_tags:
+        - Agricultural Production
+      attribution_short: FAO
+
+# NOTE: You can modify all indicators' metadata below.
+# However, it is preferrable to change unit and short_unit in the custom_elements_and_units.csv.
+# After any modifications to the `custom_*.csv` files, remember to run the `faostat_metadata` garden step again.
+# tables:
+#   faostat_ic_flat:
+#     variables:
+#       credit_to_agriculture__forestry_and_fishing__00023068__agriculture_orientation_index_usd__006159:
+#         description_short: |-
+#           A value greater than 1 means the agriculture sector receives a higher share of government spending relative to its economic value. A value less than 1 reflects a lower orientation to agriculture.
+#         display:
+#           name: "Agriculture orientation index: Credit to agriculture, forestry and fishing"
+#           numDecimalPlaces: 2
+#         presentation:
+#           title_public: "Agriculture orientation index: Credit to agriculture, forestry and fishing"

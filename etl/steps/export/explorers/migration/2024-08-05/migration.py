@@ -1,13 +1,10 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 
-from pathlib import Path
-
 import pandas as pd
 from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
 
 from etl.collections.explorer_legacy import ExplorerLegacy
 from etl.helpers import PathFinder
-from etl.paths import EXPLORERS_DIR
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -57,18 +54,16 @@ def run(dest_dir: str) -> None:
     # try to get map brackets from old explorer - only if USE_EXISTING_MAP_BRACKETS is True
     # code left in for eventual update of explorer - might need to change expl_path if explorer is renamed
     if USE_EXISTING_MAP_BRACKETS:
-        expl_path = (Path(EXPLORERS_DIR) / paths.short_name).with_suffix(".explorer.tsv")
-        if expl_path.exists():
-            old_explorer = ExplorerLegacy.from_owid_content(paths.short_name)
-            df_columns = old_explorer.df_columns
-            for _, row in df_columns.iterrows():
-                var_title = row["slug"]
-                if var_title in MAP_BRACKETS.keys() and "ColorScaleNumericBins" in row.keys():
-                    MAP_BRACKETS[var_title]["colorScaleNumericBins"] = [
-                        float(bracket) for bracket in row["colorScaleNumericBins"].split(";")
-                    ]
-                if var_title in MAP_BRACKETS.keys() and "ColorScaleScheme" in row.keys():
-                    MAP_BRACKETS[var_title]["colorScaleScheme"] = row["colorScaleScheme"]
+        old_explorer = ExplorerLegacy.from_db(paths.short_name)
+        df_columns = old_explorer.df_columns
+        for _, row in df_columns.iterrows():
+            var_title = row["slug"]
+            if var_title in MAP_BRACKETS.keys() and "ColorScaleNumericBins" in row.keys():
+                MAP_BRACKETS[var_title]["colorScaleNumericBins"] = [
+                    float(bracket) for bracket in row["colorScaleNumericBins"].split(";")
+                ]
+            if var_title in MAP_BRACKETS.keys() and "ColorScaleScheme" in row.keys():
+                MAP_BRACKETS[var_title]["colorScaleScheme"] = row["colorScaleScheme"]
 
     #
     # Process data.
