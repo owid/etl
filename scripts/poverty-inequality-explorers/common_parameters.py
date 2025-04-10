@@ -34,9 +34,9 @@ Y_AXIS_MIN = 0
 ####################################################################################################
 # WORLD BANK POVERTY AND INEQUALITY PLATFORM
 ####################################################################################################
-SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2025)"
+SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2024)"
 # TODO: Update the PIP versions here
-DATA_PUBLISHED_BY_PIP = "World Bank (2025). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/."
+DATA_PUBLISHED_BY_PIP = "World Bank (2024). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/."
 SOURCE_LINK_PIP = "https://pip.worldbank.org"
 CONSUMPTION_SPELLS_PIP = 7
 INCOME_SPELLS_PIP = 8
