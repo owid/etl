@@ -365,6 +365,8 @@ def run():
             "eggs per bird",
             "eggs",
         ]
+        from owid.catalog.utils import underscore
+
         for column in tb.drop(columns=["country", "year"]).columns:
             item, item_code, element, element_code, unit = sum(
                 [[j.strip() for j in i.split("|")] for i in tb[column].metadata.title.split("||")], []
@@ -380,9 +382,9 @@ def run():
                 else:
                     raise ValueError(f"Unexpected unit {unit}")
                 tb[column].metadata.dimensions = {
-                    "food": item,
-                    "metric": element,
-                    "unit": unit,
+                    "food": underscore(item),
+                    "metric": underscore(element),
+                    "unit": underscore(unit, validate=False),
                     "per_capita": True if "pc" in element_code else False,
                 }
                 tb[column].metadata.original_short_name = column
@@ -400,11 +402,13 @@ def run():
     config_new = expand_config(
         [tb_qcl, tb_fbsc],
         default_view={
-            "food": "Apples",
-            "metric": "Area harvested",
+            "food": "maize",
+            "metric": "production",
             "unit": "",
             "per_capita": "False",
         },
+        humanize_dimension_names=True,
+        common_view_config={"tab": "map"}
     )
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]

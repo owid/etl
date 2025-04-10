@@ -1,7 +1,7 @@
 """Common tooling for MDIMs/Explorers."""
 
 from copy import deepcopy
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
 import pandas as pd
 from owid.catalog import Table
@@ -72,6 +72,42 @@ def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv
         return {indicator.catalogPath: indicator.id for indicator in db_indicators}
 
 
+def _humanize_dimension_names(dimension, transformation, replacements):
+    for field, value in dimension.items():
+        if field == "name":
+            if value in replacements:
+                dimension["name"] = replacements[value]
+            else:
+                dimension["name"] = transformation(value)
+        if field == "choices":
+            for choice in value:
+                _humanize_dimension_names(choice, transformation=transformation, replacements=replacements)
+
+
+def default_slug_name_transformation(slug):
+    """Default transformation of machine-readable slugs, e.g. "area_harvested", into human-readable dimension names, e.g. "Area harvested"."""
+    return slug.replace("_", " ").capitalize()
+
+
+def humanize_dimension_names_in_config(
+    config: Dict[str, Any],
+    transformation: Optional[Callable[[str], str]] = None,
+    replacements: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
+    """Transform all machine-readable slugs, e.g. "area_harvested" into human-readable names, e.g. "Area harvested"."""
+    if transformation is None:
+        transformation = default_slug_name_transformation
+
+    if replacements is None:
+        replacements = dict()
+
+    config_new = deepcopy(config)
+    for dimension in config_new["dimensions"]:
+        _humanize_dimension_names(dimension, transformation=transformation, replacements=replacements)
+
+    return config_new
+
+
 def expand_config(
     tb: Union[Table, List[Table]],
     indicator_names: Optional[Union[str, List[str]]] = None,
@@ -81,6 +117,9 @@ def expand_config(
     indicators_slug: Optional[str] = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
     default_view: Optional[Dict[str, Any]] = None,
+    humanize_dimension_names: bool = False,
+    dimension_names_transformation: Optional[Callable[[str], str]] = None,
+    dimension_names_replacements: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
 
@@ -243,6 +282,13 @@ def expand_config(
                 break
         if not _default_view_set:
             log.warning("Default view not found.")
+
+    if humanize_dimension_names:
+        config_partial = humanize_dimension_names_in_config(
+            config=config_partial,
+            transformation=dimension_names_transformation,
+            replacements=dimension_names_replacements,
+        )
 
     return config_partial
 
