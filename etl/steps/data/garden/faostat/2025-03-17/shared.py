@@ -1714,10 +1714,68 @@ def prepare_wide_table(tb: Table) -> Table:
         unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
+    def prepare_public_titles(item: str, element: str, unit: str) -> str:
+        # Find whether unit is per capita.
+        # TODO: Instead of this, create a separate function to edit metadata (based on codes), and consider removing metadata from the yaml.
+        # TODO: Add description short.
+        per_capita = True if "capita" in unit else False
+        if element in ["Production", "Yield", "Imports", "Exports"] and unit.startswith("tonnes"):
+            title = f"{item} {element.lower()}"
+            if per_capita:
+                title = "Per capita " + title.lower()
+        elif element == "Yield" and unit == "tonnes per hectare":
+            title = f"{item} yield"
+        elif element == "Area harvested" and unit.startswith("hectares"):
+            title = f"Land used for {item.lower()} production"
+            if per_capita:
+                title = title + " per capita"
+        elif element == "Food available for consumption" and unit == "kilograms per year per capita":
+            title = f"Per capita {item.lower()} supply per year"
+        elif element == "Food available for consumption" and unit == "grams per day":
+            title = f"Per capita {item.lower()} supply per day"
+        elif element == "Food available for consumption" and unit == "kilocalories per day":
+            title = f"Per capita kilocalorie supply from {item.lower()} per day"
+        elif element == "Food available for consumption" and unit == "grams of protein per day per capita":
+            title = f"Per capita protein supply from {item.lower()} per day"
+        elif element == "Food available for consumption" and unit == "grams of fat per day per capita":
+            title = f"Per capita fat supply from {item.lower()} per day"
+        elif element == "Food" and unit.startswith("tonnes"):
+            title = f"{item} used for direct human food"
+            if per_capita:
+                title = title + " per capita"
+        elif element == "Feed" and unit.startswith("tonnes"):
+            title = f"{item} used for animal feed"
+            if per_capita:
+                title = title + " per capita"
+        elif element == "Other uses" and unit.startswith("tonnes"):
+            title = f"{item} allocated to other uses"
+            if per_capita:
+                title = title + " per capita"
+        elif element == "Waste in supply chain" and unit.startswith("tonnes"):
+            title = f"{item} wasted in supply chains"
+            if per_capita:
+                title = title + " per capita"
+        elif element == "Domestic supply" and unit.startswith("tonnes"):
+            title = f"Domestic supply of {item.lower()}"
+            if per_capita:
+                title = "Per capita " + title.lower()
+        elif element == "Producing or slaughtered animals" and item.lower().startswith(
+            ("meat", "fat", "offals", "skins")
+        ):
+            product = item.lower().split(",")[0]
+            animal = item.lower().replace(f"{product},", "").strip().lower()
+            if animal == "total":
+                animal == "all"
+            title = f"Animals slaughtered {'per capita ' if per_capita else ''}to produce {animal} {product}"
+        else:
+            title = f"{item} - {element} ({unit})"
+
+        return title
+
     # Construct a human-readable variable display name (which will be shown in grapher charts).
     tb["variable_display_name"] = dataframes.apply_on_categoricals(
         [tb.item, tb.element, tb.unit],
-        lambda item, element, unit: f"{item} - {element} ({unit})",
+        lambda item, element, unit: prepare_public_titles(item=item, element=element, unit=unit),
     )
 
     if "item_description" in tb.columns:
