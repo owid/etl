@@ -6,6 +6,10 @@ definitions:
         - Vaccination
       grapher_config:
         originUrl: ourworldindata.org/vaccination
+  description_key_common: &description_key_common
+    - Vaccines included in a country’s vaccination program are those that are provided and recommended through routine services.
+    - They may or may not be mandatory and their coverage rates may vary widely.
+    - When countries do not have a vaccine in their schedule, this does not necessarily mean that the vaccine is completely unavailable in those countries, as it may be available commercially.
   vaccine_name: |-
     <% if description == "Seasonal Influenza vaccine" %>
     seasonal influenza vaccine
@@ -24,7 +28,7 @@ definitions:
     <%- elif description == "Hib (Haemophilus influenzae type B) vaccine" %>
     Haemophilus influenzae type B vaccine (Hib)
     <%- elif description == "HepB birth dose" %>
-    hepatitis B birth dose (HEPB_BD)
+    hepatitis B birth dose
     <%- elif description == "IPV (Inactivated polio vaccine) 2nd dose" %>
     inactivated polio vaccine second dose (IPV2)
     <%- elif description == "Meningococcal meningitis vaccines (all strains)" %>
@@ -36,9 +40,9 @@ definitions:
     <%- elif description == "Japanese Encephalitis" %>
     Japanese encephalitis vaccine
     <%- elif description == "Varicella vaccine" %>
-    chickenpox vaccine (Varicella) vaccine
+    chickenpox vaccine
     <%- elif description == "aP (acellular pertussis) vaccine" %>
-    pertussis vaccine (aP)
+    acellular pertussis vaccine
     <%- elif description == "Hepatitis A vaccine" %>
     hepatitis A vaccine
     <%- elif description == 'Typhoid' %>
@@ -82,15 +86,15 @@ definitions:
     <%- elif description == "Japanese Encephalitis" %>
     Japanese encephalitis vaccine
     <%- elif description == "Varicella vaccine" %>
-    Chickenpox vaccine (Varicella)
+    Chickenpox vaccine
     <%- elif description == "aP (acellular pertussis) vaccine" %>
-    Pertussis vaccine (aP)
+    Acellular pertussis vaccine (aP)
     <%- elif description == "Hepatitis A vaccine" %>
     Hepatitis A vaccine
     <%- elif description == 'Typhoid vaccine' %>
     Typhoid vaccine
     <%- elif description == "HPV (Human Papilloma Virus) vaccine" %>
-    Human papillomavirus  (HPV)
+    Human papillomavirus (HPV)
     <%- elif description == "Rotavirus vaccine" %>
     Rotavirus
     <%- elif description == "Malaria vaccine" %>
@@ -152,11 +156,12 @@ tables:
   vaccination_introductions:
     variables:
       intro:
-        title: Vaccination introduction for the {definitions.vaccine_name}
-        description_short: The introduction status of {definitions.vaccine_name} vaccination schedule.
+        title: Which countries include the {definitions.vaccine_name} in their national vaccination programs?
+        description_short: Countries including {definitions.vaccine_name} in their national vaccination program.
         unit: ""
         description_key:
           - "{definitions.vaccine_description_key}"
+          - *description_key_common
   vaccination_introductions_sum:
     variables:
       countries:
@@ -165,6 +170,7 @@ tables:
         unit: "countries"
         description_key:
           - "{definitions.vaccine_description_key}"
+          - *description_key_common
         presentation:
           title_public: Number of countries administering {definitions.vaccine_name}
         display:
