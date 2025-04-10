@@ -1,5 +1,5 @@
 # TODO: Change the slug of this explorer
-# # Poverty Data Explorer of World Bank data: 2017 vs 2021 prices
+# # Poverty Data Explorer of World Bank data: PPP prices
 # This code creates the tsv file for the PPP comparison explorer from the World Bank PIP data, available [here](https://ourworldindata.org/explorers/poverty-explorer-ppp-comparison)
 
 import textwrap
