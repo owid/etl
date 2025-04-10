@@ -68,6 +68,8 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP
 
 notes_title = NOTES_TITLE_PIP
 
+ppp_year = PPP_VERSION_CURRENT_PIP
+
 processing_description = PROCESSING_DESCRIPTION_PIP
 ppp_description = PPP_DESCRIPTION_PIP_CURRENT
 relative_poverty_description = RELATIVE_POVERTY_DESCRIPTION_PIP
@@ -151,7 +153,7 @@ for survey in range(len(survey_type)):
                 processing_description,
             ]
         )
-        df_tables.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
         df_tables.loc[j, "shortUnit"] = "$"
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = (
@@ -175,7 +177,7 @@ for survey in range(len(survey_type)):
                 processing_description,
             ]
         )
-        df_tables.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
         df_tables.loc[j, "shortUnit"] = "$"
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = povlines_abs.scale_total_shortfall[p]
@@ -198,7 +200,7 @@ for survey in range(len(survey_type)):
                 processing_description,
             ]
         )
-        df_tables.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
         df_tables.loc[j, "shortUnit"] = "$"
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = povlines_abs.scale_avg_shortfall[p]
@@ -355,7 +357,7 @@ for survey in range(len(survey_type)):
                 processing_description,
             ]
         )
-        df_tables.loc[j, "unit"] = "international-$ in 2017 prices"
+        df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
         df_tables.loc[j, "shortUnit"] = "$"
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = povlines_rel.scale_avg_shortfall[pct]
@@ -527,7 +529,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = f"{povlines_abs.subtitle[p]}"
         df_graphers.loc[j, "note"] = (
-            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -547,7 +549,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = f"{povlines_abs.subtitle[p]}"
         df_graphers.loc[j, "note"] = (
-            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -567,7 +569,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = f"{povlines_abs.subtitle_total_shortfall[p]}"
         df_graphers.loc[j, "note"] = (
-            "This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. The cost of closing the poverty gap does not take into account costs and inefficiencies from making the necessary transfers."
+            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. The cost of closing the poverty gap does not take into account costs and inefficiencies from making the necessary transfers."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -587,7 +589,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = f"{povlines_abs.subtitle_avg_shortfall[p]}"
         df_graphers.loc[j, "note"] = (
-            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -607,7 +609,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = f"{povlines_abs.subtitle_income_gap_ratio[p]}"
         df_graphers.loc[j, "note"] = (
-            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -629,7 +631,7 @@ for survey in range(len(survey_type)):
             f"The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
         )
         df_graphers.loc[j, "note"] = (
-            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -653,7 +655,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -676,7 +678,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -699,7 +701,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        "This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. The cost of closing the poverty gap does not take into account costs and inefficiencies from making the necessary transfers."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. The cost of closing the poverty gap does not take into account costs and inefficiencies from making the necessary transfers."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -722,7 +724,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        "This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -745,7 +747,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        "This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -766,7 +768,7 @@ for survey in range(len(survey_type)):
     df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
     df_graphers.loc[j, "subtitle"] = ""
     df_graphers.loc[j, "note"] = (
-        "This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries."
+        f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -834,7 +836,7 @@ for survey in range(len(survey_type)):
             f"This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {povlines_rel.text[pct]} {survey_type.text[survey]}."
         )
         df_graphers.loc[j, "note"] = (
-            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -858,7 +860,7 @@ for survey in range(len(survey_type)):
             f"This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {povlines_rel.text[pct]} {survey_type.text[survey]}, averaged across the population in poverty."
         )
         df_graphers.loc[j, "note"] = (
-            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -882,7 +884,7 @@ for survey in range(len(survey_type)):
             f'This is the average shortfall expressed as a share of the poverty line, sometimes called the "income gap ratio". It captures the depth of poverty of those living on less than {povlines_rel.text[pct]} {survey_type.text[survey]}'
         )
         df_graphers.loc[j, "note"] = (
-            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -904,7 +906,7 @@ for survey in range(len(survey_type)):
             f"The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line)."
         )
         df_graphers.loc[j, "note"] = (
-            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -1012,7 +1014,7 @@ df_graphers["note"] = df_graphers["note"].str.replace(
 # Select one default view
 df_graphers.loc[
     (df_graphers["ySlugs"] == "headcount_ratio_215")
-    & (df_graphers["tableSlug"] == "income_consumption_2017")
+    & (df_graphers["tableSlug"] == f"income_consumption_{ppp_year}")
     & (df_graphers["Show breaks between less comparable surveys Checkbox"] == "false"),
     ["defaultView"],
 ] = "true"

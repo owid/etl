@@ -415,6 +415,8 @@ new_line = NEW_LINE
 additional_description = ADDITIONAL_DESCRIPTION_WID
 ppp_description = PPP_DESCRIPTION_WID
 
+ppp_year = PPP_YEAR_WID
+
 df_tables_wid = pd.DataFrame()
 j = 0
 
@@ -438,7 +440,7 @@ for tab in range(len(merged_tables)):
                 additional_description,
             ]
         )
-        df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+        df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
         df_tables_wid.loc[j, "shortUnit"] = "$"
         df_tables_wid.loc[j, "type"] = "Numeric"
         # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_mean"][wel]
@@ -456,7 +458,7 @@ for tab in range(len(merged_tables)):
                 additional_description,
             ]
         )
-        df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+        df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
         df_tables_wid.loc[j, "shortUnit"] = "$"
         df_tables_wid.loc[j, "type"] = "Numeric"
         # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_median"][wel]
@@ -475,7 +477,7 @@ for tab in range(len(merged_tables)):
                     additional_description,
                 ]
             )
-            df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+            df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
             df_tables_wid.loc[j, "shortUnit"] = "$"
             df_tables_wid.loc[j, "type"] = "Numeric"
             # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_deciles9["scale_thr"][
@@ -496,7 +498,7 @@ for tab in range(len(merged_tables)):
                     additional_description,
                 ]
             )
-            df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+            df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
             df_tables_wid.loc[j, "shortUnit"] = "$"
             df_tables_wid.loc[j, "type"] = "Numeric"
             # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_deciles10["scale_avg"][
@@ -540,7 +542,7 @@ for tab in range(len(merged_tables)):
                     additional_description,
                 ]
             )
-            df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+            df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
             df_tables_wid.loc[j, "shortUnit"] = "$"
             df_tables_wid.loc[j, "type"] = "Numeric"
             # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_mean"][
@@ -565,7 +567,7 @@ for tab in range(len(merged_tables)):
                     additional_description,
                 ]
             )
-            df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+            df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
             df_tables_wid.loc[j, "shortUnit"] = "$"
             df_tables_wid.loc[j, "type"] = "Numeric"
             # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_median"][
@@ -591,7 +593,7 @@ for tab in range(len(merged_tables)):
                         additional_description,
                     ]
                 )
-                df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+                df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
                 df_tables_wid.loc[j, "shortUnit"] = "$"
                 df_tables_wid.loc[j, "type"] = "Numeric"
                 # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_deciles9[
@@ -617,7 +619,7 @@ for tab in range(len(merged_tables)):
                         additional_description,
                     ]
                 )
-                df_tables_wid.loc[j, "unit"] = f"international-$ in {PPP_YEAR_WID} prices"
+                df_tables_wid.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
                 df_tables_wid.loc[j, "shortUnit"] = "$"
                 df_tables_wid.loc[j, "type"] = "Numeric"
                 # df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_deciles10[

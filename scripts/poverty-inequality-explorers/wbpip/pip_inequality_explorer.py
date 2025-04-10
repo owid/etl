@@ -70,6 +70,8 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP
 
 notes_title = NOTES_TITLE_PIP
 
+ppp_year = PPP_VERSION_CURRENT_PIP
+
 processing_description = PROCESSING_DESCRIPTION_PIP
 relative_poverty_description = RELATIVE_POVERTY_DESCRIPTION_PIP
 
@@ -478,7 +480,7 @@ df_graphers["subtitle"] = df_graphers["subtitle"].str.replace(
 df_graphers.loc[
     (df_graphers["ySlugs"] == "gini")
     & (df_graphers["Show breaks between less comparable surveys Checkbox"] == "false")
-    & (df_graphers["tableSlug"] == "income_consumption_2017"),
+    & (df_graphers["tableSlug"] == f"income_consumption_{ppp_year}"),
     ["defaultView"],
 ] = "true"
 

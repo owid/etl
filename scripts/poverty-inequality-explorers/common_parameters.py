@@ -42,7 +42,16 @@ CONSUMPTION_SPELLS_PIP = 7
 INCOME_SPELLS_PIP = 8
 
 # Define PPP versions
+# TODO: Update the PPP versions here
 PPP_VERSIONS_PIP = [2011, 2017]
+
+# Define old and current PPP version
+PPP_VERSION_OLD_PIP = PPP_VERSIONS_PIP[0]
+PPP_VERSION_CURRENT_PIP = PPP_VERSIONS_PIP[1]
+
+# Define PPP to use for comparisons
+# NOTE: Update the PPP version here
+PPP_VERSION_COMPARISON_PIP = PPP_VERSION_OLD_PIP
 
 
 INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
@@ -122,7 +131,7 @@ DATA_PUBLISHED_BY_WID = "World Inequality Database (WID), https://wid.world"
 SOURCE_LINK_WID = "https://wid.world"
 
 # NOTE: Also update the year here: https://docs.google.com/spreadsheets/d/1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI/edit#gid=329774797
-PPP_YEAR_WID = 2023
+PPP_VERSION_WID = 2023
 
 ADDITIONAL_DESCRIPTION_WID = NEW_LINE.join(
     [
@@ -143,6 +152,9 @@ PPP_DESCRIPTION_WID = f"The data is measured in international-$ at {PPP_YEAR_WID
 SOURCE_NAME_LIS = "Luxembourg Income Study (2024)"
 DATA_PUBLISHED_BY_LIS = "Luxembourg Income Study (LIS) Database, http://www.lisdatacenter.org (multiple countries; December 2024). Luxembourg: LIS."
 SOURCE_LINK_LIS = "https://www.lisdatacenter.org/our-data/lis-database/"
+
+# NOTE: Also update the year here: https://docs.google.com/spreadsheets/d/1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI/edit#gid=329774797
+PPP_VERSION_LIS = 2017
 
 NOTES_TITLE_LIS = "NOTES ON HOW WE PROCESSED THIS INDICATOR"
 
