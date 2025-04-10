@@ -8,6 +8,9 @@ import pandas as pd
 
 from ..common_parameters import *
 
+# Define ppp year
+ppp_year = PPP_VERSION_CURRENT_PIP
+
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each poverty line or survey type.
 
@@ -15,7 +18,7 @@ from ..common_parameters import *
 sheet_id = "17KJ9YcvfdmO_7-Sv2Ij0vmzAQI6rXSIqHfJtgFHN-a8"
 
 # Absolute poverty sheet
-sheet_name = "povlines_abs"
+sheet_name = f"povlines_abs_{ppp_year}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 povlines_abs = pd.read_csv(url, dtype={"dollars_text": "str"})
 
@@ -25,7 +28,7 @@ url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sh
 povlines_rel = pd.read_csv(url)
 
 # Survey type sheet
-sheet_name = "survey_type"
+sheet_name = f"survey_type_{ppp_year}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 survey_type = pd.read_csv(url)
 
@@ -68,7 +71,6 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP
 
 notes_title = NOTES_TITLE_PIP
 
-ppp_year = PPP_VERSION_CURRENT_PIP
 
 processing_description = PROCESSING_DESCRIPTION_PIP
 ppp_description = PPP_DESCRIPTION_PIP_CURRENT

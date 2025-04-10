@@ -8,6 +8,9 @@ import pandas as pd
 
 from ..common_parameters import *
 
+# Define ppp year
+ppp_year = PPP_VERSION_CURRENT_PIP
+
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each poverty line or survey type.
 
@@ -30,7 +33,7 @@ url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sh
 income_aggregation = pd.read_csv(url, keep_default_na=False, dtype={"multiplier": "str"})
 
 # Survey type sheet
-sheet_name = "survey_type"
+sheet_name = f"survey_type_{ppp_year}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 survey_type = pd.read_csv(url)
 
@@ -73,7 +76,6 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP
 
 notes_title = NOTES_TITLE_PIP
 
-ppp_year = PPP_VERSION_CURRENT_PIP
 
 processing_description = PROCESSING_DESCRIPTION_PIP
 ppp_description = PPP_DESCRIPTION_PIP_CURRENT

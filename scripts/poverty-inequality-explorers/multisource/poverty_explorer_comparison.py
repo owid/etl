@@ -6,6 +6,9 @@ import pandas as pd
 
 from ..common_parameters import *
 
+# NOTE: Define this for LIS and PIP, to have a common PPP year
+ppp_year_pip_lis = PPP_VERSION_COMPARISON_PIP
+
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each type of welfare measure or tables considered.
 
@@ -41,11 +44,6 @@ sheet_name = "equivalence_scales"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 lis_equivalence_scales = pd.read_csv(url, keep_default_na=False)
 
-# Absolute poverty sheet
-sheet_name = "povlines_abs"
-url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
-lis_povlines_abs = pd.read_csv(url, dtype={"dollars_text": "str"})
-
 # Relative poverty sheet
 sheet_name = "povlines_rel"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
@@ -61,7 +59,7 @@ url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sh
 pip_tables = pd.read_csv(url)
 
 # Absolute poverty sheet
-sheet_name = "povlines_abs"
+sheet_name = f"povlines_abs_{ppp_year_pip_lis}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 pip_povlines_abs = pd.read_csv(url, dtype={"dollars_text": "str"})
 
@@ -119,8 +117,6 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP_COMPARISON
 
 notes_title = NOTES_TITLE_PIP
 
-# NOTE: Define this for LIS and PIP, to have a common PPP year
-ppp_year_pip_lis = PPP_VERSION_COMPARISON_PIP
 
 processing_description = PROCESSING_DESCRIPTION_PIP_POVERTY
 ppp_description = PPP_DESCRIPTION_PIP_CURRENT

@@ -42,7 +42,7 @@ url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sh
 povlines_rel = pd.read_csv(url)
 
 # Survey type sheet
-sheet_name = "survey_type"
+sheet_name = f"survey_type_{ppp_year_old}_{ppp_year_current}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 survey_type = pd.read_csv(url)
 
