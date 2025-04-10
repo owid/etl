@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "hasMapTab": True,
-    # "hasChartTab": False,
+    "chartTypes": [],
     "tab": "map",
     "map": {
         "colorScale": {
