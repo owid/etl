@@ -161,7 +161,7 @@ tables:
         unit: ""
         description_key:
           - "{definitions.vaccine_description_key}"
-          - "{definitions.description_key_common}"
+          - *description_key_common
   vaccination_introductions_sum:
     variables:
       countries:
@@ -170,7 +170,7 @@ tables:
         unit: "countries"
         description_key:
           - "{definitions.vaccine_description_key}"
-          - "{definitions.description_key_common}"
+          - *description_key_common
         presentation:
           title_public: Number of countries administering {definitions.vaccine_name}
         display:
