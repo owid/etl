@@ -110,6 +110,7 @@ def run() -> None:
     for rel_ind, abs_ind in ind.items():
         tb.loc[tb["country"].isin(REGIONS), rel_ind] = tb[abs_ind] / tb["population"] * 100
 
+    # dropping age standardized totals, since they are not needed/ misleading
     tb = tb.drop(columns=["cig_smokers_age_std", "tobacco_smokers_age_std", "tobacco_users_age_std", "population"])
 
     tb["cig_smokers"] = tb["cig_smokers"].copy_metadata(tb["cig_smoking_pct"])
