@@ -292,10 +292,6 @@ ELEMENT_CODES_QCL = [
 ]
 # List of element codes to consider from faostat_fbsc.
 ELEMENT_CODES_FBSC = [
-    "000645",
-    "000664",
-    "000674",
-    "000684",
     "005072",
     "005123",
     "005131",
@@ -325,6 +321,15 @@ ELEMENT_CODES_FBSC = [
     "5911pc",
     # The following element code is for population.
     "000511",
+    # Indicators initially given by FAOSTAT as per capita, and converted to total by OWID:
+    # Food supply quantity (kg/capita/yr).
+    # "000645",
+    # Food supply (kcal/capita/day).
+    # "000664",
+    # Protein supply quantity (g/capita/day)
+    # "000674",
+    # Fat supply quantity (g/capita/day).
+    # "000684",
 ]
 
 
