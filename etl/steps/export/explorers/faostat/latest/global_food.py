@@ -409,6 +409,9 @@ def run():
         },
         humanize_dimension_names=True,
         common_view_config={"tab": "map"},
+        dimension_names_replacements={
+            "maize": "Maize (corn)",
+        },
     )
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
