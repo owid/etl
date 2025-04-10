@@ -1281,3 +1281,12 @@ steps:
     - data://garden/who/latest/flunet
   data://grapher/who/2025-03-19/flu_yamagata:
     - data://garden/who/2025-03-19/flu_yamagata
+
+  # WHO Smoking data
+  data://garden/who/2025-04-07/gho_smoking:
+    - data://garden/who/2024-01-03/gho
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/who/2025-04-07/gho_smoking:
+    - data://garden/who/2025-04-07/gho_smoking
