@@ -14,10 +14,10 @@ meta:
       This is the average cantril ladder score and country rank for all countries broken down by ages. There are four age groups: young (under 30), lower middle age (30-44), upper middle age (45-59) and old (60+ years old).
 
     # Citation
-    producer: Wellbeing Research Center
+    producer: Gallup World Poll via the World Happiness Report #preferred citation by the WHR
     citation_full: |-
       Helliwell, J. F., Layard, R., Sachs, J. D., De Neve, J.-E., Aknin, L. B., & Wang, S. (Eds.). (2024). World Happiness Report 2024. University of Oxford: Wellbeing Research Centre.
-    attribution_short: WHR
+    attribution_short: World Happiness Report
 
     # Files
     url_main: https://happiness-report.s3.amazonaws.com/2024/Ch2+Appendix.pdf
@@ -25,8 +25,8 @@ meta:
 
     # License
     license:
-      name: ""
-      url: https://worldhappiness.report/faq/
+      name: "World Happiness Report - Data sharing policy"
+      url: https://worldhappiness.report/data-sharing/
 
 outs:
   - md5: a5b1ca904570d16ac9fe5c8bc4a1eaf0
