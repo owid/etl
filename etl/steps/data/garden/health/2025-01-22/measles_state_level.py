@@ -28,7 +28,6 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("measles_state_level")
 
-    origins = tb["countvalue"].metadata.origins
     tb_cdc_historical = ds_measles_cdc_historical.read_csv()
     tb_cdc_historical = tb_cdc_historical[tb_cdc_historical["cases"] != "NN"].dropna(subset=["cases"])
     tb_cdc_archive = ds_measles_cdc_archive.read_csv()
@@ -53,9 +52,6 @@ def run(dest_dir: str) -> None:
     tb["population"] = pr.to_numeric(tb["population"], errors="coerce")
     tb["case_rate"] = tb["case_count"] / tb["population"] * 100000
     tb = tb.drop(columns=["state", "population"])
-    # tb["case_count"].metadata.origins = origins
-    # tb["case_rate"].metadata.origins = origins
-    # tb["source"].metadata.origins = origins
     tb = tb.format(["country", "year"], short_name="measles")
     #
     # Save outputs.
