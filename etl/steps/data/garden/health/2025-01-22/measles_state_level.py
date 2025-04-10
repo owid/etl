@@ -49,13 +49,13 @@ def run(dest_dir: str) -> None:
     # Combine with population
     tb = tb.merge(tb_pop, left_on=["country", "year"], right_on=["state", "year"], how="left")
 
-    tb["case_count"] = pd.to_numeric(tb["case_count"], errors="coerce")
-    tb["population"] = pd.to_numeric(tb["population"], errors="coerce")
+    tb["case_count"] = pr.to_numeric(tb["case_count"], errors="coerce")
+    tb["population"] = pr.to_numeric(tb["population"], errors="coerce")
     tb["case_rate"] = tb["case_count"] / tb["population"] * 100000
     tb = tb.drop(columns=["state", "population"])
-    tb["case_count"].metadata.origins = origins
-    tb["case_rate"].metadata.origins = origins
-    tb["source"].metadata.origins = origins
+    # tb["case_count"].metadata.origins = origins
+    # tb["case_rate"].metadata.origins = origins
+    # tb["source"].metadata.origins = origins
     tb = tb.format(["country", "year"], short_name="measles")
     #
     # Save outputs.
