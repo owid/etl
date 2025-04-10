@@ -59,11 +59,6 @@ steps:
   data://grapher/agriculture/2023-06-12/attainable_yields:
     - data://garden/agriculture/2023-06-12/attainable_yields
   #
-  # Crop yields explorer.
-  #
-  data://explorers/agriculture/2023-06-12/crop_yields:
-    - data://garden/agriculture/2023-06-12/attainable_yields
-  #
   # Food prices for nutrition - World Bank based on FAO.
   #
   data://meadow/wb/2023-07-24/food_prices_for_nutrition:

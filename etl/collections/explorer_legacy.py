@@ -11,7 +11,7 @@ TODO:
 from copy import copy
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -22,10 +22,16 @@ from apps.chart_sync.admin_api import AdminAPI
 from etl.config import OWID_ENV, OWIDEnv
 from etl.grapher import model as gm
 from etl.grapher.io import get_variables_data
-from etl.paths import EXPLORERS_DIR
+from etl.paths import EXPORT_DIR
 
 # Initialize logger.
 log = get_logger()
+
+# Fields in config section that are lists and need to be tabbed.
+# NOTE: Can we do this for all fields that are lists instead of hardcoding it?
+LIST_CONFIG_FIELDS = [
+    "selection",
+]
 
 
 class ExplorerLegacy:
@@ -56,6 +62,10 @@ class ExplorerLegacy:
     explorer.df_columns = ...
     ```
     """
+
+    # Internal use. For save() method.
+    # NOTE: name should match #[...] in catalog_path
+    _catalog_path: Optional[str] = None
 
     def __init__(
         self,
@@ -98,6 +108,15 @@ class ExplorerLegacy:
         # Others
         self.name = name
         self.content_raw = None
+
+    @property
+    def catalog_path(self) -> Optional[str]:
+        return self._catalog_path
+
+    @catalog_path.setter
+    def catalog_path(self, value: str) -> None:
+        assert "#" in value, "Catalog path should be in the format `path#name`."
+        self._catalog_path = value
 
     @classmethod
     def from_raw_string(
@@ -189,15 +208,19 @@ class ExplorerLegacy:
         if owid_env is None:
             owid_env = OWID_ENV
 
-        # Update TSV in owid-content, this is only temporary to see a diff.
-        # TODO: Get rid of this and show diff in explorer-diff
-        if EXPLORERS_DIR.exists():
-            explorer_path = (Path(EXPLORERS_DIR) / self.name).with_suffix(".explorer.tsv")
-            explorer_path.write_text(self.content)
+        # Export content to local directory in addition to uploading it to MySQL for debugging.
+        log.info(f"Exporting explorer to {self.local_tsv_path}")
+        self.local_tsv_path.write_text(self.content)
 
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
         admin_api.put_explorer_config(self.name, self.content)
+
+    @property
+    def local_tsv_path(self) -> Path:
+        # export://explorers/who/latest/influenza#influenza -> explorers/who/latest/influenza/influenza.tsv
+        assert self.catalog_path, "Catalog path not set. Please set it before saving."
+        return EXPORT_DIR / "explorers" / (self.catalog_path.replace("#", "/") + ".tsv")
 
     @staticmethod
     def _parse_config(config_raw, sep) -> Dict[str, Any]:
@@ -364,6 +387,14 @@ class ExplorerLegacy:
         df_config = self._add_empty_row(df_config)
         # True, False -> 'true', 'false'
         df_config[1] = df_config[1].apply(lambda x: str(x).lower() if str(x) in {"False", "True"} else x)
+
+        # Fix pickerColumnSlugs - it is a list, but TSV only accepts space separated values.
+        if "pickerColumnSlugs" in df_config[0].values:
+            pos = df_config[0].tolist().index("pickerColumnSlugs")
+            val = df_config[1][pos]
+            if isinstance(val, list):
+                df_config.iloc[pos, 1] = " ".join(val)
+
         dfs.append(df_config)
 
         # 2/ GRAPHERS
@@ -382,13 +413,17 @@ class ExplorerLegacy:
             ignore_index=True,
         )
 
-        # Fix config.selection (should be tabbed!)
-        selections = df.loc[df[0] == "selection", 1].item()
-        for i, selection in enumerate(selections):
-            if i + 1 > df.shape[1] - 1:
-                # Add column
-                df[i + 1] = ""
-            df.loc[df[0] == "selection", i + 1] = selection
+        # Fix config.selection
+        for col in LIST_CONFIG_FIELDS:
+            sub_df = df.loc[df[0] == col, 1]
+            if sub_df.empty:
+                continue
+            selections = sub_df.item()
+            for i, selection in enumerate(selections):
+                if i + 1 > df.shape[1] - 1:
+                    # Add column
+                    df[i + 1] = ""
+                df.loc[df[0] == col, i + 1] = selection
 
         assert isinstance(df, pd.DataFrame), "df should be a dataframe!"
         return df  # type: ignore
@@ -396,7 +431,14 @@ class ExplorerLegacy:
     @property
     def content(self) -> str:
         """Based on modified config, graphers and column, build the raw content text."""
-        content = self.df.to_csv(sep="\t", index=False, header=False)
+        df_clean = self.df.copy()
+
+        # Replace actual newline characters with literal "\n", but only in string values
+        for col in df_clean.select_dtypes(include=["object"]).columns:
+            df_clean[col] = df_clean[col].apply(lambda x: x.replace("\n", "\\n") if isinstance(x, str) else x)
+
+        content = df_clean.to_csv(sep="\t", index=False, header=False)
+
         assert isinstance(content, str), "content should be a string!"
         content = [c.rstrip() for c in content.splitlines()]
         content = "\n".join(content)
@@ -622,65 +664,36 @@ class ExplorerLegacy:
             self.df_columns = self.df_columns.drop(columns=["variableId"])
 
 
-def create_explorer_legacy(
-    dest_dir: Union[str, Path],
-    config: Dict[str, Any],
-    df_graphers: pd.DataFrame,
-    df_columns: Optional[pd.DataFrame] = None,
-    explorer_name: Optional[str] = None,
-) -> ExplorerLegacy:
-    """This function is used to create an Explorer object using the legacy configuration.
-
-    To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
-    """
-    log.warning(
-        "This function is operative, but relies on legacy configuration. To use latest tools, consider migrating your explorer to use MDIM-based configuration."
-    )
-    # Extract information about this step from dest_dir.
-    channel, namespace, version, short_name = str(dest_dir).split("/")[-4:]
-    explorer_path = f"{channel}/{namespace}/{version}/{short_name}"
-
-    # If the name of the explorer is specified in config, take that, otherwise use the step's short_name.
-    # NOTE: This is the expected name of the explorer tsv file.
-    if explorer_name is None:
-        if "name" in config:
-            explorer_name = config["name"]
-        else:
-            explorer_name = short_name
-    assert isinstance(explorer_name, str)
-
-    return _create_explorer_legacy(
-        explorer_path=explorer_path,
-        config=config,
-        df_graphers=df_graphers,
-        explorer_name=explorer_name,
-        df_columns=df_columns,
-    )
-
-
 def _create_explorer_legacy(
-    explorer_path: str,
+    catalog_path: str,
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,
     explorer_name: str,
     df_columns: Optional[pd.DataFrame] = None,
-    reset: bool = False,
+    reset: bool = True,
 ) -> ExplorerLegacy:
     """This function is used to create an Explorer object using the legacy configuration.
 
     To use the new tools, first migrate the explorer to use the new MDIM-based configuration.
 
-    :param reset: If True, create explorer from scratch. If False, update explorer in database.
+    :param reset: If True, create explorer from scratch. If False, load the explorer from DB and update its config.
     """
     if reset:
         # Create explorer from scratch.
-        explorer = ExplorerLegacy.from_raw_string(name=explorer_name)
+        explorer = ExplorerLegacy.from_raw_string(
+            content=None,
+            sep="\t",
+            name=explorer_name,
+        )
     else:
         # Load explorer from database.
         explorer = ExplorerLegacy.from_db(explorer_name)
 
+    # Set catalog path.
+    explorer.catalog_path = catalog_path
+
     # Add a comment to avoid manual edits.
-    explorer.comments = [f"# DO NOT EDIT THIS FILE MANUALLY. IT WAS GENERATED BY ETL step '{explorer_path}'."]
+    explorer.comments = [f"# DO NOT EDIT THIS FILE MANUALLY. IT WAS GENERATED BY ETL step '{catalog_path}'."]
     # Update its config.
     explorer.config.update(config)
     # Update its graphers and columns tables.

@@ -14,8 +14,9 @@ export function activate(context: vscode.ExtensionContext) {
         let endLine: number | null = null;
 
         // Read timeout values from VS Code settings (default: 100ms and 500ms)
+        // NOTE: After a recent VSCode update, it seems that cursorDelay needs to be at least 1300ms
         const execDelay = vscode.workspace.getConfiguration("runUntilCursor").get<number>("execDelay", 100);
-        const cursorDelay = vscode.workspace.getConfiguration("runUntilCursor").get<number>("cursorDelay", 500);
+        const cursorDelay = vscode.workspace.getConfiguration("runUntilCursor").get<number>("cursorDelay", 1500);
 
         // Step 1: Find where `run()` starts
         for (let i = 0; i < document.lineCount; i++) {

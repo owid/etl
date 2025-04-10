@@ -136,11 +136,6 @@ steps:
   data://grapher/agriculture/2025-03-26/attainable_yields:
     - data://garden/agriculture/2025-03-26/attainable_yields
   #
-  # Crop yields explorer.
-  #
-  data://explorers/agriculture/latest/crop_yields:
-    - data://garden/agriculture/2025-03-26/attainable_yields
-  #
   # Food expenditure in US - USDA
   #
   data://meadow/usda_ers/2025-03-26/food_expenditure_in_us:
@@ -175,3 +170,8 @@ steps:
   #
   data://grapher/usda_ers/2025-03-26/food_expenditure:
     - data://garden/usda_ers/2025-03-26/food_expenditure
+  #
+  # Crop yields explorer.
+  #
+  export://explorers/agriculture/latest/crop_yields:
+    - data://grapher/agriculture/2025-03-26/attainable_yields

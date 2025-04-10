@@ -123,7 +123,7 @@ definitions:
     <<sector>> aid includes general budget support, development food assistance and other commodity assistance.
     <%- endif -%>
 
-  key_constant_usd: The data is measured in constant {definitions.inflation_year} US$ – this adjusts for inflation.
+  key_constant_usd: The data is measured in constant {definitions.inflation_year} US$ – this adjusts for inflation. The OECD makes this adjustment by using annual average market exchange rates and GDP deflators for each donor country. For more information on the methodology, visit [the OECD's documentation on DAC deflators](https://www.oecd.org/content/oecd/en/data/insights/data-explainers/2024/10/resources-for-reporting-development-finance-statistics.html).
 
   key_indonor: "In-donor aid considers these subcategories of ODA: scholarships and student costs in donor countries, administrative costs not included elsewhere, development awareness, and refugees in donor countries"
 

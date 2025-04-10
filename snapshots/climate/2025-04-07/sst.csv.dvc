@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Equatorial Pacific Sea Surface Temperatures (SST) data
+    description: |-
+      The dataset contains data on El Niño and La Niña, phenomena in the equatorial Pacific Ocean defined by a five consecutive 3-month running mean of sea surface temperature (SST) anomalies in the Niño 3.4 region. El Niño occurs when the anomalies exceed +0.5°C, while La Niña occurs when they fall below -0.5°C. This measure is known as the Oceanic Niño Index (ONI).
+    date_published: "2025"
+
+    # Citation
+    producer: NOAA National Centers for Environmental Information
+    citation_full: |-
+      National Oceanic and Atmospheric Administration (NOAA) National Centers for Environmental Information (NCEI) - Equatorial Pacific Sea Surface Temperatures (SST) data
+
+    # Files
+    url_main: https://www.ncei.noaa.gov/access/monitoring/enso/sst
+    url_download: https://www.cpc.ncep.noaa.gov/data/indices/sstoi.indices
+    date_accessed: 2025-04-07
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://gml.noaa.gov/about/disclaimer.html
+outs:
+  - md5: 1bfc4be5618ddca9b08d7a71b57285c1
+    size: 43509
+    path: sst.csv

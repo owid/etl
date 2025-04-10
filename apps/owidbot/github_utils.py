@@ -83,7 +83,7 @@ def github_app_access_token(max_retries=3) -> str:
     backoff = 2
     for attempt in range(1, max_retries + 1):
         response = requests.post(installation_access_token_url, headers=headers)
-        if response.status_code != 504:
+        if response.status_code not in (500, 504):
             response.raise_for_status()
             access_token = response.json()["token"]
             return access_token

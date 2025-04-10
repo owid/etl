@@ -626,17 +626,14 @@ class ChartDiffShow:
             self._show()
 
 
-def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str, tofile: str = "staging"):
-    """Get diff of two dictionaries.
+def compare_strings(s1: str, s2: str, fromfile: str, tofile: str = "staging"):
+    """Get diff of two multi-line strings.
 
     Useful for chart config diffs, indicator metadata diffs, etc.
     """
-    d1 = json.dumps(dix_1, indent=4)
-    d2 = json.dumps(dix_2, indent=4)
-
     diff = difflib.unified_diff(
-        d1.splitlines(keepends=True),
-        d2.splitlines(keepends=True),
+        s1.strip().splitlines(keepends=True),
+        s2.strip().splitlines(keepends=True),
         fromfile=fromfile,
         tofile=tofile,
     )
@@ -644,6 +641,14 @@ def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile:
     diff_string = "".join(diff)
 
     return diff_string
+
+
+def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str, tofile: str = "staging"):
+    """Get diff of two dictionaries.
+
+    Useful for chart config diffs, indicator metadata diffs, etc.
+    """
+    return compare_strings(json.dumps(dix_1, indent=4), json.dumps(dix_2, indent=4), fromfile=fromfile, tofile=tofile)
 
 
 def st_show_diff(diff_str):

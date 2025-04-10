@@ -181,7 +181,7 @@ views:
       title: "Climate change: Arctic sea ice extent"
       subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
       yScaleToggle: false
-      yAxisMin: "0"
+      yAxisMin: 0
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -196,7 +196,7 @@ views:
       title: "Climate change: Antarctic sea ice extent"
       subtitle: The minimum and maximum sea ice extent typically occur in February and September each year.
       yScaleToggle: false
-      yAxisMin: "0"
+      yAxisMin: 0
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -212,7 +212,7 @@ views:
       subtitle: |-
         Cumulative change in mass of ice sheets, measured relative to a base year of 2002. For reference, 1,000 billion metric tons is equal to about 260 cubic miles of ice—enough to raise sea level by about 3 millimeters.
       yScaleToggle: false
-      yAxisMin: "-5200"
+      yAxisMin: -5200
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -228,7 +228,7 @@ views:
       subtitle: |-
         Cumulative mass balance of U.S. reference glaciers, relative to the base year 1965. This is given in meters of water equivalent, which represent changes in the average thickness of a glacier.
       yScaleToggle: false
-      yAxisMin: "-50"
+      yAxisMin: -50
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -244,7 +244,7 @@ views:
       subtitle: |-
         This metric measures the area covered by snow, based on an analysis of weekly maps. These data cover all of North America (including Greenland).
       yScaleToggle: false
-      yAxisMin: "0"
+      yAxisMin: 0
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -259,7 +259,7 @@ views:
       title: Global atmospheric CO₂ concentration
       subtitle: Atmospheric carbon dioxide (CO₂) concentration is measured in parts per million (ppm).
       yScaleToggle: false
-      yAxisMin: "320"
+      yAxisMin: 320
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -274,7 +274,7 @@ views:
       title: Global atmospheric methane concentration
       subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
       yScaleToggle: false
-      yAxisMin: "1600"
+      yAxisMin: 1600
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -289,7 +289,7 @@ views:
       title: Global atmospheric nitrous oxide concentration
       subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
       yScaleToggle: false
-      yAxisMin: "300"
+      yAxisMin: 300
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -304,7 +304,7 @@ views:
       subtitle: |-
         Atmospheric carbon dioxide (CO₂) concentration is measured in parts per million (ppm). Long-term trends in CO₂ concentrations can be measured at high-resolution using preserved air samples from ice cores.
       yScaleToggle: false
-      yAxisMin: "150"
+      yAxisMin: 150
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -318,7 +318,7 @@ views:
       title: Global atmospheric methane concentration
       subtitle: Atmospheric methane (CH₄) concentration is measured in parts per billion (ppb).
       yScaleToggle: false
-      yAxisMin: "550"
+      yAxisMin: 550
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false
@@ -332,7 +332,7 @@ views:
       title: Global atmospheric nitrous oxide concentration
       subtitle: Atmospheric nitrous oxide (N₂O) concentration is measured in parts per billion (ppb).
       yScaleToggle: false
-      yAxisMin: "250"
+      yAxisMin: 250
       baseColorScheme: owid-distinct
       type: LineChart
       hasMapTab: false

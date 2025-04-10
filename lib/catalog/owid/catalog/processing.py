@@ -25,10 +25,13 @@ from .tables import (
     to_datetime,
     to_numeric,
 )
+from .warnings import ignore_warnings
 
 __all__ = [
     "ExcelFile",
     "concat",
+    "ignore_warnings",
+    "keep_metadata",
     "melt",
     "merge",
     "multi_merge",
@@ -49,5 +52,4 @@ __all__ = [
     "read_parquet",
     "to_datetime",
     "to_numeric",
-    "keep_metadata",
 ]

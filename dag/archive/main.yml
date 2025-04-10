@@ -412,6 +412,51 @@ steps:
   data://grapher/oecd/2024-08-21/official_development_assistance:
     - data://garden/oecd/2024-08-21/official_development_assistance
 
+  # World Happiness Report (2012-2024)
+  data://meadow/happiness/2024-06-09/happiness:
+    - snapshot://happiness/2024-06-09/happiness.xls
+  data://meadow/happiness/2023-03-20/happiness:
+    - snapshot://happiness/2023-03-20/happiness.xls
+  data://meadow/happiness/2022-03-20/happiness:
+    - snapshot://happiness/2022-03-20/happiness.xls
+  data://meadow/happiness/2021-03-20/happiness:
+    - snapshot://happiness/2021-03-20/happiness.xls
+  data://meadow/happiness/2020-03-20/happiness:
+    - snapshot://happiness/2020-03-20/happiness.xls
+  data://meadow/happiness/2019-03-20/happiness:
+    - snapshot://happiness/2019-03-20/happiness.xls
+  data://meadow/happiness/2018-03-20/happiness:
+    - snapshot://happiness/2018-03-20/happiness.xls
+  data://meadow/happiness/2017-03-20/happiness:
+    - snapshot://happiness/2017-03-20/happiness.xlsx
+  data://meadow/happiness/2016-03-20/happiness:
+    - snapshot://happiness/2016-03-20/happiness.xlsx
+  data://meadow/happiness/2015-03-20/happiness:
+    - snapshot://happiness/2015-03-20/happiness.xlsx
+  data://meadow/happiness/2012-03-20/happiness:
+    - snapshot://happiness/2012-03-20/happiness.xlsx
+
+  data://garden/happiness/2023-03-20/happiness:
+    - data://meadow/happiness/2023-03-20/happiness
+    - data://meadow/happiness/2022-03-20/happiness
+    - data://meadow/happiness/2021-03-20/happiness
+    - data://meadow/happiness/2020-03-20/happiness
+    - data://meadow/happiness/2019-03-20/happiness
+    - data://meadow/happiness/2018-03-20/happiness
+    - data://meadow/happiness/2017-03-20/happiness
+    - data://meadow/happiness/2016-03-20/happiness
+    - data://meadow/happiness/2015-03-20/happiness
+    - data://meadow/happiness/2012-03-20/happiness
+
+  data://garden/happiness/2024-06-09/happiness:
+    - data://meadow/happiness/2024-06-09/happiness
+    - data://garden/happiness/2023-03-20/happiness
+    - data://garden/demography/2023-03-31/population
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-03-11/income_groups
+  data://grapher/happiness/2024-06-09/happiness:
+    - data://garden/happiness/2024-06-09/happiness
+
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
@@ -436,3 +481,4 @@ include:
   - dag/archive/space.yml
   - dag/archive/survey.yml
   - dag/archive/migration.yml
+  - dag/archive/redistribution.yml

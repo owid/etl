@@ -1,15 +1,20 @@
 import json
 import random
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pandas as pd
 import streamlit as st
+from sqlalchemy.orm import Session
 from structlog import get_logger
 
+from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
+from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import explorer_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
+from etl.grapher import model as gm
 
 log = get_logger()
 
@@ -33,12 +38,21 @@ CURRENT_DIR = Path(__file__).resolve().parent
 # Create connections to DB
 SOURCE_ENGINE, TARGET_ENGINE = get_engines()
 
+# Params
+MAX_DIFF_LINES = 100
+
 
 def _show_options():
     """Show options pane."""
     with st.popover("⚙️ Options", use_container_width=True):
         col1, col2, col3 = st.columns(3)
         with col1:
+            url_persist(st.toggle)(
+                "**Hide** explorers with no change",
+                key="hide_unchanged_explorers",
+                value=True,
+                help="Show only explorers with different TSV config.",
+            )
             url_persist(st.selectbox)(
                 "Explorer Display", value="Default", options=["Default", "Map", "Table", "Chart"], key="default_display"
             )
@@ -78,12 +92,25 @@ def _fetch_explorer_views(slug: str) -> list[dict]:
     return views
 
 
-def _fetch_explorer_slugs() -> list[str]:
+def _fetch_explorer_slugs(hide_unchanged_explorers: bool) -> list[str]:
     """Fetch all published explorer slugs."""
-    q = """
-    select slug from explorers where isPublished = 1 order by updatedAt desc
-    """
-    return read_sql(q)["slug"].tolist()
+    if not hide_unchanged_explorers:
+        q = """
+        select slug from explorers where isPublished = 1 order by updatedAt desc
+        """
+        return read_sql(q, engine=SOURCE_ENGINE)["slug"].tolist()
+    else:
+        q = """
+        select slug, md5(trim(both '\n' from tsv)) as tsv_hash from explorers where isPublished = 1 order by updatedAt desc
+        """
+        df_source = read_sql(q, engine=SOURCE_ENGINE)
+        df_target = read_sql(q, engine=TARGET_ENGINE)
+
+        # Get slugs with different tsv hashes
+        df = pd.merge(df_source, df_target, on="slug", suffixes=("_source", "_target"))
+        df = df[df["tsv_hash_source"] != df["tsv_hash_target"]]
+        df = df[["slug"]]
+        return df["slug"].tolist()
 
 
 def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
@@ -109,7 +136,9 @@ def main():
 
     _show_options()
 
-    explorer_slugs = _fetch_explorer_slugs()
+    hide_unchanged_explorers: bool = st.session_state.get("hide_unchanged_explorers")  # type: ignore
+
+    explorer_slugs = _fetch_explorer_slugs(hide_unchanged_explorers=hide_unchanged_explorers)
 
     # Select explorer to compare
     explorer_slug = url_persist(st.selectbox)(
@@ -119,6 +148,13 @@ def main():
         # cleanup query params on explorer change
         on_change=st.query_params.clear,
     )
+
+    if not explorer_slug:
+        if hide_unchanged_explorers:
+            st.info('No explorers with changes. Turn off "Hide explorers with no change" in the options to see them.')
+        else:
+            st.info("Select an explorer.")
+        return
 
     explorer_views = _fetch_explorer_views(explorer_slug)
 
@@ -172,6 +208,31 @@ def main():
         st.subheader("Staging Explorer")
         assert OWID_ENV.site
         explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
+
+    st.subheader("TSV Diff")
+
+    # NOTE: loading TSV for some explorers can take >10s!
+    def load_tsv(engine):
+        with Session(engine) as session:
+            return gm.Explorer.load_explorer(session, explorer_slug, columns=["tsv"]).tsv  # type: ignore
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        future_source = executor.submit(load_tsv, SOURCE_ENGINE)
+        future_target = executor.submit(load_tsv, TARGET_ENGINE)
+
+        tsv_source = future_source.result()
+        tsv_target = future_target.result()
+
+    diff_str = compare_strings(tsv_target, tsv_source, fromfile="production", tofile="staging")
+    st_show_diff(truncate_lines(diff_str, MAX_DIFF_LINES))
+
+    # Create columns to show TSV files side by side
+    st.subheader("TSV Files")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.code(truncate_lines(tsv_target, MAX_DIFF_LINES), line_numbers=True, language="diff")
+    with col2:
+        st.code(truncate_lines(tsv_source, MAX_DIFF_LINES), line_numbers=True, language="diff")
 
 
 main()

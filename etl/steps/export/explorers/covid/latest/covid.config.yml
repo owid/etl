@@ -56,10 +56,10 @@ config:
   subNavId: "coronavirus"
   subNavCurrentId: "data-explorer"
   wpBlockId: 43869
-  hasMapTab: "true"
+  hasMapTab: true
   yAxisMin: 0
   thumbnail: "https://ourworldindata.org/coronavirus-data-explorer.png"
-  isPublished: "true"
+  isPublished: true
 
 dimensions:
   - slug: metric
