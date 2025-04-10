@@ -352,7 +352,6 @@ def run():
     # Process data.
     #
     # TODO: Add footnote to all places in fbsc where there is a jump due to methodology change (usually around 2010).
-    # TODO: Food available for consumption was only given per capita. Does it make sense to have it in total?
     def prepare_table_with_dimensions(tb, item_codes, element_codes):
         columns_to_drop = []
         UNITS_IN_RADIO_BUTTONS = [
@@ -383,6 +382,7 @@ def run():
                 elif unit in UNITS_NOT_IN_RADIO_BUTTONS:
                     # We remove the unit in these cases, so they don't appear in the dropdown.
                     # TODO: It seems we don't have all the units that appeared in the old explorer.
+                    #  I think the only missing one is food available, which is given in kg per year, and should also be in grams per day.
                     unit = ""
                 else:
                     raise ValueError(f"Unexpected unit {unit}")
