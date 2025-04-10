@@ -24,9 +24,16 @@ def run() -> None:
     ds_population = paths.load_dataset("un_wpp")
 
     # get smoking indicators
-    all_smoking_indicators = [c for c in ds_meadow.table_names if (("smok" in c.lower()) or ("tobac" in c.lower()))]
+    all_rel_indicators = [
+        c for c in ds_meadow.table_names if (("smok" in c.lower()) or ("tobac" in c.lower()) or "tax" in c.lower())
+    ]
 
-    smoking_estimates = [ind for ind in all_smoking_indicators if "estimate" in ind.lower()]
+    smoking_estimates = [ind for ind in all_rel_indicators if "estimate" in ind.lower()]
+
+    tb_taxes = ds_meadow.read("taxes_as_a_pct_of_price__total_tax")
+    tb_ads = ds_meadow.read("enforce_bans_on_tobacco_advertising")
+    tb_quit = ds_meadow.read("offer_help_to_quit_tobacco_use")
+  
 
     tbs = []
 
