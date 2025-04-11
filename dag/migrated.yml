@@ -20,7 +20,3 @@ steps:
     - data://garden/gapminder/2019-05-25/fertility_rate
   data://garden/gapminder/2019-05-25/fertility_rate:
     - snapshot://gapminder/2019-05-25/fertility_rate.feather
-  data://grapher/biodiversity/2021-01-01/habitat_loss:
-    - data://garden/biodiversity/2021-01-01/habitat_loss
-  data://garden/biodiversity/2021-01-01/habitat_loss:
-    - snapshot://biodiversity/2021-01-01/habitat_loss.feather

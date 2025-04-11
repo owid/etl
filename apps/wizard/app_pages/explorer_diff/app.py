@@ -89,6 +89,14 @@ def _fetch_explorer_views(slug: str) -> list[dict]:
             if dims:
                 views.append(dims)
 
+    # If view doesn't have all dimensions, use '-'
+    dim_names = {n for v in views for n in v.keys()}
+    for view in views:
+        for dim in dim_names:
+            # If dimension is missing in a view, use '-'
+            if dim not in view:
+                view[dim] = "-"
+
     return views
 
 
@@ -114,13 +122,14 @@ def _fetch_explorer_slugs(hide_unchanged_explorers: bool) -> list[str]:
 
 
 def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
+    dim_names = list(explorer_views[0].keys())
+
     # Extract all unique dimensions across views
-    all_dimensions = {}
+    all_dimensions = {dim: set() for dim in dim_names}
     for view in explorer_views:
-        for dim, val in view.items():
-            if dim not in all_dimensions:
-                all_dimensions[dim] = set()
-            all_dimensions[dim].add(val)
+        for dim in dim_names:
+            all_dimensions[dim].add(view[dim])
+
     # Convert sets to lists for selectboxes
     return {dim: sorted(list(values)) for dim, values in all_dimensions.items()}
 
