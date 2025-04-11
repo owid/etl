@@ -1714,68 +1714,10 @@ def prepare_wide_table(tb: Table) -> Table:
         unit: f"{item} | {item_code} || {element} | {element_code} || {unit}",
     )
 
-    def prepare_public_titles(item: str, element: str, unit: str) -> str:
-        # Find whether unit is per capita.
-        # TODO: Instead of this, create a separate function to edit metadata (based on codes), and consider removing metadata from the yaml.
-        # TODO: Add description short.
-        per_capita = True if "capita" in unit else False
-        if element in ["Production", "Yield", "Imports", "Exports"] and unit.startswith("tonnes"):
-            title = f"{item} {element.lower()}"
-            if per_capita:
-                title = "Per capita " + title.lower()
-        elif element == "Yield" and unit == "tonnes per hectare":
-            title = f"{item} yield"
-        elif element == "Area harvested" and unit.startswith("hectares"):
-            title = f"Land used for {item.lower()} production"
-            if per_capita:
-                title = title + " per capita"
-        elif element == "Food available for consumption" and unit == "kilograms per year per capita":
-            title = f"Per capita {item.lower()} supply per year"
-        elif element == "Food available for consumption" and unit == "grams per day":
-            title = f"Per capita {item.lower()} supply per day"
-        elif element == "Food available for consumption" and unit == "kilocalories per day":
-            title = f"Per capita kilocalorie supply from {item.lower()} per day"
-        elif element == "Food available for consumption" and unit == "grams of protein per day per capita":
-            title = f"Per capita protein supply from {item.lower()} per day"
-        elif element == "Food available for consumption" and unit == "grams of fat per day per capita":
-            title = f"Per capita fat supply from {item.lower()} per day"
-        elif element == "Food" and unit.startswith("tonnes"):
-            title = f"{item} used for direct human food"
-            if per_capita:
-                title = title + " per capita"
-        elif element == "Feed" and unit.startswith("tonnes"):
-            title = f"{item} used for animal feed"
-            if per_capita:
-                title = title + " per capita"
-        elif element == "Other uses" and unit.startswith("tonnes"):
-            title = f"{item} allocated to other uses"
-            if per_capita:
-                title = title + " per capita"
-        elif element == "Waste in supply chain" and unit.startswith("tonnes"):
-            title = f"{item} wasted in supply chains"
-            if per_capita:
-                title = title + " per capita"
-        elif element == "Domestic supply" and unit.startswith("tonnes"):
-            title = f"Domestic supply of {item.lower()}"
-            if per_capita:
-                title = "Per capita " + title.lower()
-        elif element == "Producing or slaughtered animals" and item.lower().startswith(
-            ("meat", "fat", "offals", "skins")
-        ):
-            product = item.lower().split(",")[0]
-            animal = item.lower().replace(f"{product},", "").strip().lower()
-            if animal == "total":
-                animal == "all"
-            title = f"Animals slaughtered {'per capita ' if per_capita else ''}to produce {animal} {product}"
-        else:
-            title = f"{item} - {element} ({unit})"
-
-        return title
-
     # Construct a human-readable variable display name (which will be shown in grapher charts).
     tb["variable_display_name"] = dataframes.apply_on_categoricals(
         [tb.item, tb.element, tb.unit],
-        lambda item, element, unit: prepare_public_titles(item=item, element=element, unit=unit),
+        lambda item, element, unit: f"{item} - {element} ({unit})",
     )
 
     if "item_description" in tb.columns:
@@ -1908,6 +1850,158 @@ def sanity_check_custom_units(tb_wide: Table, ds_garden: Dataset) -> None:
             )
 
 
+def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
+    # Improve metadata in wide table (this, unfortunately, cannot easily be achieved in the long table).
+    # def prepare_public_titles(item: str, element: str, unit: str) -> str:
+    for column in tb_wide.drop(columns=["area_code"]).columns:
+        item, item_code, element, element_code, unit = sum(
+            [[j.strip() for j in i.split("|")] for i in tb_wide[column].metadata.title.split("||")], []
+        )
+
+        # First define a generic title:
+        title = f"{item} - {element} ({unit})"
+
+        # Now redefine the title for special cases:
+        # TODO: Add description short.
+        if dataset_short_name == "faostat_fbsc":
+            if element_code == "0645pc":
+                # "0645pc",  # Food available for consumption (kilograms per year per capita)
+                assert unit == "kilograms per year per capita"
+                title = f"Per capita {item.lower()} supply per year"
+            elif element_code == "0664pc":
+                # "0664pc",  # Food available for consumption (kilocalories per day per capita)
+                assert unit == "kilocalories per day per capita"
+                title = f"Per capita kilocalorie supply from {item.lower()} per day"
+            elif element_code == "0674pc":
+                # "0674pc",  # Food available for consumption (grams of protein per day per capita)
+                assert unit == "grams of protein per day per capita"
+                title = f"Per capita protein supply from {item.lower()} per day"
+            elif element_code == "0684pc":
+                # "0684pc",  # Food available for consumption (grams of fat per day per capita)
+                assert unit == "grams of fat per day per capita"
+                title = f"Per capita fat supply from {item.lower()} per day"
+            elif element_code == "005142":
+                # "005142",  # Food (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} used for direct human food"
+            elif element_code == "5142pc":
+                # "5142pc",  # Food (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} used for direct human food per capita"
+            elif element_code == "005521":
+                # "005521",  # Feed (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} used for animal feed"
+            elif element_code == "5521pc":
+                # "5521pc",  # Feed (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} used for animal feed per capita"
+            elif element_code == "005154":
+                # "005154",  # Other uses (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} allocated to other uses"
+            elif element_code == "5154pc":
+                # "5154pc",  # Other uses (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} allocated to other uses per capita"
+            elif element_code == "005123":
+                # "005123",  # Waste in supply chain (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} wasted in supply chains"
+            elif element_code == "5123pc":
+                # "5123pc",  # Waste in supply chain (tonnes_per_capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} wasted in supply chains per capita"
+            elif element_code == "005301":
+                # "005301",  # Domestic supply (tonnes)
+                assert unit == "tonnes"
+                title = f"Domestic supply of {item.lower()}"
+            elif element_code == "5301pc":
+                # "5301pc",  # Domestic supply (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita domestic supply of {item.lower()}"
+            elif element_code == "005611":
+                # "005611",  # Imports (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} imports"
+            elif element_code == "5611pc":
+                # "5611pc",  # Imports (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita {item.lower()} imports"
+            elif element_code == "005911":
+                # "005911",  # Exports (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} exports"
+            elif element_code == "5911pc":
+                # "5911pc",  # Exports (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita {item.lower()} exports"
+            # TODO: Handle remaining elements that may be used in the global food explorer:
+            # "005072",  # Stock variation (tonnes)
+            # "005131",  # Processing (tonnes)
+            # "005170",  # Residuals (tonnes)
+            # "005171",  # Tourist consumption (tonnes)
+            # "005527",  # Seed (tonnes)
+        elif dataset_short_name == "faostat_qcl":
+            if element_code == "005510":
+                # "005510",  # Production (tonnes).
+                assert unit == "tonnes"
+                title = f"{item} production"
+            elif element_code == "5510pc":
+                # "5510pc",  # Production per capita (tonnes per capita).
+                assert unit == "tonnes per capita"
+                title = f"Per capita {item.lower()} production"
+            elif element_code == "005412":
+                # "005412",  # Yield (tonnes per hectare).
+                assert unit == "tonnes per hectare"
+                title = f"{item} yield"
+            elif element_code in ["005417", "005424"]:
+                # "005417",  # Yield (kilograms per animal).
+                # "005424",  # Yield (kilograms per animal).
+                assert unit == "kilograms per animal"
+                title = f"{item} yield per animal"
+            elif element_code == "005312":
+                # "005312",  # Area harvested (hectares).
+                assert unit == "hectares"
+                title = f"Land used for {item.lower()} production"
+            elif element_code == "5312pc":
+                # "5312pc",  # Area harvested per capita (hectares per capita).
+                title = f"Land used for {item.lower()} production per capita"
+            elif element_code in ["005320", "005321"]:
+                # "005320",  # Producing or slaughtered animals (animals).
+                # "005321",  # Producing or slaughtered animals (animals).
+                assert unit == "animals"
+                # TODO: Get this from item codes, not items. Also note that this should be fixed before this loop, to also affect "Production". Maybe it's better to simply replace item so that, e.g. "Meat, buffalo" -> "Buffalo meat".
+                product = item.lower().split(",")[0]
+                animal = item.lower().replace(f"{product},", "").strip().lower()
+                if animal == "total":
+                    animal == "all"
+                title = f"Animals slaughtered to produce {animal} {product}"
+            elif element_code in ["5320pc", "5321pc"]:
+                # "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
+                # "5321pc",  # Producing or slaughtered animals per capita (animals per capita).
+                # TODO: Figure out the right units here.
+                # assert unit == "animals per person"
+                # TODO: Get this from item codes, not items:
+                product = item.lower().split(",")[0]
+                animal = item.lower().replace(f"{product},", "").strip().lower()
+                if animal == "total":
+                    animal == "all"
+                title = f"Animals slaughtered per capita to produce {animal} {product}"
+            elif element_code == "005413":
+                # "005413",  # Eggs per bird (eggs per bird).
+                assert unit == "eggs per bird"
+                # TODO: Confirm if this is a good title.
+                title = f"{item} yield per bird"
+                # TODO: Define remaining titles:
+                # "005313",  # Laying (animals).
+                # "005318",  # Milk animals (animals).
+                # "005513",  # Eggs produced (eggs).
+
+        # Update metadata.
+        tb_wide[column].metadata.presentation.title_public = title
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -1983,6 +2077,9 @@ def run(dest_dir: str) -> None:
 
     # Create a wide table (with only country and year as index).
     tb_wide = prepare_wide_table(tb=tb)
+
+    # Improve metadata (of wide table).
+    improve_metadata(tb_wide=tb_wide, dataset_short_name=dataset_short_name)
 
     # Check that column "value" has an origin (other columns are not as important and may not have origins).
     error = f"Column 'value' of the long table of {dataset_short_name} must have one origin."

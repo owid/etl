@@ -15,6 +15,7 @@ from shared import (
     handle_anomalies,
     harmonize_elements,
     harmonize_items,
+    improve_metadata,
     log,
     parse_amendments_table,
     prepare_long_table,
@@ -569,6 +570,9 @@ def run() -> None:
 
     # Create a wide table (with only country and year as index).
     tb_wide = prepare_wide_table(tb=tb)
+
+    # Improve metadata (of wide table).
+    improve_metadata(tb_wide=tb_wide, dataset_short_name=dataset_short_name)
 
     # Check that column "value" has an origin (other columns are not as important and may not have origins).
     error = f"Column 'value' of the long table of {dataset_short_name} must have one origin."
