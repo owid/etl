@@ -15,51 +15,6 @@ definitions:
 tables:
   faostat_fbsc_flat:
     variables:
-      alcoholic_beverages__00002924__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from alcoholic beverages
-        presentation:
-          title_public: Daily supply of calories from alcoholic beverages
-      all_egg_products__00002744__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from all egg products
-        presentation:
-          title_public: Daily supply of calories from all egg products
-      all_egg_products__00002744__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
-        display:
-          name: Daily supply of protein from egg products
-        presentation:
-          title_public: Daily supply of protein from egg products
-      animal_products__00002941__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
-        display:
-          name: Daily supply of protein from animal products
-        presentation:
-          title_public: Daily supply of protein from animal products
-      animal_fats_group__00002946__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from animal fats
-        presentation:
-          title_public: Daily supply of calories from animal fats
-      apples__00002617__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
-        display:
-          name: Per capita consumption of apples
-        presentation:
-          title_public: Per capita consumption of apples
-      bananas__00002615__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
-        display:
-          name: Per capita consumption of bananas
-        presentation:
-          title_public: Per capita consumption of bananas
-      barley__00002513__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from barley
-        presentation:
-          title_public: Daily supply of calories from barley
-      cephalopods__00002766__production__005511__tonnes:
-        display:
-          name: Production of cephalopods
-        presentation:
-          title_public: Production of cephalopods
       cereals__excluding_beer__00002905__exports__005911__tonnes:
         display:
           name: Cereal exports
@@ -85,11 +40,6 @@ tables:
           name: Other uses of cereals
         presentation:
           title_public: Other uses of cereals
-      cereals__excluding_beer__00002905__processing__005131__tonnes:
-        display:
-          name: Processing of cereals
-        presentation:
-          title_public: Processing of cereals
       cereals__other__00002520__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         display:
           name: Daily supply of calories from other cereals
@@ -110,11 +60,6 @@ tables:
           name: Production of crustaceans
         presentation:
           title_public: Production of crustaceans
-      dates__00002619__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
-        display:
-          name: Per capita consumption of dates
-        presentation:
-          title_public: Per capita consumption of dates
       demersal_fish__00002762__production__005511__tonnes:
         display:
           name: Production of demersal fish
@@ -135,16 +80,6 @@ tables:
           name: Per capita consumption of fish and seafood
         presentation:
           title_public: Per capita consumption of fish and seafood
-      fish_and_seafood__00002960__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from fish and seafood
-        presentation:
-          title_public: Daily supply of calories from fish and seafood
-      fish_and_seafood__00002960__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
-        display:
-          name: Daily supply of protein from fish and seafood
-        presentation:
-          title_public: Daily supply of protein from fish and seafood
       fish_and_seafood__00002960__production__005511__tonnes:
         display:
           name: Production of fish and seafood
@@ -160,11 +95,6 @@ tables:
           name: Per capita consumption of fruit
         presentation:
           title_public: Per capita consumption of fruit
-      fruit__00002919__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from fruit
-        presentation:
-          title_public: Daily supply of calories from fruit
       fruits__other__00002625__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         display:
           name: Per capita consumption of other fruits
@@ -212,66 +142,6 @@ tables:
           name: Daily supply of protein from other meat
         presentation:
           title_public: Daily supply of protein from other meat
-      meat__beef__00002731__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
-        display:
-          name: Per capita consumption of beef
-        presentation:
-          title_public: Per capita consumption of beef
-      meat__beef__00002731__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from beef
-        presentation:
-          title_public: Daily supply of calories from beef
-      meat__beef__00002731__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
-        display:
-          name: Daily supply of protein from beef
-        presentation:
-          title_public: Daily supply of protein from beef
-      meat__pig__00002733__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
-        display:
-          name: Per capita consumption of pig meat
-        presentation:
-          title_public: Per capita consumption of pig meat
-      meat__pig__00002733__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from pig meat
-        presentation:
-          title_public: Daily supply of calories from pig meat
-      meat__pig__00002733__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
-        display:
-          name: Daily supply of protein from pig meat
-        presentation:
-          title_public: Daily supply of protein from pig meat
-      meat__poultry__00002734__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
-        display:
-          name: Per capita consumption of poultry meat
-        presentation:
-          title_public: Per capita consumption of poultry meat
-      meat__poultry__00002734__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from poultry meat
-        presentation:
-          title_public: Daily supply of calories from poultry meat
-      meat__poultry__00002734__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
-        display:
-          name: Daily supply of protein from poultry meat
-        presentation:
-          title_public: Daily supply of protein from poultry meat
-      meat__sheep_and_goat__00002732__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
-        display:
-          name: Per capita consumption of sheep and goat meat
-        presentation:
-          title_public: Per capita consumption of sheep and goat meat
-      meat__sheep_and_goat__00002732__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
-        display:
-          name: Daily supply of calories from sheep and goat meat
-        presentation:
-          title_public: Daily supply of calories from sheep and goat meat
-      meat__sheep_and_goat__00002732__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita:
-        display:
-          name: Daily supply of protein from sheep and goat meat
-        presentation:
-          title_public: Daily supply of protein from sheep and goat meat
       meat__total__00002943__food_available_for_consumption__0645pc__kilograms_per_year_per_capita:
         display:
           name: Per capita consumption of meat
@@ -372,11 +242,6 @@ tables:
           name: Soybeans allocated to food
         presentation:
           title_public: Soybeans allocated to food
-      soybeans__00002555__processing__005131__tonnes:
-        display:
-          name: Processing of soybeans
-        presentation:
-          title_public: Processing of soybeans
       starchy_roots__00002907__food_available_for_consumption__0664pc__kilocalories_per_day_per_capita:
         display:
           name: Daily supply of calories from starchy roots

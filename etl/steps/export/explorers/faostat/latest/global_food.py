@@ -269,10 +269,10 @@ ITEM_CODES_FBSC = [
 
 # Elements from faostat_qcl to include.
 ELEMENT_CODES_QCL = [
+    "005510",  # Production (tonnes).
+    "5510pc",  # Production per capita (tonnes per capita).
     "005312",  # Area harvested (hectares).
     "5312pc",  # Area harvested per capita (hectares per capita).
-    "005313",  # Laying (animals).
-    "005318",  # Milk animals (animals).
     "005320",  # Producing or slaughtered animals (animals).
     "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
     "005321",  # Producing or slaughtered animals (animals).
@@ -281,36 +281,31 @@ ELEMENT_CODES_QCL = [
     "005412",  # Yield (tonnes per hectare).
     "005417",  # Yield (kilograms per animal).
     "005424",  # Yield (kilograms per animal).
-    "005510",  # Production (tonnes).
-    "5510pc",  # Production per capita (tonnes per capita).
     "005513",  # Eggs produced (eggs).
+    "005313",  # Laying (animals).
+    "005318",  # Milk animals (animals).
 ]
 
 # Elements from faostat_fbsc to include.
 ELEMENT_CODES_FBSC = [
-    "005072",  # Stock variation (tonnes)
-    "005123",  # Waste in supply chain (tonnes)
-    "5123pc",  # Waste in supply chain (tonnes_per_capita)
-    "005131",  # Processing (tonnes)
-    "005142",  # Food (tonnes)
-    "5142pc",  # Food (tonnes per capita)
-    "005154",  # Other uses (tonnes)
-    "5154pc",  # Other uses (tonnes per capita)
-    "005170",  # Residuals (tonnes)
-    "005171",  # Tourist consumption (tonnes)
-    "005301",  # Domestic supply (tonnes)
-    "5301pc",  # Domestic supply (tonnes per capita)
-    "005521",  # Feed (tonnes)
-    "5521pc",  # Feed (tonnes per capita)
-    "005527",  # Seed (tonnes)
-    "005611",  # Imports (tonnes)
-    "5611pc",  # Imports (tonnes per capita)
-    "005911",  # Exports (tonnes)
-    "5911pc",  # Exports (tonnes per capita)
     "0645pc",  # Food available for consumption (kilograms per year per capita)
     "0664pc",  # Food available for consumption (kilocalories per day per capita)
     "0674pc",  # Food available for consumption (grams of protein per day per capita)
     "0684pc",  # Food available for consumption (grams of fat per day per capita)
+    "005142",  # Food (tonnes)
+    "5142pc",  # Food (tonnes per capita)
+    "005301",  # Domestic supply (tonnes)
+    "5301pc",  # Domestic supply (tonnes per capita)
+    "005521",  # Feed (tonnes)
+    "5521pc",  # Feed (tonnes per capita)
+    "005611",  # Imports (tonnes)
+    "5611pc",  # Imports (tonnes per capita)
+    "005911",  # Exports (tonnes)
+    "5911pc",  # Exports (tonnes per capita)
+    "005123",  # Waste in supply chain (tonnes)
+    "5123pc",  # Waste in supply chain (tonnes_per_capita)
+    "005154",  # Other uses (tonnes)
+    "5154pc",  # Other uses (tonnes per capita)
     # Element 'Production' (in tonnes, originally given in 1000 tonnes) is taken from qcl.
     # Although fbsc has items for this element that are not in qcl, they overlap in a number of items with slightly
     # different values. To avoid this issue, we ignore the element from fbsc and use only the one in qcl.
@@ -326,6 +321,12 @@ ELEMENT_CODES_FBSC = [
     # "000674",
     # Fat supply quantity (g/capita/day).
     # "000684",
+    # Other elements not used.
+    # "005072",  # Stock variation (tonnes)
+    # "005131",  # Processing (tonnes)
+    # "005170",  # Residuals (tonnes)
+    # "005171",  # Tourist consumption (tonnes)
+    # "005527",  # Seed (tonnes)
 ]
 
 

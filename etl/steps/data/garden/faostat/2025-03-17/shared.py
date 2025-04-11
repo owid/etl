@@ -1903,7 +1903,9 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00000270": "Rape or colza seed",  # From faostat_qcl - 'Rape or colza seed' (previously 'Rapeseed').
             "00000299": "Melonseed",  # From faostat_qcl - 'Melonseed' (previously 'Melonseed').
             # Other.
-            "00001091": "Eggs from other birds (not hens)",  # From faostat_qcl - 'Eggs from other birds (excl. hens)' (previously 'Eggs from other birds (excl. hens)').
+            "00001091": "Eggs (from other birds)",  # From faostat_qcl - 'Eggs from other birds (excl. hens)' (previously 'Eggs from other birds (excl. hens)').
+            "00001062": "Eggs (from hens)",  # From faostat_qcl - 'Eggs from hens' (previously 'Eggs from hens').
+            "00001783": "Eggs (from hens and other birds)",  # From faostat_qcl - 'Eggs' (previously 'Eggs Primary').
             "00000176": "Dry beans",  # From faostat_qcl - 'Beans, dry' (previously 'Beans, dry').
             "00000201": "Dry lentils",  # From faostat_qcl - 'Lentils, dry' (previously 'Lentils').
             "00000216": "Brazil nuts in shell",  # From faostat_qcl - 'Brazil nuts, in shell' (previously 'Brazil nuts, with shell').
@@ -1911,7 +1913,6 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00000656": "Green coffee",  # From faostat_qcl - 'Coffee, green' (previously 'Coffee, green').
             "00000995": "Sheep skins",  # From faostat_qcl - 'Skins, sheep' (previously 'Skins, sheep').
             "00001025": "Goat skins",  # From faostat_qcl - 'Skins, goat' (previously 'Skins, goat').
-            "00001062": "Hen eggs",  # From faostat_qcl - 'Eggs from hens' (previously 'Eggs from hens').
             "00000771": "Raw or retted flax",  # From faostat_qcl - 'Flax, raw or retted' (previously 'Flax fibre').
             "00000220": "Chestnuts in shell",  # From faostat_qcl - 'Chestnuts, in shell' (previously 'Chestnut').
             "00000417": "Green peas",  # From faostat_qcl - 'Peas, green' (previously 'Peas, green').
@@ -1932,7 +1933,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             # Meat.
             "00002943": "All meat",  # From faostat_fbsc - 'Meat, total' (previously 'Meat, total').
             "00002734": "Poultry meat",  # From faostat_fbsc - 'Meat, poultry' (previously 'Meat, poultry').
-            "00002731": "Beef and buffalo meat",  # From faostat_fbsc - 'Bovine beef' (previously 'Meat, beef').
+            "00002731": "Beef and buffalo meat",  # From faostat_fbsc - 'Bovine meat'.
             "00002732": "Sheep and goat meat",  # From faostat_fbsc - 'Meat, sheep and goat' (previously 'Meat, sheep and goat').
             "00002733": "Pig meat",  # From faostat_fbsc - 'Pork' (previously 'Pork').
             # Seeds.
@@ -2035,21 +2036,19 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "5911pc",  # Exports (tonnes per capita)
                 assert unit == "tonnes per capita"
                 title = f"Per capita {item.lower()} exports"
-            # TODO: Handle remaining elements that may be used in the global food explorer:
-            # "005072",  # Stock variation (tonnes)
-            # "005131",  # Processing (tonnes)
-            # "005170",  # Residuals (tonnes)
-            # "005171",  # Tourist consumption (tonnes)
-            # "005527",  # Seed (tonnes)
+            elif element_code == "005131":
+                # "005131",  # Processing (tonnes)
+                assert unit == "tonnes"
+                title = f"Processing of {item.lower()}"
         elif dataset_short_name == "faostat_qcl":
             if element_code == "005510":
                 # "005510",  # Production (tonnes).
                 assert unit == "tonnes"
-                title = f"{item} production"
+                title = f"Production of {item.lower()}"
             elif element_code == "5510pc":
                 # "5510pc",  # Production per capita (tonnes per capita).
                 assert unit == "tonnes per capita"
-                title = f"Per capita {item.lower()} production"
+                title = f"Per capita production of {item.lower()}"
             elif element_code == "005412":
                 # "005412",  # Yield (tonnes per hectare).
                 assert unit == "tonnes per hectare"
@@ -2074,8 +2073,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code in ["5320pc", "5321pc"]:
                 # "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
                 # "5321pc",  # Producing or slaughtered animals per capita (animals per capita).
-                # TODO: Figure out the right units here.
-                # assert unit == "animals per person"
+                assert unit == "animals per capita"
                 title = f"Animals slaughtered per capita to produce {item}"
             elif element_code == "005413":
                 # "005413",  # Eggs per bird (eggs per bird).
@@ -2083,9 +2081,19 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # TODO: Confirm if this is a good title.
                 title = f"{item} yield per bird"
                 # TODO: Define remaining titles:
+            elif element_code == "005313":
                 # "005313",  # Laying (animals).
-                # "005318",  # Milk animals (animals).
+                assert unit == "animals"
+                title = f"Number of laying animals to produce {item.lower()}"
+            elif element_code == "005513":
                 # "005513",  # Eggs produced (eggs).
+                assert unit == "eggs"
+                # NOTE: The only items are eggs from hens and eggs from other birds.
+                title = f"Number of {item.lower()} produced"
+            elif element_code == "005318":
+                # "005318",  # Milk animals (animals).
+                assert unit == "animals"
+                title = f"Number of animals used to produce {item.lower()}"
 
         # Update metadata.
         tb_wide[column].metadata.presentation.title_public = title
