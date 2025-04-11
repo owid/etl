@@ -361,7 +361,7 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
             else:
                 raise ValueError(f"Unexpected unit {unit}")
             tb[column].metadata.dimensions = {
-                "food": underscore(item),
+                "item": underscore(item),
                 "metric": underscore(element),
                 "unit": underscore(unit, validate=False),
                 "per_capita": True if "pc" in element_code else False,
@@ -372,6 +372,8 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
 
     # Drop unnecessary columns.
     tb = tb.drop(columns=columns_to_drop)
+
+    return tb
 
 
 def run():
@@ -396,14 +398,14 @@ def run():
     # TODO: It seems we don't have all the units that appeared in the old explorer.
     #  I think the only missing one is food available, which is given in kg per year, and should also be in grams per day.
     # Prepare tables with dimensions.
-    prepare_table_with_dimensions(tb=tb_qcl, item_codes=ITEM_CODES_QCL, element_codes=ELEMENT_CODES_QCL)
-    prepare_table_with_dimensions(tb=tb_fbsc, item_codes=ITEM_CODES_FBSC, element_codes=ELEMENT_CODES_FBSC)
+    tb_qcl = prepare_table_with_dimensions(tb=tb_qcl, item_codes=ITEM_CODES_QCL, element_codes=ELEMENT_CODES_QCL)
+    tb_fbsc = prepare_table_with_dimensions(tb=tb_fbsc, item_codes=ITEM_CODES_FBSC, element_codes=ELEMENT_CODES_FBSC)
 
     # Expand configuration to get all dimensions and views from tables.
     config_new = expand_config(
         [tb_qcl, tb_fbsc],
         default_view={
-            "food": "maize",
+            "item": "maize",
             "metric": "production",
             "unit": "",
             "per_capita": "False",
@@ -411,6 +413,7 @@ def run():
         humanize_dimension_names=True,
         common_view_config={"tab": "map"},
         dimension_names_replacements={
+            "item": "Food",
             "maize": "Maize (corn)",
             "area_harvested": "Land use",
             "feed": "Allocated to animal feed",
