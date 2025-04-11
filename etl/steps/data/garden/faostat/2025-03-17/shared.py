@@ -1875,6 +1875,11 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00000947": "Buffalo meat",  # From faostat_qcl - 'Meat of buffalo, fresh or chilled' (previously 'Meat, buffalo').
             "00001111": "Mule meat",  # From faostat_qcl - 'Meat of mules, fresh or chilled' (previously 'Meat, mule').
             "00001017": "Goat meat",  # From faostat_qcl - 'Meat of goat, fresh or chilled' (previously 'Meat, goat').
+            "00000867": "Cattle meat with the bone",  # From faostat_qcl - "Meat of cattle with the bone, fresh or chilled".
+            "00001158": "Other domestic camelid meat meat",  # From faostat_qcl - "Meat of other domestic camelids, fresh or chilled".
+            "00001151": "Other domestic rodent meat",  # From faostat_qcl - "Meat of other domestic rodents, fresh or chilled".
+            "00001089": "Pigeon and other bird meat",  # From faostat_qcl - "Meat of pigeons and other birds n.e.c., fresh, chilled or frozen".
+            "00001166": "Other mammal meat",  # From faostat_qcl - "Other meat of mammals, fresh or chilled".
             # Fat.
             "00001019": "Unrendered goat fat",  # From faostat_qcl - 'Goat fat, unrendered' (previously 'Fat, goats').
             "00000869": "Unrendered cattle fat",  # From faostat_qcl - 'Cattle fat, unrendered' (previously 'Fat, cattle').
@@ -1882,6 +1887,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00000949": "Unrendered buffalo fat",  # From faostat_qcl - 'Buffalo fat, unrendered' (previously 'Fat, buffaloes').
             "00001037": "Pig fat",  # From faostat_qcl - 'Fat of pigs' (previously 'Fat, pigs').
             "00000979": "Unrendered sheep fat",  # From faostat_qcl - 'Sheep fat, unrendered' (previously 'Fat, sheep').
+            "00001043": "Rendered pig fat",  # From faostat_qcl - "Pig fat, rendered".
             # Offals.
             "00000868": "Cattle offals",  # From faostat_qcl - 'Offals, cattle' (previously 'Offals, cattle').
             "00001098": "Horses and other equines offals",  # From faostat_qcl - 'Edible offals of horses and other equines,  fresh, chilled or frozen' (previously 'Offals, horses').
@@ -1903,6 +1909,8 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00000270": "Rape or colza seed",  # From faostat_qcl - 'Rape or colza seed' (previously 'Rapeseed').
             "00000299": "Melonseed",  # From faostat_qcl - 'Melonseed' (previously 'Melonseed').
             # Other.
+            "00001107": "Donkeys",  # From faostat_qcl - 'Asses'.
+            "00001034": "Pigs",  # From faostat_qcl - 'Swine / pigs'.
             "00001091": "Eggs (from other birds)",  # From faostat_qcl - 'Eggs from other birds (excl. hens)' (previously 'Eggs from other birds (excl. hens)').
             "00001062": "Eggs (from hens)",  # From faostat_qcl - 'Eggs from hens' (previously 'Eggs from hens').
             "00001783": "Eggs (from hens and other birds)",  # From faostat_qcl - 'Eggs' (previously 'Eggs Primary').
@@ -1928,6 +1936,51 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00000056": "Maize (corn)",  # From faostat_qcl - 'Maize (corn)' (previously 'Maize').
             "00000414": "Green beans",  # From faostat_qcl - 'Other beans, green' (previously 'Beans, green').
             "00000592": "Kiwi",  # From faostat_qcl - 'Kiwi' (previously 'Kiwi').
+            "00000800": "Other raw agave fibres",  # From faostat_qcl - "Agave fibres, raw, n.e.c.".
+            "00000203": "Dry bambara beans",  # From faostat_qcl - "Bambara beans, dry".
+            "00000051": "Malted beer of barley",  # From faostat_qcl - "Beer of barley, malted".
+            "00000420": "Green broad and horse beans",  # From faostat_qcl - "Broad beans and horse beans, green".
+            "00000899": "Dry buttermilk",  # From faostat_qcl - "Buttermilk, dry".
+            "00000955": "Fresh or processed cheese from buffalo milk",  # From faostat_qcl - "Cheese from milk of buffalo, fresh or processed".
+            "00001021": "Fresh or processed cheese from goat milk",  # From faostat_qcl - "Cheese from milk of goats, fresh or processed".
+            "00000984": "Fresh or processed cheese from sheep milk",  # From faostat_qcl - "Cheese from milk of sheep, fresh or processed".
+            "00000693": "Raw cinnamon and cinnamon tree flowers",  # From faostat_qcl - "Cinnamon and cinnamon-tree flowers, raw".
+            "00000698": "Raw cloves (whole stems)",  # From faostat_qcl - "Cloves (whole stems), raw".
+            "00000813": "Raw coir",  # From faostat_qcl - "Coir, raw".
+            "00000885": "Fresh cream",  # From faostat_qcl - "Cream, fresh".
+            "00017530": "Fibre crops (fibre equivalent)",  # From faostat_qcl - "Fibre Crops, Fibre Equivalent".
+            "00000720": "Raw ginger",  # From faostat_qcl - "Ginger, raw".
+            "00000778": "Raw kapok fibre",  # From faostat_qcl - "Kapok fibre, raw".
+            "00000402": "Green onions and shallots",  # From faostat_qcl - "Onions and shallots, green".
+            "00000512": "Other citrus fruit",  # From faostat_qcl - "Other citrus fruit, n.e.c.".
+            "00000619": "Other fruits",  # From faostat_qcl - "Other fruits, n.e.c.".
+            "00000339": "Other oil seeds",  # From faostat_qcl - "Other oil seeds, n.e.c.".
+            "00000603": "Other tropical fruits",  # From faostat_qcl - "Other tropical fruits, n.e.c.".
+            "00000463": "Other fresh vegetables",  # From faostat_qcl - "Other vegetables, fresh n.e.c.".
+            "00000748": "Peppermint and spearmint",  # From faostat_qcl - "Peppermint, spearmint".
+            "00000788": "Raw or retted ramie",  # From faostat_qcl - "Ramie, raw or retted".
+            "00000789": "Raw sisal",  # From faostat_qcl - "Sisal, raw".
+            "00001809": "Dry skim milk and buttermilk",  # From faostat_qcl - "Skim Milk & Buttermilk, Dry".
+            "00000896": "Condensed skim milk",  # From faostat_qcl - "Skim milk, condensed".
+            "00000895": "Evaporated skim milk",  # From faostat_qcl - "Skim milk, evaporated".
+            "00000777": "Raw or retted true hemp",  # From faostat_qcl - "True hemp, raw or retted".
+            "00000692": "Raw vanilla",  # From faostat_qcl - "Vanilla, raw".
+            "00000890": "Condensed whey",  # From faostat_qcl - "Whey, condensed".
+            "00000889": "Consdensed whole milk",  # From faostat_qcl - "Whole milk, condensed".
+            "00000894": "Evaporated whole milk",  # From faostat_qcl - "Whole milk, evaporated".
+            # Other odd cases (they would need to be manually fixed, I'll leave them for now).
+            # "00000809": "abaca manila hemp raw",  # From faostat_qcl - "Abaca, manila hemp, raw".
+            # "00000839": "balata gutta percha guayule chicle and similar natural gums in primary forms or in plates sheets or strip",  # From faostat_qcl - "Balata, gutta-percha, guayule, chicle and similar natural gums in primary forms or in plates, sheets or strip".
+            # "00000401": "chillies and peppers green capsicum spp and pimenta spp",  # From faostat_qcl - "Chillies and peppers, green (Capsicum spp. and Pimenta spp.)".
+            # "00000149": "edible roots and tubers with high starch or inulin content n e c fresh",  # From faostat_qcl - "Edible roots and tubers with high starch or inulin content, n.e.c., fresh".
+            # "00000675": "green tea not fermented black tea fermented and partly fermented tea in immediate packings of a content not exceeding 3 kg",  # From faostat_qcl - "Green tea (not fermented), black tea (fermented) and partly fermented tea, in immediate packings of a content not exceeding 3 kg".
+            # "00000782": "kenaf and other textile bast fibres raw or retted",  # From faostat_qcl - "Kenaf, and other textile bast fibres, raw or retted".
+            # "00000702": "nutmeg mace cardamoms raw",  # From faostat_qcl - "Nutmeg, mace, cardamoms, raw".
+            # "00000234": "other nuts excluding wild edible nuts and groundnuts in shell n e c",  # From faostat_qcl - "Other nuts (excluding wild edible nuts and groundnuts), in shell, n.e.c.".
+            # "00000723": "other stimulant spice and aromatic crops n e c",  # From faostat_qcl - "Other stimulant, spice and aromatic crops, n.e.c.".
+            # "00000394": "pumpkins squash and gourds",  # From faostat_qcl - "Pumpkins, squash and gourds".
+            # "00000754": "pyrethrum dried flowers",  # From faostat_qcl - "Pyrethrum, dried flowers".
+            # "00001176": "snails fresh chilled frozen dried salted or in brine except sea snails",  # From faostat_qcl - "Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails".
         },
         "faostat_fbsc": {
             # Meat.
@@ -2136,7 +2189,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "005111":
                 # "005111",  # Stocks (animals)
                 assert unit == "animals"
-                title = f"Live animals used for {item.lower()}"
+                title = f"Live {item.lower()}"
                 num_decimal_places = 0
 
         # Override titles in special cases:
