@@ -1936,16 +1936,40 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00002731": "Beef and buffalo meat",  # From faostat_fbsc - 'Bovine meat'.
             "00002732": "Sheep and goat meat",  # From faostat_fbsc - 'Meat, sheep and goat' (previously 'Meat, sheep and goat').
             "00002733": "Pig meat",  # From faostat_fbsc - 'Pork' (previously 'Pork').
+            "00002768": "Aquatic mammals meat",  # From faostat_fbsc - "Meat, Aquatic Mammals".
             # Seeds.
             "00002557": "Sunflower seeds",  # From faostat_fbsc - 'Sunflower seed' (previously 'Sunflower seed').
             "00002561": "Sesame seeds",  # From faostat_fbsc - 'Sesame seed' (previously 'Sesame seed').
             "00002559": "Cottonseed",  # From faostat_fbsc - 'Cottonseed' (previously 'Cottonseed').
             # Other.
             "00002901": "All food",  # From faostat_fbsc - 'Total' (previously 'Total').
-            "00002737": "Animal fats",  # From faostat_fbsc - 'Animal fats' (previously 'Animal fats').
+            "00002737": "Raw animal fats",  # From faostat_fbsc - 'Animal fats' (previously 'Animal fats').
+            "00002946": "Animal fats",  # From faostat_fbsc - 'Animal fats group'.
             "00002546": "Dry beans",  # From faostat_fbsc - 'Beans, dry' (previously 'Beans, dry').
             "00002514": "Corn",  # From faostat_fbsc - 'Maize' (previously 'Maize').
             "00002547": "Dry peas",  # From faostat_fbsc - 'Peas, dry' (previously 'Peas, dry').
+            "00002769": "Other aquatic animals",  # From faostat_fbsc - 'Aquatic animals, other'.
+            "00002961": "Other aquatic products",  # From faostat_fbsc - 'Aquatic products, other'.
+            "00002657": "Fermented beverages",  # From faostat_fbsc - 'Beverages, fermented'.
+            "00002520": "Other cereals",  # From faostat_fbsc - 'Cereals, other'.
+            "00002659": "Non-consumable alcohol",  # From faostat_fbsc - "Alcohol, Non-Food".
+            "00002614": "Other citrus",  # From faostat_fbsc - "Citrus, Other".
+            "00002781": "Fish body oil",  # From faostat_fbsc - "Fish, Body Oil".
+            "00002782": "Fish liver oil",  # From faostat_fbsc - "Fish, Liver Oil".
+            "00002625": "Other fruits",  # From faostat_fbsc - "Fruits, Other".
+            "00002764": "Other marine fish",  # From faostat_fbsc - "Marine Fish, Other".
+            "00002735": "Other meat",  # From faostat_fbsc - "Meat, Other".
+            "00002767": "Other molluscs",  # From faostat_fbsc - "Molluscs, Other".
+            "00002570": "Other oilcrops",  # From faostat_fbsc - "Oilcrops, Other".
+            "00002534": "Other roots",  # From faostat_fbsc - "Roots, Other".
+            "00002645": "Other spices",  # From faostat_fbsc - "Spices, Other".
+            "00002543": "Other sweeteners",  # From faostat_fbsc - "Sweeteners, Other".
+            "00002605": "Other vegetables",  # From faostat_fbsc - "Vegetables, Other".
+            "00002586": "Other oilcrop oils",  # From faostat_fbsc - "Oilcrops Oil, Other".
+            "00002549": "Other pulses and products",  # From faostat_fbsc - "Pulses, Other and products".
+            # NOTE: It's unclear what the difference is between the following two, but for now, they are not used in the explorer.
+            "00002924": "All alcoholic beverages",  # From faostat_fbsc - 'Alcoholic Beverages'.
+            "00002658": "Alcoholic beverages",  # From faostat_fbsc - 'Beverages, alcoholic'.
         },
     }
 
@@ -1957,6 +1981,9 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         # Replace item names in special cases.
         if dataset_short_name in ITEM_NAME_REPLACEMENTS:
             item = ITEM_NAME_REPLACEMENTS[dataset_short_name].get(item_code, item)
+
+        # Ensure items don't have arbitrary capital letters.
+        item = item.capitalize()
 
         # First define default metadata values:
         title = f"{item} - {element} ({unit})"
@@ -2116,13 +2143,13 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         if item_code == "00002901":
             if element_code == "0664pc":
                 assert unit == "kilocalories per day per capita"
-                title = "Food available for consumption"
+                title = "Total daily supply of calories per person"
             elif element_code == "0674pc":
                 assert unit == "grams of protein per day per capita"
-                title = "Total daily supply of protein"
+                title = "Total daily supply of protein per person"
             elif element_code == "0684pc":
                 assert unit == "grams of fat per day per capita"
-                title = "Daily fat supply"
+                title = "Total daily supply of fat per person"
 
         # Update metadata.
         tb_wide[column].display["name"] = title
