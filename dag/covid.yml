@@ -30,7 +30,7 @@ steps:
     - data://garden/demography/2024-12-03/life_expectancy
     - data://garden/un/2024-07-12/un_wpp
     # Econ
-    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wb/2025-04-08/world_bank_pip
     - data://garden/un/2024-04-09/undp_hdr
     # Health
     - data://garden/wash/2024-01-06/who

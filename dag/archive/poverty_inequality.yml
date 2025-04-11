@@ -100,3 +100,15 @@ steps:
     - data://meadow/cedlas/2024-03-08/sedlac
   data://grapher/cedlas/2024-03-08/sedlac:
     - data://garden/cedlas/2024-03-08/sedlac
+
+  # World Bank Poverty and Inequality Platform
+  data://meadow/wb/2024-10-07/world_bank_pip:
+    - snapshot://wb/2024-10-07/world_bank_pip.csv
+    - snapshot://wb/2024-10-07/world_bank_pip_percentiles.csv
+    - snapshot://wb/2024-10-07/world_bank_pip_regions.csv
+  data://garden/wb/2024-10-07/world_bank_pip:
+    - data://meadow/wb/2024-10-07/world_bank_pip
+  data://grapher/wb/2024-10-07/world_bank_pip_2011ppp:
+    - data://garden/wb/2024-10-07/world_bank_pip
+  data://grapher/wb/2024-10-07/world_bank_pip_2017ppp:
+    - data://garden/wb/2024-10-07/world_bank_pip
