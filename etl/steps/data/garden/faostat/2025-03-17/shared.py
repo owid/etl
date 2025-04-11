@@ -1958,9 +1958,10 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         if dataset_short_name in ITEM_NAME_REPLACEMENTS:
             item = ITEM_NAME_REPLACEMENTS[dataset_short_name].get(item_code, item)
 
-        # First define a generic title:
+        # First define default metadata values:
         title = f"{item} - {element} ({unit})"
         description_short = None
+        num_decimal_places = 2
 
         # A few additional definitions.
         description_short_food_available = "Quantity that is available for consumption at the end of the supply chain. It does not account for consumer waste, so the quantity that is actually consumed may be lower."
@@ -2059,7 +2060,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "005412":
                 # "005412",  # Yield (tonnes per hectare).
                 assert unit == "tonnes per hectare"
-                title = f"{item} yield"
+                title = f"Yield of {item.lower()}"
                 description_short = (
                     "Yield is the amount produced per unit of land used, measured in tonnes per hectare."
                 )
@@ -2080,6 +2081,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005321",  # Producing or slaughtered animals (animals).
                 assert unit == "animals"
                 title = f"Animals slaughtered to produce {item}"
+                num_decimal_places = 0
             elif element_code in ["5320pc", "5321pc"]:
                 # "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
                 # "5321pc",  # Producing or slaughtered animals per capita (animals per capita).
@@ -2104,6 +2106,11 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005318",  # Milk animals (animals).
                 assert unit == "animals"
                 title = f"Number of animals used to produce {item.lower()}"
+            elif element_code == "005111":
+                # "005111",  # Stocks (animals)
+                assert unit == "animals"
+                title = f"Live animals used for {item.lower()}"
+                num_decimal_places = 0
 
         # Override titles in special cases:
         if item_code == "00002901":
@@ -2119,6 +2126,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
 
         # Update metadata.
         tb_wide[column].display["name"] = title
+        tb_wide[column].display["numDecimalPlaces"] = num_decimal_places
         tb_wide[column].metadata.presentation.title_public = title
         tb_wide[column].metadata.presentation.description_short = description_short
 
