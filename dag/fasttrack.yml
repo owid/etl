@@ -232,3 +232,5 @@ steps:
     - snapshot://fasttrack/latest/cdc_measles.csv
   data://grapher/fasttrack/latest/world_bank_pip_filled:
     - snapshot://fasttrack/latest/world_bank_pip_filled.csv
+  data://grapher/fasttrack/2025-04-10/guinea_worm:
+    - snapshot://fasttrack/2025-04-10/guinea_worm.csv
