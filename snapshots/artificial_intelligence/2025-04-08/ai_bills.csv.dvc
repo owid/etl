@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: AI Index Report
+    description: |-
+      The AI Index Report tracks, collates, distills, and visualizes data related to artificial intelligence (AI). The mission is to provide unbiased, rigorously vetted, broadly sourced data to enable policymakers, researchers, executives, journalists, and the general public to develop a more thorough and nuanced understanding of the complex field of AI.
+    date_published: "2025"
+    title_snapshot: AI Index Report - AI bills
+
+    # Citation
+    producer: AI Index Report
+    citation_full: |-
+      Nestor Maslej, Loredana Fattorini, Raymond Perrault, Yolanda Gil, Vanessa Parli, Njenga Kariuki, Emily Capstick, Anka Reuel, Erik
+      Brynjolfsson, John Etchemendy, Katrina Ligett, Terah Lyons, James Manyika, Juan Carlos Niebles, Yoav Shoham, Russell Wald,
+      Tobi Walsh, Armin Hamrah, Lapo Santarlasci, Julia Betts Lotufo, Alexandra Rome, Andrew Shi, Sukrut Oak. “The AI Index 2025
+      Annual Report,” AI Index Steering Committee, Institute for Human-Centered AI, Stanford University, Stanford, CA, April 2025
+    attribution_short: AI Index Report
+
+    # Files
+    url_main: https://hai-production.s3.amazonaws.com/files/hai_ai_index_report_2025.pdf
+    url_download: https://drive.google.com/uc?export=download&id=1OeAJqDeCFFFWnusis_laWnjPO8rzcMfq
+    date_accessed: 2025-04-08
+    # License
+    license:
+      name: CC BY-ND 4.0
+      url: https://hai-production.s3.amazonaws.com/files/hai_ai_index_report_2025.pdf
+outs:
+  - md5: 066531ea9cb1e537496e6e837e9b1b9f
+    size: 1480
+    path: ai_bills.csv
