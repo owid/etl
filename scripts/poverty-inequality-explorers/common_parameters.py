@@ -49,9 +49,10 @@ PPP_VERSIONS_PIP = [2011, 2017]
 PPP_VERSION_OLD_PIP = PPP_VERSIONS_PIP[0]
 PPP_VERSION_CURRENT_PIP = PPP_VERSIONS_PIP[1]
 
-# Define PPP to use for comparisons
+# Define PPP to use for comparisons with LIS
 # NOTE: Update the PPP version here
-PPP_VERSION_COMPARISON_PIP = PPP_VERSION_OLD_PIP
+# TODO: Update the PPP version here
+PPP_VERSION_COMPARISON_PIP = PPP_VERSION_CURRENT_PIP
 
 
 INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
