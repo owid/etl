@@ -675,7 +675,6 @@ class PathFinder:
         config: Dict[str, Any],
         df_graphers: pd.DataFrame,
         df_columns: Optional[pd.DataFrame] = None,
-        reset: bool = False,
     ) -> ExplorerLegacy:
         """This function is used to create an Explorer object using the legacy configuration.
 
@@ -703,7 +702,6 @@ class PathFinder:
             df_graphers=df_graphers,
             explorer_name=explorer_name,
             df_columns=df_columns,
-            reset=reset,
         )
 
         return explorer
