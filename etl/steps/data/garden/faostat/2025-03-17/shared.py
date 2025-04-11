@@ -1960,26 +1960,33 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
 
         # First define a generic title:
         title = f"{item} - {element} ({unit})"
+        description_short = None
+
+        # A few additional definitions.
+        description_short_food_available = "Quantity that is available for consumption at the end of the supply chain. It does not account for consumer waste, so the quantity that is actually consumed may be lower."
 
         # Now redefine the title for special cases:
-        # TODO: Add description short.
         if dataset_short_name == "faostat_fbsc":
             if element_code == "0645pc":
                 # "0645pc",  # Food available for consumption (kilograms per year per capita)
                 assert unit == "kilograms per year per capita"
                 title = f"Daily per capita supply of {item.lower()}"
+                description_short = description_short_food_available
             elif element_code == "0664pc":
                 # "0664pc",  # Food available for consumption (kilocalories per day per capita)
                 assert unit == "kilocalories per day per capita"
                 title = f"Daily per capita supply of calories from {item.lower()}"
+                description_short = description_short_food_available
             elif element_code == "0674pc":
                 # "0674pc",  # Food available for consumption (grams of protein per day per capita)
                 assert unit == "grams of protein per day per capita"
                 title = f"Daily per capita supply of proteins from {item.lower()}"
+                description_short = description_short_food_available
             elif element_code == "0684pc":
                 # "0684pc",  # Food available for consumption (grams of fat per day per capita)
                 assert unit == "grams of fat per day per capita"
                 title = f"Daily per capita supply of fat from {item.lower()}"
+                description_short = description_short_food_available
             elif element_code == "005142":
                 # "005142",  # Food (tonnes)
                 assert unit == "tonnes"
@@ -2023,19 +2030,19 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "005611":
                 # "005611",  # Imports (tonnes)
                 assert unit == "tonnes"
-                title = f"{item} imports"
+                title = f"Imports of {item.lower()}"
             elif element_code == "5611pc":
                 # "5611pc",  # Imports (tonnes per capita)
                 assert unit == "tonnes per capita"
-                title = f"Per capita {item.lower()} imports"
+                title = f"Per capita imports of {item.lower()}"
             elif element_code == "005911":
                 # "005911",  # Exports (tonnes)
                 assert unit == "tonnes"
-                title = f"{item} exports"
+                title = f"Exports of {item.lower()}"
             elif element_code == "5911pc":
                 # "5911pc",  # Exports (tonnes per capita)
                 assert unit == "tonnes per capita"
-                title = f"Per capita {item.lower()} exports"
+                title = f"Per capita exports of {item.lower()}"
             elif element_code == "005131":
                 # "005131",  # Processing (tonnes)
                 assert unit == "tonnes"
@@ -2053,6 +2060,9 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005412",  # Yield (tonnes per hectare).
                 assert unit == "tonnes per hectare"
                 title = f"{item} yield"
+                description_short = (
+                    "Yield is the amount produced per unit of land used, measured in tonnes per hectare."
+                )
             elif element_code in ["005417", "005424"]:
                 # "005417",  # Yield (kilograms per animal).
                 # "005424",  # Yield (kilograms per animal).
@@ -2061,10 +2071,10 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "005312":
                 # "005312",  # Area harvested (hectares).
                 assert unit == "hectares"
-                title = f"Land used for {item.lower()} production"
+                title = f"Land used to produce {item.lower()}"
             elif element_code == "5312pc":
                 # "5312pc",  # Area harvested per capita (hectares per capita).
-                title = f"Land used for {item.lower()} production per capita"
+                title = f"Per capita land used to produce {item.lower()}"
             elif element_code in ["005320", "005321"]:
                 # "005320",  # Producing or slaughtered animals (animals).
                 # "005321",  # Producing or slaughtered animals (animals).
@@ -2084,7 +2094,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "005313":
                 # "005313",  # Laying (animals).
                 assert unit == "animals"
-                title = f"Number of laying animals to produce {item.lower()}"
+                title = f"Laying animals to produce {item.lower()}"
             elif element_code == "005513":
                 # "005513",  # Eggs produced (eggs).
                 assert unit == "eggs"
@@ -2095,8 +2105,22 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 assert unit == "animals"
                 title = f"Number of animals used to produce {item.lower()}"
 
+        # Override titles in special cases:
+        if item_code == "00002901":
+            if element_code == "0664pc":
+                assert unit == "kilocalories per day per capita"
+                title = "Food available for consumption"
+            elif element_code == "0674pc":
+                assert unit == "grams of protein per day per capita"
+                title = "Total daily supply of protein"
+            elif element_code == "0684pc":
+                assert unit == "grams of fat per day per capita"
+                title = "Daily fat supply"
+
         # Update metadata.
+        tb_wide[column].display["name"] = title
         tb_wide[column].metadata.presentation.title_public = title
+        tb_wide[column].metadata.presentation.description_short = description_short
 
 
 def run(dest_dir: str) -> None:
