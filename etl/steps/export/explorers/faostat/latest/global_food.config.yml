@@ -1,0 +1,13 @@
+config:
+  explorerTitle: Global Food
+  isPublished: true
+  entityType: country
+  explorerSubtitle: Explore the world's food system crop-by-crop from production to plate.
+  selection:
+    - World
+    - United States
+    - China
+    - India
+    - Brazil
+    - United Kingdom
+  hasMapTab: true

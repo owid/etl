@@ -24,6 +24,7 @@ def run() -> None:
         indicator_names=["coverage", "unvaccinated", "vaccinated"],
         dimensions=["antigen"],
         indicators_slug="metric",
+        indicator_as_dimension=True,
     )
     # 3: Combine both sources (basically dimensions and views)
     config["dimensions"] = multidim.combine_config_dimensions(

@@ -1850,6 +1850,287 @@ def sanity_check_custom_units(tb_wide: Table, ds_garden: Dataset) -> None:
             )
 
 
+def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
+    # Improve metadata in wide table (this, unfortunately, cannot easily be achieved in the long table).
+    # def prepare_public_titles(item: str, element: str, unit: str) -> str:
+
+    ITEM_NAME_REPLACEMENTS = {
+        "faostat_qcl": {
+            # Meat items.
+            "00001765": "All meat",  # From faostat_qcl - 'Meat, total' (previously 'Meat, total').
+            "00001069": "Duck meat",  # From faostat_qcl - 'Meat of ducks, fresh or chilled' (previously 'Meat, duck').
+            "00001806": "Beef and buffalo meat",  # From faostat_qcl - 'Meat, beef and buffalo' (previously 'Meat, beef and buffalo').
+            "00001097": "Horse meat",  # From faostat_qcl - 'Horse meat, fresh or chilled' (previously 'Meat, horse').
+            "00001808": "Poultry meat",  # From faostat_qcl - 'Meat, poultry' (previously 'Meat, poultry').
+            "00000977": "Lamb and mutton meat",  # From faostat_qcl - 'Meat, lamb and mutton' (previously 'Meat, lamb and mutton').
+            "00001127": "Camel meat",  # From faostat_qcl - 'Meat of camels, fresh or chilled' (previously 'Meat, camel').
+            "00001080": "Turkey meat",  # From faostat_qcl - 'Meat of turkeys, fresh or chilled' (previously 'Meat, turkey').
+            "00001108": "Donkey meat",  # From faostat_qcl - 'Meat of asses, fresh or chilled' (previously 'Meat, ass').
+            "00001073": "Goose meat",  # From faostat_qcl - 'Meat of geese, fresh or chilled' (previously 'Meat, goose and guinea fowl').
+            "00001035": "Pig meat",  # From faostat_qcl - 'Meat of pig with the bone, fresh or chilled' (previously 'Meat, pig').
+            "00001163": "Game meat",  # From faostat_qcl - 'Game meat, fresh, chilled or frozen' (previously 'Meat, game').
+            "00001807": "Sheep and goat meat",  # From faostat_qcl - 'Meat, sheep and goat' (previously 'Meat, sheep and goat').
+            "00001141": "Rabbit and hare meat",  # From faostat_qcl - 'Meat of rabbits and hares, fresh or chilled' (previously 'Meat, rabbit').
+            "00001058": "Chicken meat",  # From faostat_qcl - 'Meat of chickens, fresh or chilled' (previously 'Meat, chicken').
+            "00000947": "Buffalo meat",  # From faostat_qcl - 'Meat of buffalo, fresh or chilled' (previously 'Meat, buffalo').
+            "00001111": "Mule meat",  # From faostat_qcl - 'Meat of mules, fresh or chilled' (previously 'Meat, mule').
+            "00001017": "Goat meat",  # From faostat_qcl - 'Meat of goat, fresh or chilled' (previously 'Meat, goat').
+            # Fat.
+            "00001019": "Unrendered goat fat",  # From faostat_qcl - 'Goat fat, unrendered' (previously 'Fat, goats').
+            "00000869": "Unrendered cattle fat",  # From faostat_qcl - 'Cattle fat, unrendered' (previously 'Fat, cattle').
+            "00001129": "Camel fat",  # From faostat_qcl - 'Fat of camels' (previously 'Fat, camels').
+            "00000949": "Unrendered buffalo fat",  # From faostat_qcl - 'Buffalo fat, unrendered' (previously 'Fat, buffaloes').
+            "00001037": "Pig fat",  # From faostat_qcl - 'Fat of pigs' (previously 'Fat, pigs').
+            "00000979": "Unrendered sheep fat",  # From faostat_qcl - 'Sheep fat, unrendered' (previously 'Fat, sheep').
+            # Offals.
+            "00000868": "Cattle offals",  # From faostat_qcl - 'Offals, cattle' (previously 'Offals, cattle').
+            "00001098": "Horses and other equines offals",  # From faostat_qcl - 'Edible offals of horses and other equines,  fresh, chilled or frozen' (previously 'Offals, horses').
+            "00000978": "Sheep offals",  # From faostat_qcl - 'Offals, sheep' (previously 'Offals, sheep').
+            "00000948": "Buffalo offals",  # From faostat_qcl - 'Offals, buffaloes' (previously 'Offals, buffaloes').
+            "00001128": "Camel offals",  # From faostat_qcl - 'Offals, camels' (previously 'Offals, camels').
+            "00001036": "Pig offals",  # From faostat_qcl - 'Offals, pigs' (previously 'Offals, pigs').
+            "00001018": "Goat offals",  # From faostat_qcl - 'Offals, goats' (previously 'Offals, goats').
+            # Seeds.
+            "00000289": "Sesame seeds",  # From faostat_qcl - 'Sesame seed' (previously 'Sesame seed').
+            "00000267": "Sunflower seeds",  # From faostat_qcl - 'Sunflower seed' (previously 'Sunflower seed').
+            "00000292": "Mustard seeds",  # From faostat_qcl - 'Mustard seed' (previously 'Mustard seed').
+            "00000101": "Canary seeds",  # From faostat_qcl - 'Canary seed' (previously 'Canary seed').
+            "00000280": "Safflower seeds",  # From faostat_qcl - 'Safflower seed' (previously 'Safflower seed').
+            "00000328": "Unginned cotton seeds",  # From faostat_qcl - 'Seed cotton, unginned' (previously 'Seed cotton').
+            "00000333": "Linseed",  # From faostat_qcl - 'Linseed' (previously 'Linseed').
+            "00000336": "Hempseed",  # From faostat_qcl - 'Hempseed' (previously 'Hempseed').
+            "00000329": "Cotton seed",  # From faostat_qcl - 'Cotton seed' (previously 'Cottonseed').
+            "00000270": "Rape or colza seed",  # From faostat_qcl - 'Rape or colza seed' (previously 'Rapeseed').
+            "00000299": "Melonseed",  # From faostat_qcl - 'Melonseed' (previously 'Melonseed').
+            # Other.
+            "00001091": "Eggs (from other birds)",  # From faostat_qcl - 'Eggs from other birds (excl. hens)' (previously 'Eggs from other birds (excl. hens)').
+            "00001062": "Eggs (from hens)",  # From faostat_qcl - 'Eggs from hens' (previously 'Eggs from hens').
+            "00001783": "Eggs (from hens and other birds)",  # From faostat_qcl - 'Eggs' (previously 'Eggs Primary').
+            "00000176": "Dry beans",  # From faostat_qcl - 'Beans, dry' (previously 'Beans, dry').
+            "00000201": "Dry lentils",  # From faostat_qcl - 'Lentils, dry' (previously 'Lentils').
+            "00000216": "Brazil nuts in shell",  # From faostat_qcl - 'Brazil nuts, in shell' (previously 'Brazil nuts, with shell').
+            "00001804": "Citrus fruit",  # From faostat_qcl - 'Citrus Fruit' (previously 'Citrus Fruit').
+            "00000656": "Green coffee",  # From faostat_qcl - 'Coffee, green' (previously 'Coffee, green').
+            "00000995": "Sheep skins",  # From faostat_qcl - 'Skins, sheep' (previously 'Skins, sheep').
+            "00001025": "Goat skins",  # From faostat_qcl - 'Skins, goat' (previously 'Skins, goat').
+            "00000771": "Raw or retted flax",  # From faostat_qcl - 'Flax, raw or retted' (previously 'Flax fibre').
+            "00000220": "Chestnuts in shell",  # From faostat_qcl - 'Chestnuts, in shell' (previously 'Chestnut').
+            "00000417": "Green peas",  # From faostat_qcl - 'Peas, green' (previously 'Peas, green').
+            "00001732": "Oilcrops (oil equivalent)",  # From faostat_qcl - 'Oilcrops, Oil Equivalent' (previously 'Oilcrops, Oil Equivalent').
+            "00000223": "Pistachios in shell",  # From faostat_qcl - 'Pistachios, in shell' (previously 'Pistachios').
+            "00000187": "Dry peas",  # From faostat_qcl - 'Peas, dry' (previously 'Peas, dry').
+            "00001841": "Oilcrops (cake equivalent)",  # From faostat_qcl - 'Oilcrops, Cake Equivalent' (previously 'Oilcrops, Cake Equivalent').
+            "00000125": "Fresh cassava",  # From faostat_qcl - 'Cassava, fresh' (previously 'Cassava').
+            "00000197": "Dry pigeon peas",  # From faostat_qcl - 'Pigeon peas, dry' (previously 'Pigeon peas').
+            "00000249": "Coconuts in shell",  # From faostat_qcl - 'Coconuts, in shell' (previously 'Coconuts').
+            "00000780": "Raw or retted jute",  # From faostat_qcl - 'Jute, raw or retted' (previously 'Jute').
+            "00000162": "Raw sugar",  # From faostat_qcl - 'Sugar (raw)' (previously 'Sugar (raw)').
+            "00000056": "Maize (corn)",  # From faostat_qcl - 'Maize (corn)' (previously 'Maize').
+            "00000414": "Green beans",  # From faostat_qcl - 'Other beans, green' (previously 'Beans, green').
+            "00000592": "Kiwi",  # From faostat_qcl - 'Kiwi' (previously 'Kiwi').
+        },
+        "faostat_fbsc": {
+            # Meat.
+            "00002943": "All meat",  # From faostat_fbsc - 'Meat, total' (previously 'Meat, total').
+            "00002734": "Poultry meat",  # From faostat_fbsc - 'Meat, poultry' (previously 'Meat, poultry').
+            "00002731": "Beef and buffalo meat",  # From faostat_fbsc - 'Bovine meat'.
+            "00002732": "Sheep and goat meat",  # From faostat_fbsc - 'Meat, sheep and goat' (previously 'Meat, sheep and goat').
+            "00002733": "Pig meat",  # From faostat_fbsc - 'Pork' (previously 'Pork').
+            # Seeds.
+            "00002557": "Sunflower seeds",  # From faostat_fbsc - 'Sunflower seed' (previously 'Sunflower seed').
+            "00002561": "Sesame seeds",  # From faostat_fbsc - 'Sesame seed' (previously 'Sesame seed').
+            "00002559": "Cottonseed",  # From faostat_fbsc - 'Cottonseed' (previously 'Cottonseed').
+            # Other.
+            "00002901": "All food",  # From faostat_fbsc - 'Total' (previously 'Total').
+            "00002737": "Animal fats",  # From faostat_fbsc - 'Animal fats' (previously 'Animal fats').
+            "00002546": "Dry beans",  # From faostat_fbsc - 'Beans, dry' (previously 'Beans, dry').
+            "00002514": "Corn",  # From faostat_fbsc - 'Maize' (previously 'Maize').
+            "00002547": "Dry peas",  # From faostat_fbsc - 'Peas, dry' (previously 'Peas, dry').
+        },
+    }
+
+    for column in tb_wide.drop(columns=["area_code"]).columns:
+        item, item_code, element, element_code, unit = sum(
+            [[j.strip() for j in i.split("|")] for i in tb_wide[column].metadata.title.split("||")], []
+        )
+
+        # Replace item names in special cases.
+        if dataset_short_name in ITEM_NAME_REPLACEMENTS:
+            item = ITEM_NAME_REPLACEMENTS[dataset_short_name].get(item_code, item)
+
+        # First define default metadata values:
+        title = f"{item} - {element} ({unit})"
+        description_short = None
+        num_decimal_places = 2
+
+        # A few additional definitions.
+        description_short_food_available = "Quantity that is available for consumption at the end of the supply chain. It does not account for consumer waste, so the quantity that is actually consumed may be lower."
+
+        # Now redefine the title for special cases:
+        if dataset_short_name == "faostat_fbsc":
+            if element_code == "0645pc":
+                # "0645pc",  # Food available for consumption (kilograms per year per capita)
+                assert unit == "kilograms per year per capita"
+                title = f"Daily per capita supply of {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "0664pc":
+                # "0664pc",  # Food available for consumption (kilocalories per day per capita)
+                assert unit == "kilocalories per day per capita"
+                title = f"Daily per capita supply of calories from {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "0674pc":
+                # "0674pc",  # Food available for consumption (grams of protein per day per capita)
+                assert unit == "grams of protein per day per capita"
+                title = f"Daily per capita supply of proteins from {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "0684pc":
+                # "0684pc",  # Food available for consumption (grams of fat per day per capita)
+                assert unit == "grams of fat per day per capita"
+                title = f"Daily per capita supply of fat from {item.lower()}"
+                description_short = description_short_food_available
+            elif element_code == "005142":
+                # "005142",  # Food (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} used for direct human food"
+            elif element_code == "5142pc":
+                # "5142pc",  # Food (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} used for direct human food per capita"
+            elif element_code == "005521":
+                # "005521",  # Feed (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} used for animal feed"
+            elif element_code == "5521pc":
+                # "5521pc",  # Feed (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} used for animal feed per capita"
+            elif element_code == "005154":
+                # "005154",  # Other uses (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} allocated to other uses"
+            elif element_code == "5154pc":
+                # "5154pc",  # Other uses (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} allocated to other uses per capita"
+            elif element_code == "005123":
+                # "005123",  # Waste in supply chain (tonnes)
+                assert unit == "tonnes"
+                title = f"{item} wasted in supply chains"
+            elif element_code == "5123pc":
+                # "5123pc",  # Waste in supply chain (tonnes_per_capita)
+                assert unit == "tonnes per capita"
+                title = f"{item} wasted in supply chains per capita"
+            elif element_code == "005301":
+                # "005301",  # Domestic supply (tonnes)
+                assert unit == "tonnes"
+                title = f"Domestic supply of {item.lower()}"
+            elif element_code == "5301pc":
+                # "5301pc",  # Domestic supply (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita domestic supply of {item.lower()}"
+            elif element_code == "005611":
+                # "005611",  # Imports (tonnes)
+                assert unit == "tonnes"
+                title = f"Imports of {item.lower()}"
+            elif element_code == "5611pc":
+                # "5611pc",  # Imports (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita imports of {item.lower()}"
+            elif element_code == "005911":
+                # "005911",  # Exports (tonnes)
+                assert unit == "tonnes"
+                title = f"Exports of {item.lower()}"
+            elif element_code == "5911pc":
+                # "5911pc",  # Exports (tonnes per capita)
+                assert unit == "tonnes per capita"
+                title = f"Per capita exports of {item.lower()}"
+            elif element_code == "005131":
+                # "005131",  # Processing (tonnes)
+                assert unit == "tonnes"
+                title = f"Processing of {item.lower()}"
+        elif dataset_short_name == "faostat_qcl":
+            if element_code == "005510":
+                # "005510",  # Production (tonnes).
+                assert unit == "tonnes"
+                title = f"Production of {item.lower()}"
+            elif element_code == "5510pc":
+                # "5510pc",  # Production per capita (tonnes per capita).
+                assert unit == "tonnes per capita"
+                title = f"Per capita production of {item.lower()}"
+            elif element_code == "005412":
+                # "005412",  # Yield (tonnes per hectare).
+                assert unit == "tonnes per hectare"
+                title = f"Yield of {item.lower()}"
+                description_short = (
+                    "Yield is the amount produced per unit of land used, measured in tonnes per hectare."
+                )
+            elif element_code in ["005417", "005424"]:
+                # "005417",  # Yield (kilograms per animal).
+                # "005424",  # Yield (kilograms per animal).
+                assert unit == "kilograms per animal"
+                title = f"{item} yield per animal"
+            elif element_code == "005312":
+                # "005312",  # Area harvested (hectares).
+                assert unit == "hectares"
+                title = f"Land used to produce {item.lower()}"
+            elif element_code == "5312pc":
+                # "5312pc",  # Area harvested per capita (hectares per capita).
+                title = f"Per capita land used to produce {item.lower()}"
+            elif element_code in ["005320", "005321"]:
+                # "005320",  # Producing or slaughtered animals (animals).
+                # "005321",  # Producing or slaughtered animals (animals).
+                assert unit == "animals"
+                title = f"Animals slaughtered to produce {item}"
+                num_decimal_places = 0
+            elif element_code in ["5320pc", "5321pc"]:
+                # "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
+                # "5321pc",  # Producing or slaughtered animals per capita (animals per capita).
+                assert unit == "animals per capita"
+                title = f"Animals slaughtered per capita to produce {item}"
+            elif element_code == "005413":
+                # "005413",  # Eggs per bird (eggs per bird).
+                assert unit == "eggs per bird"
+                # TODO: Confirm if this is a good title.
+                title = f"{item} yield per bird"
+                # TODO: Define remaining titles:
+            elif element_code == "005313":
+                # "005313",  # Laying (animals).
+                assert unit == "animals"
+                title = f"Laying animals to produce {item.lower()}"
+            elif element_code == "005513":
+                # "005513",  # Eggs produced (eggs).
+                assert unit == "eggs"
+                # NOTE: The only items are eggs from hens and eggs from other birds.
+                title = f"Number of {item.lower()} produced"
+            elif element_code == "005318":
+                # "005318",  # Milk animals (animals).
+                assert unit == "animals"
+                title = f"Number of animals used to produce {item.lower()}"
+            elif element_code == "005111":
+                # "005111",  # Stocks (animals)
+                assert unit == "animals"
+                title = f"Live animals used for {item.lower()}"
+                num_decimal_places = 0
+
+        # Override titles in special cases:
+        if item_code == "00002901":
+            if element_code == "0664pc":
+                assert unit == "kilocalories per day per capita"
+                title = "Food available for consumption"
+            elif element_code == "0674pc":
+                assert unit == "grams of protein per day per capita"
+                title = "Total daily supply of protein"
+            elif element_code == "0684pc":
+                assert unit == "grams of fat per day per capita"
+                title = "Daily fat supply"
+
+        # Update metadata.
+        tb_wide[column].display["name"] = title
+        tb_wide[column].display["numDecimalPlaces"] = num_decimal_places
+        tb_wide[column].metadata.presentation.title_public = title
+        tb_wide[column].metadata.presentation.description_short = description_short
+
+
 def run(dest_dir: str) -> None:
     #
     # Load data.
@@ -1925,6 +2206,9 @@ def run(dest_dir: str) -> None:
 
     # Create a wide table (with only country and year as index).
     tb_wide = prepare_wide_table(tb=tb)
+
+    # Improve metadata (of wide table).
+    improve_metadata(tb_wide=tb_wide, dataset_short_name=dataset_short_name)
 
     # Check that column "value" has an origin (other columns are not as important and may not have origins).
     error = f"Column 'value' of the long table of {dataset_short_name} must have one origin."

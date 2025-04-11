@@ -42,17 +42,6 @@ def improve_config_names(config, transformation=None, replacements=None):
     return config_new
 
 
-def set_default_view(config, default_view):
-    config_new = deepcopy(config)
-    error = "Default view not found"
-    assert sum([default_view == view["dimensions"] for view in config_new["views"]]) == 1, error
-    for view in config_new["views"]:
-        if view["dimensions"] == default_view:
-            view["default_view"] = True
-
-    return config_new
-
-
 def run() -> None:
     #
     # Load inputs.
@@ -89,16 +78,16 @@ def run() -> None:
             "estimate": [EMPTY_DIMENSION_LABEL, "midpoint", "lower limit", "upper limit"],
             "per_capita": ["False", "True"],
         },
-        indicator_as_dimension=True,
+        indicator_as_dimension=False,
         # TODO: The following changes the coloring of the chart tab. How do I change the color of the map tab?
         # common_view_config={"baseColorScheme": "YlOrBr"},
+        default_view={
+            "metric": "animals_killed",
+            "animal": "all land animals",
+            "estimate": "",
+            "per_capita": "False",
+        },
     )
-    ####################################################################################################################
-    # TODO: For some reason, a new dimension "indicator" is added. Manually remove it:
-    for view in config_new["views"]:
-        view["dimensions"].pop("indicator", None)
-    config_new["dimensions"] = [dimension for dimension in config_new["dimensions"] if dimension["slug"] != "indicator"]
-    ####################################################################################################################
     # Update original configuration of dimensions and views.
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
@@ -284,17 +273,6 @@ def run() -> None:
                 # "stackMode": "absolute",
             },
         }
-    )
-
-    # Set the defalt view.
-    config = set_default_view(
-        config=config,
-        default_view={
-            "metric": "animals_killed",
-            "animal": "all land animals",
-            "estimate": "",
-            "per_capita": "False",
-        },
     )
 
     #

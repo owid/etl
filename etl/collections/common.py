@@ -1,12 +1,13 @@
 """Common tooling for MDIMs/Explorers."""
 
 from copy import deepcopy
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Union
 
 import pandas as pd
 from owid.catalog import Table
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
+from structlog import get_logger
 
 import etl.grapher.model as gm
 from etl.collections.model import Collection
@@ -15,6 +16,8 @@ from etl.collections.utils import (
     validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
+
+log = get_logger()
 
 INDICATORS_SLUG = "indicator"
 
@@ -69,16 +72,60 @@ def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv
         return {indicator.catalogPath: indicator.id for indicator in db_indicators}
 
 
+def _humanize_dimension_names(dimension, transformation, replacements):
+    for field, value in dimension.items():
+        if field == "name":
+            if value in replacements:
+                dimension["name"] = replacements[value]
+            else:
+                dimension["name"] = transformation(value)
+        if field == "choices":
+            for choice in value:
+                _humanize_dimension_names(choice, transformation=transformation, replacements=replacements)
+
+
+def default_slug_name_transformation(slug):
+    """Default transformation of machine-readable slugs, e.g. "area_harvested", into human-readable dimension names, e.g. "Area harvested"."""
+    return slug.replace("_", " ").capitalize()
+
+
+def humanize_dimension_names_in_config(
+    config: Dict[str, Any],
+    transformation: Optional[Callable[[str], str]] = None,
+    replacements: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
+    """Transform all machine-readable slugs, e.g. "area_harvested" into human-readable names, e.g. "Area harvested"."""
+    if transformation is None:
+        transformation = default_slug_name_transformation
+
+    if replacements is None:
+        replacements = dict()
+
+    config_new = deepcopy(config)
+    for dimension in config_new["dimensions"]:
+        _humanize_dimension_names(dimension, transformation=transformation, replacements=replacements)
+
+    return config_new
+
+
 def expand_config(
-    tb: Table,
+    tb: Union[Table, List[Table]],
     indicator_names: Optional[Union[str, List[str]]] = None,
     dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
     common_view_config: Optional[Dict[str, Any]] = None,
     indicator_as_dimension: bool = False,
     indicators_slug: Optional[str] = None,
     expand_path_mode: Literal["table", "dataset", "full"] = "table",
+    default_view: Optional[Dict[str, Any]] = None,
+    humanize_dimension_names: bool = False,
+    dimension_names_transformation: Optional[Callable[[str], str]] = None,
+    dimension_names_replacements: Optional[Dict[str, str]] = None,
 ) -> Dict[str, Any]:
     """Create partial config (dimensions and views) from multi-dimensional indicator in table `tb`.
+
+    ####################################################################################################################
+    TODO: Update docstring - now this function can ingest both a single table or a list of tables.
+    ####################################################################################################################
 
     This method returns the configuration generated from the table `tb`. You can select a subset of indicators with argument `indicator_names`, otherwise all indicators will be expanded.
 
@@ -142,6 +189,8 @@ def expand_config(
         Set to True to keep the indicator as a dimension. For instance, if you expand a table with multiple - dimensional - indicators (e.g. 'population', 'population_density'), a dimension is added in the config that specifies the indicator. If there are more than one indicators being expanded, the indicator information is kept as a dimension regardless of this flag.
     indicators_slug: str
         Name to use as the slug for the indicator dimension. Default is 'indicator'. This is used to identify the indicator in a view using dimensional information.
+    default_view: Dict[str, Any] | None
+        View in the configuration to set as default. If not found, a warning is raised.
 
     EXAMPLES
     --------
@@ -181,20 +230,23 @@ def expand_config(
     if indicators_slug is None:
         indicators_slug = INDICATORS_SLUG
 
+    # Support both single and multiple tables
+    tables = [tb] if isinstance(tb, Table) else tb
+
     # Partial configuration
     config_partial = {}
 
     # Initiate expander object
     expander = CollectionConfigExpander(
-        tb=tb,
+        tbs=tables,
         indicators_slug=indicators_slug,
         indicator_names=indicator_names,
         indicator_as_dimension=indicator_as_dimension,
         expand_path_mode=expand_path_mode,
     )
 
-    # Combine indicator information with dimensions (only when multiple indicators are given)
-    if (len(expander.indicator_names) > 1) or (indicator_as_dimension):
+    # Combine indicator information with dimensions if requested
+    if indicator_as_dimension:
         if dimensions is None:
             dimensions = {dim: "*" for dim in expander.dimension_names}
         elif isinstance(dimensions, list):
@@ -204,21 +256,41 @@ def expand_config(
             **{k: v for k, v in dimensions.items() if k != indicators_slug},
         }
 
-    # EXPAND CHART_DIMENSIONS
+    # EXPAND DIMENSIONS
     config_partial["dimensions"] = expander.build_dimensions(
         dimensions=dimensions,
     )
 
-    # Filter of dimensions
-    dimension_choices = {}
-    for dim in config_partial["dimensions"]:
-        dimension_choices[dim["slug"]] = [choice["slug"] for choice in dim["choices"]]
+    # Map dimension slugs to selected values
+    dimension_choices = {
+        dim["slug"]: [choice["slug"] for choice in dim["choices"]] for dim in config_partial["dimensions"]
+    }
 
     # EXPAND VIEWS
     config_partial["views"] = expander.build_views(
         common_view_config=common_view_config,
         dimension_choices=dimension_choices,
     )
+
+    # Set default view
+    if default_view is not None:
+        _default_view_set = False
+        for view in config_partial["views"]:
+            if view["dimensions"] == default_view:
+                # NOTE: A copy seems to be necessary, otherwise all common configs will be modified to have a default view.
+                view["config"] = deepcopy(view.get("config", {}))
+                view["config"]["defaultView"] = True
+                _default_view_set = True
+                break
+        if not _default_view_set:
+            log.warning("Default view not found.")
+
+    if humanize_dimension_names:
+        config_partial = humanize_dimension_names_in_config(
+            config=config_partial,
+            transformation=dimension_names_transformation,
+            replacements=dimension_names_replacements,
+        )
 
     return config_partial
 
@@ -229,7 +301,7 @@ def expand_config(
 class CollectionConfigExpander:
     def __init__(
         self,
-        tb: Table,
+        tbs: List[Table],
         indicators_slug: str,
         indicator_names: Optional[Union[str, List[str]]] = None,
         indicator_as_dimension: bool = False,
@@ -237,48 +309,55 @@ class CollectionConfigExpander:
     ):
         self.indicators_slug = indicators_slug
         self.indicator_as_dimension = indicator_as_dimension
-        self.build_df_dims(tb, indicator_names)
-        self.tb = tb
-        # Get table dimensions from metadata if available, exclude country, year, and date
-        self.tb_dims = [d for d in (tb.m.dimensions or []) if d["slug"] not in ("country", "year", "date")]
-        # Indicator expand mode
         self.expand_path_mode = expand_path_mode
+        # Reference table
+        # TODO: Not sure if this is necessary. I'll keep it just in case.
+        self.tb = tbs[0]
+
+        # Merge declared dimensions across all tables (excluding country/year/date)
+        seen_slugs = set()
+        self.tb_dims = []
+        for tb in tbs:
+            for d in tb.m.dimensions or []:
+                if d["slug"] not in ("country", "year", "date") and d["slug"] not in seen_slugs:
+                    self.tb_dims.append(d)
+                    seen_slugs.add(d["slug"])
+
+        # Build DataFrame with dimensional info
+        self.build_df_dims(tbs, indicator_names)
 
     @property
-    def dimension_names(self):
-        return [col for col in self.df_dims.columns if col not in ["short_name"]]
+    def dimension_names(self) -> List[str]:
+        return [
+            col
+            for col in self.df_dims.columns
+            if col not in ["short_name", "_table_short_name", "_dataset_short_name", "_dataset_uri"]
+        ]
 
-    @property
-    def table_name(self):
-        return self.tb.m.short_name
+    # TODO: I think the following properties are no longer necessary, now that we can have multiple tables as inputs.
+    # @property
+    # def table_name(self):
+    #     return self.tb.m.short_name
 
-    @property
-    def dataset_name(self):
-        assert self.tb.m.dataset is not None, "Can't get dataset name without dataset in table's metadata!"
-        return self.tb.m.dataset.short_name
+    # @property
+    # def dataset_name(self):
+    #     assert self.tb.m.dataset is not None, "Can't get dataset name without dataset in table's metadata!"
+    #     return self.tb.m.dataset.short_name
 
-    @property
-    def dataset_uri(self):
-        assert self.tb.m.dataset is not None, "Can't get table URI without dataset in table's metadata!"
-        return self.tb.m.dataset.uri
+    # @property
+    # def dataset_uri(self):
+    #     assert self.tb.m.dataset is not None, "Can't get table URI without dataset in table's metadata!"
+    #     return self.tb.m.dataset.uri
 
     def build_dimensions(
         self,
         dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
-    ):
+    ) -> List[Dict[str, Any]]:
         """Create the specs for each dimension."""
         # Support dimension is None
         ## If dimensions is None, use a list with all dimension names (in no particular order)
         if dimensions is None:
-            # If table defines dimensions, use them
-            if self.tb_dims:
-                dimensions = [str(d["slug"]) for d in self.tb_dims]
-            else:
-                # If dimensions is None, use a list with all dimension names (in no particular order)
-                dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
-        else:
-            # log.warning("It's recommended to set dimensions in Table metadata.")
-            pass
+            dimensions = [d["slug"] for d in self.tb_dims] if self.tb_dims else self.dimension_names
 
         # Support dimensions if it is a list/dict
         config_dimensions = []
@@ -327,15 +406,9 @@ class CollectionConfigExpander:
                 ]
 
                 # Build dimension
-                if self.tb_dims:
-                    # Use full name from table if available
-                    try:
-                        dim_name = next(d["name"] for d in self.tb_dims if d["slug"] == dim)
-                    except StopIteration:
-                        dim_name = dim
-                    dim_name = dim_name
-                else:
-                    # Otherwise use slug
+                try:
+                    dim_name = next(d["name"] for d in self.tb_dims if d["slug"] == dim)
+                except StopIteration:
                     dim_name = dim
 
                 # Build dimension
@@ -354,8 +427,8 @@ class CollectionConfigExpander:
         self,
         dimension_choices: Optional[Dict[str, List[str]]] = None,
         common_view_config: Optional[Dict[str, Any]] = None,
-    ):
-        """Generate one view for each indicator in the table."""
+    ) -> List[Dict[str, Any]]:
+        """Generate one view per indicator-dimension combination."""
         df_dims_filt = self.df_dims.copy()
 
         # Keep only relevant dimensions
@@ -365,12 +438,12 @@ class CollectionConfigExpander:
 
         # Filter to only relevant dimensions
         config_views = []
-        for _, indicator in df_dims_filt.iterrows():
+        for _, row in df_dims_filt.iterrows():
             view = {
-                "dimensions": {dim_name: indicator[dim_name] for dim_name in self.dimension_names},
+                "dimensions": {dim: row[dim] for dim in self.dimension_names},
                 "indicators": {
                     "y": self._expand_indicator_path(
-                        indicator.short_name
+                        row["short_name"], row["_table_short_name"], row["_dataset_short_name"], row["_dataset_uri"]
                     ),  # TODO: Add support for (i) support "x", "color", "size"; (ii) display settings
                 },
             }
@@ -380,18 +453,20 @@ class CollectionConfigExpander:
 
         return config_views
 
-    def _expand_indicator_path(self, indicator_slug: str) -> str:
+    def _expand_indicator_path(
+        self, indicator_slug: str, table_short: str, dataset_short: Optional[str], dataset_uri: Optional[str]
+    ) -> str:
         if self.expand_path_mode == "table":
-            table_path = self.table_name
+            path = table_short
         elif self.expand_path_mode == "dataset":
-            table_path = f"{self.dataset_name}/{self.table_name}"
+            path = f"{dataset_short}/{table_short}"
         elif self.expand_path_mode == "full":
-            table_path = f"{self.dataset_uri}/{self.table_name}"
+            path = f"{dataset_uri}/{table_short}"
         else:
-            raise ValueError(f"Unknown expand_path_mode: {self.expand_path_mode}")
-        return f"{table_path}#{indicator_slug}"
+            raise ValueError(f"Invalid expand_path_mode: {self.expand_path_mode}")
+        return f"{path}#{indicator_slug}"
 
-    def build_df_dims(self, tb: Table, indicator_names: Optional[Union[str, List[str]]]):
+    def build_df_dims(self, tbs: List[Table], indicator_names: Optional[Union[str, List[str]]]):
         """Build dataframe with dimensional information from table tb.
 
         It contains the following columns:
@@ -411,7 +486,7 @@ class CollectionConfigExpander:
         trend	    Transit stations	    trend__place_transit_stations
         trend	    Workplaces	            trend__place_workplaces
         """
-        df_dims = self._build_df_dims(tb)
+        df_dims = self._build_df_dims(tbs=tbs)
 
         # Ensure that indicator_name is a list, if any value is given
         if isinstance(indicator_names, str):
@@ -423,8 +498,8 @@ class CollectionConfigExpander:
         # Keep dimensions only for relevant indicators
         self.df_dims = df_dims.loc[df_dims[self.indicators_slug].isin(self.indicator_names)]
 
-        # Drop indicator column if indicator_names is of length 1
-        if (len(self.indicator_names) == 1) & (not self.indicator_as_dimension):
+        # Drop indicator column if indicator_as_dimension is set as False
+        if not self.indicator_as_dimension:
             self.df_dims = self.df_dims.drop(columns=[self.indicators_slug])
 
         # Final checks
@@ -433,54 +508,60 @@ class CollectionConfigExpander:
         ), "Class attribute indicator_names should be a list of string!"
         assert not self.df_dims.empty, "df_dims can't be empty!"
 
-    def _build_df_dims(self, tb):
+    def _build_df_dims(self, tbs):
         """Build dataframe with dimensional information from table tb."""
         records = []
-        for col in tb.columns:
-            dims = tb[col].m.dimensions
-            if dims:
-                assert tb[col].m.original_short_name, "Missing metadata.original_short_name for dimensions!"
-                row = {
-                    self.indicators_slug: tb[col].m.original_short_name,
-                    "short_name": col,
-                }
-                # Add dimensional info
-                for name in dims.keys():
-                    if name in {self.indicators_slug, "short_name"}:
-                        raise ValueError(f"Dimension name `{name}` is reserved. Please use another one!")
-
-                row = {**row, **dims}
-
-                # Add entry to records
-                records.append(row)
+        for tb in tbs:
+            for col in tb.columns:
+                dims = tb[col].m.dimensions
+                if dims:
+                    assert tb[col].m.original_short_name, "Missing metadata.original_short_name for dimensions!"
+                    row = {
+                        self.indicators_slug: tb[col].m.original_short_name,
+                        "short_name": col,
+                        "_table_short_name": tb.m.short_name,
+                        "_dataset_short_name": tb.m.dataset.short_name if tb.m.dataset else None,
+                        "_dataset_uri": tb.m.dataset.uri if tb.m.dataset else None,
+                        **dims,
+                    }
+                    records.append(row)
 
         # Build dataframe with dimensional information
         df_dims = pd.DataFrame(records)
 
         # Re-order columns
-        cols_dims = [col for col in df_dims.columns if col not in [self.indicators_slug, "short_name"]]
-        df_dims = df_dims[[self.indicators_slug] + sorted(cols_dims) + ["short_name"]]
+        cols_dims = [
+            col
+            for col in df_dims.columns
+            if col
+            not in [self.indicators_slug, "short_name", "_table_short_name", "_dataset_short_name", "_dataset_uri"]
+        ]
 
         # Set df_dims as string!
-        df_dims = df_dims.astype(str)
+        df_dims = df_dims[
+            [self.indicators_slug]
+            + cols_dims
+            + ["short_name", "_table_short_name", "_dataset_short_name", "_dataset_uri"]
+        ].astype(str)
 
         return df_dims
 
-    def _sanity_checks_df_dims(self, indicator_names: Optional[List[str]], df_dims: pd.DataFrame):
+    def _sanity_checks_df_dims(self, indicator_names: Optional[List[str]], df_dims: pd.DataFrame) -> List[str]:
         """Sanity checks of df_dims."""
         # List with names of indicators and dimensions
         indicator_names_available = list(df_dims[self.indicators_slug].unique())
 
         # If no indicator name is provided, there should only be one in the table!
         if indicator_names is None:
-            if len(indicator_names_available) != 1:
-                raise ValueError(
-                    "There are multiple indicators, but no `indicator_name` was provided. Please specify at least one!"
-                )
-            # If only one indicator available, set it as the indicator name
+            # TODO: Was there a good reason to raise an error in this case?
+            # if len(indicator_names_available) != 1:
+            #     raise ValueError(
+            #         "There are multiple indicators, but no `indicator_name` was provided. Please specify at least one!"
+            #     )
+            # If indicator_names is not specified, assume all indicators.
             return indicator_names_available
         # Check that given indicator_names are available (i.e. are present in indicator_names_available)
-        indicator_names_unknown = set(indicator_names).difference(set(indicator_names_available))
+        indicator_names_unknown = set(indicator_names) - set(indicator_names_available)
         if indicator_names_unknown:
             raise ValueError(
                 f"Indicators `{', '.join(indicator_names_unknown)}` not found in the table. Available are: {', '.join(indicator_names_available)}"
