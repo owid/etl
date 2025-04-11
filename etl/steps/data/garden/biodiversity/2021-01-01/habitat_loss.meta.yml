@@ -1,0 +1,175 @@
+dataset:
+  title: Biodiversity habitat loss (Williams et al. 2021)
+tables:
+  habitat_loss:
+    variables:
+      all_species_number:
+        title: all_species_number
+        unit: ''
+      amphibian_species_number:
+        title: amphibian_species_number
+        unit: ''
+      bau_change_cropland_km2:
+        title: bau_change_cropland_km2
+        unit: ''
+      bau_change_pct:
+        title: bau_change_pct
+        unit: ''
+      bau_habitat_loss_all:
+        title: bau_habitat_loss_all
+        unit: ''
+      bau_habitat_loss_amphibians:
+        title: bau_habitat_loss_amphibians
+        unit: ''
+      bau_habitat_loss_birds:
+        title: bau_habitat_loss_birds
+        unit: ''
+      bau_habitat_loss_mammals:
+        title: bau_habitat_loss_mammals
+        unit: ''
+      bird_species_number:
+        title: bird_species_number
+        unit: ''
+      combined_change_cropland_km2:
+        title: combined_change_cropland_km2
+        unit: ''
+      combined_change_pct:
+        title: combined_change_pct
+        unit: ''
+      combined_habitat_loss_all:
+        title: combined_habitat_loss_all
+        unit: ''
+      combined_habitat_loss_amphibians:
+        title: combined_habitat_loss_amphibians
+        unit: ''
+      combined_habitat_loss_birds:
+        title: combined_habitat_loss_birds
+        unit: ''
+      combined_habitat_loss_mammals:
+        title: combined_habitat_loss_mammals
+        unit: ''
+      countries_losing_25_species:
+        title: Countries with more than 25 species at risk of losing more than 25% of habitat
+        unit: species
+        description: |-
+          The number of species at risk of losing greater than 25% of their habitat as a result of agricultural expansion under business-as-usual projections. This is shown for countries with more than 25 species at risk.
+      diets_change_cropland_km2:
+        title: diets_change_cropland_km2
+        unit: ''
+      diets_change_pct:
+        title: diets_change_pct
+        unit: ''
+      diets_habitat_loss_all:
+        title: diets_habitat_loss_all
+        unit: ''
+      diets_habitat_loss_amphibians:
+        title: diets_habitat_loss_amphibians
+        unit: ''
+      diets_habitat_loss_birds:
+        title: diets_habitat_loss_birds
+        unit: ''
+      diets_habitat_loss_mammals:
+        title: diets_habitat_loss_mammals
+        unit: ''
+      mammal_species_number:
+        title: mammal_species_number
+        unit: ''
+      species_losing_more_25pct:
+        title: species_losing_more_25pct
+        unit: ''
+      species_losing_more_25pct_combined:
+        title: species_losing_more_25pct_combined
+        unit: ''
+      species_losing_more_25pct_yields:
+        title: species_losing_more_25pct_yields
+        unit: ''
+      species_losing_more_50pct:
+        title: species_losing_more_50pct
+        unit: ''
+      species_losing_more_50pct_combined:
+        title: species_losing_more_50pct_combined
+        unit: ''
+      species_losing_more_50pct_yields:
+        title: species_losing_more_50pct_yields
+        unit: ''
+      species_losing_more_75pct:
+        title: species_losing_more_75pct
+        unit: ''
+      species_losing_more_75pct_combined:
+        title: species_losing_more_75pct_combined
+        unit: ''
+      species_losing_more_75pct_yields:
+        title: species_losing_more_75pct_yields
+        unit: ''
+      species_losing_more_90pct:
+        title: species_losing_more_90pct
+        unit: ''
+      species_losing_more_90pct_combined:
+        title: species_losing_more_90pct_combined
+        unit: ''
+      species_losing_more_90pct_yields:
+        title: species_losing_more_90pct_yields
+        unit: ''
+      trade_change_cropland_km2:
+        title: trade_change_cropland_km2
+        unit: ''
+      trade_change_pct:
+        title: trade_change_pct
+        unit: ''
+      trade_habitat_loss_all:
+        title: trade_habitat_loss_all
+        unit: ''
+      trade_habitat_loss_amphibians:
+        title: trade_habitat_loss_amphibians
+        unit: ''
+      trade_habitat_loss_birds:
+        title: trade_habitat_loss_birds
+        unit: ''
+      trade_habitat_loss_mammals:
+        title: trade_habitat_loss_mammals
+        unit: ''
+      waste_change_cropland_km2:
+        title: waste_change_cropland_km2
+        unit: ''
+      waste_change_pct:
+        title: waste_change_pct
+        unit: ''
+      waste_habitat_loss_all:
+        title: waste_habitat_loss_all
+        unit: ''
+      waste_habitat_loss_amphibians:
+        title: waste_habitat_loss_amphibians
+        unit: ''
+      waste_habitat_loss_birds:
+        title: waste_habitat_loss_birds
+        unit: ''
+      waste_habitat_loss_mammals:
+        title: waste_habitat_loss_mammals
+        unit: ''
+      yields_change_cropland_km2:
+        title: yields_change_cropland_km2
+        unit: ''
+      yields_change_pct:
+        title: yields_change_pct
+        unit: ''
+      yields_habitat_loss_all:
+        title: yields_habitat_loss_all
+        unit: ''
+      yields_habitat_loss_amphibians:
+        title: yields_habitat_loss_amphibians
+        unit: ''
+      yields_habitat_loss_birds:
+        title: yields_habitat_loss_birds
+        unit: ''
+      yields_habitat_loss_mammals:
+        title: yields_habitat_loss_mammals
+        unit: ''
+    dimensions:
+      - name: year
+        slug: year
+      - name: entity_name
+        slug: entity_name
+      - name: entity_id
+        slug: entity_id
+      - name: entity_code
+        slug: entity_code

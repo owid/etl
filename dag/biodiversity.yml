@@ -46,3 +46,14 @@ steps:
     - data://meadow/biodiversity/2024-12-23/iucn_number_each_status
   data://grapher/biodiversity/2024-12-23/iucn_number_each_status:
     - data://garden/biodiversity/2024-12-23/iucn_number_each_status
+
+
+  #
+  # Habitat loss
+  #
+  data://garden/biodiversity/2021-01-01/habitat_loss:
+    - snapshot://biodiversity/2021-01-01/habitat_loss.feather
+  data://grapher/biodiversity/2021-01-01/habitat_loss:
+    - data://garden/biodiversity/2021-01-01/habitat_loss
+  export://explorers/biodiversity/latest/habitat_loss:
+    - data://grapher/biodiversity/2021-01-01/habitat_loss

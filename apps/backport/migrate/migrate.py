@@ -151,15 +151,13 @@ def migrate(
 
     # Print instructions
     print("\n[bold yellow]Follow-up instructions:[/bold yellow]")
+    print("[green]1.[/green] Create a PR")
     print(
-        f"[green]1.[/green] Execute snapshot with [bold]`python snapshots/{namespace}/{version}/{short_name}.py`[/bold]"
+        f"[green]2.[/green] Execute snapshot with [bold]`python snapshots/{namespace}/{version}/{short_name}.py`[/bold]"
     )
-    print(f"[green]2.[/green] Import dataset with [bold]`etl {namespace}/{version}/{short_name} --grapher`[/bold]")
-    print(
-        f"[green]3.[/green] Merge changes or run it directly against production with [bold]`ENV=.env.prod.write etl {namespace}/{version}/{short_name} --grapher`[/bold]"
-    )
-    print("[green]4.[/green] Run chart revisions with [bold]`ENV=.env.prod.write etlwiz charts`[/bold]")
-    print("[green]5.[/green] [bold]Delete[/bold] or archive the old dataset")
+    print(f"[green]3.[/green] Run dataset with [bold]`etlr {namespace}/{version}/{short_name} --grapher`[/bold]")
+    print("[green]4.[/green] Run indicator upgrader in [bold]`make wizard`[/bold]")
+    print("[green]5.[/green] Merge your PR, then [bold]delete[/bold] or archive the old dataset")
 
 
 def _add_to_migrated_dag(namespace: str, version: str, short_name: str):
