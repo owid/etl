@@ -1,0 +1,68 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+
+dataset:
+  update_period_days: 365
+
+tables:
+  us_consumer_prices:
+    variables:
+      college_tuition_fees:
+        title: US consumer price index for college tuition & fees
+        description_from_producer: "College tuition and fees in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEB)"
+        unit: ""
+      education:
+        title: US consumer price index for education
+        description_from_producer: "Education in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAE1)"
+        unit: ""
+      tuition_fees_childcare:
+        title: US consumer price index for tuition, school fees, childcare
+        description_from_producer: "Tuition, other school fees, and childcare in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEB)"
+        unit: ""
+      medical_care:
+        title: US consumer price index for medical care
+        description_from_producer: "Medical care in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAM)"
+        unit: ""
+      household_energy:
+        title: US consumer price index for household energy
+        description_from_producer: "Household energy in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAH21)"
+        unit: ""
+      housing:
+        title: US consumer price index for housing
+        description_from_producer: "Housing in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAH)"
+        unit: ""
+      food_beverages:
+        title: US consumer price index for food & beverages
+        description_from_producer: "Food and beverages in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAF)"
+        unit: ""
+      public_transport:
+        title: US consumer price index for public transport
+        description_from_producer: "Public transportation in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SETG)"
+        unit: ""
+      new_cars:
+        title: US consumer price index for new cars
+        description_from_producer: "New cars in U.S. city average, all urban consumers, not seasonally adjusted (CUUS0000SS45011)"
+        unit: ""
+      clothing:
+        title: US consumer price index for clothing
+        description_from_producer: "Apparel in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAA)"
+        unit: ""
+      software:
+        title: US consumer price index for computer software & accessories
+        description_from_producer: "Computer software and accessories in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEE02)"
+        unit: ""
+      toys:
+        title: US consumer price index for toys
+        description_from_producer: "Toys in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SERE01)"
+        unit: ""
+      televisions:
+        title: US consumer price index for televisions
+        description_from_producer: "Televisions in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SERA01)"
+        unit: ""
+      all_items:
+        title: US consumer price index for all items
+        description_from_producer: "All items in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SA0)"
+        unit: ""
