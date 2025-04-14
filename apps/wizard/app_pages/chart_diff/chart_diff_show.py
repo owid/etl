@@ -651,9 +651,9 @@ def compare_dictionaries(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile:
     return compare_strings(json.dumps(dix_1, indent=4), json.dumps(dix_2, indent=4), fromfile=fromfile, tofile=tofile)
 
 
-def st_show_diff(diff_str):
+def st_show_diff(diff_str, **kwargs):
     """Display diff."""
-    st.code(diff_str, line_numbers=True, language="diff")
+    st.code(diff_str, line_numbers=True, language="diff", **kwargs)
 
 
 def _show_dict_diff(dix_1: Dict[str, Any], dix_2: Dict[str, Any], fromfile: str):

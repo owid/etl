@@ -10,9 +10,11 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
+from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import explorer_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
+from etl.files import yaml_dump
 from etl.grapher import model as gm
 
 log = get_logger()
@@ -124,6 +126,17 @@ def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
     return {dim: sorted(list(values)) for dim, values in all_dimensions.items()}
 
 
+def _set_tab_title_size(font_size="2rem"):
+    css = f"""
+    <style>
+        .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {{
+        font-size:{font_size};
+        }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
+
 def main():
     st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
     st.title(
@@ -208,41 +221,51 @@ def main():
         assert OWID_ENV.site
         explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
 
-    st.subheader("TSV Diff")
-
-    # NOTE: loading TSV for some explorers can take >10s!
-    def load_tsv(engine):
+    # Helper function to load explorer data
+    def load_explorer_data(engine, columns):
+        """Load explorer data from database."""
         with Session(engine) as session:
-            return gm.Explorer.load_explorer(session, explorer_slug, columns=["tsv"]).tsv  # type: ignore
+            return gm.Explorer.load_explorer(session, explorer_slug, columns=columns)
 
+    # NOTE: loading data for some explorers can take >10s!
     with ThreadPoolExecutor(max_workers=2) as executor:
-        future_source = executor.submit(load_tsv, SOURCE_ENGINE)
-        future_target = executor.submit(load_tsv, TARGET_ENGINE)
+        future_source = executor.submit(load_explorer_data, SOURCE_ENGINE, ["tsv", "config"])
+        future_target = executor.submit(load_explorer_data, TARGET_ENGINE, ["tsv", "config"])
 
-        tsv_source = future_source.result()
-        tsv_target = future_target.result()
+        source_data = future_source.result()
+        target_data = future_target.result()
+        assert source_data and target_data, "Failed to load explorer data"
 
-    diff_str = compare_strings(tsv_target, tsv_source, fromfile="production", tofile="staging")
-    st_show_diff(_truncate_lines(diff_str, MAX_DIFF_LINES))
+        # Move blocks as the last key in config
+        source_data.config["blocks"] = source_data.config.pop("blocks")
+        target_data.config["blocks"] = target_data.config.pop("blocks")
 
-    # Create columns to show TSV files side by side
-    st.subheader("TSV Files")
-    col1, col2 = st.columns(2)
-    with col1:
-        st.code(_truncate_lines(tsv_target, MAX_DIFF_LINES), line_numbers=True, language="diff")
-    with col2:
-        st.code(_truncate_lines(tsv_source, MAX_DIFF_LINES), line_numbers=True, language="diff")
+    # Create tabs for diffs
+    tsv_tab, yaml_tab = st.tabs(["**TSV Diff**", "**YAML Diff**"])
+    _set_tab_title_size("1.5rem")
 
+    with tsv_tab:
+        # Show diff
+        diff_str = compare_strings(target_data.tsv, source_data.tsv, fromfile="production", tofile="staging")
+        st_show_diff(diff_str, height=800)
 
-def _truncate_lines(s: str, max_lines: int) -> str:
-    """
-    Truncate a string to a maximum number of lines.
-    """
-    lines = s.splitlines()
-    if len(lines) > max_lines:
-        st.warning(f"The diff is too long to display in full. Showing only the first {max_lines} lines.")
-        return "\n".join(lines[:max_lines]) + "\n... (truncated)"
-    return s
+        # Create columns to show TSV files side by side
+        st.subheader("TSV Files")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.code(truncate_lines(target_data.tsv, MAX_DIFF_LINES), line_numbers=True, language="diff")
+        with col2:
+            st.code(truncate_lines(target_data.tsv, MAX_DIFF_LINES), line_numbers=True, language="diff")
+
+    with yaml_tab:
+        # Show diff
+        diff_str = compare_strings(
+            yaml_dump(target_data.config).strip(),
+            yaml_dump(source_data.config).strip(),
+            fromfile="production",
+            tofile="staging",
+        )
+        st_show_diff(diff_str, height=800)
 
 
 main()

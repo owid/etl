@@ -411,7 +411,7 @@ tables:
         description_key:
           - "The index combines 15 individual policies: the legality of same-sex relationships, marriage, gender marker changes, censorship of LGBT+ issues, gender-affirming care, legal recognition of non-binary gender, LGBT+ discrimination, employment discrimination, housing discrimination, same-sex adoption, serving openly in the military, blood donations by men who have sex with men, conversion therapies, and equal age of consent between same-sex and different-sex partners."
           - Each of these policies is weighted differently, with the most important policies receiving the highest weights. These weights are called _total possible scores_.
-          - Each policy status has a factor associated to it, ranging from o to 1. Higher scores indicate more equality.
+          - Each policy status has a factor associated to it, ranging from 0 to 1. Higher scores indicate more equality.
           - The index is calculated by summing the product of total possible scores and the factor for each policy, divided by the sum of total possible scores.
           - For more information about the methodology and the specific scores used, please refers to the [Equaldex Equality index methodology](https://www.equaldex.com/equality-index).
         description_from_producer: |-
