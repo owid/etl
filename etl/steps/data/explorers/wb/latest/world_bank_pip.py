@@ -31,11 +31,11 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("world_bank_pip")
 
     # Read table from garden dataset.
-    tb_inc_or_cons = ds_garden[f"income_consumption_{PPP_YEAR_CURRENT}"]
+    tb_inc_or_cons_current = ds_garden[f"income_consumption_{PPP_YEAR_CURRENT}"]
 
     # Drop variables not used in the explorers and rows with missing values
-    tb_inc_or_cons = drop_columns_and_rows(
-        tb=tb_inc_or_cons,
+    tb_inc_or_cons_current = drop_columns_and_rows(
+        tb=tb_inc_or_cons_current,
         drop_list=[
             "above",
             "between",
@@ -50,7 +50,23 @@ def run(dest_dir: str) -> None:
     )
 
     # Create a separate table for PIP inequality data
-    tb_pip_inequality = create_inequality_table(tb=tb_inc_or_cons, short_name="pip_inequality")
+    tb_pip_inequality = create_inequality_table(tb=tb_inc_or_cons_current, short_name="pip_inequality")
+
+    # Create another table, tb_inc_or_cons_old, with the old PPP version
+    tb_inc_or_cons_old = ds_garden[f"income_consumption_{PPP_YEAR_OLD}"]
+
+    # Drop variables not used in the explorers and rows with missing values
+    tb_inc_or_cons_old = drop_columns_and_rows(
+        tb=tb_inc_or_cons_old,
+        drop_list=[
+            "above",
+            "between",
+            "poverty_severity",
+            "watts",
+            "reporting_level",
+            "welfare_type",
+        ],
+    )
 
     # Import the rest of the tables
     rest_of_tables = import_rest_of_tables(ds_garden=ds_garden)
@@ -58,7 +74,7 @@ def run(dest_dir: str) -> None:
     # Create explorer dataset, with garden table and metadata in csv format
     ds_explorer = create_dataset(
         dest_dir,
-        tables=[tb_inc_or_cons, tb_pip_inequality] + rest_of_tables,
+        tables=[tb_inc_or_cons_current, tb_inc_or_cons_old, tb_pip_inequality] + rest_of_tables,
         default_metadata=ds_garden.metadata,
         formats=["csv"],
     )
