@@ -7,6 +7,7 @@ paths = PathFinder(__file__)
 
 # Define PPP version
 # NOTE: Change this in case of new PPP versions in the future
+# TODO: Change to 2021 prices
 PPP_VERSION_CURRENT = 2017
 
 
