@@ -1431,6 +1431,112 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
     return tb_with_pc_variables
 
 
+def add_modified_variables(tb: Table, dataset_short_name: str) -> Table:
+    # For convenience, create additional indicators in different units.
+    tb = tb.copy()
+    # NOTE: A new (arbitrary) element code will be assigned (ending in "pe", as per capita edited), which is an edited version of the given per capita element code.
+    additional_elements = {
+        "faostat_fbsc": [
+            {
+                # Food supply per day in grams (currently, there is only supply per year in kg).
+                "element_code_old": "0645pc",
+                "element_code": "0645pe",
+                "factor": 1000 / 365,
+                "unit": "grams per day per capita",
+                "unit_short_name": "g",
+            },
+            {
+                # Imports per capita in kg (currently, there is only imports per capita in tonnes).
+                "element_code_old": "5611pc",
+                "element_code": "5611pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Exports per capita in kg (currently, there is only exports per capita in tonnes).
+                "element_code_old": "5911pc",
+                "element_code": "5911pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Domestic supply per capita in kg (currently, there is only domestic supply per capita in tonnes).
+                "element_code_old": "5301pc",
+                "element_code": "5301pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Food per capita in kg (currently, there is only food per capita in tonnes).
+                "element_code_old": "5142pc",
+                "element_code": "5142pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Feed per capita in kg (currently, there is only feed per capita in tonnes).
+                "element_code_old": "5521pc",
+                "element_code": "5521pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Other uses per capita in kg (currently, there is only other uses per capita in tonnes).
+                "element_code_old": "5154pc",
+                "element_code": "5154pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Waste per capita in kg (currently, there is only waste per capita in tonnes).
+                "element_code_old": "5123pc",
+                "element_code": "5123pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+        ],
+        "faostat_qcl": [
+            {
+                # Production per capita in kg (currently, there is only production per capita in tonnes).
+                "element_code_old": "5510pc",
+                "element_code": "5510pe",
+                "factor": 1000,
+                "unit": "kilograms per capita",
+                "unit_short_name": "kg",
+            },
+            {
+                # Area harvested per capita in m2 (currently, there is only area harvested per capita in hectares).
+                "element_code_old": "5312pc",
+                "element_code": "5312pe",
+                "factor": 10000,
+                "unit": "square meters per capita",
+                "unit_short_name": "m²",
+            },
+        ],
+    }
+
+    for element in additional_elements[dataset_short_name]:
+        _tb = tb[tb["element_code"] == element["element_code_old"]].reset_index(drop=True)
+        _tb["value"] *= element["factor"]
+        _tb["unit"] = element["unit"]
+        _tb["unit_short_name"] = element["unit_short_name"]
+        _tb["element_code"] = element["element_code"]
+        # Add new rows to the original table.
+        tb = pr.concat(
+            [tb, _tb.astype({"unit": "category", "unit_short_name": "category", "element_code": "category"})],
+            ignore_index=True,
+        )
+
+    return tb
+
+
 def clean_data_values(values: Variable, amendments: Dict[str, str]) -> Variable:
     """Fix spurious data values (defined in value_amendments.csv) and make values a float column.
 
@@ -2053,8 +2159,8 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 assert unit == "kilograms per year per capita"
                 title = f"Yearly per capita supply of {item.lower()}"
                 description_short = description_short_food_available
-            elif element_code == "e645pc":
-                # "e645pc",  # Food available for consumption (grams per day per capita) - created in the garden faostat_fbsc step.
+            elif element_code == "0645pe":
+                # "0645pe",  # Food available for consumption (grams per day per capita) - created in the garden faostat_fbsc step.
                 assert unit == "grams per day per capita"
                 title = f"Daily per capita supply of {item.lower()}"
                 description_short = description_short_food_available
@@ -2295,6 +2401,9 @@ def run(dest_dir: str) -> None:
 
     # Handle detected anomalies in the data.
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
+
+    # For convenience, create additional indicators in different units.
+    tb = add_modified_variables(tb=tb, dataset_short_name=dataset_short_name)
 
     # Create a long table (with item code and element code as part of the index).
     tb_long = prepare_long_table(tb=tb)

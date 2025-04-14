@@ -270,9 +270,9 @@ ITEM_CODES_FBSC = [
 # Elements from faostat_qcl to include.
 ELEMENT_CODES_QCL = [
     "005510",  # Production (tonnes).
-    "5510pc",  # Production per capita (tonnes per capita).
+    "5510pe",  # Production per capita (kilograms per capita).
     "005312",  # Area harvested (hectares).
-    "5312pc",  # Area harvested per capita (hectares per capita).
+    "5312pe",  # Area harvested per capita (square meters per capita).
     "005320",  # Producing or slaughtered animals (animals).
     "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
     "005321",  # Producing or slaughtered animals (animals).
@@ -289,24 +289,24 @@ ELEMENT_CODES_QCL = [
 # Elements from faostat_fbsc to include.
 ELEMENT_CODES_FBSC = [
     "0645pc",  # Food available for consumption (kilograms per year per capita)
-    "e645pc",  # Food available for consumption (grams per day per capita)
+    "0645pe",  # Food available for consumption (grams per day per capita)
     "0664pc",  # Food available for consumption (kilocalories per day per capita)
     "0674pc",  # Food available for consumption (grams of protein per day per capita)
     "0684pc",  # Food available for consumption (grams of fat per day per capita)
     "005142",  # Food (tonnes)
-    "5142pc",  # Food (tonnes per capita)
+    "5142pe",  # Food (kilograms per capita)
     "005301",  # Domestic supply (tonnes)
-    "5301pc",  # Domestic supply (tonnes per capita)
+    "5301pe",  # Domestic supply (kilograms per capita)
     "005521",  # Feed (tonnes)
-    "5521pc",  # Feed (tonnes per capita)
+    "5521pe",  # Feed (kilograms per capita)
     "005611",  # Imports (tonnes)
-    "5611pc",  # Imports (tonnes per capita)
+    "5611pe",  # Imports (kilograms per capita)
     "005911",  # Exports (tonnes)
-    "5911pc",  # Exports (tonnes per capita)
+    "5911pe",  # Exports (kilograms per capita)
     "005123",  # Waste in supply chain (tonnes)
-    "5123pc",  # Waste in supply chain (tonnes_per_capita)
+    "5123pe",  # Waste in supply chain (tonnes_per_capita)
     "005154",  # Other uses (tonnes)
-    "5154pc",  # Other uses (tonnes per capita)
+    "5154pe",  # Other uses (kilograms per capita)
     # Element 'Production' (in tonnes, originally given in 1000 tonnes) is taken from qcl.
     # Although fbsc has items for this element that are not in qcl, they overlap in a number of items with slightly
     # different values. To avoid this issue, we ignore the element from fbsc and use only the one in qcl.
@@ -343,6 +343,7 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
     UNITS_NOT_IN_RADIO_BUTTONS = [
         "hectares",
         "tonnes",
+        "kilograms",
         "tonnes per hectare",
         "animals",
         "kilograms per animal",
@@ -366,7 +367,7 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
                 "item": underscore(item),
                 "metric": underscore(element),
                 "unit": underscore(unit, validate=False),
-                "per_capita": True if "pc" in element_code else False,
+                "per_capita": True if ("pc" in element_code) or ("pe" in element_code) else False,
             }
             tb[column].metadata.original_short_name = column
         else:

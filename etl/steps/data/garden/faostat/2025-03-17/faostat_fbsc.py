@@ -21,6 +21,7 @@ from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     CURRENT_DIR,
     ELEMENTS_IN_FBSH_MISSING_IN_FBS,
+    add_modified_variables,
     add_per_capita_variables,
     add_regions,
     clean_data,
@@ -198,18 +199,8 @@ def run() -> None:
     # Handle detected anomalies in the data.
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
-    # For convenience, create indicators for supply per day in grams (currently, there is only supply per year in kg).
-    tb_food = tb[tb["element_code"] == "0645pc"].reset_index()
-    tb_food["value"] *= 1000 / 365
-    tb_food["unit"] = "grams per day per capita"
-    tb_food["unit_short_name"] = "g"
-    # Assign a new (arbitrary) element code, which is an edited version of the given per capita element code.
-    tb_food["element_code"] = "e645pc"
-    # Add new rows to the original table.
-    tb = pr.concat(
-        [tb, tb_food.astype({"unit": "category", "unit_short_name": "category", "element_code": "category"})],
-        ignore_index=True,
-    )
+    # For convenience, create additional indicators in different units.
+    tb = add_modified_variables(tb=tb, dataset_short_name=dataset_short_name)
 
     # Avoid objects as they would explode memory, use categoricals instead.
     # for col in tb.columns:

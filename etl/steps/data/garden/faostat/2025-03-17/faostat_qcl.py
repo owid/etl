@@ -9,6 +9,7 @@ from shared import (
     CURRENT_DIR,
     FLAG_MULTIPLE_FLAGS,
     REGIONS_TO_ADD,
+    add_modified_variables,
     add_per_capita_variables,
     add_regions,
     clean_data,
@@ -564,6 +565,9 @@ def run() -> None:
 
     # Handle detected anomalies in the data.
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
+
+    # For convenience, create additional indicators in different units.
+    tb = add_modified_variables(tb=tb, dataset_short_name=dataset_short_name)
 
     # Create a long table (with item code and element code as part of the index).
     tb_long = prepare_long_table(tb=tb)
