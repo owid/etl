@@ -36,6 +36,9 @@ POVLINES_DICT = {
 # Define PPP versions from POVLINES_DICT
 PPP_VERSIONS = list(POVLINES_DICT.keys())
 
+PPP_YEAR_OLD = PPP_VERSIONS[0]
+PPP_YEAR_CURRENT = PPP_VERSIONS[1]
+
 # Define current International Poverty Line (in cents)
 # NOTE: Modify if poverty lines are updated from source
 # TODO: Modify the lines in 2021 prices
@@ -148,24 +151,24 @@ def run(dest_dir: str) -> None:
 
     # Create stacked variables from headcount and headcount_ratio
     tb_ppp_old, col_stacked_n_ppp_old, col_stacked_pct_ppp_old = create_stacked_variables(
-        tb_ppp_old, POVLINES_DICT, ppp_version=PPP_VERSIONS[0]
+        tb_ppp_old, POVLINES_DICT, ppp_version=PPP_YEAR_OLD
     )
     tb_ppp_current, col_stacked_n_ppp_current, col_stacked_pct_ppp_current = create_stacked_variables(
-        tb_ppp_current, POVLINES_DICT, ppp_version=PPP_VERSIONS[1]
+        tb_ppp_current, POVLINES_DICT, ppp_version=PPP_YEAR_CURRENT
     )
 
     # Sanity checks. I don't run for percentile tables because that process was done in the extraction
     tb_ppp_old = sanity_checks(
         tb_ppp_old,
         POVLINES_DICT,
-        ppp_version=PPP_VERSIONS[0],
+        ppp_version=PPP_YEAR_OLD,
         col_stacked_n=col_stacked_n_ppp_old,
         col_stacked_pct=col_stacked_pct_ppp_old,
     )
     tb_ppp_current = sanity_checks(
         tb_ppp_current,
         POVLINES_DICT,
-        ppp_version=PPP_VERSIONS[1],
+        ppp_version=PPP_YEAR_CURRENT,
         col_stacked_n=col_stacked_n_ppp_current,
         col_stacked_pct=col_stacked_pct_ppp_current,
     )
@@ -190,48 +193,46 @@ def run(dest_dir: str) -> None:
     )
 
     # Add metadata by code
-    tb_inc_ppp_old = add_metadata_vars(tb_garden=tb_inc_ppp_old, ppp_version=PPP_VERSIONS[0], welfare_type="income")
-    tb_cons_ppp_old = add_metadata_vars(
-        tb_garden=tb_cons_ppp_old, ppp_version=PPP_VERSIONS[0], welfare_type="consumption"
-    )
+    tb_inc_ppp_old = add_metadata_vars(tb_garden=tb_inc_ppp_old, ppp_version=PPP_YEAR_OLD, welfare_type="income")
+    tb_cons_ppp_old = add_metadata_vars(tb_garden=tb_cons_ppp_old, ppp_version=PPP_YEAR_OLD, welfare_type="consumption")
     tb_inc_or_cons_ppp_old_unsmoothed = add_metadata_vars(
         tb_garden=tb_inc_or_cons_ppp_old_unsmoothed,
-        ppp_version=PPP_VERSIONS[0],
+        ppp_version=PPP_YEAR_OLD,
         welfare_type="income_consumption",
     )
-    tb_inc_or_cons_ppp_old_unsmoothed.m.short_name = f"income_consumption_{PPP_VERSIONS[0]}_unsmoothed"
+    tb_inc_or_cons_ppp_old_unsmoothed.m.short_name = f"income_consumption_{PPP_YEAR_OLD}_unsmoothed"
     tb_inc_or_cons_ppp_old = add_metadata_vars(
         tb_garden=tb_inc_or_cons_ppp_old,
-        ppp_version=PPP_VERSIONS[0],
+        ppp_version=PPP_YEAR_OLD,
         welfare_type="income_consumption",
     )
 
     tb_inc_ppp_current = add_metadata_vars(
-        tb_garden=tb_inc_ppp_current, ppp_version=PPP_VERSIONS[1], welfare_type="income"
+        tb_garden=tb_inc_ppp_current, ppp_version=PPP_YEAR_CURRENT, welfare_type="income"
     )
     tb_cons_ppp_current = add_metadata_vars(
-        tb_garden=tb_cons_ppp_current, ppp_version=PPP_VERSIONS[1], welfare_type="consumption"
+        tb_garden=tb_cons_ppp_current, ppp_version=PPP_YEAR_CURRENT, welfare_type="consumption"
     )
     tb_inc_or_cons_ppp_current_unsmoothed = add_metadata_vars(
         tb_garden=tb_inc_or_cons_ppp_current_unsmoothed,
-        ppp_version=PPP_VERSIONS[1],
+        ppp_version=PPP_YEAR_CURRENT,
         welfare_type="income_consumption",
     )
-    tb_inc_or_cons_ppp_current_unsmoothed.m.short_name = f"income_consumption_{PPP_VERSIONS[1]}_unsmoothed"
+    tb_inc_or_cons_ppp_current_unsmoothed.m.short_name = f"income_consumption_{PPP_YEAR_CURRENT}_unsmoothed"
     tb_inc_or_cons_ppp_current = add_metadata_vars(
         tb_garden=tb_inc_or_cons_ppp_current,
-        ppp_version=PPP_VERSIONS[1],
+        ppp_version=PPP_YEAR_CURRENT,
         welfare_type="income_consumption",
     )
 
     tb_percentiles_ppp_old = add_metadata_vars_percentiles(
         tb_garden=tb_percentiles_ppp_old,
-        ppp_version=PPP_VERSIONS[0],
+        ppp_version=PPP_YEAR_OLD,
         welfare_type="income_consumption",
     )
     tb_percentiles_ppp_current = add_metadata_vars_percentiles(
         tb_garden=tb_percentiles_ppp_current,
-        ppp_version=PPP_VERSIONS[1],
+        ppp_version=PPP_YEAR_CURRENT,
         welfare_type="income_consumption",
     )
 
@@ -273,17 +274,17 @@ def run(dest_dir: str) -> None:
     tb_inc_ppp_comparison = combine_tables_ppp_comparison(
         tb_ppp_old=tb_inc_ppp_old,
         tb_ppp_current=tb_inc_ppp_current,
-        short_name=f"income_{PPP_VERSIONS[0]}_{PPP_VERSIONS[1]}",
+        short_name=f"income_{PPP_YEAR_OLD}_{PPP_YEAR_CURRENT}",
     )
     tb_cons_ppp_comparison = combine_tables_ppp_comparison(
         tb_ppp_old=tb_cons_ppp_old,
         tb_ppp_current=tb_cons_ppp_current,
-        short_name=f"consumption_{PPP_VERSIONS[0]}_{PPP_VERSIONS[1]}",
+        short_name=f"consumption_{PPP_YEAR_OLD}_{PPP_YEAR_CURRENT}",
     )
     tb_inc_or_cons_ppp_comparison = combine_tables_ppp_comparison(
         tb_ppp_old=tb_inc_or_cons_ppp_old,
         tb_ppp_current=tb_inc_or_cons_ppp_current,
-        short_name=f"income_consumption_{PPP_VERSIONS[0]}_{PPP_VERSIONS[1]}",
+        short_name=f"income_consumption_{PPP_YEAR_OLD}_{PPP_YEAR_CURRENT}",
     )
 
     # Define tables to upload
@@ -470,7 +471,7 @@ def create_stacked_variables(tb: Table, povlines_dict: dict, ppp_version: int) -
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
-    # Select poverty lines between PPP_VERSIONS[0] and PPP_VERSIONS[1] and sort in case they are not in order
+    # Select poverty lines between PPP_YEAR_OLD and PPP_YEAR_CURRENT and sort in case they are not in order
     povlines = povlines_dict[ppp_version]
     povlines.sort()
 
@@ -620,7 +621,7 @@ def sanity_checks(
     Sanity checks for the table
     """
 
-    # Select poverty lines between PPP_VERSIONS[0] and PPP_VERSIONS[1] and sort in case they are not in order
+    # Select poverty lines between PPP_YEAR_OLD and PPP_YEAR_CURRENT and sort in case they are not in order
     povlines = povlines_dict[ppp_version]
     povlines.sort()
 
@@ -866,8 +867,8 @@ def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
 
     # Filter table to include only the right ppp_version
     # Also, drop columns with all NaNs (which are the ones that are not relevant for the ppp_version)
-    tb_ppp_old = tb[tb["ppp_version"] == PPP_VERSIONS[0]].dropna(axis=1, how="all").reset_index(drop=True).copy()
-    tb_ppp_current = tb[tb["ppp_version"] == PPP_VERSIONS[1]].dropna(axis=1, how="all").reset_index(drop=True).copy()
+    tb_ppp_old = tb[tb["ppp_version"] == PPP_YEAR_OLD].dropna(axis=1, how="all").reset_index(drop=True).copy()
+    tb_ppp_current = tb[tb["ppp_version"] == PPP_YEAR_CURRENT].dropna(axis=1, how="all").reset_index(drop=True).copy()
 
     return tb_ppp_old, tb_ppp_current
 
@@ -1299,7 +1300,7 @@ def create_survey_spells_inc_cons(tb_inc: Table, tb_cons: Table) -> list:
 
     # Concatenate the two tables
     tb_inc_or_cons_spells = pr.concat(
-        [tb_inc, tb_cons], ignore_index=True, short_name=f"income_consumption_{PPP_VERSIONS[1]}"
+        [tb_inc, tb_cons], ignore_index=True, short_name=f"income_consumption_{PPP_YEAR_CURRENT}"
     )
 
     # Set index and sort
@@ -1313,23 +1314,23 @@ def create_survey_spells_inc_cons(tb_inc: Table, tb_cons: Table) -> list:
 
 def combine_tables_ppp_comparison(tb_ppp_old: Table, tb_ppp_current: Table, short_name: str) -> Table:
     """
-    Combine income and consumption tables from PPP_VERSIONS[0] and PPP_VERSIONS[1] PPPs.
-    We will use this table for the Poverty Data Explorer: World Bank data - PPP_VERSIONS[0] vs. PPP_VERSIONS[1] prices.
+    Combine income and consumption tables from PPP_YEAR_OLD and PPP_YEAR_CURRENT PPPs.
+    We will use this table for the Poverty Data Explorer: World Bank data - PPP_YEAR_OLD vs. PPP_YEAR_CURRENT prices.
     """
 
     # Identify columns to use (ID + indicators)
     id_cols = ["country", "year"]
 
-    tb_ppp_old = define_columns_for_ppp_comparison(tb=tb_ppp_old, id_cols=id_cols, ppp_version=PPP_VERSIONS[0])
-    tb_ppp_current = define_columns_for_ppp_comparison(tb=tb_ppp_current, id_cols=id_cols, ppp_version=PPP_VERSIONS[1])
+    tb_ppp_old = define_columns_for_ppp_comparison(tb=tb_ppp_old, id_cols=id_cols, ppp_version=PPP_YEAR_OLD)
+    tb_ppp_current = define_columns_for_ppp_comparison(tb=tb_ppp_current, id_cols=id_cols, ppp_version=PPP_YEAR_CURRENT)
 
     # Rename all the non-id columns with the suffix _ppp(year)
     # (the suffix option in merge only adds suffix when columns coincide)
     tb_ppp_old = tb_ppp_old.rename(
-        columns={c: c + f"_ppp{PPP_VERSIONS[0]}" for c in tb_ppp_old.columns if c not in id_cols}
+        columns={c: c + f"_ppp{PPP_YEAR_OLD}" for c in tb_ppp_old.columns if c not in id_cols}
     )
     tb_ppp_current = tb_ppp_current.rename(
-        columns={c: c + f"_ppp{PPP_VERSIONS[1]}" for c in tb_ppp_current.columns if c not in id_cols}
+        columns={c: c + f"_ppp{PPP_YEAR_CURRENT}" for c in tb_ppp_current.columns if c not in id_cols}
     )
 
     # Merge the two files (it's OK to have an inner join, because we want to keep country-year pairs that are in both files)
