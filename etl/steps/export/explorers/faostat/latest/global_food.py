@@ -417,16 +417,29 @@ def run():
         dimension_names_replacements={
             "item": "Food",
             "maize": "Maize (corn)",
+            "maize_oil": "Maize (corn) oil",
             "area_harvested": "Land use",
             "feed": "Allocated to animal feed",
             "food": "Allocated to human food",
             "other_uses": "Allocated to other uses",
             "herbs__e_g__fennel": "Herbs, e.g. fennel",
+            "eggs_from_other_birds__excl__hens": "Eggs from other birds",
+            "eggs": "Eggs, total",
+            "animal_fats": "Fat, total",
             "offals": "Offals, total",
+            "meat__ass": "Meat, donkey",
+            "total": "All food",
         },
     )
     config["dimensions"] = config_new["dimensions"]
     config["views"] = config_new["views"]
+
+    # Sort food and metric elements in the dropdown alphabetically.
+    for dropdown_i in [0, 1]:
+        # NOTE: Unfortunately, this is only achievable for the first dropdown. The order of any subsequent dropdowns is determined by the first time that the choices appear. So, currently, the first item in the first dropdown, "All food" starts with metric "Food available for consumption", which means that this will always be the first element in the "Metric" dropdown.
+        config["dimensions"][dropdown_i]["choices"] = sorted(
+            config["dimensions"][dropdown_i]["choices"], key=lambda x: x["name"]
+        )
 
     # Make per capita a checkbox and unit a radio button.
     for dimension in config["dimensions"]:
