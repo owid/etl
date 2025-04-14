@@ -2053,6 +2053,11 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 assert unit == "kilograms per year per capita"
                 title = f"Yearly per capita supply of {item.lower()}"
                 description_short = description_short_food_available
+            elif element_code == "e645pc":
+                # "e645pc",  # Food available for consumption (grams per day per capita) - created in the garden faostat_fbsc step.
+                assert unit == "grams per day per capita"
+                title = f"Daily per capita supply of {item.lower()}"
+                description_short = description_short_food_available
             elif element_code == "0664pc":
                 # "0664pc",  # Food available for consumption (kilocalories per day per capita)
                 assert unit == "kilocalories per day per capita"
@@ -2076,6 +2081,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "5142pc",  # Food (tonnes per capita)
                 assert unit == "tonnes per capita"
                 title = f"{item} used for direct human food per capita"
+                description_short = "Quantity that is allocated for direct consumption as human food, rather than allocation to animal feed or industrial uses."
             elif element_code == "005521":
                 # "005521",  # Feed (tonnes)
                 assert unit == "tonnes"
@@ -2084,14 +2090,16 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "5521pc",  # Feed (tonnes per capita)
                 assert unit == "tonnes per capita"
                 title = f"{item} used for animal feed per capita"
+                description_short = "Quantity allocated to feed livestock."
             elif element_code == "005154":
-                # "005154",  # Other uses (tonnes)
+                # "005154",  # Other uses (non-food) (tonnes)
                 assert unit == "tonnes"
                 title = f"{item} allocated to other uses"
             elif element_code == "5154pc":
                 # "5154pc",  # Other uses (tonnes per capita)
                 assert unit == "tonnes per capita"
                 title = f"{item} allocated to other uses per capita"
+                description_short = "Quantity allocated to industrial uses such as biofuel, pharmaceuticals or textile products, as well as other non-food uses like pet food."
             elif element_code == "005123":
                 # "005123",  # Waste in supply chain (tonnes)
                 assert unit == "tonnes"
@@ -2100,6 +2108,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "5123pc",  # Waste in supply chain (tonnes_per_capita)
                 assert unit == "tonnes per capita"
                 title = f"{item} wasted in supply chains per capita"
+                description_short = "Quantity that is lost or wasted in supply chains through poor handling, spoiling, lack of refrigeration and damage from the field to retail. It does not include consumer waste."
             elif element_code == "005301":
                 # "005301",  # Domestic supply (tonnes)
                 assert unit == "tonnes"
