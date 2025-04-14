@@ -289,6 +289,7 @@ ELEMENT_CODES_QCL = [
 # Elements from faostat_fbsc to include.
 ELEMENT_CODES_FBSC = [
     "0645pc",  # Food available for consumption (kilograms per year per capita)
+    "e645pc",  # Food available for consumption (grams per day per capita)
     "0664pc",  # Food available for consumption (kilocalories per day per capita)
     "0674pc",  # Food available for consumption (grams of protein per day per capita)
     "0684pc",  # Food available for consumption (grams of fat per day per capita)
@@ -334,6 +335,7 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
     columns_to_drop = []
     UNITS_IN_RADIO_BUTTONS = [
         "kilograms per year",
+        "grams per day",
         "kilocalories per day",
         "grams of protein per day",
         "grams of fat per day",

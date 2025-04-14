@@ -2051,7 +2051,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             if element_code == "0645pc":
                 # "0645pc",  # Food available for consumption (kilograms per year per capita)
                 assert unit == "kilograms per year per capita"
-                title = f"Daily per capita supply of {item.lower()}"
+                title = f"Yearly per capita supply of {item.lower()}"
                 description_short = description_short_food_available
             elif element_code == "0664pc":
                 # "0664pc",  # Food available for consumption (kilocalories per day per capita)
