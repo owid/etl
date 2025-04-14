@@ -5,43 +5,6 @@ definitions:
         type: LineChart
         hasMapTab: true
         yScaleToggle: false
-  additionalInfo:
-    def_4575872984850375042: &def_4575872984850375042 |-
-      Safely managed drinking water is water from an improved water source which is located on premises, available when needed and free from contamination.
-      Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-    def_3907960109857976659: &def_3907960109857976659 |-
-      Basic drinking water is water from an improved source, where the collection time is not more than 30 minutes for a roundtrip.
-      Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-    def_7037742746182220489: &def_7037742746182220489 |-
-      Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.
-      Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-    def_1359097150334892695: &def_1359097150334892695 An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
-    def_5129605864067719215: &def_5129605864067719215 |-
-      Having no access to drinking water means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
-    def_2588506289258611723: &def_2588506289258611723 |-
-      Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
-    def_6745343594930914771: &def_6745343594930914771 |-
-      Not using drinking water facilities means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
-    def_1595258020555169860: &def_1595258020555169860 |-
-      Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.
-      Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-    def_3783740543697629543: &def_3783740543697629543 |-
-      Basic sanitation is improved facilities which are not shared with other households.
-      Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-    def_4605268040840298533: &def_4605268040840298533 |-
-      Limited sanitation is improved facilities shared between two or more households.
-      Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-    def_1581787687361548153: &def_1581787687361548153 |-
-      Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.
-      Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-    def_2795547532717770227: &def_2795547532717770227 |-
-      Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.
-      Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-    def_647827750564826876: &def_647827750564826876 |-
-      Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
-    def_6458162423692798831: &def_6458162423692798831 Basic handwashing facilities are facilities on premises with soap and water.
-    def_7663388819373563533: &def_7663388819373563533 Limited handwashing facilities are facilities on premises without soap and water.
-    def_5644044454368933660: &def_5644044454368933660 No handwashing facility is available on the premises.
 config:
   subNavId: water
   yAxisMin: 0
@@ -125,7 +88,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_4575872984850375042
+            additionalInfo: |-
+              Safely managed drinking water is water from an improved water source which is located on premises, available when needed and free from contamination.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -147,7 +111,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_3907960109857976659
+            additionalInfo: |-
+              Basic drinking water is water from an improved source, where the collection time is not more than 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -169,7 +134,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_7037742746182220489
+            additionalInfo: |-
+              Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
             colorScaleEqualSizeBins: false
@@ -191,7 +157,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1359097150334892695
+            additionalInfo: An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40,,;50,,;60
             colorScaleEqualSizeBins: false
@@ -212,7 +178,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_5129605864067719215
+            additionalInfo: |-
+              Having no access to drinking water means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 2.5,,;5,,;10,,;25,,;50
             colorScaleEqualSizeBins: false
@@ -234,7 +201,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_2588506289258611723
+            additionalInfo: |-
+              Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -255,7 +223,8 @@ views:
             name: Number using safely managed drinking water services
             type: Integer
             unit: people
-            additionalInfo: *def_4575872984850375042
+            additionalInfo: |-
+              Safely managed drinking water is water from an improved water source which is located on premises, available when needed and free from contamination.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -276,7 +245,8 @@ views:
             name: Number using basic drinking water services
             type: Integer
             unit: people
-            additionalInfo: *def_3907960109857976659
+            additionalInfo: |-
+              Basic drinking water is water from an improved source, where the collection time is not more than 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -297,7 +267,8 @@ views:
             name: Number using limited drinking water services
             type: Integer
             unit: people
-            additionalInfo: *def_7037742746182220489
+            additionalInfo: |-
+              Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -318,7 +289,7 @@ views:
             name: Number using unimproved drinking water sources
             type: Integer
             unit: people
-            additionalInfo: *def_1359097150334892695
+            additionalInfo: An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -338,7 +309,8 @@ views:
             name: Number with not using drinking water facilities
             type: Integer
             unit: people
-            additionalInfo: *def_6745343594930914771
+            additionalInfo: |-
+              Not using drinking water facilities means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -359,7 +331,8 @@ views:
             name: Number using improved drinking water sources
             type: Integer
             unit: people
-            additionalInfo: *def_2588506289258611723
+            additionalInfo: |-
+              Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -381,7 +354,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_4575872984850375042
+            additionalInfo: |-
+              Safely managed drinking water is water from an improved water source which is located on premises, available when needed and free from contamination.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -403,7 +377,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_3907960109857976659
+            additionalInfo: |-
+              Basic drinking water is water from an improved source, where the collection time is not more than 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -425,7 +400,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_7037742746182220489
+            additionalInfo: |-
+              Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
             colorScaleEqualSizeBins: false
@@ -447,7 +423,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1359097150334892695
+            additionalInfo: An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40,,;50,,;60
             colorScaleEqualSizeBins: false
@@ -468,7 +444,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_6745343594930914771
+            additionalInfo: |-
+              Not using drinking water facilities means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 2.5,,;5,,;10,,;25,,;50
             colorScaleEqualSizeBins: false
@@ -490,7 +467,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_2588506289258611723
+            additionalInfo: |-
+              Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -511,7 +489,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_4575872984850375042
+            additionalInfo: |-
+              Safely managed drinking water is water from an improved water source which is located on premises, available when needed and free from contamination.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -532,7 +511,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_3907960109857976659
+            additionalInfo: |-
+              Basic drinking water is water from an improved source, where the collection time is not more than 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -553,7 +533,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_7037742746182220489
+            additionalInfo: |-
+              Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -574,7 +555,7 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_1359097150334892695
+            additionalInfo: An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -594,7 +575,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_6745343594930914771
+            additionalInfo: |-
+              Not using drinking water facilities means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -615,7 +597,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_2588506289258611723
+            additionalInfo: |-
+              Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -637,7 +620,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_4575872984850375042
+            additionalInfo: |-
+              Safely managed drinking water is water from an improved water source which is located on premises, available when needed and free from contamination.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -659,7 +643,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_3907960109857976659
+            additionalInfo: |-
+              Basic drinking water is water from an improved source, where the collection time is not more than 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -681,7 +666,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_7037742746182220489
+            additionalInfo: |-
+              Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 5,,;10,,;20,,;30,,;40
             colorScaleEqualSizeBins: false
@@ -703,7 +689,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1359097150334892695
+            additionalInfo: An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;40,,;60,,:80
             colorScaleEqualSizeBins: false
@@ -724,7 +710,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_6745343594930914771
+            additionalInfo: |-
+              Not using drinking water facilities means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;,,;40,,;50,,;60
             colorScaleEqualSizeBins: false
@@ -746,7 +733,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_2588506289258611723
+            additionalInfo: |-
+              Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -767,7 +755,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_4575872984850375042
+            additionalInfo: |-
+              Safely managed drinking water is water from an improved water source which is located on premises, available when needed and free from contamination.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -788,7 +777,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_3907960109857976659
+            additionalInfo: |-
+              Basic drinking water is water from an improved source, where the collection time is not more than 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -809,7 +799,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_7037742746182220489
+            additionalInfo: |-
+              Limited drinking water is water from an improved source, where the collection time exceeds 30 minutes for a roundtrip.\nImproved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -830,7 +821,7 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_1359097150334892695
+            additionalInfo: An unimproved drinking water source is water from an unprotected dug well or unprotected spring.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -850,7 +841,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_6745343594930914771
+            additionalInfo: |-
+              Not using drinking water facilities means people rely on surface water: directly from a river, dam, lake, pond, stream, canal or irrigation canal.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -871,7 +863,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_2588506289258611723
+            additionalInfo: |-
+              Improved drinking water sources are those that have the potential to deliver safe water. They include piped water, boreholes or tubewells, protected dug wells, protected springs, rainwater, and packaged or delivered water.
             colorScaleScheme: PuBuGn
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -893,7 +886,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1595258020555169860
+            additionalInfo: |-
+              Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -915,7 +909,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_3783740543697629543
+            additionalInfo: |-
+              Basic sanitation is improved facilities which are not shared with other households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -936,7 +931,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_4605268040840298533
+            additionalInfo: |-
+              Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
             colorScaleEqualSizeBins: false
@@ -957,7 +953,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1581787687361548153
+            additionalInfo: |-
+              Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10,,;20,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -978,7 +975,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_2795547532717770227
+            additionalInfo: |-
+              Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1000,7 +998,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_647827750564826876
+            additionalInfo: |-
+              Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1021,7 +1020,8 @@ views:
             name: Number using sanitation with off-site wastewater treatment
             type: Integer
             unit: people
-            additionalInfo: *def_1595258020555169860
+            additionalInfo: |-
+              Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1042,7 +1042,8 @@ views:
             name: Number using basic sanitation services
             type: Integer
             unit: people
-            additionalInfo: *def_3783740543697629543
+            additionalInfo: |-
+              Basic sanitation is improved facilities which are not shared with other households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1062,7 +1063,8 @@ views:
             name: Number using limited sanitation services
             type: Integer
             unit: people
-            additionalInfo: *def_4605268040840298533
+            additionalInfo: |-
+              Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1082,7 +1084,8 @@ views:
             name: Number using unimproved sanitation facilities
             type: Integer
             unit: people
-            additionalInfo: *def_1581787687361548153
+            additionalInfo: |-
+              Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1102,7 +1105,8 @@ views:
             name: Number practicing open defecation (no use of any sanitation facilities)
             type: Integer
             unit: people
-            additionalInfo: *def_2795547532717770227
+            additionalInfo: |-
+              Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1123,7 +1127,8 @@ views:
             name: Number using improved sanitation facilities
             type: Integer
             unit: people
-            additionalInfo: *def_647827750564826876
+            additionalInfo: |-
+              Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1145,7 +1150,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1595258020555169860
+            additionalInfo: |-
+              Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1167,7 +1173,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_3783740543697629543
+            additionalInfo: |-
+              Basic sanitation is improved facilities which are not shared with other households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1188,7 +1195,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_4605268040840298533
+            additionalInfo: |-
+              Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
             colorScaleEqualSizeBins: false
@@ -1209,7 +1217,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1581787687361548153
+            additionalInfo: |-
+              Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 10,,;20,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1230,7 +1239,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_2795547532717770227
+            additionalInfo: |-
+              Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1252,7 +1262,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_647827750564826876
+            additionalInfo: |-
+              Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1273,7 +1284,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_1595258020555169860
+            additionalInfo: |-
+              Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1294,7 +1306,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_3783740543697629543
+            additionalInfo: |-
+              Basic sanitation is improved facilities which are not shared with other households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1314,7 +1327,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_4605268040840298533
+            additionalInfo: |-
+              Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1334,7 +1348,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_1581787687361548153
+            additionalInfo: |-
+              Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1354,7 +1369,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_2795547532717770227
+            additionalInfo: |-
+              Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1375,7 +1391,8 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_647827750564826876
+            additionalInfo: |-
+              Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1397,7 +1414,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1595258020555169860
+            additionalInfo: |-
+              Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1419,7 +1437,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_3783740543697629543
+            additionalInfo: |-
+              Basic sanitation is improved facilities which are not shared with other households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1440,7 +1459,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_4605268040840298533
+            additionalInfo: |-
+              Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 10,,;20,,;30,,;40,,;50,,;60
             colorScaleEqualSizeBins: false
@@ -1461,7 +1481,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_1581787687361548153
+            additionalInfo: |-
+              Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;40,,;60,,:80
             colorScaleEqualSizeBins: false
@@ -1482,7 +1503,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_2795547532717770227
+            additionalInfo: |-
+              Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 5,,;10,,;20,,;,,;40,,;50,,;60
             colorScaleEqualSizeBins: false
@@ -1504,7 +1526,8 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_647827750564826876
+            additionalInfo: |-
+              Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1525,7 +1548,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_1595258020555169860
+            additionalInfo: |-
+              Safely managed sanitation is improved facilities which are not shared with other households and where excreta are safely disposed in situ or transported and treated off-site.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1546,7 +1570,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_3783740543697629543
+            additionalInfo: |-
+              Basic sanitation is improved facilities which are not shared with other households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1566,7 +1591,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_4605268040840298533
+            additionalInfo: |-
+              Limited sanitation is improved facilities shared between two or more households.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1586,7 +1612,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_1581787687361548153
+            additionalInfo: |-
+              Unimproved sanitation is the use of pit latrines without a slab or platform, hanging latrines or bucket latrines.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1606,7 +1633,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_2795547532717770227
+            additionalInfo: |-
+              Open defecation is the disposal of human faeces in fields, forests, bushes, open bodies of water, beaches and other open spaces or with solid waste.\nImproved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1627,7 +1655,8 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_647827750564826876
+            additionalInfo: |-
+              Improved sanitation facilities are designed to hygienically separate excreta from human contact. They include flush to piped sewer system, septic tanks or pit latrines; ventilated improved pit latrines, composting toilets or pit latrines with slabs.
             colorScaleScheme: Greens
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1649,7 +1678,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_6458162423692798831
+            additionalInfo: Basic handwashing facilities are facilities on premises with soap and water.
             colorScaleScheme: GnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1670,7 +1699,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_7663388819373563533
+            additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1691,7 +1720,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_5644044454368933660
+            additionalInfo: No handwashing facility is available on the premises.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 2.5,,;5,,;10,,;25,,;50
             colorScaleEqualSizeBins: false
@@ -1711,7 +1740,7 @@ views:
             name: Number with access to basic handwashing facilities
             type: Integer
             unit: people
-            additionalInfo: *def_6458162423692798831
+            additionalInfo: Basic handwashing facilities are facilities on premises with soap and water.
             colorScaleScheme: Purples
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1731,7 +1760,7 @@ views:
             name: Number with access to limited handwashing facilities
             type: Integer
             unit: people
-            additionalInfo: *def_7663388819373563533
+            additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1751,7 +1780,7 @@ views:
             name: Number with no handwashing facilities
             type: Integer
             unit: people
-            additionalInfo: *def_5644044454368933660
+            additionalInfo: No handwashing facility is available on the premises.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1772,7 +1801,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_6458162423692798831
+            additionalInfo: Basic handwashing facilities are facilities on premises with soap and water.
             colorScaleScheme: GnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1793,7 +1822,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_7663388819373563533
+            additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1814,7 +1843,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_5644044454368933660
+            additionalInfo: No handwashing facility is available on the premises.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 2.5,,;5,,;10,,;25,,;50
             colorScaleEqualSizeBins: false
@@ -1834,7 +1863,7 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_6458162423692798831
+            additionalInfo: Basic handwashing facilities are facilities on premises with soap and water.
             colorScaleScheme: Purples
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1854,7 +1883,7 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_7663388819373563533
+            additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1874,7 +1903,7 @@ views:
             name: Urban usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_5644044454368933660
+            additionalInfo: No handwashing facility is available on the premises.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1895,7 +1924,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_6458162423692798831
+            additionalInfo: Basic handwashing facilities are facilities on premises with soap and water.
             colorScaleScheme: GnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1916,7 +1945,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_7663388819373563533
+            additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
             colorScaleScheme: YlGnBu
             colorScaleNumericBins: 20,,;40,,;60,,;80,,;100
             colorScaleEqualSizeBins: false
@@ -1937,7 +1966,7 @@ views:
             type: Numeric
             unit: '%'
             shortUnit: '%'
-            additionalInfo: *def_5644044454368933660
+            additionalInfo: No handwashing facility is available on the premises.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 2.5,,;5,,;10,,;25,,;50
             colorScaleEqualSizeBins: false
@@ -1957,7 +1986,7 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_6458162423692798831
+            additionalInfo: Basic handwashing facilities are facilities on premises with soap and water.
             colorScaleScheme: Purples
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1977,7 +2006,7 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_7663388819373563533
+            additionalInfo: Limited handwashing facilities are facilities on premises without soap and water.
             colorScaleScheme: YlOrBr
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
@@ -1997,7 +2026,7 @@ views:
             name: Rural usage (number of people)
             type: Integer
             unit: people
-            additionalInfo: *def_5644044454368933660
+            additionalInfo: No handwashing facility is available on the premises.
             colorScaleScheme: YlOrRd
             colorScaleNumericBins: 100000,,;1000000,,;10000000,,;100000000,,;1000000000
             colorScaleEqualSizeBins: true
