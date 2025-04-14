@@ -1,3 +1,7 @@
+# TODO:
+# - There's a lot of duplication. `additionalInfo` and color properties should be set programatically.
+# - Units and titles should come from grapher metadata.
+
 definitions:
   common_views:
     - config:
