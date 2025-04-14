@@ -1,5 +1,6 @@
 title:
-  title: "Energy prices"
+  # TODO: undo before merging!
+  title: "TEST Energy prices"
   title_variant: "European electricity and gas"
 default_selection:
   - "European Union (27)"
