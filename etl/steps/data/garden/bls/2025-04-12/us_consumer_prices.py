@@ -55,11 +55,7 @@ def run(dest_dir: str) -> None:
     tb = tb.pivot(columns="series_id", values="value", index="year").assign(country="United States").reset_index()
 
     # Create a new table with the processed data.
-    tb_garden = tb.format(["country", "year"], short_name="us_consumer_prices")
-
-    # Ensure metadata is correctly associated.
-    for column in tb_garden.columns:
-        tb_garden[column].metadata.origins = tb["college_tuition_fees"].metadata.origins
+    tb_garden = tb.format(["country", "year"])
 
     #
     # Save outputs.

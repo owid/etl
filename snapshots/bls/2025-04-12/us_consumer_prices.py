@@ -2,19 +2,28 @@
 
 import datetime
 import json
-import time
+import os
 from pathlib import Path
 
 import click
 import pandas as pd
 import requests
+from dotenv import load_dotenv
 from owid.datautils.io import df_to_file
+from structlog import get_logger
 
 from etl.snapshot import Snapshot
+
+# Initialize log.
+log = get_logger()
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
+# Get the API key from environment (needs to be in .env file). You get an email with the key when you register here https://data.bls.gov/registrationEngine/
+# Load environment variables from .env file
+load_dotenv()
+KEY = os.getenv("US_BLS_API_KEY")
 SERIES_IDS = [
     "CUUR0000SEEB01",  # College tuition fees
     "CUUR0000SAE1",  # Tuition, other school fees, and childcare
@@ -44,20 +53,33 @@ def main(upload: bool) -> None:
 
     all_series_data = []
     headers = {"Content-type": "application/json"}
+
     for year in range(start_year, end_year + 1, 10):
         chunk_start = year
         chunk_end = min(year + 9, end_year)
 
         data = json.dumps({"seriesid": SERIES_IDS, "startyear": str(chunk_start), "endyear": str(chunk_end)})
 
-        response = requests.post("https://api.bls.gov/publicAPI/v1/timeseries/data/", data=data, headers=headers)
-        if response.status_code == 200:
+        params = {"registrationkey": KEY, "annualaverage": "true"}
+
+        response = requests.post(
+            "https://api.bls.gov/publicAPI/v2/timeseries/data/", params=params, data=data, headers=headers
+        )
+
+        try:
             json_data = response.json()
+        except json.JSONDecodeError:
+            log.info(f"Failed to decode JSON for {chunk_start}-{chunk_end}: {response.text}")
+            continue
+
+        if response.status_code == 200 and json_data.get("status") == "REQUEST_SUCCEEDED":
             all_series_data.extend(json_data.get("Results", {}).get("series", []))
         else:
-            print(f"Failed to get data for {chunk_start}-{chunk_end}: {response.status_code}")
+            log.info(f"API error: {json_data.get('message')[0]}")
+            break  # Stop on any API-reported error
 
-            time.sleep(1)
+    if not all_series_data:
+        raise ValueError("No data returned from the API.")
     # Flatten into a list of dicts
     flattened = []
     for series in all_series_data:
