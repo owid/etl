@@ -14,8 +14,14 @@ def run(dest_dir: str) -> None:
     cols = tb.columns.drop(["country", "year", "residence"])
     tb = tb.pivot_table(index=["country", "year"], columns="residence", values=cols, aggfunc="first")
 
+    old_cols = [f"{n}__residence_{res.lower()}" for n, res in tb.columns]
+
     tb.columns = ["_".join(col).strip().lower() for col in tb.columns.values]
     tb.columns = [modify_column_name(col) for col in tb.columns]
+
+    print(dict(zip(old_cols, tb.columns)))
+
+    __import__("ipdb").set_trace()
 
     # Create explorer dataset, with garden table and metadata in csv format
     ds_explorer = create_dataset(dest_dir, tables=[tb], formats=["csv"])
