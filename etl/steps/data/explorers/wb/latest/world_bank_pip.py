@@ -21,13 +21,17 @@ PPP_VERSIONS = [2011, 2017]
 # TODO: Change to 2021 prices
 INTERNATIONAL_POVERTY_LINE = 215
 
+# Define PPP years
+PPP_YEAR_OLD = PPP_VERSIONS[0]
+PPP_YEAR_CURRENT = PPP_VERSIONS[1]
+
 
 def run(dest_dir: str) -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("world_bank_pip")
 
     # Read table from garden dataset.
-    tb_inc_or_cons = ds_garden[f"income_consumption_{PPP_VERSIONS[1]}"]
+    tb_inc_or_cons = ds_garden[f"income_consumption_{PPP_YEAR_CURRENT}"]
 
     # Drop variables not used in the explorers and rows with missing values
     tb_inc_or_cons = drop_columns_and_rows(
@@ -86,12 +90,12 @@ def import_rest_of_tables(ds_garden: Dataset) -> list:
         for t in ds_garden.table_names
         if t
         not in [
-            f"income_consumption_{PPP_VERSIONS[1]}",
-            f"income_consumption_{PPP_VERSIONS[0]}",
-            f"income_{PPP_VERSIONS[0]}",
-            f"consumption_{PPP_VERSIONS[0]}",
-            f"percentiles_income_consumption_{PPP_VERSIONS[0]}",
-            f"percentiles_income_consumption_{PPP_VERSIONS[1]}",
+            f"income_consumption_{PPP_YEAR_CURRENT}",
+            f"income_consumption_{PPP_YEAR_OLD}",
+            f"income_{PPP_YEAR_OLD}",
+            f"consumption_{PPP_YEAR_OLD}",
+            f"percentiles_income_consumption_{PPP_YEAR_OLD}",
+            f"percentiles_income_consumption_{PPP_YEAR_CURRENT}",
         ]
     ]:
         tb = ds_garden[table]
@@ -126,10 +130,7 @@ def create_inequality_table(tb: Table, short_name: str) -> Table:
     # Remove regions, because they don't have inequality data
     tb_pip_inequality = tb_pip_inequality[~tb_pip_inequality["country"].str.contains("\\(PIP\\)")]
 
-    # Add short name
-    tb_pip_inequality.metadata.short_name = short_name
-
     # Verify index and sort
-    tb_pip_inequality = tb_pip_inequality.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb_pip_inequality = tb_pip_inequality.format(["country", "year"], short_name=short_name)
 
     return tb_pip_inequality

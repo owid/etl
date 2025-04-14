@@ -164,7 +164,7 @@ df_header = df_header[0].apply(pd.Series)
 # ## Tables
 # Variables are grouped by type of welfare to iterate by different survey types at the same time. The output is the list of all the variables being used in the explorer, with metadata.
 # ### Tables for variables not showing breaks between surveys
-# These variables consider a continous series, without breaks due to changes in surveys' methodology
+# These variables consider a continuous series, without breaks due to changes in surveys' methodology
 
 
 ###########################################################################################
