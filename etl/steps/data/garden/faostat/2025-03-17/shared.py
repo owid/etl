@@ -2227,6 +2227,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005123",  # Waste in supply chain (tonnes)
                 assert unit == "tonnes"
                 title = f"{item} wasted in supply chains"
+                description_short = "Quantity that is lost or wasted in supply chains through poor handling, spoiling, lack of refrigeration and damage from the field to retail. It does not include consumer waste."
             elif element_code == "5123pc":
                 # "5123pc",  # Waste in supply chain (tonnes per capita)
                 assert unit == "tonnes per capita"
@@ -2241,10 +2242,12 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005301",  # Domestic supply (tonnes)
                 assert unit == "tonnes"
                 title = f"Domestic supply of {item.lower()}"
+                description_short = "Quantity of a commodity available for use within a country after accounting for trade and stock changes. It is calculated as production plus imports, minus exports, and adjusted for changes in stocks."
             elif element_code == "5301pc":
                 # "5301pc",  # Domestic supply (tonnes per capita)
                 assert unit == "tonnes per capita"
                 title = f"Per capita domestic supply of {item.lower()}"
+                description_short = "Quantity of a commodity available for use within a country after accounting for trade and stock changes. It is calculated as production plus imports, minus exports, and adjusted for changes in stocks."
             elif element_code == "5301pe":
                 # "5301pe",  # Domestic supply (kilograms per capita)
                 assert unit == "kilograms per capita"
