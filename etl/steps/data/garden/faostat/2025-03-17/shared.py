@@ -2208,7 +2208,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         tb_wide[column].display["name"] = title
         tb_wide[column].display["numDecimalPlaces"] = num_decimal_places
         tb_wide[column].metadata.presentation.title_public = title
-        tb_wide[column].metadata.presentation.description_short = description_short
+        tb_wide[column].metadata.description_short = description_short
 
 
 def run(dest_dir: str) -> None:
