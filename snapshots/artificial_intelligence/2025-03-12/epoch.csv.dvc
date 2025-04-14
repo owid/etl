@@ -32,6 +32,6 @@ meta:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 outs:
-  - md5: c677e5d558ddab7849f18b09c795af40
-    size: 1708894
+  - md5: e92dd16288c14963087815f8e954cdb4
+    size: 1759979
     path: epoch.csv
