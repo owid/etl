@@ -1,7 +1,5 @@
 """Load a grapher dataset and create an explorer dataset with its tsv file."""
 
-import copy
-
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
