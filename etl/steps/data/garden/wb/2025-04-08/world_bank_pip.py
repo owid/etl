@@ -110,13 +110,13 @@ def run(dest_dir: str) -> None:
 
     # Read tables from meadow dataset.
     # Key indicators
-    tb = ds_meadow["world_bank_pip"].reset_index()
+    tb = ds_meadow.read("world_bank_pip")
 
     # Percentiles
-    tb_percentiles = ds_meadow["world_bank_pip_percentiles"].reset_index()
+    tb_percentiles = ds_meadow.read("world_bank_pip_percentiles")
 
     # Region definitions
-    tb_region_definitions = ds_meadow["world_bank_pip_regions"].reset_index()
+    tb_region_definitions = ds_meadow.read("world_bank_pip_regions")
 
     # Process data
     # Make table wide and change column names
