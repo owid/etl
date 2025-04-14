@@ -344,6 +344,7 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
         "hectares",
         "tonnes",
         "kilograms",
+        "square meters",
         "tonnes per hectare",
         "animals",
         "kilograms per animal",

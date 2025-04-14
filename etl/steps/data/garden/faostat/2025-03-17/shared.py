@@ -1522,7 +1522,7 @@ def add_modified_variables(tb: Table, dataset_short_name: str) -> Table:
         ],
     }
 
-    for element in additional_elements[dataset_short_name]:
+    for element in additional_elements.get(dataset_short_name, []):
         _tb = tb[tb["element_code"] == element["element_code_old"]].reset_index(drop=True)
         _tb["value"] *= element["factor"]
         _tb["unit"] = element["unit"]
@@ -2189,6 +2189,11 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 assert unit == "tonnes per capita"
                 title = f"{item} used for direct human food per capita"
                 description_short = "Quantity that is allocated for direct consumption as human food, rather than allocation to animal feed or industrial uses."
+            elif element_code == "5142pe":
+                # "5142pe",  # Food (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"{item} used for direct human food per capita"
+                description_short = "Quantity that is allocated for direct consumption as human food, rather than allocation to animal feed or industrial uses."
             elif element_code == "005521":
                 # "005521",  # Feed (tonnes)
                 assert unit == "tonnes"
@@ -2196,6 +2201,11 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "5521pc":
                 # "5521pc",  # Feed (tonnes per capita)
                 assert unit == "tonnes per capita"
+                title = f"{item} used for animal feed per capita"
+                description_short = "Quantity allocated to feed livestock."
+            elif element_code == "5521pe":
+                # "5521pe",  # Feed (kilograms per capita)
+                assert unit == "kilograms per capita"
                 title = f"{item} used for animal feed per capita"
                 description_short = "Quantity allocated to feed livestock."
             elif element_code == "005154":
@@ -2208,13 +2218,23 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 assert unit == "tonnes per capita"
                 title = f"{item} allocated to other uses per capita"
                 description_short = "Quantity allocated to industrial uses such as biofuel, pharmaceuticals or textile products, as well as other non-food uses like pet food."
+            elif element_code == "5154pe":
+                # "5154pe",  # Other uses (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"{item} allocated to other uses per capita"
+                description_short = "Quantity allocated to industrial uses such as biofuel, pharmaceuticals or textile products, as well as other non-food uses like pet food."
             elif element_code == "005123":
                 # "005123",  # Waste in supply chain (tonnes)
                 assert unit == "tonnes"
                 title = f"{item} wasted in supply chains"
             elif element_code == "5123pc":
-                # "5123pc",  # Waste in supply chain (tonnes_per_capita)
+                # "5123pc",  # Waste in supply chain (tonnes per capita)
                 assert unit == "tonnes per capita"
+                title = f"{item} wasted in supply chains per capita"
+                description_short = "Quantity that is lost or wasted in supply chains through poor handling, spoiling, lack of refrigeration and damage from the field to retail. It does not include consumer waste."
+            elif element_code == "5123pe":
+                # "5123pe",  # Waste in supply chain (kilograms per capita)
+                assert unit == "kilograms per capita"
                 title = f"{item} wasted in supply chains per capita"
                 description_short = "Quantity that is lost or wasted in supply chains through poor handling, spoiling, lack of refrigeration and damage from the field to retail. It does not include consumer waste."
             elif element_code == "005301":
@@ -2225,6 +2245,10 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "5301pc",  # Domestic supply (tonnes per capita)
                 assert unit == "tonnes per capita"
                 title = f"Per capita domestic supply of {item.lower()}"
+            elif element_code == "5301pe":
+                # "5301pe",  # Domestic supply (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"Per capita domestic supply of {item.lower()}"
             elif element_code == "005611":
                 # "005611",  # Imports (tonnes)
                 assert unit == "tonnes"
@@ -2233,6 +2257,10 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "5611pc",  # Imports (tonnes per capita)
                 assert unit == "tonnes per capita"
                 title = f"Per capita imports of {item.lower()}"
+            elif element_code == "5611pe":
+                # "5611pe",  # Imports (kilograms per capita)
+                assert unit == "kilograms per capita"
+                title = f"Per capita imports of {item.lower()}"
             elif element_code == "005911":
                 # "005911",  # Exports (tonnes)
                 assert unit == "tonnes"
@@ -2240,6 +2268,10 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "5911pc":
                 # "5911pc",  # Exports (tonnes per capita)
                 assert unit == "tonnes per capita"
+                title = f"Per capita exports of {item.lower()}"
+            elif element_code == "5911pe":
+                # "5911pe",  # Exports (kilograms per capita)
+                assert unit == "kilograms per capita"
                 title = f"Per capita exports of {item.lower()}"
             elif element_code == "005131":
                 # "005131",  # Processing (tonnes)
@@ -2253,6 +2285,10 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "5510pc":
                 # "5510pc",  # Production per capita (tonnes per capita).
                 assert unit == "tonnes per capita"
+                title = f"Per capita production of {item.lower()}"
+            elif element_code == "5510pe":
+                # "5510pe",  # Production per capita (kilograms per capita).
+                assert unit == "kilograms per capita"
                 title = f"Per capita production of {item.lower()}"
             elif element_code == "005412":
                 # "005412",  # Yield (tonnes per hectare).
@@ -2272,6 +2308,9 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 title = f"Land used to produce {item.lower()}"
             elif element_code == "5312pc":
                 # "5312pc",  # Area harvested per capita (hectares per capita).
+                title = f"Per capita land used to produce {item.lower()}"
+            elif element_code == "5312pe":
+                # "5312pe",  # Area harvested per capita (square meteres per capita).
                 title = f"Per capita land used to produce {item.lower()}"
             elif element_code in ["005320", "005321"]:
                 # "005320",  # Producing or slaughtered animals (animals).
