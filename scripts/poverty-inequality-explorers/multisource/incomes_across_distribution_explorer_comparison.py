@@ -17,7 +17,7 @@ ppp_year_pip_lis = PPP_VERSION_COMPARISON_PIP
 sheet_id = "1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI"
 
 # Merged sheet (this contains PIP, WID and LIS dataset information together in one file)
-sheet_name = "merged_tables"
+sheet_name = f"merged_tables_{ppp_year_pip_lis}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 merged_tables = pd.read_csv(url, keep_default_na=False)
 
