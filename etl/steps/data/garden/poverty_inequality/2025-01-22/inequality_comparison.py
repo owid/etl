@@ -25,6 +25,11 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define PPP year for PIP
+# NOTE: Change this in case of new PPP versions in the future
+# TODO: Change to 2021 prices
+PPP_YEAR_PIP = 2017
+
 # Initialize logger
 log = get_logger()
 
@@ -74,7 +79,7 @@ def run(dest_dir: str) -> None:
     tb = ds_pov_ineq.read("keyvars")
 
     # Load tables from PIP, WID, and LIS datasets (for metadata)
-    tb_pip = ds_pip.read("income_consumption_2017_unsmoothed")
+    tb_pip = ds_pip.read(f"income_consumption_{PPP_YEAR_PIP}_unsmoothed")
     tb_wid = ds_wid.read("world_inequality_database")
     tb_lis = ds_lis.read("luxembourg_income_study")
 
