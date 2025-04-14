@@ -146,19 +146,8 @@ def _set_tab_title_size(font_size="2rem"):
     st.markdown(css, unsafe_allow_html=True)
 
 
-def main():
-    st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
-    st.title(
-        ":material/difference: Explorer Diff",
-        help=f"""
-**Explorer diff** is a page that compares explorer between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
-""",
-    )
-
-    _show_options()
-
-    hide_unchanged_explorers: bool = st.session_state.get("hide_unchanged_explorers")  # type: ignore
-
+def _display_explorer_selection(hide_unchanged_explorers: bool) -> str | None:
+    """Display explorer selection UI and return the selected explorer slug."""
     explorer_slugs = _fetch_explorer_slugs(hide_unchanged_explorers=hide_unchanged_explorers)
 
     # Select explorer to compare
@@ -175,10 +164,14 @@ def main():
             st.info('No explorers with changes. Turn off "Hide explorers with no change" in the options to see them.')
         else:
             st.info("Select an explorer.")
-        return
+        return None
 
+    return explorer_slug
+
+
+def _display_explorer_view_options(explorer_slug: str) -> dict:
+    """Display explorer view options UI and return the selected view."""
     explorer_views = _fetch_explorer_views(explorer_slug)
-
     all_dimensions = _extract_all_dimensions(explorer_views)
 
     st.subheader("Select Explorer View Options")
@@ -216,6 +209,11 @@ def main():
             "⚠️ This specific combination of options does not exist in the explorer views. The explorer may show unexpected results."
         )
 
+    return view
+
+
+def _display_explorer_comparison(explorer_slug: str, view: dict):
+    """Display side-by-side explorer comparison."""
     # Create columns for side by side comparison
     col1, col2 = st.columns(2)
 
@@ -231,6 +229,10 @@ def main():
         assert OWID_ENV.site
         # Show preview from a staging server to see changes instantly
         explorer_chart(base_url=OWID_ENV.site + "/admin/explorers/preview", **kwargs)
+
+
+def _fetch_explorer_data(explorer_slug: str):
+    """Fetch explorer data from both environments."""
 
     # Helper function to load explorer data
     def load_explorer_data(engine, columns):
@@ -251,6 +253,11 @@ def main():
         source_data.config["blocks"] = source_data.config.pop("blocks")
         target_data.config["blocks"] = target_data.config.pop("blocks")
 
+    return source_data, target_data
+
+
+def _display_explorer_diffs(source_data, target_data):
+    """Display explorer diffs in tabs."""
     # Create tabs for diffs
     tsv_tab, yaml_tab = st.tabs(["**TSV Diff**", "**YAML Diff**"])
     _set_tab_title_size("1.5rem")
@@ -280,6 +287,37 @@ def main():
             tofile="staging",
         )
         st_show_diff(diff_str, height=800)
+
+
+def main():
+    st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
+    st.title(
+        ":material/difference: Explorer Diff",
+        help=f"""
+**Explorer diff** is a page that compares explorer between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
+""",
+    )
+
+    _show_options()
+
+    hide_unchanged_explorers: bool = st.session_state.get("hide_unchanged_explorers")  # type: ignore
+
+    # Step 1: Display explorer selection UI
+    explorer_slug = _display_explorer_selection(hide_unchanged_explorers)
+    if not explorer_slug:
+        return
+
+    # Step 2: Display explorer view options UI
+    view = _display_explorer_view_options(explorer_slug)
+
+    # Step 3: Display side-by-side explorer comparison
+    _display_explorer_comparison(explorer_slug, view)
+
+    # Step 4: Fetch explorer data
+    source_data, target_data = _fetch_explorer_data(explorer_slug)
+
+    # Step 5: Display diffs
+    _display_explorer_diffs(source_data, target_data)
 
 
 main()

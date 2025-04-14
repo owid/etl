@@ -8,7 +8,7 @@ from structlog import get_logger
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
 from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
-from apps.wizard.utils.components import url_persist
+from apps.wizard.utils.components import mdim_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.files import yaml_dump
@@ -73,19 +73,8 @@ def _fetch_mdim_catalog_paths(hide_unchanged_mdims: bool) -> list[str]:
     return df_source["catalogPath"].tolist()
 
 
-def main():
-    st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
-    st.title(
-        ":material/difference: MDIM Diff",
-        help=f"""
-**MDIM diff** is a page that compares mdims between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
-""",
-    )
-
-    _show_options()
-
-    hide_unchanged_mdims: bool = st.session_state.get("hide_unchanged_mdims")  # type: ignore
-
+def _display_mdim_selection(hide_unchanged_mdims: bool) -> str | None:
+    """Display MDIM selection UI and return the selected MDIM catalog path."""
     mdim_catalog_paths = _fetch_mdim_catalog_paths(hide_unchanged_mdims=hide_unchanged_mdims)
 
     # Select mdims to compare
@@ -102,9 +91,13 @@ def main():
             st.info('No mdims with changes. Turn off "Hide mdims with no change" in the options to see them.')
         else:
             st.info("Select an MDIM.")
-        return
+        return None
 
-    st.subheader("Config Diff")
+    return mdim_catalog_path
+
+
+def _fetch_mdim_data(mdim_catalog_path: str):
+    """Fetch MDIM configuration data from both environments."""
 
     def load_mdim_config(engine):
         with Session(engine) as session:
@@ -112,6 +105,13 @@ def main():
 
     config_source = load_mdim_config(SOURCE_ENGINE)
     config_target = load_mdim_config(TARGET_ENGINE)
+
+    return config_source, config_target
+
+
+def _display_config_diff(config_source, config_target):
+    """Display MDIM config diff."""
+    st.subheader("Config Diff")
 
     diff_str = compare_strings(
         yaml_dump(config_target), yaml_dump(config_source), fromfile="production", tofile="staging"
@@ -121,15 +121,11 @@ def main():
     else:
         st_show_diff(truncate_lines(diff_str, MAX_DIFF_LINES))
 
-    # Display configs in tabs
-    st.subheader("Config Sections")
-    _display_config_in_tabs(config_target, config_source, MAX_DIFF_LINES)
-
-    # dict_keys(["title", "views", "dimensions", "defaultSelection"])
-
 
 def _display_config_in_tabs(config_target, config_source, max_lines):
     """Display config sections in tabs for easy comparison."""
+    st.subheader("Config Sections")
+
     tab_base, tab_dimensions, tab_views = st.tabs(["Base Config", "Dimensions", "Views"])
 
     # Helper function to display a config section in two columns
@@ -167,6 +163,56 @@ def _display_config_in_tabs(config_target, config_source, max_lines):
     display_section(tab_base)
     display_section(tab_dimensions, "dimensions")
     display_section(tab_views, "views")
+
+
+def _display_mdim_comparison(mdim_slug: str, view: dict):
+    """Display side-by-side explorer comparison."""
+    # Create columns for side by side comparison
+    col1, col2 = st.columns(2)
+
+    # kwargs = {"explorer_slug": explorer_slug, "view": view, "default_display": st.session_state.get("default_display")}
+
+    with col1:
+        st.subheader("Production MDIM")
+        # explorer_chart(base_url="https://ourworldindata.org/explorers", **kwargs)
+        mdim_chart("energy_prices")
+
+    with col2:
+        st.subheader("Staging MDIM")
+        assert OWID_ENV.site
+        mdim_chart("energy_prices")
+        # explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
+
+
+def main():
+    st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
+    st.title(
+        ":material/difference: MDIM Diff",
+        help=f"""
+**MDIM diff** is a page that compares mdims between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
+""",
+    )
+
+    _show_options()
+
+    hide_unchanged_mdims: bool = st.session_state.get("hide_unchanged_mdims")  # type: ignore
+
+    # Step 1: Display MDIM selection UI
+    mdim_catalog_path = _display_mdim_selection(hide_unchanged_mdims)
+    if not mdim_catalog_path:
+        return
+
+    # Step 2: Display MDIM comparison
+    _display_mdim_comparison(None, None)
+
+    # Step 2: Fetch MDIM data
+    config_source, config_target = _fetch_mdim_data(mdim_catalog_path)
+
+    # Step 3: Display config diff
+    _display_config_diff(config_source, config_target)
+
+    # Step 4: Display config sections in tabs
+    _display_config_in_tabs(config_target, config_source, MAX_DIFF_LINES)
 
 
 main()

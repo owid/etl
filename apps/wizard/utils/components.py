@@ -176,6 +176,27 @@ def explorer_chart(
     return st.components.v1.html(HTML, height=height)  # type: ignore
 
 
+def mdim_chart(mdim_slug: str, height: int = 600):
+    url = "http://staging-site-multi-dim-embed-with-control/grapher/mdd-demo-poverty"
+    query_string = "?country=OWID_WRL~OWID_EUR~OWID_ASI~ALB&amp;povertyLine=3.65&amp;metric=absolute"
+
+    HTML = f"""
+    <!-- Redirect to the external URL -->
+    <meta http-equiv="refresh" content="0; url={url}{query_string}">
+    """
+
+    # Render the HTML
+    return st.components.v1.html(HTML, height=height)  # type: ignore
+
+    url = "http://staging-site-multi-dim-embed-with-control/grapher/mdd-demo-poverty?country=OWID_WRL~OWID_EUR~OWID_ASI~ALB&amp;povertyLine=3.65&amp;metric=absolute"
+    chart_animation_iframe_html = f"""
+    <iframe src="{url}" loading="lazy"
+            style="width: 100%; height: 600px; border: 0px none;"
+            allow="web-share; clipboard-write"></iframe>
+    """
+    return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
+
+
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     """Plot a Grapher chart using the Grapher API.
 
