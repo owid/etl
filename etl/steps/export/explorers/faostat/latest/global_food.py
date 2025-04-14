@@ -394,7 +394,6 @@ def run():
     #
     # Process data.
     #
-    # TODO: Add footnote to all places in fbsc where there is a jump due to methodology change (usually around 2010).
     # TODO: It seems we don't have all the units that appeared in the old explorer.
     #  I think the only missing one is food available, which is given in kg per year, and should also be in grams per day.
     # Prepare tables with dimensions.

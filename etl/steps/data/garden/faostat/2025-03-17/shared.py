@@ -2170,9 +2170,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "005413":
                 # "005413",  # Eggs per bird (eggs per bird).
                 assert unit == "eggs per bird"
-                # TODO: Confirm if this is a good title.
                 title = f"{item} yield per bird"
-                # TODO: Define remaining titles:
             elif element_code == "005313":
                 # "005313",  # Laying (animals).
                 assert unit == "animals"
@@ -2203,6 +2201,12 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             elif element_code == "0684pc":
                 assert unit == "grams of fat per day per capita"
                 title = "Total daily supply of fat per person"
+
+        if dataset_short_name == "faostat_fbsc":
+            # Add footnote to mention the change in methodology between FBSH and FBS, which often causes abrupt jumps in 2010.
+            tb_wide[column].metadata.presentation.grapher_config = {
+                "note": "FAOSTAT applies a methodological change from the year 2010 onwards."
+            }
 
         # Update metadata.
         tb_wide[column].display["name"] = title
