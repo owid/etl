@@ -32,11 +32,20 @@ def run(dest_dir: str) -> None:
     # Ensure the names of the regions are consistent with the 2024 AI index report data
     tb_2023["country"] = tb_2023["country"].replace(
         {
-            "Developing Markets (incl. India, Latin America, MENA)": "Developing Markets  (incl. India,  Latin America,  MENA)",
-            "Greater China (incl. Hong Kong, Taiwan)": "Greater China  (incl. Hong Kong,  Taiwan)",
+            "Developing Markets (incl. India, Latin America, MENA)": "India, Latin America, and Middle East and North Africa",
+            "Greater China (incl. Hong Kong, Taiwan)": "Greater China",
             "All Geographies": "All geographies",
         }
     )
+    tb_2025["country"] = tb_2025["country"].replace(
+        {
+            "Developing markets (incl. India, Central/South America, MENA)": " India, Latin America, and Middle East and North Africa",
+            "Greater China (incl. Hong Kong, Taiwan, Macau)": "Greater China",
+            "All Geographies": "All geographies",
+        }
+    )
+    print(tb_2023["country"].unique())
+    print(tb_2025["country"].unique())
 
     tb = pr.concat([tb_2025, tb_2023])
 
