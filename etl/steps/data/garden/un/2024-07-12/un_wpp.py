@@ -300,7 +300,7 @@ def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
     tb["age"] = tb["age"].astype("string")
 
     # Zero value for "World"
-    tb.loc[tb["country"] == "World", ["net_migration", "net_migratoin_rate"]] = 0
+    tb.loc[tb["country"] == "World", ["net_migration", "net_migration_rate"]] = 0
 
     return tb
 
