@@ -6,6 +6,9 @@ import pandas as pd
 
 from ..common_parameters import *
 
+# NOTE: Define this for both PIP and LIS, to use the same year
+ppp_year_pip_lis = PPP_VERSION_COMPARISON_PIP
+
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each type of welfare measure or tables considered.
 
@@ -19,7 +22,7 @@ url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sh
 merged_tables = pd.read_csv(url, keep_default_na=False)
 
 # Source checkbox covers all the possible combinations to get for the multi-source selector
-sheet_name = "source_checkbox"
+sheet_name = f"source_checkbox_{ppp_year_pip_lis}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 source_checkbox = pd.read_csv(url, keep_default_na=False, dtype={"pip": "str", "wid": "str", "lis": "str"})
 
@@ -180,8 +183,6 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP_COMPARISON
 
 notes_title = NOTES_TITLE_PIP
 
-# NOTE: Define this for both PIP and LIS, to use the same year
-ppp_year_pip_lis = PPP_VERSION_COMPARISON_PIP
 
 processing_description = PROCESSING_DESCRIPTION_PIP_INCOMES_ACROSS_DISTRIBUTION
 ppp_description = PPP_DESCRIPTION_PIP_CURRENT
