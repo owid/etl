@@ -3,7 +3,7 @@ import textwrap
 import pandas as pd
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.config import OWID_ENV
+from etl.config import OWID_ENV, STAGING
 
 # NOTE: Don't forget to update the consumption and income spells for PIP
 # Check this by running this on the playground Jupyter notebook in garden:
@@ -180,6 +180,12 @@ RELATIVE_POVERTY_DESCRIPTION_LIS = "This is a measure of _relative_ poverty – 
 
 
 def upsert_to_db(explorer_name: str, content: str) -> None:
+    # If on a staging server, change link to CSVs
+    if STAGING:
+        content = content.replace(
+            "https://catalog.ourworldindata.org/explorers", f"http://staging-site-{STAGING}:8881/explorers"
+        )
+
     # Upsert config via Admin API
     admin_api = AdminAPI(OWID_ENV)
     admin_api.put_explorer_config(explorer_name, content)
