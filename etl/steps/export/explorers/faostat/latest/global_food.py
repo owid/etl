@@ -412,6 +412,8 @@ def run():
         },
         humanize_dimension_names=True,
         common_view_config={"tab": "map"},
+        dimension_names_transformation=lambda slug: slug.replace("__", ", ").replace("_", " ").capitalize(),
+        # Add a few replacements for special cases.
         dimension_names_replacements={
             "item": "Food",
             "maize": "Maize (corn)",
@@ -419,6 +421,8 @@ def run():
             "feed": "Allocated to animal feed",
             "food": "Allocated to human food",
             "other_uses": "Allocated to other uses",
+            "herbs__e_g__fennel": "Herbs, e.g. fennel",
+            "offals": "Offals, total",
         },
     )
     config["dimensions"] = config_new["dimensions"]
