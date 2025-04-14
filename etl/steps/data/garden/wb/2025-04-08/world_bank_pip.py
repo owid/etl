@@ -1403,7 +1403,7 @@ def harmonize_region_name(tb: Table) -> Table:
         )
 
     # Remove (PIP) from region_name
-    tb["region_name"] = tb["region_name"].str.replace(" \(PIP\)", "", regex=True)
+    tb["region_name"] = tb["region_name"].str.replace(r" \(PIP\)", "", regex=True)
 
     return tb
 
