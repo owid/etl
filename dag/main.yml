@@ -673,6 +673,15 @@ steps:
     - data://garden/atus/2025-01-06/atus_who
 
 
+  # Happiness by age groups (World Happiness Report 2024)
+  data://meadow/happiness/2025-04-01/happiness_by_age:
+    - snapshot://happiness/2025-04-01/happiness_by_age.csv
+  data://garden/happiness/2025-04-01/happiness_by_age:
+    - data://meadow/happiness/2025-04-01/happiness_by_age
+  data://grapher/happiness/2025-04-01/happiness_by_age:
+    - data://garden/happiness/2025-04-01/happiness_by_age
+
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
