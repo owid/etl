@@ -38,11 +38,12 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
+    # Remove rows where period_name is '2nd Half' or '1st Half'
+    tb = tb[tb["period_name"].isin(["2nd Half", "1st Half"])]
 
     # Check that each series_id/year combination doesn't have more than 12 values (1 per month)
     values_per_year = tb.groupby(["series_id", "year"], as_index=False).size()
     assert values_per_year["size"].le(12).all()
-
     # Cut the time series at the end of current_year-1
     tb = tb[tb.year < datetime.date.today().year]
 

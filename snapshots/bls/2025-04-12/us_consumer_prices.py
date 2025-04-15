@@ -58,9 +58,10 @@ def main(upload: bool) -> None:
         chunk_start = year
         chunk_end = min(year + 9, end_year)
 
-        data = json.dumps({"seriesid": SERIES_IDS, "startyear": str(chunk_start), "endyear": str(chunk_end)})
-
-        params = {"registrationkey": KEY, "annualaverage": "true"}
+        data = json.dumps(
+            {"seriesid": SERIES_IDS, "startyear": str(chunk_start), "endyear": str(chunk_end), "annualaverage": "true"}
+        )
+        params = {"registrationkey": KEY}
 
         response = requests.post(
             "https://api.bls.gov/publicAPI/v2/timeseries/data/", params=params, data=data, headers=headers

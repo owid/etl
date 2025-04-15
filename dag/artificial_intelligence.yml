@@ -180,7 +180,7 @@ steps:
   # AI Index Report 2025 - AI investment trends
   data://garden/artificial_intelligence/2025-04-08/ai_investment:
     - snapshot://artificial_intelligence/2025-04-08/ai_investment.csv
-    - data://garden/bls/2024-05-16/us_consumer_prices
+    - data://garden/bls/2025-04-12/us_consumer_prices
 
   # AI Index Report grapher step
   data://grapher/artificial_intelligence/2025-04-08/ai_index:
