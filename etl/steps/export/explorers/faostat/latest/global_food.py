@@ -386,11 +386,11 @@ def run():
     #
     # Load FAOSTAT QCL dataset, and read its main table.
     ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl.read("faostat_qcl_flat")
+    tb_qcl = ds_qcl.read("faostat_qcl_flat", load_data=False)
 
     # Load FAOSTAT FBSC dataset (combination of FBS and FBSH), and read its main table.
     ds_fbsc = paths.load_dataset("faostat_fbsc")
-    tb_fbsc = ds_fbsc.read("faostat_fbsc_flat")
+    tb_fbsc = ds_fbsc.read("faostat_fbsc_flat", load_data=False)
 
     # Load grapher config from YAML.
     config = paths.load_explorer_config()
