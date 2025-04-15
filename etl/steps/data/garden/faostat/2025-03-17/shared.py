@@ -2311,7 +2311,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005417",  # Yield (kilograms per animal).
                 # "005424",  # Yield (kilograms per animal).
                 assert unit == "kilograms per animal"
-                title = f"{item} yield per animal"
+                title = f"Production of {item.lower()} per animal"
             elif element_code == "005312":
                 # "005312",  # Area harvested (hectares).
                 assert unit == "hectares"
@@ -2326,17 +2326,21 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005320",  # Producing or slaughtered animals (animals).
                 # "005321",  # Producing or slaughtered animals (animals).
                 assert unit == "animals"
-                title = f"Animals slaughtered to produce {item}"
+                title = f"Animals slaughtered to produce {item.lower()}"
                 num_decimal_places = 0
             elif element_code in ["5320pc", "5321pc"]:
                 # "5320pc",  # Producing or slaughtered animals per capita (animals per capita).
                 # "5321pc",  # Producing or slaughtered animals per capita (animals per capita).
                 assert unit == "animals per capita"
-                title = f"Animals slaughtered per capita to produce {item}"
+                title = f"Animals slaughtered per capita to produce {item.lower()}"
             elif element_code == "005413":
                 # "005413",  # Eggs per bird (eggs per bird).
+                # NOTE: There are only two items for this element: eggs from hens and eggs from other birds.
                 assert unit == "eggs per bird"
-                title = f"{item} yield per bird"
+                if item == "00001062":
+                    title = "Number of eggs per hen"
+                elif item == "00001091":
+                    title = "Number of eggs per bird (excluding hens)"
             elif element_code == "005313":
                 # "005313",  # Laying (animals).
                 assert unit == "animals"

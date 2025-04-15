@@ -202,9 +202,9 @@ tables:
           title_public: Egg production
       eggs__00001783__yield__005424__kilograms_per_animal:
         display:
-          name: Eggs per bird
+          name: Egg production per bird
         presentation:
-          title_public: Eggs per bird
+          title_public: Egg production per bird
       grapes__00000560__production__005510__tonnes:
         display:
           name: Grape production
