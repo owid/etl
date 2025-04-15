@@ -336,13 +336,11 @@ FLAGS_RANKING = (
 # Additional descriptions.
 
 # Additional explanation to append to element description for variables that were originally given per capita.
-WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
-    "Originally given per-capita, and converted into total figures by " "multiplying by population (given by FAO)."
-)
+WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "* This data was originally given per-capita by FAOSTAT. Our World in Data has converted this data into total figures by multiplying by FAOSTAT's population.\n"
 # Additional explanation to append to element description for created per-capita variables.
 NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
-    "Per-capita values are obtained by dividing the original values by the "
-    "population (either provided by FAO or by OWID)."
+    "* Per-capita values are obtained by dividing the original values by Our World in Data's population.\n"
+    "* For regions defined by FAOSTAT, per-capita values were calculated using FAOSTAT's original population data, if available."
 )
 
 # Additional text to include in the metadata title of the output wide table.
@@ -1340,13 +1338,8 @@ def convert_variables_given_per_capita_to_total_value(tb: Table, elements_metada
         tb.loc[per_capita_mask, "value"] = tb[per_capita_mask]["value"] * tb[per_capita_mask]["fao_population"]
 
         # Include an additional description to all elements that were converted from per capita to total variables.
-        if "" not in tb["element_description"].cat.categories:
-            tb["element_description"] = tb["element_description"].cat.add_categories([""])
-        tb.loc[per_capita_mask, "element_description"] = tb.loc[per_capita_mask, "element_description"].fillna("")
-        tb["element_description"] = dataframes.apply_on_categoricals(
-            [tb.element_description, per_capita_mask.astype("category")],
-            lambda desc, mask: f"{desc} {WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}".lstrip() if mask else f"{desc}",
-        )
+        tb.loc[per_capita_mask, "description_processing"] = tb.loc[per_capita_mask, "description_processing"].fillna("")
+        tb.loc[per_capita_mask, "description_processing"] += WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION
 
     return tb
 
@@ -1359,6 +1352,7 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
       custom_elements_and_units.csv file.
     * The new variables will have the same element codes as the original per-capita variables, with 'pc' appended to
     the number.
+    * For all OWID countries and regions, the data will be divided by OWID's population dataset. For "FAO" regions, the data will be divided by the FAO population, if it's given in the current dataset; if not given, those regions will not have per capita data.
 
     Parameters
     ----------
@@ -1419,10 +1413,9 @@ def add_per_capita_variables(tb: Table, elements_metadata: Table) -> Table:
 
         # Add "per capita" to all units.
         per_capita_data["unit"] = per_capita_data["unit"].cat.rename_categories(lambda c: f"{c} per capita")
-        # Include an additional note in the description on affected elements.
-        per_capita_data["element_description"] = per_capita_data["element_description"].cat.rename_categories(
-            lambda c: f"{c} {NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION}"
-        )
+        # Include an additional note in the processing description on affected elements.
+        per_capita_data["description_processing"] = per_capita_data["description_processing"].fillna("")
+        per_capita_data["description_processing"] += NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION
         # Add new rows with per capita variables to data.
         tb_with_pc_variables = dataframes.concatenate(
             [tb_with_pc_variables, per_capita_data], ignore_index=True
@@ -1651,6 +1644,9 @@ def clean_data(
 
         # Add FAO population as an additional column (if given in the original data).
         tb = add_fao_population_if_given(tb)
+
+    # Ensure a description processing column exists.
+    tb["description_processing"] = None
 
     # Convert variables that were given per-capita to total value.
     tb = convert_variables_given_per_capita_to_total_value(tb, elements_metadata=elements_metadata)

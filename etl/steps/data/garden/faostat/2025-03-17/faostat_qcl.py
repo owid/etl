@@ -82,10 +82,10 @@ SLAUGHTERED_ANIMALS_UNIT = "animals"
 SLAUGHTERED_ANIMALS_UNIT_SHORT_NAME = "animals"
 # Text to be added to the dataset description (after the description of anomalies).
 SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION = (
-    "\n\nFAO does not provide data for the total number of slaughtered animals "
+    "* FAO does not provide data for the total number of slaughtered animals "
     "to produce meat. We calculate this metric by adding up the number of slaughtered animals of all meat groups. "
     "However, when data for slaughtered poultry (which usually outnumbers other meat groups) is not provided, we do "
-    "not calculate the total (to avoid spurious dips in the data)."
+    "not calculate the total (to avoid spurious dips in the data).\n"
 )
 
 
@@ -251,6 +251,7 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
             "country",
             "year",
             "population_with_data",
+            "description_processing",
         ],
         aggregations={
             "value": "sum",
@@ -289,6 +290,8 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     animals["item_description"] = total_meat_item_description
     animals["fao_item"] = total_meat_fao_item
     animals["fao_unit_short_name"] = SLAUGHTERED_ANIMALS_FAO_UNIT_SHORT_NAME
+    animals["description_processing"] = animals["description_processing"].fillna("")
+    animals["description_processing"] += SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION
 
     log.info(f"Adding {len(animals)} rows with the total number of slaughtered animals for meat.")
 
@@ -607,9 +610,7 @@ def run() -> None:
 
     # Update dataset metadata.
     # The following description is not publicly shown in charts; it is only visible when accessing the catalog.
-    ds_garden.metadata.description = (
-        dataset_metadata["owid_dataset_description"] + anomaly_descriptions + SLAUGHTERED_ANIMALS_ADDITIONAL_DESCRIPTION
-    )
+    ds_garden.metadata.description = dataset_metadata["owid_dataset_description"] + anomaly_descriptions
 
     # Create garden dataset.
     ds_garden.save()
