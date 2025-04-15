@@ -5,7 +5,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -23,7 +23,7 @@ YEAR_MAX = 2025
 YEAR_MIN = 1997
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -32,7 +32,7 @@ def run(dest_dir: str) -> None:
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
-    tb = ds_meadow["avian_influenza_ah5n1"].reset_index()
+    tb = ds_meadow.read("avian_influenza_ah5n1")
 
     #
     # Process data.
@@ -49,7 +49,7 @@ def run(dest_dir: str) -> None:
     # date_2 = pd.to_datetime(tb_month["month"], format="%y-%b", errors="coerce")
     # date_3 = pd.to_datetime("200" + tb_month["month"].astype(str), format="%Y-%b", errors="coerce")
     # tb_month["date"] = date_1.fillna(date_2).fillna(date_3)
-    tb_month["date"] = pd.to_datetime(tb_month["month"], format="%m/%d/%Y")
+    tb_month["date"] = pr.to_datetime(tb_month["month"], format="%m/%d/%Y")
     assert tb_month["date"].notna().all(), "Some dates could not be parsed."
     tb_month = tb_month.drop(columns=["month"])
 
@@ -77,19 +77,15 @@ def run(dest_dir: str) -> None:
     )
 
     # Set dtype to numeric
-    tb_year["year"] = tb_year["year"].astype(str).astype(int)
+    tb_year["year"] = tb_year["year"].astype(int)
 
     # Sanity check
     assert tb_year["year"].max() == YEAR_MAX
     assert tb_year["year"].min() == YEAR_MIN
 
     # Set index
-    tb_month = tb_month.format(["country", "date"])
-    tb_year = tb_year.format(["country", "year"])
-
-    # Set short_name
-    tb_month.metadata.short_name = f"{tb_month.metadata.short_name}_month"
-    tb_year.metadata.short_name = f"{tb_year.metadata.short_name}_year"
+    tb_month = tb_month.format(["country", "date"], short_name=f"{tb_month.metadata.short_name}_month")
+    tb_year = tb_year.format(["country", "year"], short_name=f"{tb_year.metadata.short_name}_year")
 
     #
     # Save outputs.
@@ -98,8 +94,12 @@ def run(dest_dir: str) -> None:
         tb_month,
         tb_year,
     ]
+
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=tables, default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=tables,
+        default_metadata=ds_meadow.metadata,
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
