@@ -605,17 +605,19 @@ def prepare_dataset_description(fao_description: str, owid_description: str) -> 
     return description
 
 
-def prepare_variable_description(item: str, element: str, item_description: str, element_description: str) -> str:
-    """Prepare variable description by combining item and element names and descriptions.
+def prepare_description_from_producer(
+    fao_item: str, fao_element: str, item_description: str, element_description: str
+) -> str:
+    """Prepare description from producer by combining the original item and element names and descriptions.
 
-    This will be used in the variable metadata of the wide table, and shown in grapher SOURCES tab.
+    This will be used in the variable metadata of the wide table.
 
     Parameters
     ----------
-    item : str
-        Item name.
-    element : str
-        Element name.
+    fao_item : str
+        Original FAOSTAT item name.
+    fao_element : str
+        Original FAOSTAT element name.
     item_description : str
         Item description.
     element_description : str
@@ -624,13 +626,14 @@ def prepare_variable_description(item: str, element: str, item_description: str,
     Returns
     -------
     description : str
-        Variable description.
+        Variable as described by FAOSTAT.
+
     """
-    description = f"Item: {item}\n\n"
+    description = f"Item: {fao_item}\n\n"
     if len(item_description) > 0:
         description += f"Description: {item_description}\n"
 
-    description += f"\nMetric: {element}\n\n"
+    description += f"\nMetric: {fao_element}\n\n"
     if len(element_description) > 0:
         description += f"Description: {element_description}"
 
@@ -1829,8 +1832,8 @@ def prepare_wide_table(tb: Table) -> Table:
     if "item_description" in tb.columns:
         # Construct a human-readable variable description (for the variable metadata).
         tb["variable_description"] = dataframes.apply_on_categoricals(
-            [tb.item, tb.element, tb.item_description, tb.element_description],
-            prepare_variable_description,
+            [tb.fao_item, tb.fao_element, tb.item_description, tb.element_description],
+            prepare_description_from_producer,
         )
     else:
         # This is the case for faostat_qv since the last update.
