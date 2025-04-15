@@ -1,0 +1,2343 @@
+config:
+  yAxisMin: 0
+  hasMapTab: false
+  selection:
+    - SSP1 - Baseline
+    - SSP2 - Baseline
+    - SSP3 - Baseline
+    - SSP4 - Baseline
+    - SSP5 - Baseline
+  thumbnail: https://assets.ourworldindata.org/uploads/2022/04/ipcc-thumbnail-01.png
+  wpBlockId: 50588
+  entityType: scenario
+  isPublished: true
+  explorerTitle: IPCC Scenarios
+  hideAlertBanner: true
+  explorerSubtitle: Explore the global shared socioeconomic pathways used in IPCC scenarios.
+  hideAnnotationFieldsInTitle:
+    - true
+dimensions:
+  - slug: rate
+    name: Rate
+    choices:
+      - slug: per_capita
+        name: Per capita
+      - slug: total
+        name: Total
+      - slug: ''
+        name: ''
+      - slug: share_of_total
+        name: Share of total
+    presentation:
+      type: radio
+  - slug: metric
+    name: Metric
+    choices:
+      - slug: gdp
+        name: GDP
+      - slug: consumption
+        name: Consumption
+      - slug: population
+        name: Population
+      - slug: temperature_increase
+        name: Temperature increase
+      - slug: radiative_forcing
+        name: Radiative forcing
+      - slug: greenhouse_gas_concentrations
+        name: Greenhouse gas concentrations
+      - slug: greenhouse_gas_emissions
+        name: Greenhouse gas emissions
+      - slug: air_pollution
+        name: Air pollution
+      - slug: carbon_price
+        name: Carbon price
+      - slug: carbon_intensity_of_economy
+        name: Carbon intensity of economy
+      - slug: carbon_intensity_of_energy
+        name: Carbon intensity of energy
+      - slug: energy_conversion_efficiency
+        name: Energy conversion efficiency
+      - slug: final_energy
+        name: Final energy
+      - slug: secondary_energy
+        name: Secondary energy
+      - slug: primary_energy
+        name: Primary energy
+      - slug: electricity_capacity
+        name: Electricity capacity
+      - slug: land_cover
+        name: Land cover
+      - slug: agricultural_demand
+        name: Agricultural demand
+      - slug: agricultural_production
+        name: Agricultural production
+    presentation:
+      type: dropdown
+  - slug: region
+    name: Region
+    choices:
+      - slug: global
+        name: Global
+      - slug: asia
+        name: Asia
+      - slug: middle_east_and_africa
+        name: Middle East and Africa
+      - slug: latin_america
+        name: Latin America
+      - slug: oecd
+        name: OECD
+    presentation:
+      type: dropdown
+  - slug: sub_metric
+    name: Sub-metric
+    choices:
+      - slug: ''
+        name: ''
+      - slug: total_radiative_forcing
+        name: Total radiative forcing
+      - slug: forcing_from_co2
+        name: Forcing from CO2
+      - slug: forcing_from_ch4
+        name: Forcing from CH4
+      - slug: forcing_from_n2o
+        name: Forcing from N2O
+      - slug: forcing_from_f_gases
+        name: Forcing from F-gases
+      - slug: forcing_from_aerosols
+        name: Forcing from aerosols
+      - slug: carbon_dioxide__co2
+        name: Carbon dioxide (CO₂)
+      - slug: methane__ch4
+        name: Methane (CH4)
+      - slug: nitrous_oxide__n2o
+        name: Nitrous oxide (N₂O)
+      - slug: methane__ch4
+        name: Methane (CH₄)
+      - slug: f_gases
+        name: F-gases
+      - slug: sulfur_dioxide__so2
+        name: Sulfur dioxide (SO₂)
+      - slug: black_carbon
+        name: Black carbon
+      - slug: nitrous_oxides__nox
+        name: Nitrous oxides (NOx)
+      - slug: volatile_organic_compounds__voc
+        name: Volatile organic compounds (VOC)
+      - slug: total_consumption
+        name: Total consumption
+      - slug: energy_intensity
+        name: Energy intensity
+      - slug: electricity
+        name: Electricity
+      - slug: heat
+        name: Heat
+      - slug: industry
+        name: Industry
+      - slug: transport
+        name: Transport
+      - slug: residential_and_commercial
+        name: Residential and commercial
+      - slug: electricity_from_coal
+        name: Electricity from coal
+      - slug: electricity_from_coal__ccs
+        name: Electricity from coal (CCS)
+      - slug: electricity_from_gas
+        name: Electricity from gas
+      - slug: electricity_from_gas__ccs
+        name: Electricity from gas (CCS)
+      - slug: electricity_from_oil
+        name: Electricity from oil
+      - slug: electricity_from_nuclear
+        name: Electricity from nuclear
+      - slug: electricity_from_biomass
+        name: Electricity from biomass
+      - slug: electricity_from_biomass__ccs
+        name: Electricity from biomass (CCS)
+      - slug: electricity_from_renewables
+        name: Electricity from renewables
+      - slug: electricity_from_hydro
+        name: Electricity from hydro
+      - slug: electricity_from_solar
+        name: Electricity from solar
+      - slug: electricity_from_wind
+        name: Electricity from wind
+      - slug: electricity_from_geothermal
+        name: Electricity from geothermal
+      - slug: gas
+        name: Gas
+      - slug: oil
+        name: Oil
+      - slug: hydrogen
+        name: Hydrogen
+      - slug: liquid_biofuels
+        name: Liquid biofuels
+      - slug: coal
+        name: Coal
+      - slug: coal__with_ccs
+        name: Coal (with CCS)
+      - slug: oil__with_ccs
+        name: Oil (with CCS)
+      - slug: gas__with_ccs
+        name: Gas (with CCS)
+      - slug: fossil_fuels_and_industry
+        name: Fossil fuels and industry
+      - slug: fossil_fuels__with_ccs
+        name: Fossil fuels (with CCS)
+      - slug: nuclear
+        name: Nuclear
+      - slug: solar_pv
+        name: Solar PV
+      - slug: wind
+        name: Wind
+      - slug: hydropower
+        name: Hydropower
+      - slug: geothermal
+        name: Geothermal
+      - slug: biomass
+        name: Biomass
+      - slug: biomass__with_ccs
+        name: Biomass (with CCS)
+      - slug: traditional_biomass
+        name: Traditional biomass
+      - slug: total_capacity
+        name: Total capacity
+      - slug: onshore_wind
+        name: Onshore wind
+      - slug: offshore_wind
+        name: Offshore wind
+      - slug: solar
+        name: Solar
+      - slug: solar_csp
+        name: Solar CSP
+      - slug: other
+        name: Other
+      - slug: forest_area
+        name: Forest area
+      - slug: cropland
+        name: Cropland
+      - slug: pasture
+        name: Pasture
+      - slug: crops_for_non_energy
+        name: Crops for non-energy
+      - slug: crop_for_energy
+        name: Crop for energy
+      - slug: livestock
+        name: Livestock
+      - slug: crops
+        name: Crops
+    presentation:
+      type: dropdown
+views:
+  - dimensions:
+      rate: per_capita
+      metric: gdp
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#gdp_per_capita
+          display:
+            type: Currency
+            annotationsColumnSlug: annotation
+    config:
+      title: Global GDP per capita
+      subtitle: |-
+        Gross domestic product (GDP) is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
+  - dimensions:
+      rate: total
+      metric: gdp
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#gdp
+          display:
+            type: Currency
+            annotationsColumnSlug: annotation
+    config:
+      title: Global gross domestic product
+      subtitle: |-
+        Gross domestic product (GDP) is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
+  - dimensions:
+      rate: total
+      metric: consumption
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#econ_consumption_dollars
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global private economic consumption
+      subtitle: |-
+        Economic consumption measures the expenditure of private households. It is gross domestic product minus government expenditures, investments, and exports. It is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
+  - dimensions:
+      rate: per_capita
+      metric: consumption
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#econ_consumption_per_capita
+          display:
+            type: Currency
+            annotationsColumnSlug: annotation
+    config:
+      title: Global private economic consumption per capita
+      subtitle: |-
+        Economic consumption measures the expenditure of private households. It is gross domestic product minus government expenditures, investments, and exports. It is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
+  - dimensions:
+      rate: ''
+      metric: population
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#population
+          display:
+            type: Population
+            annotationsColumnSlug: annotation
+    config:
+      title: World population
+  - dimensions:
+      rate: ''
+      metric: temperature_increase
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#temp
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global average temperature increase relative to the pre-industrial era
+      subtitle: The global average temperature increase relative to the pre-industrial era, which is taken to be the year
+        1750.
+  - dimensions:
+      rate: ''
+      metric: radiative_forcing
+      region: global
+      sub_metric: total_radiative_forcing
+    indicators:
+      y:
+        - catalogPath: global#forcing
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Radiative forcing
+      subtitle: |-
+        Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
+  - dimensions:
+      rate: ''
+      metric: radiative_forcing
+      region: global
+      sub_metric: forcing_from_co2
+    indicators:
+      y:
+        - catalogPath: global#forcing_co2
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Radiative forcing from carbon dioxide
+      subtitle: |-
+        Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
+  - dimensions:
+      rate: ''
+      metric: radiative_forcing
+      region: global
+      sub_metric: forcing_from_ch4
+    indicators:
+      y:
+        - catalogPath: global#forcing_ch4
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Radiative forcing from methane
+      subtitle: |-
+        Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
+  - dimensions:
+      rate: ''
+      metric: radiative_forcing
+      region: global
+      sub_metric: forcing_from_n2o
+    indicators:
+      y:
+        - catalogPath: global#forcing_n2o
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Radiative forcing from nitrous oxide
+      subtitle: |-
+        Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
+  - dimensions:
+      rate: ''
+      metric: radiative_forcing
+      region: global
+      sub_metric: forcing_from_f_gases
+    indicators:
+      y:
+        - catalogPath: global#forcing_fgases
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Radiative forcing from F-gases
+      subtitle: |-
+        Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
+  - dimensions:
+      rate: ''
+      metric: radiative_forcing
+      region: global
+      sub_metric: forcing_from_aerosols
+    indicators:
+      y:
+        - catalogPath: global#forcing_aerosols
+    config:
+      title: Radiative forcing from aerosols
+      subtitle: |-
+        Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
+  - dimensions:
+      rate: ''
+      metric: greenhouse_gas_concentrations
+      region: global
+      sub_metric: carbon_dioxide__co2
+    indicators:
+      y:
+        - catalogPath: global#concentration_co2
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Atmospheric concentrations of carbon dioxide
+      subtitle: Global atmospheric concentrations of carbon dioxide are measured in parts per million.
+  - dimensions:
+      rate: ''
+      metric: greenhouse_gas_concentrations
+      region: global
+      sub_metric: methane__ch4
+    indicators:
+      y:
+        - catalogPath: global#concentration_ch4
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Atmospheric concentrations of methane
+      subtitle: Global atmospheric concentrations of methane are measured in parts per billion.
+  - dimensions:
+      rate: ''
+      metric: greenhouse_gas_concentrations
+      region: global
+      sub_metric: nitrous_oxide__n2o
+    indicators:
+      y:
+        - catalogPath: global#concentration_n2o
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Atmospheric concentrations of nitrous oxide
+      subtitle: Global atmospheric concentrations of nitrous oxide are measured in parts per billion.
+  - dimensions:
+      rate: total
+      metric: greenhouse_gas_emissions
+      region: global
+      sub_metric: carbon_dioxide__co2
+    indicators:
+      y:
+        - catalogPath: global#emissions_co2
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global carbon dioxide emissions
+  - dimensions:
+      rate: per_capita
+      metric: greenhouse_gas_emissions
+      region: global
+      sub_metric: carbon_dioxide__co2
+    indicators:
+      y:
+        - catalogPath: global#co2_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita carbon dioxide emissions
+      subtitle: This is measured as the global average.
+  - dimensions:
+      rate: total
+      metric: greenhouse_gas_emissions
+      region: global
+      sub_metric: methane__ch4
+    indicators:
+      y:
+        - catalogPath: global#emissions_ch4
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global methane emissions
+  - dimensions:
+      rate: per_capita
+      metric: greenhouse_gas_emissions
+      region: global
+      sub_metric: methane__ch4
+    indicators:
+      y:
+        - catalogPath: global#ch4_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita methane emissions
+      subtitle: This is measured as the global average.
+  - dimensions:
+      rate: total
+      metric: greenhouse_gas_emissions
+      region: global
+      sub_metric: nitrous_oxide__n2o
+    indicators:
+      y:
+        - catalogPath: global#emissions_n2o
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global nitrous oxide emissions
+  - dimensions:
+      rate: per_capita
+      metric: greenhouse_gas_emissions
+      region: global
+      sub_metric: nitrous_oxide__n2o
+    indicators:
+      y:
+        - catalogPath: global#n2o_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita nitrous oxide emissions
+      subtitle: This is measured as the global average.
+  - dimensions:
+      rate: ''
+      metric: greenhouse_gas_emissions
+      region: global
+      sub_metric: f_gases
+    indicators:
+      y:
+        - catalogPath: global#emissions_fgas
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global fluorinated gas emissions
+      subtitle: |-
+        Fluorinated gases (‘F-gases’) are greenhouse gases used in industrial applications such as refrigerants, aerosols and white goods.
+  - dimensions:
+      rate: ''
+      metric: air_pollution
+      region: global
+      sub_metric: sulfur_dioxide__so2
+    indicators:
+      y:
+        - catalogPath: global#emissions_sulfur
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global sulfur dioxide emissions
+      subtitle: |-
+        Sulfur dioxide (SO₂) is an air pollutant produced as a by-product when fuels that contain sulfur are burned. It is often produced from the burning of coal.
+  - dimensions:
+      rate: ''
+      metric: air_pollution
+      region: global
+      sub_metric: black_carbon
+    indicators:
+      y:
+        - catalogPath: global#emissions_blackcarbon
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global black carbon emissions
+      subtitle: Black carbon is an air pollutant produced through the incomplete combustion of fossil fuels, biofuel, and
+        biomass.
+  - dimensions:
+      rate: ''
+      metric: air_pollution
+      region: global
+      sub_metric: nitrous_oxides__nox
+    indicators:
+      y:
+        - catalogPath: global#emissions_nox
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global nitrogen oxide emissions
+      subtitle: |-
+        Nitrous oxides (NOx) are local air pollutants produced when fuel is burned at high temperatures. NOx is often emitted by road vehicles, and industrial sources such as power plants.
+  - dimensions:
+      rate: ''
+      metric: air_pollution
+      region: global
+      sub_metric: volatile_organic_compounds__voc
+    indicators:
+      y:
+        - catalogPath: global#emissions_voc
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global volatile organic compound emissions
+      subtitle: |-
+        Volatile organic compounds (VOCs) are local air pollutants which are emitted from certain organic compounds which are present in fuels, as well as chemicals used in paints, varnishes and cleaning products.
+  - dimensions:
+      rate: ''
+      metric: carbon_price
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#carbon_price
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      note: No carbon pricing is assumed in all baseline scenarios.
+      title: Global carbon price
+      subtitle: |-
+        This assumes a global carbon price on carbon, measured in 2005 US$ per tonne of CO₂. This means prices are adjusted for inflation.
+  - dimensions:
+      rate: ''
+      metric: carbon_intensity_of_economy
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#carbon_intensity_economy
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Carbon intensity of the economy
+      subtitle: The carbon intensity of the economy is measured as the kilograms of carbon dioxide emitted per dollar of GDP.
+  - dimensions:
+      rate: ''
+      metric: carbon_intensity_of_energy
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#carbon_intensity_energy
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Carbon intensity of energy
+      subtitle: |-
+        The carbon intensity of energy is measured as the kilograms of carbon dioxide emitted per kilowatt-hour of primary energy.
+  - dimensions:
+      rate: ''
+      metric: energy_conversion_efficiency
+      region: global
+      sub_metric: ''
+    indicators:
+      y:
+        - catalogPath: global#primary_final_efficiency
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Global final energy as a share of primary energy
+      subtitle: |-
+        Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: final_energy
+      region: global
+      sub_metric: total_consumption
+    indicators:
+      y:
+        - catalogPath: global#final_energy
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global final energy consumption
+      subtitle: |-
+        Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: per_capita
+      metric: final_energy
+      region: global
+      sub_metric: total_consumption
+    indicators:
+      y:
+        - catalogPath: global#final_energy_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global final energy consumption per person
+      subtitle: |-
+        Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: ''
+      metric: final_energy
+      region: global
+      sub_metric: energy_intensity
+    indicators:
+      y:
+        - catalogPath: global#energy_intensity_final
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global final energy intensity
+      subtitle: Energy intensity is measured as final energy consumption in kilowatt-hours per dollar of GDP.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: per_capita
+      metric: final_energy
+      region: global
+      sub_metric: electricity
+    indicators:
+      y:
+        - catalogPath: global#electricity_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita electricity use
+      subtitle: This is measured as the global average.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: final_energy
+      region: global
+      sub_metric: electricity
+    indicators:
+      y:
+        - catalogPath: global#final_energy_elec
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global final energy for electricity
+      subtitle: |-
+        Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: per_capita
+      metric: final_energy
+      region: global
+      sub_metric: heat
+    indicators:
+      y:
+        - catalogPath: global#heat_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita energy consumption for heating
+      subtitle: This is measured as the global average.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: final_energy
+      region: global
+      sub_metric: heat
+    indicators:
+      y:
+        - catalogPath: global#final_energy_heat
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global final energy for heating
+      subtitle: |-
+        Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: per_capita
+      metric: final_energy
+      region: global
+      sub_metric: industry
+    indicators:
+      y:
+        - catalogPath: global#industry_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita energy consumption for industry
+      subtitle: This is measured as the global average.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: final_energy
+      region: global
+      sub_metric: industry
+    indicators:
+      y:
+        - catalogPath: global#final_energy_industry
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global final energy for industry
+      subtitle: |-
+        Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: per_capita
+      metric: final_energy
+      region: global
+      sub_metric: transport
+    indicators:
+      y:
+        - catalogPath: global#transport_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita energy use for transport
+      subtitle: This is measured as the global average.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: final_energy
+      region: global
+      sub_metric: transport
+    indicators:
+      y:
+        - catalogPath: global#final_energy_transport
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global final energy for transport
+      subtitle: |-
+        Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: final_energy
+      region: global
+      sub_metric: residential_and_commercial
+    indicators:
+      y:
+        - catalogPath: global#final_energy_residentialcommercial
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Final energy for residential and commercial buildings
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity consumption
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: per_capita
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity
+    indicators:
+      y:
+        - catalogPath: global#secondary_elec_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita electricity consumption
+      subtitle: This is measured as the global average.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_coal
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_coal
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from coal
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_coal__ccs
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_coal_ccs
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from coal with carbon capture and storage
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_gas
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_gas
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from gas
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_gas__ccs
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_gas_ccs
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from gas with carbon capture and storage
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_oil
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_oil
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from oil
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_nuclear
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_nuclear
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from nuclear
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_biomass
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_biomass
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from biomass
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_biomass__ccs
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_biomass_ccs
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from biomass with carbon capture and storage
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_renewables
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_nonbiorenewables
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from renewables, excluding biomass
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_hydro
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_hydro
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from hydropower
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_solar
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_solar
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from solar
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_wind
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_wind
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from wind
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_geothermal
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_geothermal
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity from geothermal
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: heat
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_heat
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Total energy for heating
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: per_capita
+      metric: secondary_energy
+      region: global
+      sub_metric: heat
+    indicators:
+      y:
+        - catalogPath: global#secondary_heat_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Per capita consumption of heat energy
+      subtitle: This is measured as the global average.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: gas
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_gas
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global secondary energy from gas
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: oil
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_oil
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global secondary energy from oil
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: hydrogen
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_hydrogen
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global secondary energy from hydrogen
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: secondary_energy
+      region: global
+      sub_metric: liquid_biofuels
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_liquid_biofuel
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global secondary energy from liquid biofuels
+      subtitle: |-
+        Secondary energy is the energy that is derived and transformed from its original form (called, primary energy) into a useable form. It is primary energy minus energy losses that have occurred in the transformation or raw fuels (such as coal or gas) into electricity, heat or liquid transport fuels.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_biomass
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_biomass_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from biomass
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_biomass__ccs
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_biomass_ccs_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from biomass with carbon capture and storage
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_coal
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_coal_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from coal
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_coal__ccs
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_coal_ccs_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from coal with carbon capture and storage
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_gas
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_gas_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from gas
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_gas__ccs
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_gas_ccs_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from gas with carbon capture and storage
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_geothermal
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_geothermal_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from geothermal
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_hydro
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_hydro_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from hydropower
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_renewables
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_nonbiorenewables_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from renewables, excluding biofuels
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_nuclear
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_nuclear_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from nuclear
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_oil
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_oil_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from oil
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_solar
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_solar_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from solar
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: secondary_energy
+      region: global
+      sub_metric: electricity_from_wind
+    indicators:
+      y:
+        - catalogPath: global#secondary_energy_elec_wind_share
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global electricity that comes from wind
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: total_consumption
+    indicators:
+      y:
+        - catalogPath: global#primary_energy
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy consumption
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: per_capita
+      metric: primary_energy
+      region: global
+      sub_metric: total_consumption
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_per_capita
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy consumption per person
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: ''
+      metric: primary_energy
+      region: global
+      sub_metric: energy_intensity
+    indicators:
+      y:
+        - catalogPath: global#energy_intensity_primary
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy intensity
+      subtitle: Energy intensity is measured as primary energy consumption in kilowatt-hours per dollar of GDP.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: coal
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_coal
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from coal
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: coal__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_coal_ccs
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from coal with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: oil
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_oil
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from oil
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: oil__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_oil_ccs
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from oil with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: gas
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_gas
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from gas
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: gas__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_gas_ccs
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from gas with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: fossil_fuels_and_industry
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_fossil
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from fossil fuels and industry
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: fossil_fuels__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_fossil_ccs
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from fossil fuels with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: nuclear
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_nuclear
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from nuclear
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: solar_pv
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_solar
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from solar photovoltaics
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: wind
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_wind
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from wind
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: hydropower
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_hydro
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from hydropower
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: geothermal
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_geothermal
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from geothermal
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: biomass
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_biomass
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from biomass
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: biomass__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_biomass_ccs
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from biomass with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: primary_energy
+      region: global
+      sub_metric: traditional_biomass
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_tradbiomass
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global primary energy from traditional biomass
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: coal
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_coal
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from coal
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: coal__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_coal_ccs
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from coal with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: oil
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_oil
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from oil
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: oil__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_oil_ccs
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from gas with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: gas
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_gas
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from gas
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: gas__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_gas_ccs
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from oil with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: fossil_fuels_and_industry
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_fossil
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from fossil fuels
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: nuclear
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_nuclear
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from nuclear
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: solar_pv
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_solar
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from solar photovoltaic
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: wind
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_wind
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from wind
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: hydropower
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_hydro
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from hydropower
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: geothermal
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_geothermal
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from geothermal
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: biomass
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_biomass
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from biomass
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: biomass__with_ccs
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_biomass_ccs
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from biomass with carbon capture and storage
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: share_of_total
+      metric: primary_energy
+      region: global
+      sub_metric: traditional_biomass
+    indicators:
+      y:
+        - catalogPath: global#primary_energy_share_tradbiomass
+          display:
+            type: Percentage
+            annotationsColumnSlug: annotation
+    config:
+      title: Share of global primary energy from traditional biomass
+      subtitle: |-
+        Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
+      relatedQuestionUrl: https://ourworldindata.org/energy-definitions
+      relatedQuestionText: 'Primary, secondary, final, useful: What are the four ways of measuring energy?'
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: total_capacity
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: biomass
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_biomass
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from biomass
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: coal
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_coal
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from coal
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: gas
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_gas
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from gas
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: oil
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_oil
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from oil
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: nuclear
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_nuclear
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from nuclear
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: hydropower
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_hydro
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from hydropower
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: wind
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_wind
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from wind
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: onshore_wind
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_onshorewind
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from onshore wind
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: offshore_wind
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_offshorewind
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from offshore wind
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: solar
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_solar
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from solar
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: solar_pv
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_solarpv
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from solar photovoltaics
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: solar_csp
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_csp
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from concentrating solar power
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: geothermal
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_geothermal
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global electricity capacity from geothermal
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: total
+      metric: electricity_capacity
+      region: global
+      sub_metric: other
+    indicators:
+      y:
+        - catalogPath: global#elec_capacity_other
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Electricity capacity from other sources
+      subtitle: |-
+        Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
+  - dimensions:
+      rate: ''
+      metric: land_cover
+      region: global
+      sub_metric: forest_area
+    indicators:
+      y:
+        - catalogPath: global#land_forest
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global forest area
+      subtitle: This covers forest of all types, including primary and planted forests. It is measured in hectares.
+  - dimensions:
+      rate: ''
+      metric: land_cover
+      region: global
+      sub_metric: cropland
+    indicators:
+      y:
+        - catalogPath: global#land_cropland
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global cropland area
+      subtitle: |-
+        Cropland area includes land used for crop production for human food, animal feed, and industrial uses. It is measured in hectares.
+  - dimensions:
+      rate: ''
+      metric: land_cover
+      region: global
+      sub_metric: pasture
+    indicators:
+      y:
+        - catalogPath: global#land_pasture
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global pasture land area
+      subtitle: Pasture land is land used for livestock grazing. It is measured in hectares.
+  - dimensions:
+      rate: ''
+      metric: agricultural_demand
+      region: global
+      sub_metric: crops_for_non_energy
+    indicators:
+      y:
+        - catalogPath: global#agri_demand_crops
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global crop demand
+      subtitle: |-
+        Crop demand is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
+  - dimensions:
+      rate: ''
+      metric: agricultural_demand
+      region: global
+      sub_metric: crop_for_energy
+    indicators:
+      y:
+        - catalogPath: global#agri_demand_energycrops
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global energy crop demand
+      subtitle: |-
+        Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
+  - dimensions:
+      rate: ''
+      metric: agricultural_demand
+      region: global
+      sub_metric: livestock
+    indicators:
+      y:
+        - catalogPath: global#agri_demand_livestock
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global livestock demand
+  - dimensions:
+      rate: ''
+      metric: agricultural_production
+      region: global
+      sub_metric: crops
+    indicators:
+      y:
+        - catalogPath: global#agri_prod_crops_nonenergy
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global crop production
+      subtitle: |-
+        Total crop production is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
+  - dimensions:
+      rate: ''
+      metric: agricultural_production
+      region: global
+      sub_metric: crop_for_energy
+    indicators:
+      y:
+        - catalogPath: global#agri_prod_crops_energy
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global energy crop production
+      subtitle: |-
+        Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
+  - dimensions:
+      rate: ''
+      metric: agricultural_production
+      region: global
+      sub_metric: livestock
+    indicators:
+      y:
+        - catalogPath: global#agri_prod_livestock
+          display:
+            type: Numeric
+            annotationsColumnSlug: annotation
+    config:
+      title: Global livestock production
