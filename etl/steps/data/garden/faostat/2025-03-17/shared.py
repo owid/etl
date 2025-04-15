@@ -336,11 +336,11 @@ FLAGS_RANKING = (
 # Additional descriptions.
 
 # Additional explanation to append to element description for variables that were originally given per capita.
-WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "* This data was originally given per-capita by FAOSTAT. Our World in Data has converted this data into total figures by multiplying by FAOSTAT's population.\n"
+WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = "* This data was originally given per-capita by FAOSTAT. We converted this data into total figures by multiplying by FAOSTAT's population.\n"
 # Additional explanation to append to element description for created per-capita variables.
 NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
-    "* Per-capita values are obtained by dividing the original values by Our World in Data's population.\n"
-    "* For regions defined by FAOSTAT, per-capita values were calculated using FAOSTAT's original population data, if available."
+    "* Per-capita values were obtained by dividing total figures by Our World in Data's population.\n"
+    "* For regions defined by FAOSTAT, per-capita values were calculated using FAOSTAT's original population data, if available.\n"
 )
 
 # Additional text to include in the metadata title of the output wide table.
@@ -1881,6 +1881,11 @@ def prepare_wide_table(tb: Table) -> Table:
         tb_wide[column].metadata.display = {"name": variable_name_mapping[column]}
         tb_wide[column].metadata.presentation = VariablePresentationMeta(title_public=variable_name_mapping[column])
 
+    # Add processing description.
+    variable_name_mapping = _variable_name_map(tb, "description_processing", enforce_unique=False)
+    for column in tb_wide.columns:
+        tb_wide[column].metadata.description_processing = variable_name_mapping.get(column)
+
     # Ensure columns have the optimal dtypes, but codes are categories.
     log.info("prepare_wide_table.optimize_table_dtypes", shape=tb_wide.shape)
     tb_wide = optimize_table_dtypes(table=tb_wide.reset_index())
@@ -1905,12 +1910,15 @@ def prepare_wide_table(tb: Table) -> Table:
     return tb_wide
 
 
-def _variable_name_map(data: Table, column: str) -> Dict[str, str]:
+def _variable_name_map(data: Table, column: str, enforce_unique: bool = True) -> Dict[str, str]:
     """Extract map {variable name -> column} from dataframe and make sure it is unique (i.e. ensure that one variable
     does not map to two distinct values)."""
     pivot = data.dropna(subset=[column]).groupby(["variable_name"], observed=True)[column].apply(set)
-    assert all(pivot.map(len) == 1)
-    return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
+    if enforce_unique:
+        assert all(pivot.map(len) == 1)
+        return pivot.map(lambda x: list(x)[0]).to_dict()  # type: ignore
+    else:
+        return pivot.map(lambda x: "".join(dict.fromkeys(x))).to_dict()  # type: ignore
 
 
 def parse_amendments_table(amendments: Table, dataset_short_name: str):
