@@ -398,8 +398,6 @@ def run():
     #
     # Process data.
     #
-    # TODO: It seems we don't have all the units that appeared in the old explorer.
-    #  I think the only missing one is food available, which is given in kg per year, and should also be in grams per day.
     # Prepare tables with dimensions.
     tb_qcl = prepare_table_with_dimensions(tb=tb_qcl, item_codes=ITEM_CODES_QCL, element_codes=ELEMENT_CODES_QCL)
     tb_fbsc = prepare_table_with_dimensions(tb=tb_fbsc, item_codes=ITEM_CODES_FBSC, element_codes=ELEMENT_CODES_FBSC)
