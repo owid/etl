@@ -45,7 +45,7 @@ FUNCTIONS = {
     "General public services n.e.c.": "General public services | General public services n.e.c.",
     "Public debt transactions": "General public services | Public debt transactions",
     "Transfers of a general character between different levels of government": "General public services | Transfers of a general character between different levels of government",
-    "Defence": "Defence | Total",
+    "Defence": "Defense | Total",
     "Public order and safety": "Public order and safety | Total",
     "Police services": "Public order and safety | Police services",
     "Fire-protection services": "Public order and safety | Fire-protection services",
