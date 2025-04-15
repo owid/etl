@@ -159,6 +159,13 @@ definitions:
     General government expenditure on social protection provides financial assistance and services to individuals and families. It includes benefits for sickness and disability, old age, survivors, family and children, unemployment, housing, social exclusion, and research and development on these areas.
     <%- endif %>
 
+  key_function_subcategory: |-
+    <% if function_subcategory == "Total" and function != "Total" %>
+    This indicator represents the total amount of government expenditure on this function.
+    <%- elif function_subcategory != "Total" %>
+    This indicator represents government expenditure on the <<function>> subcategory named _<<function_subcategory>>_.
+    <%- endif %>
+
   description_from_producer_expenditure: >-
     General government expenditures data are from the
     OECD National Accounts Statistics (database), which
@@ -672,6 +679,7 @@ tables:
           - "{definitions.key_government_expenditure}"
           - "{definitions.key_cofog}"
           - "{definitions.key_function}"
+          - "{definitions.key_function_subcategory}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditure}"
         display:
