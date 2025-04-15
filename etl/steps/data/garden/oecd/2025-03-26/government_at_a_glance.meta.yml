@@ -138,25 +138,25 @@ definitions:
 
   key_function: |-
     <% if function == "General public services" %>
-    Government expenditure on general public services supports the core operations of government and public administration, such as executive and legislative organs, financial and fiscal affairs, external affairs, public debt transactions, or foreign economic aid, among others.
+    General government expenditure on general public services supports the core operations of government and public administration, such as executive and legislative organs, financial and fiscal affairs, external affairs, public debt transactions, or foreign economic aid, among others.
     <%- elif function == "Defense" %>
-    Government expenditure on defense supports all aspects of a country's forces, including military and civil defense, foreign military aid and research and development on these areas.
+    General government expenditure on defense supports all aspects of a country's forces, including military and civil defense, foreign military aid and research and development on these areas.
     <%- elif function == "Public order and safety" %>
     Government expenditure of public order and safety supports activities related to maintaining law, order, and public safety. It includes police services, fire services, law courts, prisons and research and development on these areas.
     <%- elif function == "Economic affairs" %>
-    Government expenditure on economic affairs supports the economy and specific industries. It includes general economic, commercial and labor affairs, agriculture, forestry, fishing, and hunting, mining, manufacturing, and construction, transport, communications, among others.
+    General government expenditure on economic affairs supports the economy and specific industries. It includes general economic, commercial and labor affairs, agriculture, forestry, fishing, and hunting, mining, manufacturing, and construction, transport, communications, among others.
     <%- elif function == "Environmental protection" %>
-    Government expenditure on environmental protection supports activities aimed at preserving and improving the environment. It includes waste management, waste water management, pollution reduction, protection of biodiversity and landscape, and research and development on these areas.
+    General government expenditure on environmental protection supports activities aimed at preserving and improving the environment. It includes waste management, waste water management, pollution reduction, protection of biodiversity and landscape, and research and development on these areas.
     <%- elif function == "Housing and community amenities" %>
-    Government expenditure on housing and community amenities supports housing and local infrastructure. It includes housing development, community development, water supply, street lighting, and research and development on these areas.
+    General government expenditure on housing and community amenities supports housing and local infrastructure. It includes housing development, community development, water supply, street lighting, and research and development on these areas.
     <%- elif function == "Health" %>
-    Government expenditure on health supports all government spending on health care, including medical products, appliances and equipment, outpatient services, hospital services, public health services, and research and development on these areas.
+    General government expenditure on health supports all government spending on health care, including medical products, appliances and equipment, outpatient services, hospital services, public health services, and research and development on these areas.
     <%- elif function == "Recreation, culture and religion" %>
-    Government expenditure on recreation, culture, and religion supports leisure and cultural activities, including recreation and sports programs, cultural institutions, broadcasting and publishing, religious and other community initiatives, as well as research and development in these areas.
+    General government expenditure on recreation, culture, and religion supports leisure and cultural activities, including recreation and sports programs, cultural institutions, broadcasting and publishing, religious and other community initiatives, as well as research and development in these areas.
     <%- elif function == "Education" %>
-    Government expenditure on education supports all levels of education, including pre-primary, primary, secondary, post-secondary, tertiary, and education not definable by level, subsidiary services to education, and research and development on these areas.
+    General government expenditure on education supports all levels of education, including pre-primary, primary, secondary, post-secondary, tertiary, and education not definable by level, subsidiary services to education, and research and development on these areas.
     <%- elif function == "Social protection" %>
-    Government expenditure on social protection provides financial assistance and services to individuals and families. It includes benefits for sickness and disability, old age, survivors, family and children, unemployment, housing, social exclusion, and research and development on these areas.
+    General government expenditure on social protection provides financial assistance and services to individuals and families. It includes benefits for sickness and disability, old age, survivors, family and children, unemployment, housing, social exclusion, and research and development on these areas.
     <%- endif %>
 
   description_from_producer_expenditure: >-
