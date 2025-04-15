@@ -93,7 +93,7 @@ definitions:
     <% if function == "Total" %>
     General government expenditure on all functions.
     <%- else %>
-    General government expenditure on <<function>> (_<<function_subcategory>>_).
+    General government expenditure on <<function>> (<<function_subcategory>>).
     <%- endif %>
 
   num_decimal_places: |-
