@@ -126,6 +126,7 @@ def run() -> None:
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
     )
 
     # When unit_multiplier is "Millions", multiply value by 1,000,000.
