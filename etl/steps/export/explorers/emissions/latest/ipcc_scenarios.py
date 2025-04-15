@@ -27,9 +27,7 @@ def run() -> None:
             )
 
     # Create explorer
-    explorer = paths.create_explorer(
-        config=config,
-    )
+    explorer = paths.create_explorer(config=config, explorer_name="ipcc-scenarios")
 
     # explorer.save(tolerate_extra_indicators=True)
     explorer.save()
