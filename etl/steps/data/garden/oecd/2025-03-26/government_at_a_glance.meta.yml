@@ -30,6 +30,8 @@ definitions:
     % of government production costs
     <%- elif unit == "share_tax_revenue" %>
     % of tax revenue
+    <%- elif unit == "share_gov_exp_same_function" %>
+    % of government expenditure on the same function
     <%- endif %>
 
   unit: |-
@@ -53,6 +55,8 @@ definitions:
     % of government production costs
     <%- elif unit == "share_tax_revenue" %>
     % of tax revenue
+    <%- elif unit == "share_gov_exp_same_function" %>
+    % of government expenditure on the same function
     <%- endif %>
 
   short_unit: |-
@@ -81,6 +85,15 @@ definitions:
     This data is divided by total government production costs, expressed as a percentage.
     <%- elif unit == "share_tax_revenue" %>
     This data is divided by total tax revenue, expressed as a percentage.
+    <%- elif unit == "share_gov_exp_same_function" %>
+    This data is divided by total government expenditure on the same function, expressed as a percentage.
+    <%- endif %>
+
+  short_description_function:
+    <% if function == "Total" %>
+    General government expenditure on all functions.
+    <%- else %>
+    General government expenditure on <<function>> (_<<function_subcategory>>_).
     <%- endif %>
 
   num_decimal_places: |-
@@ -119,6 +132,9 @@ definitions:
   key_production_costs: Production costs of general government are public expenditures on the goods and services the government uses. These costs include wages for government employees and purchases of goods and services, like supplies for schools and hospitals. They do not include government spending that does not involve a purchase of a good or service, such as spending on social welfare, unemployment benefits, and other transfers. It also includes outsourcing, the costs of buying goods and services from entities outside of government, such as private companies and other agencies.
 
   key_tax_revenues: Tax revenues are the compulsory unrequited payments made by economic entities to the general government. They include taxes on consumption, income, wealth, property and capital.
+
+
+
 
   description_from_producer_expenditure: >-
     General government expenditures data are from the
@@ -621,5 +637,19 @@ tables:
         description_from_producer: "{definitions.description_from_producer_tax_revenues}"
         display:
           name: Tax revenues by economic transaction - <<economic_transaction>>
+          numDecimalPlaces: "{definitions.num_decimal_places}"
+          <<: *common_display
+
+      government_expenditure_by_function:
+        title: Government expenditure by function - <<function>> | <<function_subcategory>> ({definitions.unit_human_readable})
+        unit: "{definitions.unit}"
+        short_unit: "{definitions.short_unit}"
+        description_short: "{definitions.short_description_function} {definitions.short_description_unit}"
+        description_key:
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_general_government}"
+        description_from_producer: "{definitions.description_from_producer_expenditure}"
+        display:
+          name: Government expenditure by function - <<function>> | <<function_subcategory>>
           numDecimalPlaces: "{definitions.num_decimal_places}"
           <<: *common_display
