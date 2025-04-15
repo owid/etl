@@ -160,9 +160,7 @@ definitions:
     <%- endif %>
 
   key_function_subcategory: |-
-    <% if function_subcategory == "Total" and function != "Total" %>
-    This indicator represents the total amount of government expenditure on this function.
-    <%- elif function_subcategory != "Total" %>
+    <% if function_subcategory != "Total" %>
     This indicator represents government expenditure on the <<function>> subcategory named _<<function_subcategory>>_.
     <%- endif %>
 
