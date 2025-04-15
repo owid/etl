@@ -2380,6 +2380,11 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         tb_wide[column].metadata.presentation.title_public = title
         tb_wide[column].metadata.description_short = description_short
 
+        # Remove duplicate lines in processing description.
+        processing = tb_wide[column].metadata.description_processing
+        if processing is not None:
+            tb_wide[column].metadata.description_processing = "\n".join(list(dict.fromkeys(processing.split("\n"))))
+
 
 def run(dest_dir: str) -> None:
     #
