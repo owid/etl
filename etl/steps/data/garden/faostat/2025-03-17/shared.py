@@ -2152,7 +2152,8 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         item = item.capitalize()
 
         # First define default metadata values:
-        title = f"{item} - {element} ({unit})"
+        display_name = f"{item} - {element} ({unit})"
+        title = display_name
         description_short = None
         num_decimal_places = 2
 
@@ -2379,7 +2380,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             }
 
         # Update metadata.
-        tb_wide[column].display["name"] = title
+        tb_wide[column].display["name"] = display_name
         tb_wide[column].display["numDecimalPlaces"] = num_decimal_places
         tb_wide[column].metadata.presentation.title_public = title
         tb_wide[column].metadata.description_short = description_short
