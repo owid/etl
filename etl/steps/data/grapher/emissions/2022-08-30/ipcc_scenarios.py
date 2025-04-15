@@ -132,8 +132,8 @@ def process(snap):
     region_mapping = {
         None: ("IPCC Scenarios (IIASA).csv", "global"),
         "R5.2ASIA": ("IPCC Scenarios - Asia (IIASA).csv", "asia"),
-        "R5.2MAF": ("IPCC Scenarios - Middle East and Africa (IIASA).csv", "africa"),
-        "R5.2LAM": ("IPCC Scenarios - Latin America (IIASA).csv", "latam"),
+        "R5.2MAF": ("IPCC Scenarios - Middle East and Africa (IIASA).csv", "middle_east_and_africa"),
+        "R5.2LAM": ("IPCC Scenarios - Latin America (IIASA).csv", "latin_america"),
         "R5.2OECD": ("IPCC Scenarios - OECD (IIASA).csv", "oecd"),
         # "R5.2REF": ("IPCC Scenarios - Reforming economies (IIASA).csv", 'ref'),
     }

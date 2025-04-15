@@ -178,3 +178,5 @@ steps:
   #
   data://grapher/emissions/2022-08-30/ipcc_scenarios:
     - snapshot://emissions/2022-08-30/ipcc_scenarios.zip
+  export://explorers/emissions/latest/ipcc_scenarios:
+    - data://grapher/emissions/2022-08-30/ipcc_scenarios

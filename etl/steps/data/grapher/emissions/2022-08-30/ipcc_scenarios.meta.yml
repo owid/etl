@@ -44,6 +44,10 @@ tables:
         title: Radiative forcing (f-gases)
         unit: watts per meter squared
         short_unit: W/m²
+      forcing_aerosol:
+        title: Radiative forcing (aerosols)
+        unit: watts per meter squared
+        short_unit: W/m²
       concentration_co2:
         title: CO2 concentration
         unit: parts per million
@@ -225,7 +229,7 @@ tables:
         unit: terawatt-hours
         short_unit: TWh
       secondary_energy_heat:
-        title: Secondary electricity (heat)
+        title: Secondary energy (heat)
         unit: terawatt-hours
         short_unit: TWh
       secondary_heat_per_capita:
@@ -233,19 +237,19 @@ tables:
         unit: kilowatt-hours
         short_unit: kWh
       secondary_energy_gas:
-        title: Secondary electricity (gas)
+        title: Secondary energy (gas)
         unit: terawatt-hours
         short_unit: TWh
       secondary_energy_oil:
-        title: Secondary electricity (oil)
+        title: Secondary energy (oil)
         unit: terawatt-hours
         short_unit: TWh
       secondary_energy_hydrogen:
-        title: Secondary electricity (hydrogen)
+        title: Secondary energy (hydrogen)
         unit: terawatt-hours
         short_unit: TWh
       secondary_energy_liquid_biofuel:
-        title: Secondary electricity (biofuels)
+        title: Secondary energy (biofuels)
         unit: terawatt-hours
         short_unit: TWh
       secondary_energy_elec_biomass_share:
@@ -532,7 +536,3 @@ tables:
         title: Livestock production
         unit: tonnes digestible matter
         short_unit: t
-      forcing_aerosol:
-        title: Radiative forcing (aerosols)
-        unit: watts per meter squared
-        short_unit: W/m²
