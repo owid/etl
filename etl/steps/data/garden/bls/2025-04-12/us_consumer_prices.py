@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import datetime
-
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -38,23 +36,15 @@ def run(dest_dir: str) -> None:
     #
     # Process data.
     #
-    # Remove rows where period_name is '2nd Half' or '1st Half'
-    tb = tb[tb["period_name"].isin(["2nd Half", "1st Half"])]
+    # Keep annual data only
+    tb = tb[tb["period_name"].isin(["Annual"])]
+    tb = tb.drop(columns=["period_name"])
 
-    # Check that each series_id/year combination doesn't have more than 12 values (1 per month)
-    values_per_year = tb.groupby(["series_id", "year"], as_index=False).size()
-    assert values_per_year["size"].le(12).all()
-    # Cut the time series at the end of current_year-1
-    tb = tb[tb.year < datetime.date.today().year]
-
-    # Calculate the average value per series_id & year
-    tb = tb[["series_id", "year", "value"]].groupby(["series_id", "year"], as_index=False).mean()
     # Translate variables to human-readable names
     tb.series_id = tb.series_id.replace(VARIABLE_NAMES)
 
     # Pivot to wide format and add country
     tb = tb.pivot(columns="series_id", values="value", index="year").assign(country="United States").reset_index()
-
     # Create a new table with the processed data.
     tb_garden = tb.format(["country", "year"])
 

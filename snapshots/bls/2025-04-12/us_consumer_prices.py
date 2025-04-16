@@ -26,8 +26,8 @@ load_dotenv()
 KEY = os.getenv("US_BLS_API_KEY")
 SERIES_IDS = [
     "CUUR0000SEEB01",  # College tuition fees
-    "CUUR0000SAE1",  # Tuition, other school fees, and childcare
-    "CUUR0000SEEB",  # Childcare
+    "CUUR0000SAE1",  # Education aggregate
+    "CUUR0000SEEB",  # Tuition, other school fees, and childcare
     "CUUR0000SAM",  # Medical care
     "CUUR0000SAH21",  # Household energy
     "CUUR0000SAH",  # Housing
@@ -59,7 +59,7 @@ def main(upload: bool) -> None:
         chunk_end = min(year + 9, end_year)
 
         data = json.dumps(
-            {"seriesid": SERIES_IDS, "startyear": str(chunk_start), "endyear": str(chunk_end), "annualaverage": "true"}
+            {"seriesid": SERIES_IDS, "startyear": str(chunk_start), "endyear": str(chunk_end), "annualaverage": True}
         )
         params = {"registrationkey": KEY}
 
