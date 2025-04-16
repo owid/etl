@@ -894,77 +894,7 @@ tables:
           Indicator name: `v2xcs_ccsi`
         unit: ''
 
-  ##################################################################################################
-  ##################################################################################################
-  # TABLE: MULTI-DIMENSIONAL TABLES WITHOUT REGIONS
-  vdem_multi_without_regions:
-    title: ""
-    description: ""
-    common:
-      display:
-          numDecimalPlaces: 2
-      presentation: &common_ppt_2
-        title_variant: (<< estimate >> estimate)
-    variables:
-      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.3 Access to justice for men
-      accessjust_m_row:
-        title: Access to justice for men (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate whether men have access to justice.
-        presentation:
-          <<: *common_ppt_2
-          title_public: "Access to justice for men"
-        description_from_producer: |-
-          Question: Do men enjoy secure and effective access to justice?
-
-          Clarification: This question specifies the extent to which men can bring cases before the courts without risk to their personal safety, trials are fair, and men have effective ability to seek redress if public authorities violate their rights, including the rights to counsel, defense, and appeal.
-
-          This question does not ask you to assess the relative access to justice men and women. Thus, it is possible to assign the lowest possible score to a country even if men and women enjoy equal — and extremely limited — access to justice.
-
-          Responses:
-          0: Secure and effective access to justice for men is non-existent.
-          1: Secure and effective access to justice for men is usually not established or widely respected. 2: Secure and effective access to justice for men is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
-          3: Secure and effective access to justice for men is usually observed.
-          4: Secure and effective access to justice for men is almost always observed.
-
-          Scale: Ordinal, converted to interval by the measurement model.
-        description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstm_osp*`) into two categories: 0 ("No") and 1 ("Yes").
-
-          {definitions.auxiliary.description_processing_row}
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      # [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
-      accessjust_w_row:
-        title: Access to justice for women (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate whether women have access to justice.
-        presentation:
-          <<: *common_ppt_2
-          title_public: "Access to justice for women"
-        description_from_producer: |-
-          Question: Do women enjoy equal, secure, and effective access to justice?
-
-          Clarification: This question specifies the extent to which women can bring cases before the courts without risk to their personal safety, trials are fair, and women have effective ability to seek redress if public authorities violate their rights, including the rights to counsel, defense, and appeal.
-
-          This question does not ask you to assess the relative access to justice men and women. Thus, it is possible to assign the lowest possible score to a country even if men and women enjoy equal — and extremely limited — access to justice.
-
-          Responses:
-          0: Secure and effective access to justice for women is non-existent.
-          1: Secure and effective access to justice for women is usually not established or widely respected. 2: Secure and effective access to justice for women is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
-          3: Secure and effective access to justice for women is usually observed.
-          4: Secure and effective access to justice for women is almost always observed.
-
-          Scale: Ordinal, converted to interval by the measurement model.
-        description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstw_osp*`) into two categories: 0 ("No") and 1 ("Yes").
-
-          {definitions.auxiliary.description_processing_row}
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      ## 2.2.13 Civil society participation index
+       ## 2.2.13 Civil society participation index
       civsoc_particip_vdem:
         title: Civil society participation index (<< estimate >> estimate)
         description_short: |-
@@ -1052,51 +982,6 @@ tables:
           Indicator name: `v2x_egal`
         unit: ''
 
-      ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
-      electdem_dich_row_owid:
-        title: Electoral democracy (<< estimate >> estimate) (re-estimate)
-        description_short: |-
-          << estimate.title() >> estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
-        presentation:
-          title_public: Electoral democracy
-          <<: *common_ppt_2
-        description_from_producer: *description_prod_electdem_vdem
-        description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: 0 ("No") and 1 ("Yes").
-
-          {definitions.auxiliary.description_processing_row}
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
-      electfreefair_row:
-        title: Free and fair elections (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate of whether national elections were free and fair or not.
-        presentation:
-          title_public: Free and fair elections
-          <<: *common_ppt_2
-        description_from_producer: |-
-          Question: Taking all aspects of the pre-election period, election day, and the post-election process into account, would you consider this national election to be free and fair?
-
-          Clarification: The only thing that should not be considered in coding this is the extent of suffrage (by law). Thus, a free and fair election may occur even if the law excludes significant groups (an issue measured separately).
-
-          Responses:
-          0: No, not at all. The elections were fundamentally flawed and the official results had little if anything to do with the 'will of the people' (i.e., who became president; or who won the legislative majority).
-          1: Not really. While the elections allowed for some competition, the irregularities in the end affected the outcome of the election (i.e., who became president; or who won the legislative majority).
-          2: Ambiguous. There was substantial competition and freedom of participation but there were also significant irregularities. It is hard to determine whether the irregularities affected the outcome or not (as defined above).
-          3: Yes, somewhat. There were deficiencies and some degree of fraud and irregularities but these did not in the end affect the outcome (as defined above).
-          4: Yes. There was some amount of human error and logistical restrictions but these were largely unintentional and without significant consequences.
-
-          Scale: Ordinal, converted to interval by the measurement model.
-        description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 2 to classify the original indicator (`v2elfrfair_osp*`) into two categories: 0 ("No") and 1 ("Yes").
-
-          {definitions.auxiliary.description_processing_row}
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
       ## 2.2.6 Clean elections index
       electfreefair_vdem:
         title: Clean elections index (<< estimate >> estimate)
@@ -1115,68 +1000,8 @@ tables:
           Indicator name: `v2xel_frefair`
         unit: ''
 
-      ## [CUSTOM]
-      electmulpar_hoe_row_owid:
-        title: Multi-party elections for government's chief executive (<< estimate >> estimate)
-        description_short: |-
+            ### 3.6.0.4 Range of consultation
 
-        presentation:
-          <<: *common_ppt_2
-          title_public: Multi-party elections for government's chief executive
-        unit: ''
-        description_processing: |-
-          {definitions.auxiliary.description_processing_row}
-
-          Finally, we make some additional minor changes to the coding rules.
-
-          The two most consequential changes we make relate to RoW's identification of whether a country's chief executive is elected. First, one way RoW considers a chief executive to have been elected — even if they are not directly elected or appointed by the legislature — is if they are the head of state, they depend on the approval of the legislature, and there were multi-party elections for the executive. This last part is likely a coding error because to be consistent with RoW's other definitions, this should depend on multi-party legislative, not executive, elections. Only if the legislature has been chosen in multi-party elections does it make an otherwise unelected chief executive—who must be approved by that legislature—dependent on multi-party elections. We correct this error.
-
-          Second, RoW considers a chief executive to have been elected if the country had chosen both its legislature and executive in multi-party elections. But this considers some chief executives as elected even if they came to power through force after elections were previously held. Examples include the coup d'états led by Fulgencio Batista in Cuba in 1952 and by Muhammadu Buhari in Nigeria in 1983. We instead consider such chief executives as unelected.
-        display:
-          numDecimalPlaces: 0
-
-      ## [CUSTOM, based on `v2elmulpar_osp`]
-      electmulpar_leg_row:
-        title: Multiparty elections for legislature (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of whether multi-party elections for the national legislature were held or not.
-        presentation:
-          <<: *common_ppt_2
-          title_public: Multiparty elections for legislature
-        description_processing: |-
-          Use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
-      electmulpar_row:
-        title: Multiparty elections (<< estimate >> estimate) (re-estimate)
-        description_short: |-
-          << estimate.title() >> estimate whether national multi-party elections were held.
-        presentation:
-          <<: *common_ppt_2
-          title_public: Multiparty elections
-        description_from_producer: |-
-          Question: Question: Was this national election multiparty?
-
-          Responses:
-          0: No. No-party or single-party and there is no meaningful competition (includes situations where a few parties are legal but they are all de facto controlled by the dominant party).
-          1: Not really. No-party or single-party (defined as above) but multiple candidates from the same party and/or independents contest legislative seats or the presidency.
-          2: Constrained. At least one real opposition party is allowed to contest but competition is highly constrained — legally or informally.
-          3: Almost. Elections are multiparty in principle but either one main opposition party is prevented (de jure or de facto) from contesting, or conditions such as civil unrest (excluding natural disasters) prevent competition in a portion of the territory.
-          4: Yes. Elections are multiparty, even though a few marginal parties may not be permitted to contest (e.g. far-right/left extremist parties, anti-democratic religious or ethnic parties).
-
-          Scale: Ordinal, converted to interval by the measurement model.
-        description_processing: |-
-          We use a threshold of 2 on `v2elmulpar_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
-
-          {definitions.auxiliary.description_processing_row}
-        unit: ''
-        display:
-          numDecimalPlaces: 0
-
-      ### 3.6.0.4 Range of consultation
       elitecons_polch_vdem:
         title: Elite consultation (<< estimate >> estimate)
         description_short: |-
@@ -1218,6 +1043,7 @@ tables:
 
           Indicator name: `v2xeg_eqaccess`
         unit: ''
+
 
       ## 2.2.19 Equal protection index
       equal_rights_vdem:
@@ -1403,21 +1229,6 @@ tables:
           Indicator name: `v2x_liberal`
         unit: ''
 
-      ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
-      lib_dich_row:
-        title: Liberal political institutions (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate of whether the country has meaningfully liberal political institutions
-        presentation:
-          <<: *common_ppt_2
-          title_public: Liberal political institutions
-        description_from_producer: *description_prod_lib_vdem
-        description_processing: |-
-          We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: 0 ("No") and 1 ("Yes").
-
-          {definitions.auxiliary.description_processing_row}
-        unit: ''
-        display:
-          numDecimalPlaces: 0
 
       ## 2.2.15 Local government index
       locelect_vdem:
@@ -1499,6 +1310,199 @@ tables:
 
           Indicator name: `v2dlengage`
         unit: ''
+
+
+  ##################################################################################################
+  ##################################################################################################
+  # TABLE: MULTI-DIMENSIONAL TABLES WITHOUT REGIONS
+  vdem_multi_without_regions:
+    title: ""
+    description: ""
+    common:
+      display:
+          numDecimalPlaces: 2
+      presentation: &common_ppt_2
+        title_variant: (<< estimate >> estimate)
+    variables:
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.3 Access to justice for men
+      accessjust_m_row:
+        title: Access to justice for men (<< estimate >> estimate) (re-estimate)
+        description_short: << estimate.title() >> estimate whether men have access to justice.
+        presentation:
+          <<: *common_ppt_2
+          title_public: "Access to justice for men"
+        description_from_producer: |-
+          Question: Do men enjoy secure and effective access to justice?
+
+          Clarification: This question specifies the extent to which men can bring cases before the courts without risk to their personal safety, trials are fair, and men have effective ability to seek redress if public authorities violate their rights, including the rights to counsel, defense, and appeal.
+
+          This question does not ask you to assess the relative access to justice men and women. Thus, it is possible to assign the lowest possible score to a country even if men and women enjoy equal — and extremely limited — access to justice.
+
+          Responses:
+          0: Secure and effective access to justice for men is non-existent.
+          1: Secure and effective access to justice for men is usually not established or widely respected. 2: Secure and effective access to justice for men is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
+          3: Secure and effective access to justice for men is usually observed.
+          4: Secure and effective access to justice for men is almost always observed.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: |-
+          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstm_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+
+          {definitions.auxiliary.description_processing_row}
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      # [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
+      accessjust_w_row:
+        title: Access to justice for women (<< estimate >> estimate) (re-estimate)
+        description_short: << estimate.title() >> estimate whether women have access to justice.
+        presentation:
+          <<: *common_ppt_2
+          title_public: "Access to justice for women"
+        description_from_producer: |-
+          Question: Do women enjoy equal, secure, and effective access to justice?
+
+          Clarification: This question specifies the extent to which women can bring cases before the courts without risk to their personal safety, trials are fair, and women have effective ability to seek redress if public authorities violate their rights, including the rights to counsel, defense, and appeal.
+
+          This question does not ask you to assess the relative access to justice men and women. Thus, it is possible to assign the lowest possible score to a country even if men and women enjoy equal — and extremely limited — access to justice.
+
+          Responses:
+          0: Secure and effective access to justice for women is non-existent.
+          1: Secure and effective access to justice for women is usually not established or widely respected. 2: Secure and effective access to justice for women is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
+          3: Secure and effective access to justice for women is usually observed.
+          4: Secure and effective access to justice for women is almost always observed.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: |-
+          We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstw_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+
+          {definitions.auxiliary.description_processing_row}
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
+      electdem_dich_row_owid:
+        title: Electoral democracy (<< estimate >> estimate) (re-estimate)
+        description_short: |-
+          << estimate.title() >> estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
+        presentation:
+          title_public: Electoral democracy
+          <<: *common_ppt_2
+        description_from_producer: *description_prod_electdem_vdem
+        description_processing: |-
+          We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+
+          {definitions.auxiliary.description_processing_row}
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
+      electfreefair_row:
+        title: Free and fair elections (<< estimate >> estimate) (re-estimate)
+        description_short: << estimate.title() >> estimate of whether national elections were free and fair or not.
+        presentation:
+          title_public: Free and fair elections
+          <<: *common_ppt_2
+        description_from_producer: |-
+          Question: Taking all aspects of the pre-election period, election day, and the post-election process into account, would you consider this national election to be free and fair?
+
+          Clarification: The only thing that should not be considered in coding this is the extent of suffrage (by law). Thus, a free and fair election may occur even if the law excludes significant groups (an issue measured separately).
+
+          Responses:
+          0: No, not at all. The elections were fundamentally flawed and the official results had little if anything to do with the 'will of the people' (i.e., who became president; or who won the legislative majority).
+          1: Not really. While the elections allowed for some competition, the irregularities in the end affected the outcome of the election (i.e., who became president; or who won the legislative majority).
+          2: Ambiguous. There was substantial competition and freedom of participation but there were also significant irregularities. It is hard to determine whether the irregularities affected the outcome or not (as defined above).
+          3: Yes, somewhat. There were deficiencies and some degree of fraud and irregularities but these did not in the end affect the outcome (as defined above).
+          4: Yes. There was some amount of human error and logistical restrictions but these were largely unintentional and without significant consequences.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: |-
+          We employ Lührmann et al.'s criteria and use a threshold of 2 to classify the original indicator (`v2elfrfair_osp*`) into two categories: 0 ("No") and 1 ("Yes").
+
+          {definitions.auxiliary.description_processing_row}
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [CUSTOM]
+      electmulpar_hoe_row_owid:
+        title: Multi-party elections for government's chief executive (<< estimate >> estimate)
+        description_short: |-
+
+        presentation:
+          <<: *common_ppt_2
+          title_public: Multi-party elections for government's chief executive
+        unit: ''
+        description_processing: |-
+          {definitions.auxiliary.description_processing_row}
+
+          Finally, we make some additional minor changes to the coding rules.
+
+          The two most consequential changes we make relate to RoW's identification of whether a country's chief executive is elected. First, one way RoW considers a chief executive to have been elected — even if they are not directly elected or appointed by the legislature — is if they are the head of state, they depend on the approval of the legislature, and there were multi-party elections for the executive. This last part is likely a coding error because to be consistent with RoW's other definitions, this should depend on multi-party legislative, not executive, elections. Only if the legislature has been chosen in multi-party elections does it make an otherwise unelected chief executive—who must be approved by that legislature—dependent on multi-party elections. We correct this error.
+
+          Second, RoW considers a chief executive to have been elected if the country had chosen both its legislature and executive in multi-party elections. But this considers some chief executives as elected even if they came to power through force after elections were previously held. Examples include the coup d'états led by Fulgencio Batista in Cuba in 1952 and by Muhammadu Buhari in Nigeria in 1983. We instead consider such chief executives as unelected.
+        display:
+          numDecimalPlaces: 0
+
+      ## [CUSTOM, based on `v2elmulpar_osp`]
+      electmulpar_leg_row:
+        title: Multiparty elections for legislature (<< estimate >> estimate)
+        description_short: |-
+          << estimate.title() >> estimate of whether multi-party elections for the national legislature were held or not.
+        presentation:
+          <<: *common_ppt_2
+          title_public: Multiparty elections for legislature
+        description_processing: |-
+          Use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
+      electmulpar_row:
+        title: Multiparty elections (<< estimate >> estimate) (re-estimate)
+        description_short: |-
+          << estimate.title() >> estimate whether national multi-party elections were held.
+        presentation:
+          <<: *common_ppt_2
+          title_public: Multiparty elections
+        description_from_producer: |-
+          Question: Question: Was this national election multiparty?
+
+          Responses:
+          0: No. No-party or single-party and there is no meaningful competition (includes situations where a few parties are legal but they are all de facto controlled by the dominant party).
+          1: Not really. No-party or single-party (defined as above) but multiple candidates from the same party and/or independents contest legislative seats or the presidency.
+          2: Constrained. At least one real opposition party is allowed to contest but competition is highly constrained — legally or informally.
+          3: Almost. Elections are multiparty in principle but either one main opposition party is prevented (de jure or de facto) from contesting, or conditions such as civil unrest (excluding natural disasters) prevent competition in a portion of the territory.
+          4: Yes. Elections are multiparty, even though a few marginal parties may not be permitted to contest (e.g. far-right/left extremist parties, anti-democratic religious or ethnic parties).
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        description_processing: |-
+          We use a threshold of 2 on `v2elmulpar_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
+
+          {definitions.auxiliary.description_processing_row}
+        unit: ''
+        display:
+          numDecimalPlaces: 0
+
+      ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
+      lib_dich_row:
+        title: Liberal political institutions (<< estimate >> estimate) (re-estimate)
+        description_short: << estimate.title() >> estimate of whether the country has meaningfully liberal political institutions
+        presentation:
+          <<: *common_ppt_2
+          title_public: Liberal political institutions
+        description_from_producer: *description_prod_lib_vdem
+        description_processing: |-
+          We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: 0 ("No") and 1 ("Yes").
+
+          {definitions.auxiliary.description_processing_row}
+        unit: ''
+        display:
+          numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.1 Transparent laws with predictable enforcement
       transplaws_row:

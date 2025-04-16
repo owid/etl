@@ -56,33 +56,62 @@ REGIONS = {
 }
 # Indicators for which we estimate region-averages
 _indicators_avg = [
-    "electdem_vdem",
-    "libdem_vdem",
-    "participdem_vdem",
-    "delibdem_vdem",
-    "egaldem_vdem",
     "civ_libs_vdem",
+    "civ_soc_str_vdem",
+    "civsoc_particip_vdem",
+    "corr_exec_vdem",
+    "corr_jud_vdem",
+    "corr_leg_vdem",
+    "corr_publsec_vdem",
+    "corruption_vdem",
+    "counterarg_polch_vdem",
+    "civ_libs_vdem",
+    "civ_soc_str_vdem",
+    "delib_vdem",
+    "delibdem_vdem",
+    "dom_auton_vdem",
+    "egal_vdem",
+    "egaldem_vdem",
+    "electdem_vdem",
+    "electfreefair_vdem",
+    "electoff_vdem",
+    "elitecons_polch_vdem",
+    "equal_access_vdem",
+    "equal_res_vdem",
+    "equal_rights_vdem",
+    "freeassoc_vdem",
+    "freeexpr_vdem",
+    "indiv_libs_vdem",
+    "int_auton_vdem",
+    "judicial_constr_vdem",
+    "justcomgd_polch_vdem",
+    "justified_polch_vdem",
+    "legis_constr_vdem",
+    "lib_vdem",
+    "libdem_vdem",
+    "locelect_vdem",
+    "particip_vdem",
+    "participdem_vdem",
+    "personalism_vdem",
     "phys_integr_libs_vdem",
     "pol_libs_vdem",
     "priv_libs_vdem",
+    "public_admin_vdem",
+    "regelect_vdem",
+    "rule_of_law_vdem",
+    "soccons_polch_vdem",
+    "socgr_civ_libs_vdem",
+    "socgr_pow_vdem",
+    "suffr_vdem",
+    "terr_contr_vdem",
+    "turnout_total_vdem",
+    "turnout_vdem",
     "wom_emp_vdem",
     "wom_civ_libs_vdem",
     "wom_civ_soc_vdem",
+    "wom_emp_vdem",
+    "wom_parl_vdem",
     "wom_pol_par_vdem",
-    "socgr_civ_libs_vdem",
-    "socgr_pow_vdem",
-    "terr_contr_vdem",
-    "rule_of_law_vdem",
-    "public_admin_vdem",
-    "int_auton_vdem",
-    "dom_auton_vdem",
-    "corruption_vdem",
-    "corr_publsec_vdem",
-    "corr_exec_vdem",
-    "corr_leg_vdem",
-    "corr_jud_vdem",
-    "personalism_vdem",
-    "civ_soc_str_vdem",
 ]
 INDICATORS_REGION_AVERAGES = [[f"{ind_name}{dim}" for dim in ["", "_low", "_high"]] for ind_name in _indicators_avg]
 INDICATORS_REGION_AVERAGES = list(chain.from_iterable(INDICATORS_REGION_AVERAGES)) + ["wom_parl_vdem"]
@@ -170,18 +199,19 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = tb.copy()
 
     # Keep only relevant columns
-    tb_ = tb_.loc[:, ["year", "country"] + INDICATORS_REGION_AVERAGES]
+    cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
+    tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
 
     # Estimate region aggregates
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
-        aggregations_world={k: "mean" for k in INDICATORS_REGION_AVERAGES},  # type: ignore
+        aggregations={k: "mean" for k in cols_indicators},  # type: ignore
+        aggregations_world={k: "mean" for k in cols_indicators},  # type: ignore
     )
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 84, "Unexpected number of columns."
+    assert tb_.shape[1] == 151, "Unexpected number of columns."
 
     return tb_
 
@@ -286,7 +316,8 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     tb_ = tb.copy()
 
     # Keep only relevant columns
-    tb_ = tb_.loc[:, ["year", "country"] + INDICATORS_REGION_AVERAGES]
+    cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
+    tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
 
     # Add population in dummies (population value replaces 1, 0 otherwise)
     tb_ = add_population_in_dummies(
@@ -328,11 +359,11 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
-        aggregations={k: "sum" for k in INDICATORS_REGION_AVERAGES} | {"population": "sum"},  # type: ignore
+        aggregations={k: "sum" for k in cols_indicators} | {"population": "sum"},  # type: ignore
         min_num_values_per_year=1,
     )
 
-    # Normalize by region's populatino
+    # Normalize by region's population
     columns_index = ["year", "country"]
     columns_indicators = [col for col in tb_.columns if col not in columns_index + ["population"]]
     tb_[columns_indicators] = tb_[columns_indicators].div(tb_["population"], axis=0)
@@ -341,7 +372,7 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     # Rename columns
     # tb_ = tb_.rename(columns={col: f"popw_{col}" for col in INDICATORS_REGION_AVERAGES})
     # Sanity check on output shape
-    assert tb_.shape[1] == 84, "Unexpected number of columns."
+    assert tb_.shape[1] == 151, "Unexpected number of columns."
 
     return tb_
 
@@ -436,10 +467,9 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
 
     # Split multi-dimensional in two: table with region aggregates, table without
     columns_index = ["year", "country", "estimate"]
-    tb_multi_with_regions = tb_multi[tb_population_avg.columns].copy()
-    tb_multi_without_regions = tb_multi.drop(
-        columns=[col for col in tb_population_avg.columns if col not in columns_index]
-    ).copy()
+    cols_multi = [col for col in tb_population_avg.columns if col in tb_multi.columns]
+    tb_multi_with_regions = tb_multi.loc[:, cols_multi].copy()
+    tb_multi_without_regions = tb_multi.drop(columns=[col for col in cols_multi if col not in columns_index]).copy()
 
     # Merge multi-dimensional table with region aggregates.
     # Since there are two ways of estimating the regional aggregates, we create two versions of the indicators
@@ -503,7 +533,8 @@ def _split_into_uni_and_multi(tb: Table) -> Tuple[Table, Table]:
 
 def _add_note_on_region_averages(tb: Table) -> Table:
     note = "We have estimated the values for regions by averaging the values from the countries in the region."
-    for col in INDICATORS_REGION_AVERAGES:
+    cols_indicators = [col for col in tb.columns if col in INDICATORS_REGION_AVERAGES]
+    for col in cols_indicators:
         if tb[col].metadata.description_processing:
             tb[col].metadata.description_processing += f"\n\n{note}"
         else:
