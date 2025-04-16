@@ -13,22 +13,9 @@ config:
   isPublished: true
   explorerTitle: IPCC Scenarios
   hideAlertBanner: true
-  explorerSubtitle: Explore the global shared socioeconomic pathways used in IPCC scenarios.
+  explorerSubtitle: AAA Explore the global shared socioeconomic pathways used in IPCC scenarios.
   hideAnnotationFieldsInTitle: true
 dimensions:
-  - slug: rate
-    name: Rate
-    choices:
-      - slug: per_capita
-        name: Per capita
-      - slug: total
-        name: Total
-      - slug: ''
-        name: ''
-      - slug: share_of_total
-        name: Share of total
-    presentation:
-      type: radio
   - slug: metric
     name: Metric
     choices:
@@ -70,21 +57,6 @@ dimensions:
         name: Agricultural demand
       - slug: agricultural_production
         name: Agricultural production
-    presentation:
-      type: dropdown
-  - slug: region
-    name: Region
-    choices:
-      - slug: global
-        name: Global
-      - slug: asia
-        name: Asia
-      - slug: middle_east_and_africa
-        name: Middle East and Africa
-      - slug: latin_america
-        name: Latin America
-      - slug: oecd
-        name: OECD
     presentation:
       type: dropdown
   - slug: sub_metric
@@ -224,6 +196,34 @@ dimensions:
         name: Livestock
       - slug: crops
         name: Crops
+    presentation:
+      type: dropdown
+  - slug: rate
+    name: Rate
+    choices:
+      - slug: per_capita
+        name: Per capita
+      - slug: total
+        name: Total
+      - slug: ''
+        name: ''
+      - slug: share_of_total
+        name: Share of total
+    presentation:
+      type: radio
+  - slug: region
+    name: Region
+    choices:
+      - slug: global
+        name: Global
+      - slug: asia
+        name: Asia
+      - slug: middle_east_and_africa
+        name: Middle East and Africa
+      - slug: latin_america
+        name: Latin America
+      - slug: oecd
+        name: OECD
     presentation:
       type: dropdown
 views:

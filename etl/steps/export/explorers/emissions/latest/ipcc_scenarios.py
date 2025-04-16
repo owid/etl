@@ -14,12 +14,7 @@ def run() -> None:
     config = paths.load_explorer_config()
 
     # Add annotations to all columns
-    # TODO: can we use common_views for this?
     for view in config["views"]:
-        y = view["indicators"]["y"][0]
-        if "display" in y:
-            y["display"]["annotationsColumnSlug"] = "annotation"
-
         if view["dimensions"]["metric"] in ("primary_energy", "secondary_energy", "final_energy"):
             view["config"]["relatedQuestionUrl"] = "https://ourworldindata.org/energy-definitions"
             view["config"]["relatedQuestionText"] = (

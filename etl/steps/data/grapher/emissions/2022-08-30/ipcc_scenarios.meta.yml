@@ -1,3 +1,34 @@
+definitions:
+  common:
+    display:
+      entityAnnotationsMap: |-
+        SSP1 - 1.9: Sustainability - Taking the Green Road
+        SSP1 - 2.6: Sustainability - Taking the Green Road
+        SSP1 - 3.4: Sustainability - Taking the Green Road
+        SSP1 - 4.5: Sustainability - Taking the Green Road
+        SSP1 - Baseline: Sustainability - Taking the Green Road
+        SSP2 - 1.9: Middle of the Road
+        SSP2 - 2.6: Middle of the Road
+        SSP2 - 3.4: Middle of the Road
+        SSP2 - 4.5: Middle of the Road
+        SSP2 - 6.0: Middle of the Road
+        SSP2 - Baseline: Middle of the Road
+        SSP3 - 3.4: Regional Rivalry - A Rocky Road
+        SSP3 - 4.5: Regional Rivalry - A Rocky Road
+        SSP3 - 6.0: Regional Rivalry - A Rocky Road
+        SSP3 - Baseline: Regional Rivalry - A Rocky Road
+        SSP4 - 2.6: Inequality - A Road Divided
+        SSP4 - 3.4: Inequality - A Road Divided
+        SSP4 - 4.5: Inequality - A Road Divided
+        SSP4 - 6.0: Inequality - A Road Divided
+        SSP4 - Baseline: Inequality - A Road Divided
+        SSP5 - 1.9: Fossil-fueled Development - Taking the Highway
+        SSP5 - 2.6: Fossil-fueled Development - Taking the Highway
+        SSP5 - 3.4: Fossil-fueled Development - Taking the Highway
+        SSP5 - 4.5: Fossil-fueled Development - Taking the Highway
+        SSP5 - 6.0: Fossil-fueled Development - Taking the Highway
+        SSP5 - Baseline: Fossil-fueled Development - Taking the Highway
+
 tables:
   ipcc_scenarios:
     variables:
