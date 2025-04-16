@@ -105,21 +105,52 @@ tables:
       food_beverages:
         title: US consumer price index for food & beverages
         description_from_producer: "Food and beverages in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAF)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s food and beverages category tracks out-of-pocket expenses for a wide range of food items and nonalcoholic beverages, both for consumption at home and away from home.
+          - It reflects actual prices paid by consumers, excluding any discounts, subsidies, or assistance programs.
+          - The category encompasses various subgroups, including cereals, meats, dairy products, fruits and vegetables, nonalcoholic beverages, and other food items.
+          - Food consumed away from home, such as meals at restaurants or cafeterias, is also included, capturing the full scope of consumer food expenditures.
+          - Seasonal variations and regional price differences are accounted for through monthly data collection across diverse geographic areas.
+          - Most price changes are treated as direct inflation, with limited adjustments for changes in food quality or preparation.
+          - This category provides insight into how fluctuations in food prices impact household budgets and contribute to overall inflation trends.
+          - *cpi_base_1982_84
         unit: ""
 
       public_transport:
         title: US consumer price index for public transport
         description_from_producer: "Public transportation in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SETG)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s public transportation category captures out-of-pocket expenses for mass transit services used by consumers.
+          - It includes services such as intercity train travel (e.g., Amtrak), intercity bus services, and mass transit systems like subways, local buses, and commuter rail.
+          - These codes cover regular, scheduled transit options that operate on fixed routes and timetables.
+          - Airline fares are not included here; they fall under a separate CPI category.
+          - Prices reflect actual fares paid — including single tickets, transit passes, and monthly cards — and exclude subsidies or employer-sponsored commuter benefits.
+          - The CPI collects data monthly across regions, accounting for fare increases, service changes, and seasonal fluctuations in transit usage.
+          - Most price changes are treated as direct inflation, though adjustments for service quality (like frequency or coverage) are rare.
+          - This category helps track how urban and regional transportation costs influence consumer budgets and inflation trends, especially for commuting households.
+          - *cpi_base_1982_84
         unit: ""
 
       new_cars:
         title: US consumer price index for new cars
         description_from_producer: "New cars in U.S. city average, all urban consumers, not seasonally adjusted (CUUS0000SS45011)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s new cars index measures prices paid by consumers for newly purchased passenger cars, excluding trucks, SUVs, and fleet vehicles.
+          - It includes categories like subcompact, compact, intermediate, full-size, sporty, and luxury cars, based on vehicle classifications defined by the Environmental Protection Agency (EPA).
+          - Prices are sourced from J.D. Power transaction data, reflecting actual dealership sales across the U.S.
+          - A blend of month-to-month price comparisons and year-over-year trends is used to track both short- and long-term inflation.
+          - When models change between years, quality adjustments are made for added features like improved safety or fuel efficiency.
+          - The index helps capture how market trends and vehicle upgrades affect the cost of new cars for consumers.
+          - *cpi_base_1982_84
         unit: ""
 
       clothing:
         title: US consumer price index for clothing
         description_from_producer: "Apparel in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAA)"
+
         unit: ""
 
       software:
@@ -135,9 +166,25 @@ tables:
       televisions:
         title: US consumer price index for televisions
         description_from_producer: "Televisions in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SERA01)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s television item tracks prices for non-portable TVs with built-in tuners, including models with DVD players, stands, or separate speakers.
+          - TVs are included only if individually priced, even when part of a component system.
+          - Portable TVs and computer monitors are excluded and tracked separately.
+          - Prices reflect actual consumer purchases, with adjustments for quality improvements like resolution and smart features.
+          - The item captures how technological changes and market trends impact TV prices over time.
+          - *cpi_base_1982_84
         unit: ""
 
       all_items:
         title: US consumer price index for all items
         description_from_producer: "All items in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SA0)"
+        description_key:
+          - *cpi_desc
+          - The all items CPI provides a comprehensive measure of the average change over time in prices paid by urban consumers for a broad basket of goods and services.
+          - It encompasses categories such as food, housing, apparel, transportation, medical care, recreation, education, and communication.
+          - Prices are collected monthly from a wide array of retail and service establishments across the U.S.
+          - The index serves as a key indicator of inflation, reflecting the overall cost of living for consumers.
+          - It is widely used for economic analysis, policy-making, and adjusting income payments for inflation.​
+          - *cpi_base_1982_84
         unit: ""
