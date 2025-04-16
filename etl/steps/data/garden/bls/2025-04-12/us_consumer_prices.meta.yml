@@ -4,7 +4,7 @@ definitions:
       topic_tags:
         - Economic Growth
   cpi_desc: &cpi_desc |-
-    The Consumer Price Index (CPI) measures inflation — how the average prices of goods and services change over time. It shows how much more (or less) people are paying for things like food, housing, transport, and health care.
+    The Consumer Price Index (CPI) measures inflation — how the average prices of goods and services change over time.
 
   cpi_base_1982_84: &cpi_base_1982_84 |-
     The index uses a base period of 1982–84, which is set to 100. Later values show how much prices have changed since then.
