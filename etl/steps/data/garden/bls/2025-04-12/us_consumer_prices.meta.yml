@@ -3,6 +3,8 @@ definitions:
     presentation:
       topic_tags:
         - Economic Growth
+    display:
+      numDecimalPlaces: 1
   cpi_desc: &cpi_desc |-
     The Consumer Price Index (CPI) measures inflation — how the average prices of goods and services change over time.
 
