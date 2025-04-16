@@ -223,12 +223,14 @@ def main():
 
     with col1:
         st.subheader("Production Explorer")
-        explorer_chart(base_url="https://ourworldindata.org/explorers", **kwargs)
+        # explorer_chart(base_url="https://ourworldindata.org/explorers", **kwargs)
+        explorer_chart(base_url="https://admin.owid.io/admin/explorers/preview", **kwargs)
 
     with col2:
         st.subheader("Staging Explorer")
         assert OWID_ENV.site
-        explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
+        # explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
+        explorer_chart(base_url=OWID_ENV.site + "/admin/explorers/preview", **kwargs)
 
     # Helper function to load explorer data
     def load_explorer_data(engine, columns):

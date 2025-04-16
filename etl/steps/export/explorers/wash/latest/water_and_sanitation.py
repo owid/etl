@@ -13,6 +13,11 @@ def run() -> None:
     # Load grapher config from YAML
     config = paths.load_explorer_config()
 
+    # Set equal size color bins
+    for view in config["views"]:
+        for y in view["indicators"]["y"]:
+            y["display"]["colorScaleEqualSizeBins"] = True
+
     # Create explorer
     explorer = paths.create_explorer(config=config, explorer_name="water-and-sanitation")
 
