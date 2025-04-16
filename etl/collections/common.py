@@ -1,7 +1,7 @@
 """Common tooling for MDIMs/Explorers."""
 
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Literal, Optional, Union
+from typing import Any, Callable, Dict, List, Literal, Optional, Set, Union
 
 import pandas as pd
 from owid.catalog import Table
@@ -20,6 +20,10 @@ from etl.config import OWID_ENV, OWIDEnv
 log = get_logger()
 
 INDICATORS_SLUG = "indicator"
+
+
+# Slugs of dimensions that should be ignored, because they are protected in Grapher.
+GRAPHER_PROTECTED_DIMENSIONS = ("country", "year", "date")
 
 
 def validate_collection_config(collection: Collection, engine: Engine, tolerate_extra_indicators: bool) -> None:
@@ -295,6 +299,32 @@ def expand_config(
     return config_partial
 
 
+def get_dimension_slugs_from_table(tb: Table) -> Set[str]:
+    # Get data columns from table, ignoring index.
+    columns = [column for column in tb.columns if column not in tb.metadata.primary_key]
+    # Get dimensions from all columns in table.
+    column_dimensions = set([tuple(tb[column].metadata.dimensions) for column in columns])
+    error = f"Different sets of dimensions found within table {tb.metadata.short_name}:\n{column_dimensions}"
+    assert len(column_dimensions) == 1, error
+    dimension_slugs = set(list(column_dimensions)[0])
+    # If the table itself also has dimensions, check that they agree with dimensions extracted from columns.
+    if tb.metadata.dimensions is not None:
+        # NOTE: The following warning may not be necessary, and we may decide to remove it.
+        # I think dimensions at the table level may not be useful (only dimensions at the column level are useful).
+        table_dimension_slugs = [
+            dimension["slug"]
+            for dimension in tb.metadata.dimensions
+            if dimension["slug"] not in GRAPHER_PROTECTED_DIMENSIONS
+        ]
+        # Warn if dimensions inferred from columns differ from table dimensions.
+        if dimension_slugs != set(table_dimension_slugs):
+            log.warning(
+                f"(minor) Dimension slugs defined in table {tb.metadata.short_name} ({table_dimension_slugs}) differ from dimensions extracted from table columns ({dimension_slugs})."
+            )
+
+    return dimension_slugs
+
+
 ####################################################################################################
 # Config auto-expander: Expand configuration from a table. This config is partial!
 ####################################################################################################
@@ -310,16 +340,21 @@ class CollectionConfigExpander:
         self.indicators_slug = indicators_slug
         self.indicator_as_dimension = indicator_as_dimension
         self.expand_path_mode = expand_path_mode
-        # Reference table
-        # TODO: Not sure if this is necessary. I'll keep it just in case.
-        self.tb = tbs[0]
 
         # Merge declared dimensions across all tables (excluding country/year/date)
         seen_slugs = set()
         self.tb_dims = []
+        # Normally, dimensions should be consistent across all columns in a table.
+        # * Warn if that's not the case.
+        # * Warn if dimensions are not consistent across all tables.
+        # Expected dimensions across all columns and tables.
+        expected_dims = get_dimension_slugs_from_table(tb=tbs[0])
         for tb in tbs:
+            _tb_dims = get_dimension_slugs_from_table(tb=tb)
+            if _tb_dims != expected_dims:
+                log.warning(f"Inconsistent dimensions across tables.\nExpected: {expected_dims}\nFound: {_tb_dims}")
             for d in tb.m.dimensions or []:
-                if d["slug"] not in ("country", "year", "date") and d["slug"] not in seen_slugs:
+                if d["slug"] not in GRAPHER_PROTECTED_DIMENSIONS and d["slug"] not in seen_slugs:
                     self.tb_dims.append(d)
                     seen_slugs.add(d["slug"])
 
