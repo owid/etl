@@ -405,7 +405,6 @@ tables:
           Indicator name: `v2x_delibdem`
         unit: ''
 
-
       ## 2.1.5 Egalitarian democracy index
       egaldem_vdem:
         title: |-
@@ -900,7 +899,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which major civil society organizations are routinely consulted by policymakers, how many people are involved in them, women can participate, and candidate nomination for the legislature within parties is decentralized or made through primaries.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Civil society participation index
         description_from_producer: |-
           Question: Are major CSOs routinely consulted by policymakers; how large is the involvement of people in CSOs; are women prevented from participating; and is legislative candidate nomination within party organization highly decentralized or made through party primaries?
@@ -922,7 +921,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites acknowledge and respect counterarguments when considering important policy changes.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Respect for counterarguments
         description_from_producer: |-
           Question: When important policy changes are being considered, to what extent do political elites acknowledge and respect counterarguments?
@@ -947,7 +946,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Deliberative political institutions index
         description_from_producer: |-
           Question: To what extent is the deliberative principle of democracy achieved?
@@ -1153,7 +1152,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites justify their views with the common good for society, either the greatest good for the greatest number of people or as helping the least advantaged people in society when considering important policy changes.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Common good justifications
         description_from_producer: |-
           Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
@@ -1176,7 +1175,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which political elites provide complex, nuanced, and complete justifications for their views when considering important policy changes.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Justified political positions
         description_from_producer: |-
           Question: When important policy changes are being considered, i.e. before a decision has been made, to what extent do political elites give public and reasoned justifications for their positions?
@@ -1199,7 +1198,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which the legislature, including opposition parties, questions executive officials and oversees and investigates the executive.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Legislative constraints on the executive index
         description_from_producer: |-
           Question: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
@@ -1217,7 +1216,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent of individual and minority rights, equality before the law, and executive constraints.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Liberal component index
         description_from_producer: &description_prod_lib_vdem |-
           Question: To what extent is the liberal principle of democracy achieved?
@@ -1236,7 +1235,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which elected local governments exist, and they operate without interference from local unelected bodies.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Elected local governments
         description_from_producer: |-
           Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
@@ -1254,7 +1253,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Participatory political institutions
         description_from_producer: |-
           Question: To what extent is the participatory principle achieved?
@@ -1273,7 +1272,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which elected regional governments exist, and they operate without interference from regional unelected bodies.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Elected regional governments
         description_from_producer: |-
           Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
@@ -1291,7 +1290,7 @@ tables:
         description_short: |-
           << estimate.title() >> estimate of the extent to which ordinary people independently discuss important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
         presentation:
-          <<: *common_ppt_2
+          <<: *common_ppt
           title_public: Engaged society
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide and how independent are public deliberations?
