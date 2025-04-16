@@ -169,7 +169,10 @@ tables:
         title: Voter turnout of registered voters
         description_short: |-
           Denotes the voter turnout as a share of all registered voters in the national election according to official results.
-
+        description_key:
+          - Measures the percentage of registered voters who cast a ballot in national elections, based on official results.
+          - Reported as a continuous percentage; higher values indicate greater voter participation.
+          - Data sourced from IPU, IFES, IDEA, and various electoral databases.
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
@@ -464,7 +467,7 @@ tables:
           Indicator name: `v2lgcrrpt`
         unit: ""
 
-      ## 3.5.3.7 Lower chamber female legislators
+      ## 3.6.3.7 Lower chamber female legislators
       wom_parl_vdem:
         title: |-
           Lower chamber female legislators (aggregate: << aggregate_method >>)
@@ -477,6 +480,10 @@ tables:
             <%- if aggregate_method != 'average' -%>
             (aggregate: << aggregate_method >>)
             <%- endif -%>
+        description_key:
+          - Measures the percentage of female members in the lower (or unicameral) chamber of the national legislature.
+          - Values are expressed as a percentage; higher values indicate greater gender representation.
+          - Data is compiled from authoritative sources like the Inter-Parliamentary Union and is cleaned to exclude non-bicameral systems.
         description_from_producer: |-
           Question: What percentage (%) of the lower (or unicameral) chamber of the legislature is female?
 
@@ -889,6 +896,10 @@ tables:
         presentation:
           <<: *common_ppt
           title_public: Rule of Law index
+        description_key:
+          - Measures how well laws are enforced transparently, impartially, independently, predictably, and equally.
+          - Includes indicators such as judicial independence, compliance with courts, public sector corruption, and access to justice.
+          - Higher values (0–1 scale) indicate stronger adherence to the rule of law.
         description_from_producer: |-
           Question: To what extent are laws transparently, independently, predictably, impartially, and equally enforced, and to what extent do the actions of government officials comply with the law?
 
@@ -1131,6 +1142,10 @@ tables:
         presentation:
           title_public: Free and fair elections index
           <<: *common_ppt_2
+        description_key:
+          - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
+          - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
+          - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
         description_from_producer: |-
           Question: To what extent are elections free and fair?
 
