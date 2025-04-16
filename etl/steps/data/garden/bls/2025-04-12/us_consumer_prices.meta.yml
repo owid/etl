@@ -106,7 +106,6 @@ tables:
           - *cpi_desc
           - The CPI’s housing category encompasses out-of-pocket expenses related to shelter and household operations, including rent, owners’ equivalent rent, utilities, and household furnishings.​
           - It reflects the prices consumers actually pay, excluding mortgage interest, home purchase prices, or housing subsidies.​
-          - Shelter costs—such as rent of primary residence and owners’ equivalent rent—constitute a significant portion of the CPI due to their substantial impact on household budgets.​
           - While adjustments are made for changes in housing quality (e.g., renovations or added amenities), most price changes are treated as direct inflation.​
           - This category is a major driver of core inflation and provides insights into long-term cost-of-living trends.​
           - *cpi_base_1982_84
@@ -145,7 +144,6 @@ tables:
           - The CPI’s new cars index measures prices paid by consumers for newly purchased passenger cars, excluding trucks, SUVs, and fleet vehicles.
           - It includes categories like subcompact, compact, intermediate, full-size, sporty, and luxury cars, based on vehicle classifications defined by the Environmental Protection Agency (EPA).
           - Prices are sourced from J.D. Power transaction data, reflecting actual dealership sales across the U.S.
-          - A blend of month-to-month price comparisons and year-over-year trends is used to track both short- and long-term inflation.
           - When models change between years, quality adjustments are made for added features like improved safety or fuel efficiency.
           - The index helps capture how market trends and vehicle upgrades affect the cost of new cars for consumers.
           - *cpi_base_1982_84
