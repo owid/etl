@@ -223,12 +223,14 @@ def main():
 
     with col1:
         st.subheader("Production Explorer")
+        # This is the non-preview version of an explorer
         explorer_chart(base_url="https://ourworldindata.org/explorers", **kwargs)
 
     with col2:
         st.subheader("Staging Explorer")
         assert OWID_ENV.site
-        explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
+        # Show preview from a staging server to see changes instantly
+        explorer_chart(base_url=OWID_ENV.site + "/admin/explorers/preview", **kwargs)
 
     # Helper function to load explorer data
     def load_explorer_data(engine, columns):
