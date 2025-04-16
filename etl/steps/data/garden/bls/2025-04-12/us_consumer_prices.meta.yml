@@ -84,7 +84,6 @@ tables:
           title_public: Medical care (US consumer price index)
         display:
           name: Medical care
-          numDecimalPlaces: 0
 
       household_energy:
         title: US consumer price index for household energy
