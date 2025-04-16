@@ -1,9 +1,12 @@
 """Step that pushes the global-food explorer (tsv content) to DB, to create the global-food (indicator-based) explorer."""
 
+from copy import deepcopy
+from typing import Any, Callable, Dict, Optional
+
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
-from etl.collections.explorer import expand_config
+from etl.collections.explorer import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
 
 # Initialize log.
@@ -370,7 +373,7 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
                 "unit": underscore(unit, validate=False),
                 "per_capita": True if ("pc" in element_code) or ("pe" in element_code) else False,
             }
-            tb[column].metadata.original_short_name = column
+            tb[column].metadata.original_short_name = "value"
         else:
             columns_to_drop.append(column)
 
@@ -378,6 +381,80 @@ def prepare_table_with_dimensions(tb, item_codes, element_codes):
     tb = tb.drop(columns=columns_to_drop)
 
     return tb
+
+
+def _humanize_dimension_names(dimension, transformation, replacements):
+    for field, value in dimension.items():
+        if field == "name":
+            if value in replacements:
+                dimension["name"] = replacements[value]
+            else:
+                dimension["name"] = transformation(value)
+        if field == "choices":
+            for choice in value:
+                _humanize_dimension_names(choice, transformation=transformation, replacements=replacements)
+
+
+def default_slug_name_transformation(slug):
+    """Default transformation of machine-readable slugs, e.g. "area_harvested", into human-readable dimension names, e.g. "Area harvested"."""
+    return slug.replace("__", ", ").replace("_", " ").capitalize()
+
+
+def humanize_dimension_names_in_config(
+    config: Dict[str, Any],
+    transformation: Optional[Callable[[str], str]] = None,
+    replacements: Optional[Dict[str, str]] = None,
+) -> Dict[str, Any]:
+    """Transform all machine-readable slugs, e.g. "area_harvested" into human-readable names, e.g. "Area harvested"."""
+    if transformation is None:
+        transformation = default_slug_name_transformation
+
+    if replacements is None:
+        replacements = dict()
+
+    config_new = deepcopy(config)
+    for dimension in config_new["dimensions"]:
+        _humanize_dimension_names(dimension, transformation=transformation, replacements=replacements)
+
+    return config_new
+
+
+def append_to_config(config, tb):
+    table_config = expand_config(
+        tb=tb,
+        dimensions=["item", "metric", "unit", "per_capita"],
+        common_view_config={"tab": "map"},
+    )
+    config = deepcopy(config)
+
+    # Append dimensions to config.
+    if "dimensions" not in config:
+        config["dimensions"] = table_config["dimensions"]
+    else:
+        config["dimensions"] = combine_config_dimensions(config["dimensions"], table_config["dimensions"])
+
+    # Append views to existing config.
+    if "views" not in config:
+        config["views"] = table_config["views"]
+    else:
+        config["views"] += table_config["views"]
+
+    return config
+
+
+def set_default_view(config, default_view):
+    _default_view_set = False
+    for view in config["views"]:
+        if view["dimensions"] == default_view:
+            # NOTE: A copy seems to be necessary, otherwise all common configs will be modified to have a default view.
+            view["config"] = deepcopy(view.get("config", {}))
+            view["config"]["defaultView"] = True
+            _default_view_set = True
+            break
+    if not _default_view_set:
+        log.warning("Default view not found.")
+
+    return config
 
 
 def run():
@@ -402,20 +479,14 @@ def run():
     tb_qcl = prepare_table_with_dimensions(tb=tb_qcl, item_codes=ITEM_CODES_QCL, element_codes=ELEMENT_CODES_QCL)
     tb_fbsc = prepare_table_with_dimensions(tb=tb_fbsc, item_codes=ITEM_CODES_FBSC, element_codes=ELEMENT_CODES_FBSC)
 
-    # Expand configuration to get all dimensions and views from tables.
-    config_new = expand_config(
-        [tb_qcl, tb_fbsc],
-        default_view={
-            "item": "maize",
-            "metric": "production",
-            "unit": "",
-            "per_capita": "False",
-        },
-        humanize_dimension_names=True,
-        common_view_config={"tab": "map"},
-        dimension_names_transformation=lambda slug: slug.replace("__", ", ").replace("_", " ").capitalize(),
-        # Add a few replacements for special cases.
-        dimension_names_replacements={
+    # Append dimensions and views from QCL and FBSC to config.
+    config = append_to_config(config=config, tb=tb_qcl)
+    config = append_to_config(config=config, tb=tb_fbsc)
+
+    # Improve names of certain dimensions and choices.
+    config = humanize_dimension_names_in_config(
+        config=config,
+        replacements={
             "item": "Food",
             "maize": "Maize (corn)",
             "maize_oil": "Maize (corn) oil",
@@ -432,8 +503,17 @@ def run():
             "total": "All food",
         },
     )
-    config["dimensions"] = config_new["dimensions"]
-    config["views"] = config_new["views"]
+
+    # Set defalt view.
+    config = set_default_view(
+        config=config,
+        default_view={
+            "item": "maize",
+            "metric": "production",
+            "unit": "",
+            "per_capita": "False",
+        },
+    )
 
     # Sort food and metric elements in the dropdown alphabetically.
     for dropdown_i in [0, 1]:
