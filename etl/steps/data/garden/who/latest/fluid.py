@@ -67,11 +67,9 @@ def clean_sari_inpatient(df: pd.DataFrame) -> pd.DataFrame:
     """
     Removing rows where the number of SARI cases is below the number of inpatients, I don't think this should be possible.
     """
-    remove_inpatients = df["inpatients"][(df["case_info"] == "SARI") & (df["reported_cases"] > df["inpatients"])].shape[
-        0
-    ]
+    remove_inpatients = (df["sari_case"] > df["sari_inpatients"]).sum()
     log.info(f"Removing {remove_inpatients} rows where the number of inpatients is below the number of SARI cases...")
-    df["inpatients"][(df["case_info"] == "SARI") & (df["reported_cases"] > df["inpatients"])] = np.nan
+    df["sari_inpatients"][(df["sari_case"] > df["sari_inpatients"])] = np.nan
 
     return df
 
@@ -84,11 +82,11 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     * Drop unwanted columns
     * Drop rows where reported cases = 0
     """
-
-    df = df.query("agegroup_code == 'ALL' & case_info.isin(['ILI', 'SARI', 'ARI','SARI_ICU' ,'SARI_DEATHS'])")
+    df = df[df["agegroup_code"] == "All"]
+    # df = df.query("agegroup_code == 'ALL' & case_info.isin(['ILI', 'SARI', 'ARI','SARI_ICU' ,'SARI_DEATHS'])")
     df["date"] = pd.to_datetime(df["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
     # At time of creation the source type was not used in FluID, but it is used in FluNET to identify Sentinel sites
-    assert df.origin_source.unique() == ["NOTDEFINED"]
+    # assert df.origin_source.unique() == ["NOTDEFINED"]
 
     df = df.drop(
         columns=[
@@ -98,51 +96,52 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "country_code",
             "iso_week",
             "iso_weekstartdate",
-            "iso_year",
+            # "iso_year",
             "mmwr_weekstartdate",
             "mmwr_year",
             "mmwr_week",
             "agegroup_code",
-            "pop_cov",
-            "inf_tested",
-            "inf_pos",
-            "inf_neg",
-            "inf_a",
-            "inf_b",
-            "inf_mixed",
-            "ah1",
-            "ah1n12009",
-            "ah3",
-            "ah5",
-            "ah7",
-            "anotsubtyped",
-            "aothertypes",
-            "byamagata",
-            "bvictoria",
-            "bnotdetermined",
-            "other",
-            "rsv",
-            "adeno",
-            "parainfluenza",
-            "inf_risk",
+            # "pop_cov",
+            # "inf_tested",
+            # "inf_pos",
+            # "inf_neg",
+            # "inf_a",
+            # "inf_b",
+            # "inf_mixed",
+            # "ah1",
+            # "ah1n12009",
+            # "ah3",
+            # "ah5",
+            # "ah7",
+            # "anotsubtyped",
+            # "aothertypes",
+            # "byamagata",
+            # "bvictoria",
+            # "bnotdetermined",
+            # "other",
+            # "rsv",
+            # "adeno",
+            # "parainfluenza",
+            # "inf_risk",
             "geospread",
             "impact",
             "intensity",
             "trend",
-            "nb_sites",
-            "mortality_all",
-            "mortality_pni",
-            "iso2",
+            # "nb_sites",
+            # "mortality_all",
+            # "mortality_pni",
+            # "iso2",
             "isoyw",
             "mmwryw",
-            "iso2",
-            "isoyw",
-            "mmwryw",
-            "origin_source",
+            # "origin_source",
+            ### adding these in APR 2025
+            "pneu_case",
+            "pneu_inpatients",
+            "pneu_pop_cov",
         ]
     )
 
-    df = df.dropna(subset=["reported_cases"])
+    # df = df.dropna(subset=["reported_cases"])
     df = clean_sari_inpatient(df)
     return df
 
