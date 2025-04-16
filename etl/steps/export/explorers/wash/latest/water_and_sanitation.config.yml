@@ -41,17 +41,6 @@ dimensions:
         name: Handwashing facilities
     presentation:
       type: radio
-  - slug: residence
-    name: Residence
-    choices:
-      - slug: total
-        name: Total
-      - slug: urban
-        name: Urban
-      - slug: rural
-        name: Rural
-    presentation:
-      type: radio
   - slug: level_of_use_access
     name: Level of Use/Access
     choices:
@@ -69,6 +58,17 @@ dimensions:
         name: Improved
     presentation:
       type: dropdown
+  - slug: residence
+    name: Residence
+    choices:
+      - slug: total
+        name: Total
+      - slug: urban
+        name: Urban
+      - slug: rural
+        name: Rural
+    presentation:
+      type: radio
   - slug: relative_to_population
     name: Relative to population
     choices:
