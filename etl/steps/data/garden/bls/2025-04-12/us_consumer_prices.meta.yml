@@ -48,7 +48,6 @@ tables:
           title_public: Education (US consumer price index)
         display:
           name: Education
-          numDecimalPlaces: 0
 
       tuition_fees_childcare:
         title: US consumer price index for tuition, school fees, childcare
@@ -65,7 +64,6 @@ tables:
           title_public: Tuition, school fees, childcare (US consumer price index)
         display:
           name: Tuition, other school fees, and childcare
-          numDecimalPlaces: 0
 
       medical_care:
         title: US consumer price index for medical care
@@ -98,6 +96,10 @@ tables:
           - This category helps illustrate how energy price volatility impacts household budgets and is a critical driver of short-term inflation movements.
           - *cpi_base_1982_84
         unit: ""
+        presentation:
+          title_public: Household energy (US consumer price index)
+        display:
+          name: Household energy
 
       housing:
         title: US consumer price index for housing
@@ -110,6 +112,10 @@ tables:
           - This category is a major driver of core inflation and provides insights into long-term cost-of-living trends.​
           - *cpi_base_1982_84
         unit: ""
+        presentation:
+          title_public: Housing (US consumer price index)
+        display:
+          name: Housing
 
       food_beverages:
         title: US consumer price index for food & beverages
@@ -121,6 +127,10 @@ tables:
           - Food and non-alcholic beverages consumed away from home, such as meals at restaurants or cafeterias, are not included. But alcoholic beverages consumed away from home are included.
           - *cpi_base_1982_84
         unit: ""
+        presentation:
+          title_public: Food and beverages (US consumer price index)
+        display:
+          name: Food and beverages
 
       public_transport:
         title: US consumer price index for public transport
