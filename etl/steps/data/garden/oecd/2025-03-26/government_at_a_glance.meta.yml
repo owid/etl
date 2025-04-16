@@ -89,12 +89,17 @@ definitions:
     This data is divided by total government expenditure on the same function, expressed as a percentage.
     <%- endif %>
 
-  short_description_function:
+  short_description_function: |-
     <% if function == "Total" %>
     General government expenditure on all functions.
+    <% elif function_subcategory != "Total" %>
+    General government expenditure on <<function.lower()>>, subcategory _<<function_subcategory>>_.
     <%- else %>
-    General government expenditure on <<function>> (<<function_subcategory>>).
+    General government expenditure on <<function.lower()>>.
     <%- endif %>
+
+  short_description_function_subcategory: |-
+    <
 
   num_decimal_places: |-
     <% if unit == "ppp" %>
@@ -674,10 +679,10 @@ tables:
         short_unit: "{definitions.short_unit}"
         description_short: "{definitions.short_description_function} {definitions.short_description_unit}"
         description_key:
-          - "{definitions.key_government_expenditure}"
-          - "{definitions.key_cofog}"
           - "{definitions.key_function}"
           - "{definitions.key_function_subcategory}"
+          - "{definitions.key_government_expenditure}"
+          - "{definitions.key_cofog}"
           - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditure}"
         display:
