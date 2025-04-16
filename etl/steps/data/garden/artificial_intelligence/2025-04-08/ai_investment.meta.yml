@@ -123,4 +123,4 @@ tables:
         description_key:
           - Quid tracks information on over 8 million companies worldwide, updated weekly using data from Capital IQ and Crunchbase.
           - AI companies are identified using keyword searches in company descriptions and websites.
-          - The data focuses on AI and machine learning companies that raised over $1.5 million between 2014 and 2024 (not adjusted for inflation).
+          - The data focuses on AI and machine learning companies that raised over $1.5 million between 2013 and 2024 (not adjusted for inflation).
