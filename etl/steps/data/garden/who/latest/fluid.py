@@ -83,10 +83,7 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     * Drop rows where reported cases = 0
     """
     df = df[df["agegroup_code"] == "All"]
-    # df = df.query("agegroup_code == 'ALL' & case_info.isin(['ILI', 'SARI', 'ARI','SARI_ICU' ,'SARI_DEATHS'])")
     df["date"] = pd.to_datetime(df["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
-    # At time of creation the source type was not used in FluID, but it is used in FluNET to identify Sentinel sites
-    # assert df.origin_source.unique() == ["NOTDEFINED"]
 
     df = df.drop(
         columns=[
@@ -111,6 +108,13 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "pneu_case",
             "pneu_inpatients",
             "pneu_pop_cov",
+            "ili_pop_cov",
+            "sari_pop_cov",
+            "ari_pop_cov",
+            "ili_nb_sites",
+            "sari_nb_sites",
+            "ari_nb_sites",
+            "pneu_nb_sites",
         ]
     )
 
@@ -120,16 +124,7 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def rename_fluid(df: pd.DataFrame) -> pd.DataFrame:
-    # drop spurious duplicates
-    # df = df.drop_duplicates()
-    # df_piv = df.pivot(
-    #    index=["country", "hemisphere", "date"],
-    #    columns=["case_info"],
-    #    values=["reported_cases", "outpatients", "inpatients"],
-    # ).reset_index()
-
-    # df_piv.columns = list(map("".join, df_piv.columns))
-
+    # Just to make life a bit easier
     df = df.rename(
         columns={
             "sari_case": "reported_sari_cases",
@@ -142,18 +137,6 @@ def rename_fluid(df: pd.DataFrame) -> pd.DataFrame:
         },
         errors="raise",
     )
-    df = df.drop(
-        columns=[
-            "ili_pop_cov",
-            "sari_pop_cov",
-            "ari_pop_cov",
-            "ili_nb_sites",
-            "sari_nb_sites",
-            "ari_nb_sites",
-            "pneu_nb_sites",
-        ]
-    )
-
     return df
 
 
@@ -259,14 +242,6 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
         "date",
         "hemisphere",
         "year",
-        # "ah5COMBINED",
-        # "ah5NONSENTINEL",
-        # "ah5NOTDEFINED",
-        # "ah5SENTINEL",
-        # "ah7n9COMBINED",
-        # "ah7n9NONSENTINEL",
-        # "ah7n9NOTDEFINED",
-        # "ah7n9SENTINEL",
     ]
     cols = df.columns.difference(constant_cols)
     current_year = datetime.today().year
