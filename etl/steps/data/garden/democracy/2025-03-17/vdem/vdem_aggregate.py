@@ -117,23 +117,40 @@ INDICATORS_REGION_AVERAGES = [[f"{ind_name}{dim}" for dim in ["", "_low", "_high
 INDICATORS_REGION_AVERAGES = list(chain.from_iterable(INDICATORS_REGION_AVERAGES)) + ["wom_parl_vdem"]
 
 
-def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table, Table, Table, Table]:
+def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table, Table, Table, Table, Table]:
+    tb_ = tb.copy()
+
     # Create table with sums and averages
-    tb_countries_counts, tb_countries_avg = make_table_countries(tb, ds_regions)
+    tb_countries_counts, tb_countries_avg = make_table_countries(tb_, ds_regions)
 
     # Create table with population-weighted averages
-    tb_population_counts, tb_population_avg = make_table_population(tb, ds_regions, ds_population=ds_population)
+    tb_population_counts, tb_population_avg = make_table_population(tb_, ds_regions, ds_population=ds_population)
 
     # Consolidate main table with additional regional aggregates
-    tb_uni, tb_multi_without_regions, tb_multi_with_regions = make_main_tables(tb, tb_countries_avg, tb_population_avg)
+    tb_ = tb_.drop(columns=["regime_imputed_country", "regime_imputed", "histname"])
+    tb_uni_without_regions, tb_uni_with_regions, tb_multi_without_regions, tb_multi_with_regions = make_main_tables(
+        tb_, tb_countries_avg, tb_population_avg
+    )
 
     # Only have one origin in tb_multi_with_regions
     origin = tb_multi_with_regions["civ_libs_vdem"].m.origins[0]
     assert origin.producer == "V-Dem", "Assigned origin should be V-Dem!"
     for col in tb_multi_with_regions.columns:
         tb_multi_with_regions[col].metadata.origins = [origin]
+    # Only have one origin in tb_uni_with_regions
+    origin = tb_uni_with_regions["electoff_vdem"].m.origins[0]
+    assert origin.producer == "V-Dem", "Assigned origin should be V-Dem!"
+    for col in tb_uni_with_regions.columns:
+        tb_uni_with_regions[col].metadata.origins = [origin]
 
-    return tb_uni, tb_multi_without_regions, tb_multi_with_regions, tb_countries_counts, tb_population_counts
+    return (
+        tb_uni_without_regions,
+        tb_uni_with_regions,
+        tb_multi_without_regions,
+        tb_multi_with_regions,
+        tb_countries_counts,
+        tb_population_counts,
+    )
 
 
 # %% NUM_COUNTRIES TABLES
@@ -434,7 +451,7 @@ def expand_observations_without_leading_to_duplicates(tb: Table) -> Table:
 
 
 # %% MAIN TABLES
-def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> Tuple[Table, Table, Table]:
+def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> Tuple[Table, Table, Table, Table]:
     """Integrate the indicators from region aggregates and add dimensions to indicators.
 
     This method generates three tables:
@@ -445,7 +462,11 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
 
         Note: We have estimated regional aggregates with two methods: 'simple mean' or 'population-weighted mean'. We add both flavours, and differentiate them with an additional dimension. (see column `aggregate_method`).
     """
-    # Re-shape tables with region averages (WIDE -> LONG)
+    # 1/ Get uni- and multi-dimensional indicator tables
+    ## It puts indicators that have '_low' in the name in the multi-dimensional table. It also formats it into "long format", so to have a new column `estimate`.
+    tb_uni, tb_multi = _split_into_uni_and_multi(tb)
+
+    # 2/ Re-shape tables with region averages (WIDE -> LONG)
     tb_countries_avg = from_wide_to_long(
         tb_countries_avg,
         indicator_name_callback=lambda x: x.replace("_low", "").replace("_high", ""),
@@ -462,26 +483,66 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
         tb_countries_avg
     ), "Columns in tb_population_avg and tb_countries_avg do not match!"
 
-    # Get uni- and multi-dimensional indicator tables
-    tb_uni, tb_multi = _split_into_uni_and_multi(tb)
+    # 3/ Get columns of indicators with region data, based on whether they have estimates (dimension estimate) or not
+    columns_uni = [
+        col
+        for col in tb_uni.columns
+        if (col in tb_countries_avg.columns and col not in {"country", "year", "estimate"})
+    ]
+    columns_multi = [
+        col
+        for col in tb_multi.columns
+        if (col in tb_countries_avg.columns and col not in {"country", "year", "estimate"})
+    ]
 
-    # Split multi-dimensional in two: table with region aggregates, table without
-    columns_index = ["year", "country", "estimate"]
-    cols_multi = [col for col in tb_population_avg.columns if col in tb_multi.columns]
-    tb_multi_with_regions = tb_multi.loc[:, cols_multi].copy()
-    tb_multi_without_regions = tb_multi.drop(columns=[col for col in cols_multi if col not in columns_index]).copy()
+    # 4/ Bake tb_uni_*
+    ## Initiate two tables with and without regions
+    cols_index = ["country", "year"]
+    tb_uni_with_regions = tb_uni.loc[:, cols_index + columns_uni].copy()
+    tb_uni_without_regions = tb_uni.drop(columns=columns_uni).copy()
 
-    # Merge multi-dimensional table with region aggregates.
-    # Since there are two ways of estimating the regional aggregates, we create two versions of the indicators
+    ## Get columns from tb_*_avg tables relevant
+    tb_uni_with_regions["aggregate_method"] = "average"
+    tb_countries_avg_uni = tb_countries_avg.loc[:, cols_index + columns_uni].dropna(subset=columns_uni, how="all")
+    tb_countries_avg_uni["aggregate_method"] = "average"
+    tb_population_avg_uni = tb_population_avg.loc[:, cols_index + columns_uni].dropna(subset=columns_uni, how="all")
+    tb_population_avg_uni["aggregate_method"] = "population-weighted average"
+
+    ## Concatenate and create tb_uni_with_regions
+    tb_uni_with_regions = concat(
+        [
+            tb_uni_with_regions,
+            tb_countries_avg_uni,
+            tb_population_avg_uni,
+        ],
+        ignore_index=True,
+    )
+
+    # 5/ Bake tb_multi_*
+    ## Initiate two tables with and without regions
+    cols_index = ["country", "year", "estimate"]
+    tb_multi_with_regions = tb_multi.loc[:, cols_index + columns_multi].copy()
+    tb_multi_without_regions = tb_multi.drop(columns=columns_multi).copy()
+
+    ## Get columns from tb_*_avg tables relevant
     tb_multi_with_regions["aggregate_method"] = "average"
-    # tb_multi_with_regions_popw = tb_multi_with_regions.copy()
-    # tb_multi_with_regions_popw["aggregate_method"] = "population-weighted average"
-    tb_countries_avg["aggregate_method"] = "average"
-    tb_population_avg["aggregate_method"] = "population-weighted average"
-    # Combine
-    tb_multi_with_regions = concat([tb_multi_with_regions, tb_countries_avg, tb_population_avg], ignore_index=True)
+    tb_countries_avg_multi = tb_countries_avg.loc[:, cols_index + columns_multi].dropna(subset=columns_multi, how="all")
+    tb_countries_avg_multi["aggregate_method"] = "average"
+    tb_population_avg_multi = tb_population_avg.loc[:, cols_index + columns_multi].dropna(
+        subset=columns_multi, how="all"
+    )
+    tb_population_avg_multi["aggregate_method"] = "population-weighted average"
 
-    return tb_uni, tb_multi_without_regions, tb_multi_with_regions
+    ## Concatenate and create tb_uni_with_regions
+    tb_multi_with_regions = concat(
+        [
+            tb_multi_with_regions,
+            tb_countries_avg_multi,
+            tb_population_avg_multi,
+        ],
+        ignore_index=True,
+    )
+    return tb_uni_without_regions, tb_uni_with_regions, tb_multi_without_regions, tb_multi_with_regions
 
 
 def _split_into_uni_and_multi(tb: Table) -> Tuple[Table, Table]:
