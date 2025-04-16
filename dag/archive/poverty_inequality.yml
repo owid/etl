@@ -102,9 +102,9 @@ steps:
     - data://garden/cedlas/2024-03-08/sedlac
 
   # # OECD Income Distribution Database
-  data://meadow/oecd/2025-04-16/income_distribution_database:
-    - snapshot://oecd/2025-04-16/income_distribution_database.csv
-  data://garden/oecd/2025-04-16/income_distribution_database:
-    - data://meadow/oecd/2025-04-16/income_distribution_database
-  data://grapher/oecd/2025-04-16/income_distribution_database:
-    - data://garden/oecd/2025-04-16/income_distribution_database
+  data://meadow/oecd/2024-04-10/income_distribution_database:
+    - snapshot://oecd/2024-04-10/income_distribution_database.csv
+  data://garden/oecd/2024-04-10/income_distribution_database:
+    - data://meadow/oecd/2024-04-10/income_distribution_database
+  data://grapher/oecd/2024-04-10/income_distribution_database:
+    - data://garden/oecd/2024-04-10/income_distribution_database
