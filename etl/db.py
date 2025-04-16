@@ -10,6 +10,7 @@ import structlog
 from deprecated import deprecated
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
+from sqlalchemy.exc import PendingRollbackError
 from sqlalchemy.orm import Session
 
 from etl import config
@@ -76,7 +77,13 @@ def read_sql(sql: str, engine: Optional[Engine | Session] = None, *args, **kwarg
             with engine.connect() as con:
                 return pd.read_sql(sql, con, *args, **kwargs)
         elif isinstance(engine, Session):
-            return pd.read_sql(sql, engine.bind, *args, **kwargs)
+            try:
+                return pd.read_sql(sql, engine.bind, *args, **kwargs)
+            except PendingRollbackError as e:
+                # Rollback and retry
+                log.error("PendingRollbackError occurred", error=str(e))
+                engine.rollback()
+                return pd.read_sql(sql, engine.bind, *args, **kwargs)
         else:
             raise ValueError(f"Unsupported engine type {type(engine)}")
 
