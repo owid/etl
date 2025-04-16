@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from typing import List
+
 import vdem_aggregate as aggregate  # VDEM's aggregating library
 import vdem_clean as clean  # VDEM's cleaning library
 import vdem_impute as impute  # VDEM's imputing library
@@ -102,13 +104,28 @@ def run() -> None:
 
     # %% PART 4: AGGREGATES
     paths.log.info("4/ Aggregating data...")
-    tb_uni, tb_multi_without_regions, tb_multi_with_regions, tb_countries_counts, tb_population_counts = aggregate.run(
-        tb, ds_regions, ds_population
-    )
+    (
+        tb_uni_without_regions,
+        tb_uni_with_regions,
+        tb_multi_without_regions,
+        tb_multi_with_regions,
+        tb_countries_counts,
+        tb_population_counts,
+    ) = aggregate.run(tb, ds_regions, ds_population)
 
     # %% PART 5: Format and prepare tables
     paths.log.info("5/ Formatting tables...")
-    tb_uni = tb_uni.format()
+    tb_meta = tb.loc[:, ["year", "country", "regime_imputed", "regime_imputed_country", "histname"]]
+    tb_meta = tb_meta.format(short_name="metadata")
+
+    tb_uni_without_regions = tb_uni_without_regions.format(
+        keys=["country", "year"],
+        short_name="vdem_uni_without_regions",
+    )
+    tb_uni_with_regions = tb_uni_with_regions.format(
+        keys=["country", "year", "aggregate_method"],
+        short_name="vdem_uni_with_regions",
+    )
     tb_multi_without_regions = tb_multi_without_regions.format(
         keys=["country", "year", "estimate"], short_name="vdem_multi_without_regions"
     )
@@ -123,8 +140,12 @@ def run() -> None:
     )
 
     tables = [
-        # Main indicators (uni-dimensional)
-        tb_uni,  # some have 0 origins
+        # Metadata (former country names, etc.)
+        tb_meta,
+        # Main indicators (uni-dimensional) without regions
+        tb_uni_without_regions,  # some have 0 origins
+        # Main indicators (uni-dimensional) with regions
+        tb_uni_with_regions,
         # Main indicators (multi-dimensional) without regions
         tb_multi_without_regions,
         # Main indicators (multi-dimensional) with regions
@@ -151,7 +172,7 @@ def run() -> None:
     # Save outputs.
     #
     # Tweak citation full for some indicators
-    tb = adjust_citation_full(tb.copy())
+    tables = adjust_citation_full(tables)
 
     # %% Set index
     # tb = tb.format()
@@ -168,11 +189,12 @@ def run() -> None:
 
 
 # %%
-def adjust_citation_full(tb: Table) -> Table:
+def adjust_citation_full(tbs: List[Table]) -> List[Table]:
     """Adjust the citation_full metadata field for some indicators."""
-    tb = replace_citation_full(tb)
-    tb = append_citation_full(tb)
-    return tb
+    for tb in tbs:
+        tb = replace_citation_full(tb)
+        tb = append_citation_full(tb)
+    return tbs
 
 
 def replace_citation_full(tb: Table) -> Table:
@@ -265,7 +287,8 @@ def append_citation_full(tb: Table) -> Table:
     }
     citation_full = {col: citation for col, citation in citation_full.items() if col in tb.columns}
     for indicator_name, citation_additional in citation_full.items():
-        tb[indicator_name].metadata.origins[0].citation_full += f";\n\n{citation_additional}"
+        if indicator_name in tb.columns:
+            tb[indicator_name].metadata.origins[0].citation_full += f";\n\n{citation_additional}"
 
     # Add citation for Luhrmann (at the beginning of the citation full)
     citation_luhrmann = [
@@ -281,7 +304,8 @@ def append_citation_full(tb: Table) -> Table:
     ]
     citation_luhrmann = [col for col in citation_luhrmann if col in tb.columns]
     for indicator_name in citation_luhrmann:
-        tb[indicator_name].metadata.origins[0].citation_full = (
-            f"{CITATION_LUHRMANN};\n\n" + tb[indicator_name].metadata.origins[0].citation_full
-        )
+        if indicator_name in tb.columns:
+            tb[indicator_name].metadata.origins[0].citation_full = (
+                f"{CITATION_LUHRMANN};\n\n" + tb[indicator_name].metadata.origins[0].citation_full
+            )
     return tb

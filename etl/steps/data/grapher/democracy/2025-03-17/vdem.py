@@ -28,7 +28,7 @@ def run() -> None:
     #
     ## Special indicator values renamings
     ## We add labels for these indicators. Otherwise they'd have the value zero (which is correct). Labelling makes them more informative.
-    tables["vdem"] = add_categories_to_counters(tables["vdem"])
+    tables["vdem_uni_without_regions"] = add_categories_to_counters(tables["vdem_uni_without_regions"])
     #
     # Save outputs.
     #
