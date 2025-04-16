@@ -58,10 +58,25 @@ tables:
         short_unit: ''
         description_short: |-
           {definitions.description_short_industrial}
+        description_key:
+          - The use of robots with AI-based software shows how AI is being applied in the real world.
+          - Industrial robots are machines used in factories to automate tasks like welding, assembly, and packaging.
+          - They are defined as automatically controlled, reprogrammable, and multipurpose machines that can move in three or more directions.
+          - Reprogrammable means their functions can be changed through software without altering their physical parts.
+          - Multipurpose means they can be adapted for different tasks with mechanical changes.
+          - Robots are becoming easier to install and more flexible, which means even small production runs can be automated.
+          - Companies use robots to improve product quality, increase speed, reduce waste, and cut costs.
+
       operational_stock:
         title: Total industrial robots in operation
         unit: 'robots'
         short_unit: ''
         description_short: |-
           {definitions.description_short_industrial}
-
+        description_key:
+        - The operational stock of robots refers to the number of robots currently in use.
+        - In Japan, this is measured directly by the Japan Robot Association (JARA).
+        - In other countries, the International Federation of Robotics (IFR) estimates the stock by summing robot installations over the past 12 years. This assumes robots are withdrawn after 12 years of service.
+        - This 12-year assumption may be conservative — a pilot study suggested the average service life could be closer to 15 years.
+        - Tax guidelines in Germany and the US assume shorter lifespans of 5 to 6 years, though these may underestimate actual use due to refurbishment.
+        - The actual service life likely depends on the industry, application, and type of robot. More research is needed to improve these estimates.
