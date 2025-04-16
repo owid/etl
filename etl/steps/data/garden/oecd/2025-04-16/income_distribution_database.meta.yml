@@ -5,6 +5,7 @@ definitions:
     display: &common-display
       tolerance: 5
     presentation:
+      attribution_short: OECD
       topic_tags:
         - Economic Inequality
         - Poverty
@@ -85,8 +86,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: Gini coefficient (disposable income)
         display:
           name: Gini coefficient (disposable income)
           numDecimalPlaces: 2
@@ -108,8 +107,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: Gini coefficient (gross income)
         display:
           name: Gini coefficient (gross income)
           numDecimalPlaces: 2
@@ -133,8 +130,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: Gini coefficient (market income)
         display:
           name: Gini coefficient (market income)
           numDecimalPlaces: 2
@@ -156,8 +151,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: P50/P10 ratio (disposable income)
         display:
           name: P50/P10 ratio (disposable income)
           numDecimalPlaces: 1
@@ -179,8 +172,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: P90/P10 ratio (disposable income)
         display:
           name: P90/P10 ratio (disposable income)
           numDecimalPlaces: 1
@@ -202,8 +193,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: P90/P50 ratio (disposable income)
         display:
           name: P90/P50 ratio (disposable income)
           numDecimalPlaces: 1
@@ -225,8 +214,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: Palma ratio (disposable income)
         display:
           name: Palma ratio (disposable income)
           numDecimalPlaces: 1
@@ -248,8 +235,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: S80/S20 ratio (disposable income)
         display:
           name: S80/S20 ratio (disposable income)
           numDecimalPlaces: 1
@@ -269,8 +254,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: 50% of median - Share of population in poverty (disposable income)
         display:
           name: 50% of median - Share of population in poverty (disposable income)
           numDecimalPlaces: 1
@@ -290,8 +273,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: 60% of median - Share of population in poverty (disposable income)
         display:
           name: 60% of median - Share of population in poverty (disposable income)
           numDecimalPlaces: 1
@@ -313,8 +294,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: 50% of median - Share of population in poverty (market income)
         display:
           name: 50% of median - Share of population in poverty (market income)
           numDecimalPlaces: 1
@@ -336,8 +315,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: 60% of median - Share of population in poverty (market income)
         display:
           name: 60% of median - Share of population in poverty (market income)
           numDecimalPlaces: 1
@@ -356,8 +333,6 @@ tables:
           {definitions.source_income_definition_2012}
 
           {definitions.source_recommended_uses_and_limitations}
-        presentation:
-          title_public: Percentage reduction in Gini coefficient
         display:
           name: Percentage reduction in Gini coefficient
           numDecimalPlaces: 1
