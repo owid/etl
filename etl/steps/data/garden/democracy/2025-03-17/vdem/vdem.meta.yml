@@ -12,18 +12,39 @@ definitions:
       While RoW covers the years since 1900, we use V-Dem's historical data from 1789 to 1899 to expand the classification's coverage back in time.
 
       {definitions.common.description_processing}
+    estimate: |-
+      << "central" if estimate == 'best' else estimate >>
+    estimate_title: |-
+      << "Central" if estimate == 'best' else estimate.title() >>
 
 dataset:
   title: V-Dem Country-Year (Full + Others)
   update_period_days: 365
 
 tables:
+  ##################################################################################################
+  ##################################################################################################
+  # TABLE: METADATA
+  metadata:
+    variables:
+      # Historical state name
+      histname:
+        title: "Historical country name"
+        unit: ""
+
+      regime_imputed:
+        title: Data imputed from another country
+        description_short: Denotes whether we imputed regime information from another country this one was historically a part of.
+        unit: ""
+
+      regime_imputed_country:
+        title: "Country name (imputed country)"
+        unit: ""
 
   ##################################################################################################
   ##################################################################################################
-  # UNI DIMENSIONAL INDICATORS
-  vdem:
-    title: V-Dem Country-Year (Full + Others)
+  # TABLE: UNI-DIMENSIONAL TABLES, WITHOUT REGIONS
+  vdem_uni_with_regions:
     description: |-
       The Varieties of Democracy (V-Dem) project publishes data and research on democracy and human rights.
 
@@ -36,7 +57,129 @@ tables:
       This snapshot contains all 500 V-Dem indicators and 245 indices + 57 other indicators from other data sources.
     common:
       display:
-          numDecimalPlaces: 0
+        numDecimalPlaces: 0
+      description_processing: |-
+        <%- if aggregate_method == 'average' -%>
+        The regional aggregates (including values for the World) have been estimated by averaging the country values.
+        <%- elif aggregate_method < 'population-weighted average' -%>
+        The regional aggregates (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2022 revision dataset.
+        <%- endif -%>
+      presentation: &ppt_uni_w_regions
+        title_variant: |-
+          <%- if aggregate_method != 'average' -%>
+          << aggregate_method >>
+          <%- endif -%>
+        grapher_config:
+          selectedEntityNames:
+            - "Africa"
+            - "Asia"
+            - "Europe"
+            - "North America"
+            - "Oceania"
+            - "South America"
+          selectedEntityColors:
+            "Africa": "#A2559C"
+            "Asia": "#00847E"
+            "Europe": "#4C6A9C"
+            "North America": "#C4523E"
+            "Oceania": "#9A5129"
+            "South America": "#883039"
+
+    variables:
+      ## 2.2.7 Elected officials index
+      electoff_vdem:
+        title: "Elected officials index (aggregate: << aggregate_method >>)"
+        description_short: |-
+          Measures the extent to which the legislature is chosen through broad elections, and the chief executive is elected directly or indirectly (appointed by a popularly elected legislature).
+        description_from_producer: |-
+          Question: Is the chief executive and legislature appointed through popular elections?
+
+          Clarification: This index attempts to measure (a) whether the chief executive is elected, either directly elected through popular elections or indirectly through a popularly elected legislature that then appoints the chief executive; and (b) whether the legislature, in presidential systems with a directly elected president that is also chief executive, is directly or indirectly elected. Note that a popular election is minimally defined and also includes sham elections with limited suffrage and no competition. Similarly, "appointment" by legislature only implies selection and/or approval, not the power to dismiss. This index is useful primarily for aggregating higher-order indices and should not necessarily be interpreted as an important element of democracy in its own right.
+
+          Indicator name: `v2x_elecoff`
+        presentation:
+          <<: *ppt_uni_w_regions
+          title_public: Elected officials index
+        unit: ""
+        display:
+          numDecimalPlaces: 2
+
+      ## 2.2.5 Share of population with suffrage
+      suffr_vdem:
+        title: "Share of population with suffrage (aggregate: << aggregate_method >>)"
+        description_short: |-
+          Share of adult citizens which have the legal right to vote in national elections.
+        description_from_producer: |-
+          Question: What share of adult citizens as defined by statute has the legal right to vote in national elections?
+
+          Clarification:
+          This question does not take into consideration restrictions based on age, residence, having been convicted for crime, or being legally incompetent. It covers legal de jure restrictions, not restrictions that may be operative in practice de facto. The adult population as defined by statute is defined by citizens in the case of independent countries or the people living in the territorial entity in the case of colonies. Universal suffrage is coded as 100%. Universal male suffrage only is coded as 50%. Years before electoral provisions are introduced are scored 0%. The scores do not reflect whether an electoral regime was interrupted or not. Only if new constitutions, electoral laws, or the like explicitly introduce new regulations of suffrage, the scores were adjusted accordingly if the changes suggested doing so. If qualifying criteria other than gender apply such as property, tax payments, income, literacy, region, race, ethnicity, religion, and/or 'economic independence', estimates have been calculated by combining information on the restrictions with different kinds of statistical information on population size, age distribution, wealth distribution, literacy rates, size of ethnic groups, etc., secondary country-specific sources, and — in the case of very poor information — the conditions in similar countries or colonies. The scores reflect de jure provisions of suffrage extension in percentage of the adult population. If the suffrage law is revised in a way that affects the extension, the scores reflect this change as of the calendar year the law was enacted.
+
+          Indicator name: `v2x_suffr`
+        description_processing: |-
+          Converted ratio (0-1) into share (0-100%).
+
+          {definitions.common.description_processing}
+        presentation:
+          <<: *ppt_uni_w_regions
+          title_public: Share of population with suffrage
+        unit: "%"
+        display:
+          numDecimalPlaces: 2
+
+      ## 3.1.3.3 Election turnout
+      turnout_vdem:
+        title: "Voter turnout of registered voters (aggregate: << aggregate_method >>)"
+        description_short: |-
+          Denotes the voter turnout as a share of all registered voters in the national election according to official results.
+        description_key:
+          - Measures the percentage of registered voters who cast a ballot in national elections, based on official results.
+          - Reported as a continuous percentage; higher values indicate greater voter participation.
+          - Data sourced from IPU, IFES, IDEA, and various electoral databases.
+        description_from_producer: |-
+          Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
+
+          Indicator name: `v2eltrnout`
+        unit: "%"
+        presentation:
+          <<: *ppt_uni_w_regions
+          title_public: Voter turnout of registered voters
+        display:
+          numDecimalPlaces: 2
+
+      turnout_total_vdem:
+        title: "Voter turnout of voting-age population (aggregate: << aggregate_method >>)"
+        description_short: |-
+          Denotes the voter turnout as a share of the voting age population in the national election according to official results.
+
+        description_from_producer: |-
+          Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
+
+          Indicator name: `v2elvaptrn`
+        unit: "%"
+        presentation:
+          <<: *ppt_uni_w_regions
+          title_public: Voter turnout of voting-age population
+        display:
+          numDecimalPlaces: 2
+
+  ##################################################################################################
+  ##################################################################################################
+  # TABLE: UNI-DIMENSIONAL TABLES, WITHOUT REGIONS
+  vdem_uni_without_regions:
+    description: |-
+      The Varieties of Democracy (V-Dem) project publishes data and research on democracy and human rights.
+
+      It acknowledges that democracy can be characterized differently and measures electoral, liberal, participatory, deliberative, and egalitarian characterizations of democracy.
+
+      The project relies on evaluations by around 3,500 country experts and supplementary work by its researchers to assess political institutions and the protection of rights.
+
+      The project is managed by the V-Dem Institute, based at the University of Gothenburg in Sweden.
+
+      This snapshot contains all 500 V-Dem indicators and 245 indices + 57 other indicators from other data sources.
+    common:
+      display:
+        numDecimalPlaces: 0
 
     variables:
       ## 9.9.3 Corruption perception index [not in use]
@@ -46,7 +189,7 @@ tables:
           The CPI focuses on corruption in the public sector and defines corruption as the abuse of public office for private gain. The surveys used in compiling the CPI tend to ask questions in line with the misuse of public power for private benefit, with a focus, for example, on bribe-taking by public officials in public procurement. The sources do not distinguish between administrative and political corruption. The CPI Score relates to perceptions of the degree of corruption as seen by business people, risk analysts and the general public and ranges between 100 (highly clean) and 0 (highly corrupt).
 
           Notes: The data spans 2012-present due to the methodological incomparability with the data prior 2012.
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 2
 
@@ -63,22 +206,7 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2xdd_dd`
-        unit: ''
-        display:
-          numDecimalPlaces: 2
-
-      ## 2.2.7 Elected officials index
-      electoff_vdem:
-        title: Elected officials index
-        description_short: |-
-          Measures the extent to which the legislature is chosen through broad elections, and the chief executive is elected directly or indirectly (appointed by a popularly elected legislature).
-        description_from_producer: |-
-          Question: Is the chief executive and legislature appointed through popular elections?
-
-          Clarification: This index attempts to measure (a) whether the chief executive is elected, either directly elected through popular elections or indirectly through a popularly elected legislature that then appoints the chief executive; and (b) whether the legislature, in presidential systems with a directly elected president that is also chief executive, is directly or indirectly elected. Note that a popular election is minimally defined and also includes sham elections with limited suffrage and no competition. Similarly, "appointment" by legislature only implies selection and/or approval, not the power to dismiss. This index is useful primarily for aggregating higher-order indices and should not necessarily be interpreted as an important element of democracy in its own right.
-
-          Indicator name: `v2x_elecoff`
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 2
 
@@ -92,104 +220,52 @@ tables:
           "Government Effectiveness" combines into a single grouping responses on the quality of public service provision, the quality of the bureaucracy, the competence of civil servants, the independence of the civil service from political pressures, and the credibility of the government's commitment to policies. The main focus of this index is on "inputs" required for the government to be able to produce and implement good policies and deliver public goods.
 
           Indicator name: `e_wbgi_gee`
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 2
 
-      # Historical state name
-      histname:
-        title: 'Historical country name'
-        unit: ''
-
       # NEW
-      num_years_in_electdem_consecutive: # electdem_age_row_owid
-        title: Age of electoral democracy
-        description_short: Number of consecutive years in electoral democracy.
+      num_years_in_electdem: # electdem_exp_row_owid
+        title: Experience with electoral democracy
+        description_short: Number of total years in electoral democracy. It sums all periods of electoral democracy.
         description_key: &description_key_num_electdem
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         unit: years
 
-      num_years_in_electdem:  # electdem_exp_row_owid
-        title: Experience with electoral democracy
-        description_short: Number of total years in electoral democracy. It sums all periods of electoral democracy.
+      num_years_in_electdem_consecutive: # electdem_age_row_owid
+        title: Age of electoral democracy
+        description_short: Number of consecutive years in electoral democracy.
         description_key: *description_key_num_electdem
         unit: years
 
-      num_years_in_electdem_consecutive_cat:  # electdem_age_group_row_owid
+      num_years_in_electdem_consecutive_cat: # electdem_age_group_row_owid
         title: Electoral democracy age group
         description_short: Category of electoral democracies based on the country's age of electoral democracy.
         description_key: *description_key_num_electdem
-        unit: ''
+        unit: ""
 
-      num_years_in_libdem_consecutive:  # libdem_age_row_owid
-        title: Age of liberal democracy
-        description_short: Number of consecutive years in electoral democracy.
+      num_years_in_libdem: # libdem_exp_row_owid
+        title: Experience with liberal democracy
+        description_processing: Number of total years in liberal democracy. It sums all periods of liberal democracy.
         description_key: &description_key_num_libdem
           - In liberal democracies, citizens have further individual and minority rights, are equal before the law, and the actions of the executive are constrained by the legislative and the courts.
         unit: years
 
-      num_years_in_libdem:  # libdem_exp_row_owid
-        title: Experience with liberal democracy
-        description_processing: Number of total years in liberal democracy. It sums all periods of liberal democracy.
+      num_years_in_libdem_consecutive: # libdem_age_row_owid
+        title: Age of liberal democracy
+        description_short: Number of consecutive years in electoral democracy.
         description_key: *description_key_num_libdem
-        unit : years
+        unit: years
 
-      num_years_in_libdem_consecutive_cat:  # libdem_age_group_row_owid
+      num_years_in_libdem_consecutive_cat: # libdem_age_group_row_owid
         title: Liberal democracy age group
         description_short: Category of liberal democracies based on the country's age of liberal democracy.
         description_processing: Number of consecutive years in liberal democracy.
         description_key: *description_key_num_libdem
-        unit : ''
-
-      ## 2.2.5 Share of population with suffrage
-      suffr_vdem:
-        title: Share of population with suffrage
-        description_short: |-
-          Share of adult citizens which have the legal right to vote in national elections.
-        description_from_producer: |-
-          Question: What share of adult citizens as defined by statute has the legal right to vote in national elections?
-
-          Clarification:
-          This question does not take into consideration restrictions based on age, residence, having been convicted for crime, or being legally incompetent. It covers legal de jure restrictions, not restrictions that may be operative in practice de facto. The adult population as defined by statute is defined by citizens in the case of independent countries or the people living in the territorial entity in the case of colonies. Universal suffrage is coded as 100%. Universal male suffrage only is coded as 50%. Years before electoral provisions are introduced are scored 0%. The scores do not reflect whether an electoral regime was interrupted or not. Only if new constitutions, electoral laws, or the like explicitly introduce new regulations of suffrage, the scores were adjusted accordingly if the changes suggested doing so. If qualifying criteria other than gender apply such as property, tax payments, income, literacy, region, race, ethnicity, religion, and/or 'economic independence', estimates have been calculated by combining information on the restrictions with different kinds of statistical information on population size, age distribution, wealth distribution, literacy rates, size of ethnic groups, etc., secondary country-specific sources, and — in the case of very poor information — the conditions in similar countries or colonies. The scores reflect de jure provisions of suffrage extension in percentage of the adult population. If the suffrage law is revised in a way that affects the extension, the scores reflect this change as of the calendar year the law was enacted.
-
-          Indicator name: `v2x_suffr`
-        description_processing: |-
-          Converted ratio (0-1) into share (0-100%).
-
-          {definitions.common.description_processing}
-        unit: '%'
-        display:
-          numDecimalPlaces: 2
-
-      ## 3.1.3.3 Election turnout
-      turnout_vdem:
-        title: Voter turnout of registered voters
-        description_short: |-
-          Denotes the voter turnout as a share of all registered voters in the national election according to official results.
-
-        description_from_producer: |-
-          Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
-
-          Indicator name: `v2eltrnout`
-        unit: '%'
-        display:
-          numDecimalPlaces: 2
-
-      turnout_total_vdem:
-        title: Voter turnout of voting-age population
-        description_short: |-
-          Denotes the voter turnout as a share of the voting age population in the national election according to official results.
-
-        description_from_producer: |-
-          Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
-
-          Indicator name: `v2elvaptrn`
-        unit: '%'
-        display:
-          numDecimalPlaces: 2
+        unit: ""
 
       # 3.4.2.18 HOS female
-      wom_hos_vdem:  # wom_hos_vdem_owid
+      wom_hos_vdem: # wom_hos_vdem_owid
         title: Woman head of state
         description_short: |-
           Denotes whether the head of state in office on December 31 is a woman.
@@ -197,10 +273,10 @@ tables:
           If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
 
           Indicator name: `v2exfemhos`
-        unit: ''
+        unit: ""
 
       ## 3.4.3.16 HOG female
-      wom_hog_vdem:  # wom_hog_vdem_owid
+      wom_hog_vdem: # wom_hog_vdem_owid
         title: Woman head of government
         description_short: |-
           Denotes whether the head of government in office on December 31 is a woman.
@@ -214,10 +290,10 @@ tables:
           1: Female
 
           Indicator name: `v2exfemhog`
-        unit: ''
+        unit: ""
 
       ## HOE female (custom)
-      wom_hoe_vdem:  # wom_hoe_vdem_owid
+      wom_hoe_vdem: # wom_hoe_vdem_owid
         title: Woman chief executive
         description_short: |-
           The variable denotes whether the chief executive of government in office on December 31 is a woman.
@@ -233,19 +309,19 @@ tables:
             - If head of state is less powerful than head of government
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
-        unit: ''
+        unit: ""
 
-      wom_parl_vdem_cat:  # wom_parl_gr_vdem_owid
+      wom_parl_vdem_cat: # wom_parl_gr_vdem_owid
         title: Women in parliament (category)
         description_short: Categorisation of women's political representation in parliament
-        unit: ''
+        unit: ""
 
       ## Other regime indicators
       regime_row_owid:
         title: Political regime
         description_short: |-
           Identifies the political regime of a country by distinguishing between closed autocracies, electoral autocracies, electoral democracies, and liberal democracies.
-        unit: ''
+        unit: ""
         description_key:
           - The indicator uses the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg.
           - The classification distinguishes between closed autocracies (score 0), electoral autocracies (score 1), electoral democracies (score 2), and liberal democracies (score 3).
@@ -256,7 +332,7 @@ tables:
 
       regime_amb_row_owid:
         title: Political regime (inc. ambiguous categories)
-        unit: ''
+        unit: ""
         description_short: |-
           Political regime of a country using the Regimes of the World classification by political scientists Anna Lührmann, Marcus Tannenberg and Staffan Lindberg, including ambiguous categories.
         description_key:
@@ -281,20 +357,10 @@ tables:
           - In electoral autocracies, citizens have the right to choose the chief executive and the legislature through multi-party elections; but they lack some freedoms, such as the freedoms of association or expression, that make the elections meaningful, free, and fair.
           - In electoral democracies, citizens have the right to participate in meaningful, free and fair, and multi-party elections.
         description_processing: "{definitions.auxiliary.description_processing_row}"
-        unit: ''
+        unit: ""
         presentation:
           title_public: "Political regime"
           title_variant: "reduced"
-
-      # Not used
-      regime_imputed:
-        title: Data imputed from another country
-        description_short: Denotes whether we imputed regime information from another country this one was historically a part of.
-        unit: ''
-
-      regime_imputed_country:
-        title: 'Country name (imputed country)'
-        unit: ''
 
   ##################################################################################################
   ##################################################################################################
@@ -309,8 +375,13 @@ tables:
         <%- endif -%>
       display:
         numDecimalPlaces: 2
-      presentation: &common_ppt
-        title_variant: "(<< estimate >> estimate, aggregate: << aggregate_method >>)"
+      presentation: &ppt_multi_w_regions
+        title_variant: |-
+          ({definitions.auxiliary.estimate} estimate
+          <%- if aggregate_method != 'average' -%>
+          , << aggregate_method >>
+          <%- endif -%>
+          )
         grapher_config:
           selectedEntityNames:
             - "Africa"
@@ -332,9 +403,9 @@ tables:
       ## 2.1.1 Electoral democracy index
       electdem_vdem:
         title: |-
-          Electoral democracy index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Electoral democracy index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
         description_from_producer: &description_prod_electdem_vdem |-
           Question: To what extent is the ideal of electoral democracy in its fullest sense achieved?
           Clarification: The electoral principle of democracy seeks to embody the core value of making rulers responsive to citizens, achieved through electoral competition for the electorate's approval under circumstances when suffrage is extensive; political and civil society organizations can operate freely; elections are clean and not marred by fraud or systematic irregularities; and elections affect the composition of the chief executive of the country. In between elections, there is freedom of expression and an independent media capable of presenting alternative views on matters of political relevance. In the V-Dem conceptual scheme, electoral democracy is understood as an essential element of any other conception of representative democracy — liberal, participatory, deliberative, egalitarian, or some other.
@@ -342,20 +413,24 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_polyarchy`
-        unit: ''
+        unit: ""
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Electoral democracy index
 
       ## 2.1.2 Liberal democracy index
       libdem_vdem:
         title: |-
-          Liberal democracy index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Liberal democracy index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, individual and minority rights, equality before the law, and executive constraints.
+          {definitions.auxiliary.estimate_title} estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, individual and minority rights, equality before the law, and executive constraints.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Liberal democracy index
+        description_key:
+          - Measures how closely countries adhere to liberal democracy, emphasizing protection of individual and minority rights against state and majority tyranny.
+          - Integrates electoral democracy with constitutionally protected civil liberties, strong rule of law, judicial independence, and effective checks and balances.
+          - Higher scores (0-1 scale) indicate stronger achievement of liberal democratic ideals.
         description_from_producer: |-
           Question: To what extent is the ideal of liberal democracy achieved?
 
@@ -364,16 +439,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_libdem`
-        unit: ''
+        unit: ""
 
       # 2.1.3 Participatory democracy index
       participdem_vdem:
         title: |-
-          Extent of direct popular votes (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Extent of direct popular votes ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
+          {definitions.auxiliary.estimate_title} estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Participatory democracy index
         description_from_producer: |-
           Question: To what extent is the ideal of participatory democracy achieved?
@@ -383,16 +458,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_partipdem`
-        unit: ''
+        unit: ""
 
       ## 2.1.4 Deliberative democracy index
       delibdem_vdem:
         title: |-
-          Deliberative democracy index (<< estimate >> estimate, aggregate: << aggregate_method >>)
-        description_short:
-          << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
+          Deliberative democracy index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Deliberative democracy index
         description_from_producer: |-
           Question: To what extent is the ideal of deliberative democracy achieved?
@@ -403,16 +478,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_delibdem`
-        unit: ''
+        unit: ""
 
       ## 2.1.5 Egalitarian democracy index
       egaldem_vdem:
         title: |-
-          Egalitarian democracy index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Egalitarian democracy index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which the protection of rights, access to power, and distribution of resources is equal.
+          {definitions.auxiliary.estimate_title} estimate of the extent of suffrage, the freedom and fairness of elections, freedoms of association and expression, as well as the extent to which the protection of rights, access to power, and distribution of resources is equal.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Egalitarian democracy index
         description_from_producer: |-
           Question: To what extent is the ideal of egalitarian democracy achieved?
@@ -423,14 +498,128 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_egaldem`
-        unit: ''
+        unit: ""
+
+      ## 2.2.11 Legislative constraints on the executive index
+      legis_constr_vdem:
+        title: |-
+          Legislative constraints on the executive index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which the legislature, including opposition parties, questions executive officials and oversees and investigates the executive.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Legislative constraints on the executive index
+        description_from_producer: |-
+          Question: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
+
+          Clarification: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xlg_legcon`
+        unit: ""
+
+      ## 2.2.8 Liberal component index
+      lib_vdem:
+        title: |-
+          Liberal component index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent of individual and minority rights, equality before the law, and executive constraints.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Liberal component index
+        description_from_producer: &description_prod_lib_vdem |-
+          Question: To what extent is the liberal principle of democracy achieved?
+
+          Clarification: The liberal principle of democracy emphasizes the importance of protecting individual and minority rights against the tyranny of the state and the tyranny of the majority. The liberal model takes a "negative" view of political power insofar as it judges the quality of democracy by the limits placed on government. This is achieved by constitutionally protected civil liberties, strong rule of law, an independent judiciary, and effective checks and balances that, together, limit the exercise of executive power.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_liberal`
+        unit: ""
+
+      ## 2.2.15 Local government index
+      locelect_vdem:
+        title: |-
+          Elected local governments ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which elected local governments exist, and they operate without interference from local unelected bodies.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Elected local governments
+        description_from_producer: |-
+          Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
+
+          Clarification: The lowest score would be reserved for a country that has no elected local governments. A medium score would be accorded a country that has elected local governments but where those governments are subordinate to unelected officials at the local level perhaps appointed by a higher-level body. A high score would be accorded to a country in which local governments are elected and able to operate without restrictions from unelected actors at the local level with the exception of judicial bodies. Naturally, local governments remain subordinate to the regional and national governments.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xel_locelec`
+        unit: ""
+
+      ## 2.2.12 Participatory component index
+      particip_vdem:
+        title: |-
+          Participatory political institutions ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Participatory political institutions
+        description_from_producer: |-
+          Question: To what extent is the participatory principle achieved?
+
+          Clarification:
+          The participatory principle of democracy emphasizes active participation by citizens in all political processes, electoral and non-electoral. It is motivated by uneasiness about a bedrock practice of electoral democracy: delegating authority to representatives. Thus, direct rule by citizens is preferred, wherever practicable. This model of democracy thus takes suffrage for granted, emphasizing engagement in civil society organizations, direct democracy, and subnational elected bodies.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2x_partip`
+        unit: ""
+
+      ## 2.2.16 Regional government index
+      regelect_vdem:
+        title: "Elected regional governments ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)"
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which elected regional governments exist, and they operate without interference from regional unelected bodies.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Elected regional governments
+        description_from_producer: |-
+          Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
+
+          Clarification: The lowest score would be reserved for a country that has no elected regional governments. A medium score would be accorded a country that has elected regional governments but where those governments are subordinate to unelected officials at the regional level perhaps appointed by a higher-level body. A high score would be accorded to a country in which regional governments are elected and able to operate without restrictions from unelected actors at the regional level with the exception of judicial bodies. Naturally, regional governments remain subordinate to the national government.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xel_regelec`
+        unit: ""
+
+      ## 2.2.21 Equal distribution of resources index
+      equal_res_vdem:
+        title: |-
+          Equal resource distribution index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which all social groups benefit from public spending and have equal access to education, healthcare, and the welfare state.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Equal resource distribution index
+        description_from_producer: |-
+          Question: How equal is the distribution of resources?
+
+          Clarification: This component measures the extent to which resources — both tangible and intangible — are distributed in society. An equal distribution of resources supports egalitarian democracy in two ways. First, lower poverty rates and the distribution of goods and services such as food, water, housing, education and healthcare ensure that all individuals are capable of participating in politics and government. In short, basic needs must be met in order for individuals to effectively exercise their rights and freedoms see, for example, Sen 1999, Maslow 1943. Second, high levels of resource inequality undermine the ability of poorer populations to participate meaningfully Aristotle, Dahl 2006. Thus, it is necessary to include not only measures of poverty and the distribution of goods and services, but also the levels of inequality in these distributions, and the proportion of the population who are not eligible for social services i.e. means-tests, particularistic distribution, etc.. This principle also implies that social or economic inequalities can translate into political inequalities, an issue addressed most notably by Walzer 1983, who argues that overlapping "spheres" of inequality are particularly harmful to society. To address these overlapping "spheres", this component also includes measures of the distribution of power in society amongst different socio-economic groups, genders, etc.
+
+          Scale: Interval, from low to high (0-1).
+
+          Indicator name: `v2xeg_eqdr`
+        unit: ""
 
       ## 3.5.1.6 Legislature corrupt activities
       corr_leg_vdem:
         title: |-
-          Legislative corruption (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Legislative corruption ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Legislative corruption
         description_from_producer: |-
           Question: Do members of the legislature abuse their position for financial gain?
@@ -450,7 +639,7 @@ tables:
           4: Never, or hardly ever.
 
           Indicator name: `v2lgcrrpt`
-        unit: ''
+        unit: ""
 
       ## 3.5.3.7 Lower chamber female legislators
       wom_parl_vdem:
@@ -459,19 +648,96 @@ tables:
         description_short: |-
           Percentage of women in the lower or single chamber of the legislature.
         presentation:
-          <<: *common_ppt
-          title_public: Lower chamber female legislators
+          <<: *ppt_multi_w_regions
+          title_public: Share of women in parliament
           title_variant: "(aggregate: << aggregate_method >>)"
+        description_key:
+          - Measures the percentage of female members in the lower (or unicameral) chamber of the national legislature.
+          - Values are expressed as a percentage; higher values indicate greater gender representation.
+          - Data is compiled from authoritative sources like the Inter-Parliamentary Union and is cleaned to exclude non-bicameral systems.
         description_from_producer: |-
           Question: What percentage (%) of the lower (or unicameral) chamber of the legislature is female?
 
           Indicator name: `v2lgfemleg`
-        unit: '%'
+        unit: "%"
+
+      ## 3.6.0.2 Common good
+      justcomgd_polch_vdem:
+        title: "Common good justifications ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)"
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which political elites justify their views with the common good for society, either the greatest good for the greatest number of people or as helping the least advantaged people in society when considering important policy changes.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Common good justifications
+        description_from_producer: |-
+          Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
+
+          Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
+
+          Responses:
+          0: Little or no justification in terms of the common good is usually offered.
+          1: Specific business, geographic, group, party, or constituency interests are for the most part offered as justifications.
+          2: Justifications are for the most part a mix of specific interests and the common good and it is impossible to say which justification is more common than the other.
+          3: Justifications are based on a mixture of references to constituency/party/group interests and on appeals to the common good.
+          4: Justifications are for the most part almost always based on explicit statements of the common good for society, understood either as the greatest good for the greatest number or as helping the least advantaged in a society.
+
+          Indicator name: `v2dlcommon`
+        unit: ""
+
+      ## 3.6.0.1 Reasoned justification
+      justified_polch_vdem:
+        title: |-
+          Justified political positions ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which political elites provide complex, nuanced, and complete justifications for their views when considering important policy changes.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Justified political positions
+        description_from_producer: |-
+          Question: When important policy changes are being considered, i.e. before a decision has been made, to what extent do political elites give public and reasoned justifications for their positions?
+
+          Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
+
+          Responses:
+
+          0: No justification. Elites almost always only dictate that something should or should not be done, but no reasoning about justification is given. For example, "We must cut spending."
+          1: Inferior justification. Elites tend to give reasons why someone should or should not be for doing or not doing something, but the reasons tend to be illogical or false, although they may appeal to many voters. For example, "We must cut spending. The state is inefficient." [The inference is incomplete because addressing inefficiencies would not necessarily reduce spending and it might undermine essential services.]
+          2: Qualified justification. Elites tend to offer a single simple reason justifying why the proposed policies contribute to or detract from an outcome. For example, "We must cut spending because taxpayers cannot afford to pay for current programs."
+          3: Sophisticated justification. Elites tend to offer more than one or more complex, nuanced and complete justification. For example, "We must cut spending because taxpayers cannot afford to pay for current government programs. Raising taxes would hurt economic growth, and deficit spending would lead to inflation."
+
+          Indicator name: `v2dlreason`
+        unit: ""
+
+      ## 3.6.0.5 Engaged society
+      soccons_polch_vdem:
+        title: "Engaged society ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)"
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which ordinary people independently discuss important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Engaged society
+        description_from_producer: |-
+          Question: When important policy changes are being considered, how wide and how independent are public deliberations?
+
+          Clarification: This question refers to deliberation as manifested in discussion, debate, and other public forums such as popular media.
+
+          Responses:
+          0: Public deliberation is never, or almost never allowed.
+          1: Some limited public deliberations are allowed but the public below the elite levels is almost always either unaware of major policy debates or unable to take part in them.
+          2: Public deliberation is not repressed but nevertheless infrequent and non-elite actors are typically controlled and/or constrained by the elites.
+          3: Public deliberation is actively encouraged and some autonomous non-elite groups participate, but it is confined to a small slice of specialized groups that tends to be the same across issue-areas.
+          4: Public deliberation is actively encouraged and a relatively broad segment of non-elite groups often participate and vary with different issue-areas.
+          5: Large numbers of non-elite groups as well as ordinary people tend to discuss major policies among themselves, in the media, in associations or neighborhoods, or in the streets. Grass-roots deliberation is common and unconstrained.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2dlengage`
+        unit: ""
 
       ## 3.7.0.6 Judicial corruption decision
       corr_jud_vdem:
         title: |-
-          Judicial corruption (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Judicial corruption ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_from_producer: |-
           Question: How often do individuals or businesses make undocumented extra payments or bribes in order to speed up or delay the process or to obtain a favorable judicial decision?
 
@@ -487,18 +753,18 @@ tables:
 
           Indicator name: `v2jucorrdc`
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Judicial corruption
-        unit: ''
+        unit: ""
 
       ## 3.8.2.2 Rigorous and impartial public administration
       public_admin_vdem:
         title: |-
-          Rigorous and impartial public administration (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Rigorous and impartial public administration ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which public officials respect the law, and administer it without arbitrariness and bias.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which public officials respect the law, and administer it without arbitrariness and bias.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Rigorous and impartial public administration
         description_from_producer: |-
           Question: Are public officials rigorous and impartial in the performance of their duties?
@@ -518,16 +784,16 @@ tables:
           Scale: Ordinal, converted to interval by the measurement model.
 
           Indicator name: `v2clrspct`
-        unit: ''
+        unit: ""
 
       ## 3.8.2.6 Social group equality in respect for civil liberties
       socgr_civ_libs_vdem:
         title: |-
-          Equality of civil liberties across social groups (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Equality of civil liberties across social groups ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are free from forced labor, have property rights and access to the justice system, and enjoy freedoms of movement.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Equality of civil liberties across social groups
         description_from_producer: |-
           Question: Do all social groups, as distinguished by language, ethnicity, religion, race, region, or caste, enjoy the same level of civil liberties, or are some groups generally in a more favorable position?
@@ -542,16 +808,16 @@ tables:
           Scale: Ordinal, converted to interval by the measurement model.
 
           Indicator name: `v2clsocgrp`
-        unit: ''
+        unit: ""
 
       ## 3.9.0.1 Domestic autonomy
       dom_auton_vdem:
         title: |-
-          Domestic policymaking free from foreign influence (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Domestic policymaking free from foreign influence ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which domestic policy is free from the interference of other states.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which domestic policy is free from the interference of other states.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Domestic policymaking free from foreign influence
         description_from_producer: |-
           Question: Is the state autonomous from the control of other states with respect to the conduct of domestic policy?
@@ -566,16 +832,16 @@ tables:
           Scale: Ordinal, converted to interval by the measurement model.
 
           Indicator name: `v2svdomaut`
-        unit: ''
+        unit: ""
 
       ## 3.9.0.2 International autonomy
       int_auton_vdem:
         title: |-
-          Foreign policymaking free from foreign influence (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Foreign policymaking free from foreign influence ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which foreign policy is free from the interference of other states.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which foreign policy is free from the interference of other states.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Foreign policymaking free from foreign influence
         description_from_producer: |-
           Question: Is the state autonomous from the control of other states with respect to the conduct of its foreign policy?
@@ -586,16 +852,16 @@ tables:
           2: Autonomous. Domestic political actors exercise foreign policy free of the direct control of external political actors. Direct control is meant to exclude the exercise of constraint or the impact of interdependence in the international system. Treaties in which states concede some part of that control to a supra- or international organization voluntarily, and from which there is a possibility of exit should not be interpreted as a violation of autonomy.
 
           Indicator name: `v2svinlaut`
-        unit: ''
+        unit: ""
 
       ## 3.9.0.3 State authority over territory
       terr_contr_vdem:
         title: |-
-          Territory under state control (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Territory under state control ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the percentage of territory controlled by the government.
+          {definitions.auxiliary.estimate_title} estimate of the percentage of territory controlled by the government.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Territory under state control
         description_from_producer: |-
           Question: Over what percentage (%) of the territory does the state have effective control?
@@ -606,16 +872,16 @@ tables:
           By "officially part of the country" we refer to international law. In cases where international law is not entirely clear, we refer you to general understandings. For example, China claims sovereignty over Taiwan, but it remains under the control of its own government. For purposes of this question, Taiwan should not be considered a failure to control its territory by the government of the PRC.
 
           Indicator name: `v2svstterr`
-        unit: '%'
+        unit: "%"
 
       ## 3.12.0.2 Power distributed by social group
       socgr_pow_vdem:
         title: |-
-          Equality of political power across social groups (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Equality of political power across social groups ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics or have similar political power.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which social groups — defined by language, ethnicity, religion, race, region, and/or caste — are irrelevant to politics or have similar political power.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Equality of political power across social groups
         description_from_producer: |-
           Question: Is political power distributed according to social groups?
@@ -630,16 +896,16 @@ tables:
           4: All social groups have roughly equal political power or there are no strong ethnic, caste, linguistic, racial, religious, or regional differences to speak of. Social group characteristics are not relevant to politics.
 
           Indicator name: `v2pepwrsoc`
-        unit: ''
+        unit: ""
 
       ## 5.4.3 Presidentialism Index
       personalism_vdem:
         title: |-
-          Presidentialism index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Presidentialism index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral management body, and other oversight.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which the executive is unconstrained by the legislature, judiciary, electoral management body, and other oversight.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Presidentialism index
         description_from_producer: |-
           Question: To what extent is the regime characterized by presidentialism?
@@ -650,17 +916,21 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2xnp_pres`
-        unit: ''
+        unit: ""
 
       ## 5.5.1 Civil liberties index
       civ_libs_vdem:
         title: |-
-          Civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Civil liberties index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which people are free from government torture, political killings, and forced labor, they have property rights, and enjoy the freedoms of movement, religion, expression, and association.
         presentation:
-          <<: *common_ppt
-          title_public: Civil liberties index
+          <<: *ppt_multi_w_regions
+          title_public: Human rights index
+        description_key:
+          - The Civil Liberties Index measures the extent to which individuals are free from government-imposed physical harm and unjust restrictions on private and political liberties.
+          - It is a composite index averaging scores on physical violence, political civil liberties, and private civil liberties.
+          - Higher values (on a 0–1 scale) indicate stronger protection of liberal freedoms such as safety, expression, and movement.
         description_from_producer: |-
           Question: To what extent is civil liberty respected?
 
@@ -669,16 +939,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_civlib`
-        unit: ''
+        unit: ""
 
       ## 5.5.4 Private civil liberties index
       priv_libs_vdem:
         title: |-
-          Private civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Private civil liberties index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate the extent to which people are free from forced labor, have property rights, and enjoy freedom of movement and religion.
+          {definitions.auxiliary.estimate_title} estimate the extent to which people are free from forced labor, have property rights, and enjoy freedom of movement and religion.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Private civil liberties index
         description_from_producer: |-
           Question: To what extent are private liberties respected?
@@ -688,16 +958,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_clpriv`
-        unit: ''
+        unit: ""
 
       ## 5.5.3 Political civil liberties index
       pol_libs_vdem:
         title: |-
-          Political civil liberties index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Political civil liberties index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which people enjoy the freedoms of expression and association.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which people enjoy the freedoms of expression and association.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Political civil liberties index
         description_from_producer: |-
           Question: To what extent are political liberties respected?
@@ -707,16 +977,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_clpol`
-        unit: ''
+        unit: ""
 
       ## 5.5.2 Physical violence index
       phys_integr_libs_vdem:
         title: |-
-          Physical violence index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Physical violence index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which people are free from government torture and political killings.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which people are free from government torture and political killings.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Physical violence index
         description_from_producer: |-
           Question: To what extent is physical integrity respected?
@@ -726,17 +996,21 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_clphy`
-        unit: ''
+        unit: ""
 
       ## 5.7.1 Political corruption index
       corruption_vdem:
         title: |-
-          Political corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Political corruption index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which a country is affected by political corruption.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which a country is affected by political corruption.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Political corruption index
+        description_key:
+          - Measures the extent of political corruption across executive, legislative, judicial, and public sectors.
+          - Includes both petty and grand corruption, such as bribery, embezzlement, and misuse of office.
+          - Higher values (0–1 scale) indicate more pervasive corruption, reversing the typical V-Dem index direction.
         description_from_producer: |-
           Question: How pervasive is political corruption?
 
@@ -745,14 +1019,14 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_corr`
-        unit: ''
+        unit: ""
 
       ## 5.7.3 Public sector corruption index [Not in use]
       corr_publsec_vdem:
         title: |-
-          Public sector corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Public sector corruption index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Public sector corruption index
         description_from_producer: |-
           Question: To what extent do public sector employees grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
@@ -762,14 +1036,14 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_pubcorr`
-        unit: ''
+        unit: ""
 
       ## 5.7.2 Executive corruption index [Not in use]
       corr_exec_vdem:
         title: |-
-          Executive corruption index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Executive corruption index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Executive corruption index
         description_from_producer: |-
           Question: How routinely do members of the executive, or their agents grant favors in exchange for bribes, kickbacks, or other material inducements, and how often do they steal, embezzle, or misappropriate public funds or other state resources for personal or family use?
@@ -779,16 +1053,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_execorr`
-        unit: ''
+        unit: ""
 
       ## 5.8.1 Women political empowerment index
       wom_emp_vdem:
         title: |-
-          Women's political empowerment index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Women's political empowerment index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which women enjoy civil liberties, can participate in civil society, and are represented in politics.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Women's political empowerment index
         description_from_producer: |-
           Question: How politically empowered are women?
@@ -798,16 +1072,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_gender`
-        unit: ''
+        unit: ""
 
       ## 5.8.2 Women civil liberties index
       wom_civ_libs_vdem:
         title: |-
-          Women's civil rights index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Women's civil rights index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which women are free from forced labor, have property rights and access to the justice system, and enjoy freedom of movement.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Women's civil rights index
         description_from_producer: |-
           Question: Do women have the ability to make meaningful decisions in key areas of their lives?
@@ -817,16 +1091,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_gencl`
-        unit: ''
+        unit: ""
 
       ## 5.8.3 Women civil society participation index
       wom_civ_soc_vdem:
         title: |-
-          Women's civil society participation index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Women's civil society participation index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which women can discuss political issues, participate in civil society organizations, and are represented among journalists.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Women's civil society participation index
         description_from_producer: |-
           Question: Do women have the ability to express themselves and to form and participate in groups?
@@ -836,16 +1110,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_gencs`
-        unit: ''
+        unit: ""
 
       ## 5.8.4 Women political participation index
       wom_pol_par_vdem:
         title: |-
-          Women's political participation index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Women's political participation index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which women are represented in the legislature and have an equal share of political power.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which women are represented in the legislature and have an equal share of political power.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Women's political participation index
         description_from_producer: |-
           Question: Are women descriptively represented in formal political positions?
@@ -855,31 +1129,35 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_genpp`
-        unit: ''
+        unit: ""
 
       ## 5.9.1 Rule of law index
       rule_of_law_vdem:
         title: |-
-          Rule of Law index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Rule of Law index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which the government complies with the law, courts are independent, laws transparent, justice accessible, corruption absent, and the bureaucracy is impartial.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which the government complies with the law, courts are independent, laws transparent, justice accessible, corruption absent, and the bureaucracy is impartial.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Rule of Law index
+        description_key:
+          - Measures how well laws are enforced transparently, impartially, independently, predictably, and equally.
+          - Includes indicators such as judicial independence, compliance with courts, public sector corruption, and access to justice.
+          - Higher values (0–1 scale) indicate stronger adherence to the rule of law.
         description_from_producer: |-
           Question: To what extent are laws transparently, independently, predictably, impartially, and equally enforced, and to what extent do the actions of government officials comply with the law?
 
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_rule`
-        unit: ''
+        unit: ""
 
       ## 5.11.1 Core civil society index [not in use]
       civ_soc_str_vdem:
         title: |-
-          Core civil society index (<< estimate >> estimate, aggregate: << aggregate_method >>)
+          Core civil society index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Core civil society index
         description_from_producer: |-
           Question: How robust is civil society?
@@ -891,15 +1169,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2xcs_ccsi`
-        unit: ''
+        unit: ""
 
-       ## 2.2.13 Civil society participation index
+      ## 2.2.13 Civil society participation index
       civsoc_particip_vdem:
-        title: Civil society participation index (<< estimate >> estimate)
+        title: |-
+          Civil society participation index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which major civil society organizations are routinely consulted by policymakers, how many people are involved in them, women can participate, and candidate nomination for the legislature within parties is decentralized or made through primaries.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which major civil society organizations are routinely consulted by policymakers, how many people are involved in them, women can participate, and candidate nomination for the legislature within parties is decentralized or made through primaries.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Civil society participation index
         description_from_producer: |-
           Question: Are major CSOs routinely consulted by policymakers; how large is the involvement of people in CSOs; are women prevented from participating; and is legislative candidate nomination within party organization highly decentralized or made through party primaries?
@@ -913,15 +1192,16 @@ tables:
           Interval, from low to high (0-1).
 
           Indicator name: `v2x_cspart`
-        unit: ''
+        unit: ""
 
       ## 3.6.0.3 Respect counterarguments
       counterarg_polch_vdem:
-        title: Respect for counterarguments (<< estimate >> estimate)
+        title: |-
+          Respect for counterarguments ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which political elites acknowledge and respect counterarguments when considering important policy changes.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which political elites acknowledge and respect counterarguments when considering important policy changes.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Respect for counterarguments
         description_from_producer: |-
           Question: When important policy changes are being considered, to what extent do political elites acknowledge and respect counterarguments?
@@ -938,15 +1218,16 @@ tables:
           Scale: Ordinal, converted to interval by the measurement model.
 
           Indicator name: `v2dlcountr`
-        unit: ''
+        unit: ""
 
       # 2.2.17 Deliberative component index
       delib_vdem:
-        title: Deliberative political institutions index (<< estimate >> estimate)
+        title: |-
+          Deliberative political institutions index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which political elites justify their positions, justify them with the common good, acknowledge counterarguments, consult elites in policy changes, and society deliberates policy changes.
         presentation:
-          <<: *common_ppt
+          <<: *ppt_multi_w_regions
           title_public: Deliberative political institutions index
         description_from_producer: |-
           Question: To what extent is the deliberative principle of democracy achieved?
@@ -960,17 +1241,17 @@ tables:
           Interval, from low to high (0-1).
 
           Indicator name: `v2xdl_delib`
-        unit: ''
+        unit: ""
 
       ## 2.2.18 Egalitarian component index
       egal_vdem:
         title: |-
-          Egalitarian political institutions index (<< estimate >> estimate)
+          Egalitarian political institutions index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which the protection of rights, access to power, and distribution of resources is equal.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which the protection of rights, access to power, and distribution of resources is equal.
         presentation:
           title_public: Egalitarian political institutions index
-          <<: *common_ppt_2
+          <<: *ppt_multi_w_regions
         description_from_producer: |-
           Question: To what extent is the egalitarian principle achieved?
 
@@ -979,16 +1260,21 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_egal`
-        unit: ''
+        unit: ""
 
       ## 2.2.6 Clean elections index
       electfreefair_vdem:
-        title: Clean elections index (<< estimate >> estimate)
+        title: |-
+          Clean elections index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which registration fraud, systematic irregularities, government intimidation of the opposition, vote buying, and election violence are absent, and the election management body is autonomous and has enough staff and resources.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which registration fraud, systematic irregularities, government intimidation of the opposition, vote buying, and election violence are absent, and the election management body is autonomous and has enough staff and resources.
         presentation:
-          title_public: Clean elections index
-          <<: *common_ppt_2
+          title_public: Free and fair elections index
+          <<: *ppt_multi_w_regions
+        description_key:
+          - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
+          - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
+          - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
         description_from_producer: |-
           Question: To what extent are elections free and fair?
 
@@ -997,16 +1283,15 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2xel_frefair`
-        unit: ''
+        unit: ""
 
-            ### 3.6.0.4 Range of consultation
-
+      ### 3.6.0.4 Range of consultation
       elitecons_polch_vdem:
-        title: Elite consultation (<< estimate >> estimate)
+        title: "Elite consultation ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)"
         description_short: |-
-          << estimate.title() >> estimate of the extent to which political elites consult other elites across the political spectrum and from relevant sectors of society and business when considering important policy changes.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which political elites consult other elites across the political spectrum and from relevant sectors of society and business when considering important policy changes.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_w_regions
           title_public: Elite consultation
         description_from_producer: |-
           Question: When important policy changes are being considered, how wide is the range of consultation at elite levels?
@@ -1023,15 +1308,16 @@ tables:
           Scale: Ordinal, converted to interval by the measurement model.
 
           Indicator name: `v2dlconslt`
-        unit: ''
+        unit: ""
 
       ## 2.2.20 Equal access index
       equal_access_vdem:
-        title: Equal access to power index (<< estimate >> estimate)
+        title: |-
+          Equal access to power index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which access to power is equal across socioeconomic position, social group, and gender.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which access to power is equal across socioeconomic position, social group, and gender.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_w_regions
           title_public: Equal access to power index
         description_from_producer: |-
           Question: How equal is access to power?
@@ -1041,16 +1327,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2xeg_eqaccess`
-        unit: ''
-
+        unit: ""
 
       ## 2.2.19 Equal protection index
       equal_rights_vdem:
-        title: Equal rights protection index (<< estimate >> estimate)
+        title: |-
+          Equal rights protection index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which the state protects the rights and freedoms across social groups equally.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which the state protects the rights and freedoms across social groups equally.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_w_regions
           title_public: Equal rights protection index
         description_from_producer: |-
           Question: How equal is the protection of rights and freedoms across social groups by the state?
@@ -1060,33 +1346,15 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2xeg_eqprotec`
-        unit: ''
-
-      ## 2.2.21 Equal distribution of resources index
-      equal_res_vdem:
-        title: Equal resource distribution index (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which all social groups benefit from public spending and have equal access to education, healthcare, and the welfare state.
-        presentation:
-          <<: *common_ppt_2
-          title_public: Equal resource distribution index
-        description_from_producer: |-
-          Question: How equal is the distribution of resources?
-
-          Clarification: This component measures the extent to which resources — both tangible and intangible — are distributed in society. An equal distribution of resources supports egalitarian democracy in two ways. First, lower poverty rates and the distribution of goods and services such as food, water, housing, education and healthcare ensure that all individuals are capable of participating in politics and government. In short, basic needs must be met in order for individuals to effectively exercise their rights and freedoms see, for example, Sen 1999, Maslow 1943. Second, high levels of resource inequality undermine the ability of poorer populations to participate meaningfully Aristotle, Dahl 2006. Thus, it is necessary to include not only measures of poverty and the distribution of goods and services, but also the levels of inequality in these distributions, and the proportion of the population who are not eligible for social services i.e. means-tests, particularistic distribution, etc.. This principle also implies that social or economic inequalities can translate into political inequalities, an issue addressed most notably by Walzer 1983, who argues that overlapping "spheres" of inequality are particularly harmful to society. To address these overlapping "spheres", this component also includes measures of the distribution of power in society amongst different socio-economic groups, genders, etc.
-
-          Scale: Interval, from low to high (0-1).
-
-          Indicator name: `v2xeg_eqdr`
-        unit: ''
+        unit: ""
 
       ## 2.2.4 Freedom of association thick index
       freeassoc_vdem:
-        title: Freedom of association thick index (<< estimate >> estimate)
+        title: "Freedom of association thick index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)"
         description_short: |-
-          << estimate.title() >> estimate of the extent to which parties, including opposition parties, are allowed to form and participate in elections and the extent to which civil society organizations are allowed to form and operate freely.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which parties, including opposition parties, are allowed to form and participate in elections and the extent to which civil society organizations are allowed to form and operate freely.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_w_regions
           title_public: Freedom of association thick index
         description_from_producer: |-
           Question: To what extent are parties, including opposition parties, allowed to form and to participate in elections, and to what extent are civil society organizations able to form and to operate freely?
@@ -1094,16 +1362,20 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_frassoc_thick`
-        unit: ''
+        unit: ""
 
       ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
       freeexpr_vdem:
-        title: Freedom of Expression and Alternative Sources of Information index (<< estimate >> estimate)
+        title: "Freedom of expression and alternative sources of information index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)"
         description_short: |-
-          << estimate.title() >> estimate of the extent to which people can discuss political matters at home and in the public sphere, the press, and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which people can discuss political matters at home and in the public sphere, the press, and media are free and can present different political perspectives, and the freedom of academic and cultural expression.
         presentation:
-          <<: *common_ppt_2
-          title_public: Freedom of Expression and Alternative Sources of Information index
+          <<: *ppt_multi_w_regions
+          title_public: Freedom of expression index
+        description_key:
+          - Measures the extent to which governments respect freedoms of expression, academic and cultural expression, and access to alternative sources of information.
+          - Based on media censorship, harassment of journalists, media bias, self-censorship, freedom of discussion, and pluralism in media perspectives.
+          - Higher values (0–1 scale) indicate broader and more secure access to free and diverse information sources.
         description_from_producer: |-
           Question: To what extent does government respect press and media freedom, the freedom of ordinary people to discuss political matters at home and in the public sphere, as well as the freedom of academic and cultural expression?
 
@@ -1112,15 +1384,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_freexp_altinf`
-        unit: ''
+        unit: ""
 
-        ## 2.2.9 Equality before the law and individual liberty index
+      ## 2.2.9 Equality before the law and individual liberty index
       indiv_libs_vdem:
-        title: Equality before the law and individual liberty index (<< estimate >> estimate)
+        title: |-
+          Equality before the law and individual liberty index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which extent to which citizens enjoy physical integrity rights, freedoms of religion, of movement, and from forced labor, as well as access to justice, laws are transparent, and public administration is impartial.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which extent to which citizens enjoy physical integrity rights, freedoms of religion, of movement, and from forced labor, as well as access to justice, laws are transparent, and public administration is impartial.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_w_regions
           title_public: Equality before the law and individual liberty index
         description_from_producer: |-
           Question: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what extent do citizens enjoy access to justice, secure property rights, freedom from forced labor, freedom of movement, physical integrity rights, and freedom of religion?
@@ -1128,15 +1401,16 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2xcl_rol`
-        unit: ''
+        unit: ""
 
       ## 2.2.10 Judicial constraints on the executive index
       judicial_constr_vdem:
-        title: Judicial constraints on the executive index (<< estimate >> estimate)
+        title: |-
+          Judicial constraints on the executive index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_short: |-
-          << estimate.title() >> estimate of the extent to which the executive respects the constitution, complies with the judiciary and high courts, and higher and lower courts are independent.
+          {definitions.auxiliary.estimate_title} estimate of the extent to which the executive respects the constitution, complies with the judiciary and high courts, and higher and lower courts are independent.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_w_regions
           title_public: Judicial constraints on the executive index
         description_from_producer: |-
           Question: To what extent does the executive respect the constitution and comply with court rulings, and to what extent is the judiciary able to act in an independent fashion?
@@ -1144,172 +1418,7 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_jucon`
-        unit: ''
-
-      ## 3.6.0.2 Common good
-      justcomgd_polch_vdem:
-        title: Common good justifications (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which political elites justify their views with the common good for society, either the greatest good for the greatest number of people or as helping the least advantaged people in society when considering important policy changes.
-        presentation:
-          <<: *common_ppt
-          title_public: Common good justifications
-        description_from_producer: |-
-          Question: Question: When important policy changes are being considered, to what extent do political elites justify their positions in terms of the common good?
-
-          Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
-
-          Responses:
-          0: Little or no justification in terms of the common good is usually offered.
-          1: Specific business, geographic, group, party, or constituency interests are for the most part offered as justifications.
-          2: Justifications are for the most part a mix of specific interests and the common good and it is impossible to say which justification is more common than the other.
-          3: Justifications are based on a mixture of references to constituency/party/group interests and on appeals to the common good.
-          4: Justifications are for the most part almost always based on explicit statements of the common good for society, understood either as the greatest good for the greatest number or as helping the least advantaged in a society.
-
-          Indicator name: `v2dlcommon`
-        unit: ''
-
-      ## 3.6.0.1 Reasoned justification
-      justified_polch_vdem:
-        title: Justified political positions (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which political elites provide complex, nuanced, and complete justifications for their views when considering important policy changes.
-        presentation:
-          <<: *common_ppt
-          title_public: Justified political positions
-        description_from_producer: |-
-          Question: When important policy changes are being considered, i.e. before a decision has been made, to what extent do political elites give public and reasoned justifications for their positions?
-
-          Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
-
-          Responses:
-
-          0: No justification. Elites almost always only dictate that something should or should not be done, but no reasoning about justification is given. For example, "We must cut spending."
-          1: Inferior justification. Elites tend to give reasons why someone should or should not be for doing or not doing something, but the reasons tend to be illogical or false, although they may appeal to many voters. For example, "We must cut spending. The state is inefficient." [The inference is incomplete because addressing inefficiencies would not necessarily reduce spending and it might undermine essential services.]
-          2: Qualified justification. Elites tend to offer a single simple reason justifying why the proposed policies contribute to or detract from an outcome. For example, "We must cut spending because taxpayers cannot afford to pay for current programs."
-          3: Sophisticated justification. Elites tend to offer more than one or more complex, nuanced and complete justification. For example, "We must cut spending because taxpayers cannot afford to pay for current government programs. Raising taxes would hurt economic growth, and deficit spending would lead to inflation."
-
-          Indicator name: `v2dlreason`
-        unit: ''
-
-      ## 2.2.11 Legislative constraints on the executive index
-      legis_constr_vdem:
-        title: Legislative constraints on the executive index (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which the legislature, including opposition parties, questions executive officials and oversees and investigates the executive.
-        presentation:
-          <<: *common_ppt
-          title_public: Legislative constraints on the executive index
-        description_from_producer: |-
-          Question: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
-
-          Clarification: To what extent are the legislature and government agencies e.g., comptroller general, general prosecutor, or ombudsman capable of questioning, investigating, and exercising oversight over the executive?
-
-          Scale: Interval, from low to high (0-1).
-
-          Indicator name: `v2xlg_legcon`
-        unit: ''
-
-      ## 2.2.8 Liberal component index
-      lib_vdem:
-        title: Liberal component index (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent of individual and minority rights, equality before the law, and executive constraints.
-        presentation:
-          <<: *common_ppt
-          title_public: Liberal component index
-        description_from_producer: &description_prod_lib_vdem |-
-          Question: To what extent is the liberal principle of democracy achieved?
-
-          Clarification: The liberal principle of democracy emphasizes the importance of protecting individual and minority rights against the tyranny of the state and the tyranny of the majority. The liberal model takes a "negative" view of political power insofar as it judges the quality of democracy by the limits placed on government. This is achieved by constitutionally protected civil liberties, strong rule of law, an independent judiciary, and effective checks and balances that, together, limit the exercise of executive power.
-
-          Scale: Interval, from low to high (0-1).
-
-          Indicator name: `v2x_liberal`
-        unit: ''
-
-
-      ## 2.2.15 Local government index
-      locelect_vdem:
-        title: Elected local governments (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which elected local governments exist, and they operate without interference from local unelected bodies.
-        presentation:
-          <<: *common_ppt
-          title_public: Elected local governments
-        description_from_producer: |-
-          Question: Are there elected local governments, and — if so — to what extent can they operate without interference from unelected bodies at the local level?
-
-          Clarification: The lowest score would be reserved for a country that has no elected local governments. A medium score would be accorded a country that has elected local governments but where those governments are subordinate to unelected officials at the local level perhaps appointed by a higher-level body. A high score would be accorded to a country in which local governments are elected and able to operate without restrictions from unelected actors at the local level with the exception of judicial bodies. Naturally, local governments remain subordinate to the regional and national governments.
-
-          Scale: Interval, from low to high (0-1).
-
-          Indicator name: `v2xel_locelec`
-        unit: ''
-
-      ## 2.2.12 Participatory component index
-      particip_vdem:
-        title: Participatory political institutions (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which citizens can engage in regional and local government, civil society organizations, and direct democracy.
-        presentation:
-          <<: *common_ppt
-          title_public: Participatory political institutions
-        description_from_producer: |-
-          Question: To what extent is the participatory principle achieved?
-
-          Clarification:
-          The participatory principle of democracy emphasizes active participation by citizens in all political processes, electoral and non-electoral. It is motivated by uneasiness about a bedrock practice of electoral democracy: delegating authority to representatives. Thus, direct rule by citizens is preferred, wherever practicable. This model of democracy thus takes suffrage for granted, emphasizing engagement in civil society organizations, direct democracy, and subnational elected bodies.
-
-          Scale: Interval, from low to high (0-1).
-
-          Indicator name: `v2x_partip`
-        unit: ''
-
-      ## 2.2.16 Regional government index
-      regelect_vdem:
-        title: Elected regional governments (<< estimate >> estimate)
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which elected regional governments exist, and they operate without interference from regional unelected bodies.
-        presentation:
-          <<: *common_ppt
-          title_public: Elected regional governments
-        description_from_producer: |-
-          Question: Are there elected regional governments, and — if so — to what extent can they operate without interference from unelected bodies at the regional level?
-
-          Clarification: The lowest score would be reserved for a country that has no elected regional governments. A medium score would be accorded a country that has elected regional governments but where those governments are subordinate to unelected officials at the regional level perhaps appointed by a higher-level body. A high score would be accorded to a country in which regional governments are elected and able to operate without restrictions from unelected actors at the regional level with the exception of judicial bodies. Naturally, regional governments remain subordinate to the national government.
-
-          Scale: Interval, from low to high (0-1).
-
-          Indicator name: `v2xel_regelec`
-        unit: ''
-
-      ## 3.6.0.5 Engaged society
-      soccons_polch_vdem:
-        title: "Engaged society (<< estimate >> estimate)"
-        description_short: |-
-          << estimate.title() >> estimate of the extent to which ordinary people independently discuss important policy changes among themselves, in the media, in associations or neighborhoods, or in the streets.
-        presentation:
-          <<: *common_ppt
-          title_public: Engaged society
-        description_from_producer: |-
-          Question: When important policy changes are being considered, how wide and how independent are public deliberations?
-
-          Clarification: This question refers to deliberation as manifested in discussion, debate, and other public forums such as popular media.
-
-          Responses:
-          0: Public deliberation is never, or almost never allowed.
-          1: Some limited public deliberations are allowed but the public below the elite levels is almost always either unaware of major policy debates or unable to take part in them.
-          2: Public deliberation is not repressed but nevertheless infrequent and non-elite actors are typically controlled and/or constrained by the elites.
-          3: Public deliberation is actively encouraged and some autonomous non-elite groups participate, but it is confined to a small slice of specialized groups that tends to be the same across issue-areas.
-          4: Public deliberation is actively encouraged and a relatively broad segment of non-elite groups often participate and vary with different issue-areas.
-          5: Large numbers of non-elite groups as well as ordinary people tend to discuss major policies among themselves, in the media, in associations or neighborhoods, or in the streets. Grass-roots deliberation is common and unconstrained.
-
-          Scale: Ordinal, converted to interval by the measurement model.
-
-          Indicator name: `v2dlengage`
-        unit: ''
-
+        unit: ""
 
   ##################################################################################################
   ##################################################################################################
@@ -1319,16 +1428,18 @@ tables:
     description: ""
     common:
       display:
-          numDecimalPlaces: 2
-      presentation: &common_ppt_2
-        title_variant: (<< estimate >> estimate)
+        numDecimalPlaces: 2
+      presentation: &ppt_multi_wo_regions
+        title_variant: ({definitions.auxiliary.estimate} estimate)
+
     variables:
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.3 Access to justice for men
       accessjust_m_row:
-        title: Access to justice for men (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate whether men have access to justice.
+        title: Access to justice for men ({definitions.auxiliary.estimate} estimate) (re-estimate)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate whether men have access to justice.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
           title_public: "Access to justice for men"
         description_from_producer: |-
           Question: Do men enjoy secure and effective access to justice?
@@ -1348,16 +1459,17 @@ tables:
           We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstm_osp*`) into two categories: 0 ("No") and 1 ("Yes").
 
           {definitions.auxiliary.description_processing_row}
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
 
       # [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.4 Access to justice for women
       accessjust_w_row:
-        title: Access to justice for women (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate whether women have access to justice.
+        title: Access to justice for women ({definitions.auxiliary.estimate} estimate) (re-estimate)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate whether women have access to justice.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
           title_public: "Access to justice for women"
         description_from_producer: |-
           Question: Do women enjoy equal, secure, and effective access to justice?
@@ -1377,34 +1489,39 @@ tables:
           We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2clacjstw_osp*`) into two categories: 0 ("No") and 1 ("Yes").
 
           {definitions.auxiliary.description_processing_row}
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.1.1 Electoral democracy index
       electdem_dich_row_owid:
-        title: Electoral democracy (<< estimate >> estimate) (re-estimate)
+        title: Electoral democracy ({definitions.auxiliary.estimate} estimate) (re-estimate)
         description_short: |-
-          << estimate.title() >> estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
+          {definitions.auxiliary.estimate_title} estimate of whether the country is meaningfully an electoral democracy. This includes the extent to which political leaders are elected under comprehensive suffrage in free and fair elections, and freedoms of association and expression are guaranteed.
         presentation:
           title_public: Electoral democracy
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
         description_from_producer: *description_prod_electdem_vdem
         description_processing: |-
           We employ Lührmann et al.'s criteria and use a threshold of 0.5 to classify the original indicator (`v2x_polyarchy_osp*`) into two categories: 0 ("No") and 1 ("Yes").
 
           {definitions.auxiliary.description_processing_row}
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.1.2.15 Election free and fair
       electfreefair_row:
-        title: Free and fair elections (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate of whether national elections were free and fair or not.
+        title: Free and fair elections ({definitions.auxiliary.estimate} estimate) (re-estimate)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of whether national elections were free and fair or not.
         presentation:
           title_public: Free and fair elections
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
+        description_key:
+          - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
+          - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
+          - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
         description_from_producer: |-
           Question: Taking all aspects of the pre-election period, election day, and the post-election process into account, would you consider this national election to be free and fair?
 
@@ -1422,19 +1539,19 @@ tables:
           We employ Lührmann et al.'s criteria and use a threshold of 2 to classify the original indicator (`v2elfrfair_osp*`) into two categories: 0 ("No") and 1 ("Yes").
 
           {definitions.auxiliary.description_processing_row}
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
 
       ## [CUSTOM]
       electmulpar_hoe_row_owid:
-        title: Multi-party elections for government's chief executive (<< estimate >> estimate)
+        title: Multi-party elections for government's chief executive ({definitions.auxiliary.estimate} estimate)
         description_short: |-
 
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
           title_public: Multi-party elections for government's chief executive
-        unit: ''
+        unit: ""
         description_processing: |-
           {definitions.auxiliary.description_processing_row}
 
@@ -1448,25 +1565,25 @@ tables:
 
       ## [CUSTOM, based on `v2elmulpar_osp`]
       electmulpar_leg_row:
-        title: Multiparty elections for legislature (<< estimate >> estimate)
+        title: Multiparty elections for legislature ({definitions.auxiliary.estimate} estimate)
         description_short: |-
-          << estimate.title() >> estimate of whether multi-party elections for the national legislature were held or not.
+          {definitions.auxiliary.estimate_title} estimate of whether multi-party elections for the national legislature were held or not.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
           title_public: Multiparty elections for legislature
         description_processing: |-
           Use the value from `v2elmulpar_osp` whenever `v2eltype` is 0, 1, 4 or 5. Otherwise the value is missing.
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE] 3.1.2.5 Elections multiparty
       electmulpar_row:
-        title: Multiparty elections (<< estimate >> estimate) (re-estimate)
+        title: Multiparty elections ({definitions.auxiliary.estimate} estimate) (re-estimate)
         description_short: |-
-          << estimate.title() >> estimate whether national multi-party elections were held.
+          {definitions.auxiliary.estimate_title} estimate whether national multi-party elections were held.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
           title_public: Multiparty elections
         description_from_producer: |-
           Question: Question: Was this national election multiparty?
@@ -1483,33 +1600,34 @@ tables:
           We use a threshold of 2 on `v2elmulpar_osp` to classify the original indicator into 0 ("No") and 1 ("Yes") categories.
 
           {definitions.auxiliary.description_processing_row}
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 2.2.8 Liberal component index
       lib_dich_row:
-        title: Liberal political institutions (<< estimate >> estimate) (re-estimate)
-        description_short: << estimate.title() >> estimate of whether the country has meaningfully liberal political institutions
+        title: Liberal political institutions ({definitions.auxiliary.estimate} estimate) (re-estimate)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of whether the country has meaningfully liberal political institutions
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
           title_public: Liberal political institutions
         description_from_producer: *description_prod_lib_vdem
         description_processing: |-
           We employ Lührmann et al.'s criteria and use a threshold of 0.8 to classify the original indicator (`v2x_liberal*`) into two categories: 0 ("No") and 1 ("Yes").
 
           {definitions.auxiliary.description_processing_row}
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
 
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.1 Transparent laws with predictable enforcement
       transplaws_row:
-        title: Transparent laws with predictable enforcement (<< estimate >> estimate) (re-estimate)
+        title: Transparent laws with predictable enforcement ({definitions.auxiliary.estimate} estimate) (re-estimate)
         description_short: |-
-          << estimate.title() >> estimate of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable.
+          {definitions.auxiliary.estimate_title} estimate of whether laws are transparent, coherent, and relatively stable, and their enforcement predictable.
         presentation:
-          <<: *common_ppt_2
+          <<: *ppt_multi_wo_regions
           title_public: Transparent laws with predictable enforcement
         description_from_producer: |-
           Question: Are the laws of the land clear, well publicized, coherent (consistent with each other), relatively stable from year to year, and enforced in a predictable manner?
@@ -1528,7 +1646,7 @@ tables:
           We employ Lührmann et al.'s criteria and use a threshold of 3 to classify the original indicator (`v2cltrnslw_osp*`) into two categories: 0 ("No") and 1 ("Yes").
 
           {definitions.auxiliary.description_processing_row}
-        unit: ''
+        unit: ""
         display:
           numDecimalPlaces: 0
 
