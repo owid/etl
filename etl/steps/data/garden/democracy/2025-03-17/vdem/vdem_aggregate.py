@@ -117,9 +117,6 @@ _indicators_avg = [
     "v2mecenefm",
     "v2meharjrn",
     "v2meslfcen",
-    "v2xpas_democracy",
-    "v2xpas_democracy_government",
-    "v2xpas_democracy_opposition",
     "v2cademmob",
     "v2caautmob",
     "v2cacamps",
@@ -240,7 +237,8 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     )
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 178, "Unexpected number of columns."
+    n_expected = 175
+    assert tb_.shape[1] == n_expected, f"Unexpected number of columns. Expected {n_expected} but found {tb_.shape[1]}"
 
     return tb_
 
@@ -401,7 +399,8 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     # Rename columns
     # tb_ = tb_.rename(columns={col: f"popw_{col}" for col in INDICATORS_REGION_AVERAGES})
     # Sanity check on output shape
-    assert tb_.shape[1] == 178, "Unexpected number of columns."
+    n_expected = 175
+    assert tb_.shape[1] == n_expected, f"Unexpected number of columns. Expected {n_expected} but found {tb_.shape[1]}"
 
     return tb_
 
