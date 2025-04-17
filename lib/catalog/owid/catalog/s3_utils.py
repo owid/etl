@@ -104,7 +104,11 @@ def download_s3_folder(
             local_file_path = local_dir / Path(s3_key).name
             futures.append(
                 executor.submit(
-                    download, f"s3://{bucket}/{s3_key}", local_file_path.as_posix(), client=client, quiet=True
+                    download,
+                    f"s3://{bucket}/{s3_key}",
+                    local_file_path.as_posix(),
+                    client=client,
+                    quiet=True,
                 )
             )
 

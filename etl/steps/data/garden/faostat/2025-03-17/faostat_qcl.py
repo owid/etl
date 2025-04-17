@@ -59,7 +59,7 @@ MEAT_TOTAL_ITEM_CODES = [
     "00001158",  # 'Meat of other domestic camelids, fresh or chilled',
     "00001151",  # 'Meat of other domestic rodents, fresh or chilled',
     "00001089",  # 'Meat of pigeons and other birds n.e.c., fresh, chilled or frozen',
-    "00001176",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
+    # "00001176",  # 'Snails, fresh, chilled, frozen, dried, salted or in brine, except sea snails',
     # Items that were in the list of "Meat, Total", but were not in the data:
     # "00001083",  # 'Other birds',
 ]
@@ -183,7 +183,9 @@ def add_slaughtered_animals_to_meat_total(tb: Table) -> Table:
     tb = tb.copy()
 
     error = f"Some items required to get the aggregate '{TOTAL_MEAT_ITEM}' are missing in data."
-    assert set(MEAT_TOTAL_ITEM_CODES) < set(tb["item_code"]), error
+    assert set(MEAT_TOTAL_ITEM_CODES) < set(
+        tb[tb["element_code"].isin(list(SLAUGHTERED_ANIMALS_ELEMENT_CODES_TO_FAO_UNITS))]["item_code"]
+    ), error
     assert SLAUGHTERED_ANIMALS_ELEMENT in set(tb["element"])
     assert SLAUGHTERED_ANIMALS_UNIT in set(tb["unit"])
 

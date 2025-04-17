@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Set
 from owid.catalog import Dataset
 
 from etl.db import read_sql
+from etl.files import yaml_dump
 from etl.paths import DATA_DIR
 
 
@@ -332,3 +333,78 @@ def camelize(obj: Any, exclude_keys: Optional[Set[str]] = None) -> Any:
         return [camelize(item, exclude_keys) for item in obj]
     else:
         return obj
+
+
+def move_field_to_top(data, field):
+    """
+    Returns a new dictionary with the specified field moved to the top.
+    If the field doesn't exist, returns the original dictionary.
+    """
+    if field not in data:
+        return data
+
+    # Create a new dictionary starting with the specified field
+    new_data = {field: data[field]}
+
+    # Add the remaining items in their original order
+    for key, value in data.items():
+        if key != field:
+            new_data[key] = value
+
+    return new_data
+
+
+def extract_definitions(config: dict) -> dict:
+    config = deepcopy(config)
+
+    definitions = defaultdict(dict)
+    for view in config["views"]:
+        # Create shared definitions
+        for indicator in view["indicators"]["y"]:
+            # Move some fields into definitions
+            display = indicator["display"]
+            for key in ("additionalInfo",):
+                info = display[key]
+                info = info.replace("\\n", "\n")
+
+                h = "def_" + str(abs(hash(display[key])))
+
+                definitions[key][h] = info
+                display[key] = "*" + h
+
+    if "definitions" not in config:
+        config["definitions"] = {}
+    config["definitions"].update(definitions)
+    config = move_field_to_top(config, "definitions")
+
+    return config
+
+
+def dump_yaml_with_anchors(data):
+    """
+    Dump a dictionary to a YAML string, converting definition keys to anchors
+    and replacing quoted alias strings with YAML aliases.
+
+    Args:
+        data (dict): The dictionary to dump.
+
+    Returns:
+        str: The YAML string with anchors and aliases.
+    """
+    # Dump the dict to a YAML string. Using default_flow_style=False to get block style.
+    dumped = yaml_dump(data)
+
+    # For any key in the definitions block starting with "def_",
+    # insert an anchor. This regex finds lines with an indented key that starts with def_.
+    dumped = re.sub(
+        r"^(\s+)(def_[^:]+):(.*)$",
+        lambda m: f"{m.group(1)}{m.group(2)}: &{m.group(2)}{m.group(3)}",
+        dumped,
+        flags=re.MULTILINE,
+    )
+
+    # Replace quoted alias strings like '*def_2329260084214905053'
+    # with an unquoted alias *def_2329260084214905053.
+    dumped = re.sub(r"""(['"])(\*def_[^'"]+)\1""", lambda m: m.group(2), dumped)
+
+    return dumped

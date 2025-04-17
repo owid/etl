@@ -34,16 +34,15 @@ steps:
     - data://garden/lgbt_rights/2024-06-11/criminalization_mignot
 
   # Equaldex dataset
-  data://meadow/lgbt_rights/2024-06-03/equaldex:
-    - snapshot://lgbt_rights/2024-06-03/equaldex.csv
-    - snapshot://lgbt_rights/2024-06-03/equaldex_current.csv
-    - snapshot://lgbt_rights/2024-06-03/equaldex_indices.csv
-
-  data://garden/lgbt_rights/2024-06-03/equaldex:
-    - data://meadow/lgbt_rights/2024-06-03/equaldex
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
+  data://meadow/lgbt_rights/2025-04-07/equaldex:
+    - snapshot://lgbt_rights/2025-04-07/equaldex.csv
+    - snapshot://lgbt_rights/2025-04-07/equaldex_indices.csv
+    - snapshot://lgbt_rights/2025-04-07/equaldex_current.csv
+  data://garden/lgbt_rights/2025-04-07/equaldex:
+    - data://meadow/lgbt_rights/2025-04-07/equaldex
+    - data://garden/demography/2024-07-15/population
     - data://garden/countries/2023-09-25/isd
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/lgbt_rights/2025-04-07/equaldex:
+    - data://garden/lgbt_rights/2025-04-07/equaldex
 
-  data://grapher/lgbt_rights/2024-06-03/equaldex:
-    - data://garden/lgbt_rights/2024-06-03/equaldex

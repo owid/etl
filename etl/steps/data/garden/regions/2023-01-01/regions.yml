@@ -1476,6 +1476,7 @@
     - "Chinese Taipei"
     - "Taiwan (Province of China)"
     - "Taiwan, Province Of China"
+    - "Taiwan, China"
 
 - code: "TJK"
   name: "Tajikistan"
@@ -1521,6 +1522,8 @@
   name: "Turkey"
   aliases:
     - "The Republic of Türkiye"
+    - "Turkiye"
+    - "Türkiye"
 
 - code: "TKM"
   name: "Turkmenistan"

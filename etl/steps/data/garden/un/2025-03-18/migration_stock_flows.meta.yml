@@ -1,0 +1,58 @@
+# This metadata is applied to the GRAPHER step set - as the garden set is in a different format with less dimensions for reusing in other steps
+definitions:
+  people_label: |-
+    <% if gender == "all" %>people<% elif gender == "female" %>women<% elif gender == "male" %>men<% endif %>
+  immigrants:
+    title: |-
+      <% if gender == "all" %>
+      Immigrants to << country_select >>: Where did they move from?
+      <%- elif gender == "female" %>
+      Women who moved from another country to << country_select >>
+      <%- elif gender == "male" %>
+      Men who moved from another country to << country_select >>
+      <%- endif %>
+    description_short: |-
+      The number of {definitions.people_label} who moved from another country to << country_select >>. This is a measure of immigrant stocks at mid-year, not the annual flow of immigrants.
+  emigrants:
+    title: |-
+      <% if gender == "all" %>
+      Emigrants from << country_select >>: Where did they move to?
+      <%- elif gender == "female" %>
+      Women who moved from << country_select >> to another country
+      <%- elif gender == "male" %>
+      Men who moved from << country_select >> to another country
+      <%- endif %>
+    description_short: |-
+      The number of {definitions.people_label} who were born in << country_select >> and now live abroad. This is a measure of emigrant stocks at mid-year, not the annual flow of emigrants.
+  common:
+    display:
+      numDecimalPlaces: 0
+    presentation:
+      topic_tags:
+        - Migration
+    short_unit: ""
+    unit: people
+    processing_level: major
+    description_processing: |-
+      - Regional aggregates (such as continents, income groups and the worldwide aggregate) are based on [our definition of the continents](https://ourworldindata.org/world-region-map-definitions#our-world-in-data) and the [World Bank definition of income groups](https://ourworldindata.org/grapher/world-bank-income-groups), unless otherwise indicated. They might differ from the definitions used by the United Nations.
+
+dataset:
+  update_period_days: 729
+
+
+tables:
+  migrant_stock_dest_origin:
+    variables:
+      migrants:
+        title: |-
+          <% if metric == "immigrants" %>
+          {definitions.immigrants.title}
+          <%- elif metric == "emigrants"%>
+          {definitions.emigrants.title}
+          <%- endif %>
+        description_short: |-
+          <% if metric == "immigrants" %>
+          {definitions.immigrants.description_short}
+          <%- elif metric == "emigrants"%>
+          {definitions.emigrants.description_short}
+          <%- endif %>

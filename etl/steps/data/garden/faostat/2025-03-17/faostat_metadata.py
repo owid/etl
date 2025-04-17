@@ -1003,10 +1003,10 @@ def run() -> None:
     #
     # Load data.
     #
-    # Define path to current step file.
+    # Define path to current dataset step file.
     current_step_file = (CURRENT_DIR / "faostat_metadata").with_suffix(".py")
 
-    # Get paths and naming conventions for current data step.
+    # Get paths and naming conventions for current step.
     paths = PathFinder(current_step_file.as_posix())
 
     # Path to file with custom dataset titles and descriptions.
@@ -1062,11 +1062,13 @@ def run() -> None:
     #
     # Save outputs.
     #
-    # Create a new garden dataset.
+    # Initialize a new garden dataset.
     ds_grapher = paths.create_dataset(
         tables=[datasets_table, items_table, elements_table, countries_table, amendments_table],
         repack=False,
         default_metadata=metadata.metadata,
         check_variables_metadata=False,
     )
+
+    # Save garden dataset.
     ds_grapher.save()

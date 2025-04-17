@@ -150,10 +150,12 @@ def run() -> None:
     tb_vegetable_oil_yields = ds_garden.read("vegetable_oil_yields", reset_index=False)
     tb_agriculture_land_use_evolution = ds_garden.read("agriculture_land_use_evolution", reset_index=False)
     tb_hypothetical_meat_consumption = ds_garden.read("hypothetical_meat_consumption", reset_index=False)
+    tb_hypothetical_animals_slaughtered = ds_garden.read("hypothetical_animals_slaughtered", reset_index=False)
     tb_cereal_allocation = ds_garden.read("cereal_allocation", reset_index=False)
     tb_maize_and_wheat = ds_garden.read("maize_and_wheat", reset_index=True)
     tb_fertilizer_exports = ds_garden.read("fertilizer_exports", reset_index=False)
     tb_net_exports_as_share_of_supply = ds_garden.read("net_exports_as_share_of_supply", reset_index=False)
+    tb_milk_per_animal = ds_garden.read("milk_per_animal", reset_index=False)
 
     #
     # Process data.
@@ -199,10 +201,12 @@ def run() -> None:
             tb_vegetable_oil_yields,
             tb_agriculture_land_use_evolution,
             tb_hypothetical_meat_consumption,
+            tb_hypothetical_animals_slaughtered,
             tb_cereal_allocation,
             tb_maize_and_wheat_in_the_context_of_the_ukraine_war,
             tb_fertilizer_exports_in_the_context_of_the_ukraine_war,
             tb_net_exports_as_share_of_supply,
+            tb_milk_per_animal,
         ],
         default_metadata=ds_garden.metadata,
     )

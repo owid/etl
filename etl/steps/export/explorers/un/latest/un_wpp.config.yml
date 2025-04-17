@@ -21,6 +21,7 @@ definitions:
       config:
         title: Annual net migration rate
 
+# TODO: this is duplicated with config from un_wpp.manual.config.yml
 config:
   explorerTitle: "Population & Demography"
   explorerSubtitle: "Explore data from the United Nations World Population Prospects."
@@ -28,6 +29,35 @@ config:
   hasMapTab: true
   thumbnail: "https://owid.cloud/app/uploads/2022/07/Population-Data-Explorer.png"
   isPublished: true
+  selection:
+    - China
+    - India
+    - United States
+    - Indonesia
+    - Pakistan
+    - Nigeria
+    - Brazil
+    - Japan
+  pickerColumnSlugs:
+    - location
+    - population__all__all__records
+    - population_change__all__all__records
+    - population_density__all__all__records
+    - births__all__all__records
+    - birth_rate__all__all__records
+    - deaths__all__all__records
+    - death_rate__all__all__records
+    - fertility_rate__all__all__records
+    - growth_natural_rate__all__all__records
+    - growth_rate__all__all__records
+    - life_expectancy__all__at_birth__records
+    - net_migration__all__all__records
+    - net_migration_rate__all__all__records
+    - sex_ratio__none__at_birth__records
+    - dependency_ratio_total__all__none__records
+    - dependency_ratio_child__all__none__records
+    - dependency_ratio_old__all__none__records
+    - median_age__all__all__records
 
 dimensions:
   - slug: indicator

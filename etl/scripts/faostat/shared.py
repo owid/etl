@@ -37,14 +37,14 @@ N_CHARACTERS_ELEMENT_CODE = 6
 # Codes of FAOSTAT domains to download from FAO and upload to bucket.
 # This is the list that will determine the datasets (faostat_*) to be created in all further etl data steps.
 INCLUDED_DATASETS_CODES = [
+    # Country Investment Statistics Profile
+    "cisp",
     # Food Balances: Food Balances (2010-).
     "fbs",
     # Food Balances: Food Balances (-2013, old methodology and population).
     "fbsh",
     # Food Security and Nutrition: Suite of Food Security Indicators.
     "fs",
-    # Credit to Agriculture.
-    "ic",
     # Land, Inputs and Sustainability: Land Cover.
     "lc",
     # Production: Crops and livestock products.
@@ -96,6 +96,9 @@ INCLUDED_DATASETS_CODES = [
     # "el",
     # Land, Inputs and Sustainability: Pesticides indicators.
     # "ep",
+    # The following were used in the past, but they are not used anymore in charts.
+    # Credit to Agriculture.
+    # "ic",
     # Food Balances: Supply Utilization Accounts.
     # "scl",
 ]

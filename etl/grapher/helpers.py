@@ -103,11 +103,9 @@ def _yield_wide_table(
             # Silence - DeprecationWarning: Passing a BlockManager to Table is deprecated and will raise
             # in a future version. Use public APIs instead.
             with warnings.ignore_warnings([DeprecationWarning]):
+                mask = table_to_yield[column].notna() if na_action == "drop" else slice(None)
                 # NOTE: this copy is important, otherwise we'd ruin metadata
-                tab = table_to_yield.loc[:, [column]].copy(deep=False)
-
-            # Drop NA values
-            tab = tab.dropna() if na_action == "drop" else tab
+                tab = table_to_yield.loc[mask, [column]].copy(deep=False)
 
             # Create underscored name of a new column from the combination of column and dimensions
             short_name = _underscore_column_and_dimensions(

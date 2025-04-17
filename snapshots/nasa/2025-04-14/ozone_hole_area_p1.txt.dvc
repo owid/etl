@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: NASA Ozone Watch
+    title: Ozone hole area and concentration
+    description: |-
+      Annual maximum and Antarctic stratospheric ozone hole area, resultant from the emission of ozone-depleting substances.
+
+      Minimum and mean Southern Hemisphere daily ozone concentrations, measured in Dobson Units (DU).
+    title_snapshot: Ozone hole are and concentration, Part 2
+    citation_full: NASA, Goddard Space Flight Center. 2025. NASA Ozone Watch.
+    attribution_short: NASA
+    url_main: http://ozonewatch.gsfc.nasa.gov/meteorology/annual_data.html
+    url_download: https://ozonewatch.gsfc.nasa.gov/statistics/ytd_data.txt
+    date_accessed: "2025-04-14"
+    date_published: "2024-10-29"
+    license:
+      name: CC BY
+      url: https://science.data.nasa.gov/license/
+outs:
+  - md5: ec9116b4aefdbf5104b99742b13ee35d
+    size: 2446
+    path: ozone_hole_area_p1.txt
