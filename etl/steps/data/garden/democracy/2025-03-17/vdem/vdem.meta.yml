@@ -96,7 +96,7 @@ tables:
 
           Clarification: This index attempts to measure (a) whether the chief executive is elected, either directly elected through popular elections or indirectly through a popularly elected legislature that then appoints the chief executive; and (b) whether the legislature, in presidential systems with a directly elected president that is also chief executive, is directly or indirectly elected. Note that a popular election is minimally defined and also includes sham elections with limited suffrage and no competition. Similarly, "appointment" by legislature only implies selection and/or approval, not the power to dismiss. This index is useful primarily for aggregating higher-order indices and should not necessarily be interpreted as an important element of democracy in its own right.
 
-          Indicator name: `v2x_elecoff`
+          V-Dem indicator nanme: `v2x_elecoff`
         presentation:
           <<: *ppt_uni_w_regions
           title_public: Elected officials index
@@ -115,7 +115,7 @@ tables:
           Clarification:
           This question does not take into consideration restrictions based on age, residence, having been convicted for crime, or being legally incompetent. It covers legal de jure restrictions, not restrictions that may be operative in practice de facto. The adult population as defined by statute is defined by citizens in the case of independent countries or the people living in the territorial entity in the case of colonies. Universal suffrage is coded as 100%. Universal male suffrage only is coded as 50%. Years before electoral provisions are introduced are scored 0%. The scores do not reflect whether an electoral regime was interrupted or not. Only if new constitutions, electoral laws, or the like explicitly introduce new regulations of suffrage, the scores were adjusted accordingly if the changes suggested doing so. If qualifying criteria other than gender apply such as property, tax payments, income, literacy, region, race, ethnicity, religion, and/or 'economic independence', estimates have been calculated by combining information on the restrictions with different kinds of statistical information on population size, age distribution, wealth distribution, literacy rates, size of ethnic groups, etc., secondary country-specific sources, and — in the case of very poor information — the conditions in similar countries or colonies. The scores reflect de jure provisions of suffrage extension in percentage of the adult population. If the suffrage law is revised in a way that affects the extension, the scores reflect this change as of the calendar year the law was enacted.
 
-          Indicator name: `v2x_suffr`
+          V-Dem indicator nanme: `v2x_suffr`
         description_processing: |-
           Converted ratio (0-1) into share (0-100%).
 
@@ -139,7 +139,7 @@ tables:
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
-          Indicator name: `v2eltrnout`
+          V-Dem indicator nanme: `v2eltrnout`
         unit: "%"
         presentation:
           <<: *ppt_uni_w_regions
@@ -154,71 +154,11 @@ tables:
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
-          Indicator name: `v2elvaptrn`
+          V-Dem indicator nanme: `v2elvaptrn`
         unit: "%"
         presentation:
           <<: *ppt_uni_w_regions
           title_public: Voter turnout of voting-age population
-        display:
-          numDecimalPlaces: 2
-
-      # 6.1 Party-System Democracy Index (D)
-      v2xpas_democracy:
-        title: |-
-          Political parties support democracy (aggregate: << aggregate_method >>)
-        description_short: |-
-          Extent to which the overall party system adheres to democratic norms prior to elections, based on weighted assessments of anti-pluralism among all parties in a given electoral year​.
-        description_from_producer: |-
-          Question: To what extent does the party system show commitment to democratic norms prior to elections?
-
-          Clarification: The Party-System Democracy Index (PSDI) ranges from 0 to 1, where lower values are associated with more authoritarian party systems and higher values with more democratic party systems. As this index is calculated for country-election-year, we advise caution using it for years where a country does not have a general election (lower house).
-
-          Scale: Interval, from low to high (0-1).
-
-          Notes: The PSDI is calculated by using two V-Party variables: (1) the anti-pluralist index for each political party in a given party system (v2xpa_antiplural) and (2) the seat shares for each political party within that party system (v2paseatshare). Political parties are further divided into those in the government (v2pagovsup = 0, 1, or 2) or those in the opposition (v2pagovsup = 3). To account for hegemonic or competitive authoritarian regimes that allow opposition parties to exist, missing values for a non-existent opposition are replaced with 0 if the electoral democracy index (v2x_polyarchy) scores lower than 0.5 for that country-election- year. Consequently, these missing values are separated from missing values due to delayed formation of the executive, or inability for parties to reach a governmental coalition resulting in missing values for the opposition. The symbol ws denotes the weight for the seatshare of the government coalition (gp) or opposition (op) for a given election-year (t).
-
-          Indicator name: `v2xpas_democracy`
-        unit: ""
-        display:
-          numDecimalPlaces: 2
-
-      # 6.2 Government Coalition Democracy Index (D)
-      v2xpas_democracy_government:
-        title: |-
-          Government supports democracy (aggregate: << aggregate_method >>)
-        description_short: |-
-          Extent to which political parties in the governing coalition commit to democratic principles ahead of elections, excluding opposition parties from the assessment​.
-        description_from_producer: |-
-          Question: To what extent do the parties in the government show commitment to democratic norms prior to elections?
-
-          Clarification: The Government Coalition Democracy Index (GCDI) ranges from 0 to 1, where lower values are associated with more authoritarian governmental coalitions and higher values with more democratic governmental coalitions. As this index is calculated for country-election-year, we advise caution using it for years where a country does not have a general election (lower house).
-
-          Scale: Interval, from low to high (0-1).
-
-          Notes: The GCDI is a restricted version of the PSDI index. It only captures the democratic levels for parties in a governmental coalition. The symbol ws denotes the weight for the seatshare of the government coalition (gp) for a given election-year (t).
-
-          Indicator name: `v2xpas_democracy_government`
-        unit: ""
-        display:
-          numDecimalPlaces: 2
-
-      # 6.3 Opposition Parties Democracy Index (D)
-      v2xpas_democracy_opposition:
-        title: |-
-          Opposition parties support democracy (aggregate: << aggregate_method >>)
-        description_short: |-
-          Extent to which opposition parties support democratic norms before elections, measured independently from government-affiliated parties​.
-        description_from_producer: |-
-          Question: To what extent do the parties in the opposition show commitment to democratic norms prior to elections?
-
-          Clarification: The Opposition Parties’ Democracy Index (OPDI) ranges from 0 to 1, where lower values are associated with more authoritarian opposition parties and higher values with more democratic opposition parties. As this index is calculated for country-election-year, we advise caution using it for years where the country does not have a general election (lower house).
-
-          Scale: Interval, from low to high (0-1).
-
-          Notes: The OPDI is a restricted version of the PSDI index. It only captures the democratic levels for parties in the opposition. The symbol ws denotes the weight for the seatshare of the opposition (op) for a given election-year (t).
-
-          Indicator name: `v2xpas_democracy_opposition`
-        unit: ""
         display:
           numDecimalPlaces: 2
 
@@ -264,7 +204,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xdd_dd`
+          V-Dem indicator nanme: `v2xdd_dd`
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -278,7 +218,7 @@ tables:
         description_from_producer: |-
           "Government Effectiveness" combines into a single grouping responses on the quality of public service provision, the quality of the bureaucracy, the competence of civil servants, the independence of the civil service from political pressures, and the credibility of the government's commitment to policies. The main focus of this index is on "inputs" required for the government to be able to produce and implement good policies and deliver public goods.
 
-          Indicator name: `e_wbgi_gee`
+          V-Dem indicator nanme: `e_wbgi_gee`
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -331,7 +271,7 @@ tables:
         description_from_producer: |-
           If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
 
-          Indicator name: `v2exfemhos`
+          V-Dem indicator nanme: `v2exfemhos`
         unit: ""
 
       ## 3.4.3.16 HOG female
@@ -345,10 +285,10 @@ tables:
           Clarification: If the head of government is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
 
           Responses:
-          0: Male
-          1: Female
+          - 0: Male
+          - 1: Female
 
-          Indicator name: `v2exfemhog`
+          V-Dem indicator nanme: `v2exfemhog`
         unit: ""
 
       ## HOE female (custom)
@@ -421,6 +361,65 @@ tables:
           title_public: "Political regime"
           title_variant: "reduced"
 
+      # 6.1 Party-System Democracy Index (D)
+      v2xpas_democracy:
+        title: |-
+          Political parties support democracy
+        description_short: |-
+          Extent to which the overall party system adheres to democratic norms prior to elections, based on weighted assessments of anti-pluralism among all parties in a given electoral year​.
+        description_from_producer: |-
+          Question: To what extent does the party system show commitment to democratic norms prior to elections?
+
+          Clarification: The Party-System Democracy Index (PSDI) ranges from 0 to 1, where lower values are associated with more authoritarian party systems and higher values with more democratic party systems. As this index is calculated for country-election-year, we advise caution using it for years where a country does not have a general election (lower house).
+
+          Scale: Interval, from low to high (0-1).
+
+          Notes: The PSDI is calculated by using two V-Party variables: (1) the anti-pluralist index for each political party in a given party system (v2xpa_antiplural) and (2) the seat shares for each political party within that party system (v2paseatshare). Political parties are further divided into those in the government (v2pagovsup = 0, 1, or 2) or those in the opposition (v2pagovsup = 3). To account for hegemonic or competitive authoritarian regimes that allow opposition parties to exist, missing values for a non-existent opposition are replaced with 0 if the electoral democracy index (v2x_polyarchy) scores lower than 0.5 for that country-election- year. Consequently, these missing values are separated from missing values due to delayed formation of the executive, or inability for parties to reach a governmental coalition resulting in missing values for the opposition. The symbol ws denotes the weight for the seatshare of the government coalition (gp) or opposition (op) for a given election-year (t).
+
+          V-Dem indicator nanme: `v2xpas_democracy`
+        unit: ""
+        display:
+          numDecimalPlaces: 2
+
+      # 6.2 Government Coalition Democracy Index (D)
+      v2xpas_democracy_government:
+        title: |-
+          Government supports democracy
+        description_short: |-
+          Extent to which political parties in the governing coalition commit to democratic principles ahead of elections, excluding opposition parties from the assessment​.
+        description_from_producer: |-
+          Question: To what extent do the parties in the government show commitment to democratic norms prior to elections?
+
+          Clarification: The Government Coalition Democracy Index (GCDI) ranges from 0 to 1, where lower values are associated with more authoritarian governmental coalitions and higher values with more democratic governmental coalitions. As this index is calculated for country-election-year, we advise caution using it for years where a country does not have a general election (lower house).
+
+          Scale: Interval, from low to high (0-1).
+
+          Notes: The GCDI is a restricted version of the PSDI index. It only captures the democratic levels for parties in a governmental coalition. The symbol ws denotes the weight for the seatshare of the government coalition (gp) for a given election-year (t).
+
+          V-Dem indicator nanme: `v2xpas_democracy_government`
+        unit: ""
+        display:
+          numDecimalPlaces: 2
+
+      # 6.3 Opposition Parties Democracy Index (D)
+      v2xpas_democracy_opposition:
+        title: |-
+          Opposition parties support democracy
+        description_short: |-
+          Extent to which opposition parties support democratic norms before elections, measured independently from government-affiliated parties​.
+        description_from_producer: |-
+          Question: To what extent do the parties in the opposition show commitment to democratic norms prior to elections?
+
+          Clarification: The Opposition Parties’ Democracy Index (OPDI) ranges from 0 to 1, where lower values are associated with more authoritarian opposition parties and higher values with more democratic opposition parties. As this index is calculated for country-election-year, we advise caution using it for years where the country does not have a general election (lower house).
+
+          Scale: Interval, from low to high (0-1).
+
+          Notes: The OPDI is a restricted version of the PSDI index. It only captures the democratic levels for parties in the opposition. The symbol ws denotes the weight for the seatshare of the opposition (op) for a given election-year (t).
+
+          V-Dem indicator nanme: `v2xpas_democracy_opposition`
+        unit: ""
+        display:
+          numDecimalPlaces: 2
   ##################################################################################################
   ##################################################################################################
   # TABLE: MULTI-DIMENSIONAL TABLES, WITH REGIONS
@@ -471,7 +470,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_polyarchy`
+          V-Dem indicator nanme: `v2x_polyarchy`
         unit: ""
         presentation:
           <<: *ppt_multi_w_regions
@@ -497,7 +496,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_libdem`
+          V-Dem indicator nanme: `v2x_libdem`
         unit: ""
 
       # 2.1.3 Participatory democracy index
@@ -516,7 +515,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_partipdem`
+          V-Dem indicator nanme: `v2x_partipdem`
         unit: ""
 
       ## 2.1.4 Deliberative democracy index
@@ -536,7 +535,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_delibdem`
+          V-Dem indicator nanme: `v2x_delibdem`
         unit: ""
 
       ## 2.1.5 Egalitarian democracy index
@@ -556,7 +555,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_egaldem`
+          V-Dem indicator nanme: `v2x_egaldem`
         unit: ""
 
       ## 2.2.11 Legislative constraints on the executive index
@@ -575,7 +574,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xlg_legcon`
+          V-Dem indicator nanme: `v2xlg_legcon`
         unit: ""
 
       ## 2.2.8 Liberal component index
@@ -594,7 +593,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_liberal`
+          V-Dem indicator nanme: `v2x_liberal`
         unit: ""
 
       ## 2.2.15 Local government index
@@ -613,7 +612,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xel_locelec`
+          V-Dem indicator nanme: `v2xel_locelec`
         unit: ""
 
       ## 2.2.12 Participatory component index
@@ -633,7 +632,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_partip`
+          V-Dem indicator nanme: `v2x_partip`
         unit: ""
 
       ## 2.2.16 Regional government index
@@ -651,7 +650,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xel_regelec`
+          V-Dem indicator nanme: `v2xel_regelec`
         unit: ""
 
       ## 2.2.21 Equal distribution of resources index
@@ -670,7 +669,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xeg_eqdr`
+          V-Dem indicator nanme: `v2xeg_eqdr`
         unit: ""
 
       ## 3.5.1.6 Legislature corrupt activities
@@ -691,13 +690,13 @@ tables:
           For reasons of consistency, as of December 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
 
           Responses:
-          0: Commonly. Most legislators probably engage in these activities.
-          1: Often. Many legislators probably engage in these activities.
-          2: Sometimes. Some legislators probably engage in these activities.
-          3: Very occasionally. There may be a few legislators who engage in these activities, but the vast majority do not.
-          4: Never, or hardly ever.
+          - 0: Commonly. Most legislators probably engage in these activities.
+          - 1: Often. Many legislators probably engage in these activities.
+          - 2: Sometimes. Some legislators probably engage in these activities.
+          - 3: Very occasionally. There may be a few legislators who engage in these activities, but the vast majority do not.
+          - 4: Never, or hardly ever.
 
-          Indicator name: `v2lgcrrpt`
+          V-Dem indicator nanme: `v2lgcrrpt`
         unit: ""
 
       ## 3.5.3.7 Lower chamber female legislators
@@ -717,7 +716,7 @@ tables:
         description_from_producer: |-
           Question: What percentage (%) of the lower (or unicameral) chamber of the legislature is female?
 
-          Indicator name: `v2lgfemleg`
+          V-Dem indicator nanme: `v2lgfemleg`
         unit: "%"
 
       ## 3.6.0.2 Common good
@@ -734,13 +733,13 @@ tables:
           Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
 
           Responses:
-          0: Little or no justification in terms of the common good is usually offered.
-          1: Specific business, geographic, group, party, or constituency interests are for the most part offered as justifications.
-          2: Justifications are for the most part a mix of specific interests and the common good and it is impossible to say which justification is more common than the other.
-          3: Justifications are based on a mixture of references to constituency/party/group interests and on appeals to the common good.
-          4: Justifications are for the most part almost always based on explicit statements of the common good for society, understood either as the greatest good for the greatest number or as helping the least advantaged in a society.
+          - 0: Little or no justification in terms of the common good is usually offered.
+          - 1: Specific business, geographic, group, party, or constituency interests are for the most part offered as justifications.
+          - 2: Justifications are for the most part a mix of specific interests and the common good and it is impossible to say which justification is more common than the other.
+          - 3: Justifications are based on a mixture of references to constituency/party/group interests and on appeals to the common good.
+          - 4: Justifications are for the most part almost always based on explicit statements of the common good for society, understood either as the greatest good for the greatest number or as helping the least advantaged in a society.
 
-          Indicator name: `v2dlcommon`
+          V-Dem indicator nanme: `v2dlcommon`
         unit: ""
 
       ## 3.6.0.1 Reasoned justification
@@ -758,13 +757,12 @@ tables:
           Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
 
           Responses:
+          - 0: No justification. Elites almost always only dictate that something should or should not be done, but no reasoning about justification is given. For example, "We must cut spending."
+          - 1: Inferior justification. Elites tend to give reasons why someone should or should not be for doing or not doing something, but the reasons tend to be illogical or false, although they may appeal to many voters. For example, "We must cut spending. The state is inefficient." [The inference is incomplete because addressing inefficiencies would not necessarily reduce spending and it might undermine essential services.]
+          - 2: Qualified justification. Elites tend to offer a single simple reason justifying why the proposed policies contribute to or detract from an outcome. For example, "We must cut spending because taxpayers cannot afford to pay for current programs."
+          - 3: Sophisticated justification. Elites tend to offer more than one or more complex, nuanced and complete justification. For example, "We must cut spending because taxpayers cannot afford to pay for current government programs. Raising taxes would hurt economic growth, and deficit spending would lead to inflation."
 
-          0: No justification. Elites almost always only dictate that something should or should not be done, but no reasoning about justification is given. For example, "We must cut spending."
-          1: Inferior justification. Elites tend to give reasons why someone should or should not be for doing or not doing something, but the reasons tend to be illogical or false, although they may appeal to many voters. For example, "We must cut spending. The state is inefficient." [The inference is incomplete because addressing inefficiencies would not necessarily reduce spending and it might undermine essential services.]
-          2: Qualified justification. Elites tend to offer a single simple reason justifying why the proposed policies contribute to or detract from an outcome. For example, "We must cut spending because taxpayers cannot afford to pay for current programs."
-          3: Sophisticated justification. Elites tend to offer more than one or more complex, nuanced and complete justification. For example, "We must cut spending because taxpayers cannot afford to pay for current government programs. Raising taxes would hurt economic growth, and deficit spending would lead to inflation."
-
-          Indicator name: `v2dlreason`
+          V-Dem indicator nanme: `v2dlreason`
         unit: ""
 
       ## 3.6.0.5 Engaged society
@@ -781,16 +779,16 @@ tables:
           Clarification: This question refers to deliberation as manifested in discussion, debate, and other public forums such as popular media.
 
           Responses:
-          0: Public deliberation is never, or almost never allowed.
-          1: Some limited public deliberations are allowed but the public below the elite levels is almost always either unaware of major policy debates or unable to take part in them.
-          2: Public deliberation is not repressed but nevertheless infrequent and non-elite actors are typically controlled and/or constrained by the elites.
-          3: Public deliberation is actively encouraged and some autonomous non-elite groups participate, but it is confined to a small slice of specialized groups that tends to be the same across issue-areas.
-          4: Public deliberation is actively encouraged and a relatively broad segment of non-elite groups often participate and vary with different issue-areas.
-          5: Large numbers of non-elite groups as well as ordinary people tend to discuss major policies among themselves, in the media, in associations or neighborhoods, or in the streets. Grass-roots deliberation is common and unconstrained.
+          - 0: Public deliberation is never, or almost never allowed.
+          - 1: Some limited public deliberations are allowed but the public below the elite levels is almost always either unaware of major policy debates or unable to take part in them.
+          - 2: Public deliberation is not repressed but nevertheless infrequent and non-elite actors are typically controlled and/or constrained by the elites.
+          - 3: Public deliberation is actively encouraged and some autonomous non-elite groups participate, but it is confined to a small slice of specialized groups that tends to be the same across issue-areas.
+          - 4: Public deliberation is actively encouraged and a relatively broad segment of non-elite groups often participate and vary with different issue-areas.
+          - 5: Large numbers of non-elite groups as well as ordinary people tend to discuss major policies among themselves, in the media, in associations or neighborhoods, or in the streets. Grass-roots deliberation is common and unconstrained.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2dlengage`
+          V-Dem indicator nanme: `v2dlengage`
         unit: ""
 
       ## 3.7.0.6 Judicial corruption decision
@@ -801,16 +799,16 @@ tables:
           Question: How often do individuals or businesses make undocumented extra payments or bribes in order to speed up or delay the process or to obtain a favorable judicial decision?
 
           Responses:
-          0: Always.
-          1: Usually.
-          2: About half of the time. 3: Not usually.
-          4: Never.
+          - 0: Always.
+          - 1: Usually.
+          - 2: About half of the time. 3: Not usually.
+          - 4: Never.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
           Notes: For reasons of consistency, as of December 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
 
-          Indicator name: `v2jucorrdc`
+          V-Dem indicator nanme: `v2jucorrdc`
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Judicial corruption score
@@ -834,15 +832,15 @@ tables:
           The question covers the public officials that handle the cases of ordinary people. If no functioning public administration exists, the lowest score (0) applies.
 
           Responses:
-          0: The law is not respected by public officials. Arbitrary or biased administration of the law is rampant.
-          1: The law is weakly respected by public officials. Arbitrary or biased administration of the law is widespread.
-          2: The law is modestly respected by public officials. Arbitrary or biased administration of the law is moderate.
-          3: The law is mostly respected by public officials. Arbitrary or biased administration of the law is limited.
-          4: The law is generally fully respected by the public officials. Arbitrary or biased administration of the law is very limited.
+          - 0: The law is not respected by public officials. Arbitrary or biased administration of the law is rampant.
+          - 1: The law is weakly respected by public officials. Arbitrary or biased administration of the law is widespread.
+          - 2: The law is modestly respected by public officials. Arbitrary or biased administration of the law is moderate.
+          - 3: The law is mostly respected by public officials. Arbitrary or biased administration of the law is limited.
+          - 4: The law is generally fully respected by the public officials. Arbitrary or biased administration of the law is very limited.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2clrspct`
+          V-Dem indicator nanme: `v2clrspct`
         unit: ""
 
       ## 3.8.2.6 Social group equality in respect for civil liberties
@@ -860,13 +858,15 @@ tables:
           Clarification: Here, civil liberties are understood to include access to justice, private property rights, freedom of movement, and freedom from forced labor.
 
           Responses:
-          0: Members of some social groups enjoy much fewer civil liberties than the general population. 1: Members of some social groups enjoy substantially fewer civil liberties than the general population.
-          2: Members of some social groups enjoy moderately fewer civil liberties than the general population.
-          3: Members of some social groups enjoy slightly fewer civil liberties than the general population. 4: Members of all salient social groups enjoy the same level of civil liberties.
+          - 0: Members of some social groups enjoy much fewer civil liberties than the general population.
+          - 1: Members of some social groups enjoy substantially fewer civil liberties than the general population.
+          - 2: Members of some social groups enjoy moderately fewer civil liberties than the general population.
+          - 3: Members of some social groups enjoy slightly fewer civil liberties than the general population.
+          - 4: Members of all salient social groups enjoy the same level of civil liberties.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2clsocgrp`
+          V-Dem indicator nanme: `v2clsocgrp`
         unit: ""
 
       ## 3.9.0.1 Domestic autonomy
@@ -884,13 +884,13 @@ tables:
           Clarification: The question of domestic autonomy does not include restrictions emanating from treaties (e.g., NATO), international organizations (e.g., the WTO), or confederations (e.g., the European Union) if these agreements are freely negotiated by the state and if the state is free to exit from that treaty, organization, or confederation. Nor does it include restrictions on policymaking emanating from international market forces and trans-national corporations.
 
           Responses:
-          0: Non-autonomous. National level authority is exercised by an external power, either by law or in practice. The most common examples of this are direct colonial rule and military occupation (e.g. quadripartite occupation of Germany in 1945). It also includes situations in which domestic actors provide de jure cover for de facto control by a foreign power (e.g. Vichy France). However, control of some part of the territory of a state by an enemy during war is not considered control by external actors if the sovereign government remains on scene and continues to wage conventional war (e.g., the USSR during WW II).
-          1: Semi-autonomous. An external political actor directly constrains the ability of domestic actors to rule, decides who can or cannot rule through formal rules or informal understandings, or precludes certain policies through explicit treaty provisions or well-understood rules of the game from which the subject state cannot withdraw. Examples include Soviet "satellite" states in Eastern Europe, and situations where colonial powers grant limited powers of national self- government to their possessions (e.g., protectorates and limited home government).
-          2: Autonomous. Domestic political actors exercise political authority free of the direct control of external political actors.
+          - 0: Non-autonomous. National level authority is exercised by an external power, either by law or in practice. The most common examples of this are direct colonial rule and military occupation (e.g. quadripartite occupation of Germany in 1945). It also includes situations in which domestic actors provide de jure cover for de facto control by a foreign power (e.g. Vichy France). However, control of some part of the territory of a state by an enemy during war is not considered control by external actors if the sovereign government remains on scene and continues to wage conventional war (e.g., the USSR during WW II).
+          - 1: Semi-autonomous. An external political actor directly constrains the ability of domestic actors to rule, decides who can or cannot rule through formal rules or informal understandings, or precludes certain policies through explicit treaty provisions or well-understood rules of the game from which the subject state cannot withdraw. Examples include Soviet "satellite" states in Eastern Europe, and situations where colonial powers grant limited powers of national self- government to their possessions (e.g., protectorates and limited home government).
+          - 2: Autonomous. Domestic political actors exercise political authority free of the direct control of external political actors.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2svdomaut`
+          V-Dem indicator nanme: `v2svdomaut`
         unit: ""
 
       ## 3.9.0.2 International autonomy
@@ -906,11 +906,11 @@ tables:
           Question: Is the state autonomous from the control of other states with respect to the conduct of its foreign policy?
 
           Responses:
-          0: Non-autonomous. Foreign policy is controlled by an external power, either de facto or de jure. The most common examples of this are colonial rule and military occupation (e.g. quadripartite occupation of Germany in 1945). Situations in which domestic actors provide de jure cover for de facto control by a foreign power should not be construed as semi-autonomy (e.g. Vichy France). Governments in exile that control underground forces waging unconventional warfare are not considered as mitigating an occupation regime (e.g. countries under German occupation during WWII).
-          1: Semi-autonomous. An external political actor directly constrains the ability of domestic actors to pursue an independent foreign policy course in some important areas. This may be the product of explicit treaty provisions or well-understood rules of the game from which the subject state cannot withdraw. Examples would include Soviet strictures over rule in so-called "satellite" states in Eastern Europe, and explicitly negotiated postwar settlements (e.g. Austria following WWII).
-          2: Autonomous. Domestic political actors exercise foreign policy free of the direct control of external political actors. Direct control is meant to exclude the exercise of constraint or the impact of interdependence in the international system. Treaties in which states concede some part of that control to a supra- or international organization voluntarily, and from which there is a possibility of exit should not be interpreted as a violation of autonomy.
+          - 0: Non-autonomous. Foreign policy is controlled by an external power, either de facto or de jure. The most common examples of this are colonial rule and military occupation (e.g. quadripartite occupation of Germany in 1945). Situations in which domestic actors provide de jure cover for de facto control by a foreign power should not be construed as semi-autonomy (e.g. Vichy France). Governments in exile that control underground forces waging unconventional warfare are not considered as mitigating an occupation regime (e.g. countries under German occupation during WWII).
+          - 1: Semi-autonomous. An external political actor directly constrains the ability of domestic actors to pursue an independent foreign policy course in some important areas. This may be the product of explicit treaty provisions or well-understood rules of the game from which the subject state cannot withdraw. Examples would include Soviet strictures over rule in so-called "satellite" states in Eastern Europe, and explicitly negotiated postwar settlements (e.g. Austria following WWII).
+          - 2: Autonomous. Domestic political actors exercise foreign policy free of the direct control of external political actors. Direct control is meant to exclude the exercise of constraint or the impact of interdependence in the international system. Treaties in which states concede some part of that control to a supra- or international organization voluntarily, and from which there is a possibility of exit should not be interpreted as a violation of autonomy.
 
-          Indicator name: `v2svinlaut`
+          V-Dem indicator nanme: `v2svinlaut`
         unit: ""
 
       ## 3.9.0.3 State authority over territory
@@ -930,7 +930,7 @@ tables:
 
           By "officially part of the country" we refer to international law. In cases where international law is not entirely clear, we refer you to general understandings. For example, China claims sovereignty over Taiwan, but it remains under the control of its own government. For purposes of this question, Taiwan should not be considered a failure to control its territory by the government of the PRC.
 
-          Indicator name: `v2svstterr`
+          V-Dem indicator nanme: `v2svstterr`
         unit: "%"
 
       ## 3.12.0.2 Power distributed by social group
@@ -948,13 +948,13 @@ tables:
           Clarification: A social group is differentiated within a country by caste, ethnicity, language, race, region, religion, or some combination thereof. (It does not include identities grounded in sexual orientation or socioeconomic status.) Social group identity is contextually defined and is likely to vary across countries and through time. Social group identities are also likely to cross-cut, so that a given person could be defined in multiple ways, i.e., as part of multiple groups. Nonetheless, at any given point in time there are social groups within a society that are understood — by those residing within that society — to be different, in ways that may be politically relevant.
 
           Responses:
-          0: Political power is monopolized by one social group comprising a minority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
-          1: Political power is monopolized by several social groups comprising a minority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
-          2: Political power is monopolized by several social groups comprising a majority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
-          3: Either all social groups possess some political power, with some groups having more power than others; or different social groups alternate in power, with one group controlling much of the political power for a period of time, followed by another — but all significant groups have a turn at the seat of power.
-          4: All social groups have roughly equal political power or there are no strong ethnic, caste, linguistic, racial, religious, or regional differences to speak of. Social group characteristics are not relevant to politics.
+          - 0: Political power is monopolized by one social group comprising a minority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
+          - 1: Political power is monopolized by several social groups comprising a minority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
+          - 2: Political power is monopolized by several social groups comprising a majority of the population. This monopoly is institutionalized, i.e., not subject to frequent change.
+          - 3: Either all social groups possess some political power, with some groups having more power than others; or different social groups alternate in power, with one group controlling much of the political power for a period of time, followed by another — but all significant groups have a turn at the seat of power.
+          - 4: All social groups have roughly equal political power or there are no strong ethnic, caste, linguistic, racial, religious, or regional differences to speak of. Social group characteristics are not relevant to politics.
 
-          Indicator name: `v2pepwrsoc`
+          V-Dem indicator nanme: `v2pepwrsoc`
         unit: ""
 
       ## 5.4.3 Presidentialism Index
@@ -974,7 +974,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xnp_pres`
+          V-Dem indicator nanme: `v2xnp_pres`
         unit: ""
 
       ## 5.5.1 Civil liberties index
@@ -997,7 +997,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_civlib`
+          V-Dem indicator nanme: `v2x_civlib`
         unit: ""
 
       ## 5.5.4 Private civil liberties index
@@ -1016,7 +1016,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_clpriv`
+          V-Dem indicator nanme: `v2x_clpriv`
         unit: ""
 
       ## 5.5.3 Political civil liberties index
@@ -1035,7 +1035,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_clpol`
+          V-Dem indicator nanme: `v2x_clpol`
         unit: ""
 
       ## 5.5.2 Physical violence index
@@ -1054,7 +1054,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_clphy`
+          V-Dem indicator nanme: `v2x_clphy`
         unit: ""
 
       ## 5.7.1 Political corruption index
@@ -1077,7 +1077,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_corr`
+          V-Dem indicator nanme: `v2x_corr`
         unit: ""
 
       ## 5.7.3 Public sector corruption index [Not in use]
@@ -1094,7 +1094,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_pubcorr`
+          V-Dem indicator nanme: `v2x_pubcorr`
         unit: ""
 
       ## 5.7.2 Executive corruption index [Not in use]
@@ -1111,7 +1111,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_execorr`
+          V-Dem indicator nanme: `v2x_execorr`
         unit: ""
 
       ## 5.8.1 Women political empowerment index
@@ -1130,7 +1130,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_gender`
+          V-Dem indicator nanme: `v2x_gender`
         unit: ""
 
       ## 5.8.2 Women civil liberties index
@@ -1149,7 +1149,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_gencl`
+          V-Dem indicator nanme: `v2x_gencl`
         unit: ""
 
       ## 5.8.3 Women civil society participation index
@@ -1168,7 +1168,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_gencs`
+          V-Dem indicator nanme: `v2x_gencs`
         unit: ""
 
       ## 5.8.4 Women political participation index
@@ -1187,7 +1187,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_genpp`
+          V-Dem indicator nanme: `v2x_genpp`
         unit: ""
 
       ## 5.9.1 Rule of law index
@@ -1208,7 +1208,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_rule`
+          V-Dem indicator nanme: `v2x_rule`
         unit: ""
 
       ## 5.11.1 Core civil society index [not in use]
@@ -1227,7 +1227,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xcs_ccsi`
+          V-Dem indicator nanme: `v2xcs_ccsi`
         unit: ""
 
       ## 2.2.13 Civil society participation index
@@ -1250,7 +1250,7 @@ tables:
           Scale:
           Interval, from low to high (0-1).
 
-          Indicator name: `v2x_cspart`
+          V-Dem indicator nanme: `v2x_cspart`
         unit: ""
 
       ## 3.6.0.3 Respect counterarguments
@@ -1268,15 +1268,16 @@ tables:
           Clarification: Because discourse varies greatly from person to person, base your answer on the style that is most typical of prominent national political leaders.
 
           Responses:
-          0: Counterarguments are not allowed or if articulated, punished.
-          1: Counterarguments are allowed at least from some parties, but almost always are ignored. 2: Elites tend to acknowledge counterarguments but then explicitly degrade them by making a negative statement about them or the individuals and groups that propose them.
-          3: Elites tend to acknowledge counterarguments without making explicit negative or positive statements about them.
-          4: Elites almost always acknowledge counterarguments and explicitly value them, even if they ultimately reject them for the most part.
-          5: Elites almost always acknowledge counterarguments and explicitly value them, and frequently also even accept them and change their position.
+          - 0: Counterarguments are not allowed or if articulated, punished.
+          - 1: Counterarguments are allowed at least from some parties, but almost always are ignored.
+          - 2: Elites tend to acknowledge counterarguments but then explicitly degrade them by making a negative statement about them or the individuals and groups that propose them.
+          - 3: Elites tend to acknowledge counterarguments without making explicit negative or positive statements about them.
+          - 4: Elites almost always acknowledge counterarguments and explicitly value them, even if they ultimately reject them for the most part.
+          - 5: Elites almost always acknowledge counterarguments and explicitly value them, and frequently also even accept them and change their position.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2dlcountr`
+          V-Dem indicator nanme: `v2dlcountr`
         unit: ""
 
       # 2.2.17 Deliberative component index
@@ -1299,7 +1300,7 @@ tables:
           Scale:
           Interval, from low to high (0-1).
 
-          Indicator name: `v2xdl_delib`
+          V-Dem indicator nanme: `v2xdl_delib`
         unit: ""
 
       ## 2.2.18 Egalitarian component index
@@ -1318,7 +1319,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_egal`
+          V-Dem indicator nanme: `v2x_egal`
         unit: ""
 
       ## 2.2.6 Clean elections index
@@ -1341,7 +1342,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xel_frefair`
+          V-Dem indicator nanme: `v2xel_frefair`
         unit: ""
 
       ### 3.6.0.4 Range of consultation
@@ -1358,15 +1359,16 @@ tables:
           Clarification: Because practices vary greatly from policy to policy, base your answer on the style that is most typical of policymaking.
 
           Responses:
-          0: No consultation. The leader or a very small group (e.g. military council) makes authoritative decisions on their own.
-          1: Very little and narrow. Consultation with only a narrow circle of loyal party/ruling elites. 2: Consultation includes the former plus a larger group that is loyal to the government, such as the ruling party's or parties' local executives and/or women, youth and other branches.
-          3: Consultation includes the former plus leaders of other parties.
-          4: Consultation includes the former plus a select range of society/labor/business representatives.
-          5: Consultation engages elites from essentially all parts of the political spectrum and all politically relevant sectors of society and business.
+          - 0: No consultation. The leader or a very small group (e.g. military council) makes authoritative decisions on their own.
+          - 1: Very little and narrow. Consultation with only a narrow circle of loyal party/ruling elites.
+          - 2: Consultation includes the former plus a larger group that is loyal to the government, such as the ruling party's or parties' local executives and/or women, youth and other branches.
+          - 3: Consultation includes the former plus leaders of other parties.
+          - 4: Consultation includes the former plus a select range of society/labor/business representatives.
+          - 5: Consultation engages elites from essentially all parts of the political spectrum and all politically relevant sectors of society and business.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2dlconslt`
+          V-Dem indicator nanme: `v2dlconslt`
         unit: ""
 
       ## 2.2.20 Equal access index
@@ -1385,7 +1387,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xeg_eqaccess`
+          V-Dem indicator nanme: `v2xeg_eqaccess`
         unit: ""
 
       ## 2.2.19 Equal protection index
@@ -1404,7 +1406,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xeg_eqprotec`
+          V-Dem indicator nanme: `v2xeg_eqprotec`
         unit: ""
 
       ## 2.2.4 Freedom of association thick index
@@ -1420,7 +1422,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_frassoc_thick`
+          V-Dem indicator nanme: `v2x_frassoc_thick`
         unit: ""
 
       ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
@@ -1442,7 +1444,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_freexp_altinf`
+          V-Dem indicator nanme: `v2x_freexp_altinf`
         unit: ""
 
       ## 2.2.9 Equality before the law and individual liberty index
@@ -1459,7 +1461,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2xcl_rol`
+          V-Dem indicator nanme: `v2xcl_rol`
         unit: ""
 
       ## 2.2.10 Judicial constraints on the executive index
@@ -1476,7 +1478,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          Indicator name: `v2x_jucon`
+          V-Dem indicator nanme: `v2x_jucon`
         unit: ""
 
       # 5.15.1 Academic Freedom Index
@@ -1497,7 +1499,7 @@ tables:
 
           Aggregation: The index is formed by point estimates drawn from a Bayesian factor analysis model including the following indicators: freedom to research and teach (v2cafres), freedom of academic exchange and dissemination (v2cafexch), institutional autonomy (v2cainsaut), campus integrity (v2casurv), freedom of academic and cultural expression (v2clacfree).
 
-          Indicator name: `v2xca_academ`
+          V-Dem indicator nanme: `v2xca_academ`
         unit: ""
 
       # 3.12.1.1 Government censorship effort — Media (C)
@@ -1515,7 +1517,6 @@ tables:
           Clarification: Indirect forms of censorship might include politically motivated awarding of broadcast frequencies, withdrawal of financial support, influence over printing facilities and distribution networks, selected distribution of advertising, onerous registration requirements, prohibitive tariffs, and bribery. We are not concerned with censorship of non-political topics such as child pornography, statements offensive to a particular religion, or defamatory speech unless this sort of censorship is used as a pretext for censoring political speech.
 
           Responses:
-
           - 0: Attempts to censor are direct and routine.
           - 1: Attempts to censor are indirect but nevertheless routine.
           - 2: Attempts to censor are direct but limited to especially sensitive issues.
@@ -1524,7 +1525,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2mecenefm`
+          V-Dem indicator nanme: `v2mecenefm`
         unit: ""
 
       # 3.12.1.7 Harassment of journalists (C)
@@ -1540,16 +1541,15 @@ tables:
           Question: Are individual journalists harassed — i.e., threatened with libel, arrested, imprisoned, beaten, or killed — by governmental or powerful nongovernmental actors while engaged in legitimate journalistic activities?
 
           Responses:
-
-          0: No journalists dare to engage in journalistic activities that would offend powerful actors because harassment or worse would be certain to occur.
-          1: Some journalists occasionally offend powerful actors but they are almost always harassed or worse and eventually are forced to stop.
-          2: Somejournalistswhooffendpowerfulactorsareforcedtostopbutothersmanagetocontinue practicing journalism freely for long periods of time.
-          3: It is rare for any journalist to be harassed for offending powerful actors, and if this were to happen, those responsible for the harassment would be identified and punished.
-          4: Journalists are never harassed by governmental or powerful nongovernmental actors while engaged in legitimate journalistic activities.
+          - 0: No journalists dare to engage in journalistic activities that would offend powerful actors because harassment or worse would be certain to occur.
+          - 1: Some journalists occasionally offend powerful actors but they are almost always harassed or worse and eventually are forced to stop.
+          - 2: Somejournalistswhooffendpowerfulactorsareforcedtostopbutothersmanagetocontinue practicing journalism freely for long periods of time.
+          - 3: It is rare for any journalist to be harassed for offending powerful actors, and if this were to happen, those responsible for the harassment would be identified and punished.
+          - 4: Journalists are never harassed by governmental or powerful nongovernmental actors while engaged in legitimate journalistic activities.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2meharjrn`
+          V-Dem indicator nanme: `v2meharjrn`
         unit: ""
 
       # 3.12.1.8 Media self-censorship (C)
@@ -1565,15 +1565,14 @@ tables:
           Question: Is there self-censorship among journalists when reporting on issues that the government considers politically sensitive?
 
           Responses:
-            0: Self-censorship is complete and thorough.
-            1: Self-censorship is common but incomplete.
-            2: There is self-censorship on a few highly sensitive political issues but not on moderately
-            sensitive issues.
-            3: There is little or no self-censorship among journalists.
+          - 0: Self-censorship is complete and thorough.
+          - 1: Self-censorship is common but incomplete.
+          - 2: There is self-censorship on a few highly sensitive political issues but not on moderately sensitive issues.
+          - 3: There is little or no self-censorship among journalists.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2meslfcen`
+          V-Dem indicator nanme: `v2meslfcen`
         unit: ""
 
       # 3.15.2.3 Mobilization for democracy (C)
@@ -1591,11 +1590,11 @@ tables:
           Clarification: Events are pro-democratic if they are organized with the explicit aim to advance and/or protect democratic institutions such as free and fair elections with multiple parties, and courts and parliaments; or if they are in support of civil liberties such as freedom of association and speech. This question concerns the mobilization of citizens for mass events such as demonstrations, strikes and sit-ins.
 
           Responses:
-          0: There have been virtually no events.
-          1: There have been several small-scale events.
-          2: There have been many small-scale events.
-          3: There have been several large-scale and small-scale events.
-          4: There have been many large-scale and small-scale events.
+          - 0: There have been virtually no events.
+          - 1: There have been several small-scale events.
+          - 2: There have been many small-scale events.
+          - 3: There have been several large-scale and small-scale events.
+          - 4: There have been many large-scale and small-scale events.
 
           Scale: Ordinal, converted to interval by the measurement model.
         unit: ""
@@ -1615,15 +1614,15 @@ tables:
           Clarification: Events are pro-autocratic if they are organized explicitly in support of non-democratic rulers and forms of government such as a one-party state, monarchy, theocracy or military dictatorships. Events are also pro-autocratic if they are organized in support of leaders that question basic principles of democracy, or are generally aiming to undermine democratic ideas and institutions such as the rule of law, free and fair elections, or media freedom. This question concerns the mobilization of citizens for mass events such as demonstrations, strikes, sit-ins. These events are typically organized by non-state actors, but the question also concerns state- orchestrated rallies (e.g. to show support of an autocratic government).
 
           Responses:
-          0: There have been virtually no events.
-          1: There have been several small-scale events.
-          2: There have been many small-scale events.
-          3: There have been several large-scale and small-scale events.
-          4: There have been many large-scale and small-scale events.
+          - 0: There have been virtually no events.
+          - 1: There have been several small-scale events.
+          - 2: There have been many small-scale events.
+          - 3: There have been several large-scale and small-scale events.
+          - 4: There have been many large-scale and small-scale events.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2caautmob`
+          V-Dem indicator nanme: `v2caautmob`
         unit: ""
 
       # 3.15.1.1 Political polarization (C)
@@ -1641,11 +1640,12 @@ tables:
           Clarification: Here we refer to the extent to which political differences affect social relationships beyond political discussions. Societies are highly polarized if supporters of opposing political camps are reluctant to engage in friendly interactions, for example, in family functions, civic associations, their free time activities and workplaces
 
           Responses:
-          0: Not at all. Supporters of opposing political camps generally interact in a friendly manner.
-          1: Mainly not. Supporters of opposing political camps are more likely to interact in a friendly than a hostile manner.
-          2: Somewhat. Supporters of opposing political camps are equally likely to interact in a friendly or hostile manner.
-          3: Yes, to noticeable extent. Supporters of opposing political camps are more likely to interact in a hostile than friendly manner.
-          4: Yes, to a large extent. Supporters of opposing political camps generally interact in a hostile manner.
+          - 0: Not at all. Supporters of opposing political camps generally interact in a friendly manner.
+          - 1: Mainly not. Supporters of opposing political camps are more likely to interact in a friendly than a hostile manner.
+          - 2: Somewhat. Supporters of opposing political camps are equally likely to interact in a friendly or hostile manner.
+          - 3: Yes, to noticeable extent. Supporters of opposing political camps are more likely to interact in a hostile than friendly manner.
+          - 4: Yes, to a large extent. Supporters of opposing political camps generally interact in a hostile manner.
+
           Scale: Ordinal, converted to interval by the measurement model.
 
           Indicator nanme: `v2cacamps`
@@ -1666,15 +1666,15 @@ tables:
           Clarification: We understand political violence as the use of physical force to achieve political objectives by non-state actors. The restriction to political objectives excludes profit-driven crime-related violence, for instance. By non-state actors we refer to individuals or entities that are not formally part of the state. Thus, politically oriented militias and youth groups count as non-state actors even though they might potentially be informally affiliated with the ruling party or the state. Political violence against persons excludes psychological and symbolic violence (e.g. destruction of objects).
 
           Responses:
-          0: Not at all. Non-state actors did not use political violence.
-          1: Rare. Non-state actors rarely used political violence.
-          2: Occasionally. Non-state actors occasionally used political violence.
-          3: Frequently. Non-state actors frequently used political violence.
-          4: Often. Non-state actors often used political violence.
+          - 0: Not at all. Non-state actors did not use political violence.
+          - 1: Rare. Non-state actors rarely used political violence.
+          - 2: Occasionally. Non-state actors occasionally used political violence.
+          - 3: Frequently. Non-state actors frequently used political violence.
+          - 4: Often. Non-state actors often used political violence.
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          Indicator name: `v2caviol`
+          V-Dem indicator nanme: `v2caviol`
         unit: ""
 
   ##################################################################################################
@@ -1706,10 +1706,11 @@ tables:
           This question does not ask you to assess the relative access to justice men and women. Thus, it is possible to assign the lowest possible score to a country even if men and women enjoy equal — and extremely limited — access to justice.
 
           Responses:
-          0: Secure and effective access to justice for men is non-existent.
-          1: Secure and effective access to justice for men is usually not established or widely respected. 2: Secure and effective access to justice for men is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
-          3: Secure and effective access to justice for men is usually observed.
-          4: Secure and effective access to justice for men is almost always observed.
+          - 0: Secure and effective access to justice for men is non-existent.
+          - 1: Secure and effective access to justice for men is usually not established or widely respected.
+          - 2: Secure and effective access to justice for men is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
+          - 3: Secure and effective access to justice for men is usually observed.
+          - 4: Secure and effective access to justice for men is almost always observed.
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
@@ -1736,10 +1737,10 @@ tables:
           This question does not ask you to assess the relative access to justice men and women. Thus, it is possible to assign the lowest possible score to a country even if men and women enjoy equal — and extremely limited — access to justice.
 
           Responses:
-          0: Secure and effective access to justice for women is non-existent.
-          1: Secure and effective access to justice for women is usually not established or widely respected. 2: Secure and effective access to justice for women is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
-          3: Secure and effective access to justice for women is usually observed.
-          4: Secure and effective access to justice for women is almost always observed.
+          - 0: Secure and effective access to justice for women is non-existent.
+          - 1: Secure and effective access to justice for women is usually not established or widely respected. 2: Secure and effective access to justice for women is inconsistently observed. Minor problems characterize most cases or occur rather unevenly across different parts of the country.
+          - 3: Secure and effective access to justice for women is usually observed.
+          - 4: Secure and effective access to justice for women is almost always observed.
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
@@ -1785,11 +1786,11 @@ tables:
           Clarification: The only thing that should not be considered in coding this is the extent of suffrage (by law). Thus, a free and fair election may occur even if the law excludes significant groups (an issue measured separately).
 
           Responses:
-          0: No, not at all. The elections were fundamentally flawed and the official results had little if anything to do with the 'will of the people' (i.e., who became president; or who won the legislative majority).
-          1: Not really. While the elections allowed for some competition, the irregularities in the end affected the outcome of the election (i.e., who became president; or who won the legislative majority).
-          2: Ambiguous. There was substantial competition and freedom of participation but there were also significant irregularities. It is hard to determine whether the irregularities affected the outcome or not (as defined above).
-          3: Yes, somewhat. There were deficiencies and some degree of fraud and irregularities but these did not in the end affect the outcome (as defined above).
-          4: Yes. There was some amount of human error and logistical restrictions but these were largely unintentional and without significant consequences.
+          - 0: No, not at all. The elections were fundamentally flawed and the official results had little if anything to do with the 'will of the people' (i.e., who became president; or who won the legislative majority).
+          - 1: Not really. While the elections allowed for some competition, the irregularities in the end affected the outcome of the election (i.e., who became president; or who won the legislative majority).
+          - 2: Ambiguous. There was substantial competition and freedom of participation but there were also significant irregularities. It is hard to determine whether the irregularities affected the outcome or not (as defined above).
+          - 3: Yes, somewhat. There were deficiencies and some degree of fraud and irregularities but these did not in the end affect the outcome (as defined above).
+          - 4: Yes. There was some amount of human error and logistical restrictions but these were largely unintentional and without significant consequences.
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
@@ -1846,11 +1847,11 @@ tables:
           Question: Question: Was this national election multiparty?
 
           Responses:
-          0: No. No-party or single-party and there is no meaningful competition (includes situations where a few parties are legal but they are all de facto controlled by the dominant party).
-          1: Not really. No-party or single-party (defined as above) but multiple candidates from the same party and/or independents contest legislative seats or the presidency.
-          2: Constrained. At least one real opposition party is allowed to contest but competition is highly constrained — legally or informally.
-          3: Almost. Elections are multiparty in principle but either one main opposition party is prevented (de jure or de facto) from contesting, or conditions such as civil unrest (excluding natural disasters) prevent competition in a portion of the territory.
-          4: Yes. Elections are multiparty, even though a few marginal parties may not be permitted to contest (e.g. far-right/left extremist parties, anti-democratic religious or ethnic parties).
+          - 0: No. No-party or single-party and there is no meaningful competition (includes situations where a few parties are legal but they are all de facto controlled by the dominant party).
+          - 1: Not really. No-party or single-party (defined as above) but multiple candidates from the same party and/or independents contest legislative seats or the presidency.
+          - 2: Constrained. At least one real opposition party is allowed to contest but competition is highly constrained — legally or informally.
+          - 3: Almost. Elections are multiparty in principle but either one main opposition party is prevented (de jure or de facto) from contesting, or conditions such as civil unrest (excluding natural disasters) prevent competition in a portion of the territory.
+          - 4: Yes. Elections are multiparty, even though a few marginal parties may not be permitted to contest (e.g. far-right/left extremist parties, anti-democratic religious or ethnic parties).
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
@@ -1892,11 +1893,11 @@ tables:
           Clarification: This question focuses on the transparency and predictability of the laws of the land.
 
           Responses:
-          0: Transparency and predictability are almost non-existent. The laws of the land are created and/or enforced in completely arbitrary fashion.
-          1: Transparency and predictability are severely limited. The laws of the land are more often than not created and/or enforced in arbitrary fashion.
-          2: Transparency and predictability are somewhat limited. The laws of the land are mostly created in a non-arbitrary fashion but enforcement is rather arbitrary in some parts of the country.
-          3: Transparency and predictability are fairly strong. The laws of the land are usually created and enforced in a non-arbitrary fashion.
-          4: Transparency and predictability are very strong. The laws of the land are created and enforced in a non-arbitrary fashion.
+          - 0: Transparency and predictability are almost non-existent. The laws of the land are created and/or enforced in completely arbitrary fashion.
+          - 1: Transparency and predictability are severely limited. The laws of the land are more often than not created and/or enforced in arbitrary fashion.
+          - 2: Transparency and predictability are somewhat limited. The laws of the land are mostly created in a non-arbitrary fashion but enforcement is rather arbitrary in some parts of the country.
+          - 3: Transparency and predictability are fairly strong. The laws of the land are usually created and enforced in a non-arbitrary fashion.
+          - 4: Transparency and predictability are very strong. The laws of the land are created and enforced in a non-arbitrary fashion.
 
           Scale: Ordinal, converted to interval by the measurement model.
         description_processing: |-
