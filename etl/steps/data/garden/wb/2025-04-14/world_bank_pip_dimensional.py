@@ -138,7 +138,7 @@ def run() -> None:
     tb = identify_rural_urban(tb)
 
     # Create stacked variables from headcount and headcount_ratio
-    tb, col_stacked_n, col_stacked_pct = create_stacked_variables(tb, POVLINES_DICT)
+    tb = create_stacked_variables(tb=tb, povlines_dict=POVLINES_DICT)
 
     # Sanity checks. I don't run for percentile tables because that process was done in the extraction
     tb_ppp_old = sanity_checks(
@@ -389,6 +389,8 @@ def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, lis
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
 
+    tb = tb.copy()
+
     # Define headcount_above and headcount_ratio_above variables
     tb["headcount_above"] = tb["reporting_pop"] - tb["headcount"]
     tb["headcount_ratio_above"] = tb["headcount_above"] / tb["reporting_pop"]
@@ -396,64 +398,72 @@ def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, lis
     # Make headcount_ratio_above a percentage
     tb["headcount_ratio_above"] = tb["headcount_ratio_above"] * 100
 
-    # Stacked variables
+    # Define stacked variables as headcount and headcount_ratio between poverty lines
+    # Select only the necessary columns
+    tb_pivot = tb[
+        [
+            "country",
+            "year",
+            "reporting_level",
+            "welfare_type",
+            "ppp_version",
+            "poverty_line",
+            "headcount_ratio",
+            "headcount",
+            "reporting_pop",
+        ]
+    ].copy()
 
-    col_stacked_n = []
-    col_stacked_pct = []
-
-    for i in range(len(povlines)):
-        # if it's the first value only continue
-        if i == 0:
-            continue
-
-        # If it's the last value calculate the people between this value and the previous
-        # and also the people over this poverty line (and percentages)
-        elif i == len(povlines) - 1:
-            varname_n = f"headcount_between_{povlines[i-1]}_{povlines[i]}"
-            varname_pct = f"headcount_ratio_between_{povlines[i-1]}_{povlines[i]}"
-            tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i-1]}"]
-            tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
-            col_stacked_n.append(varname_n)
-            col_stacked_pct.append(varname_pct)
-            varname_n = f"headcount_above_{povlines[i]}"
-            varname_pct = f"headcount_ratio_above_{povlines[i]}"
-            tb[varname_n] = tb["reporting_pop"] - tb[f"headcount_{povlines[i]}"]
-            tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
-            col_stacked_n.append(varname_n)
-            col_stacked_pct.append(varname_pct)
-
-        # If it's any value between the first and the last calculate the people between this value and the previous (and percentage)
-        else:
-            varname_n = f"headcount_between_{povlines[i-1]}_{povlines[i]}"
-            varname_pct = f"headcount_ratio_between_{povlines[i-1]}_{povlines[i]}"
-            tb[varname_n] = tb[f"headcount_{povlines[i]}"] - tb[f"headcount_{povlines[i-1]}"]
-            tb[varname_pct] = tb[varname_n] / tb["reporting_pop"]
-            col_stacked_n.append(varname_n)
-            col_stacked_pct.append(varname_pct)
-
-    tb.loc[:, col_stacked_pct] = tb[col_stacked_pct] * 100
-
-    # Add variables below first poverty line to the stacked variables
-    col_stacked_n.append(f"headcount_{povlines[0]}")
-    col_stacked_pct.append(f"headcount_ratio_{povlines[0]}")
-
-    # Calculate stacked variables which "jump" the original order
-
-    tb[f"headcount_between_{povlines[1]}_{povlines[4]}"] = (
-        tb[f"headcount_{povlines[4]}"] - tb[f"headcount_{povlines[1]}"]
-    )
-    tb[f"headcount_between_{povlines[4]}_{povlines[6]}"] = (
-        tb[f"headcount_{povlines[6]}"] - tb[f"headcount_{povlines[4]}"]
+    # Pivot the table to calculate indicator more easily
+    tb_pivot = tb_pivot.pivot(
+        index=["country", "year", "reporting_level", "welfare_type"], columns=["ppp_version", "poverty_line"]
     )
 
-    tb[f"headcount_ratio_between_{povlines[1]}_{povlines[4]}"] = (
-        tb[f"headcount_ratio_{povlines[4]}"] - tb[f"headcount_ratio_{povlines[1]}"]
-    )
-    tb[f"headcount_ratio_between_{povlines[4]}_{povlines[6]}"] = (
-        tb[f"headcount_ratio_{povlines[6]}"] - tb[f"headcount_ratio_{povlines[4]}"]
-    )
+    # Create a dictionary with the ppp_version and their corresponding poverty_line, without repeating the values
+    povlines_dict = {}
+    for ppp_version in tb_pivot.columns.levels[1]:
+        povlines_dict[ppp_version] = sorted(
+            list(set([col[1] for col in tb_pivot.xs(ppp_version, level="ppp_version", axis=1).columns])), key=int
+        )
 
-    return tb, col_stacked_n, col_stacked_pct
+    for ppp_year, povlines in povlines_dict.items():
+        print(povlines)
+        for i in range(len(povlines)):
+            # if it's the first value only continue
+            if i == 0:
+                continue
+
+            # If it's the last value calculate the people between this value and the previous
+            # and also the people over this poverty line (and percentages)
+            else:
+                varname_n = ("headcount_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
+                varname_pct = ("headcount_ratio_between", ppp_year, f"{povlines[i-1]} and {povlines[i]}")
+                tb_pivot[varname_n] = (
+                    tb_pivot[("headcount", ppp_year, povlines[i])] - tb_pivot[("headcount", ppp_year, povlines[i - 1])]
+                )
+                tb_pivot[varname_pct] = tb_pivot[varname_n] / tb_pivot[("reporting_pop", ppp_year, povlines[i])]
+
+                # Multiply by 100 to get percentage
+                tb_pivot[varname_pct] = tb_pivot[varname_pct] * 100
+
+        # Calculate stacked variables which "jump" the original order
+        tb_pivot[("headcount_between", ppp_year, f"{povlines[1]} and {povlines[4]}")] = (
+            tb_pivot[("headcount", ppp_year, povlines[4])] - tb_pivot[("headcount", ppp_year, povlines[1])]
+        )
+        tb_pivot[("headcount_between", ppp_year, f"{povlines[4]} and {povlines[6]}")] = (
+            tb_pivot[("headcount", ppp_year, povlines[6])] - tb_pivot[("headcount", ppp_year, povlines[4])]
+        )
+
+        tb_pivot[("headcount_ratio_between", ppp_year, f"{povlines[1]} and {povlines[4]}")] = (
+            tb_pivot[("headcount_ratio", ppp_year, povlines[4])] - tb_pivot[("headcount_ratio", ppp_year, povlines[1])]
+        )
+        tb_pivot[("headcount_ratio_between", ppp_year, f"{povlines[4]} and {povlines[6]}")] = (
+            tb_pivot[("headcount_ratio", ppp_year, povlines[6])] - tb_pivot[("headcount_ratio", ppp_year, povlines[4])]
+        )
+
+    print(tb_pivot)
+
+    return tb
 
 
 def calculate_inequality_indicators(tb: Table) -> Table:
