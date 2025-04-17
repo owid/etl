@@ -13,7 +13,7 @@ config:
   isPublished: true
   explorerTitle: IPCC Scenarios
   hideAlertBanner: true
-  explorerSubtitle: AAA Explore the global shared socioeconomic pathways used in IPCC scenarios.
+  explorerSubtitle: Explore the global shared socioeconomic pathways used in IPCC scenarios.
   hideAnnotationFieldsInTitle: true
 dimensions:
   - slug: metric
