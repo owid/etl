@@ -617,10 +617,10 @@ tables:
       ## 3.5.1.6 Legislature corrupt activities
       corr_leg_vdem:
         title: |-
-          Legislative corruption ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+          Legislative corruption score ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         presentation:
           <<: *ppt_multi_w_regions
-          title_public: Legislative corruption
+          title_public: Legislative corruption score
         description_from_producer: |-
           Question: Do members of the legislature abuse their position for financial gain?
 
@@ -737,7 +737,7 @@ tables:
       ## 3.7.0.6 Judicial corruption decision
       corr_jud_vdem:
         title: |-
-          Judicial corruption ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+          Judicial corruption score ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
         description_from_producer: |-
           Question: How often do individuals or businesses make undocumented extra payments or bribes in order to speed up or delay the process or to obtain a favorable judicial decision?
 
@@ -754,7 +754,7 @@ tables:
           Indicator name: `v2jucorrdc`
         presentation:
           <<: *ppt_multi_w_regions
-          title_public: Judicial corruption
+          title_public: Judicial corruption score
         unit: ""
 
       ## 3.8.2.2 Rigorous and impartial public administration
