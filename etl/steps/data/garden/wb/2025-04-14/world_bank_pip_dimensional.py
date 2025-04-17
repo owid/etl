@@ -410,6 +410,8 @@ def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, lis
             "poverty_line",
             "headcount_ratio",
             "headcount",
+            "headcount_ratio_above",
+            "headcount_above",
             "reporting_pop",
         ]
     ].copy()
@@ -427,7 +429,6 @@ def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, lis
         )
 
     for ppp_year, povlines in povlines_dict.items():
-        print(povlines)
         for i in range(len(povlines)):
             # if it's the first value only continue
             if i == 0:
@@ -460,6 +461,38 @@ def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, lis
         tb_pivot[("headcount_ratio_between", ppp_year, f"{povlines[4]} and {povlines[6]}")] = (
             tb_pivot[("headcount_ratio", ppp_year, povlines[6])] - tb_pivot[("headcount_ratio", ppp_year, povlines[4])]
         )
+
+    # Now, only keep headcount_between and headcount_ratio_between, and headcount_above and headcount_ratio_above
+    tb_pivot = tb_pivot.loc[
+        :,
+        tb_pivot.columns.get_level_values(0).isin(
+            [
+                "country",
+                "year",
+                "reporting_level",
+                "welfare_type",
+                "headcount_between",
+                "headcount_ratio_between",
+                "headcount_above",
+                "headcount_ratio_above",
+            ]
+        ),
+    ]
+
+    # Reset the MultiIndex on columns
+    tb_pivot = tb_pivot.reset_index()
+
+    # Convert the table to show the following columns: country, year, reporting_level, welfare_type, ppp_version, poverty_line, headcount_between, headcount_ratio_between, headcount_above, headcount_ratio_above
+    tb_pivot = tb_pivot.stack(level=[0, 1, 2], future_stack=True).reset_index()
+    # Delete level_0
+    tb_pivot = tb_pivot.drop(columns=["level_0"])
+
+    print(tb_pivot)
+
+    # Make level_1 wide
+    tb_pivot = tb_pivot.pivot(
+        columns=["level_1"],
+    )
 
     print(tb_pivot)
 
