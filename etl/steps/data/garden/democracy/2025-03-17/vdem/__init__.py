@@ -207,13 +207,17 @@ def append_citation_full(tb: Table) -> Table:
 
     Some indicators require additional citation information.
     """
-    CITATION_COPPEDGE = "Coppedge et al. (2015, V-Dem Working Paper Series 2015:6)"
-    CITATION_PEMSTEIN = "Pemstein et al. (2024, V-Dem Working Paper Series 2024:21)"
-    CITATION_SIGMAN = "Sigman et al. (2015, V-Dem Working Paper Series 2015:22)"
-    CITATION_MCMANN = "McMann et al. (2016, V-Dem Working Paper Series 2016:23)"
-    CITATION_SUNDSTROM = "Sundström et al. (2017, V-Dem Working Paper Series 2017:19)"
-    CITATION_TEORELL = "Teorell et al. (2019)"
+    CITATION_COPPEDGE = "Coppedge et al. (2015), 'Measuring High Level Democratic Principles using the V-Dem Data', V-Dem Working Paper Series 2015(6)"
+    # CITATION_PEMSTEIN = "Pemstein et al. (2024, V-Dem Working Paper Series 2024:21)"
+    CITATION_SIGMAN = "Sigman et al. (2015), 'The Index of Egalitarian Democracy and its Components: V-Dem's Conceptualization and Measurement', V-Dem Working Paper Series 2015(22)."
+    CITATION_MCMANN = "McMann et al. (2016), 'Strategies of Validation: Assessing the Varieties of Democracy Corruption Data', V-Dem Working Paper Series 2016(23)."
+    CITATION_SUNDSTROM = "Sundström et al. (2017), 'Women's Political Empowerment: A New Global Index, 1900-2012', World Development 94, 321-335"
+    CITATION_TEORELL = "Teorell et al. (2019), 'Measuring Polyarchy Across the Globe, 1900-2017', Studies in Comparative International Development 54(1), 71-95."
     CITATION_LUHRMANN = "Lührmann, Anna, Marcus Tannnberg, and Staffan Lindberg. 2018. Regimes of the World (RoW): Opening New Avenues for the Comparative Study of Political Regimes. Politics and Governance 6(1): 60-77."
+    CITATION_HELLMEIER = "Hellmeier and Bernhard (2022), 'Mass Mobilization and Regime Change. Evidence From a New Measure of Mobilization for Democracy and Autocracy From 1900 to 2020', V-Dem Working Paper Series 2022(128)."
+    CITATION_ANGIOLILLO = (
+        "Agiolillo et al. (2023), 'Democractic-Autocratic Party Systems: A New Index', V-Dem Working Paper Series (143)"
+    )
 
     citation_coppedge = [
         "libdem_vdem",
@@ -225,35 +229,35 @@ def append_citation_full(tb: Table) -> Table:
         # row indicators
         "lib_dich_row",
     ]
-    citation_pemstein = [
-        "freeexpr_vdem",
-        "freeassoc_vdem",
-        "electfreefair_vdem",
-        "indiv_libs_vdem",
-        "judicial_constr_vdem",
-        "legis_constr_vdem",
-        "civsoc_particip_vdem",
-        "corr_leg_vdem",
-        "justified_polch_vdem",
-        "justcomgd_polch_vdem",
-        "counterarg_polch_vdem",
-        "elitecons_polch_vdem",
-        "soccons_polch_vdem",
-        "corr_jud_vdem",
-        "public_admin_vdem",
-        "socgr_civ_libs_vdem",
-        "dom_auton_vdem",
-        "int_auton_vdem",
-        "socgr_pow_vdem",
-        "priv_libs_vdem",
-        "pol_libs_vdem",
-        # row indicators
-        "transplaws_row",
-        "accessjust_w_row",
-        "accessjust_m_row",
-        "electfreefair_row",
-        "electmulpar_row",
-    ]
+    # citation_pemstein = [
+    #     "freeexpr_vdem",
+    #     "freeassoc_vdem",
+    #     "electfreefair_vdem",
+    #     "indiv_libs_vdem",
+    #     "judicial_constr_vdem",
+    #     "legis_constr_vdem",
+    #     "civsoc_particip_vdem",
+    #     "corr_leg_vdem",
+    #     "justified_polch_vdem",
+    #     "justcomgd_polch_vdem",
+    #     "counterarg_polch_vdem",
+    #     "elitecons_polch_vdem",
+    #     "soccons_polch_vdem",
+    #     "corr_jud_vdem",
+    #     "public_admin_vdem",
+    #     "socgr_civ_libs_vdem",
+    #     "dom_auton_vdem",
+    #     "int_auton_vdem",
+    #     "socgr_pow_vdem",
+    #     "priv_libs_vdem",
+    #     "pol_libs_vdem",
+    #     # row indicators
+    #     "transplaws_row",
+    #     "accessjust_w_row",
+    #     "accessjust_m_row",
+    #     "electfreefair_row",
+    #     "electmulpar_row",
+    # ]
     citation_mcmann = [
         "corruption_vdem",
         "corr_publsec_vdem",
@@ -264,26 +268,42 @@ def append_citation_full(tb: Table) -> Table:
         # row indicators
         "electdem_dich_row_owid",
     ]
+    citation_helmmeier = [
+        "v2cademmob",
+        "v2caautmob",
+    ]
+    citation_angiolillo = [
+        "v2xpas_democracy",
+        "v2xpas_democracy_government",
+        "v2xpas_democracy_opposition",
+    ]
 
     citation_full = {
         # Single citations
         **{i: CITATION_COPPEDGE for i in citation_coppedge},
-        **{i: CITATION_PEMSTEIN for i in citation_pemstein},
+        # **{i: CITATION_PEMSTEIN for i in citation_pemstein},
         **{i: CITATION_MCMANN for i in citation_mcmann},
         **{i: CITATION_TEORELL for i in citation_teorell},
+        **{i: CITATION_HELLMEIER for i in citation_helmmeier},
+        **{i: CITATION_ANGIOLILLO for i in citation_angiolillo},
         ##
         "egaldem_vdem": CITATION_SIGMAN,
         "wom_emp_vdem": CITATION_SUNDSTROM,
         "wom_pol_par_vdem": CITATION_SUNDSTROM,
         # Combined citations
         "egal_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_COPPEDGE}",
-        "equal_rights_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_PEMSTEIN}",
-        "equal_access_vdem{dim}": f"Sigman and Lindberg (2017);\n\n {CITATION_PEMSTEIN}",
+        "equal_rights_vdem{dim}": f"{CITATION_SIGMAN}",
+        "equal_access_vdem{dim}": "Sigman and Lindberg (2017)",
+        # "equal_rights_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_PEMSTEIN}",
+        # "equal_access_vdem{dim}": f"Sigman and Lindberg (2017);\n\n {CITATION_PEMSTEIN}",
         ##
-        "equal_res_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_PEMSTEIN}",
-        "personalism_vdem{dim}": "Sigman and Lindberg (2017, V-Dem Working Paper Series 2017:56); Sigman and Lindberg (2018); {CITATION_PEMSTEIN}",
-        "wom_civ_libs_vdem{dim}": f"{CITATION_SUNDSTROM};\n\n {CITATION_PEMSTEIN}",
-        "wom_civ_soc_vdem{dim}": f"{CITATION_SUNDSTROM};\n\n {CITATION_PEMSTEIN}",
+        "equal_res_vdem{dim}": f"{CITATION_SIGMAN}",
+        # "equal_res_vdem{dim}": f"{CITATION_SIGMAN};\n\n {CITATION_PEMSTEIN}",
+        "personalism_vdem{dim}": "Sigman and Lindberg (2017); Sigman and Lindberg (2018)",
+        "wom_civ_libs_vdem{dim}": f"{CITATION_SUNDSTROM}",
+        "wom_civ_soc_vdem{dim}": f"{CITATION_SUNDSTROM}",
+        # "wom_civ_libs_vdem{dim}": f"{CITATION_SUNDSTROM};\n\n {CITATION_PEMSTEIN}",
+        # "wom_civ_soc_vdem{dim}": f"{CITATION_SUNDSTROM};\n\n {CITATION_PEMSTEIN}",
     }
     citation_full = {col: citation for col, citation in citation_full.items() if col in tb.columns}
     for indicator_name, citation_additional in citation_full.items():

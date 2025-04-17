@@ -112,6 +112,18 @@ _indicators_avg = [
     "wom_emp_vdem",
     "wom_parl_vdem",
     "wom_pol_par_vdem",
+    # New
+    "v2xca_academ",
+    "v2mecenefm",
+    "v2meharjrn",
+    "v2meslfcen",
+    "v2xpas_democracy",
+    "v2xpas_democracy_government",
+    "v2xpas_democracy_opposition",
+    "v2cademmob",
+    "v2caautmob",
+    "v2cacamps",
+    "v2caviol",
 ]
 INDICATORS_REGION_AVERAGES = [[f"{ind_name}{dim}" for dim in ["", "_low", "_high"]] for ind_name in _indicators_avg]
 INDICATORS_REGION_AVERAGES = list(chain.from_iterable(INDICATORS_REGION_AVERAGES)) + ["wom_parl_vdem"]
@@ -228,7 +240,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     )
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 151, "Unexpected number of columns."
+    assert tb_.shape[1] == 178, "Unexpected number of columns."
 
     return tb_
 
@@ -389,7 +401,7 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     # Rename columns
     # tb_ = tb_.rename(columns={col: f"popw_{col}" for col in INDICATORS_REGION_AVERAGES})
     # Sanity check on output shape
-    assert tb_.shape[1] == 151, "Unexpected number of columns."
+    assert tb_.shape[1] == 178, "Unexpected number of columns."
 
     return tb_
 

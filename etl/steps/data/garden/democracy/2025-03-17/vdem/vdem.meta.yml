@@ -151,7 +151,6 @@ tables:
         title: "Voter turnout of voting-age population (aggregate: << aggregate_method >>)"
         description_short: |-
           Denotes the voter turnout as a share of the voting age population in the national election according to official results.
-
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
@@ -160,6 +159,66 @@ tables:
         presentation:
           <<: *ppt_uni_w_regions
           title_public: Voter turnout of voting-age population
+        display:
+          numDecimalPlaces: 2
+
+      # 6.1 Party-System Democracy Index (D)
+      v2xpas_democracy:
+        title: |-
+          Political parties support democracy (aggregate: << aggregate_method >>)
+        description_short: |-
+          Extent to which the overall party system adheres to democratic norms prior to elections, based on weighted assessments of anti-pluralism among all parties in a given electoral year​.
+        description_from_producer: |-
+          Question: To what extent does the party system show commitment to democratic norms prior to elections?
+
+          Clarification: The Party-System Democracy Index (PSDI) ranges from 0 to 1, where lower values are associated with more authoritarian party systems and higher values with more democratic party systems. As this index is calculated for country-election-year, we advise caution using it for years where a country does not have a general election (lower house).
+
+          Scale: Interval, from low to high (0-1).
+
+          Notes: The PSDI is calculated by using two V-Party variables: (1) the anti-pluralist index for each political party in a given party system (v2xpa_antiplural) and (2) the seat shares for each political party within that party system (v2paseatshare). Political parties are further divided into those in the government (v2pagovsup = 0, 1, or 2) or those in the opposition (v2pagovsup = 3). To account for hegemonic or competitive authoritarian regimes that allow opposition parties to exist, missing values for a non-existent opposition are replaced with 0 if the electoral democracy index (v2x_polyarchy) scores lower than 0.5 for that country-election- year. Consequently, these missing values are separated from missing values due to delayed formation of the executive, or inability for parties to reach a governmental coalition resulting in missing values for the opposition. The symbol ws denotes the weight for the seatshare of the government coalition (gp) or opposition (op) for a given election-year (t).
+
+          Indicator name: `v2xpas_democracy`
+        unit: ""
+        display:
+          numDecimalPlaces: 2
+
+      # 6.2 Government Coalition Democracy Index (D)
+      v2xpas_democracy_government:
+        title: |-
+          Government supports democracy (aggregate: << aggregate_method >>)
+        description_short: |-
+          Extent to which political parties in the governing coalition commit to democratic principles ahead of elections, excluding opposition parties from the assessment​.
+        description_from_producer: |-
+          Question: To what extent do the parties in the government show commitment to democratic norms prior to elections?
+
+          Clarification: The Government Coalition Democracy Index (GCDI) ranges from 0 to 1, where lower values are associated with more authoritarian governmental coalitions and higher values with more democratic governmental coalitions. As this index is calculated for country-election-year, we advise caution using it for years where a country does not have a general election (lower house).
+
+          Scale: Interval, from low to high (0-1).
+
+          Notes: The GCDI is a restricted version of the PSDI index. It only captures the democratic levels for parties in a governmental coalition. The symbol ws denotes the weight for the seatshare of the government coalition (gp) for a given election-year (t).
+
+          Indicator name: `v2xpas_democracy_government`
+        unit: ""
+        display:
+          numDecimalPlaces: 2
+
+      # 6.3 Opposition Parties Democracy Index (D)
+      v2xpas_democracy_opposition:
+        title: |-
+          Opposition parties support democracy (aggregate: << aggregate_method >>)
+        description_short: |-
+          Extent to which opposition parties support democratic norms before elections, measured independently from government-affiliated parties​.
+        description_from_producer: |-
+          Question: To what extent do the parties in the opposition show commitment to democratic norms prior to elections?
+
+          Clarification: The Opposition Parties’ Democracy Index (OPDI) ranges from 0 to 1, where lower values are associated with more authoritarian opposition parties and higher values with more democratic opposition parties. As this index is calculated for country-election-year, we advise caution using it for years where the country does not have a general election (lower house).
+
+          Scale: Interval, from low to high (0-1).
+
+          Notes: The OPDI is a restricted version of the PSDI index. It only captures the democratic levels for parties in the opposition. The symbol ws denotes the weight for the seatshare of the opposition (op) for a given election-year (t).
+
+          Indicator name: `v2xpas_democracy_opposition`
+        unit: ""
         display:
           numDecimalPlaces: 2
 
@@ -1418,6 +1477,204 @@ tables:
           Scale: Interval, from low to high (0-1).
 
           Indicator name: `v2x_jucon`
+        unit: ""
+
+      # 5.15.1 Academic Freedom Index
+      v2xca_academ:
+        title: |-
+          Academic freedom index ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which academics can research, teach, publish, express opinions, and participate in academic bodies without interference, censorship, or institutional restrictions, and universities exercise institutional autonomy.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Academic freedom index
+        description_from_producer: |-
+          Question: To what extent is academic freedom respected?
+
+          Clarification: Academic freedom is understood as the right of academics, without constriction by prescribed doctrine, to freedom of teaching and discussion, freedom in carrying out research and disseminating and publishing the results thereof, freedom to express freely their opinion about the institution or system in which they work, freedom from institutional censorship and freedom to participate in professional or representative academic bodies (UNESCO 1997 Recommendation concerning the Status of Higher-Education Teaching Personnel). The Academic Freedom Index is designed to provide an aggregated measure that captures the de facto realization of academic freedom, including the degree to which higher-education institutions are autonomous.
+
+          Scale: Interval, from low to high (0-1).
+
+          Aggregation: The index is formed by point estimates drawn from a Bayesian factor analysis model including the following indicators: freedom to research and teach (v2cafres), freedom of academic exchange and dissemination (v2cafexch), institutional autonomy (v2cainsaut), campus integrity (v2casurv), freedom of academic and cultural expression (v2clacfree).
+
+          Indicator name: `v2xca_academ`
+        unit: ""
+
+      # 3.12.1.1 Government censorship effort — Media (C)
+      v2mecenefm:
+        title: |-
+          Government censorship of the media ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which the government directly or indirectly attempts to censor political content in print and broadcast media, through formal restrictions or indirect pressures such as financial control, licensing, or access to distribution channels.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Government censorship of the media
+        description_from_producer: |-
+          Question: Does the government directly or indirectly attempt to censor the print or broadcast media?
+
+          Clarification: Indirect forms of censorship might include politically motivated awarding of broadcast frequencies, withdrawal of financial support, influence over printing facilities and distribution networks, selected distribution of advertising, onerous registration requirements, prohibitive tariffs, and bribery. We are not concerned with censorship of non-political topics such as child pornography, statements offensive to a particular religion, or defamatory speech unless this sort of censorship is used as a pretext for censoring political speech.
+
+          Responses:
+
+          - 0: Attempts to censor are direct and routine.
+          - 1: Attempts to censor are indirect but nevertheless routine.
+          - 2: Attempts to censor are direct but limited to especially sensitive issues.
+          - 3: Attempts to censor are indirect and limited to especially sensitive issues.
+          - 4: The government rarely attempts to censor major media in any way, and when such exceptional attempts are discovered, the responsible officials are usually punished.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2mecenefm`
+        unit: ""
+
+      # 3.12.1.7 Harassment of journalists (C)
+      v2meharjrn:
+        title: |-
+          Journalist harassment ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which journalists are threatened, arrested, imprisoned, beaten, or killed by government or powerful non-government actors while carrying out legitimate journalistic activities​.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Journalist harassment
+        description_from_producer: |-
+          Question: Are individual journalists harassed — i.e., threatened with libel, arrested, imprisoned, beaten, or killed — by governmental or powerful nongovernmental actors while engaged in legitimate journalistic activities?
+
+          Responses:
+
+          0: No journalists dare to engage in journalistic activities that would offend powerful actors because harassment or worse would be certain to occur.
+          1: Some journalists occasionally offend powerful actors but they are almost always harassed or worse and eventually are forced to stop.
+          2: Somejournalistswhooffendpowerfulactorsareforcedtostopbutothersmanagetocontinue practicing journalism freely for long periods of time.
+          3: It is rare for any journalist to be harassed for offending powerful actors, and if this were to happen, those responsible for the harassment would be identified and punished.
+          4: Journalists are never harassed by governmental or powerful nongovernmental actors while engaged in legitimate journalistic activities.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2meharjrn`
+        unit: ""
+
+      # 3.12.1.8 Media self-censorship (C)
+      v2meslfcen:
+        title: |-
+          Self-censorship of the media ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which journalists censor themselves when reporting on politically sensitive issues, due to fear of consequences such as harassment, job loss, or retaliation.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Self-censorship of the media
+        description_from_producer: |-
+          Question: Is there self-censorship among journalists when reporting on issues that the government considers politically sensitive?
+
+          Responses:
+            0: Self-censorship is complete and thorough.
+            1: Self-censorship is common but incomplete.
+            2: There is self-censorship on a few highly sensitive political issues but not on moderately
+            sensitive issues.
+            3: There is little or no self-censorship among journalists.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2meslfcen`
+        unit: ""
+
+      # 3.15.2.3 Mobilization for democracy (C)
+      v2cademmob:
+        title: |-
+          Mass mobilization for democracy ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the frequency and scale of mass mobilization events—such as protests or strikes—organized to advance or protect democratic institutions and civil liberties.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Mass mobilization for democracy
+        description_from_producer: |-
+          Question: In this year, how frequent and large have events of mass mobilization for pro-democratic aims been?
+
+          Clarification: Events are pro-democratic if they are organized with the explicit aim to advance and/or protect democratic institutions such as free and fair elections with multiple parties, and courts and parliaments; or if they are in support of civil liberties such as freedom of association and speech. This question concerns the mobilization of citizens for mass events such as demonstrations, strikes and sit-ins.
+
+          Responses:
+          0: There have been virtually no events.
+          1: There have been several small-scale events.
+          2: There have been many small-scale events.
+          3: There have been several large-scale and small-scale events.
+          4: There have been many large-scale and small-scale events.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+        unit: ""
+
+      # 3.15.2.4 Mobilization for autocracy (C)
+      v2caautmob:
+        title: |-
+          Mass mobilization for autocracy ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the frequency and scale of citizen mobilizations in support of non-democratic leaders or regimes, including mass events that undermine democratic principles or endorse autocratic governance, whether organized by non-state or state actors.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Mass mobilization for autocracy
+        description_from_producer: |-
+          Question: In this year, how frequent and large have events of mass mobilization for pro-autocratic aims been?
+
+          Clarification: Events are pro-autocratic if they are organized explicitly in support of non-democratic rulers and forms of government such as a one-party state, monarchy, theocracy or military dictatorships. Events are also pro-autocratic if they are organized in support of leaders that question basic principles of democracy, or are generally aiming to undermine democratic ideas and institutions such as the rule of law, free and fair elections, or media freedom. This question concerns the mobilization of citizens for mass events such as demonstrations, strikes, sit-ins. These events are typically organized by non-state actors, but the question also concerns state- orchestrated rallies (e.g. to show support of an autocratic government).
+
+          Responses:
+          0: There have been virtually no events.
+          1: There have been several small-scale events.
+          2: There have been many small-scale events.
+          3: There have been several large-scale and small-scale events.
+          4: There have been many large-scale and small-scale events.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2caautmob`
+        unit: ""
+
+      # 3.15.1.1 Political polarization (C)
+      v2cacamps:
+        title: |-
+          Political polarization score ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the extent to which society is divided into hostile political camps, where political differences undermine social relationships and discourage interaction across ideological lines.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Political polarization score
+        description_from_producer: |-
+          Question: Is society polarized into antagonistic, political camps?
+
+          Clarification: Here we refer to the extent to which political differences affect social relationships beyond political discussions. Societies are highly polarized if supporters of opposing political camps are reluctant to engage in friendly interactions, for example, in family functions, civic associations, their free time activities and workplaces
+
+          Responses:
+          0: Not at all. Supporters of opposing political camps generally interact in a friendly manner.
+          1: Mainly not. Supporters of opposing political camps are more likely to interact in a friendly than a hostile manner.
+          2: Somewhat. Supporters of opposing political camps are equally likely to interact in a friendly or hostile manner.
+          3: Yes, to noticeable extent. Supporters of opposing political camps are more likely to interact in a hostile than friendly manner.
+          4: Yes, to a large extent. Supporters of opposing political camps generally interact in a hostile manner.
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator nanme: `v2cacamps`
+        unit: ""
+
+      # 3.15.1.2 Political violence (C)
+      v2caviol:
+        title: |-
+          Political violence by non-state actors ({definitions.auxiliary.estimate} estimate, aggregate: << aggregate_method >>)
+        description_short: |-
+          {definitions.auxiliary.estimate_title} estimate of the frequency with which non-state actors use physical force to achieve political goals, excluding symbolic or profit-driven violence, and focusing on assaults, killings, or beatings committed by militias or informal groups​.
+        presentation:
+          <<: *ppt_multi_w_regions
+          title_public: Political violence by non-state actors
+        description_from_producer: |-
+          Question: How often have non-state actors used political violence against persons this year?
+
+          Clarification: We understand political violence as the use of physical force to achieve political objectives by non-state actors. The restriction to political objectives excludes profit-driven crime-related violence, for instance. By non-state actors we refer to individuals or entities that are not formally part of the state. Thus, politically oriented militias and youth groups count as non-state actors even though they might potentially be informally affiliated with the ruling party or the state. Political violence against persons excludes psychological and symbolic violence (e.g. destruction of objects).
+
+          Responses:
+          0: Not at all. Non-state actors did not use political violence.
+          1: Rare. Non-state actors rarely used political violence.
+          2: Occasionally. Non-state actors occasionally used political violence.
+          3: Frequently. Non-state actors frequently used political violence.
+          4: Often. Non-state actors often used political violence.
+
+          Scale: Ordinal, converted to interval by the measurement model.
+
+          Indicator name: `v2caviol`
         unit: ""
 
   ##################################################################################################
