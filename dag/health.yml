@@ -2,14 +2,15 @@ steps:
   # Health
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
-  # Death completion (Karlinsky,2023)
-  data://meadow/health/2023-08-16/deaths_karlinsky:
-    - snapshot://health/2023-08-16/deaths_karlinsky.csv
-  data://garden/health/2023-08-16/deaths_karlinsky:
-    - data://meadow/health/2023-08-16/deaths_karlinsky
-    - data://garden/demography/2023-03-31/population
-  data://grapher/health/2023-08-16/deaths_karlinsky:
-    - data://garden/health/2023-08-16/deaths_karlinsky
+
+  # Death completion (Karlinsky, 2024)
+  data://meadow/health/2025-04-18/deaths_karlinsky:
+    - snapshot://health/2025-04-18/deaths_karlinsky.csv
+  data://garden/health/2025-04-18/deaths_karlinsky:
+    - data://meadow/health/2025-04-18/deaths_karlinsky
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-04-18/deaths_karlinsky:
+    - data://garden/health/2025-04-18/deaths_karlinsky
 
   # IHME GBD Leading cause of  deaths - update
   data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
