@@ -40,10 +40,10 @@ definitions:
     - A minority stake is an ownership interest of less than 50% of the total shares of a company.
 
   desc_key_private: &desc_key_private
+      - AI companies and their focus areas are identified using keyword searches in company descriptions and websites.
       - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
       - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
       - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
-
   desc_key_generative: &desc_key_generative
       - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
       - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
