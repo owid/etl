@@ -79,7 +79,8 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
         # Read the CSV file
         df_add = pd.read_csv(file_path)
         if "complete" in df_add.columns:
-            df_add = df_add[df_add["complete"] == True]
+            df_add["complete"] = df_add["complete"].astype(str)
+            df_add = df_add[df_add["complete"] == "True"]
             df_add = df_add.drop(columns=["complete"])
 
         # Normalize 'field' capitalization
