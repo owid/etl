@@ -141,13 +141,13 @@ steps:
     - data://garden/war/2023-09-21/brecke
 
   # Peace data (Diehl)
-  data://meadow/war/2023-09-27/peace_diehl:
-    - snapshot://war/2023-09-27/peace_diehl.zip
-  data://garden/war/2023-09-27/peace_diehl:
-    - data://meadow/war/2023-09-27/peace_diehl
+  data://meadow/war/2025-04-18/peace_diehl:
+    - snapshot://war/2025-04-18/peace_diehl.zip
+  data://garden/war/2025-04-18/peace_diehl:
+    - data://meadow/war/2025-04-18/peace_diehl
     - data://garden/countries/2023-09-29/cow_ssm
-  data://grapher/war/2023-09-27/peace_diehl:
-    - data://garden/war/2023-09-27/peace_diehl
+  data://grapher/war/2025-04-18/peace_diehl:
+    - data://garden/war/2025-04-18/peace_diehl
 
   # Chupilkin and Koczan (Supplementary dataset to CoW)
   data://meadow/war/2023-11-29/chupilkin_koczan:

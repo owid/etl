@@ -372,7 +372,6 @@ def explode_rows_by_time_range(
         |  1990 |    1    |
         |  1991 |    1    |
         |  1992 |    1    |
-        |  1993 |    1    |
 
     Parameters
     ----------
@@ -385,7 +384,7 @@ def explode_rows_by_time_range(
     col_time: str
         Name of the new column for time. E.g. 'year'.
     cols_scale: List[str]
-        If given, column specified by this will be scalled based on the length of the time period. E.g. if the value was '10' over the whole period of 20 years, the new rows per year will have the value '0.5'.
+        If given, column specified by this will be scaled based on the length of the time period. E.g. if the value was '10' over the whole period of 20 years, the new rows per year will have the value '0.5'.
 
     Returns
     -------
