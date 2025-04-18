@@ -125,7 +125,8 @@ tables:
               - Nigeria
 
       expected_confidence_score:
-        title: ""
+        title: "Expected confidence score"
+        unit: "%"
         short_unit: "%"
         description_short: |-
           Ratio between min to max death completeness between WPP/GBD/GHE. from 0 (lowest) to 100% (highest confidence) (conditional on having at least 2 sources for expected_deaths).
