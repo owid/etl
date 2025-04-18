@@ -39,7 +39,7 @@ definitions:
   description_key_patents:  &description_key_patents |-
     - CSET sources patent data from 1790 Analytics, PATSTAT, and The Lens.
     - Patent data can be delayed, as some patent offices take years to release filings, so the most recent years may be incomplete and should be used with caution.
-    - Here we've opted not to include the most recent years of data in the dataset, as they are likely to be incomplete as noted by the source.
+    - Here, we’ve chosen not to include the most recent years of data in the dataset, as they are likely incomplete, as noted in the original dataset provided by CSET.
     - The dataset includes over 360,000 AI-related patent families—groups of documents related to a single invention—and counts each family as one patent, treating it as a "granted patent" if any document in the family has been granted, or as a "patent application" if all documents are still pending.
     - Inventors often apply for the same patent in multiple countries, so the dataset groups all filings for one invention across jurisdictions into a single patent family, using the year and country of the first application to assign a filing date and location.
     - For example, if someone files a robot patent first in the European Patent Office and then in China, all documents are grouped under one EPO patent.
