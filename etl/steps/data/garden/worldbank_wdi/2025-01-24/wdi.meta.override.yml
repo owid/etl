@@ -795,7 +795,7 @@ tables:
           - Exports of goods and services represent the value of all goods and other market services provided to the rest of the world. Imports represent the value of all goods and other market services received from the rest of the world. In both cases, they include the value of merchandise, freight, insurance, transport, travel, royalties, license fees, and other services, such as communication, construction, financial, information, business, personal, and government services.
 
       eg_elc_accs_zs_without:
-        title:  Access to clean fuels and technologies for cooking (% of population with no access)
+        title:  Access to electricity (% of population with no access)
         unit: '% of population'
         short_unit: '%'
         description_short: *description_short_electricity
