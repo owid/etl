@@ -28,6 +28,7 @@ def run(dest_dir: str) -> None:
     tb_robots = ds_garden_robots.read("ai_robots", reset_index=False)
     tb_private_investment = ds_garden_ai_investment.read("ai_private_investment", reset_index=False)
     tb_corporate = ds_garden_ai_investment.read("ai_corporate_investment", reset_index=False)
+    tb_total_private_investment = ds_garden_ai_investment.read("ai_total_investment_private", reset_index=False)
     tb_generative = ds_garden_ai_investment.read("ai_investment_generative", reset_index=False)
     tb_companies = ds_garden_ai_investment.read("ai_new_companies", reset_index=False)
 
@@ -50,6 +51,7 @@ def run(dest_dir: str) -> None:
             tb_corporate,
             tb_generative,
             tb_companies,
+            tb_total_private_investment,
         ],
         check_variables_metadata=True,
     )
