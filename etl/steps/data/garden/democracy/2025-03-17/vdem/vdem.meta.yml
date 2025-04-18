@@ -96,7 +96,7 @@ tables:
 
           Clarification: This index attempts to measure (a) whether the chief executive is elected, either directly elected through popular elections or indirectly through a popularly elected legislature that then appoints the chief executive; and (b) whether the legislature, in presidential systems with a directly elected president that is also chief executive, is directly or indirectly elected. Note that a popular election is minimally defined and also includes sham elections with limited suffrage and no competition. Similarly, "appointment" by legislature only implies selection and/or approval, not the power to dismiss. This index is useful primarily for aggregating higher-order indices and should not necessarily be interpreted as an important element of democracy in its own right.
 
-          V-Dem indicator nanme: `v2x_elecoff`
+          V-Dem indicator name: `v2x_elecoff`
         presentation:
           <<: *ppt_uni_w_regions
           title_public: Elected officials index
@@ -115,7 +115,7 @@ tables:
           Clarification:
           This question does not take into consideration restrictions based on age, residence, having been convicted for crime, or being legally incompetent. It covers legal de jure restrictions, not restrictions that may be operative in practice de facto. The adult population as defined by statute is defined by citizens in the case of independent countries or the people living in the territorial entity in the case of colonies. Universal suffrage is coded as 100%. Universal male suffrage only is coded as 50%. Years before electoral provisions are introduced are scored 0%. The scores do not reflect whether an electoral regime was interrupted or not. Only if new constitutions, electoral laws, or the like explicitly introduce new regulations of suffrage, the scores were adjusted accordingly if the changes suggested doing so. If qualifying criteria other than gender apply such as property, tax payments, income, literacy, region, race, ethnicity, religion, and/or 'economic independence', estimates have been calculated by combining information on the restrictions with different kinds of statistical information on population size, age distribution, wealth distribution, literacy rates, size of ethnic groups, etc., secondary country-specific sources, and — in the case of very poor information — the conditions in similar countries or colonies. The scores reflect de jure provisions of suffrage extension in percentage of the adult population. If the suffrage law is revised in a way that affects the extension, the scores reflect this change as of the calendar year the law was enacted.
 
-          V-Dem indicator nanme: `v2x_suffr`
+          V-Dem indicator name: `v2x_suffr`
         description_processing: |-
           Converted ratio (0-1) into share (0-100%).
 
@@ -139,7 +139,7 @@ tables:
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
-          V-Dem indicator nanme: `v2eltrnout`
+          V-Dem indicator name: `v2eltrnout`
         unit: "%"
         presentation:
           <<: *ppt_uni_w_regions
@@ -154,7 +154,7 @@ tables:
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
-          V-Dem indicator nanme: `v2elvaptrn`
+          V-Dem indicator name: `v2elvaptrn`
         unit: "%"
         presentation:
           <<: *ppt_uni_w_regions
@@ -204,7 +204,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xdd_dd`
+          V-Dem indicator name: `v2xdd_dd`
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -218,7 +218,7 @@ tables:
         description_from_producer: |-
           "Government Effectiveness" combines into a single grouping responses on the quality of public service provision, the quality of the bureaucracy, the competence of civil servants, the independence of the civil service from political pressures, and the credibility of the government's commitment to policies. The main focus of this index is on "inputs" required for the government to be able to produce and implement good policies and deliver public goods.
 
-          V-Dem indicator nanme: `e_wbgi_gee`
+          V-Dem indicator name: `e_wbgi_gee`
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -271,7 +271,7 @@ tables:
         description_from_producer: |-
           If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
 
-          V-Dem indicator nanme: `v2exfemhos`
+          V-Dem indicator name: `v2exfemhos`
         unit: ""
 
       ## 3.4.3.16 HOG female
@@ -288,7 +288,7 @@ tables:
           - 0: Male
           - 1: Female
 
-          V-Dem indicator nanme: `v2exfemhog`
+          V-Dem indicator name: `v2exfemhog`
         unit: ""
 
       ## HOE female (custom)
@@ -376,7 +376,7 @@ tables:
 
           Notes: The PSDI is calculated by using two V-Party variables: (1) the anti-pluralist index for each political party in a given party system (v2xpa_antiplural) and (2) the seat shares for each political party within that party system (v2paseatshare). Political parties are further divided into those in the government (v2pagovsup = 0, 1, or 2) or those in the opposition (v2pagovsup = 3). To account for hegemonic or competitive authoritarian regimes that allow opposition parties to exist, missing values for a non-existent opposition are replaced with 0 if the electoral democracy index (v2x_polyarchy) scores lower than 0.5 for that country-election- year. Consequently, these missing values are separated from missing values due to delayed formation of the executive, or inability for parties to reach a governmental coalition resulting in missing values for the opposition. The symbol ws denotes the weight for the seatshare of the government coalition (gp) or opposition (op) for a given election-year (t).
 
-          V-Dem indicator nanme: `v2xpas_democracy`
+          V-Dem indicator name: `v2xpas_democracy`
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -396,7 +396,7 @@ tables:
 
           Notes: The GCDI is a restricted version of the PSDI index. It only captures the democratic levels for parties in a governmental coalition. The symbol ws denotes the weight for the seatshare of the government coalition (gp) for a given election-year (t).
 
-          V-Dem indicator nanme: `v2xpas_democracy_government`
+          V-Dem indicator name: `v2xpas_democracy_government`
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -416,7 +416,7 @@ tables:
 
           Notes: The OPDI is a restricted version of the PSDI index. It only captures the democratic levels for parties in the opposition. The symbol ws denotes the weight for the seatshare of the opposition (op) for a given election-year (t).
 
-          V-Dem indicator nanme: `v2xpas_democracy_opposition`
+          V-Dem indicator name: `v2xpas_democracy_opposition`
         unit: ""
         display:
           numDecimalPlaces: 2
@@ -470,7 +470,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_polyarchy`
+          V-Dem indicator name: `v2x_polyarchy`
         unit: ""
         presentation:
           <<: *ppt_multi_w_regions
@@ -496,7 +496,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_libdem`
+          V-Dem indicator name: `v2x_libdem`
         unit: ""
 
       # 2.1.3 Participatory democracy index
@@ -515,7 +515,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_partipdem`
+          V-Dem indicator name: `v2x_partipdem`
         unit: ""
 
       ## 2.1.4 Deliberative democracy index
@@ -535,7 +535,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_delibdem`
+          V-Dem indicator name: `v2x_delibdem`
         unit: ""
 
       ## 2.1.5 Egalitarian democracy index
@@ -555,7 +555,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_egaldem`
+          V-Dem indicator name: `v2x_egaldem`
         unit: ""
 
       ## 2.2.11 Legislative constraints on the executive index
@@ -574,7 +574,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xlg_legcon`
+          V-Dem indicator name: `v2xlg_legcon`
         unit: ""
 
       ## 2.2.8 Liberal component index
@@ -593,7 +593,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_liberal`
+          V-Dem indicator name: `v2x_liberal`
         unit: ""
 
       ## 2.2.15 Local government index
@@ -612,7 +612,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xel_locelec`
+          V-Dem indicator name: `v2xel_locelec`
         unit: ""
 
       ## 2.2.12 Participatory component index
@@ -632,7 +632,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_partip`
+          V-Dem indicator name: `v2x_partip`
         unit: ""
 
       ## 2.2.16 Regional government index
@@ -650,7 +650,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xel_regelec`
+          V-Dem indicator name: `v2xel_regelec`
         unit: ""
 
       ## 2.2.21 Equal distribution of resources index
@@ -669,7 +669,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xeg_eqdr`
+          V-Dem indicator name: `v2xeg_eqdr`
         unit: ""
 
       ## 3.5.1.6 Legislature corrupt activities
@@ -696,7 +696,7 @@ tables:
           - 3: Very occasionally. There may be a few legislators who engage in these activities, but the vast majority do not.
           - 4: Never, or hardly ever.
 
-          V-Dem indicator nanme: `v2lgcrrpt`
+          V-Dem indicator name: `v2lgcrrpt`
         unit: ""
 
       ## 3.5.3.7 Lower chamber female legislators
@@ -716,7 +716,7 @@ tables:
         description_from_producer: |-
           Question: What percentage (%) of the lower (or unicameral) chamber of the legislature is female?
 
-          V-Dem indicator nanme: `v2lgfemleg`
+          V-Dem indicator name: `v2lgfemleg`
         unit: "%"
 
       ## 3.6.0.2 Common good
@@ -739,7 +739,7 @@ tables:
           - 3: Justifications are based on a mixture of references to constituency/party/group interests and on appeals to the common good.
           - 4: Justifications are for the most part almost always based on explicit statements of the common good for society, understood either as the greatest good for the greatest number or as helping the least advantaged in a society.
 
-          V-Dem indicator nanme: `v2dlcommon`
+          V-Dem indicator name: `v2dlcommon`
         unit: ""
 
       ## 3.6.0.1 Reasoned justification
@@ -762,7 +762,7 @@ tables:
           - 2: Qualified justification. Elites tend to offer a single simple reason justifying why the proposed policies contribute to or detract from an outcome. For example, "We must cut spending because taxpayers cannot afford to pay for current programs."
           - 3: Sophisticated justification. Elites tend to offer more than one or more complex, nuanced and complete justification. For example, "We must cut spending because taxpayers cannot afford to pay for current government programs. Raising taxes would hurt economic growth, and deficit spending would lead to inflation."
 
-          V-Dem indicator nanme: `v2dlreason`
+          V-Dem indicator name: `v2dlreason`
         unit: ""
 
       ## 3.6.0.5 Engaged society
@@ -788,7 +788,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2dlengage`
+          V-Dem indicator name: `v2dlengage`
         unit: ""
 
       ## 3.7.0.6 Judicial corruption decision
@@ -808,7 +808,7 @@ tables:
 
           Notes: For reasons of consistency, as of December 2014, responses to this question are reversed so that the least democratic response is ”0” and the most democratic is ”4”.
 
-          V-Dem indicator nanme: `v2jucorrdc`
+          V-Dem indicator name: `v2jucorrdc`
         presentation:
           <<: *ppt_multi_w_regions
           title_public: Judicial corruption score
@@ -840,7 +840,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2clrspct`
+          V-Dem indicator name: `v2clrspct`
         unit: ""
 
       ## 3.8.2.6 Social group equality in respect for civil liberties
@@ -866,7 +866,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2clsocgrp`
+          V-Dem indicator name: `v2clsocgrp`
         unit: ""
 
       ## 3.9.0.1 Domestic autonomy
@@ -890,7 +890,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2svdomaut`
+          V-Dem indicator name: `v2svdomaut`
         unit: ""
 
       ## 3.9.0.2 International autonomy
@@ -910,7 +910,7 @@ tables:
           - 1: Semi-autonomous. An external political actor directly constrains the ability of domestic actors to pursue an independent foreign policy course in some important areas. This may be the product of explicit treaty provisions or well-understood rules of the game from which the subject state cannot withdraw. Examples would include Soviet strictures over rule in so-called "satellite" states in Eastern Europe, and explicitly negotiated postwar settlements (e.g. Austria following WWII).
           - 2: Autonomous. Domestic political actors exercise foreign policy free of the direct control of external political actors. Direct control is meant to exclude the exercise of constraint or the impact of interdependence in the international system. Treaties in which states concede some part of that control to a supra- or international organization voluntarily, and from which there is a possibility of exit should not be interpreted as a violation of autonomy.
 
-          V-Dem indicator nanme: `v2svinlaut`
+          V-Dem indicator name: `v2svinlaut`
         unit: ""
 
       ## 3.9.0.3 State authority over territory
@@ -930,7 +930,7 @@ tables:
 
           By "officially part of the country" we refer to international law. In cases where international law is not entirely clear, we refer you to general understandings. For example, China claims sovereignty over Taiwan, but it remains under the control of its own government. For purposes of this question, Taiwan should not be considered a failure to control its territory by the government of the PRC.
 
-          V-Dem indicator nanme: `v2svstterr`
+          V-Dem indicator name: `v2svstterr`
         unit: "%"
 
       ## 3.12.0.2 Power distributed by social group
@@ -954,7 +954,7 @@ tables:
           - 3: Either all social groups possess some political power, with some groups having more power than others; or different social groups alternate in power, with one group controlling much of the political power for a period of time, followed by another — but all significant groups have a turn at the seat of power.
           - 4: All social groups have roughly equal political power or there are no strong ethnic, caste, linguistic, racial, religious, or regional differences to speak of. Social group characteristics are not relevant to politics.
 
-          V-Dem indicator nanme: `v2pepwrsoc`
+          V-Dem indicator name: `v2pepwrsoc`
         unit: ""
 
       ## 5.4.3 Presidentialism Index
@@ -974,7 +974,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xnp_pres`
+          V-Dem indicator name: `v2xnp_pres`
         unit: ""
 
       ## 5.5.1 Civil liberties index
@@ -997,7 +997,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_civlib`
+          V-Dem indicator name: `v2x_civlib`
         unit: ""
 
       ## 5.5.4 Private civil liberties index
@@ -1016,7 +1016,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_clpriv`
+          V-Dem indicator name: `v2x_clpriv`
         unit: ""
 
       ## 5.5.3 Political civil liberties index
@@ -1035,7 +1035,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_clpol`
+          V-Dem indicator name: `v2x_clpol`
         unit: ""
 
       ## 5.5.2 Physical violence index
@@ -1054,7 +1054,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_clphy`
+          V-Dem indicator name: `v2x_clphy`
         unit: ""
 
       ## 5.7.1 Political corruption index
@@ -1077,7 +1077,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_corr`
+          V-Dem indicator name: `v2x_corr`
         unit: ""
 
       ## 5.7.3 Public sector corruption index [Not in use]
@@ -1094,7 +1094,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_pubcorr`
+          V-Dem indicator name: `v2x_pubcorr`
         unit: ""
 
       ## 5.7.2 Executive corruption index [Not in use]
@@ -1111,7 +1111,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_execorr`
+          V-Dem indicator name: `v2x_execorr`
         unit: ""
 
       ## 5.8.1 Women political empowerment index
@@ -1130,7 +1130,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_gender`
+          V-Dem indicator name: `v2x_gender`
         unit: ""
 
       ## 5.8.2 Women civil liberties index
@@ -1149,7 +1149,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_gencl`
+          V-Dem indicator name: `v2x_gencl`
         unit: ""
 
       ## 5.8.3 Women civil society participation index
@@ -1168,7 +1168,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_gencs`
+          V-Dem indicator name: `v2x_gencs`
         unit: ""
 
       ## 5.8.4 Women political participation index
@@ -1187,7 +1187,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_genpp`
+          V-Dem indicator name: `v2x_genpp`
         unit: ""
 
       ## 5.9.1 Rule of law index
@@ -1208,7 +1208,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_rule`
+          V-Dem indicator name: `v2x_rule`
         unit: ""
 
       ## 5.11.1 Core civil society index [not in use]
@@ -1227,7 +1227,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xcs_ccsi`
+          V-Dem indicator name: `v2xcs_ccsi`
         unit: ""
 
       ## 2.2.13 Civil society participation index
@@ -1250,7 +1250,7 @@ tables:
           Scale:
           Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_cspart`
+          V-Dem indicator name: `v2x_cspart`
         unit: ""
 
       ## 3.6.0.3 Respect counterarguments
@@ -1277,7 +1277,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2dlcountr`
+          V-Dem indicator name: `v2dlcountr`
         unit: ""
 
       # 2.2.17 Deliberative component index
@@ -1300,7 +1300,7 @@ tables:
           Scale:
           Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xdl_delib`
+          V-Dem indicator name: `v2xdl_delib`
         unit: ""
 
       ## 2.2.18 Egalitarian component index
@@ -1319,7 +1319,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_egal`
+          V-Dem indicator name: `v2x_egal`
         unit: ""
 
       ## 2.2.6 Clean elections index
@@ -1342,7 +1342,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xel_frefair`
+          V-Dem indicator name: `v2xel_frefair`
         unit: ""
 
       ### 3.6.0.4 Range of consultation
@@ -1368,7 +1368,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2dlconslt`
+          V-Dem indicator name: `v2dlconslt`
         unit: ""
 
       ## 2.2.20 Equal access index
@@ -1387,7 +1387,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xeg_eqaccess`
+          V-Dem indicator name: `v2xeg_eqaccess`
         unit: ""
 
       ## 2.2.19 Equal protection index
@@ -1406,7 +1406,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xeg_eqprotec`
+          V-Dem indicator name: `v2xeg_eqprotec`
         unit: ""
 
       ## 2.2.4 Freedom of association thick index
@@ -1422,7 +1422,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_frassoc_thick`
+          V-Dem indicator name: `v2x_frassoc_thick`
         unit: ""
 
       ## 2.2.3 Freedom of Expression and Alternative Sources of Information index
@@ -1444,7 +1444,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_freexp_altinf`
+          V-Dem indicator name: `v2x_freexp_altinf`
         unit: ""
 
       ## 2.2.9 Equality before the law and individual liberty index
@@ -1461,7 +1461,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2xcl_rol`
+          V-Dem indicator name: `v2xcl_rol`
         unit: ""
 
       ## 2.2.10 Judicial constraints on the executive index
@@ -1478,7 +1478,7 @@ tables:
 
           Scale: Interval, from low to high (0-1).
 
-          V-Dem indicator nanme: `v2x_jucon`
+          V-Dem indicator name: `v2x_jucon`
         unit: ""
 
       # 5.15.1 Academic Freedom Index
@@ -1499,7 +1499,7 @@ tables:
 
           Aggregation: The index is formed by point estimates drawn from a Bayesian factor analysis model including the following indicators: freedom to research and teach (v2cafres), freedom of academic exchange and dissemination (v2cafexch), institutional autonomy (v2cainsaut), campus integrity (v2casurv), freedom of academic and cultural expression (v2clacfree).
 
-          V-Dem indicator nanme: `v2xca_academ`
+          V-Dem indicator name: `v2xca_academ`
         unit: ""
 
       # 3.12.1.1 Government censorship effort — Media (C)
@@ -1525,7 +1525,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2mecenefm`
+          V-Dem indicator name: `v2mecenefm`
         unit: ""
 
       # 3.12.1.7 Harassment of journalists (C)
@@ -1549,7 +1549,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2meharjrn`
+          V-Dem indicator name: `v2meharjrn`
         unit: ""
 
       # 3.12.1.8 Media self-censorship (C)
@@ -1572,7 +1572,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2meslfcen`
+          V-Dem indicator name: `v2meslfcen`
         unit: ""
 
       # 3.15.2.3 Mobilization for democracy (C)
@@ -1622,7 +1622,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2caautmob`
+          V-Dem indicator name: `v2caautmob`
         unit: ""
 
       # 3.15.1.1 Political polarization (C)
@@ -1674,7 +1674,7 @@ tables:
 
           Scale: Ordinal, converted to interval by the measurement model.
 
-          V-Dem indicator nanme: `v2caviol`
+          V-Dem indicator name: `v2caviol`
         unit: ""
 
   ##################################################################################################
