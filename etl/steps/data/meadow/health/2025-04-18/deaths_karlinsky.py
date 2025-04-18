@@ -1,10 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-
-import pandas as pd
-from owid.catalog import Table
-
-from etl.helpers import PathFinder,
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
