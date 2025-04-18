@@ -987,6 +987,7 @@ def rename_columns(tb: Table) -> Table:
             "e_wbgi_gee": "goveffective_vdem_wbgi",
         }
     )
+    tb.columns = tb.columns.str.replace(r"code(low|high)", r"\1", regex=True)
     return tb
 
 
@@ -1040,3 +1041,6 @@ def estimate_gender_hoe_indicator(tb: Table) -> Table:
         ]
     )
     return tb
+
+
+# %%
