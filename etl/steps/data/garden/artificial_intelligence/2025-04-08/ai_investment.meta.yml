@@ -69,7 +69,7 @@ tables:
   ai_private_investment:
     variables:
       world:
-        title: Global private investment in AI
+        title: Global private investment in AI by focus area
         description_short: *desc_short_private
         description_key: *desc_key_private
         description_processing: *desc_processing_inflation
@@ -94,6 +94,17 @@ tables:
             note: *note_inflation
       europe:
         title: Private investment in AI in the European Union and United Kingdom
+        description_short: *desc_short_private
+        description_key: *desc_key_private
+        description_processing: *desc_processing_inflation
+        presentation:
+          grapher_config:
+            note: *note_inflation
+
+  ai_total_investment_private:
+    variables:
+      private_investment:
+        title: Global total private investment in AI
         description_short: *desc_short_private
         description_key: *desc_key_private
         description_processing: *desc_processing_inflation
