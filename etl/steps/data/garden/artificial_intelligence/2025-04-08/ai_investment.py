@@ -93,13 +93,22 @@ def run(dest_dir: str) -> None:
     tb_private_investment = create_private_investment_table(tb_cpi_inv)
     tb_corporate_investment = create_corporate_investment(tb_cpi_inv)
 
+    tb_total_privata_data_page = tb_cpi_inv[["private_investment"]].copy()
+    tb_total_privata_data_page.metadata.short_name = "ai_total_investment_private"
+
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb_generative, tb_private_investment, tb_corporate_investment, tb_companies],
+        tables=[
+            tb_generative,
+            tb_private_investment,
+            tb_corporate_investment,
+            tb_companies,
+            tb_total_privata_data_page,
+        ],
         check_variables_metadata=True,
         default_metadata=snap.metadata,
     )
