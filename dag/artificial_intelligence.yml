@@ -191,12 +191,6 @@ steps:
     - data://garden/artificial_intelligence/2025-04-08/ai_incidents
     - data://garden/artificial_intelligence/2025-04-08/ai_robots
     - data://garden/artificial_intelligence/2025-04-08/ai_investment
-
-  # AI Index Report 2024 - AI PhDs
-  data://garden/artificial_intelligence/2024-06-28/ai_phds:
-    - snapshot://artificial_intelligence/2024-06-28/ai_phds.csv
-  data://grapher/artificial_intelligence/2024-06-28/ai_phds:
-    - data://garden/artificial_intelligence/2024-06-28/ai_phds
   #
   # CSET datasets
   #
