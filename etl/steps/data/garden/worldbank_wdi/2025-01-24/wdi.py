@@ -105,7 +105,7 @@ def run() -> None:
             ds_population=ds_population,
         )
 
-    tb_garden = add_energy_access_variables(tb_garden, ds_population)
+    tb_garden = add_energy_access_variables(tb_garden)
 
     ####################################################################################################################
 
@@ -766,7 +766,7 @@ def add_population_weighted_aggregations(
     return tb
 
 
-def add_energy_access_variables(tb: Table, ds_population: Dataset) -> Table:
+def add_energy_access_variables(tb: Table) -> Table:
     """
     Calculate the following energy related variables:
 
@@ -785,14 +785,12 @@ def add_energy_access_variables(tb: Table, ds_population: Dataset) -> Table:
     tb["eg_elc_accs_zs_without"] = 100 - tb["eg_elc_accs_zs"]
     tb["eg_cft_accs_zs_without"] = 100 - tb["eg_cft_accs_zs"]
 
-    # Add population to the table
-    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
     # Calculate number of people with and without access to electricity
-    tb["eg_elc_accs_zs_number"] = tb["eg_elc_accs_zs"] / 100 * tb["population"]
-    tb["eg_elc_accs_zs_without_number"] = tb["eg_elc_accs_zs_without"] / 100 * tb["population"]
+    tb["eg_elc_accs_zs_number"] = tb["eg_elc_accs_zs"] / 100 * tb["sp_pop_totl"]
+    tb["eg_elc_accs_zs_without_number"] = tb["eg_elc_accs_zs_without"] / 100 * tb["sp_pop_totl"]
 
     # Calculate number of people with and without access to clean cooking fuels
-    tb["eg_cft_accs_zs_number"] = tb["eg_cft_accs_zs"] / 100 * tb["population"]
-    tb["eg_cft_accs_zs_without_number"] = tb["eg_cft_accs_zs_without"] / 100 * tb["population"]
+    tb["eg_cft_accs_zs_number"] = tb["eg_cft_accs_zs"] / 100 * tb["sp_pop_totl"]
+    tb["eg_cft_accs_zs_without_number"] = tb["eg_cft_accs_zs_without"] / 100 * tb["sp_pop_totl"]
     tb = tb.format(["country", "year"])
     return tb

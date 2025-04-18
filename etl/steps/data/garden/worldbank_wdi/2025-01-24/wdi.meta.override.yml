@@ -829,7 +829,6 @@ tables:
       eg_elc_accs_zs_number:
         title: Access to electricity (number of people with access)
         unit: 'people'
-        short_unit: 'people'
         description_short: *description_short_electricity
         description_from_producer: *description_from_producer_electricity
         description_processing: We calculated the number of people with access to electricity by multiplying the fraction of the population with access by the total population.
@@ -845,7 +844,6 @@ tables:
       eg_elc_accs_zs_without_number:
         title: Access to electricity (number of people without access)
         unit: 'people'
-        short_unit: 'people'
         description_short: *description_short_electricity
         description_from_producer: *description_from_producer_electricity
         description_processing: We calculated the number of people without access to electricity by multiplying the fraction of the population without access by the total population.
@@ -861,7 +859,6 @@ tables:
       eg_cft_accs_zs_number:
         title: Access to clean fuels and technologies for cooking (number of people with access)
         unit: 'people'
-        short_unit: 'people'
         description_short: *description_short_clean_fuels
         description_from_producer: *description_from_producer_clean_fuels
         description_processing: We calculated the number of people with access to clean fuels and technologies for cooking by multiplying the fraction of the population with access by the total population.
@@ -877,7 +874,6 @@ tables:
       eg_cft_accs_zs_without_number:
         title: Access to clean fuels and technologies for cooking (number of people without access)
         unit: 'people'
-        short_unit: 'people'
         description_short: *description_short_clean_fuels
         description_from_producer: *description_from_producer_clean_fuels
         description_processing: We calculated the number of people without access to clean fuels and technologies for cooking by multiplying the fraction of the population without access by the total population.
