@@ -71,7 +71,8 @@ def run(dest_dir: str) -> None:
     tb_2023 = tb_2023.rename(columns=column_rename_map)
     tb_professional = pr.concat([tb[tb_2023.columns], tb_2023])
     tb_professional = tb_professional.drop_duplicates(subset=["country", "year"], keep="last")
-    cols_to_merge = [
+
+    industrial_robots = [
         col
         for col in tb.columns
         if col
@@ -83,13 +84,41 @@ def run(dest_dir: str) -> None:
             "Transportation and logistics",
         ]
     ]
-    tb = pr.merge(tb[cols_to_merge], tb_professional, on=["country", "year"], how="left")
-    tb = tb.format(["country", "year"])
+
+    # Industrial robots
+    tb_industrial = tb[industrial_robots].copy()
+    tb_industrial = tb_industrial.format(["country", "year"])
+    tb_industrial.metadata.short_name = "industrial_robots"
+
+    # Professional service robots
+    tb_professional = tb_professional.drop(columns=["country"])
+    # Remove rows where all columns except 'year' are NaN
+    tb_professional = tb_professional.dropna(
+        subset=[col for col in tb_professional.columns if col != "year"], how="all"
+    )
+
+    tb_professional = tb_professional.melt(
+        id_vars=["year"],
+        value_vars=[
+            "Agriculture",
+            "Hospitality",
+            "Medical and health care",
+            "Professional cleaning",
+            "Transportation and logistics",
+        ],
+        var_name="application_area",
+        value_name="number_of_professional_robots_installed",
+    )
+
+    tb_professional = tb_professional.format(["year", "application_area"])
+    tb_professional.metadata.short_name = "professional_robots"
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_garden = create_dataset(
+        dest_dir, tables=[tb_professional, tb_industrial], check_variables_metadata=True, default_metadata=snap.metadata
+    )
 
     # Save changes in the new garden dataset.
     ds_garden.save()

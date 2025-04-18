@@ -20,38 +20,22 @@ dataset:
 
 
 tables:
-  ai_robots:
+  professional_robots:
     variables:
-      agriculture:
-        title: Agriculture
+      number_of_professional_robots_installed:
+        title: Number of professional robots installed
         unit: 'robots'
         short_unit: ''
         description_short: |-
           {definitions.description_short_professional}
-      hospitality:
-        title: Hospitality
-        unit: 'robots'
-        short_unit: ''
-        description_short: |-
-          {definitions.description_short_professional}
-      professional_cleaning:
-        title: Professional cleaning
-        unit: 'robots'
-        short_unit: ''
-        description_short: |-
-          {definitions.description_short_professional}
-      transportation_and_logistics:
-        title: Transportation and logistics
-        unit: 'robots'
-        short_unit: ''
-        description_short: |-
-          {definitions.description_short_professional}
-      medical_and_health_care:
-        title: Medical robotics
-        unit: 'robots'
-        short_unit: ''
-        description_short: |-
-          {definitions.description_short_professional}
+        description_key:
+          - Agriculture category includes robots used for tasks such as plowing, seeding, harvesting, weeding, fertilizing, and pesticide spraying—both indoors (e.g. greenhouses) and outdoors (e.g. fields and vineyards). It also covers robots for milking, as well as those used in other livestock activities like feeding and barn cleaning.
+          - Professional cleaning category includes robots designed to clean floors, windows, walls, tanks, pipes, and vehicle hulls in professional environments. This category also includes disinfection robots and others used for specialized or large-scale cleaning tasks.
+          - Transportation and logistics category includes robots that transport goods and manage inventory in both indoor and outdoor environments. These robots are used in places such as warehouses, hospitals, hotels, and public streets, and they support activities like deliveries, stock counting, and restocking.
+          - Medical and health care category includes robots used in clinical and care settings for diagnostics, surgery, rehabilitation, and non-invasive therapy. It also includes hospital support robots, wearable exoskeletons, and telepresence robots used specifically in healthcare.
+          - Hospitality category includes robots that prepare and serve food or drinks, as well as those that provide information, guidance, or remote presence in customer-facing environments like hotels, restaurants, and museums.
+  industrial_robots:
+    variables:
       installations:
         title: Annual industrial robots installed
         unit: 'robots'
