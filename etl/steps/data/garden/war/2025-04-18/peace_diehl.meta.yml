@@ -21,21 +21,19 @@ definitions:
 
       Fixes: The source used country codes 936 and 937 instead of 946 (Kiribati) and 947 (Tuvalu), respectively.
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
 dataset:
-  title: Peace data (Diehl et al., 2023)
+  title: Peace data (Diehl et al., 2025)
   update_period_days: 1000
   description: |-
-    This dataset provides information on the relationships between countries, using data from Diehl et al. (2023).
+    This dataset provides information on the relationships between countries, using data from Diehl et al. (2025).
 
     We aggregate the data to the year and world (region).
 
     The data distinguishes five types of relationships between a pair of countries: severe rivalry, lesser rivalry, negative peace, warm peace, and security community.
 
     It does not include country pairs without any relationship.
-
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
@@ -73,7 +71,7 @@ tables:
           numDecimalPlaces: 0
 
       lesser_rivalry:
-        title:  Number of country-pairs with 'lesser rivalry' relationship
+        title: Number of country-pairs with 'lesser rivalry' relationship
         description_short: |-
           Lesser rivalry between two countries is when these have important unresolved issues, and handle them with infrequent and limited violence. Their diplomacy is hostile, and their communication is limited.
         description_key:
