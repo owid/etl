@@ -99,7 +99,7 @@ tables:
               min: 0
               max: 0
             map:
-              columnSlug: "539877"
+              # variableId:
               timeTolerance: 5
               colorScale:
                 baseColorScheme: PuBu
