@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: Karlinsky
+    title: International Completeness of Death Registration 2015-2019
+    description: |-
+      Death registration completeness, the share of deaths captured by countries’ vital registration systems, vary substantially across countries. Estimates of completeness, even recent ones, are outdated or contradictory for many countries. The authors of this paper present the International Completeness of Death Registration (ICDR) dataset. ICDR contains the annual amount of deaths registered in 181 countries’ vital registration systems from 2015 to 2019. These counts allow derivation of the most up-to-date and consistent estimates of death registration completeness.
+
+      The work and sources are documented in detail on GitHub: https://github.com/akarlinsky/death_registration.
+
+      You can read a detailed description of the ICDR in the medRxiv preprint "Karlinsky, A. (2021). International Completeness of Death Registration 2015–2019.": https://www.medrxiv.org/content/10.1101/2021.08.12.21261978v1.
+
+      Ariel Karlinsky is also a co-producer of the World Mortality Dataset (WMD), which currently collects data on all-cause mortality from 2015–2022 for 117 countries and territories. The WMD is one of the primary data sources on excess mortality during the COVID-19 pandemic. You can find the WMD on GitHub here: https://github.com/akarlinsky/world_mortality.
+    citation_full: |-
+      A. Karlinsky (2023). International Completeness of Death Registration 2015-2019. GitHub. https://github.com/akarlinsky/death_registration
+    url_main: https://github.com/akarlinsky/death_registration
+    url_download: https://raw.githubusercontent.com/akarlinsky/death_registration/main/death_reg_final.csv
+    date_accessed: '2025-04-18'
+    date_published: '2024-03-15'
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: c57e02b53008fb359f2099fc07216fa5
+    size: 62229
+    path: deaths_karlinsky.csv
