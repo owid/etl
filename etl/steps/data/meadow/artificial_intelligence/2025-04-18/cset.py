@@ -81,6 +81,7 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
         if "complete" in df_add.columns:
             df_add["complete"] = df_add["complete"].astype(str)
             df_add = df_add[df_add["complete"] == "True"]
+            df_add = df_add.drop(columns=["complete"])
         # Normalize 'field' capitalization
         df_add["field"] = df_add["field"].apply(lambda s: s[0] + s[1:].lower() if isinstance(s, str) else s)
         all_dfs_list.append(df_add)

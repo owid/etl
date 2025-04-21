@@ -32,7 +32,7 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
 
     tb_with_regions = tb_with_regions[~tb_with_regions["country"].isin(members)].reset_index(drop=True)
     numeric_cols = [col for col in tb_with_regions.columns if col not in ["country", "year", "field"]]
-
+    print(tb_with_regions)
     result = tb_with_regions.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan).reset_index()
     result["country"] = "World"
 
