@@ -31,17 +31,9 @@ class Explorer(Collection):
     definitions: Optional[Definitions] = None
     avoid_duplicate_hack: bool = False
 
-    # Internal use. For save() method.
-    _catalog_path: Optional[str] = None
-
-    @property
-    def catalog_path(self) -> Optional[str]:
-        return self._catalog_path
-
-    @catalog_path.setter
-    def catalog_path(self, value: str) -> None:
-        assert "#" in value, "Catalog path should be in the format `path#name`."
-        self._catalog_path = value
+    def __post_init__(self):
+        # Internal use
+        self._collection_type = "explorer"
 
     def display_config_names(self):
         """Get display names for all dimensions and choices.
@@ -105,9 +97,12 @@ class Explorer(Collection):
         # Check that no choice name is repeated
         self.validate_choice_names()
 
-        # Check that all indicators in mdim exist
+        # Check that all indicators in explorer exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Export config to local directory in addition to uploading it to MySQL for debugging.
+        self.save_config_local()
 
         # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
