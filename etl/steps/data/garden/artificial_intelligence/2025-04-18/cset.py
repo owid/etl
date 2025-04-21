@@ -76,7 +76,7 @@ def sum_with_nan(x):
     return x.sum() if x.notna().any() else np.nan
 
 
-def add_regions(tb, ds_regions):
+def add_regions(tb: Table, ds_regions: Dataset) -> Table:
     # Add region aggregates.
     tb = geo.add_regions_to_table(
         tb,
