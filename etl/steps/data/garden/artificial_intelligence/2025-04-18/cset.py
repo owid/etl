@@ -31,9 +31,11 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
     ]
 
     tb_with_regions = tb_with_regions[~tb_with_regions["country"].isin(members)].reset_index(drop=True)
-    numeric_cols = [col for col in tb_with_regions.columns if col not in ["country", "year", "field"]]
+    numeric_cols = [col for col in tb_with_regions.columns if col not in ["country", "year", "field", "type"]]
 
-    result = tb_with_regions.groupby(["year", "field"], observed=False)[numeric_cols].agg(sum_with_nan).reset_index()
+    result = (
+        tb_with_regions.groupby(["year", "field", "type"], observed=False)[numeric_cols].agg(sum_with_nan).reset_index()
+    )
     result["country"] = "World"
 
     tb = pr.concat([tb_with_regions, result])
@@ -91,7 +93,7 @@ def run(dest_dir: str) -> None:
 
     tb = tb.drop("population", axis=1)
 
-    tb = tb.format(["country", "year", "field"])
+    tb = tb.format(["country", "year", "field", "type"])
     #
     # Save outputs.
     #

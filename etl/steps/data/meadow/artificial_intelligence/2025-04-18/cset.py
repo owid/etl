@@ -48,12 +48,12 @@ def run(dest_dir: str) -> None:
     # Merge all dataframes on the 'year', 'country', and 'field' columns
     final_df = all_dfs[0]
     for df in all_dfs[1:]:
-        final_df = pd.merge(final_df, df, on=["year", "country", "field"], how="outer")
+        final_df = pd.merge(final_df, df, on=["year", "country", "field", "type"], how="outer")
 
     tb = Table(final_df, short_name=paths.short_name, underscore=True)
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.format(["country", "year", "field"])
+    tb = tb.format(["country", "year", "field", "type"])
     for column in tb.columns:
         tb[column].metadata.origins = [snap.metadata.origin]
 
@@ -79,10 +79,13 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
         # Read the CSV file
         df_add = pd.read_csv(file_path)
         if "complete" in df_add.columns:
-            df_add["complete"] = df_add["complete"].astype(str)
-            df_add = df_add[df_add["complete"] == "True"]
-            df_add = df_add.drop(columns=["complete"])
+            # Rename the column 'complete' to 'type'
+            df_add = df_add.rename(columns={"complete": "type"})
 
+            # Convert the 'type' column to string and replace values
+            df_add["type"] = df_add["type"].astype(str).replace({"True": "estimate", "False": "projection"})
+        elif "complete" not in df_add.columns:
+            df_add["type"] = "estimate"
         # Normalize 'field' capitalization
         df_add["field"] = df_add["field"].apply(lambda s: s[0] + s[1:].lower() if isinstance(s, str) else s)
         all_dfs_list.append(df_add)
@@ -90,5 +93,5 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
     # Merge all dataframes on the 'year', 'country', and 'field' columns
     merged_df = all_dfs_list[0]
     for df in all_dfs_list[1:]:
-        merged_df = pd.merge(merged_df, df, on=["year", "country", "field"], how="outer")
+        merged_df = pd.merge(merged_df, df, on=["year", "country", "field", "type"], how="outer")
     return merged_df
