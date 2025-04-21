@@ -1,6 +1,5 @@
 {
   "Afghanistan": "Afghanistan",
-  "Africa": "Africa",
   "Albania": "Albania",
   "Algeria": "Algeria",
   "Andorra": "Andorra",
@@ -50,7 +49,6 @@
   "Djibouti": "Djibouti",
   "Dominica": "Dominica",
   "Dominican Republic": "Dominican Republic",
-  "EU": "European Union (27)",
   "Ecuador": "Ecuador",
   "Egypt": "Egypt",
   "El Salvador": "El Salvador",
@@ -58,7 +56,6 @@
   "Eritrea": "Eritrea",
   "Estonia": "Estonia",
   "Ethiopia": "Ethiopia",
-  "Europe": "Europe",
   "Fiji": "Fiji",
   "Finland": "Finland",
   "France": "France",
@@ -130,7 +127,6 @@
   "North Korea": "North Korea",
   "North Macedonia": "North Macedonia",
   "Norway": "Norway",
-  "Oceania": "Oceania",
   "Oman": "Oman",
   "Pakistan": "Pakistan",
   "Palau": "Palau",
@@ -200,13 +196,18 @@
   "Moldova, Republic of": "Moldova",
   "S\u00e3o Tom\u00e9 and Pr\u00edncipe": "Sao Tome and Principe",
   "Vatican City": "Vatican",
-  "OECD": "OECD",
   "Five Eyes": "Five Eyes (Australia, Canada, New Zealand, UK, and the US) (CSET)",
   "Global Partnership on Artificial Intelligence": "Global Partnership on Artificial Intelligence (CSET)",
   "Latin America and the Caribbean": "Latin America and the Caribbean (CSET)",
-  "NATO": "NATO",
   "Northern America": "North America (CSET)",
   "Quad": "Quad (Australia, India, Japan and the US) (CSET)",
   "ASEAN": "ASEAN (Association of Southeast Asian Nations) (CSET)",
-  "Asia Pacific": "Asia Pacific (CSET)"
+  "Asia Pacific": "Asia Pacific (CSET)",
+  "Africa": "Africa (CSET)",
+  "Oceania": "Oceania (CSET)",
+  "EU": "European Union (27) (CSET)",
+  "Europe": "Europe (CSET)",
+  "NATO": "NATO (CSET)",
+  "OECD": "OECD (CSET)"
 }
+

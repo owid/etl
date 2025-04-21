@@ -76,11 +76,9 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_investment}
+          title_public:
+              Disclosed investment - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>
 
       estimated_investment:
@@ -97,11 +95,9 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_investment}
+          title_public:
+              Estimated investment - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>
 
       num_patent_applications:
@@ -117,11 +113,9 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_patents}
+          title_public: |-
+              Patent applications - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>
 
       num_patent_granted:
@@ -137,11 +131,9 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_patents}
+          title_public: |-
+              Patent applications granted - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>
 
       num_articles:
@@ -155,11 +147,9 @@ tables:
           grapher_config:
             note: |-
               {definitions.note_articles}
+          title_public: |-
+              Number of articles - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>
 
       num_citations:
@@ -173,11 +163,9 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_citations}
+          title_public: |-
+              Number of citations - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>
 
       num_patent_applications_per_mil:
@@ -192,11 +180,9 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_patents}
+          title_public: |-
+              Patent applications per 1 million people - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>
 
       num_patent_granted_per_mil:
@@ -211,11 +197,9 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_patents}
+          title_public: |-
+              Patent applications granted per 1 million people - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>
 
       num_articles_per_mil:
@@ -228,9 +212,7 @@ tables:
           grapher_config:
               note: |-
                 {definitions.note_articles}
+          title_public: |-
+              Number of articles per 1 million people - <<field>>
         display:
-          isProjection: |-
-             <% if type == "projection"%>
-              true
-             <%- endif -%>
           name: << field >>

@@ -15,27 +15,25 @@ def add_world(tb: Table, ds_regions: Dataset) -> Table:
 
     # List of members representing different regions CSET and don't use these for World aggregation
     members = [
-        "North America",
-        "Europe",
-        "Asia Pacific",
-        "Africa",
-        "Latin America and the Caribbean",
-        "Oceania",
-        "OECD",
-        "Five Eyes (Australia, Canada, New Zealand, UK, and the US)",
-        "Global Partnership on Artificial Intelligence",
-        "NATO",
-        "Quad (Australia, India, Japan and the US)",
-        "ASEAN (Association of Southeast Asian Nations)",
-        "European Union (27)",
+        "North America (CSET)",
+        "Europe (CSET)",
+        "Asia Pacific (CSET)",
+        "Africa (CSET)",
+        "Latin America and the Caribbean (CSET)",
+        "Oceania (CSET)",
+        "OECD (CSET)",
+        "Five Eyes (Australia, Canada, New Zealand, UK, and the US) (CSET)",
+        "Global Partnership on Artificial Intelligence (CSET)",
+        "NATO (CSET)",
+        "Quad (Australia, India, Japan and the US) (CSET)",
+        "ASEAN (Association of Southeast Asian Nations) (CSET)",
+        "European Union (27) (CSET)",
     ]
 
     tb_with_regions = tb_with_regions[~tb_with_regions["country"].isin(members)].reset_index(drop=True)
-    numeric_cols = [col for col in tb_with_regions.columns if col not in ["country", "year", "field", "type"]]
+    numeric_cols = [col for col in tb_with_regions.columns if col not in ["country", "year", "field"]]
 
-    result = (
-        tb_with_regions.groupby(["year", "field", "type"], observed=False)[numeric_cols].agg(sum_with_nan).reset_index()
-    )
+    result = tb_with_regions.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan).reset_index()
     result["country"] = "World"
 
     tb = pr.concat([tb_with_regions, result])
@@ -93,7 +91,7 @@ def run(dest_dir: str) -> None:
 
     tb = tb.drop("population", axis=1)
 
-    tb = tb.format(["country", "year", "field", "type"])
+    tb = tb.format(["country", "year", "field"])
     #
     # Save outputs.
     #
@@ -104,9 +102,5 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
-def sum_with_nan(values):
-    # Define a custom aggregation function that returns NaN if all values are NaN, else returns the sum
-    if values.isnull().all():
-        return np.nan
-    else:
-        return values.sum()
+def sum_with_nan(x):
+    return x.sum() if x.notna().any() else np.nan
