@@ -84,6 +84,18 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
 
             # Convert the 'type' column to string and replace values
             df_add["type"] = df_add["type"].astype(str).replace({"True": "estimate", "False": "projection"})
+            # Find the lowest year with type == "projection" for each country and field
+            projection_rows = df_add[df_add["type"] == "projection"]
+            min_years = projection_rows.groupby(["country", "field"])["year"].min().reset_index()
+
+            # Add a new row for each country and field with year - 1
+            new_rows = min_years.copy()
+            new_rows["year"] = new_rows["year"] - 1
+            new_rows["type"] = "projection"
+
+            # Add the new rows to the merged DataFrame
+            df_add = pd.concat([df_add, new_rows], ignore_index=True)
+
         elif "complete" not in df_add.columns:
             df_add["type"] = "estimate"
         # Normalize 'field' capitalization
