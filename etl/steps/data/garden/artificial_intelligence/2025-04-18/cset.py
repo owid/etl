@@ -7,39 +7,8 @@ from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-
-def add_world(tb: Table, ds_regions: Dataset) -> Table:
-    # Create a deep copy of the input table to avoid modifying the original data
-    tb_with_regions = tb.copy()
-
-    # List of members representing different regions CSET and don't use these for World aggregation
-    members = [
-        "North America (CSET)",
-        "Europe (CSET)",
-        "Asia Pacific (CSET)",
-        "Africa (CSET)",
-        "Latin America and the Caribbean (CSET)",
-        "Oceania (CSET)",
-        "OECD (CSET)",
-        "Five Eyes (Australia, Canada, New Zealand, UK, and the US) (CSET)",
-        "Global Partnership on Artificial Intelligence (CSET)",
-        "NATO (CSET)",
-        "Quad (Australia, India, Japan and the US) (CSET)",
-        "ASEAN (Association of Southeast Asian Nations) (CSET)",
-        "European Union (27) (CSET)",
-    ]
-
-    tb_with_regions = tb_with_regions[~tb_with_regions["country"].isin(members)].reset_index(drop=True)
-    numeric_cols = [col for col in tb_with_regions.columns if col not in ["country", "year", "field"]]
-    print(tb_with_regions)
-    result = tb_with_regions.groupby(["year", "field"])[numeric_cols].agg(sum_with_nan).reset_index()
-    result["country"] = "World"
-
-    tb = pr.concat([tb_with_regions, result])
-    tb = tb.reset_index(drop=True)
-
-    return tb
+# Regions for which aggregates will be created.
+REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
 def run(dest_dir: str) -> None:
@@ -61,7 +30,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    tb = add_world(tb=tb, ds_regions=ds_regions)
+
+    tb = add_regions(tb, ds_regions)
 
     # Adjust investment columns for inflation using the US Consumer Price Index (CPI)
     _investment_cols = [col for col in tb.columns if "investment" in col]
@@ -104,3 +74,15 @@ def run(dest_dir: str) -> None:
 
 def sum_with_nan(x):
     return x.sum() if x.notna().any() else np.nan
+
+
+def add_regions(tb, ds_regions):
+    # Add region aggregates.
+    tb = geo.add_regions_to_table(
+        tb,
+        regions=REGIONS,
+        index_columns=["country", "year", "field"],
+        ds_regions=ds_regions,
+        min_num_values_per_year=1,
+    )
+    return tb
