@@ -91,6 +91,7 @@ def read_and_clean_data(file_ids: List[str], temp_dir: str, field_name: str) -> 
             # Add a new row for each country and field with year - 1
             new_rows = min_years.copy()
             new_rows["year"] = new_rows["year"] - 1
+
             new_rows["type"] = "projection"
 
             # Add the new rows to the merged DataFrame
