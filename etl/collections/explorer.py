@@ -30,7 +30,6 @@ class Explorer(Collection):
     views: List[ExplorerView]
     config: Dict[str, str]
     definitions: Optional[Definitions] = None
-    avoid_duplicate_hack: bool = False
 
     # Internal use. For save() method.
     _catalog_path: Optional[str] = None
@@ -112,7 +111,7 @@ class Explorer(Collection):
 
         # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
-        df_grapher, df_columns = extract_explorers_tables(self, avoid_duplicate_hack=self.avoid_duplicate_hack)
+        df_grapher, df_columns = extract_explorers_tables(self)
 
         # Transform to legacy format
         explorer_legacy = _create_explorer_legacy(
@@ -129,12 +128,10 @@ class Explorer(Collection):
 def create_explorer(
     config: dict,
     dependencies: Set[str],
-    avoid_duplicate_hack: bool = False,
 ) -> Explorer:
     """Create an explorer object."""
     # Read configuration as structured data
     explorer = Explorer.from_dict(config)
-    explorer.avoid_duplicate_hack = avoid_duplicate_hack
 
     # Edit views
     process_views(explorer, dependencies)
@@ -173,7 +170,6 @@ def process_views(
 
 def extract_explorers_tables(
     explorer: Explorer,
-    avoid_duplicate_hack: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     1. Obtain `dimensions_display` dictionary. This helps later when remixing the Explorer configuration.
@@ -197,7 +193,9 @@ def extract_explorers_tables(
     )
     # 4. Adapt tables for view-level indicator display settings
     df_grapher, df_columns = _add_indicator_display_settings(
-        df_grapher, df_columns, columns_widgets, avoid_duplicate_hack=avoid_duplicate_hack
+        df_grapher,
+        df_columns,
+        columns_widgets,
     )
 
     # 5. Order columns
@@ -282,7 +280,7 @@ def _extract_explorers_tables(
     return df_grapher, df_columns
 
 
-def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avoid_duplicate_hack=False):
+def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
     """Add indicator display settings.
 
     Since we want to support different display settings for the same indicator across different views, we need to use some 'hacks' (transform column, slugs instead of paths, etc.).
@@ -326,7 +324,7 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
         # A) YES: Add slugs to df_columns and df_grapher!
         # B) NO: No need to add slug and all related complexity (skip)
         duplicate_indicators = df_columns["_slug_id"] != 0
-        if duplicate_indicators.any() and (not avoid_duplicate_hack):
+        if duplicate_indicators.any():
             # 1. Get indicator IDs for duplicates! The way a duplicate works, is by referencing the variable ID (does not work with catalogPath). E.g. `duplicate 123`.
             catalog_paths = df_columns.loc[duplicate_indicators, "catalogPath"].unique().tolist()
             mapping = get_mapping_paths_to_id(catalog_paths)
@@ -410,9 +408,6 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
         df_grapher.loc[:, cols_variables] = df_grapher_ids
         if "_slug_renames" in df_grapher.columns:
             df_grapher = df_grapher.drop(columns=["_slug_renames"])
-
-        # if avoid_duplicate_hack:
-        #     df_columns = df_columns.drop(columns=["slug"])
 
     return df_grapher, df_columns
 
