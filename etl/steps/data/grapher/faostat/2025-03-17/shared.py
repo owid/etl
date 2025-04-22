@@ -39,6 +39,6 @@ def run(dest_dir: str) -> None:
     #
     # Create a new grapher dataset.
     ds_grapher = paths.create_dataset(
-        ables=[tb_garden], default_metadata=ds_garden.metadata, check_variables_metadata=True
+        tables=[tb_garden], default_metadata=ds_garden.metadata, check_variables_metadata=True
     )
     ds_grapher.save()
