@@ -151,7 +151,7 @@ dimensions:
         name: Under 1 year
         description: null
       - slug: "0-4"
-        name: Under 5 year
+        name: Under 5 years
         description: null
 
   - slug: variant
