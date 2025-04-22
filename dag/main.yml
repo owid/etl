@@ -128,7 +128,6 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
     - data://garden/technology/2023-03-16/hcctad
 
-
   # World Happiness report (2025)
   data://meadow/happiness/2025-03-28/happiness:
     - snapshot://happiness/2025-03-28/happiness.xlsx
@@ -141,7 +140,6 @@ steps:
 
   data://grapher/happiness/2025-03-28/happiness:
     - data://garden/happiness/2025-03-28/happiness
-
 
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
@@ -681,7 +679,6 @@ steps:
   data://grapher/atus/2025-01-06/atus_who:
     - data://garden/atus/2025-01-06/atus_who
 
-
   # Happiness by age groups (World Happiness Report 2024)
   data://meadow/happiness/2025-04-01/happiness_by_age:
     - snapshot://happiness/2025-04-01/happiness_by_age.csv
@@ -689,7 +686,6 @@ steps:
     - data://meadow/happiness/2025-04-01/happiness_by_age
   data://grapher/happiness/2025-04-01/happiness_by_age:
     - data://garden/happiness/2025-04-01/happiness_by_age
-
 
 include:
   - dag/open_numbers.yml
