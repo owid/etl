@@ -1,7 +1,7 @@
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
@@ -9,7 +9,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("cherry_blossom.start")
 
     # Read dataset from meadow.
@@ -24,7 +24,7 @@ def run(dest_dir: str) -> None:
     #
     tb = tb.format(["country", "year"])
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds = create_dataset(dest_dir, tables=[tb], default_metadata=ds_meadow.metadata)
+    ds = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
 
     # finally save the dataset
     ds.save()

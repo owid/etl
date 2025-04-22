@@ -10,7 +10,7 @@ paths = PathFinder(__file__)
 REGIONS = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania", "World"]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
