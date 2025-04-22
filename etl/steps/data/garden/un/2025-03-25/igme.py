@@ -3,7 +3,6 @@
 from math import trunc
 from typing import List
 
-import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 
@@ -23,43 +22,44 @@ UNIT = {
     "D_PER_1000_10": "Deaths per 1,000 children aged 10",
     "D_PER_1000_15": "Deaths per 1,000 children aged 15",
     "D_PER_1000_20": "Deaths per 1,000 children aged 20",
-    "STILLBIRTHS": "Stillbirts",
+    "STILLBIRTHS": "Stillbirths",
     "SB_PER_1000_B": "Stillbirths per 1,000 total births",
 }
 
+
 INDICATOR = {
-    "MRY0T4",
-    "MRY0",
-    "MRY1T4",
-    "TMY0",
-    "TMY0T4",
-    "TMY1T4",
-    "MRM0",
-    "MRM1T11",
-    "MRM1T59",
-    "TMM0",
-    "TMM1T11",
-    "TMM1T59",
-    "MRY10T14",
-    "MRY10T19",
-    "MRY15T19",
-    "MRY15T24",
-    "MRY20T24",
-    "MRY5T14",
-    "MRY5T24",
-    "MRY5T9",
-    "TMY10T14",
-    "TMY10T19",
-    "TMY15T19",
-    "TMY15T24",
-    "TMY20T24",
-    "TMY5T14",
-    "TMY5T24",
-    "TMY5T9",
-    "SB",
-    "SBR",
-    "PR_MRM0",
-    "PR_MRY0T4",
+    "MRY0T4": "Under-five mortality rate",
+    "MRY0": "Infant mortality rate",
+    "MRY1T4": "Mortality rate age 1-4",
+    "TMY0": "Infant deaths",
+    "TMY0T4": "Under-five deaths",
+    "TMY1T4": "Child deaths age 1-4",
+    "MRM0": "Neonatal mortality rate",
+    "MRM1T11": "Mortality rate age 1-11 months",
+    "MRM1T59": "Mortality rate age 1-59 months",
+    "TMM0": "Neonatal deaths",
+    "TMM1T11": "Deaths age 1-11 months",
+    "TMM1T59": "Deaths age 1-59 months",
+    "MRY10T14": "Mortality rate age 10-14",
+    "MRY10T19": "Mortality rate age 10-19",
+    "MRY15T19": "Mortality rate age 15-19",
+    "MRY15T24": "Mortality rate age 15-24",
+    "MRY20T24": "Mortality rate age 20-24",
+    "MRY5T14": "Mortality rate age 5-14",
+    "MRY5T24": "Mortality rate age 5-24",
+    "MRY5T9": "Mortality rate age 5-9",
+    "TMY10T14": "Deaths age 10-14",
+    "TMY10T19": "Deaths age 10-19",
+    "TMY15T19": "Deaths age 15-19",
+    "TMY15T24": "Deaths age 15-24",
+    "TMY20T24": "Deaths age 20-24",
+    "TMY5T14": "Deaths age 5-14",
+    "TMY5T24": "Deaths age 5-24",
+    "TMY5T9": "Deaths age 5-9",
+    "SB": "Stillbirths",
+    "SBR": "Stillbirth rate",
+    "PR_MRM0": "Additional neonatal deaths",  # Not sure what these measure currently
+    "PR_MRY0T4": "Additional under-five deaths",  # Not sure what these measure currently
 }
 
 
@@ -98,6 +98,7 @@ def run(dest_dir: str) -> None:
     tb = filter_data(tb)
     tb = round_down_year(tb)
     tb["unit_measure"] = tb["unit_measure"].replace(UNIT)
+    tb["indicator"] = tb["indicator"].replace(INDICATOR)
 
     # get regional data for count variables
     tb_counts_regions = regional_aggregates_counts(tb, ds_regions, ds_population, threshold=0.8)
@@ -115,10 +116,11 @@ def run(dest_dir: str) -> None:
     tb_under_fifteen = tb[
         (
             tb["indicator"].isin(
-                ["Under-five deaths", "Deaths age 5 to 14", "Under-five mortality rate", "Mortality rate age 5-14"]
+                ["Under-five deaths", "Deaths age 5-14", "Under-five mortality rate", "Mortality rate age 5-14"]
             )
         )
     ]
+    assert len(tb_under_fifteen["indicator"].unique()) == 4
 
     # Combine datasets with a preference for the current data when there is a conflict - this is needed to calculate the youth mortality rate.
 
@@ -246,10 +248,11 @@ def convert_to_percentage(tb: Table) -> Table:
         "Deaths per 1000 children aged 1": "Deaths per 100 children aged 1",
         "Deaths per 1000 children aged 5": "Deaths per 100 children aged 5",
         "Deaths per 1000 children aged 10": "Deaths per 100 children aged 10",
-        "Deaths per 1000 youths aged 15": "Deaths per 100 children aged 15",
+        "Deaths per 1000 children aged 15": "Deaths per 100 children aged 15",
         "Deaths per 1000 children aged 20": "Deaths per 100 children aged 20",
         "Stillbirths per 1000 total births": "Stillbirths per 100 births",
     }
+
     # Dividing values of selected rows by 10
 
     selected_rows = tb["unit_measure"].isin(rate_conversions.keys())
