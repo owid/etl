@@ -3,7 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Child & Infant Mortality
-    unit: << unit_measure.lower() >>
+    unit: << unit_of_measure.lower() >>
     short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
     description_key:
       - |-
@@ -12,9 +12,9 @@ definitions:
         - **Subcategories exist**: ICD-11 distinguishes between “early gestation stillbirth” (22–27 weeks) and “late gestation stillbirth” (28+ weeks).
         <% endif %>
   sex: |-
-    <% if sex == "_T" %>Total<% elif sex == "M" %>male <% elif sex == "F" %>female <%- endif -%>
+    <% if sex == "Total" %>Total<% elif sex == "Male" %>male <% elif sex == "Female" %>female <%- endif -%>
   wealth_quintile: |-
-    <% if wealth_quintile == "_T" %>all wealth quintiles<% elif wealth_quintile == "Q1" %>the poorest 20% of the population<% elif wealth_quintile == "Q2" %>the second poorest 20% of the population<% elif wealth_quintile == "Q3" %>the middle 20% of the population in terms of wealth<% elif wealth_quintile == "Q4" %>the second richest 20% of the population<% elif wealth_quintile == "Q5" %>the richest 20% of the population<%- endif -%>
+    <% if wealth_quintile == "Total" %>all wealth quintiles<% elif wealth_quintile == "Lowest" %>the poorest 20% of the population<% elif wealth_quintile == "Second" %>the second poorest 20% of the population<% elif wealth_quintile == "Middle" %>the middle 20% of the population in terms of wealth<% elif wealth_quintile == "Fourth" %>the second richest 20% of the population<% elif wealth_quintile == "Highest" %>the richest 20% of the population<%- endif -%>
   description_short: |-
     <% set indicator = indicator | default('') %>
     <% if indicator == "Neonatal mortality rate" %>
@@ -83,14 +83,13 @@ definitions:
 tables:
   igme:
     variables:
-      obs_value:
-        title: Obs value - <<indicator>> - {definitions.sex} - {definitions.wealth_quintile}
+      observation_value:
+        title: Observation value - <<indicator>> - {definitions.sex} - {definitions.wealth_quintile}
       lower_bound:
-        title: Lower bound - <<indicator>> -{definitions.sex} - {definitions.wealth_quintile}
+        title: Lower bound - <<indicator>> - {definitions.sex} - {definitions.wealth_quintile}
       upper_bound:
-        title: Upper bound - <<indicator>> -   {definitions.sex}  - {definitions.wealth_quintile}
+        title: Upper bound - <<indicator>> - {definitions.sex}  - {definitions.wealth_quintile}
   igme_under_fifteen_mortality:
     variables:
-      obs_value:
-        title: Under-15 mortality rate
-        unit: "deathe per 100 live births"
+      observation_value:
+        title: <<indicator>>
