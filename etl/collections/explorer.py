@@ -305,9 +305,10 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
     ## Drop duplicates, if any
     df_columns = df_columns.drop_duplicates()
 
+    # NOTE: I've commented the following lines because it was dropping rows where no metadata was set, and we want to keep these actually! Otherwise these are not properly assigned a _slug_id!
     # Drop those that do not have any settings set
-    cols_settings = [col for col in df_columns.columns if col not in columns_widgets + ["_axis", "catalogPath"]]
-    df_columns = df_columns.dropna(how="all", subset=cols_settings)
+    # cols_settings = [col for col in df_columns.columns if col not in columns_widgets + ["_axis", "catalogPath"]]
+    # df_columns = df_columns.dropna(how="all", subset=cols_settings)
 
     # If there is more than one definition for the same indicator, proceed to adapt tables
     # mask = df_columns.duplicated(subset=["catalogPath"])
