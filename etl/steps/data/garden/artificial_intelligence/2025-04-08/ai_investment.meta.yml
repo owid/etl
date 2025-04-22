@@ -40,10 +40,10 @@ definitions:
     - A minority stake is an ownership interest of less than 50% of the total shares of a company.
 
   desc_key_private: &desc_key_private
+      - AI companies and their focus areas are identified using keyword searches in company descriptions and websites.
       - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
       - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
       - One-time events, such as large acquisitions, can distort yearly figures, while broader economic factors like interest rates and market sentiment can influence investment trends independently of AI-specific developments.
-
   desc_key_generative: &desc_key_generative
       - The data likely underestimates total global AI investment, as it only captures certain types of private equity transactions, excluding other significant channels and categories of AI-related spending.
       - The source does not fully disclose its methodology and what's included or excluded. This means it may not fully capture important areas of AI investment, such as those from publicly traded companies, corporate internal R&D, government funding, public sector initiatives, data center infrastructure, hardware production, semiconductor manufacturing, and expenses for research and talent.
@@ -69,7 +69,7 @@ tables:
   ai_private_investment:
     variables:
       world:
-        title: Global private investment in AI
+        title: Global private investment in AI by focus area
         description_short: *desc_short_private
         description_key: *desc_key_private
         description_processing: *desc_processing_inflation
@@ -101,6 +101,17 @@ tables:
           grapher_config:
             note: *note_inflation
 
+  ai_total_investment_private:
+    variables:
+      private_investment:
+        title: Global total private investment in AI
+        description_short: *desc_short_private
+        description_key: *desc_key_private
+        description_processing: *desc_processing_inflation
+        presentation:
+          grapher_config:
+            note: *note_inflation
+
   ai_investment_generative:
     variables:
       generative_ai:
@@ -122,4 +133,5 @@ tables:
         processing_level: minor
         description_key:
           - Quid tracks information on over 8 million companies worldwide, updated weekly using data from Capital IQ and Crunchbase.
-          - The data focuses on AI and machine learning companies that raised over $1.5 million between 2014 and 2024 (not adjusted for inflation).
+          - AI companies are identified using keyword searches in company descriptions and websites.
+          - The data focuses on AI and machine learning companies that raised over $1.5 million between 2013 and 2024 (not adjusted for inflation).

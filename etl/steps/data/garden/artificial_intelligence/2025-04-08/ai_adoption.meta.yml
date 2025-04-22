@@ -22,7 +22,11 @@ tables:
         title: Organizations reporting having adopted AI
         description_short: Share of companies using AI technology (e.g., machine learning, computer vision, or natural language processing) in at least one business function.
         description_key:
-          - Share of respondents who reported that their organizations have adopted AI in at least one function, with a breakdown by region. The regional groupings, as defined by McKinsey & Company, classify countries into specific categories. The "Developing markets" grouping includes countries such as India, Latin America, and the Middle East and North Africa (MENA). The "Greater China" grouping includes Hong Kong and Taiwan.
+          - The McKinsey survey asked organizations in which business functions they had adopted AI technologies, such as machine learning, computer vision, or natural language processing.
+          - Respondents could choose from eleven business functions, including marketing and sales, product and service development, IT, service operations, knowledge management, software engineering, human resources, legal, risk and compliance, corporate strategy and finance, supply chain management, and manufacturing.
+          - An organization was considered to be using AI if it had adopted it in at least one of these areas.
+          - The term “adopted” was not strictly defined, so reported use of AI ranged from limited experimentation by a small group of employees to widespread implementation across departments.
+          - The regional groupings, as defined by McKinsey & Company, classify countries into specific categories. The "Developing markets" grouping includes countries such as India, Latin America, and the Middle East and North Africa (MENA). The "Greater China" grouping includes Hong Kong and Taiwan.
           - The number of companies that respond to the survey varies between years and ranged between 1363 and 1843 between 2021 and 2024.
           - The data is adjusted to account for differences in response rates and to ensure that each country's economic contribution to global GDP is properly represented.
         unit: '%'
