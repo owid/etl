@@ -1,6 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from typing import Tuple
+from typing import List, Tuple
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -138,23 +138,10 @@ def run() -> None:
     tb = identify_rural_urban(tb)
 
     # Create stacked variables from headcount and headcount_ratio
-    tb = create_stacked_variables(tb=tb, povlines_dict=POVLINES_DICT)
+    tb = create_stacked_variables(tb=tb)
 
     # Sanity checks. I don't run for percentile tables because that process was done in the extraction
-    tb_ppp_old = sanity_checks(
-        tb_ppp_old,
-        POVLINES_DICT,
-        ppp_version=PPP_YEAR_OLD,
-        col_stacked_n=col_stacked_n_ppp_old,
-        col_stacked_pct=col_stacked_pct_ppp_old,
-    )
-    tb_ppp_current = sanity_checks(
-        tb_ppp_current,
-        POVLINES_DICT,
-        ppp_version=PPP_YEAR_CURRENT,
-        col_stacked_n=col_stacked_n_ppp_current,
-        col_stacked_pct=col_stacked_pct_ppp_current,
-    )
+    tb = sanity_checks(tb=tb)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb_inc_ppp_old, tb_cons_ppp_old, tb_inc_or_cons_ppp_old_unsmoothed, tb_inc_or_cons_ppp_old = inc_or_cons_data(
@@ -383,7 +370,149 @@ def create_new_indicators_and_format(tb: Table) -> Table:
     return tb
 
 
-def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, list, list]:
+def calculate_inequality_indicators(tb: Table) -> Table:
+    """
+    Calculate inequality indicators: decile averages and ratios
+    """
+
+    col_decile_share = []
+    col_decile_avg = []
+    col_decile_thr = []
+
+    for i in range(1, 11):
+        # Because there are only 9 thresholds
+        if i != 10:
+            varname_thr = f"decile{i}_thr"
+            col_decile_thr.append(varname_thr)
+
+        # Define the share and average variables
+        varname_share = f"decile{i}_share"
+        varname_avg = f"decile{i}_avg"
+
+        # Calculate the averages from the shares data
+        tb[varname_avg] = tb[varname_share] * tb["mean"] / 0.1
+
+        # Save the variable names to the lists
+        col_decile_share.append(varname_share)
+        col_decile_avg.append(varname_avg)
+
+    # Multiplies decile columns by 100
+    tb.loc[:, col_decile_share] = tb[col_decile_share] * 100
+
+    # Create bottom 50 and middle 40% shares
+    tb["bottom50_share"] = (
+        tb["decile1_share"] + tb["decile2_share"] + tb["decile3_share"] + tb["decile4_share"] + tb["decile5_share"]
+    )
+    tb["middle40_share"] = tb["decile6_share"] + tb["decile7_share"] + tb["decile8_share"] + tb["decile9_share"]
+
+    # Palma ratio and other average/share ratios
+    tb["palma_ratio"] = tb["decile10_share"] / (
+        tb["decile1_share"] + tb["decile2_share"] + tb["decile3_share"] + tb["decile4_share"]
+    )
+    tb["s80_s20_ratio"] = (tb["decile9_share"] + tb["decile10_share"]) / (tb["decile1_share"] + tb["decile2_share"])
+    tb["p90_p10_ratio"] = tb["decile9_thr"] / tb["decile1_thr"]
+    tb["p90_p50_ratio"] = tb["decile9_thr"] / tb["decile5_thr"]
+    tb["p50_p10_ratio"] = tb["decile5_thr"] / tb["decile1_thr"]
+
+    # Replace infinite values with nulls
+    tb = tb.replace([np.inf, -np.inf], pd.NA)
+
+    return tb
+
+
+def harmonize_region_name(tb: Table) -> Table:
+    """
+    Harmonize country and region_name in tb_region_definitions, using the harmonizing tool, but removing the (PIP) suffix
+    """
+
+    tb = tb.copy()
+
+    for country_col in ["country", "region_name"]:
+        tb = geo.harmonize_countries(
+            df=tb, country_col=country_col, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
+        )
+
+    # Remove (PIP) from region_name
+    tb["region_name"] = tb["region_name"].str.replace(r" \(PIP\)", "", regex=True)
+
+    return tb
+
+
+def add_top_1_percentile(tb: Table, tb_percentiles: Table) -> Table:
+    """
+    Add top 1% data (share, average, threshold) to the main indicators
+    Also, calculate the share of the top 90-99%
+    """
+
+    tb = tb.copy()
+    tb_percentiles = tb_percentiles.copy()
+
+    # Create different tables for thresholds and shares/averages
+    tb_percentiles_thr = tb_percentiles[tb_percentiles["percentile"] == 99].copy()
+    tb_percentiles_share = tb_percentiles[tb_percentiles["percentile"] == 100].copy()
+
+    # Select appropriate columns and rename
+    tb_percentiles_thr = tb_percentiles_thr[
+        ["ppp_version", "country", "year", "reporting_level", "welfare_type", "thr"]
+    ]
+    tb_percentiles_thr = tb_percentiles_thr.rename(columns={"thr": "top1_thr"})
+
+    tb_percentiles_share = tb_percentiles_share[
+        ["ppp_version", "country", "year", "reporting_level", "welfare_type", "share", "avg"]
+    ]
+    tb_percentiles_share = tb_percentiles_share.rename(columns={"share": "top1_share", "avg": "top1_avg"})
+
+    # Merge with the main table
+    tb = pr.merge(
+        tb, tb_percentiles_thr, on=["ppp_version", "country", "year", "reporting_level", "welfare_type"], how="left"
+    )
+    tb = pr.merge(
+        tb, tb_percentiles_share, on=["ppp_version", "country", "year", "reporting_level", "welfare_type"], how="left"
+    )
+
+    # Now I can calculate the share of the top 90-99%
+    tb["top90_99_share"] = tb["decile10_share"] - tb["top1_share"]
+
+    return tb
+
+
+def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
+    """
+    Select regional data only from 1990 onwards, due to the uncertainty in 1980s data
+    """
+    # Create a regions table
+    tb_regions = tb[(tb["year"] >= 1990) & (tb["country"].isin(regions_list))].reset_index(drop=True).copy()
+
+    # Remove regions from tb
+    tb = tb[~tb["country"].isin(regions_list)].reset_index(drop=True).copy()
+
+    # Concatenate both tables
+    tb = pr.concat([tb, tb_regions], ignore_index=True)
+
+    return tb
+
+
+def identify_rural_urban(tb: Table) -> Table:
+    """
+    Amend the entity to reflect if data refers to urban or rural only
+    """
+
+    # Make country and reporting_level columns into strings
+    tb["country"] = tb["country"].astype(str)
+    tb["reporting_level"] = tb["reporting_level"].astype(str)
+
+    # Define condition to identify urban and rural data
+    condition_urban_rural = tb["reporting_level"].isin(["urban", "rural"])
+
+    # Change the country name only for urban and rural data
+    tb.loc[(condition_urban_rural), "country"] = (
+        tb.loc[(condition_urban_rural), "country"] + " (" + tb.loc[(condition_urban_rural), "reporting_level"] + ")"
+    )
+
+    return tb
+
+
+def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     """
     Create stacked variables from the indicators to plot them as stacked area/bar charts
     """
@@ -415,17 +544,12 @@ def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, lis
         ]
     ].copy()
 
-    # Pivot the table to calculate indicator more easily
-    tb_pivot = tb_pivot.pivot(
-        index=["country", "year", "reporting_level", "welfare_type"], columns=["ppp_version", "poverty_line"]
+    # Pivot and obtain the poverty lines dictionary
+    tb_pivot, povlines_dict = pivot_and_obtain_povlines_dict(
+        tb=tb_pivot,
+        index=["country", "year", "reporting_level", "welfare_type"],
+        columns=["ppp_version", "poverty_line"],
     )
-
-    # Create a dictionary with the ppp_version and their corresponding poverty_line, without repeating the values
-    povlines_dict = {}
-    for ppp_version in tb_pivot.columns.levels[1]:
-        povlines_dict[ppp_version] = sorted(
-            list(set([col[1] for col in tb_pivot.xs(ppp_version, level="ppp_version", axis=1).columns])), key=int
-        )
 
     for ppp_year, povlines in povlines_dict.items():
         for i in range(len(povlines)):
@@ -493,133 +617,77 @@ def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, lis
     return tb
 
 
-def calculate_inequality_indicators(tb: Table) -> Table:
+def pivot_and_obtain_povlines_dict(tb: Table, index: List[str], columns: List[str]) -> Tuple[Table, dict]:
     """
-    Calculate inequality indicators: decile averages and ratios
+    Pivot the table to calculate indicator more easily and create a dictionary with the ppp_version and their corresponding poverty_line
     """
+    tb = tb.copy()
 
-    col_decile_share = []
-    col_decile_avg = []
-    col_decile_thr = []
+    # Pivot the table to calculate indicator more easily
+    tb_pivot = tb.pivot(index=index, columns=columns)
 
-    for i in range(1, 11):
-        # Because there are only 9 thresholds
-        if i != 10:
-            varname_thr = f"decile{i}_thr"
-            col_decile_thr.append(varname_thr)
+    # Create a dictionary with the ppp_version and their corresponding poverty_line for headcount_ratio column, without repeating the values
+    povlines_dict = {}
+    for ppp_version in tb_pivot.columns.levels[1]:
+        povlines_dict[ppp_version] = sorted(
+            list(
+                set(
+                    [
+                        col[1]
+                        for col in tb_pivot.xs(ppp_version, level="ppp_version", axis=1).columns
+                        if col[0] == "headcount_ratio"
+                        and not tb_pivot.xs(ppp_version, level="ppp_version", axis=1)[col].isna().all()
+                    ]
+                )
+            ),
+            key=int,
+        )
 
-        # Define the share and average variables
-        varname_share = f"decile{i}_share"
-        varname_avg = f"decile{i}_avg"
-
-        # Calculate the averages from the shares data
-        tb[varname_avg] = tb[varname_share] * tb["mean"] / 0.1
-
-        # Save the variable names to the lists
-        col_decile_share.append(varname_share)
-        col_decile_avg.append(varname_avg)
-
-    # Multiplies decile columns by 100
-    tb.loc[:, col_decile_share] = tb[col_decile_share] * 100
-
-    # Create bottom 50 and middle 40% shares
-    tb["bottom50_share"] = (
-        tb["decile1_share"] + tb["decile2_share"] + tb["decile3_share"] + tb["decile4_share"] + tb["decile5_share"]
-    )
-    tb["middle40_share"] = tb["decile6_share"] + tb["decile7_share"] + tb["decile8_share"] + tb["decile9_share"]
-
-    # Palma ratio and other average/share ratios
-    tb["palma_ratio"] = tb["decile10_share"] / (
-        tb["decile1_share"] + tb["decile2_share"] + tb["decile3_share"] + tb["decile4_share"]
-    )
-    tb["s80_s20_ratio"] = (tb["decile9_share"] + tb["decile10_share"]) / (tb["decile1_share"] + tb["decile2_share"])
-    tb["p90_p10_ratio"] = tb["decile9_thr"] / tb["decile1_thr"]
-    tb["p90_p50_ratio"] = tb["decile9_thr"] / tb["decile5_thr"]
-    tb["p50_p10_ratio"] = tb["decile5_thr"] / tb["decile1_thr"]
-
-    # Replace infinite values with nulls
-    tb = tb.replace([np.inf, -np.inf], pd.NA)
-    return tb
-
-
-def identify_rural_urban(tb: Table) -> Table:
-    """
-    Amend the entity to reflect if data refers to urban or rural only
-    """
-
-    # Make country and reporting_level columns into strings
-    tb["country"] = tb["country"].astype(str)
-    tb["reporting_level"] = tb["reporting_level"].astype(str)
-
-    # Define condition to identify urban and rural data
-    condition_urban_rural = tb["reporting_level"].isin(["urban", "rural"])
-
-    # Change the country name only for urban and rural data
-    tb.loc[(condition_urban_rural), "country"] = (
-        tb.loc[(condition_urban_rural), "country"] + " (" + tb.loc[(condition_urban_rural), "reporting_level"] + ")"
-    )
-
-    return tb
+    return tb_pivot, povlines_dict
 
 
 def sanity_checks(
     tb: Table,
-    povlines_dict: dict,
-    ppp_version: int,
-    col_stacked_n: list,
-    col_stacked_pct: list,
 ) -> Table:
     """
     Sanity checks for the table
     """
 
-    # Select poverty lines between PPP_YEAR_OLD and PPP_YEAR_CURRENT and sort in case they are not in order
-    povlines = povlines_dict[ppp_version]
-    povlines.sort()
+    # Define index for pivot
+    index = ["country", "year", "reporting_level", "welfare_type"]
+
+    # Pivot and obtain the poverty lines dictionary
+    tb_pivot, povlines_dict = pivot_and_obtain_povlines_dict(
+        tb=tb, index=index, columns=["ppp_version", "poverty_line"]
+    )
 
     # Save the number of observations before the checks
-    obs_before_checks = len(tb)
+    obs_before_checks = len(tb_pivot)
 
-    # Create lists of variables to check
-    col_headcount = []
-    col_headcount_ratio = []
-    col_povertygap = []
-    col_tot_shortfall = []
-    col_watts = []
-    col_poverty_severity = []
+    # Create lists of variables to check that depend on the poverty lines
+    columns_poverty_lines = [
+        "headcount",
+        "headcount_ratio",
+        "poverty_gap_index",
+        "total_shortfall",
+        "watts",
+        "poverty_severity",
+    ]
+
+    # Create list for decile variables
     col_decile_share = []
     col_decile_thr = []
-
-    for p in povlines:
-        col_headcount.append(f"headcount_{p}")
-        col_headcount_ratio.append(f"headcount_ratio_{p}")
-        col_povertygap.append(f"poverty_gap_index_{p}")
-        col_tot_shortfall.append(f"total_shortfall_{p}")
-        col_watts.append(f"watts_{p}")
-        col_poverty_severity.append(f"poverty_severity_{p}")
+    col_decile_avg = []
 
     for i in range(1, 11):
         col_decile_share.append(f"decile{i}_share")
+        col_decile_avg.append(f"decile{i}_avg")
         if i != 10:
             col_decile_thr.append(f"decile{i}_thr")
 
     ############################
     # Negative values
-    mask = (
-        tb[
-            col_headcount
-            + col_headcount_ratio
-            + col_povertygap
-            + col_tot_shortfall
-            + col_watts
-            + col_poverty_severity
-            + col_decile_share
-            + col_decile_thr
-            + ["mean", "median", "mld", "gini", "polarization"]
-        ]
-        .lt(0)
-        .any(axis=1)
-    )
+    mask = tb[[col for col in tb.columns[0] if col not in index]].lt(0).any(axis=1)
     tb_error = tb[mask].reset_index(drop=True).copy()
 
     if not tb_error.empty:
@@ -1310,78 +1378,6 @@ def define_columns_for_ppp_comparison(tb: Table, id_cols: list, ppp_version: int
 
     # Filter columns
     tb = tb[cols_list]
-
-    return tb
-
-
-def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
-    """
-    Select regional data only from 1990 onwards, due to the uncertainty in 1980s data
-    """
-    # Create a regions table
-    tb_regions = tb[(tb["year"] >= 1990) & (tb["country"].isin(regions_list))].reset_index(drop=True).copy()
-
-    # Remove regions from tb
-    tb = tb[~tb["country"].isin(regions_list)].reset_index(drop=True).copy()
-
-    # Concatenate both tables
-    tb = pr.concat([tb, tb_regions], ignore_index=True)
-
-    return tb
-
-
-def harmonize_region_name(tb: Table) -> Table:
-    """
-    Harmonize country and region_name in tb_region_definitions, using the harmonizing tool, but removing the (PIP) suffix
-    """
-
-    tb = tb.copy()
-
-    for country_col in ["country", "region_name"]:
-        tb = geo.harmonize_countries(
-            df=tb, country_col=country_col, countries_file=paths.country_mapping_path, warn_on_unused_countries=False
-        )
-
-    # Remove (PIP) from region_name
-    tb["region_name"] = tb["region_name"].str.replace(r" \(PIP\)", "", regex=True)
-
-    return tb
-
-
-def add_top_1_percentile(tb: Table, tb_percentiles: Table) -> Table:
-    """
-    Add top 1% data (share, average, threshold) to the main indicators
-    Also, calculate the share of the top 90-99%
-    """
-
-    tb = tb.copy()
-    tb_percentiles = tb_percentiles.copy()
-
-    # Create different tables for thresholds and shares/averages
-    tb_percentiles_thr = tb_percentiles[tb_percentiles["percentile"] == 99].copy()
-    tb_percentiles_share = tb_percentiles[tb_percentiles["percentile"] == 100].copy()
-
-    # Select appropriate columns and rename
-    tb_percentiles_thr = tb_percentiles_thr[
-        ["ppp_version", "country", "year", "reporting_level", "welfare_type", "thr"]
-    ]
-    tb_percentiles_thr = tb_percentiles_thr.rename(columns={"thr": "top1_thr"})
-
-    tb_percentiles_share = tb_percentiles_share[
-        ["ppp_version", "country", "year", "reporting_level", "welfare_type", "share", "avg"]
-    ]
-    tb_percentiles_share = tb_percentiles_share.rename(columns={"share": "top1_share", "avg": "top1_avg"})
-
-    # Merge with the main table
-    tb = pr.merge(
-        tb, tb_percentiles_thr, on=["ppp_version", "country", "year", "reporting_level", "welfare_type"], how="left"
-    )
-    tb = pr.merge(
-        tb, tb_percentiles_share, on=["ppp_version", "country", "year", "reporting_level", "welfare_type"], how="left"
-    )
-
-    # Now I can calculate the share of the top 90-99%
-    tb["top90_99_share"] = tb["decile10_share"] - tb["top1_share"]
 
     return tb
 
