@@ -53,11 +53,13 @@ def ask_gpt(query, model):
 MODEL_DEFAULT = "gpt-4.1"
 MODELS_AVAILABLE = {
     "gpt-4.1": "GPT-4.1",  # IN: US$2.00 / 1M tokens; OUT: US$8.00 / 1M tokens
-    # "o4-mini": "GPT o4-mini",  # IN: US$1.10 / 1M tokens; OUT: US$4.40 / 1M tokens
+    "o4-mini": "GPT o4-mini",  # IN: US$1.10 / 1M tokens; OUT: US$4.40 / 1M tokens
     "gpt-4o": "GPT-4o",  # IN: US$5.00 / 1M tokens; OUT: US$15.00 / 1M tokens
     # "gpt-4-turbo": "GPT-4 Turbo",  # IN: US$10.00 / 1M tokens; OUT: US$30.00 / 1M tokens  (gpt-4-turbo-2024-04-09)
 }
 MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
+# Some models don't support certain arguments (I think these are the "mini" ones)
+MODELS_DIFFERENT_API = {"o4-mini"}
 
 
 # CATEGORY FOR CHAT
@@ -222,7 +224,7 @@ with st.container(border=True):
         "Temperature",
         min_value=0.0,
         max_value=2.0,
-        value=0.15,
+        value=1.0 if model_name in MODELS_DIFFERENT_API else 0.15,
         step=0.01,
         help="What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.",
     )
@@ -285,14 +287,25 @@ with container_chat:
         # Display assistant response in chat message container
         with container_response:
             with st.chat_message("assistant"):
+                print("EEEE-----------------------")
+                print(model_name)
                 # Ask GPT (stream)
-                stream = api.chat.completions.create(
-                    model=cast(str, model_name),
-                    messages=messages,  # type: ignore
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                    stream=True,
-                )
+                if model_name in MODELS_DIFFERENT_API:
+                    stream = api.chat.completions.create(
+                        model=cast(str, model_name),
+                        messages=messages,  # type: ignore
+                        temperature=1,
+                        max_completion_tokens=max_tokens,
+                        stream=True,
+                    )
+                else:
+                    stream = api.chat.completions.create(
+                        model=cast(str, model_name),
+                        messages=messages,  # type: ignore
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        stream=True,
+                    )
                 st.session_state.response = cast(str, st.write_stream(stream))
 
             # Add new response by the System

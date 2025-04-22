@@ -109,6 +109,9 @@ MODELS_TOKEN_ENCODINGS = {
     "gpt-4.1": "o200k_base",
     "gpt-4.1-mini": "o200k_base",
     "gpt-4.1-nano": "o200k_base",
+    "o1": "o200k_base",
+    "o3": "o200k_base",
+    "o4-mini": "o200k_base",
 }
 
 
