@@ -19,11 +19,11 @@ def run() -> None:
     # Process data.
     #
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.rename(columns={"REF_AREA": "country", "REF_DATE": "year"}, errors="raise")
+    tb = tb.rename(columns={"Geographic area": "country", "Reference Date": "year"}, errors="raise")
     # There are some duplicated values in the UNICEF regions - so let's remove those. I wrote to UN IGME to report this 2024-09-12.
-    tb = tb[tb["REGIONAL_GROUP"] != "UNICEF"]
+    tb = tb[tb["Regional group"] != "UNICEF"]
     # Only grab the UN IGME estimates (not the input raw data)
-    tb = tb[tb["SERIES_NAME"] == "UN_IGME"]
+    tb = tb[tb["Observation Status"] == "Normal value"].reset_index(drop=True)
     tb = tb.format(
         [
             "country",
@@ -33,7 +33,7 @@ def run() -> None:
             "wealth_quintile",
             "series_name",
             "regional_group",
-            "unit_measure",
+            "unit_of_measure",
         ]
     )
     #

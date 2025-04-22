@@ -13,55 +13,6 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 REGIONS = geo.REGIONS
 
-UNIT = {
-    "D": "Number of deaths",
-    "D_PER_1000_B": "Deaths per 1,000 live births",
-    "D_PER_1000_1": "Deaths per 1,000 children aged 1",
-    "D_PER_1000_1M": "Deaths per 1,000 children aged 1 month",
-    "D_PER_1000_5": "Deaths per 1,000 children aged 5",
-    "D_PER_1000_10": "Deaths per 1,000 children aged 10",
-    "D_PER_1000_15": "Deaths per 1,000 children aged 15",
-    "D_PER_1000_20": "Deaths per 1,000 children aged 20",
-    "STILLBIRTHS": "Stillbirths",
-    "SB_PER_1000_B": "Stillbirths per 1,000 total births",
-}
-
-
-INDICATOR = {
-    "MRY0T4": "Under-five mortality rate",
-    "MRY0": "Infant mortality rate",
-    "MRY1T4": "Mortality rate age 1-4",
-    "TMY0": "Infant deaths",
-    "TMY0T4": "Under-five deaths",
-    "TMY1T4": "Child deaths age 1-4",
-    "MRM0": "Neonatal mortality rate",
-    "MRM1T11": "Mortality rate age 1-11 months",
-    "MRM1T59": "Mortality rate age 1-59 months",
-    "TMM0": "Neonatal deaths",
-    "TMM1T11": "Deaths age 1-11 months",
-    "TMM1T59": "Deaths age 1-59 months",
-    "MRY10T14": "Mortality rate age 10-14",
-    "MRY10T19": "Mortality rate age 10-19",
-    "MRY15T19": "Mortality rate age 15-19",
-    "MRY15T24": "Mortality rate age 15-24",
-    "MRY20T24": "Mortality rate age 20-24",
-    "MRY5T14": "Mortality rate age 5-14",
-    "MRY5T24": "Mortality rate age 5-24",
-    "MRY5T9": "Mortality rate age 5-9",
-    "TMY10T14": "Deaths age 10-14",
-    "TMY10T19": "Deaths age 10-19",
-    "TMY15T19": "Deaths age 15-19",
-    "TMY15T24": "Deaths age 15-24",
-    "TMY20T24": "Deaths age 20-24",
-    "TMY5T14": "Deaths age 5-14",
-    "TMY5T24": "Deaths age 5-24",
-    "TMY5T9": "Deaths age 5-9",
-    "SB": "Stillbirths",
-    "SBR": "Stillbirth rate",
-    "PR_MRM0": "Additional neonatal deaths",  # Not sure what these measure currently
-    "PR_MRY0T4": "Additional under-five deaths",  # Not sure what these measure currently
-}
-
 
 def run() -> None:
     #
