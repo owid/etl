@@ -406,7 +406,8 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
         df_grapher_ids = df_grapher[cols_variables].copy()
         df_grapher = df_grapher.dropna(how="all", axis=1)  # Probably some *Slug columns are dropped here
         df_grapher.loc[:, cols_variables] = df_grapher_ids
-        df_grapher = df_grapher.drop(columns=["_slug_renames"])
+        if "_slug_renames" in df_grapher.columns:
+            df_grapher = df_grapher.drop(columns=["_slug_renames"])
 
         # if avoid_duplicate_hack:
         #     df_columns = df_columns.drop(columns=["slug"])
