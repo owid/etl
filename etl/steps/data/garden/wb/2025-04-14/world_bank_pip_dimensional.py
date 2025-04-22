@@ -478,22 +478,17 @@ def create_stacked_variables(tb: Table, povlines_dict: dict) -> Tuple[Table, lis
         ),
     ]
 
-    # Reset the MultiIndex on columns
-    tb_pivot = tb_pivot.reset_index()
+    # Stack table
+    tb_pivot = tb_pivot.stack(future_stack=True)
+    tb_pivot = tb_pivot.stack(future_stack=True).reset_index()
 
-    # Convert the table to show the following columns: country, year, reporting_level, welfare_type, ppp_version, poverty_line, headcount_between, headcount_ratio_between, headcount_above, headcount_ratio_above
-    tb_pivot = tb_pivot.stack(level=[0, 1, 2], future_stack=True).reset_index()
-    # Delete level_0
-    tb_pivot = tb_pivot.drop(columns=["level_0"])
-
-    print(tb_pivot)
-
-    # Make level_1 wide
-    tb_pivot = tb_pivot.pivot(
-        columns=["level_1"],
+    # Merge with tb
+    tb = pr.merge(
+        tb,
+        tb_pivot,
+        on=["country", "year", "reporting_level", "welfare_type", "poverty_line", "ppp_version"],
+        how="outer",
     )
-
-    print(tb_pivot)
 
     return tb
 
