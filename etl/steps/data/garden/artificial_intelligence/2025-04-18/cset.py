@@ -3,7 +3,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -60,20 +60,17 @@ def run(dest_dir: str) -> None:
         tb[f"{col}_per_mil"] = tb[col] / (tb["population"] / 1e6)
 
     tb = tb.drop("population", axis=1)
+    # Remove regional aggregates except "World" as these are not meaningful in the context of this dataset
+    tb = tb[~tb["country"].isin(["North America", "South America", "Europe", "Africa", "Asia", "Oceania"])]
 
     tb = tb.format(["country", "year", "field"])
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
+
     ds_garden.save()
-
-
-def sum_with_nan(x):
-    return x.sum() if x.notna().any() else np.nan
 
 
 def add_regions(tb: Table, ds_regions: Dataset) -> Table:
@@ -85,4 +82,5 @@ def add_regions(tb: Table, ds_regions: Dataset) -> Table:
         ds_regions=ds_regions,
         min_num_values_per_year=1,
     )
+
     return tb
