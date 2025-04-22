@@ -50,11 +50,12 @@ def ask_gpt(query, model):
 
 
 # GPT CONFIG
-MODEL_DEFAULT = "gpt-4o"
+MODEL_DEFAULT = "gpt-4.1"
 MODELS_AVAILABLE = {
+    "gpt-4.1": "GPT-4.1",  # IN: US$2.00 / 1M tokens; OUT: US$8.00 / 1M tokens
+    # "o4-mini": "GPT o4-mini",  # IN: US$1.10 / 1M tokens; OUT: US$4.40 / 1M tokens
     "gpt-4o": "GPT-4o",  # IN: US$5.00 / 1M tokens; OUT: US$15.00 / 1M tokens
-    "gpt-4-turbo": "GPT-4 Turbo",  # IN: US$10.00 / 1M tokens; OUT: US$30.00 / 1M tokens  (gpt-4-turbo-2024-04-09)
-    "gpt-3.5-turbo": "GPT 3.5 Turbo",  # IN: US$0.50 / 1M tokens; OUT: US$1.50 / 1M tokens  (gpt-3.5-turbo-0125)
+    # "gpt-4-turbo": "GPT-4 Turbo",  # IN: US$10.00 / 1M tokens; OUT: US$30.00 / 1M tokens  (gpt-4-turbo-2024-04-09)
 }
 MODELS_AVAILABLE_LIST = list(MODELS_AVAILABLE.keys())
 
@@ -66,10 +67,10 @@ class Options:
 
     DATASETTE = "Datasette"
     METADATA = "Metadata"
-    START = "Setting up your environment"
+    START = "Env set up"
     GUIDES = "Tools, APIs, and guides"
     PRINCIPLES = "Design principles"
-    FULL = "Complete documentation"
+    FULL = "All docs"
     DEBUG = "Debug"
 
 
@@ -145,14 +146,13 @@ options = [
 # NOTE: using pills is a good viz (https://github.com/jrieke/streamlit-pills). however, existing tool does not have an on_change options, which is basic if we want to reset some values from session_state
 with st.container(border=True):
     st.markdown("**Settings**")
-    st.radio(
+    st.segmented_control(
         label="Choose a category for the question",
         options=options,
-        index=0,
+        default=options[0],
         help="Choosing a domain reduces the cost of the query to chatGPT, since only a subset of the documentation will be used in the query (i.e. fewer tokens used).",
         key="category_gpt",
         on_change=reset_messages,
-        horizontal=True,
     )
 
     ## EXAMPLE QUERIES

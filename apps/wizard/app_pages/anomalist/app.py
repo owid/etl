@@ -81,7 +81,7 @@ ANOMALY_TYPE_NAMES = {k: v["tag_name"] for k, v in ANOMALY_TYPES.items()}
 ANOMALY_TYPES_TO_DETECT = tuple(ANOMALY_TYPES.keys())
 
 # GPT
-MODEL_NAME = "gpt-4o"
+MODEL_NAME = "gpt-4.1"
 
 # Map sorting strategy to name to show in UI.
 SORTING_STRATEGIES = {
