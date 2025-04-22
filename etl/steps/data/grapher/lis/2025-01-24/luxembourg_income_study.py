@@ -2,13 +2,13 @@
 
 from owid.catalog import warnings
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -26,8 +26,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     with warnings.ignore_warnings([warnings.NoOriginsWarning, warnings.DisplayNameWarning]):
-        ds_garden = create_dataset(
-            dest_dir, tables=[tb_garden], check_variables_metadata=True, default_metadata=ds_garden.metadata
+        ds_garden = paths.create_dataset(
+            tables=[tb_garden], check_variables_metadata=True, default_metadata=ds_garden.metadata
         )
 
     ds_garden.save()
