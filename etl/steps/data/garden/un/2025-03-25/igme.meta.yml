@@ -88,7 +88,7 @@ tables:
       lower_bound:
         title: Lower bound - <<indicator>> -{definitions.sex} - {definitions.wealth_quintile}
       upper_bound:
-        title: Upper bound -<<indicator>> -   {definitions.sex}  - {definitions.wealth_quintile}
+        title: Upper bound - <<indicator>> -   {definitions.sex}  - {definitions.wealth_quintile}
   igme_under_fifteen_mortality:
     variables:
       obs_value:
