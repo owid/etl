@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
+from deprecated import deprecated
 from owid.catalog.utils import underscore
 
 from etl.collections.common import INDICATORS_SLUG, combine_config_dimensions, expand_config, get_mapping_paths_to_id
@@ -491,8 +492,11 @@ def bake_indicators_view(indicator_paths) -> Dict[str, List[str]]:
     return indicators
 
 
+@deprecated("This function is deprecated, and there is no need to use it anymore.")
 def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
-    """There is some issue with metadata not being propagated into explorer views.
+    """NOTE: FIXED BY https://github.com/owid/owid-grapher/pull/4797
+
+    There is some issue with metadata not being propagated into explorer views.
 
     It looks like, as long as we use `slug` (instead of `catalogPath`) to reference indicators, parts of the indicator's metadata is ignored (subtitle, note, originUrl, etc.). My impression is that fields from `presentation.grapher_config` are being ignored?
 
