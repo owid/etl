@@ -1,4 +1,3 @@
-import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
