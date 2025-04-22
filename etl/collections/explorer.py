@@ -336,6 +336,7 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
             df_columns.loc[duplicate_indicators, "_variableId"] = df_columns.loc[
                 duplicate_indicators, "catalogPath"
             ].map(mapping)
+            df_columns = df_columns.astype({"_variableId": "Int64"})
 
             # 2. Add unique indicator identifier (will be used as slug)
             df_columns.loc[duplicate_indicators, "slug"] = (
