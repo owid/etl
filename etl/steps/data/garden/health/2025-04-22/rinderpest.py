@@ -26,7 +26,20 @@ def run() -> None:
         countries_file=paths.country_mapping_path,
     )
     tb = tb.drop(columns="listing_date")
+    tb["last_recorded_rinderpest"] = (
+        tb["last_recorded_rinderpest"]
+        .str.replace(r"\s*\(imported\)", "", regex=True)
+        # Sao Tome and Principe is recorded as 1950s, so we replace it with 1959
+        # to match the other countries.
+        # Kosovo is listed as the 1890s so we replace it with 1899 to match the other countries.
+        # We also replace the values for Liechtenstein of 19th century with 1899 to match the other countries.
+        .replace({"1950s": "1959", "1890s": "1899", "19th century": "1899"})
+    )
 
+    def is_valid(val):
+        return val == "Never reported" or (str(val).isdigit() and len(str(val)) == 4)
+
+    assert tb["last_recorded_rinderpest"].apply(is_valid).all(), "Invalid values found in Last outbreak"
     # Improve table format.
     tb = tb.format(["country"])
 
