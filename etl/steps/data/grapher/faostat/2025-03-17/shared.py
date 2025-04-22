@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Define path to current folder, namespace and version of all datasets in this folder.
 CURRENT_DIR = Path(__file__).parent
@@ -38,7 +38,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset.
-    ds_grapher = create_dataset(
-        dest_dir=dest_dir, tables=[tb_garden], default_metadata=ds_garden.metadata, check_variables_metadata=True
+    ds_grapher = paths.create_dataset(
+        ables=[tb_garden], default_metadata=ds_garden.metadata, check_variables_metadata=True
     )
     ds_grapher.save()
