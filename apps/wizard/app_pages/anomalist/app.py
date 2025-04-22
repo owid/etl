@@ -617,7 +617,7 @@ with st.form(key="dataset_search"):
 # If anomalies for dataset already exist in DB, load them. Warn user that these are being loaded from DB
 if not st.session_state.anomalist_anomalies or st.session_state.anomalist_datasets_submitted:
     # 3.1/ Check if anomalies are already there in DB
-    with st.spinner("Loading anomalies (already detected) from database..."):
+    with st.spinner("Loading anomalies (already detected) from database...", show_time=True):
         st.session_state.anomalist_anomalies = WizardDB.load_anomalies(st.session_state.anomalist_datasets_selected)
 
     # Load indicators in selected datasets
@@ -636,7 +636,7 @@ if not st.session_state.anomalist_anomalies or st.session_state.anomalist_datase
         # Reset flag
         st.session_state.anomalist_anomalies_out_of_date = False
 
-        with st.spinner("Scanning for anomalies... This can take some time."):
+        with st.spinner("Scanning for anomalies... This can take some time.", show_time=True):
             anomaly_detection(
                 anomaly_types=ANOMALY_TYPES_TO_DETECT,
                 variable_ids=variable_ids,

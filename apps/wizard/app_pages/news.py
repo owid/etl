@@ -90,7 +90,7 @@ with tab_1:
     # Summary
     st.subheader(f"Summary {window_suffix}")
     # with st.popover("Config"):
-    with st.spinner():
+    with st.spinner(show_time=True):
         result = WizardDB.get_news_summary(window_type=st.session_state.window_type)
         if result:
             summary, dt, cost = result

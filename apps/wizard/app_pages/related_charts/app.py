@@ -48,7 +48,7 @@ st.set_page_config(
 @st.cache_data(show_spinner=False, ttl="1h")
 def get_charts() -> list[data.Chart]:
     """Fetch chart metadata from the database and return a list of Chart objects."""
-    with st.spinner("Loading charts..."):
+    with st.spinner("Loading charts...", show_time=True):
         df = data.get_raw_charts()
         if len(df) == 0:
             raise ValueError("No charts found in the database.")
@@ -100,9 +100,9 @@ def st_chart_info(chart: data.Chart, show_coviews: bool = True) -> None:
 )
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
     """Load an embedding model and fit it to the charts for similarity scoring."""
-    with st.spinner("Loading model..."):
+    with st.spinner("Loading model...", show_time=True):
         scoring_model = scoring.ScoringModel(emb.get_model())
-    with st.spinner("Fitting model..."):
+    with st.spinner("Fitting model...", show_time=True):
         scoring_model.fit(charts)
     return scoring_model
 
