@@ -82,7 +82,7 @@ EXPLORER_CONFIG = {
                         "catalogPath": "monkeypox#total_cases",
                         "display": {
                             "sourceName": "World Health Organization",
-                            "sourceLink": "https://example.com",
+                            "sourceLink": "https://example.com",  # Difference
                             "additionalInfo": "Data on mpox is collated by the [World Health Organization](https://extranet.who.int/publicemergency/) since 2022, and is updated as new information is reported.\\n\\nWe fetch the latest version of the WHO data every hour, keep records up to the previous day, apply some transformations (7-day averages, per-capita adjustments, etc.), and produce a transformed version of the data, [available on GitHub](https://github.com/owid/monkeypox). This transformed data powers our Mpox Data Explorer on Our World in Data.",
                             "colorScaleNumericMinValue": "0",
                             "colorScaleScheme": "OrRd",
@@ -243,8 +243,8 @@ def test_explorer_config_legacy(mock_map_func):
 
     # TODO: check df_grapher
     mask = df_grapher["yVariableIds"].notna()
-    assert (df_grapher[mask].index == [5]).all()
+    assert (df_grapher[mask].index == [0, 1, 3, 5]).all()
     mask = df_grapher["ySlugs"].notna()
-    assert (df_grapher[mask].index == [0, 1, 2, 3]).all()
+    assert (df_grapher[mask].index == [2, 3]).all()
     mask = df_grapher["xSlug"].notna()
     assert (df_grapher[mask].index == [4]).all()
