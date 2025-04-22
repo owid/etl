@@ -7,7 +7,7 @@ Loads the latest PIP data from garden and stores multiple tables as csv files.
 
 from owid.catalog import Dataset, Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -26,7 +26,7 @@ PPP_YEAR_OLD = PPP_VERSIONS[0]
 PPP_YEAR_CURRENT = PPP_VERSIONS[1]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Load garden dataset.
     ds_garden = paths.load_dataset("world_bank_pip")
 
@@ -72,8 +72,7 @@ def run(dest_dir: str) -> None:
     rest_of_tables = import_rest_of_tables(ds_garden=ds_garden)
 
     # Create explorer dataset, with garden table and metadata in csv format
-    ds_explorer = create_dataset(
-        dest_dir,
+    ds_explorer = paths.create_dataset(
         tables=[tb_inc_or_cons_current, tb_inc_or_cons_old, tb_pip_inequality] + rest_of_tables,
         default_metadata=ds_garden.metadata,
         formats=["csv"],

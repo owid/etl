@@ -293,19 +293,18 @@ def run() -> None:
         + spell_tables_inc_or_cons
     )
 
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=tables,
-        check_variables_metadata=True,
-        default_metadata=ds_meadow.metadata,
-    )
+    # #
+    # # Save outputs.
+    # #
+    # # Create a new garden dataset with the same metadata as the meadow dataset.
+    # ds_garden = paths.create_dataset(
+    #     tables=tables,
+    #     check_variables_metadata=True,
+    #     default_metadata=ds_meadow.metadata,
+    # )
 
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    # # Save changes in the new garden dataset.
+    # ds_garden.save()
 
     #
     # Process data.

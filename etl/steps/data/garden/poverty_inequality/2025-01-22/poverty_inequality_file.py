@@ -3,7 +3,7 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table, warnings
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -16,7 +16,7 @@ PPP_YEAR_LIS = 2017
 PPP_YEAR_WID = 2023
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -151,8 +151,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create explorer dataset
-    ds_explorer = create_dataset(
-        dest_dir,
+    ds_explorer = paths.create_dataset(
         tables=[tb, tb_percentiles, tb_wdi],
         default_metadata=ds_lis.metadata,
     )

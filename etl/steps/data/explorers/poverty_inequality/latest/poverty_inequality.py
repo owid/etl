@@ -7,7 +7,7 @@ Loads the latest PIP, WID and LIS explorer steps and stores a table (as a csv fi
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -22,7 +22,7 @@ PPP_YEAR_OLD = PPP_VERSIONS[0]
 PPP_YEAR_CURRENT = PPP_VERSIONS[1]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     # Load WID explorer step.
     ds_wid = paths.load_dataset("world_inequality_database")
     tb_wid = ds_wid["world_inequality_database"].reset_index()
@@ -51,7 +51,7 @@ def run(dest_dir: str) -> None:
     )
 
     # Create explorer dataset with merged table in csv format
-    ds_explorer = create_dataset(dest_dir, tables=[tb_explorer_old, tb_explorer_current], formats=["csv"])
+    ds_explorer = paths.create_dataset(tables=[tb_explorer_old, tb_explorer_current], formats=["csv"])
     ds_explorer.save()
 
 
