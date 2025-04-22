@@ -3,7 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Child & Infant Mortality
-    unit: <<unit_measure>>.lower()
+    unit: << unit_measure.lower() >>
     short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
     description_key:
       - |-
