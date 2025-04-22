@@ -4,7 +4,7 @@ import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, grapher_checks
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -51,11 +51,6 @@ def run() -> None:
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
     ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata, check_variables_metadata=True)
-
-    #
-    # Checks.
-    #
-    grapher_checks(ds_grapher)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
