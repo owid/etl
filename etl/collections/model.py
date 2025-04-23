@@ -500,7 +500,8 @@ class Collection(MDIMBase):
         # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
         if self._collection_type is None:
             raise ValueError("_collection_type must have a value!")
-        return EXPORT_DIR / self._collection_type / (self.catalog_path.replace("#", "/") + ".config.json")
+        collection_dir = "explorers" if self._collection_type == "explorer" else self._collection_type
+        return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")
