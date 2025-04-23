@@ -2374,6 +2374,25 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 assert unit == "grams of fat per day per capita"
                 title = "Total daily supply of fat per person"
 
+        # Add a text to the short description of some items that require further explanation.
+        description_short_by_item_code = {
+            "00001841": "Oilseed cake is the residue from oil extraction, commonly used as animal feed.",
+            "00001732": "Oil equivalent is a measurement of oil extracted from oil-bearing crops.",
+            "00000226": "The areca nut is the seed of the areca palm, and is commonly referred to as betel nut.",
+            "00001717": "Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.",
+            "00000656": "Green coffee beans are coffee seeds (beans) that have not yet been roasted.",
+            "00001780": "Milk represents the raw equivalents of all dairy products including cheese, yoghurt, cream and milk consumed as the final product.",
+            "00002551": "Nuts is the sum of all nut crops including brazil nuts, cashews, almonds, walnuts, pistachios, and areca nuts.",
+            "00002911": "Pulses are the edible seeds of plants in the legume family.",
+            "00001720": "Roots and tubers are a category of crops including cassava, potatoes, sweet potatoes, yams, and yautia.",
+            "00000162": "Raw sugar is the total quantity of sugar product yielded from sugar cane and sugar beet crops, expressed in its raw equivalents.",
+            "00001723": "Sugar crops is the sum of sugar cane and sugar beet.",
+            "00002901": "This is the total of all agricultural produce, both crops and livestock.",
+        }
+        for item_code in description_short_by_item_code:
+            description_short = description_short + " " if description_short else ""
+            description_short += description_short_by_item_code[item_code]
+
         if dataset_short_name == "faostat_fbsc":
             # Add footnote to mention the change in methodology between FBSH and FBS, which often causes abrupt jumps in 2010.
             tb_wide[column].metadata.presentation.grapher_config = {
