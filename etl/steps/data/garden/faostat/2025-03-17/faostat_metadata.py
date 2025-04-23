@@ -1003,7 +1003,7 @@ def run() -> None:
     #
     # Load data.
     #
-    # Define path to current data step file.
+    # Define path to current step file.
     current_step_file = (CURRENT_DIR / "faostat_metadata").with_suffix(".py")
 
     # Get paths and naming conventions for current step.

@@ -507,7 +507,7 @@ def run():
             "eggs_from_other_birds__excl__hens": "Eggs from other birds",
             "eggs": "Eggs, total",
             "animal_fats": "Fat, total",
-            "offals": "Offals, total",
+            "offal": "Offal, total",
             "meat__ass": "Meat, donkey",
             "total": "All food",
             "chillies_and_peppers": "Chilies and peppers",

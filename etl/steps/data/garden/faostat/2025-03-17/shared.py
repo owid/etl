@@ -2002,13 +2002,13 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00000979": "Unrendered sheep fat",  # From faostat_qcl - 'Sheep fat, unrendered' (previously 'Fat, sheep').
             "00001043": "Rendered pig fat",  # From faostat_qcl - "Pig fat, rendered".
             # Offals.
-            "00000868": "Cattle offals",  # From faostat_qcl - 'Offals, cattle' (previously 'Offals, cattle').
-            "00001098": "Horses and other equines offals",  # From faostat_qcl - 'Edible offals of horses and other equines,  fresh, chilled or frozen' (previously 'Offals, horses').
-            "00000978": "Sheep offals",  # From faostat_qcl - 'Offals, sheep' (previously 'Offals, sheep').
-            "00000948": "Buffalo offals",  # From faostat_qcl - 'Offals, buffaloes' (previously 'Offals, buffaloes').
-            "00001128": "Camel offals",  # From faostat_qcl - 'Offals, camels' (previously 'Offals, camels').
-            "00001036": "Pig offals",  # From faostat_qcl - 'Offals, pigs' (previously 'Offals, pigs').
-            "00001018": "Goat offals",  # From faostat_qcl - 'Offals, goats' (previously 'Offals, goats').
+            "00000868": "Cattle offal",  # From faostat_qcl - 'Offals, cattle' (previously 'Offals, cattle').
+            "00001098": "Horses and other equines offal",  # From faostat_qcl - 'Edible offals of horses and other equines,  fresh, chilled or frozen' (previously 'Offals, horses').
+            "00000978": "Sheep offal",  # From faostat_qcl - 'Offals, sheep' (previously 'Offals, sheep').
+            "00000948": "Buffalo offal",  # From faostat_qcl - 'Offals, buffaloes' (previously 'Offals, buffaloes').
+            "00001128": "Camel offal",  # From faostat_qcl - 'Offals, camels' (previously 'Offals, camels').
+            "00001036": "Pig offal",  # From faostat_qcl - 'Offals, pigs' (previously 'Offals, pigs').
+            "00001018": "Goat offal",  # From faostat_qcl - 'Offals, goats' (previously 'Offals, goats').
             # Seeds.
             "00000289": "Sesame seeds",  # From faostat_qcl - 'Sesame seed' (previously 'Sesame seed').
             "00000267": "Sunflower seeds",  # From faostat_qcl - 'Sunflower seed' (previously 'Sunflower seed').
