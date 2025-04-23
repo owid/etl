@@ -105,8 +105,6 @@ class MultidimSet:
         mdim = Multidim.load(str(path))
 
         # Get and set catalog path
-        # mdim_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}"
-        # mdim.catalog_path = mdim_catalog_path
         return mdim
 
     @property
