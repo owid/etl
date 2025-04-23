@@ -2,7 +2,7 @@ config:
   explorerTitle: Global Food
   isPublished: true
   entityType: country
-  explorerSubtitle: Explore the world's food system crop-by-crop from production to plate.
+  explorerSubtitle: Explore the world's food system, from production to supply.
   selection:
     - World
     - United States

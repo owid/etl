@@ -525,7 +525,6 @@ def run():
     # Make per capita a checkbox and unit a radio button.
     for dimension in config["dimensions"]:
         if dimension["slug"] == "per_capita":
-            dimension["name"] = "per capita"
             dimension["presentation"] = {"type": "checkbox", "choice_slug_true": "True"}
         if dimension["slug"] == "unit":
             dimension["presentation"] = {"type": "radio"}
