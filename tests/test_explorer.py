@@ -7,6 +7,7 @@ from etl.collections.model import Dimension
 
 # EXAMPLE explorer. Inspired by Mpox explorer.
 EXPLORER_CONFIG = {
+    "catalog_path": "",
     "config": {
         "explorerTitle": "Mpox",
         "explorerSubtitle": "Explore the data produced by the World Health Organization and Africa CDC on mpox (monkeypox).",
