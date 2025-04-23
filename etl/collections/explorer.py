@@ -31,9 +31,8 @@ class Explorer(Collection):
     definitions: Optional[Definitions] = None
     avoid_duplicate_hack: bool = False
 
-    def __post_init__(self):
-        # Internal use
-        self._collection_type = "explorer"
+    # Internal
+    _collection_type: str | None = "explorer"
 
     def display_config_names(self):
         """Get display names for all dimensions and choices.

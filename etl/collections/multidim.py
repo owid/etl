@@ -48,9 +48,8 @@ class Multidim(Collection):
     topic_tags: Optional[List[str]] = None
     definitions: Optional[Definitions] = None
 
-    def __post_init__(self):
-        # Internal use
-        self._collection_type = "multidim"
+    # Internal
+    _collection_type: str | None = "explorer"
 
     def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
         # Ensure we have an environment set
