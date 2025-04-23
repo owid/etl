@@ -20,7 +20,7 @@ definitions:
     <% if indicator == "Neonatal mortality rate" %>
     The estimated number of deaths of {definitions.sex} children aged less than 28 days, per 100 live births, in {definitions.wealth_quintile}.
     <% elif indicator == "Mortality rate 1-59 months" %>
-    The estimated number of deaths of {definitions.sex} children aged between 1 and 59 months, per 100 live births, in {definitions.wealth_quintile}.
+    The estimated number of deaths of {definitions.sex} children aged between 1 and 59 months, per 100 babies aged 1 month, in {definitions.wealth_quintile}.
     <% elif indicator == "Infant mortality rate" %>
     The estimated number of deaths of {definitions.sex} children aged under one year, per 100 live births, in {definitions.wealth_quintile}.
     <% elif indicator == "Under-five mortality rate" %>
@@ -75,6 +75,10 @@ definitions:
     The estimated number of deaths of {definitions.sex} children aged between 5 and 9, in {definitions.wealth_quintile}.
     <% elif indicator == "Post-neonatal deaths" %>
     The estimated number of deaths of {definitions.sex} children aged between 28 days and 1 year, in {definitions.wealth_quintile}.
+    <% elif indicator == "Mortality rate age 1-11 months" %>
+    The estimated number of deaths of {definitions.sex} babies aged between 1 days and 11 months per 100 babies aged 1 month, in {definitions.wealth_quintile}.
+    <% elif indicator == "Deaths age 1-11 months" %>
+    The estimated number of deaths of {definitions.sex} babies aged between 1 days and 11 months, in {definitions.wealth_quintile}.
     <% elif indicator == "Under-fifteen deaths" %>
     The estimated number of deaths of children aged under fifteen years.
     <% elif indicator == "Under-fifteen mortality rate" %>
@@ -85,7 +89,9 @@ definitions:
     <% if indicator == "Neonatal mortality rate" %>
     Neonatal mortality rate of {definitions.sex} babies aged less than 28 days, per 100 live births, in {definitions.wealth_quintile}
     <% elif indicator == "Mortality rate 1-59 months" %>
-    Mortality rate of {definitions.sex} children aged between 1 and 59 months, per 100 live births, in {definitions.wealth_quintile}
+    Mortality rate of {definitions.sex} children aged between 1 and 59 months, per 100 babies aged 1 month, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate 1-11 months" %>
+    Mortality rate of {definitions.sex} babies aged between 1 and 11 months, per 100 babies aged 1 month, in {definitions.wealth_quintile}
     <% elif indicator == "Infant mortality rate" %>
     Infant mortality rate of {definitions.sex} babies aged under one year, per 100 live births, in {definitions.wealth_quintile}
     <% elif indicator == "Under-five mortality rate" %>
@@ -116,6 +122,8 @@ definitions:
     Deaths of {definitions.sex} babies aged less than 28 days, in {definitions.wealth_quintile}
     <% elif indicator == "Deaths 1-59 months" %>
     Deaths of {definitions.sex} children aged between 1 and 59 months, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths 1-11 months" %>
+    Deaths of {definitions.sex} children aged between 1 and 11 months, in {definitions.wealth_quintile}
     <% elif indicator == "Infant deaths" %>
     Deaths of {definitions.sex} children aged under one year, in {definitions.wealth_quintile}
     <% elif indicator == "Under-five deaths" %>
@@ -126,31 +134,22 @@ definitions:
     Deaths of {definitions.sex} children aged between 10 and 19 years, in {definitions.wealth_quintile}
     <% elif indicator == "Deaths age 15 to 19" %>
     Deaths of {definitions.sex} children aged between 15 and 19 years, in {definitions.wealth_quintile}
-
     <% elif indicator == "Deaths age 15 to 24" %>
     Deaths of {definitions.sex} children aged between 15 and 24 years, in {definitions.wealth_quintile}
-
     <% elif indicator == "Child deaths age 1 to 4" %>
     Deaths of {definitions.sex} children aged between 1 and 4 years, in {definitions.wealth_quintile}
-
     <% elif indicator == "Deaths age 20 to 24" %>
     Deaths of {definitions.sex} children aged between 20 and 24 years, in {definitions.wealth_quintile}
-
     <% elif indicator == "Deaths age 5 to 14" %>
     Deaths of {definitions.sex} children aged between 5 and 14 years, in {definitions.wealth_quintile}
-
     <% elif indicator == "Deaths age 5 to 24" %>
     Deaths of {definitions.sex} children aged between 5 and 24 years, in {definitions.wealth_quintile}
-
     <% elif indicator == "Deaths age 5 to 9" %>
     Deaths of {definitions.sex} children aged between 5 and 9 years, in {definitions.wealth_quintile}
-
     <% elif indicator == "Post-neonatal deaths" %>
     Deaths of {definitions.sex} children aged between 28 and 364 days, in {definitions.wealth_quintile}
-
     <% elif indicator == "Under-fifteen deaths" %>
     Deaths of children aged under 15 years
-
     <% elif indicator == "Under-fifteen mortality rate" %>
     Deaths of children aged under 15 years per 100 live births
 
