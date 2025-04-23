@@ -3,6 +3,7 @@ definitions:
     presentation:
       topic_tags:
         - Child & Infant Mortality
+      attribution: United Nations Inter-agency Group for Child Mortality Estimation (2025)
     unit: << unit_of_measure.lower() >>
     short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
     description_key:
@@ -11,6 +12,7 @@ definitions:
         - **Definition threshold varies**: A stillbirth generally refers to the birth of a baby showing no signs of life after a certain number of weeks of gestation, with the [ICD-11](https://icd.who.int/en) setting the cutoff at 22 weeks.
         - **Subcategories exist**: ICD-11 distinguishes between “early gestation stillbirth” (22–27 weeks) and “late gestation stillbirth” (28+ weeks).
         <% endif %>
+
   sex: |-
     <% if sex == "Total" %><% elif sex == "Male" %>male <% elif sex == "Female" %>female <%- endif -%>
   wealth_quintile: |-
@@ -152,7 +154,6 @@ definitions:
     Deaths of children aged under 15 years
     <% elif indicator == "Under-fifteen mortality rate" %>
     Deaths of children aged under 15 years per 100 live births
-
     <%- endif -%>
 tables:
   igme:
