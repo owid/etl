@@ -501,6 +501,7 @@ def run():
             "offals": "Offals, total",
             "meat__ass": "Meat, donkey",
             "total": "All food",
+            "chillies_and_peppers": "Chilies and peppers",
         },
     )
 

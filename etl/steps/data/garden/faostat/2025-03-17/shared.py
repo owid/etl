@@ -2293,6 +2293,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
                 # "005510",  # Production (tonnes).
                 assert unit == "tonnes"
                 title = f"Production of {item.lower()}"
+                num_decimal_places = 0
             elif element_code == "5510pc":
                 # "5510pc",  # Production per capita (tonnes per capita).
                 assert unit == "tonnes per capita"
