@@ -92,7 +92,7 @@ definitions:
     Neonatal mortality rate of {definitions.sex} babies aged less than 28 days, per 100 live births, in {definitions.wealth_quintile}
     <% elif indicator == "Mortality rate 1-59 months" %>
     Mortality rate of {definitions.sex} children aged between 1 and 59 months, per 100 babies aged 1 month, in {definitions.wealth_quintile}
-    <% elif indicator == "Mortality rate 1-11 months" %>
+    <% elif indicator == "Mortality rate age 1-11 months" %>
     Mortality rate of {definitions.sex} babies aged between 1 and 11 months, per 100 babies aged 1 month, in {definitions.wealth_quintile}
     <% elif indicator == "Infant mortality rate" %>
     Infant mortality rate of {definitions.sex} babies aged under one year, per 100 live births, in {definitions.wealth_quintile}
@@ -122,9 +122,9 @@ definitions:
     Stillbirths of {definitions.sex} babies per 100 births, in {definitions.wealth_quintile}
     <% elif indicator == "Neonatal deaths" %>
     Deaths of {definitions.sex} babies aged less than 28 days, in {definitions.wealth_quintile}
-    <% elif indicator == "Deaths 1-59 months" %>
+    <% elif indicator == "Deaths age 1-59 months" %>
     Deaths of {definitions.sex} children aged between 1 and 59 months, in {definitions.wealth_quintile}
-    <% elif indicator == "Deaths 1-11 months" %>
+    <% elif indicator == "Deaths age 1-11 months" %>
     Deaths of {definitions.sex} children aged between 1 and 11 months, in {definitions.wealth_quintile}
     <% elif indicator == "Infant deaths" %>
     Deaths of {definitions.sex} children aged under one year, in {definitions.wealth_quintile}
