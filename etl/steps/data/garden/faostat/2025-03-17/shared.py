@@ -2029,21 +2029,21 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00001783": "Eggs (from hens and other birds)",  # From faostat_qcl - 'Eggs' (previously 'Eggs Primary').
             "00000176": "Dry beans",  # From faostat_qcl - 'Beans, dry' (previously 'Beans, dry').
             "00000201": "Dry lentils",  # From faostat_qcl - 'Lentils, dry' (previously 'Lentils').
-            "00000216": "Brazil nuts in shell",  # From faostat_qcl - 'Brazil nuts, in shell' (previously 'Brazil nuts, with shell').
+            "00000216": "Brazil nuts",  # From faostat_qcl - 'Brazil nuts, in shell' (previously 'Brazil nuts, with shell').
             "00001804": "Citrus fruit",  # From faostat_qcl - 'Citrus Fruit' (previously 'Citrus Fruit').
             "00000656": "Green coffee",  # From faostat_qcl - 'Coffee, green' (previously 'Coffee, green').
             "00000995": "Sheep skins",  # From faostat_qcl - 'Skins, sheep' (previously 'Skins, sheep').
             "00001025": "Goat skins",  # From faostat_qcl - 'Skins, goat' (previously 'Skins, goat').
             "00000771": "Raw or retted flax",  # From faostat_qcl - 'Flax, raw or retted' (previously 'Flax fibre').
-            "00000220": "Chestnuts in shell",  # From faostat_qcl - 'Chestnuts, in shell' (previously 'Chestnut').
+            "00000220": "Chestnuts",  # From faostat_qcl - 'Chestnuts, in shell' (previously 'Chestnut').
             "00000417": "Green peas",  # From faostat_qcl - 'Peas, green' (previously 'Peas, green').
             "00001732": "Oilcrops (oil equivalent)",  # From faostat_qcl - 'Oilcrops, Oil Equivalent' (previously 'Oilcrops, Oil Equivalent').
-            "00000223": "Pistachios in shell",  # From faostat_qcl - 'Pistachios, in shell' (previously 'Pistachios').
+            "00000223": "Pistachios",  # From faostat_qcl - 'Pistachios, in shell' (previously 'Pistachios').
             "00000187": "Dry peas",  # From faostat_qcl - 'Peas, dry' (previously 'Peas, dry').
             "00001841": "Oilcrops (cake equivalent)",  # From faostat_qcl - 'Oilcrops, Cake Equivalent' (previously 'Oilcrops, Cake Equivalent').
             "00000125": "Fresh cassava",  # From faostat_qcl - 'Cassava, fresh' (previously 'Cassava').
             "00000197": "Dry pigeon peas",  # From faostat_qcl - 'Pigeon peas, dry' (previously 'Pigeon peas').
-            "00000249": "Coconuts in shell",  # From faostat_qcl - 'Coconuts, in shell' (previously 'Coconuts').
+            "00000249": "Coconuts",  # From faostat_qcl - 'Coconuts, in shell' (previously 'Coconuts').
             "00000780": "Raw or retted jute",  # From faostat_qcl - 'Jute, raw or retted' (previously 'Jute').
             "00000162": "Raw sugar",  # From faostat_qcl - 'Sugar (raw)' (previously 'Sugar (raw)').
             "00000056": "Maize (corn)",  # From faostat_qcl - 'Maize (corn)' (previously 'Maize').
