@@ -13,6 +13,7 @@ TODO: We should add testing!
 """
 
 import inspect
+from copy import deepcopy
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import pandas as pd
@@ -87,8 +88,6 @@ def create_explorer_experimental(
 
     NOTE: This function is experimental for this step, but could be used in other steps as well. Consider migrating to etl.collections.explorer once we are happy with it.
     """
-    from copy import deepcopy
-
     config = deepcopy(config_yaml)
 
     # Read from table (programatically expand)
@@ -189,7 +188,7 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
 
     # 0) Preliminary work #
     # Create dictionary with explorers, so to have identifiers for them
-    explorers_by_id = {str(i): explorer.copy() for i, explorer in enumerate(explorers)}
+    explorers_by_id = {str(i): deepcopy(explorer) for i, explorer in enumerate(explorers)}
 
     # Build dataframe with all choices. Each row provides details of a choices, and explorer identifier and the dimension slug
     df_choices, cols_choices = _build_df_choices(explorers_by_id)
