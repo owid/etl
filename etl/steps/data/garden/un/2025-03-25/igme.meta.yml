@@ -149,10 +149,10 @@ definitions:
     Deaths of {definitions.sex} children aged between 28 and 364 days, in {definitions.wealth_quintile}
 
     <% elif indicator == "Under-fifteen deaths" %>
-    Deaths of {definitions.sex} children aged under 15 years, in {definitions.wealth_quintile}
+    Deaths of children aged under 15 years
 
     <% elif indicator == "Under-fifteen mortality rate" %>
-    Deaths of {definitions.sex} children aged under 15 years per 100 live births, in {definitions.wealth_quintile}
+    Deaths of children aged under 15 years per 100 live births
 
     <%- endif -%>
 tables:
