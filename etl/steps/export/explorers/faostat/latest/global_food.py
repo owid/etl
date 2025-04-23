@@ -494,7 +494,6 @@ def run():
             "feed": "Allocated to animal feed",
             "food": "Allocated to human food",
             "other_uses": "Allocated to other uses",
-            "herbs__e_g__fennel": "Herbs, e.g. fennel",
             "eggs_from_other_birds__excl__hens": "Eggs from other birds",
             "eggs": "Eggs, total",
             "animal_fats": "Fat, total",
@@ -502,13 +501,13 @@ def run():
             "meat__ass": "Meat, donkey",
             "total": "All food",
             "chillies_and_peppers": "Chilies and peppers",
-            'fat__sheep': 'Fat, sheep',
-            'fat__buffaloes': 'Fat, buffalo',
-            'fat__pigs': 'Fat, pig',
-            'fat__camels': 'Fat, camel',
-            'fat__goats': 'Fat, goat',
-            'fat__cattle': 'Fat, cattle',
-        }
+            "fat__sheep": "Fat, sheep",
+            "fat__buffaloes": "Fat, buffalo",
+            "fat__pigs": "Fat, pig",
+            "fat__camels": "Fat, camel",
+            "fat__goats": "Fat, goat",
+            "fat__cattle": "Fat, cattle",
+        },
     )
 
     # Set defalt view.

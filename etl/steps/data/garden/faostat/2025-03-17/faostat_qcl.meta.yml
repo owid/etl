@@ -523,9 +523,9 @@ tables:
       hempseed__00000336__yield__005412__tonnes_per_hectare:
         presentation:
           title_public: Hempseed yield
-      herbs__e_g__fennel__00000711__yield__005412__tonnes_per_hectare:
+      herbs__00000711__yield__005412__tonnes_per_hectare:
         presentation:
-          title_public: Herbs yield (e.g. fennel)
+          title_public: Yield of herbs
       jute__00000780__yield__005412__tonnes_per_hectare:
         presentation:
           title_public: Jute yield
