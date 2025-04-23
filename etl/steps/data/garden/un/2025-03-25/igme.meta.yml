@@ -5,7 +5,9 @@ definitions:
         - Child & Infant Mortality
       attribution: United Nations Inter-agency Group for Child Mortality Estimation (2025)
     unit: << unit_of_measure.lower() >>
-    short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
+    short_unit: <% if 'per' in indicator | default('') %>%<% else %><%- endif -%>
+    display:
+      numDecimalPlaces: <% if 'per' in indicator | default('') %>0<% else %>1<%- endif -%>
     description_key:
       - |-
         <% if indicator == "Stillbirths per 100 births" %>
@@ -166,7 +168,6 @@ tables:
         presentation:
           title_public: <<indicator>>
         display:
-          numDecimalPlaces: 1
           name: <<indicator>>
   igme_under_fifteen_mortality:
     variables:
@@ -177,5 +178,4 @@ tables:
         presentation:
           title_public: <<indicator>>
         display:
-          numDecimalPlaces: 1
           name: <<indicator>>
