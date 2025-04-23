@@ -8,9 +8,9 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     file_indicator = "language"  # Change this based on your dataset: math, language, coding
     column_to_process = ["performance_language_average"]  # Change or expand this list based on your dataset
     perform_merge = False  # Set to True if you need to merge two processed tables
 
-    load_and_process_dataset(file_indicator, column_to_process, dest_dir, paths, perform_merge)
+    load_and_process_dataset(file_indicator, column_to_process, paths, perform_merge)
