@@ -20,3 +20,6 @@ steps:
     - data://garden/dummy/2020-01-01/dummy
   data://grapher/dummy/2023-10-12/dummy_monster:
     - data://garden/dummy/2023-10-12/dummy_monster
+
+  export://multidim/dummy/latest/test:
+    - export://multidim/covid/latest/covid

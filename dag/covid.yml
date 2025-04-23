@@ -327,7 +327,3 @@ steps:
     - data://grapher/covid/latest/infections_model
     - data://grapher/covid/latest/google_mobility
     - data://grapher/regions/2023-01-01/regions
-
-  export://multidim/migration/latest/test:
-    - data://grapher/covid/latest/hospital
-    - export://multidim/covid/latest/covid
