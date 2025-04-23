@@ -169,7 +169,7 @@ tables:
           numDecimalPlaces: 1
           name: <<indicator>>
       lower_bound:
-        title: Lower bound - {definitions.title}
+        title: "Lower bound - {definitions.title}"
         description_short: |-
           {definitions.description_short}
         presentation:
@@ -178,7 +178,7 @@ tables:
           numDecimalPlaces: 1
           name: <<indicator>>
       upper_bound:
-        title: Upper bound - {definitions.title}
+        title: "Upper bound - {definitions.title}"
         description_short: |-
           {definitions.description_short}
         presentation:
