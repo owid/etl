@@ -119,7 +119,7 @@ definitions:
     <% elif indicator == "Stillbirths" %>
     Stillbirths
     <% elif indicator == "Stillbirth rate" %>
-    Stillbirths of per 100 births
+    Stillbirths per 100 births
     <% elif indicator == "Neonatal deaths" %>
     Deaths of {definitions.sex} babies aged less than 28 days, in {definitions.wealth_quintile}
     <% elif indicator == "Deaths age 1-59 months" %>
