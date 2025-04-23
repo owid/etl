@@ -656,11 +656,11 @@ class PathFinder:
             Name of the MDIM page. Default is short_name from mdim catalog path.
         """
         # Create Multidim
-        mdim = create_mdim(config, self.dependencies)
-
-        # Get and set catalog path
-        mdim_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}"
-        mdim.catalog_path = mdim_catalog_path
+        mdim = create_mdim(
+            config,
+            self.dependencies,
+            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}",
+        )
 
         return mdim
 
@@ -682,11 +682,8 @@ class PathFinder:
         explorer = create_explorer(
             config=config,
             dependencies=self.dependencies,
+            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}",
         )
-
-        # Get and set catalog path
-        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}"
-        explorer.catalog_path = explorer_catalog_path
 
         return explorer
 

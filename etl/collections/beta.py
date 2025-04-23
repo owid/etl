@@ -220,8 +220,8 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
         config=config,
         dimensions=dimensions,
         views=views,
+        catalog_path=catalog_path,
     )
-    explorer.catalog_path = catalog_path
 
     # 5) Announce conflicts
     df_conflict = df_choices.loc[df_choices["in_conflict"]]

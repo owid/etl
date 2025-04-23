@@ -81,9 +81,6 @@ class Explorer(Collection):
 
     @property
     def explorer_name(self):
-        if self.catalog_path is None:
-            raise ValueError("Catalog path is not set. Please set it before saving.")
-
         _, name = self.catalog_path.split("#")
         return name
 
@@ -99,9 +96,6 @@ class Explorer(Collection):
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
-
-        if self.catalog_path is None:
-            raise ValueError("Catalog path is not set. Please set it before saving.")
 
         # Prune non-used dimensions
         if prune_dimensions:
@@ -136,10 +130,11 @@ class Explorer(Collection):
 def create_explorer(
     config: dict,
     dependencies: Set[str],
+    catalog_path: str,
 ) -> Explorer:
     """Create an explorer object."""
     # Read configuration as structured data
-    explorer = Explorer.from_dict(config)
+    explorer = Explorer.from_dict(dict(**config, catalog_path=catalog_path))
 
     # Edit views
     process_views(explorer, dependencies)

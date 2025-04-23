@@ -475,14 +475,17 @@ class Collection(MDIMBase):
 
     dimensions: List[Dimension]
     views: List[Any]
+    catalog_path: str
 
     # Private for fast access
     # _views_hash: Optional[Dict[str, Any]] = None
     # _dimensions_hash: Optional[Dict[str, Dimension]] = None
 
     # Internal use. For save() method.
-    _catalog_path: Optional[str] = field(init=False, default=None)
     _collection_type: Optional[str] = field(init=False, default=None)
+
+    def __post_init__(self):
+        assert "#" in self.catalog_path, "Catalog path should be in the format `path#name`."
 
     @property
     def v(self):
@@ -493,21 +496,12 @@ class Collection(MDIMBase):
         return self.dimensions
 
     @property
-    def catalog_path(self) -> Optional[str]:
-        return self._catalog_path
-
-    @catalog_path.setter
-    def catalog_path(self, value: str) -> None:
-        assert "#" in value, "Catalog path should be in the format `path#name`."
-        self._catalog_path = value
-
-    @property
     def local_config_path(self) -> Path:
         # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
-        assert self.catalog_path
         if self._collection_type is None:
             raise ValueError("_collection_type must have a value!")
-        return EXPORT_DIR / self._collection_type / (self.catalog_path.replace("#", "/") + ".config.json")
+        collection_dir = "explorers" if self._collection_type == "explorer" else self._collection_type
+        return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")

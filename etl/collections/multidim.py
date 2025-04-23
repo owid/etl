@@ -61,9 +61,6 @@ class Multidim(Collection):
         if owid_env is None:
             owid_env = OWID_ENV
 
-        if self.catalog_path is None:
-            raise ValueError("Catalog path is not set. Please set it before saving.")
-
         # Check that all indicators in mdim exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)
@@ -120,9 +117,10 @@ class MultidimSet:
 def create_mdim(
     config: dict,
     dependencies: Set[str],
+    catalog_path: str,
 ) -> Multidim:
     # Read config as structured object
-    mdim = Multidim.from_dict(config)
+    mdim = Multidim.from_dict(dict(**config, catalog_path=catalog_path))
 
     # Edit views
     process_views(mdim, dependencies=dependencies)
