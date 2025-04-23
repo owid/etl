@@ -116,7 +116,7 @@ def create_mdim(
     catalog_path: str,
 ) -> Multidim:
     # Read config as structured object
-    mdim = Multidim.from_dict(config)
+    mdim = Multidim.from_dict(dict(**config, catalog_path=catalog_path))
 
     # Edit views
     process_views(mdim, dependencies=dependencies)
