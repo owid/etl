@@ -29,7 +29,6 @@ class Explorer(Collection):
     views: List[ExplorerView]
     config: Dict[str, str]
     definitions: Optional[Definitions] = None
-    avoid_duplicate_hack: bool = False
 
     # Internal
     _collection_type: str | None = "explorer"
@@ -105,7 +104,7 @@ class Explorer(Collection):
 
         # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
-        df_grapher, df_columns = extract_explorers_tables(self, avoid_duplicate_hack=self.avoid_duplicate_hack)
+        df_grapher, df_columns = extract_explorers_tables(self)
 
         # Transform to legacy format
         explorer_legacy = _create_explorer_legacy(
@@ -122,12 +121,10 @@ class Explorer(Collection):
 def create_explorer(
     config: dict,
     dependencies: Set[str],
-    avoid_duplicate_hack: bool = False,
 ) -> Explorer:
     """Create an explorer object."""
     # Read configuration as structured data
     explorer = Explorer.from_dict(config)
-    explorer.avoid_duplicate_hack = avoid_duplicate_hack
 
     # Edit views
     process_views(explorer, dependencies)
@@ -166,7 +163,6 @@ def process_views(
 
 def extract_explorers_tables(
     explorer: Explorer,
-    avoid_duplicate_hack: bool = False,
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
     1. Obtain `dimensions_display` dictionary. This helps later when remixing the Explorer configuration.
@@ -190,7 +186,9 @@ def extract_explorers_tables(
     )
     # 4. Adapt tables for view-level indicator display settings
     df_grapher, df_columns = _add_indicator_display_settings(
-        df_grapher, df_columns, columns_widgets, avoid_duplicate_hack=avoid_duplicate_hack
+        df_grapher,
+        df_columns,
+        columns_widgets,
     )
 
     # 5. Order columns
@@ -207,8 +205,12 @@ def extract_explorers_tables(
     df_columns = df_columns.drop_duplicates()
 
     # Sanity check (even if all-NA, we keep it because otherwise Grapher complains!)
-    if not avoid_duplicate_hack:
-        assert df_columns["catalogPath"].isna().all(), "catalogPath should be all NA in df_columns."
+    if "slug" in df_columns:
+        mask = df_columns["catalogPath"].isna()
+        assert df_columns.loc[mask, "slug"].notna().all(), "`slug` must be set whenever `catalogPath` is missing."
+        assert (
+            df_columns.loc[mask, "transform"].notna().all()
+        ), "`transform` must be set whenever `catalogPath` is missing."
 
     return df_grapher, df_columns
 
@@ -271,7 +273,7 @@ def _extract_explorers_tables(
     return df_grapher, df_columns
 
 
-def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avoid_duplicate_hack=False):
+def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
     """Add indicator display settings.
 
     Since we want to support different display settings for the same indicator across different views, we need to use some 'hacks' (transform column, slugs instead of paths, etc.).
@@ -295,61 +297,81 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
     ## Drop duplicates, if any
     df_columns = df_columns.drop_duplicates()
 
+    # NOTE: I've commented the following lines because it was dropping rows where no metadata was set, and we want to keep these actually! Otherwise these are not properly assigned a _slug_id!
     # Drop those that do not have any settings set
-    cols_settings = [col for col in df_columns.columns if col not in columns_widgets + ["_axis", "catalogPath"]]
-    df_columns = df_columns.dropna(how="all", subset=cols_settings)
+    # cols_settings = [col for col in df_columns.columns if col not in columns_widgets + ["_axis", "catalogPath"]]
+    # df_columns = df_columns.dropna(how="all", subset=cols_settings)
 
     # If there is more than one definition for the same indicator, proceed to adapt tables
     # mask = df_columns.duplicated(subset=["catalogPath"])
     if not df_columns.empty:
         # Assign ID to each row, based on whether the indicator config is the same. This helps us reduce unnecessary duplication of display settings.
-        columns_subset = [col for col in df_columns.columns if col not in columns_widgets + ["_axis"]]
-        df_columns.loc[:, "_slug_id"] = df_columns.groupby(columns_subset, dropna=False).ngroup()
+        columns_subset = [col for col in df_columns.columns if col not in columns_widgets + ["_axis", "catalogPath"]]
+        # df_columns.loc[:, "_slug_id"] = df_columns.groupby(columns_subset, dropna=False).ngroup()
+        # Generate IDs per 'catalogPath' context, based on identical values in column_subset
+        df_columns["_slug_id"] = df_columns.groupby(["catalogPath"] + columns_subset, sort=False, dropna=False).ngroup()
+        # Optionally, reset IDs per catalogPath context (making them start from zero in each catalogPath)
+        df_columns["_slug_id"] = df_columns.groupby("catalogPath")["_slug_id"].transform(lambda x: pd.factorize(x)[0])
 
-        # 1. Tweak df_columns to have a row for all the different display settings of each indicator
-        catalog_paths = df_columns["catalogPath"].unique().tolist()
-        mapping = get_mapping_paths_to_id(catalog_paths)
-        df_columns.loc[:, "_variableId"] = df_columns["catalogPath"].map(mapping)
+        # Are there more than one indicator settings?
+        # A) YES: Add slugs to df_columns and df_grapher!
+        # B) NO: No need to add slug and all related complexity (skip)
+        duplicate_indicators = df_columns["_slug_id"] != 0
+        if duplicate_indicators.any():
+            # 1. Get indicator IDs for duplicates! The way a duplicate works, is by referencing the variable ID (does not work with catalogPath). E.g. `duplicate 123`.
+            catalog_paths = df_columns.loc[duplicate_indicators, "catalogPath"].unique().tolist()
+            mapping = get_mapping_paths_to_id(catalog_paths)
+            # Debugging
+            # keys = set(catalog_paths)
+            # values = [int(i) for i in range(1, len(keys))]
+            # mapping = dict(zip(keys, values))
+            df_columns.loc[duplicate_indicators, "_variableId"] = df_columns.loc[
+                duplicate_indicators, "catalogPath"
+            ].map(mapping)
+            df_columns = df_columns.astype({"_variableId": "Int64"})
 
-        # Add unique identifier
-        df_columns.loc[:, "slug"] = (
-            df_columns["catalogPath"].apply(lambda x: underscore(x.replace("/", "__").replace("#", "__")))
-            + "__"
-            + df_columns["_slug_id"].astype(str)
-        )
-        if not avoid_duplicate_hack:
+            # 2. Add unique indicator identifier (will be used as slug)
+            df_columns.loc[duplicate_indicators, "slug"] = (
+                df_columns.loc[duplicate_indicators, "catalogPath"].apply(
+                    lambda x: underscore(x.replace("/", "__").replace("#", "__"))
+                )
+                + "__"
+                + df_columns.loc[duplicate_indicators, "_slug_id"].astype(str)
+            )
+
             # Add transform column
-            df_columns.loc[:, "transform"] = "duplicate " + df_columns["_variableId"].astype(str)
+            df_columns.loc[duplicate_indicators, "transform"] = "duplicate " + df_columns["_variableId"].astype(str)
 
-        # 3. Tweak df_grapher
-        # Get dictionary for re-mapping
-        # Generate mapping
-        mapping_series = (
-            df_columns.groupby(columns_widgets)[["_axis", "catalogPath", "slug"]].apply(_create_mapping).reset_index()
-        )
-        # Merge mapping
-        df_grapher = df_grapher.merge(mapping_series, on=columns_widgets, how="left")
-        # Add ySlugs, xSlug, colorSlug or sizeSlug.
-        columns_slugs = ["xSlug", "ySlugs", "colorSlug", "sizeSlug"]
-        df_grapher[columns_slugs] = None
-        # Iterate over affected rows, add slugs / remove paths
-        mask_2 = df_grapher["_slug_renames"].notna()
-        for idx, row in df_grapher[mask_2].iterrows():
-            renames = row["_slug_renames"]
+            # 3. Tweak df_grapher
+            # Get dictionary for re-mapping
+            mapping_series = (
+                df_columns[duplicate_indicators]
+                .groupby(columns_widgets)[["_axis", "catalogPath", "slug"]]
+                .apply(_create_mapping)
+                .reset_index()
+            )
+            # Merge mapping
+            df_grapher = df_grapher.merge(mapping_series, on=columns_widgets, how="left")
+            # Add ySlugs, xSlug, colorSlug or sizeSlug.
+            columns_slugs = ["xSlug", "ySlugs", "colorSlug", "sizeSlug"]
+            df_grapher[columns_slugs] = None
+            # Iterate over affected rows, add slugs, AND set affected *VariableIds to NaN
+            mask_2 = df_grapher["_slug_renames"].notna()
+            for idx, row in df_grapher[mask_2].iterrows():
+                renames = row["_slug_renames"]
 
-            for axis, renames_axis in renames.items():
-                if axis == "y":
-                    col_id = "yVariableIds"
-                    col_slug = "ySlugs"
-                    # Sanity check
-                    assert (col_id in row) and isinstance(row[col_id], list) and (len(row[col_id]) >= 1)
-                else:
-                    col_id = f"{axis}VariableId"
-                    col_slug = f"{axis}Slug"
-                    # Sanity check
-                    assert (col_id in row) and isinstance(row[col_id], list) and (len(row[col_id]) == 1)
+                for axis, renames_axis in renames.items():
+                    if axis == "y":
+                        col_id = "yVariableIds"
+                        col_slug = "ySlugs"
+                        # Sanity check
+                        assert (col_id in row) and isinstance(row[col_id], list) and (len(row[col_id]) >= 1)
+                    else:
+                        col_id = f"{axis}VariableId"
+                        col_slug = f"{axis}Slug"
+                        # Sanity check
+                        assert (col_id in row) and isinstance(row[col_id], list) and (len(row[col_id]) == 1)
 
-                if not avoid_duplicate_hack:
                     # Get new values
                     slugs = [renames_axis.get(p) for p in row[col_id] if p in renames_axis]
                     paths = [p for p in row[col_id] if p not in renames_axis]
@@ -357,29 +379,28 @@ def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets, avo
                     df_grapher.at[idx, col_slug] = slugs if slugs != [] else np.nan
                     df_grapher.at[idx, col_id] = paths if paths != [] else np.nan
 
-        # 3. Finalize df_columns and df_grapher
-        # COLUMNS
-        # Reorder
-        if avoid_duplicate_hack:
-            columns_first = ["catalogPath"]
-        else:
-            columns_first = ["catalogPath", "slug", "transform"]
-        df_columns = df_columns[[*columns_first, *df_columns.columns.difference(columns_first)]]
-        # Set catalogPath to None
-        if not avoid_duplicate_hack:
-            df_columns.loc[:, "catalogPath"] = None
-        # Drop auxiliary columns
-        df_columns = df_columns.drop(columns=["_variableId", "_slug_id"])
+            # Set catalogPath to None where applicable (where a slug is in use!)
+            df_columns.loc[duplicate_indicators, "catalogPath"] = None
 
-        # GRAPHER
+        # 3. Finalize df_columns and df_grapher
+        # 3.1 COLUMNS table
+        # Drop auxiliary columns
+        cols_aux = ["_variableId", "_slug_id"]
+        df_columns = df_columns.drop(columns=[col for col in cols_aux if col in df_columns.columns])
+        # Reorder columns
+        columns_first = ["catalogPath", "slug", "transform"]
+        columns_first = [col for col in columns_first if col in df_columns.columns]
+        df_columns = df_columns[[*columns_first, *df_columns.columns.difference(columns_first)]]
+
+        # 3.2 GRAPHER table
         # Drop all-NA columns (TODO: does something happen if there is 'xSlug' but no 'xVariableId'? or any other axis?)
+        ## Temporary copy *VariableIds in case we remove any of these columns, but we don't want?
         cols_variables = df_grapher.filter(regex=r"(y|x|color|size)VariableIds?").columns
         df_grapher_ids = df_grapher[cols_variables].copy()
-        df_grapher = df_grapher.dropna(how="all", axis=1)
+        df_grapher = df_grapher.dropna(how="all", axis=1)  # Probably some *Slug columns are dropped here
         df_grapher.loc[:, cols_variables] = df_grapher_ids
-        df_grapher = df_grapher.drop(columns=["_slug_renames"])
-        if avoid_duplicate_hack:
-            df_columns = df_columns.drop(columns=["slug"])
+        if "_slug_renames" in df_grapher.columns:
+            df_grapher = df_grapher.drop(columns=["_slug_renames"])
 
     return df_grapher, df_columns
 
@@ -457,118 +478,3 @@ def bake_indicators_view(indicator_paths) -> Dict[str, List[str]]:
                 indicators[f"{dim}VariableId"].append(indicator["path"])
                 break
     return indicators
-
-
-def hack_metadata_propagation(explorer, tbs, indicator_slug=None):
-    """There is some issue with metadata not being propagated into explorer views.
-
-    It looks like, as long as we use `slug` (instead of `catalogPath`) to reference indicators, parts of the indicator's metadata is ignored (subtitle, note, originUrl, etc.). My impression is that fields from `presentation.grapher_config` are being ignored?
-
-    This issue appears whenever we define display settings for an indicator in a view. That's because our workaround to define indicator-display settings for a view is to use slug together with `transform` to duplicate an existing indicator. Note that this only applies to views with one indicator, because those are the only ones that propagate indicator's metadata to the FAUST.
-
-    More details: https://owid.slack.com/archives/C46U9LXRR/p1742416990042489
-
-    For now, this function manually hardcodes the relevant metadata in the explorer config. That means, that we set the subtitle and note in the grapher table based on the metadata of it's indicator (only if it uses one indicator!).
-
-    Args:
-    -----
-
-    explorer: Explorer
-        Final explorer. Only use this function once you've finished processing the explorer.
-    tbs: List[Table]
-        List of tables used in the explorer. TODO: Could be generated from `paths`.
-    indicator_slug: str
-        Slug for the indicator. Default is `indicator`. I think this is irrelevant, and shouldn't matter what you input here.
-
-    """
-    COL_METADATA = "__metadata"
-    if indicator_slug is None:
-        indicator_slug = "indicator"
-
-    # Build dataframe mapping dimensions to metadata
-    records = []
-    for tb in tbs:
-        for col in tb.columns:
-            if tb[col].m.dimensions is None:
-                continue
-
-            records.append(
-                {
-                    **tb[col].m.dimensions,
-                    indicator_slug: tb[col].m.original_short_name,
-                    COL_METADATA: tb[col].m,
-                }
-            )
-
-    df = pd.DataFrame(records)
-    dimension_slugs_tb = [col for col in df.columns if col not in [COL_METADATA]]
-    dimension_slugs = set(explorer.dimension_slugs)
-
-    assert len(dimension_slugs_tb) >= len(set(dimension_slugs_tb))
-    if set(dimension_slugs_tb) != dimension_slugs:
-        if len(dimension_slugs_tb) > len(dimension_slugs):
-            dim_extra = set(dimension_slugs_tb) - dimension_slugs
-            assert len(dim_extra) == 1, f"Extra dimensions found: {dim_extra}"
-            assert df[list(dim_extra)[0]].nunique() == 1, f"Expected to only have one value in {dim_extra}"
-            df = df.drop(columns=list(dim_extra))
-        elif len(dimension_slugs_tb) == len(dimension_slugs):
-            assert len(set(dimension_slugs_tb).intersection(set(dimension_slugs))) == 2
-            renames = dict(zip(dimension_slugs_tb, dimension_slugs))
-            df = df.rename(columns=renames)
-        else:
-            raise ValueError("Dimension slugs mismatch")
-
-    # Set index
-    cols_index = [col for col in df.columns if col not in [COL_METADATA]]
-    df = df.set_index(cols_index, verify_integrity=True)
-
-    for view in explorer.views:
-        # Conditions for metadata propagation (otherwise not needed)
-        ## 1) Only one indicator: Metadata is only relevant in views with single indicator
-        has_one_indicator = view.num_indicators == 1
-        ## 2) It has display settings: When display settings are set, metadata is overwritten
-        props = view.indicators.to_records()[0]
-        has_display = ("display" in props) and (props["display"] is not None)
-        ## Validate two conditions
-        if has_one_indicator and has_display:
-            dimensions = view.dimensions
-            dimension_idx = [str(dimensions[col]) for col in cols_index]
-
-            try:
-                meta = df.loc[tuple(dimension_idx), COL_METADATA]
-            except KeyError:
-                continue
-
-            additional_config = {}
-
-            # Propagate subtitle
-            if (view.config is None) or ((view.config is not None) and ("subtitle" not in view.config)):
-                subtitle = ""
-                if (
-                    (meta.presentation is not None)
-                    and (meta.presentation.grapher_config is not None)
-                    and ("subtitle" in meta.presentation.grapher_config)
-                ):
-                    subtitle = meta.presentation.grapher_config["subtitle"]
-                elif meta.description_short is not None:
-                    subtitle = meta.description_short
-
-                if subtitle != "":
-                    additional_config["subtitle"] = subtitle
-            # Propagate note
-            if (view.config is None) or ((view.config is not None) and ("note" not in view.config)):
-                note = ""
-                if (
-                    (meta.presentation is not None)
-                    and (meta.presentation.grapher_config is not None)
-                    and ("note" in meta.presentation.grapher_config)
-                ):
-                    note = meta.presentation.grapher_config["note"]
-
-                if note != "":
-                    additional_config["note"] = note
-
-            if (additional_config != {}) and (view.config is None):
-                view.config = additional_config
-            if (additional_config != {}) and (view.config is not None):
-                view.config = {**view.config, **additional_config}
