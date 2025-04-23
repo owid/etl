@@ -4,7 +4,6 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
-from deprecated import deprecated
 from owid.catalog.utils import underscore
 
 from etl.collections.common import INDICATORS_SLUG, combine_config_dimensions, expand_config, get_mapping_paths_to_id
