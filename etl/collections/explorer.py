@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
@@ -14,6 +15,7 @@ from etl.collections.utils import (
     validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
+from etl.paths import EXPORT_EXPLORER_DIR
 
 __all__ = [
     "expand_config",
@@ -30,8 +32,21 @@ class Explorer(Collection):
     config: Dict[str, str]
     definitions: Optional[Definitions] = None
 
-    # Internal
-    _collection_type: str | None = "explorer"
+    def __post_init__(self):
+        """We set it here because of simplicity.
+
+        Adding a class attribute like `_collection_type: Optional[str] = "explorer"` leads to error `TypeError: non-default argument 'config' follows default argument`.
+        Alternative would be to define the class attribute like `_collection_type: Optional[str] = field(init=False, default="explorer")` but feels a bit redundant with parent definition.
+        """
+        self._collection_type = "explorer"
+
+    @property
+    def local_config_path(self) -> Path:
+        # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
+        assert self.catalog_path
+        if self._collection_type is None:
+            raise ValueError("_collection_type must have a value!")
+        return EXPORT_EXPLORER_DIR / (self.catalog_path.replace("#", "/") + ".config.json")
 
     def display_config_names(self):
         """Get display names for all dimensions and choices.

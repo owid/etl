@@ -48,8 +48,13 @@ class Multidim(Collection):
     topic_tags: Optional[List[str]] = None
     definitions: Optional[Definitions] = None
 
-    # Internal
-    _collection_type: str | None = "explorer"
+    def __post_init__(self):
+        """We set it here because of simplicity.
+
+        Adding a class attribute like `_collection_type: Optional[str] = "explorer"` leads to error `TypeError: non-default argument 'config' follows default argument`.
+        Alternative would be to define the class attribute like `_collection_type: Optional[str] = field(init=False, default="explorer")` but feels a bit redundant with parent definition.
+        """
+        self._collection_type = "multidim"
 
     def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
         # Ensure we have an environment set
