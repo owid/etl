@@ -8,6 +8,9 @@
             "description": "Definitions with anchors that are reused in other parts of the metadata",
             "additionalProperties": true
         },
+        "catalog_path": {
+            "type": "string"
+        },
         "grapherConfigSchema": {
             "description": "URL of a JSON schema for the grapher config.",
             "type": "string"
