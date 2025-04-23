@@ -502,7 +502,13 @@ def run():
             "meat__ass": "Meat, donkey",
             "total": "All food",
             "chillies_and_peppers": "Chilies and peppers",
-        },
+            'fat__sheep': 'Fat, sheep',
+            'fat__buffaloes': 'Fat, buffalo',
+            'fat__pigs': 'Fat, pig',
+            'fat__camels': 'Fat, camel',
+            'fat__goats': 'Fat, goat',
+            'fat__cattle': 'Fat, cattle',
+        }
     )
 
     # Set defalt view.
