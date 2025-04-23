@@ -8,7 +8,7 @@ definitions:
     short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
     description_key:
       - |-
-        <% if indicator == "Stillbirth rate" %>
+        <% if indicator == "Stillbirths per 100 births" %>
         - **Definition threshold varies**: A stillbirth generally refers to the birth of a baby showing no signs of life after a certain number of weeks of gestation, with the [ICD-11](https://icd.who.int/en) setting the cutoff at 22 weeks.
         - **Subcategories exist**: ICD-11 distinguishes between “early gestation stillbirth” (22–27 weeks) and “late gestation stillbirth” (28+ weeks).
         <% endif %>
@@ -46,9 +46,9 @@ definitions:
     <% elif indicator == "Mortality rate age 5-9" %>
     The estimated number of deaths of {definitions.sex} children aged between 5 and 9, per 100 children aged 5, in {definitions.wealth_quintile}.
     <% elif indicator == "Stillbirths" %>
-    The estimated number of stillbirths, in {definitions.wealth_quintile}.
+    The estimated number of stillbirths.
     <% elif indicator == "Stillbirth rate" %>
-    The estimated number of stillbirths, per 100 total births, in {definitions.wealth_quintile}.
+    The estimated number of stillbirths, per 100 total births.
     <% elif indicator == "Neonatal deaths" %>
     The estimated number of deaths of {definitions.sex} children aged less than 28 days, in {definitions.wealth_quintile}.
     <% elif indicator == "Deaths 1-59 months" %>
@@ -117,9 +117,9 @@ definitions:
     <% elif indicator == "Mortality rate age 5-9" %>
     Mortality rate of {definitions.sex} children aged between 5 and 9, per 100 children aged 5, in {definitions.wealth_quintile}
     <% elif indicator == "Stillbirths" %>
-    Stillbirths of {definitions.sex} babies, in {definitions.wealth_quintile}
+    Stillbirths
     <% elif indicator == "Stillbirth rate" %>
-    Stillbirths of {definitions.sex} babies per 100 births, in {definitions.wealth_quintile}
+    Stillbirths of per 100 births
     <% elif indicator == "Neonatal deaths" %>
     Deaths of {definitions.sex} babies aged less than 28 days, in {definitions.wealth_quintile}
     <% elif indicator == "Deaths age 1-59 months" %>
