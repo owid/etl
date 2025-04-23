@@ -2389,7 +2389,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
             "00001723": "Sugar crops is the sum of sugar cane and sugar beet.",
             "00002901": "This is the total of all agricultural produce, both crops and livestock.",
         }
-        for item_code in description_short_by_item_code:
+        if item_code in description_short_by_item_code:
             description_short = description_short + " " if description_short else ""
             description_short += description_short_by_item_code[item_code]
 
