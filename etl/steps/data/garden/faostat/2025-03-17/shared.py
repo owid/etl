@@ -21,7 +21,7 @@ import pandas as pd
 import structlog
 from detected_anomalies import handle_anomalies
 from owid import repack  # type: ignore
-from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta
+from owid.catalog import Dataset, Table, Variable, VariablePresentationMeta, warnings
 from owid.catalog.utils import underscore
 from owid.datautils import dataframes
 from tqdm.auto import tqdm
@@ -1837,13 +1837,11 @@ def prepare_wide_table(tb: Table) -> Table:
 
     # Pivot over long dataframe to generate a wide dataframe with country-year as index, and as many columns as
     # unique elements in "variable_name" (which should be as many as combinations of item-elements).
-    # Note: We include area_code in the index for completeness, but by construction country-year should not have
-    # duplicates.
     # Note: `pivot` operation is usually faster on categorical columns
     log.info("prepare_wide_table.pivot", shape=tb.shape)
     # Create a wide table with just the data values.
     tb_wide = tb.pivot(
-        index=["area_code", "country", "year"],
+        index=["country", "year"],
         columns=["variable_name"],
         values="value",
     )
@@ -1891,9 +1889,7 @@ def prepare_wide_table(tb: Table) -> Table:
     tb_wide = optimize_table_dtypes(table=tb_wide.reset_index())
 
     # Sort columns and rows conveniently.
-    tb_wide = tb_wide.set_index(["country", "year"], verify_integrity=True)
-    tb_wide = tb_wide[["area_code"] + sorted([column for column in tb_wide.columns if column != "area_code"])]
-    tb_wide = tb_wide.sort_index(level=["country", "year"]).sort_index()
+    tb_wide = tb_wide.format(sort_columns=True)
 
     # Make all column names snake_case.
     variable_to_short_name = {
@@ -1902,6 +1898,10 @@ def prepare_wide_table(tb: Table) -> Table:
         if tb_wide[column].metadata.title is not None
     }
     tb_wide = tb_wide.rename(columns=variable_to_short_name, errors="raise")
+
+    # Remove columns that only contain nans and zeros.
+    with warnings.ignore_warnings():
+        tb_wide = tb_wide.loc[:, ~(tb_wide.fillna(0).sum() == 0)]
 
     # Sanity check.
     number_of_infinities = np.isinf(tb_wide.select_dtypes(include=np.number).fillna(0)).values.sum()
@@ -2139,7 +2139,7 @@ def improve_metadata(tb_wide: Table, dataset_short_name: str) -> None:
         },
     }
 
-    for column in tb_wide.drop(columns=["area_code"]).columns:
+    for column in tb_wide.columns:
         item, item_code, element, element_code, unit = sum(
             [[j.strip() for j in i.split("|")] for i in tb_wide[column].metadata.title.split("||")], []
         )
@@ -2478,9 +2478,7 @@ def run(dest_dir: str) -> None:
     error = f"Column 'value' of the long table of {dataset_short_name} must have one origin."
     assert len(tb_long["value"].metadata.origins) == 1, error
     error = f"All value columns of the wide table of {dataset_short_name} must have one origin."
-    assert all(
-        [len(tb_wide[column].metadata.origins) == 1 for column in tb_wide.columns if column not in ["area_code"]]
-    ), error
+    assert all([len(tb_wide[column].metadata.origins) == 1 for column in tb_wide.columns]), error
 
     #
     # Save outputs.

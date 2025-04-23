@@ -475,6 +475,16 @@ def run():
     #
     # Process data.
     #
+    # Some columns have very sparse data (in some cases, just nans and zero except a few values close to zero, possibly spurious).
+    # These are uninformative, and show a red map, so I'll remove them here.
+    tb_fbsc = tb_fbsc.drop(
+        columns=[
+            "apples__00002617__other_uses__005154__tonnes",
+            "apples__00002617__other_uses__5154pe__kilograms_per_capita",
+            "sesame_oil__00002579__food_available_for_consumption__0674pc__grams_of_protein_per_day_per_capita",
+        ],
+    )
+
     # Prepare tables with dimensions.
     tb_qcl = prepare_table_with_dimensions(tb=tb_qcl, item_codes=ITEM_CODES_QCL, element_codes=ELEMENT_CODES_QCL)
     tb_fbsc = prepare_table_with_dimensions(tb=tb_fbsc, item_codes=ITEM_CODES_FBSC, element_codes=ELEMENT_CODES_FBSC)
