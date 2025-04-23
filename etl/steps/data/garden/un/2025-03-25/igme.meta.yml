@@ -1,0 +1,95 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Child & Infant Mortality
+    unit: << unit_of_measure.lower() >>
+    short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
+    description_key:
+      - |-
+        <% if indicator == "Stillbirth rate" %>
+        - **Definition threshold varies**: A stillbirth generally refers to the birth of a baby showing no signs of life after a certain number of weeks of gestation, with the [ICD-11](https://icd.who.int/en) setting the cutoff at 22 weeks.
+        - **Subcategories exist**: ICD-11 distinguishes between “early gestation stillbirth” (22–27 weeks) and “late gestation stillbirth” (28+ weeks).
+        <% endif %>
+  sex: |-
+    <% if sex == "Total" %>Total<% elif sex == "Male" %>male <% elif sex == "Female" %>female <%- endif -%>
+  wealth_quintile: |-
+    <% if wealth_quintile == "Total" %>all wealth quintiles<% elif wealth_quintile == "Lowest" %>the poorest 20% of the population<% elif wealth_quintile == "Second" %>the second poorest 20% of the population<% elif wealth_quintile == "Middle" %>the middle 20% of the population in terms of wealth<% elif wealth_quintile == "Fourth" %>the second richest 20% of the population<% elif wealth_quintile == "Highest" %>the richest 20% of the population<%- endif -%>
+  description_short: |-
+    <% set indicator = indicator | default('') %>
+    <% if indicator == "Neonatal mortality rate" %>
+    The estimated number of deaths of {definitions.sex} children aged less than 28 days, per 100 live births, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate 1-59 months" %>
+    The estimated number of deaths of {definitions.sex} children aged between 1 and 59 months, per 100 live births, in {definitions.wealth_quintile}
+    <% elif indicator == "Infant mortality rate" %>
+    The estimated number of deaths of {definitions.sex} children aged under one year, per 100 live births, in {definitions.wealth_quintile}
+    <% elif indicator == "Under-five mortality rate" %>
+    The estimated number of deaths of {definitions.sex} children aged under five years, per 100 live births, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate age 10-14" %>
+    The estimated number of deaths of {definitions.sex} children aged between 10 and 14, per 100 children aged 10, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate age 10-19" %>
+    The estimated number of deaths of {definitions.sex} children aged between 10 and 19, per 100 children aged 10, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate age 15-19" %>
+    The estimated number of deaths of {definitions.sex} children aged between 15 and 19, per 100 children aged 15, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate age 15-24" %>
+    The estimated number of deaths of {definitions.sex} children aged between 15 and 24, per 100 children aged 15, in {definitions.wealth_quintile}
+    <% elif indicator == "Child Mortality rate age 1-4" %>
+    The estimated number of deaths of {definitions.sex} children aged between 1 and 4, per 100 children aged 1, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate age 20-24" %>
+    The estimated number of deaths of {definitions.sex} children aged between 20 and 24, per 100 children aged 20, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate age 5-14" %>
+    The estimated number of deaths of {definitions.sex} children aged between 5 and 14, per 100 children aged 5, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate age 5-24" %>
+    The estimated number of deaths of {definitions.sex} children aged between 5 and 24, per 100 children aged 5, in {definitions.wealth_quintile}
+    <% elif indicator == "Mortality rate age 5-9" %>
+    The estimated number of deaths of {definitions.sex} children aged between 5 and 9, per 100 children aged 5, in {definitions.wealth_quintile}
+    <% elif indicator == "Stillbirths" %>
+    The estimated number of stillbirths, in {definitions.wealth_quintile}
+    <% elif indicator == "Stillbirth rate" %>
+    The estimated number of stillbirths, per 100 total births, in {definitions.wealth_quintile}
+    <% elif indicator == "Neonatal deaths" %>
+    The estimated number of deaths of {definitions.sex} children aged less than 28 days, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths 1-59 months" %>
+    The estimated number of deaths of {definitions.sex} children aged between 1 and 59 months, in {definitions.wealth_quintile}
+    <% elif indicator == "Infant deaths" %>
+    The estimated number of deaths of {definitions.sex} children aged under 1, in {definitions.wealth_quintile}
+    <% elif indicator == "Under-five deaths" %>
+    The estimated number of deaths of {definitions.sex} children aged under 5, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths age 10 to 14" %>
+    The estimated number of deaths of {definitions.sex} children aged between 10 and 14, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths age 10 to 19" %>
+    The estimated number of deaths of {definitions.sex} children aged between 10 and 19, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths age 15 to 19" %>
+    The estimated number of deaths of {definitions.sex} children aged between 15 and 19, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths age 15 to 24" %>
+    The estimated number of deaths of {definitions.sex} children aged between 15 and 24, in {definitions.wealth_quintile}
+    <% elif indicator == "Child deaths age 1 to 4" %>
+    The estimated number of deaths of {definitions.sex} children aged between 1 and 4, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths age 20 to 24" %>
+    The estimated number of deaths of {definitions.sex} children aged between 20 and 24, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths age 5 to 14" %>
+    The estimated number of deaths of {definitions.sex} children aged between 5 and 14, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths age 5 to 24" %>
+    The estimated number of deaths of {definitions.sex} children aged between 5 and 24, in {definitions.wealth_quintile}
+    <% elif indicator == "Deaths age 5 to 9" %>
+    The estimated number of deaths of {definitions.sex} children aged between 5 and 9, in {definitions.wealth_quintile}
+    <% elif indicator == "Post-neonatal deaths" %>
+    The estimated number of deaths of {definitions.sex} children aged between 28 days and 1 year, in {definitions.wealth_quintile}
+    <% elif indicator == "Under-fifteen deaths" %>
+    The estimated number of deaths of {definitions.sex} children aged under fifteen years, in {definitions.wealth_quintile}
+    <% elif indicator == "Under-fifteen mortality rate" %>
+    The estimated number of deaths of {definitions.sex} children aged under fifteen years, per 1,000 live births, in {definitions.wealth_quintile}
+    <%- endif -%>
+tables:
+  igme:
+    variables:
+      observation_value:
+        title: Observation value - <<indicator>> - {definitions.sex} - {definitions.wealth_quintile}
+      lower_bound:
+        title: Lower bound - <<indicator>> - {definitions.sex} - {definitions.wealth_quintile}
+      upper_bound:
+        title: Upper bound - <<indicator>> - {definitions.sex}  - {definitions.wealth_quintile}
+  igme_under_fifteen_mortality:
+    variables:
+      observation_value:
+        title: <<indicator>>
