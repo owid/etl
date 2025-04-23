@@ -82,6 +82,9 @@ def run() -> None:
     tb = convert_to_percentage(tb)
     # Calculate post neonatal deaths
     tb = add_post_neonatal_deaths(tb)
+    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Number of deaths", "Deaths", regex=False)
+    tb["unit_of_measure"] = tb["unit_of_measure"].str.replace("Stillbirths", "Deaths per 100 live births", regex=False)
+    tb["indicator"] = tb["indicator"].str.replace("Under-five mortality rate", "Child mortality rate", regex=False)
     # Drop unused columns
     tb = tb.drop(columns=["source", "lower_bound", "upper_bound"])
     tb = tb.format(
