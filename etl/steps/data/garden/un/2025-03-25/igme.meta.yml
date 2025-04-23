@@ -150,7 +150,6 @@ definitions:
     Deaths of children aged under 15 years
     <% elif indicator == "Under-fifteen mortality rate" %>
     Deaths of children aged under 15 years per 100 live births
-
     <%- endif -%>
 tables:
   igme:
@@ -158,24 +157,6 @@ tables:
       observation_value:
         title: |-
           {definitions.title}
-        description_short: |-
-          {definitions.description_short}
-        presentation:
-          title_public: <<indicator>>
-        display:
-          numDecimalPlaces: 1
-          name: <<indicator>>
-      lower_bound:
-        title: "Lower bound - {definitions.title}"
-        description_short: |-
-          {definitions.description_short}
-        presentation:
-          title_public: <<indicator>>
-        display:
-          numDecimalPlaces: 1
-          name: <<indicator>>
-      upper_bound:
-        title: "Upper bound - {definitions.title}"
         description_short: |-
           {definitions.description_short}
         presentation:

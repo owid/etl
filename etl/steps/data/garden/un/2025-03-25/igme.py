@@ -32,13 +32,6 @@ def run() -> None:
     tb_vintage = process_vintage_data(tb_vintage)
     tb_vintage["unit_of_measure"] = tb_vintage["unit_of_measure"].str.replace(",", "", regex=False)
     tb_vintage = tb_vintage.rename(columns={"obs_value": "observation_value"})
-    # Appending the region to country where it exists
-    # tb["country"] = tb.apply(
-    #    lambda row: f"{row['country']} ({row['regional_group']})"
-    #    if pd.notna(row["regional_group"])
-    #    else row["country"],
-    #    axis=1,
-    # )
 
     # Process data.
     #
@@ -89,7 +82,8 @@ def run() -> None:
     tb = convert_to_percentage(tb)
     # Calculate post neonatal deaths
     tb = add_post_neonatal_deaths(tb)
-    tb = tb.drop(columns=["source"])
+    # Drop unused columns
+    tb = tb.drop(columns=["source", "lower_bound", "upper_bound"])
     tb = tb.format(
         ["country", "year", "indicator", "sex", "wealth_quintile", "unit_of_measure"],
     )
