@@ -679,3 +679,51 @@ tables:
       yams__00000137__yield__005412__tonnes_per_hectare:
         presentation:
           title_public: Yam yield
+      eggs_from_hens__00001062__eggs_per_bird__005413__eggs_per_bird:
+        presentation:
+          title_public: Number of eggs produced per hen
+      eggs_from_hens__00001062__eggs_produced__005513__eggs:
+        presentation:
+          title_public: Number of eggs produced from hens
+      eggs_from_hens__00001062__eggs_produced__5513pc__eggs_per_capita:
+        presentation:
+          title_public: Egg production from hens per capita
+      eggs_from_hens__00001062__laying__005313__animals:
+        presentation:
+          title_public: Number of laying hens
+      eggs_from_hens__00001062__production__005510__tonnes:
+        presentation:
+          title_public: Egg production from hens
+      eggs_from_hens__00001062__production__5510pc__tonnes_per_capita:
+        presentation:
+          title_public: Egg production from hens per capita
+      eggs_from_hens__00001062__production__5510pe__kilograms_per_capita:
+        presentation:
+          title_public: Egg production from hens per capita
+      eggs_from_hens__00001062__yield__005424__kilograms_per_animal:
+        presentation:
+          title_public: Egg production per hen
+      eggs_from_other_birds__excl__hens__00001091__eggs_per_bird__005413__eggs_per_bird:
+        presentation:
+          title_public: Number of eggs produced per bird (excluding hens)
+      eggs_from_other_birds__excl__hens__00001091__eggs_produced__005513__eggs:
+        presentation:
+          title_public: Number of eggs produced from birds other than hens
+      eggs_from_other_birds__excl__hens__00001091__eggs_produced__5513pc__eggs_per_capita:
+        presentation:
+          title_public: Egg production from birds other than hens per capita
+      eggs_from_other_birds__excl__hens__00001091__laying__005313__animals:
+        presentation:
+          title_public: Number of laying birds (excluding hens)
+      eggs_from_other_birds__excl__hens__00001091__production__005510__tonnes:
+        presentation:
+          title_public: Egg production from birds other than hens
+      eggs_from_other_birds__excl__hens__00001091__production__5510pc__tonnes_per_capita:
+        presentation:
+          title_public: Egg production from birds other than hens per capita
+      eggs_from_other_birds__excl__hens__00001091__production__5510pe__kilograms_per_capita:
+        presentation:
+          title_public: Egg production from birds other than hens per capita
+      eggs_from_other_birds__excl__hens__00001091__yield__005424__kilograms_per_animal:
+        presentation:
+          title_public: Egg production per bird (excluding hens)
