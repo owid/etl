@@ -14,7 +14,7 @@ definitions:
         <% endif %>
 
   sex: |-
-    <% if sex == "Total" %><% elif sex == "Male" %>male <% elif sex == "Female" %>female <%- endif -%>
+    <% if sex == "Total" %><% elif sex == "Male" %>male <% elif sex == "Female" %>female <% endif -%>
   wealth_quintile: |-
     <% if wealth_quintile == "Total" %>all wealth quintiles<% elif wealth_quintile == "Lowest" %>the poorest 20% of the population<% elif wealth_quintile == "Second" %>the second poorest 20% of the population<% elif wealth_quintile == "Middle" %>the middle 20% of the population in terms of wealth<% elif wealth_quintile == "Fourth" %>the second richest 20% of the population<% elif wealth_quintile == "Highest" %>the richest 20% of the population<%- endif -%>
   description_short: |-
