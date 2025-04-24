@@ -344,7 +344,7 @@ if st.session_state.chart_animation_show_image_settings:
     first_frame = 1 if (query_parameters["chart_type"] == "LineChart" and query_parameters["tab"] == "chart") else 0
 
     # GIF/Video generation.
-    with st.spinner("Generating animation. This can take few seconds..."):
+    with st.spinner("Generating animation. This can take few seconds...", show_time=True):
         if output_type == "GIF":
             st.session_state.chart_animation_file = create_gif_from_images(
                 image_paths=image_paths_selected,

@@ -25,6 +25,9 @@ from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 from etl.grapher.io import variable_metadata_df_from_s3
 
+# GPT model default
+MODEL_DEFAULT = "gpt-4.1"
+
 # How to display the various chart review statuses
 DISPLAY_STATE_OPTIONS = {
     gm.ChartStatus.APPROVED.value: {
@@ -415,7 +418,7 @@ class ChartDiffShow:
                     },
                 ]
                 stream = api.chat.completions.create(
-                    model="gpt-4o",
+                    model=MODEL_DEFAULT,
                     messages=messages,  # type: ignore
                     temperature=0.15,
                     max_tokens=1000,
@@ -425,7 +428,7 @@ class ChartDiffShow:
 
             # Print cost information
             text_in = "\n".join([m["content"] for m in messages])
-            cost, num_tokens = get_cost_and_tokens(text_in, response, "gpt-4o")
+            cost, num_tokens = get_cost_and_tokens(text_in, response, MODEL_DEFAULT)
             cost_msg = f"**Cost**: ≥{cost} USD.\n\n **Tokens**: ≥{num_tokens}."
             st.info(cost_msg)
 

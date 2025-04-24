@@ -17,7 +17,7 @@ class DataError(Exception):
     pass
 
 
-MODEL = "gpt-4o"
+MODEL = "gpt-4.1"
 
 # CONFIG
 st.set_page_config(
