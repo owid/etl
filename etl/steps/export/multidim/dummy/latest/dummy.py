@@ -23,8 +23,8 @@ def run() -> None:
     mdim = combine_mdims(
         mdims=mdims,
         mdim_name=mdim_name,
-        new_dimension_name="Indicator",
-        new_choices_names=["COVID-19 cases", "COVID-19 deaths"],
+        mdim_dimension_name="Indicator",
+        mdim_choices_names=["COVID-19 cases", "COVID-19 deaths"],
         config=paths.load_mdim_config(),
     )
 
