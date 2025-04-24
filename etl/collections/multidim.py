@@ -102,7 +102,13 @@ class MultidimSet:
 
         # Read MDIM
         path = self.mdims[mdim_name]
-        mdim = Multidim.load(str(path))
+        try:
+            mdim = Multidim.load(str(path))
+        except TypeError as e:
+            # This is a workaround for the TypeError that occurs when loading the config file.
+            raise TypeError(
+                f"Error loading MDIM config file. Please check the file format and ensure it is valid JSON. Suggestion: Re-run export step generating {mdim_name}. Error: {e}"
+            )
 
         # Get and set catalog path
         return mdim

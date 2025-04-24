@@ -503,6 +503,11 @@ class Collection(MDIMBase):
         collection_dir = "explorers" if self._collection_type == "explorer" else self._collection_type
         return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
+    @property
+    def name(self):
+        _, name = self.catalog_path.split("#")
+        return name
+
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")
         self.save_file(self.local_config_path)

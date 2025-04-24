@@ -14,7 +14,7 @@ TODO: We should add testing!
 
 import inspect
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 import pandas as pd
 from owid.catalog import Table
@@ -22,7 +22,7 @@ from structlog import get_logger
 
 from etl.collections.explorer import Explorer, expand_config
 from etl.collections.model import Dimension, DimensionChoice
-from etl.collections.multidim import combine_config_dimensions
+from etl.collections.multidim import Multidim, combine_config_dimensions
 from etl.collections.utils import has_duplicate_table_names
 from etl.helpers import PathFinder
 
@@ -197,7 +197,7 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
     dimensions = _combine_dimensions(
         df_choices=df_choices,
         cols_choices=cols_choices,
-        explorer=explorers[0].copy(),
+        collection=explorers[0].copy(),
     )
 
     # 2) Combine views #
@@ -244,19 +244,21 @@ def _extract_choice_slug_changes(df_choices) -> Dict[str, Any]:
     # Track modifications (useful later for views)
     slug_changes = (
         df_choices.loc[df_choices["in_conflict"]]
-        .groupby(["explorer_id", "dimension_slug"])
+        .groupby(["collection_id", "dimension_slug"])
         .apply(lambda x: dict(zip(x["slug_original"], x["slug"])), include_groups=False)
-        .unstack("explorer_id")
+        .unstack("collection_id")
         .to_dict()
     )
 
     return slug_changes
 
 
-def _combine_dimensions(df_choices: pd.DataFrame, cols_choices: List[str], explorer: Explorer) -> List[Dimension]:
+def _combine_dimensions(
+    df_choices: pd.DataFrame, cols_choices: List[str], collection: Union[Explorer, Multidim]
+) -> List[Dimension]:
     """Combine dimensions from different explorers"""
     # Dimension bucket
-    dimensions = explorer.dimensions.copy()
+    dimensions = collection.dimensions.copy()
 
     # Drop duplicates
     df_choices = df_choices.drop_duplicates(subset=cols_choices + ["slug", "dimension_slug"])
@@ -280,11 +282,11 @@ def _combine_dimensions(df_choices: pd.DataFrame, cols_choices: List[str], explo
     return dimensions
 
 
-def _update_choice_slugs_in_views(choice_slug_changes, explorers_by_id):
+def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id):
     """Access each explorer, and update choice slugs in views"""
     for explorer_id, change in choice_slug_changes.items():
         # Get explorer
-        explorer = explorers_by_id[explorer_id]
+        explorer = collection_by_id[explorer_id]
 
         # Get views as dataframe for easy processing
         df_views_dimensions = pd.DataFrame([view.dimensions for view in explorer.views])
@@ -300,27 +302,27 @@ def _update_choice_slugs_in_views(choice_slug_changes, explorers_by_id):
         for view, view_dimensions in zip(explorer.views, views_dimensions):
             # cast keys to str to satisfy type requirements
             view.dimensions = {str(key): value for key, value in view_dimensions.items()}
-    return explorers_by_id
+    return collection_by_id
 
 
-def _build_df_choices(explorers_by_id: Dict[str, Explorer]) -> Tuple[pd.DataFrame, List[str]]:
+def _build_df_choices(collections_by_id: Mapping[str, Union[Multidim, Explorer]]) -> Tuple[pd.DataFrame, List[str]]:
     # Collect all choices in a dataframe: choice_slug, choice_name, ..., explorer_id, dimension_slug.
     records = []
-    for i, explorer in explorers_by_id.items():
+    for i, explorer in collections_by_id.items():
         for dim in explorer.dimensions:
             for choice in dim.choices:
                 records.append(
                     {
                         **choice.to_dict(),
                         "dimension_slug": dim.slug,
-                        "explorer_id": i,
+                        "collection_id": i,
                     }
                 )
     # This needs to change to support checkboxes
     df_choices = pd.DataFrame(records).astype("string")
 
     # Get column names of fields from choice objects
-    cols_choices = [col for col in df_choices.columns if col not in ["slug", "explorer_id", "dimension_slug"]]
+    cols_choices = [col for col in df_choices.columns if col not in ["slug", "collection_id", "dimension_slug"]]
 
     # For each choice slug, assign an ID (choice_slug_id) that identifies that "slug flavour". E.g. if a slug has different names (or descriptions) across explorers, each "flavour" will have a different ID. This will be useful later to identify conflicts & rename slugs.
     df_choices["choice_slug_id"] = (
