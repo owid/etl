@@ -1,4 +1,4 @@
-from etl.collections import multidim
+# from etl.collections import multidim
 
 # from etl.db import get_engine
 from etl.helpers import PathFinder
@@ -12,7 +12,7 @@ def run() -> None:
     config = paths.load_mdim_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
-    ds = paths.load_dataset("ucdp")
+    # ds = paths.load_dataset("ucdp")
     # tb = ds.read("migrant_stock_dest_origin", load_data=False)
 
     # Create mdim
