@@ -14,11 +14,15 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collections.common import combine_config_dimensions, expand_config, map_indicator_path_to_id
-from etl.collections.model import Collection, Definitions, MDIMView, pruned_json
-from etl.collections.utils import camelize, get_tables_by_name_mapping
+from etl.collections.common import (
+    combine_config_dimensions,
+    create_mdim_or_explorer,
+    expand_config,
+    map_indicator_path_to_id,
+)
+from etl.collections.model import Collection, pruned_json
+from etl.collections.utils import camelize
 from etl.config import OWIDEnv
-from etl.paths import SCHEMAS_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -38,11 +42,9 @@ __all__ = [
 class Multidim(Collection):
     """Model for MDIM configuration."""
 
-    views: List[MDIMView]
     title: Dict[str, str]
     default_selection: List[str]
     topic_tags: Optional[List[str]] = None
-    definitions: Optional[Definitions] = None
 
     def __post_init__(self):
         """We set it here because of simplicity.
@@ -108,51 +110,13 @@ def create_mdim(
     dependencies: Set[str],
     catalog_path: str,
 ) -> Multidim:
-    # Read config as structured object
-    mdim = Multidim.from_dict(dict(**config, catalog_path=catalog_path))
-
-    # Edit views
-    process_views(mdim, dependencies=dependencies)
-
-    # Validate config
-    mdim.validate_schema(SCHEMAS_DIR / "multidim-schema.json")
-
-    # Ensure that all views are in choices
-    mdim.validate_views_with_dimensions()
-
-    # Validate duplicate views
-    mdim.check_duplicate_views()
-
+    mdim = create_mdim_or_explorer(
+        Multidim,
+        config,
+        dependencies,
+        catalog_path,
+    )
     return mdim
-
-
-def process_views(mdim: Multidim, dependencies: Set[str]):
-    """Process views in MDIM configuration.
-
-    This includes:
-        - Make sure that catalog paths for indicators are complete.
-        - TODO: Process views with multiple indicators to have adequate metadata
-    """
-    # Get table information by table name, and table URI
-    tables_by_name = get_tables_by_name_mapping(dependencies)
-    # tables_by_uri = get_tables_by_uri_mapping(tables_by_name)  # This is to be used when processing views with multiple indicators
-
-    # Go through all views and expand catalog paths
-    for view in mdim.views:
-        # Update indicators for each dimension, making sure they have the complete URI
-        view.expand_paths(tables_by_name)
-
-        # Combine metadata/config with definitions.common_views
-        if (mdim.definitions is not None) and (mdim.definitions.common_views is not None):
-            view.combine_with_common(mdim.definitions.common_views)
-
-        # Combine metadata in views which contain multiple indicators
-        if view.metadata_is_needed:  # Check if view "contains multiple indicators"
-            # TODO
-            # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
-            log.info(
-                f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view.dimensions}"
-            )
 
 
 def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: Dict[str, Table]):

@@ -11,7 +11,7 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
+from typing import Any, Callable, ClassVar, Dict, List, Optional, Self, TypeGuard, TypeVar, Union
 
 import fastjsonschema
 import pandas as pd
@@ -344,16 +344,16 @@ class View(MDIMBase):
         return indicators
 
 
-@dataclass
-class ExplorerView(View):
-    """https://github.com/owid/owid-grapher/blob/cb01ebb366d22f255b0acb791347981867225e8b/packages/%40ourworldindata/explorer/src/GrapherGrammar.ts"""
+# @dataclass
+# class ExplorerView(View):
+#     """https://github.com/owid/owid-grapher/blob/cb01ebb366d22f255b0acb791347981867225e8b/packages/%40ourworldindata/explorer/src/GrapherGrammar.ts"""
 
-    pass
+#     pass
 
 
-@dataclass
-class MDIMView(View):
-    pass
+# @dataclass
+# class MDIMView(View):
+#     pass
 
 
 @pruned_json
@@ -470,14 +470,19 @@ class Dimension(MDIMBase):
             raise ValueError(f"Dimension choices for '{self.slug}' must have unique names!")
 
 
+T = TypeVar("T")
+
+
 @pruned_json
 @dataclass
 class Collection(MDIMBase):
     """Overall MDIM/Explorer config"""
 
     dimensions: List[Dimension]
-    views: List[Any]
+    views: List[View]
     catalog_path: str
+
+    _definitions: Definitions
 
     # Private for fast access
     # _views_hash: Optional[Dict[str, Any]] = None
@@ -486,8 +491,29 @@ class Collection(MDIMBase):
     # Internal use. For save() method.
     _collection_type: Optional[str] = field(init=False, default=None)
 
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> Self:
+        """Coerce the dictionary into the expected shape before passing it to the parent class."""
+        # Make a shallow copy so we don't mutate the user's dictionary in-place
+        data = dict(d)
+
+        # If dictionary contains field 'definitions', change it for '_definitions'
+        if "definitions" in data:
+            data["_definitions"] = data["definitions"]
+            del data["definitions"]
+        else:
+            data["_definitions"] = Definitions()
+
+        # Now that data is in the expected shape, let the parent class handle the rest
+        return super().from_dict(data)
+
     def __post_init__(self):
+        # Sanity check
         assert "#" in self.catalog_path, "Catalog path should be in the format `path#name`."
+
+    @property
+    def definitions(self) -> Definitions:
+        return self._definitions
 
     @property
     def v(self):
@@ -509,6 +535,10 @@ class Collection(MDIMBase):
     def short_name(self):
         _, name = self.catalog_path.split("#")
         return name
+
+    @property
+    def schema_path(self) -> Path:
+        return SCHEMAS_DIR / f"{self._collection_type}-schema.json"
 
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")
@@ -573,8 +603,10 @@ class Collection(MDIMBase):
                     view.dimensions[dim_slug] in choice_slugs
                 ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
 
-    def validate_schema(self, schema_path):
+    def validate_schema(self, schema_path: Optional[Union[str, Path]] = None):
         """Validate class against schema."""
+        if schema_path is None:
+            schema_path = self.schema_path
         with open(schema_path) as f:
             s = f.read()
 

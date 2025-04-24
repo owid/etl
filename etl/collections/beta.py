@@ -245,7 +245,7 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
             # Now group by 'value' to see which col3 values correspond to each unique 'value'
             log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
             for _, subgroup in group.groupby("choice_slug_id"):
-                explorer_ids = subgroup["explorer_id"].unique().tolist()
+                explorer_ids = subgroup["collection_id"].unique().tolist()
                 explorer_names = [explorers_by_id[i].short_name for i in explorer_ids]
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
