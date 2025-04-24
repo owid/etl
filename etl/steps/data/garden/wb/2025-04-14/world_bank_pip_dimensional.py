@@ -687,9 +687,6 @@ def sanity_checks(
     # Reset index in tb_pivot
     tb_pivot = tb_pivot.reset_index()
 
-    # Save the number of observations before the checks
-    obs_before_checks = len(tb_pivot)
-
     # Create lists of variables to check that depend on the poverty lines
     columns_poverty_lines = [
         "headcount",
@@ -713,33 +710,38 @@ def sanity_checks(
         if i != 10:
             col_decile_thr.append(f"decile{i}_thr")
 
-    ############################
-    # Negative values
-    # Create a mask to check for negative values in columns_poverty_lines + col_decile_share + col_decile_avg + col_decile_thr
-    cols_to_check = tb_pivot.columns.get_level_values(0).isin(
-        columns_poverty_lines
-        + col_decile_share
-        + col_decile_avg
-        + col_decile_thr
-        + ["mean", "median", "mld", "gini", "polarization"]
-    )
-    mask = tb_pivot.loc[:, cols_to_check].lt(0).any(axis=1)
-    tb_error = tb_pivot[mask].reset_index(drop=True)
-
-    if not tb_error.empty:
-        log.fatal(
-            f"""There are {len(tb_error)} observations with negative values! In:
-            {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
-        )
-        # NOTE: Check if we want to delete these observations
-        # tb_pivot = tb_pivot[~mask].reset_index(drop=True)
-
-    ############################
-    # stacked values not adding up to 100%
-    # Define stacked columns
-    col_stacked_pct_dict = {}
-    col_stacked_n_dict = {}
     for ppp_year, povlines in povlines_dict.items():
+        log.info(f"SANITY CHECKS FOR {ppp_year} PRICES")
+        # Save the number of observations before the checks
+        obs_before_checks = len(tb_pivot)
+        ############################
+        # Negative values
+        # Create a mask to check for negative values in columns_poverty_lines + col_decile_share + col_decile_avg + col_decile_thr
+        cols_to_check = [
+            (col, ppp_year, povline)
+            for col in columns_poverty_lines
+            + col_decile_share
+            + col_decile_avg
+            + col_decile_thr
+            + ["mean", "median", "mld", "gini", "polarization"]
+            for povline in povlines
+        ]
+        mask = tb_pivot.loc[:, cols_to_check].lt(0).any(axis=1)
+        tb_error = tb_pivot[mask].reset_index(drop=True)
+
+        if not tb_error.empty:
+            log.fatal(
+                f"""There are {len(tb_error)} observations with negative values! In:
+                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
+            )
+            # NOTE: Check if we want to delete these observations
+            # tb_pivot = tb_pivot[~mask].reset_index(drop=True)
+
+        ############################
+        # stacked values not adding up to 100%
+        # Define stacked columns
+        col_stacked_pct_dict = {}
+        col_stacked_n_dict = {}
         # Initialize the stacked column lists representing all the possible intervals
         col_stacked_pct_all = []
         col_stacked_n_all = []
@@ -794,7 +796,7 @@ def sanity_checks(
 
         if not tb_error.empty:
             log.warning(
-                f"""{len(tb_error)} observations of all stacked values ({ppp_year} prices) are not adding up to 100% and will be deleted:
+                f"""{len(tb_error)} observations of all stacked values are not adding up to 100% and will be deleted:
                 {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
@@ -806,35 +808,32 @@ def sanity_checks(
 
         if not tb_error.empty:
             log.warning(
-                f"""{len(tb_error)} observations of the reduced set of stacked values ({ppp_year} prices) are not adding up to 100% and will be deleted:
+                f"""{len(tb_error)} observations of the reduced set of stacked values are not adding up to 100% and will be deleted:
                 {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
-    ############################
-    # missing poverty values (headcount, poverty gap, total shortfall)
-    cols_to_check = tb_pivot.columns.get_level_values(0).isin(
-        columns_poverty_lines
-    ) & ~tb_pivot.columns.get_level_values(2).str.contains("and")
-    mask = (tb_pivot.loc[:, cols_to_check].isna().any(axis=1)) & (
-        ~tb_pivot["country"].isin(["World (excluding China)", "World (excluding India)"])
-    )
-    tb_error = tb_pivot[mask].reset_index(drop=True)
-
-    if not tb_error.empty:
-        log.warning(
-            f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
-            {tabulate(tb_error[(index + ["headcount_ratio"])], headers = 'keys', tablefmt = TABLEFMT)}"""
+        ############################
+        # missing poverty values (headcount, poverty gap, total shortfall)
+        cols_to_check = [(col, ppp_year, povline) for col in columns_poverty_lines for povline in povlines]
+        mask = (tb_pivot.loc[:, cols_to_check].isna().any(axis=1)) & (
+            ~tb_pivot["country"].isin(["World (excluding China)", "World (excluding India)"])
         )
-        tb_error.to_csv(
-            "errors_missing_poverty_values.csv",
-            index=False,
-        )
-        tb_pivot = tb_pivot[~mask].reset_index(drop=True)
+        tb_error = tb_pivot[mask].reset_index(drop=True)
 
-    ############################
-    # Missing median, mean and gini
-    for ppp_year, povlines in povlines_dict.items():
+        if not tb_error.empty:
+            log.warning(
+                f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
+                {tabulate(tb_error[(index + ["headcount_ratio"])], headers = 'keys', tablefmt = TABLEFMT)}"""
+            )
+            tb_error.to_csv(
+                "errors_missing_poverty_values.csv",
+                index=False,
+            )
+            tb_pivot = tb_pivot[~mask].reset_index(drop=True)
+
+        ############################
+        # Missing median, mean and gini
         for indicator in ["mean", "median", "gini"]:
             # Check if the indicator is missing
             mask = tb_pivot[(indicator, ppp_year, povlines[1])].isna()
@@ -842,19 +841,18 @@ def sanity_checks(
 
             if not tb_error.empty:
                 log.info(
-                    f"""There are {len(tb_error)} observations with missing {indicator} ({ppp_year} prices). They will be not deleted."""
+                    f"""There are {len(tb_error)} observations with missing {indicator}. They will be not deleted."""
                 )
 
-    ############################
-    # Missing decile shares
-    for ppp_year, povlines in povlines_dict.items():
+        ############################
+        # Missing decile shares
         # Define mask as all col_decile_share columns with ppp_year = ppp_year and povlines[1]
         cols_to_check = [(col, ppp_year, povlines[1]) for col in col_decile_share]
         mask = tb_pivot[cols_to_check].isna().any(axis=1)
         tb_error = tb_pivot[mask].reset_index(drop=True)
         if not tb_error.empty:
             log.info(
-                f"""There are {len(tb_error)} observations with missing decile shares ({ppp_year} prices). They will be not deleted."""
+                f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted."""
             )
 
         ############################
@@ -864,7 +862,7 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
         if not tb_error.empty:
             log.info(
-                f"""There are {len(tb_error)} observations with missing decile thresholds ({ppp_year} prices). They will be not deleted."""
+                f"""There are {len(tb_error)} observations with missing decile thresholds. They will be not deleted."""
             )
 
         ############################
@@ -874,12 +872,11 @@ def sanity_checks(
         tb_error = tb_pivot[mask].reset_index(drop=True)
         if not tb_error.empty:
             log.info(
-                f"""There are {len(tb_error)} observations with missing decile averages ({ppp_year} prices). They will be not deleted."""
+                f"""There are {len(tb_error)} observations with missing decile averages. They will be not deleted."""
             )
 
-    ############################
-    # headcount monotonicity check
-    for ppp_year, povlines in povlines_dict.items():
+        ############################
+        # headcount monotonicity check
         # Define the headcount columns for the current ppp_year
         col_headcount = [("headcount", ppp_year, povline) for povline in povlines]
         m_check_vars = []
@@ -894,8 +891,8 @@ def sanity_checks(
 
         if not tb_error.empty:
             log.warning(
-                f"""There are {len(tb_error)} observations with headcount not monotonically increasing ({ppp_year} prices) and will be deleted:
-                {tabulate(tb_error[index + col_headcount], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
+                f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
+                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
             )
             tb_pivot = tb_pivot[tb_pivot["check_total"]].reset_index(drop=True)
 
@@ -918,8 +915,8 @@ def sanity_checks(
 
         if not tb_error.empty:
             log.warning(
-                f"""There are {len(tb_error)} observations with thresholds not monotonically increasing ({ppp_year} prices) and will be deleted:
-                {tabulate(tb_error[index + cols_to_check], headers = 'keys', tablefmt = TABLEFMT)}"""
+                f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
+                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT)}"""
             )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -941,53 +938,60 @@ def sanity_checks(
 
         if not tb_error.empty:
             log.warning(
-                f"""There are {len(tb_error)} observations with shares not monotonically increasing ({ppp_year} prices) and will be deleted:
-                {tabulate(tb_error[index + cols_to_check], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
+                {tabulate(tb_error[index], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
-    ############################
-    # Shares not adding up to 100%
+        ############################
+        # Shares not adding up to 100%
 
-    tb["sum_pct"] = tb[col_decile_share].sum(axis=1)
+        cols_to_check = [(col, ppp_year, povlines[1]) for col in col_decile_share]
+        tb_pivot["sum_pct"] = tb_pivot[cols_to_check].sum(axis=1)
 
-    # Drop rows if columns in col_decile_share are all null. Keep if some are null
-    mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9) & (tb[col_decile_share].notnull().any(axis=1))
-    tb_error = tb[mask].reset_index(drop=True).copy()
+        # Drop rows if columns in col_decile_share are all null. Keep if some are null
+        mask = (tb_pivot["sum_pct"] >= 100 + PRECISION_PERCENTAGE) | (
+            tb_pivot["sum_pct"] <= 100 - PRECISION_PERCENTAGE
+        ) & (tb_pivot[cols_to_check].notnull().any(axis=1))
+        tb_error = tb_pivot[mask].reset_index(drop=True).copy()
 
-    if not tb_error.empty:
-        log.warning(
-            f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-        )
-        tb = tb[~mask].reset_index(drop=True)
+        if not tb_error.empty:
+            log.warning(
+                f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
+            tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
-    ############################
-    # Shares not adding up to 100% (top 1%)
+        ############################
+        # Shares not adding up to 100% (top 1%)
 
-    # Define columns to add up to 100%
-    col_decile_share_top = ["bottom50_share", "middle40_share", "top90_99_share", "top1_share"]
+        # Define columns to add up to 100%
+        col_decile_share_top = ["bottom50_share", "middle40_share", "top90_99_share", "top1_share"]
+        cols_to_check = [(col, ppp_year, povlines[1]) for col in col_decile_share_top]
+        tb_pivot["sum_pct"] = tb_pivot[cols_to_check].sum(axis=1)
 
-    tb["sum_pct"] = tb[col_decile_share_top].sum(axis=1)
+        # Drop rows if columns in col_decile_share_top are all null. Keep if some are null
+        mask = (tb_pivot["sum_pct"] >= 100 + PRECISION_PERCENTAGE) | (
+            tb_pivot["sum_pct"] <= 100 - PRECISION_PERCENTAGE
+        ) & (tb_pivot[cols_to_check].notnull().any(axis=1))
+        tb_error = tb_pivot[mask].reset_index(drop=True).copy()
 
-    # Drop rows if columns in col_decile_share_top are all null. Keep if some are null
-    mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9) & (tb[col_decile_share_top].notnull().any(axis=1))
-    tb_error = tb[mask].reset_index(drop=True).copy()
+        if not tb_error.empty:
+            log.warning(
+                f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
+            # Make columns None if mask is True
+            tb_pivot.loc[mask, [("top90_99_share", ppp_year, povlines[1]), ("top1_share", ppp_year, povlines[1])]] = (
+                None
+            )
 
-    if not tb_error.empty:
-        log.warning(
-            f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-        )
-        # Make columns None if mask is True
-        tb.loc[mask, ["top90_99_share", "top1_share"]] = None
+        ############################
+        # delete columns created for the checks
+        tb_pivot = tb_pivot.drop(columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"])
 
-    ############################
-    # delete columns created for the checks
-    tb = tb.drop(columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"])
-
-    obs_after_checks = len(tb)
-    log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_version} PPPs.")
+        obs_after_checks = len(tb_pivot)
+        log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_year} PPPs.")
 
     return tb
 
