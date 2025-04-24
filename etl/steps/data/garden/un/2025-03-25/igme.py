@@ -314,6 +314,7 @@ def calculate_under_fifteen_deaths(tb: Table) -> Table:
     tb_merge["indicator"] = "Under-fifteen deaths"
     # Combine with original data
     tb = pr.concat([tb, tb_merge], ignore_index=True)
+    tb["unit_of_measure"] = "Deaths"
     return tb
 
 
