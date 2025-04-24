@@ -116,6 +116,7 @@ def create_explorer(
         config,
         dependencies,
         catalog_path,
+        validate_schema=False,
     )
 
     return explorer
