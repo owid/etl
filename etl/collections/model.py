@@ -19,6 +19,7 @@ import yaml
 from owid.catalog.meta import GrapherConfig, MetaBase
 from structlog import get_logger
 
+from etl.collections.exceptions import DuplicateCollectionViews
 from etl.collections.utils import merge_common_metadata_by_dimension
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
@@ -594,7 +595,7 @@ class Collection(MDIMBase):
         for view in self.views:
             dims = tuple(view.dimensions.items())
             if dims in seen_dims:
-                raise ValueError(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
+                raise DuplicateCollectionViews(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
             seen_dims.add(dims)
 
         # NOTE: this is allowed, some views might contain other views
