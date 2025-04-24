@@ -259,10 +259,37 @@ def combine_mdims(
     mdim_name: str,
     config: Optional[Dict[str, Any]] = None,
     dependencies: Optional[Set[str]] = None,
-    new_dimension_name: Optional[str] = None,
-    new_choices_names: Optional[List[str]] = None,
+    mdim_dimension_name: Optional[str] = None,
+    mdim_choices_names: Optional[List[str]] = None,
+    force_mdim_dimension: Optional[bool] = False,
 ) -> Multidim:
-    """If we find duplicate views, a jew dimension is added to differentiate them."""
+    """Combine multiple MDIMs into a single one.
+
+    Notes:
+    - All MDIMs should have the same dimensions (slug, name, etc.).
+    - Dimensions can vary across explorers, that's fine. This function consolidates all of them. If there are multiple slugs in use with different names, this function will rename them to preserve uniqueness.
+
+    Args:
+        mdims: List[Multidim]
+            List of MDIMs to be combined.
+        mdim_name: str
+            Name of the combined MDIM.
+        config: Optional[Dict[str, Any]]
+            Configuration for the combined MDIM. If None, a default configuration is used. We recommend using a config YAML file and calling `paths.load_mdim_config()` to obtain a good default for config.
+        dependencies: Optional[Set[str]]
+            Set of dependencies for the combined MDIM. If None, an empty set is used. TODO: This should probably be required.
+        mdim_dimension_name: Optional[str]
+            Name of the new dimension added if there are duplicate views. This dimension will identify each MDIM and will be shown as the first MDIM dropdown. If None, a default name is used.
+        mdim_choices_names: Optional[List[str]]
+            List of choice names of the MDIM dimension (see `mdim_dimension_name`). Each choice stands for an MDIM in `mdims` (it should be a 1-to-1 correspondence). The length of this list should match that from `mdims`. If None, a default name is used.
+        force_mdim_dimension: Optional[bool]
+            If True, a new dimension to identify each MDIM is added even if there are no duplicate views. Its default value is `False`. This argument will be ignored if there are duplicate views!
+
+    TODO:
+        - Consolidate with `combine_explorers` function.
+        - Integrate into `PathFinder`.
+    """
+
     # Check that there are at least 2 MDIMs to combine
     assert len(mdims) > 0, "No MDIMs to combine."
     assert len(mdims) > 1, "At least two MDIMs should be provided."
@@ -279,10 +306,12 @@ def combine_mdims(
             ), "Dimensions are not the same across MDIMs. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
 
     # If there are duplicate views, add dimension to differentiate them!
-    if new_dimension_name is None:
-        new_dimension_name = MDIM_TITLE
-    if new_choices_names is not None:
-        assert len(new_choices_names) == len(mdims), "Length of `new_choices_names` should equal the length of `mdimd`."
+    if mdim_dimension_name is None:
+        mdim_dimension_name = MDIM_TITLE
+    if mdim_choices_names is not None:
+        assert len(mdim_choices_names) == len(
+            mdims
+        ), "Length of `mdim_choices_names` should equal the length of `mdimd`."
 
     seen_dims = set()
     has_duplicate_views = False
@@ -295,16 +324,16 @@ def combine_mdims(
                 break
             seen_dims.add(dims)
     ## Add dimension to differentiate them if applicable
-    if has_duplicate_views:
+    if has_duplicate_views or force_mdim_dimension:
         for i, mdim in enumerate(mdims):
-            if new_choices_names is not None:
-                choice = new_choices_names[i]
+            if mdim_choices_names is not None:
+                choice = mdim_choices_names[i]
             else:
                 choice = mdim.title["title"]
 
             dimension_mdim = Dimension(
                 slug=MDIM_SLUG,
-                name=new_dimension_name,
+                name=mdim_dimension_name,
                 choices=[
                     DimensionChoice(slug=mdim.name, name=choice),
                 ],
@@ -374,8 +403,8 @@ def combine_mdims(
             # Now group by 'value' to see which col3 values correspond to each unique 'value'
             log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
             for _, subgroup in group.groupby("choice_slug_id"):
-                explorer_ids = subgroup["collection_id"].unique().tolist()
-                explorer_names = [mdims_by_id[i].name for i in explorer_ids]
+                collection_ids = subgroup["collection_id"].unique().tolist()
+                explorer_names = [mdims_by_id[i].name for i in collection_ids]
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
                 log.warning(f" MDIMs {explorer_names} map to {record[0]}")
@@ -427,12 +456,12 @@ def _combine_dimensions(
 
 def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id):
     """Access each explorer, and update choice slugs in views"""
-    for explorer_id, change in choice_slug_changes.items():
-        # Get explorer
-        explorer = collection_by_id[explorer_id]
+    for collection_id, change in choice_slug_changes.items():
+        # Get collection
+        collection = collection_by_id[collection_id]
 
         # Get views as dataframe for easy processing
-        df_views_dimensions = pd.DataFrame([view.dimensions for view in explorer.views])
+        df_views_dimensions = pd.DataFrame([view.dimensions for view in collection.views])
 
         # FUTURE: this needs to change in order to support checkboxes
         df_views_dimensions = df_views_dimensions.astype("string")
@@ -440,16 +469,16 @@ def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id):
         # Process views
         df_views_dimensions = df_views_dimensions.replace(change)
 
-        # Bring back views to explorers
+        # Bring back views to collections
         views_dimensions = df_views_dimensions.to_dict("records")
-        for view, view_dimensions in zip(explorer.views, views_dimensions):
+        for view, view_dimensions in zip(collection.views, views_dimensions):
             # cast keys to str to satisfy type requirements
             view.dimensions = {str(key): value for key, value in view_dimensions.items()}
     return collection_by_id
 
 
 def _build_df_choices(collections_by_id: Mapping[str, Union[Multidim, Explorer]]) -> Tuple[pd.DataFrame, List[str]]:
-    # Collect all choices in a dataframe: choice_slug, choice_name, ..., explorer_id, dimension_slug.
+    # Collect all choices in a dataframe: choice_slug, choice_name, ..., collection_id, dimension_slug.
     records = []
     for i, explorer in collections_by_id.items():
         for dim in explorer.dimensions:
