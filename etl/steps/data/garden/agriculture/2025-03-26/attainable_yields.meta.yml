@@ -166,8 +166,8 @@ tables:
         title: Hazelnuts yield
       hempseed_yield:
         title: Hempseed yield
-      herbs__e_g__fennel__yield:
-        title: Herbs e g fennel yield
+      herbs_yield:
+        title: Yield of herbs
       hop_cones_yield:
         title: Hop cones yield
       jojoba_seeds_yield:

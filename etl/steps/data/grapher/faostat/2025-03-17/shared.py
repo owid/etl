@@ -29,12 +29,6 @@ def run(dest_dir: str) -> None:
     tb_garden = ds_garden[f"{dataset_short_name}_flat"]
 
     #
-    # Process data.
-    #
-    # Remove unnecessary columns.
-    tb_garden = tb_garden.drop(columns="area_code")
-
-    #
     # Save outputs.
     #
     # Create a new grapher dataset.

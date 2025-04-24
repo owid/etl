@@ -322,23 +322,16 @@ which there is new data (let us call the new dataset version to be created `YYYY
 
 10. From the ETL Wizard, use Indicator Upgrader for each of the grapher datasets to replace variables in charts to their latest versions.
 
-11. From the ETL Wizard, use Chart Diff to visually inspect changes between the old and new versions of updated charts, and
-    accept or reject changes.
+11. Update the versions of the dependencies of the explorers step `export://explorers/faostat/latest/global_food` in the dag (for the moment, this has to be done manually).
 
-12. Update the explorers steps `data://garden/faostat/latest/food_explorer` and `export://explorers/faostat/latest/global_food` (for the moment, this has to be done manually): Edit the versions of their dependencies in the dag.
-
-13. Run the new etl explorers step, to generate the csv files for the global food explorer, and the export step.
+12. Run the explorers step, to update the global food explorer.
 
     ```bash
-    etl run garden/faostat/latest/food_explorer
     etl run explorers/faostat/latest/global_food --export
     ```
 
-    Run internal sanity checks on the generated files.
-
-    !!! note
-
-        Sometimes items change in FAOSTAT. If that's the case, you may need to edit the `FOODS_CONTENT` defined inside the `global_food` step.
+13. From the ETL Wizard, use Chart Diff to visually inspect changes between the old and new versions of updated charts, and
+    accept or reject changes. Inspect also changes in the global food explorer using Explorer Diff.
 
 14. Manually create a new garden dataset of additional variables `additional_variables` for the new version, and update its metadata. Then create a new grapher dataset too. Manually update all other datasets that use any faostat dataset as a dependency.
 
