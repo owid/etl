@@ -85,6 +85,7 @@ class Multidim(Collection):
 
         # Export config to local directory in addition to uploading it to MySQL for debugging.
         log.info(f"Exporting config to {self.local_config_path}")
+        Path(self.local_config_path).parent.mkdir(parents=True, exist_ok=True)
         with open(self.local_config_path, "w") as f:
             yaml_dump(config, f)
 
