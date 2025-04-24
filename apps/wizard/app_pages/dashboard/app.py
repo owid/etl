@@ -81,7 +81,7 @@ If you are running Wizard on your local machine, you can select steps from it to
 _ = check_db()
 
 # Load the steps dataframe.
-with st.spinner("Loading steps details from ETL and DB..."):
+with st.spinner("Loading steps details from ETL and DB...", show_time=True):
     steps_df = load_steps_df(reload_key=st.session_state["reload_key"])
 
 # Simplify the steps dataframe to show only the relevant columns.

@@ -217,14 +217,14 @@ wpBlockId	56732
 hasMapTab	true
 pickerColumnSlugs	Country
 graphers
-	yVariableIds	ySlugs	Confirmed cases or Symptoms Radio	Metric Dropdown	Interval Radio	title	subtitle	type	timelineMinTime
-		grapher__who__latest__flu__flu__reported_ari_cases__0	Symptoms	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart	-4043
-		grapher__who__latest__flu__flu_monthly__reported_ari_cases__1	Symptoms	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart	-4043
+	yVariableIds	Confirmed cases or Symptoms Radio	Metric Dropdown	Interval Radio	title	subtitle	type	timelineMinTime
+	grapher/who/latest/flu/flu#reported_ari_cases	Symptoms	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart	-4043
+	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Symptoms	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart	-4043
 
 columns
-	catalogPath	slug	transform	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit
-		grapher__who__latest__flu__flu__reported_ari_cases__0	duplicate IND_ID	**Dataset Description**:\\n- FluID...release.	0	YlOrRd	Global...	Cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
-		grapher__who__latest__flu__flu_monthly__reported_ari_cases__1	duplicate IND_ID	**Dataset Description:**\\n- FluID...	0	YlOrRd	Global...	Reported cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
+	catalogPath	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit
+	grapher/who/latest/flu/flu#reported_ari_cases	**Dataset Description**:\\n- FluID...release.	0	YlOrRd	Global...	Cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
+	grapher/who/latest/flu/flu_monthly#reported_ari_cases	**Dataset Description:**\\n- FluID...	0	YlOrRd	Global...	Reported cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
 """
 
 
@@ -273,5 +273,4 @@ def test_explorer_legacy(tmp_path, monkeypatch):
 
     # Replace string "duplicate 12345" with "duplicate IND_ID"
     content = re.sub(r"duplicate\s+\d+", "duplicate IND_ID", content)
-
     assert content.strip() == expected_tsv.strip()

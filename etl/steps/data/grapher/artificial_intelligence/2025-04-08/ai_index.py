@@ -1,12 +1,12 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -25,11 +25,14 @@ def run(dest_dir: str) -> None:
     tb_conferences = ds_garden_ai_conferences.read("ai_conferences", reset_index=False)
     tb_bills = ds_garden_bills.read("ai_bills", reset_index=False)
     tb_incidents = ds_garden_ai_incidents.read("ai_incidents", reset_index=False)
-    tb_robots = ds_garden_robots.read("ai_robots", reset_index=False)
     tb_private_investment = ds_garden_ai_investment.read("ai_private_investment", reset_index=False)
     tb_corporate = ds_garden_ai_investment.read("ai_corporate_investment", reset_index=False)
+    tb_total_private_investment = ds_garden_ai_investment.read("ai_total_investment_private", reset_index=False)
     tb_generative = ds_garden_ai_investment.read("ai_investment_generative", reset_index=False)
     tb_companies = ds_garden_ai_investment.read("ai_new_companies", reset_index=False)
+    tb_robots_industrial = ds_garden_robots.read("industrial_robots", reset_index=False)
+    tb_robots_professional = ds_garden_robots.read("professional_robots", reset_index=False)
+    tb_robots_professional = tb_robots_professional.rename_index_names({"application_area": "country"})
 
     # Rename for plotting model name as country in grapher
     tb_conferences = tb_conferences.rename_index_names({"conference": "country"})
@@ -37,19 +40,20 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir,
+    ds_grapher = paths.create_dataset(
         tables=[
             tb_adoption,
             tb_jobs,
             tb_conferences,
             tb_bills,
             tb_incidents,
-            tb_robots,
+            tb_robots_industrial,
+            tb_robots_professional,
             tb_private_investment,
             tb_corporate,
             tb_generative,
             tb_companies,
+            tb_total_private_investment,
         ],
         check_variables_metadata=True,
     )

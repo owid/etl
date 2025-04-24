@@ -73,6 +73,14 @@ steps:
     - data://meadow/war/2023-09-25/peace_diehl
   data://grapher/war/2023-09-26/peace_diehl:
     - data://garden/war/2023-09-25/peace_diehl
+  ## v2023
+  data://meadow/war/2023-09-27/peace_diehl:
+    - snapshot://war/2023-09-27/peace_diehl.zip
+  data://garden/war/2023-09-27/peace_diehl:
+    - data://meadow/war/2023-09-27/peace_diehl
+    - data://garden/countries/2023-09-29/cow_ssm
+  data://grapher/war/2023-09-27/peace_diehl:
+    - data://garden/war/2023-09-27/peace_diehl
 
   # Arms Control Association - Nuclear Weapons Tests.
   data://meadow/war/2024-01-15/nuclear_weapons_tests:

@@ -1,4 +1,4 @@
-from etl.collections.explorer import combine_config_dimensions, expand_config, hack_metadata_propagation
+from etl.collections.explorer import combine_config_dimensions, expand_config
 
 # from etl.db import get_engine
 from etl.helpers import PathFinder
@@ -57,9 +57,6 @@ def run() -> None:
 
     # Set display settings
     add_display_settings(explorer)
-
-    # HACK
-    hack_metadata_propagation(explorer, [tb])
 
     # Save explorer to DB
     explorer.save()
