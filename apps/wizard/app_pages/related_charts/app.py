@@ -35,7 +35,7 @@ if not COVIEWS_PATH.exists():
 
 # Page configuration.
 st.set_page_config(
-    page_title="Wizard: Similar Charts",
+    page_title="Wizard: Related Charts",
     page_icon="🪄",
     layout="wide",
 )
@@ -203,7 +203,7 @@ top_100_charts = sorted(charts, key=lambda x: x.views_365d, reverse=True)[:100] 
 # SIDEBAR / SEARCH
 ########################################################################################################################
 
-st.title(":material/search: Similar charts")
+st.title(":material/search: Related charts")
 
 col1, col2 = st.columns(2)
 with col2:

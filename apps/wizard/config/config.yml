@@ -177,7 +177,7 @@ sections:
         entrypoint: app_pages/indicator_search/app.py
         icon: ":material/search:"
         image_url: "https://www.shutterstock.com/image-vector/standard-ph-chart-aqueous-solution-600nw-2007387788.jpg"
-      - title: "Similar charts"
+      - title: "Similar charts (deprecated)"
         alias: similar_charts
         description: "Find similar charts"
         maintainer: "@mojmir"

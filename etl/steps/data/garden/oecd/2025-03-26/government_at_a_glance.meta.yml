@@ -108,7 +108,7 @@ definitions:
     1
     <%- endif %>
 
-  key_general_government: General government consists of central, state and local governments and social security funds.
+  key_general_government: This data refers to general government, which includes central, state, and local governments and social security funds.
 
   key_government_expenditure: General government expenditure includes goods and services consumed in a production process, compensation of employees, subsidies, property income, social benefits, capital transfers and investments, and other current expenditures.
 
@@ -139,7 +139,7 @@ definitions:
   key_tax_revenues: Tax revenues are the compulsory unrequited payments made by economic entities to the general government. They include taxes on consumption, income, wealth, property and capital.
 
   key_cofog: |-
-    This data was classified using the OECD’s Classification of the Functions of Government (COFOG) framework. This is an international classification system to classify government expenditures by the functions or purposes they serve. It was developed by the OECD and the UN and is adopted by other international organizations. It defines ten different functions of government: general public services, defense, public order and safety, economic affairs, environmental protection, housing and community amenities, health, recreation, culture and religion, education, and social protection.
+    This data was classified using the Classification of the Functions of Government (COFOG) framework. This is an international classification system to classify government expenditures by the functions or purposes they serve. It was developed by the OECD and the UN and is adopted by other international organizations It defines ten different functions of government: general public services, defense, public order and safety, economic affairs, environmental protection, housing and community amenities, health, recreation, culture and religion, education, and social protection.
 
   key_function: |-
     <% if function == "General public services" %>
@@ -679,11 +679,11 @@ tables:
         short_unit: "{definitions.short_unit}"
         description_short: "{definitions.short_description_function} {definitions.short_description_unit}"
         description_key:
+          - "{definitions.key_government_expenditure}"
           - "{definitions.key_function}"
           - "{definitions.key_function_subcategory}"
-          - "{definitions.key_government_expenditure} {definitions.key_general_government}"
           - "{definitions.key_cofog}"
-
+          - "{definitions.key_general_government}"
         description_from_producer: "{definitions.description_from_producer_expenditure}"
         display:
           name: Government expenditure by function - <<function>> | <<function_subcategory>>

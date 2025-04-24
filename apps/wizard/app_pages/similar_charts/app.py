@@ -115,6 +115,12 @@ scoring_model = get_and_fit_model(charts)
 # Streamlit app layout.
 st.title(":material/search: Similar charts")
 
+st.warning(
+    "This app has been deprecated by the simplified Related charts app.",
+    icon="⚠️",
+)
+
+
 col1, col2 = st.columns(2)
 with col2:
     st_multiselect_wider()
