@@ -22,8 +22,7 @@ def run() -> None:
             )
 
     # Create explorer
-    # NOTE: `avoid_duplicate_hack` is necessary to show annotations
-    explorer = paths.create_explorer(config=config, explorer_name="ipcc-scenarios", avoid_duplicate_hack=True)
+    explorer = paths.create_explorer(config=config, explorer_name="ipcc-scenarios")
 
     # explorer.save(tolerate_extra_indicators=True)
     explorer.save()
