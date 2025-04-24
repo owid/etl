@@ -579,7 +579,10 @@ class PathFinder:
             path = self.directory / Path(filename)
         elif path is None:
             path = self.config_path
-        config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
+        try:
+            config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
+        except AttributeError as e:
+            raise AttributeError(f"There was a problem loading config from {path}, please review!. Original error: {e}")
         return config
 
     def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
