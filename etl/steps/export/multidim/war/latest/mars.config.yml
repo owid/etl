@@ -1,0 +1,24 @@
+title:
+  title: Data on conflict since 1800
+  title_variant: "from Project Mars"
+default_selection:
+  - World
+
+dimensions:
+  - name: Measure
+    slug: indicator
+    choices:
+      - slug: "deaths"
+        name: "Deaths"
+        # description: People moving away from country
+      - slug: "death_rate"
+        name: "Death rate"
+        # description: People moving to country
+      - slug: "wars_count"
+        name: "Number of Wars"
+        # description: People moving to country
+      - slug: "wars_rate"
+        name: "War rate"
+        # description: People moving to country
+
+views: []
