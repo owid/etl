@@ -11,6 +11,7 @@ from etl.collections.model import Dimension
 # - monkeypox#total_cases_per_million: view 2
 # - monkeypox#suspected_cases_cumulative: views 3, 4, 5, 6 (all different, except 5=6)
 EXPLORER_CONFIG = {
+    "catalog_path": "",
     "config": {
         "explorerTitle": "Mpox",
         "explorerSubtitle": "Explore the data produced by the World Health Organization and Africa CDC on mpox (monkeypox).",

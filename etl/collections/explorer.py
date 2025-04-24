@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
@@ -14,6 +15,7 @@ from etl.collections.utils import (
     validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
+from etl.paths import EXPORT_EXPLORER_DIR
 
 __all__ = [
     "expand_config",
@@ -30,17 +32,21 @@ class Explorer(Collection):
     config: Dict[str, str]
     definitions: Optional[Definitions] = None
 
-    # Internal use. For save() method.
-    _catalog_path: Optional[str] = None
+    def __post_init__(self):
+        """We set it here because of simplicity.
+
+        Adding a class attribute like `_collection_type: Optional[str] = "explorer"` leads to error `TypeError: non-default argument 'config' follows default argument`.
+        Alternative would be to define the class attribute like `_collection_type: Optional[str] = field(init=False, default="explorer")` but feels a bit redundant with parent definition.
+        """
+        self._collection_type = "explorer"
 
     @property
-    def catalog_path(self) -> Optional[str]:
-        return self._catalog_path
-
-    @catalog_path.setter
-    def catalog_path(self, value: str) -> None:
-        assert "#" in value, "Catalog path should be in the format `path#name`."
-        self._catalog_path = value
+    def local_config_path(self) -> Path:
+        # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
+        assert self.catalog_path
+        if self._collection_type is None:
+            raise ValueError("_collection_type must have a value!")
+        return EXPORT_EXPLORER_DIR / (self.catalog_path.replace("#", "/") + ".config.json")
 
     def display_config_names(self):
         """Get display names for all dimensions and choices.
@@ -75,9 +81,6 @@ class Explorer(Collection):
 
     @property
     def explorer_name(self):
-        if self.catalog_path is None:
-            raise ValueError("Catalog path is not set. Please set it before saving.")
-
         _, name = self.catalog_path.split("#")
         return name
 
@@ -94,9 +97,6 @@ class Explorer(Collection):
         if owid_env is None:
             owid_env = OWID_ENV
 
-        if self.catalog_path is None:
-            raise ValueError("Catalog path is not set. Please set it before saving.")
-
         # Prune non-used dimensions
         if prune_dimensions:
             self.prune_dimension_choices()
@@ -104,9 +104,12 @@ class Explorer(Collection):
         # Check that no choice name is repeated
         self.validate_choice_names()
 
-        # Check that all indicators in mdim exist
+        # Check that all indicators in explorer exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Export config to local directory in addition to uploading it to MySQL for debugging.
+        self.save_config_local()
 
         # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
@@ -127,10 +130,11 @@ class Explorer(Collection):
 def create_explorer(
     config: dict,
     dependencies: Set[str],
+    catalog_path: str,
 ) -> Explorer:
     """Create an explorer object."""
     # Read configuration as structured data
-    explorer = Explorer.from_dict(config)
+    explorer = Explorer.from_dict(dict(**config, catalog_path=catalog_path))
 
     # Edit views
     process_views(explorer, dependencies)

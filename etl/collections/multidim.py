@@ -22,8 +22,7 @@ from etl.collections.utils import (
     validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
-from etl.files import yaml_dump
-from etl.paths import EXPORT_DIR, SCHEMAS_DIR
+from etl.paths import SCHEMAS_DIR
 
 # Initialize logger.
 log = get_logger()
@@ -49,44 +48,29 @@ class Multidim(Collection):
     topic_tags: Optional[List[str]] = None
     definitions: Optional[Definitions] = None
 
-    # Internal use. For save() method.
-    _catalog_path: Optional[str] = None
+    def __post_init__(self):
+        """We set it here because of simplicity.
 
-    @property
-    def catalog_path(self) -> Optional[str]:
-        return self._catalog_path
-
-    @catalog_path.setter
-    def catalog_path(self, value: str) -> None:
-        assert "#" in value, "Catalog path should be in the format `path#name`."
-        self._catalog_path = value
-
-    @property
-    def local_config_path(self) -> Path:
-        # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
-        assert self.catalog_path
-        return EXPORT_DIR / "multidim" / (self.catalog_path.replace("#", "/") + ".config.yml")
+        Adding a class attribute like `_collection_type: Optional[str] = "explorer"` leads to error `TypeError: non-default argument 'config' follows default argument`.
+        Alternative would be to define the class attribute like `_collection_type: Optional[str] = field(init=False, default="explorer")` but feels a bit redundant with parent definition.
+        """
+        self._collection_type = "multidim"
 
     def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
 
-        if self.catalog_path is None:
-            raise ValueError("Catalog path is not set. Please set it before saving.")
-
         # Check that all indicators in mdim exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)
 
+        # Export config to local directory in addition to uploading it to MySQL for debugging.
+        self.save_config_local()
+
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
-
-        # Export config to local directory in addition to uploading it to MySQL for debugging.
-        log.info(f"Exporting config to {self.local_config_path}")
-        with open(self.local_config_path, "w") as f:
-            yaml_dump(config, f)
 
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
@@ -96,12 +80,51 @@ class Multidim(Collection):
         admin_api.put_mdim_config(self.catalog_path, config)
 
 
+class MultidimSet:
+    def __init__(self, path: Path):
+        self.path = path
+        self.mdims = self._build_dictionary()
+
+    def _build_dictionary(self) -> Dict[str, Path]:
+        dix = {}
+        paths = self.path.glob(r"*.config.json")
+        for p in paths:
+            name = p.name.replace(".config.json", "")
+            dix[name] = p
+        return dix
+
+    def read(self, mdim_name: str):
+        # Check mdim exists
+        if mdim_name not in self.mdims:
+            raise ValueError(
+                f"MDIM name not available. Available options are {self.names}. If this does not make sense to you, try running the necessary steps to re-export files to {self.path}"
+            )
+
+        # Read MDIM
+        path = self.mdims[mdim_name]
+        try:
+            mdim = Multidim.load(str(path))
+        except TypeError as e:
+            # This is a workaround for the TypeError that occurs when loading the config file.
+            raise TypeError(
+                f"Error loading MDIM config file. Please check the file format and ensure it is valid JSON. Suggestion: Re-run export step generating {mdim_name}. Error: {e}"
+            )
+
+        # Get and set catalog path
+        return mdim
+
+    @property
+    def names(self):
+        return list(sorted(self.mdims.keys()))
+
+
 def create_mdim(
     config: dict,
     dependencies: Set[str],
+    catalog_path: str,
 ) -> Multidim:
     # Read config as structured object
-    mdim = Multidim.from_dict(config)
+    mdim = Multidim.from_dict(dict(**config, catalog_path=catalog_path))
 
     # Edit views
     process_views(mdim, dependencies=dependencies)
