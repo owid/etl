@@ -16,12 +16,8 @@ from structlog import get_logger
 from apps.chart_sync.admin_api import AdminAPI
 from etl.collections.common import combine_config_dimensions, expand_config, map_indicator_path_to_id
 from etl.collections.model import Collection, Definitions, MDIMView, pruned_json
-from etl.collections.utils import (
-    camelize,
-    get_tables_by_name_mapping,
-    validate_indicators_in_db,
-)
-from etl.config import OWID_ENV, OWIDEnv
+from etl.collections.utils import camelize, get_tables_by_name_mapping
+from etl.config import OWIDEnv
 from etl.paths import SCHEMAS_DIR
 
 # Initialize logger.
@@ -56,18 +52,7 @@ class Multidim(Collection):
         """
         self._collection_type = "multidim"
 
-    def save(self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False):
-        # Ensure we have an environment set
-        if owid_env is None:
-            owid_env = OWID_ENV
-
-        # Check that all indicators in mdim exist
-        indicators = self.indicators_in_use(tolerate_extra_indicators)
-        validate_indicators_in_db(indicators, owid_env.engine)
-
-        # Export config to local directory in addition to uploading it to MySQL for debugging.
-        self.save_config_local()
-
+    def upsert_to_db(self, owid_env: OWIDEnv):
         # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())

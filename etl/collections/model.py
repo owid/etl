@@ -20,7 +20,8 @@ from owid.catalog.meta import GrapherConfig, MetaBase
 from structlog import get_logger
 
 from etl.collections.exceptions import DuplicateCollectionViews
-from etl.collections.utils import merge_common_metadata_by_dimension
+from etl.collections.utils import merge_common_metadata_by_dimension, validate_indicators_in_db
+from etl.config import OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
@@ -505,7 +506,7 @@ class Collection(MDIMBase):
         return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
     @property
-    def name(self):
+    def short_name(self):
         _, name = self.catalog_path.split("#")
         return name
 
@@ -515,8 +516,35 @@ class Collection(MDIMBase):
         # with open(self.local_config_path, "w") as f:
         #     yaml_dump(config, f)
 
-    def save(self):  # type: ignore[override]
-        raise NotImplementedError("This method should be implemented in the children class")
+    # def save(self):  # type: ignore[override]
+    #     pass
+
+    def save(  # type: ignore[override]
+        self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False, prune_dimensions: bool = True
+    ):
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
+
+        # Prune non-used dimensions
+        if prune_dimensions:
+            self.prune_dimension_choices()
+
+        # Check that no choice name is repeated
+        self.validate_choice_names()
+
+        # Check that all indicators in explorer exist
+        indicators = self.indicators_in_use(tolerate_extra_indicators)
+        validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Export config to local directory in addition to uploading it to MySQL for debugging.
+        self.save_config_local()
+
+        # Upsert to DB
+        self.upsert_to_db(owid_env)
+
+    def upsert_to_db(self, owid_env: OWIDEnv):
+        raise NotImplementedError("Upser to DB must be implemented in children classes!")
 
     def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)

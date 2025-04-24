@@ -10,11 +10,8 @@ from owid.catalog.utils import underscore
 from etl.collections.common import INDICATORS_SLUG, combine_config_dimensions, expand_config, get_mapping_paths_to_id
 from etl.collections.explorer_legacy import _create_explorer_legacy
 from etl.collections.model import CHART_DIMENSIONS, Collection, Definitions, ExplorerView, pruned_json
-from etl.collections.utils import (
-    get_tables_by_name_mapping,
-    validate_indicators_in_db,
-)
-from etl.config import OWID_ENV, OWIDEnv
+from etl.collections.utils import get_tables_by_name_mapping
+from etl.config import OWIDEnv
 from etl.paths import EXPORT_EXPLORER_DIR
 
 __all__ = [
@@ -90,27 +87,7 @@ class Explorer(Collection):
             indicators_slug = INDICATORS_SLUG
         self.sort_choices({"indicator": order})
 
-    def save(
-        self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False, prune_dimensions: bool = True
-    ):
-        # Ensure we have an environment set
-        if owid_env is None:
-            owid_env = OWID_ENV
-
-        # Prune non-used dimensions
-        if prune_dimensions:
-            self.prune_dimension_choices()
-
-        # Check that no choice name is repeated
-        self.validate_choice_names()
-
-        # Check that all indicators in explorer exist
-        indicators = self.indicators_in_use(tolerate_extra_indicators)
-        validate_indicators_in_db(indicators, owid_env.engine)
-
-        # Export config to local directory in addition to uploading it to MySQL for debugging.
-        self.save_config_local()
-
+    def upsert_to_db(self, owid_env: OWIDEnv):
         # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
         df_grapher, df_columns = extract_explorers_tables(self)
@@ -118,13 +95,13 @@ class Explorer(Collection):
         # Transform to legacy format
         explorer_legacy = _create_explorer_legacy(
             catalog_path=self.catalog_path,
-            explorer_name=self.explorer_name,
+            explorer_name=self.name,
             config=self.config,
             df_graphers=df_grapher,
             df_columns=df_columns,
         )
 
-        explorer_legacy.save()
+        explorer_legacy.save(owid_env)
 
 
 def create_explorer(

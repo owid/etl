@@ -246,7 +246,7 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
             log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
             for _, subgroup in group.groupby("choice_slug_id"):
                 explorer_ids = subgroup["explorer_id"].unique().tolist()
-                explorer_names = [explorers_by_id[i].explorer_name for i in explorer_ids]
+                explorer_names = [explorers_by_id[i].short_name for i in explorer_ids]
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
                 log.warning(f" Explorers {explorer_names} map to {record[0]}")
@@ -454,7 +454,7 @@ def _combine_dimensions(
     return dimensions
 
 
-def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id):
+def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Union[Multidim, Explorer]]:
     """Access each explorer, and update choice slugs in views"""
     for collection_id, change in choice_slug_changes.items():
         # Get collection
