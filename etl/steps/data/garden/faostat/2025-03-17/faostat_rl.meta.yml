@@ -59,3 +59,6 @@ tables:
       planted_forest__00006716__area__005110__hectares:
         presentation:
           title_public: Area of planted forest
+      land_area__00006601__area__005110__hectares:
+        presentation:
+          title_public: Land area in hectares
