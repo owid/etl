@@ -589,7 +589,9 @@ steps:
   data://grapher/artificial_intelligence/2023-06-14/ai_all_conferences:
     - data://garden/artificial_intelligence/2023-06-14/ai_all_conferences
 
-  # AI robots
+  # AI Index Report 2023 - AI robots
+  data://meadow/artificial_intelligence/2023-06-14/ai_robots:
+    - snapshot://artificial_intelligence/2023-06-14/ai_robots.csv
   data://garden/artificial_intelligence/2023-06-14/ai_robots:
     - data://meadow/artificial_intelligence/2023-06-14/ai_robots
   data://grapher/artificial_intelligence/2023-06-14/ai_robots:
@@ -680,8 +682,6 @@ steps:
     - data://garden/artificial_intelligence/2024-06-28/ai_bills
 
   # AI Index Report 2024 -  AI robots
-  data://garden/artificial_intelligence/2024-06-28/ai_robots:
-    - snapshot://artificial_intelligence/2024-06-28/ai_robots.csv
   data://grapher/artificial_intelligence/2024-06-28/ai_robots:
     - data://garden/artificial_intelligence/2024-06-28/ai_robots
 
