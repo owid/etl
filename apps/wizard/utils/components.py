@@ -177,8 +177,9 @@ def explorer_chart(
 
 
 def mdim_chart(mdim_slug: str, height: int = 600):
-    url = "http://staging-site-multi-dim-embed-with-control/grapher/mdd-demo-poverty"
-    query_string = "?country=OWID_WRL~OWID_EUR~OWID_ASI~ALB&amp;povertyLine=3.65&amp;metric=absolute"
+    url = "http://staging-site-mdim-iframe/grapher/mdd-energy-prices"
+    # query_string = "?country=OWID_WRL~OWID_EUR~OWID_ASI~ALB&amp;povertyLine=3.65&amp;metric=absolute"
+    query_string = "?hideControls=true"
 
     HTML = f"""
     <!-- Redirect to the external URL -->
