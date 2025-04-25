@@ -1,3 +1,6 @@
+import json
+import random
+import urllib.parse
 from pathlib import Path
 
 import pandas as pd
@@ -10,7 +13,7 @@ from apps.wizard.app_pages.chart_diff.utils import get_engines
 from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import mdim_chart, url_persist
 from etl.config import OWID_ENV
-from etl.db import read_sql
+from etl.db import get_engine, read_sql
 from etl.files import yaml_dump
 from etl.grapher import model as gm
 
@@ -165,25 +168,114 @@ def _display_config_in_tabs(config_target, config_source, max_lines):
     display_section(tab_views, "views")
 
 
-def _display_mdim_comparison(mdim_slug: str, view: dict):
+def _display_mdim_comparison(mdim_slug: str, catalog_path: str, view: dict):
     """Display side-by-side explorer comparison."""
     # Create columns for side by side comparison
     col1, col2 = st.columns(2)
 
-    # TODO: use proper view!
-    view = {}
-
-    kwargs = {"mdim_slug": mdim_slug, "view": view, "default_display": st.session_state.get("default_display")}
+    kwargs = {"view": view, "default_display": st.session_state.get("default_display")}
 
     with col1:
         st.subheader("Production MDIM")
-        mdim_chart(base_url="https://ourworldindata.org/grapher", **kwargs)
+        baked_url = f"https://ourworldindata.org/grapher/admin/grapher/{mdim_slug}"
+        mdim_chart(baked_url, **kwargs)
 
     with col2:
         st.subheader("Staging MDIM")
         assert OWID_ENV.site
-        # TODO: can we use preview URL here?
-        mdim_chart(base_url=OWID_ENV.site + "/grapher", **kwargs)
+        preview_url = f"{OWID_ENV.site}/admin/grapher/{urllib.parse.quote(catalog_path, safe='')}"
+        # baked_url = f"{OWID_ENV.site}/grapher/{mdim_slug}"
+        mdim_chart(preview_url, **kwargs)
+
+
+def _fetch_explorer_views(slug: str) -> list[dict]:
+    """
+    Return a list of views for the explorer, e.g.
+
+    [{
+        'Metric': 'Confirmed cases',
+        'Frequency': '7-day average',
+        'Relative to population': 'false'
+    }]
+    """
+    engine = get_engine()
+
+    # TODO: use gm.MultiDimDataPage.load_mdim() to fetch the config
+    q = """
+    select config from multi_dim_data_pages where slug = %(slug)s;
+    """
+    df = pd.read_sql(q, engine, params={"slug": slug})
+    if len(df) != 1:
+        raise ValueError(f"Expected exactly one explorer with slug '{slug}', got {len(df)}.")
+    config = json.loads(df.iloc[0].config)
+
+    views = [v["dimensions"] for v in config["views"]]
+
+    # If view doesn't have all dimensions, use '-'
+    dim_names = {n for v in views for n in v.keys()}
+    for view in views:
+        for dim in dim_names:
+            # If dimension is missing in a view, use '-'
+            if dim not in view:
+                view[dim] = "-"
+
+    return views
+
+
+def _display_explorer_view_options(explorer_slug: str) -> dict:
+    """Display explorer view options UI and return the selected view."""
+    explorer_views = _fetch_explorer_views(explorer_slug)
+    all_dimensions = _extract_all_dimensions(explorer_views)
+
+    st.subheader("Select Explorer View Options")
+
+    # Create random view button
+    if st.button(f"🎲 Random view ({len(explorer_views)} views available)"):
+        # Select a random view from explorer_views
+        if explorer_views:
+            random_view = random.choice(explorer_views)
+            # Update session state with the random view values
+            for dim, val in random_view.items():
+                st.session_state[f"{explorer_slug}_{dim}"] = val
+            # Rerun to apply the changes
+            st.rerun()
+
+    # Arrange selectboxes horizontally using columns
+    cols = st.columns(len(all_dimensions)) if all_dimensions else []
+
+    selected_options = {}
+    for i, (dim, values) in enumerate(all_dimensions.items()):
+        selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{explorer_slug}_{dim}")
+
+    view = selected_options if selected_options else (explorer_views[0] if explorer_views else {})
+
+    # Check if the selected combination exists in any of the views
+    combination_exists = False
+    for explorer_view in explorer_views:
+        if all(dim in explorer_view and explorer_view[dim] == val for dim, val in view.items()):
+            combination_exists = True
+            break
+
+    # Display warning if combination doesn't exist
+    if not combination_exists and view:
+        st.warning(
+            "⚠️ This specific combination of options does not exist in the explorer views. The explorer may show unexpected results."
+        )
+
+    return view
+
+
+def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
+    dim_names = list(explorer_views[0].keys())
+
+    # Extract all unique dimensions across views
+    all_dimensions = {dim: set() for dim in dim_names}
+    for view in explorer_views:
+        for dim in dim_names:
+            all_dimensions[dim].add(view[dim])
+
+    # Convert sets to lists for selectboxes
+    return {dim: sorted(list(values)) for dim, values in all_dimensions.items()}
 
 
 def main():
@@ -207,10 +299,13 @@ def main():
     # Fetch MDIMs
     source_mdim, target_mdim = _fetch_mdims(mdim_catalog_path)
     assert source_mdim.slug, f"MDIM slug does not exist for {mdim_catalog_path}"
+    assert source_mdim.catalogPath, f"MDIM catalogPath does not exist for {mdim_catalog_path}"
+
+    view = _display_explorer_view_options(source_mdim.slug)
 
     # Step 2: Display MDIM comparison
-    # TODO: use view instead of None
-    _display_mdim_comparison(source_mdim.slug, None)
+    st.warning("If you see **Sorry, that page doesn’t exist!**, it means the MDIM has not been published yet.")
+    _display_mdim_comparison(source_mdim.slug, source_mdim.catalogPath, view)
 
     # Step 3: Display config diff
     _display_config_diff(source_mdim.config, target_mdim.config)

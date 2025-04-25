@@ -176,10 +176,7 @@ def explorer_chart(
     return st.components.v1.html(HTML, height=height)  # type: ignore
 
 
-def mdim_chart(base_url: str, mdim_slug: str, view: dict, height: int = 600, default_display: Optional[str] = None):
-    # First HTML definition with parameters
-    url = f"{base_url}/{mdim_slug}"
-
+def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optional[str] = None):
     params = {
         "hideControls": "true",
         **view,
@@ -191,8 +188,6 @@ def mdim_chart(base_url: str, mdim_slug: str, view: dict, height: int = 600, def
 
     query_string = "?" + urllib.parse.urlencode(params)
 
-    query_string = ""
-
     HTML = f"""
     <!-- Redirect to the external URL -->
     <meta http-equiv="refresh" content="0; url={url}{query_string}">
@@ -200,26 +195,6 @@ def mdim_chart(base_url: str, mdim_slug: str, view: dict, height: int = 600, def
 
     # Render the HTML
     return st.components.v1.html(HTML, height=height)  # type: ignore
-
-    url = f"http://staging-site-mdim-iframe/grapher/{mdim_slug}"
-    # query_string = "?country=OWID_WRL~OWID_EUR~OWID_ASI~ALB&amp;povertyLine=3.65&amp;metric=absolute"
-    query_string = "?hideControls=true"
-
-    HTML = f"""
-    <!-- Redirect to the external URL -->
-    <meta http-equiv="refresh" content="0; url={url}{query_string}">
-    """
-
-    # Render the HTML
-    return st.components.v1.html(HTML, height=height)  # type: ignore
-
-    url = "http://staging-site-multi-dim-embed-with-control/grapher/mdd-demo-poverty?country=OWID_WRL~OWID_EUR~OWID_ASI~ALB&amp;povertyLine=3.65&amp;metric=absolute"
-    chart_animation_iframe_html = f"""
-    <iframe src="{url}" loading="lazy"
-            style="width: 100%; height: 600px; border: 0px none;"
-            allow="web-share; clipboard-write"></iframe>
-    """
-    return st.components.v1.html(chart_animation_iframe_html, height=height)  # type: ignore
 
 
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
