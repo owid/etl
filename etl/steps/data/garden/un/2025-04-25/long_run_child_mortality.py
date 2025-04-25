@@ -40,9 +40,9 @@ def run() -> None:
     max_year = tb_igme["year"].max()
     tb_gap_full = ds_gapminder_v11["under_five_mortality"].reset_index()
     tb_gap_full = tb_gap_full[tb_gap_full["year"] <= max_year].reset_index(drop=True)
-    tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "child_mortality_rate_full"}, errors="raise")
+    tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "child_mortality_rate"}, errors="raise")
     tb_gap_full["source"] = "gapminder"
-    tb_gap_full["child_mortality_rate_full"] = tb_gap_full["child_mortality_rate_full"].div(10)
+    tb_gap_full["child_mortality_rate"] = tb_gap_full["child_mortality_rate"].div(10)
 
     # Load Gapminder data v7 - has the source of the data (unlike v11)
     # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
@@ -62,6 +62,9 @@ def run() -> None:
     tb_surviving = calculate_share_surviving_first_five_years(tb_combined_full)
     # Combine with full Gapminder dataset
     tb_combined_full = pr.merge(tb_combined_full, tb_surviving, on=["country", "year"], how="left")
+    tb_combined_full = tb_combined_full.rename(
+        columns={"child_mortality_rate": "child_mortality_rate_full"}, errors="raise"
+    )
 
     # Save outputs.
     tb_combined_full = tb_combined_full.drop(columns=["source"]).format(["country", "year"])
