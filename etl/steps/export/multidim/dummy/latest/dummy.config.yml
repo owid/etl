@@ -7,5 +7,7 @@ default_selection:
   - China
   - India
 # Both will be filled programmatically.
-dimensions: []
+dimensions:
+  - slug: metric
+    name: Metric
 views: []

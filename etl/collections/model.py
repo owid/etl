@@ -502,7 +502,7 @@ class Collection(MDIMBase):
         if "definitions" in data:
             data["_definitions"] = data["definitions"]
             del data["definitions"]
-        else:
+        elif "_definitions" not in data:
             data["_definitions"] = Definitions()
 
         # Now that data is in the expected shape, let the parent class handle the rest
@@ -549,6 +549,18 @@ class Collection(MDIMBase):
 
     # def save(self):  # type: ignore[override]
     #     pass
+
+    def sort_dimensions(self, slug_order: List[str]):
+        """Sort dimensions based on the given order."""
+        assert set(slug_order) == set(self.dimension_slugs), "All dimensions must be in the given order!"
+        new_dimensions = []
+        for dim in slug_order:
+            # Get the dimension from the slug
+            dim_ = next((d for d in self.dimensions if d.slug == dim), None)
+            if dim_ is None:
+                raise ValueError(f"Dimension {dim} not found in dimensions!")
+            new_dimensions.append(dim_)
+        self.dimensions = new_dimensions
 
     def save(  # type: ignore[override]
         self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False, prune_dimensions: bool = True

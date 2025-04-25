@@ -3,7 +3,7 @@
 TODO: Look in etl.collections.beta for more details.
 """
 
-from etl.collections.beta import combine_mdims
+from etl.collections.beta import combine_mdims, mdim_to_explorer
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -27,6 +27,10 @@ def run() -> None:
         mdim_choices_names=["COVID-19 cases", "COVID-19 deaths"],
         config=paths.load_mdim_config(),
     )
+
+    # TODO: Translate MDIM to explorer!
+    explorer = mdim_to_explorer(mdim)
+    explorer.save()
 
     # Save & upload
     mdim.save()
