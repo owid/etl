@@ -29,7 +29,7 @@ import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.collections.explorer import Explorer, expand_config
+from etl.collections.explorer import Explorer, create_explorer, expand_config
 from etl.collections.model import Dimension, DimensionChoice
 from etl.collections.multidim import Multidim, combine_config_dimensions, create_mdim
 from etl.collections.utils import has_duplicate_table_names
@@ -170,7 +170,12 @@ def create_explorer_experimental(
     return explorer
 
 
-def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dict[str, str]):
+def combine_explorers(
+    explorers: List[Explorer],
+    explorer_name: str,
+    config: Dict[str, str],
+    dependencies: Optional[Set[str]] = None,
+):
     """Combine multiple explorers into a single one.
 
     Notes:
@@ -230,10 +235,15 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
     catalog_path = explorers[0].catalog_path.split("#")[0] + "#" + explorer_name
 
     # 4) Create final explorer #
-    explorer = Explorer(
-        config=config,
-        dimensions=dimensions,
-        views=views,
+    explorer_config = {
+        "config": config,
+        "dimensions": dimensions,
+        "views": views,
+        "catalog_path": catalog_path,
+    }
+    explorer = create_explorer(
+        config=explorer_config,
+        dependencies=dependencies if dependencies is not None else set(),
         catalog_path=catalog_path,
     )
 
@@ -245,8 +255,8 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
             # Now group by 'value' to see which col3 values correspond to each unique 'value'
             log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
             for _, subgroup in group.groupby("choice_slug_id"):
-                explorer_ids = subgroup["explorer_id"].unique().tolist()
-                explorer_names = [explorers_by_id[i].explorer_name for i in explorer_ids]
+                explorer_ids = subgroup["collection_id"].unique().tolist()
+                explorer_names = [explorers_by_id[i].short_name for i in explorer_ids]
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
                 log.warning(f" Explorers {explorer_names} map to {record[0]}")
@@ -335,12 +345,12 @@ def combine_mdims(
                 slug=MDIM_SLUG,
                 name=mdim_dimension_name,
                 choices=[
-                    DimensionChoice(slug=mdim.name, name=choice),
+                    DimensionChoice(slug=mdim.short_name, name=choice),
                 ],
             )
             mdim.dimensions = [dimension_mdim] + mdim.dimensions
             for v in mdim.views:
-                v.dimensions[MDIM_SLUG] = mdim.name
+                v.dimensions[MDIM_SLUG] = mdim.short_name
 
     # 0) Preliminary work #
     # Create dictionary with MDIMs, so to have identifiers for them
@@ -404,7 +414,7 @@ def combine_mdims(
             log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
             for _, subgroup in group.groupby("choice_slug_id"):
                 collection_ids = subgroup["collection_id"].unique().tolist()
-                explorer_names = [mdims_by_id[i].name for i in collection_ids]
+                explorer_names = [mdims_by_id[i].short_name for i in collection_ids]
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
                 log.warning(f" MDIMs {explorer_names} map to {record[0]}")
@@ -454,7 +464,7 @@ def _combine_dimensions(
     return dimensions
 
 
-def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id):
+def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Union[Multidim, Explorer]]:
     """Access each explorer, and update choice slugs in views"""
     for collection_id, change in choice_slug_changes.items():
         # Get collection

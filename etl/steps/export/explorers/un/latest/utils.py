@@ -66,7 +66,7 @@ class ExplorerCreator:
 
         explorer = combine_explorers(
             explorers=[explorer, explorer_proj],
-            explorer_name=explorer.explorer_name,
+            explorer_name=explorer.short_name,
             config=explorer.config,
         )
 

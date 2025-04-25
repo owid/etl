@@ -1,42 +1,20 @@
 """Common tooling for MDIMs/Explorers."""
 
 from copy import deepcopy
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Set, Union
 
 import pandas as pd
 from owid.catalog import Table
-from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
-from etl.collections.model import Collection
 from etl.collections.utils import (
+    get_tables_by_name_mapping,
     records_to_dictionary,
-    validate_indicators_in_db,
 )
 from etl.config import OWID_ENV, OWIDEnv
 
 INDICATORS_SLUG = "indicator"
-
-
-def validate_collection_config(collection: Collection, engine: Engine, tolerate_extra_indicators: bool) -> None:
-    """Fundamental validation of the configuration of a collection (explorer or MDIM):
-
-    - Ensure that the views reference valid dimensions.
-    - Ensure that there are no duplicate views.
-    - Ensure that all indicators in the collection are in the database.
-
-    NOTE: On top of this validation, one may want to apply further validations on MDIMs or Explorers specifically.
-    """
-    # Ensure that all views are in choices
-    collection.validate_views_with_dimensions()
-
-    # Validate duplicate views
-    collection.check_duplicate_views()
-
-    # Check that all indicators in mdim exist
-    indicators = collection.indicators_in_use(tolerate_extra_indicators)
-    validate_indicators_in_db(indicators, engine)
 
 
 def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = None) -> str | int:
@@ -221,6 +199,62 @@ def expand_config(
     )
 
     return config_partial
+
+
+def process_views(
+    mdim_or_explorer,
+    dependencies: Set[str],
+    combine_metadata_when_mult: bool = False,
+):
+    """Process views in Explorer configuration.
+
+    TODO: See if we can converge to one solution with etl.collections.multidim.process_views.
+    """
+    # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
+    tables_by_name = get_tables_by_name_mapping(dependencies)
+
+    for view in mdim_or_explorer.views:
+        # Expand paths
+        view.expand_paths(tables_by_name)
+
+        # Combine metadata/config with definitions.common_views
+        if (mdim_or_explorer.definitions is not None) and (mdim_or_explorer.definitions.common_views is not None):
+            view.combine_with_common(mdim_or_explorer.definitions.common_views)
+
+        # Combine metadata in views which contain multiple indicators
+        if combine_metadata_when_mult and view.metadata_is_needed:  # Check if view "contains multiple indicators"
+            # TODO
+            # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
+            # log.info(
+            #     f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view.dimensions}"
+            # )
+            pass
+
+
+def create_mdim_or_explorer(
+    obj,
+    config: dict,
+    dependencies: Set[str],
+    catalog_path: str,
+    validate_schema: bool = True,
+):
+    # Read config as structured object
+    mdim_or_explorer = obj.from_dict(dict(**config, catalog_path=catalog_path))
+
+    # Edit views
+    process_views(mdim_or_explorer, dependencies=dependencies)
+
+    # Validate config
+    if validate_schema:
+        mdim_or_explorer.validate_schema()
+
+    # Ensure that all views are in choices
+    mdim_or_explorer.validate_views_with_dimensions()
+
+    # Validate duplicate views
+    mdim_or_explorer.check_duplicate_views()
+
+    return mdim_or_explorer
 
 
 ####################################################################################################
