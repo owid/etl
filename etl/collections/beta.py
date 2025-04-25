@@ -29,7 +29,7 @@ import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.collections.explorer import Explorer, expand_config
+from etl.collections.explorer import Explorer, create_explorer, expand_config
 from etl.collections.model import Dimension, DimensionChoice
 from etl.collections.multidim import Multidim, combine_config_dimensions, create_mdim
 from etl.collections.utils import has_duplicate_table_names
@@ -170,7 +170,12 @@ def create_explorer_experimental(
     return explorer
 
 
-def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dict[str, str]):
+def combine_explorers(
+    explorers: List[Explorer],
+    explorer_name: str,
+    config: Dict[str, str],
+    dependencies: Optional[Set[str]] = None,
+):
     """Combine multiple explorers into a single one.
 
     Notes:
@@ -230,10 +235,15 @@ def combine_explorers(explorers: List[Explorer], explorer_name: str, config: Dic
     catalog_path = explorers[0].catalog_path.split("#")[0] + "#" + explorer_name
 
     # 4) Create final explorer #
-    explorer = Explorer(
-        config=config,
-        dimensions=dimensions,
-        views=views,
+    explorer_config = {
+        "config": config,
+        "dimensions": dimensions,
+        "views": views,
+        "catalog_path": catalog_path,
+    }
+    explorer = create_explorer(
+        config=explorer_config,
+        dependencies=dependencies if dependencies is not None else set(),
         catalog_path=catalog_path,
     )
 
