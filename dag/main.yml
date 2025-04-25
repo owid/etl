@@ -554,13 +554,21 @@ steps:
   data://grapher/un/2025-03-25/igme:
     - data://garden/un/2025-03-25/igme
 
-  # Long-run child mortality, Gapminder + UN IGME
+  # Long-run child mortality, Gapminder + UN IGME - to archive
   data://garden/un/2024-09-16/long_run_child_mortality:
-    - data://garden/un/2025-03-25/igme
+    - data://garden/un/2024-09-16/igme
     - data://garden/gapminder/2023-09-18/under_five_mortality
     - data://garden/gapminder/2023-09-21/under_five_mortality
   data://grapher/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-16/long_run_child_mortality
+
+    # Long-run child mortality, Gapminder + UN IGME - to update
+  data://garden/un/2025-03-25/long_run_child_mortality:
+    - data://garden/un/2025-03-25/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2025-03-25/long_run_child_mortality:
+    - data://garden/un/2025-03-25/long_run_child_mortality
 
   # UN SDG (2024)
   data://meadow/un/2024-08-27/un_sdg:
