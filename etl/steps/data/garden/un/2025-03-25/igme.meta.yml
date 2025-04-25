@@ -5,16 +5,13 @@ definitions:
         - Child & Infant Mortality
       attribution: United Nations Inter-agency Group for Child Mortality Estimation (2025)
     unit: << unit_of_measure.lower() >>
-    short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
-    display:
-      numDecimalPlaces: <% if 'per' in (unit_of_measure | default('')) %>1<% else %>0<% endif %>
+    short_unit: <% if 'rate' in indicator  %>%<% else %><%- endif -%>
     description_key:
       - |-
         <% if indicator == "Stillbirths per 100 births" %>
         - **Definition threshold varies**: A stillbirth generally refers to the birth of a baby showing no signs of life after a certain number of weeks of gestation, with the [ICD-11](https://icd.who.int/en) setting the cutoff at 22 weeks.
         - **Subcategories exist**: ICD-11 distinguishes between “early gestation stillbirth” (22–27 weeks) and “late gestation stillbirth” (28+ weeks).
         <% endif %>
-
   sex: |-
     <% if sex == "Total" %><% elif sex == "Male" %>male <% elif sex == "Female" %>female <% endif -%>
   wealth_quintile: |-
@@ -169,6 +166,7 @@ tables:
           title_public: <<indicator>>
         display:
           name: <<indicator>>
+          numDecimalPlaces: <% if 'rate' in indicator  %>1<% else %>0<% endif %>
   igme_under_fifteen_mortality:
     variables:
       observation_value:
@@ -179,3 +177,4 @@ tables:
           title_public: <<indicator>>
         display:
           name: <<indicator>>
+          numDecimalPlaces: <% if 'rate' in indicator  %>1<% else %>0<% endif %>
