@@ -2,8 +2,10 @@
 
 from datetime import datetime
 
+import click
 import pandas as pd
 import requests
+from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.utils.google import GoogleDocHandler
@@ -74,12 +76,26 @@ def get_chart_title_from_url(chart_url):
     return title
 
 
-def run():
-    # Inputs:
-    year = 2025
-    quarter = 1
-    producer = "Global Carbon Project"
-
+@click.command(name="create_data_producer_report", cls=RichCommand, help=__doc__)
+@click.option(
+    "--producer",
+    type=str,
+    # multiple=True,
+    # default=None,
+    help="Producer name(s).",
+)
+@click.option(
+    "--quarter",
+    type=int,
+    help="Quarter (1, 2, 3, or 4).",
+)
+@click.option(
+    "--year",
+    type=int,
+    default=datetime.today().year,
+    help="Year.",
+)
+def run(producer, quarter, year):
     # TODO: This is work in progress. Clean up code and move to producer analytics (and/or consider creating appropriate tables in analytics or metabase).
     quarters = {
         1: {"name": "first", "min_date": "01-01", "max_date": "03-31"},
@@ -374,9 +390,9 @@ def run():
 
     # Replace simple placeholders.
     replacements = {
-        r"{{producer}}": "Global Carbon Project",
-        r"{{year}}": "2025",
-        r"{{quarter}}": "Q1",
+        r"{{producer}}": producer,
+        r"{{year}}": str(year),
+        r"{{quarter}}": str(quarter),
         r"{{executive_summary_intro}}": executive_summary_intro,
         r"{{n_charts_humanized}}": n_charts_humanized,
         r"{{n_articles_humanized}}": n_articles_humanized,
@@ -466,12 +482,10 @@ def run():
         insert_index = google_doc.find_marker_index(doc_id=report_id, marker=r"{{data_insights}}")
 
         if len(df_top_insights) == 1:
-            text = f"""
-During {quarter_date_humanized}, the following data insight was also published:
+            text = f"""During {quarter_date_humanized}, the following data insight was also published:
             """
         else:
-            text = f"""
-During {quarter_date_humanized}, the following data insights were also published:
+            text = f"""During {quarter_date_humanized}, the following data insights were also published:
             """
         edits = [{"insertText": {"location": {"index": insert_index}, "text": text}}]
         google_doc.edit(doc_id=report_id, requests=edits)
