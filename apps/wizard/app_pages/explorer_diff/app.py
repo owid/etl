@@ -59,6 +59,21 @@ def _show_options():
             )
 
 
+def _fill_missing_dimensions(views: list[dict]) -> list[dict]:
+    """
+    Fill missing dimensions in views with '-'.
+    This is to ensure that all views have the same dimensions for comparison.
+    """
+    # If view doesn't have all dimensions, use '-'
+    dim_names = {n for v in views for n in v.keys()}
+    for view in views:
+        for dim in dim_names:
+            # If dimension is missing in a view, use '-'
+            if dim not in view:
+                view[dim] = "-"
+    return views
+
+
 def _fetch_explorer_views(slug: str) -> list[dict]:
     """
     Return a list of views for the explorer, e.g.
@@ -90,13 +105,7 @@ def _fetch_explorer_views(slug: str) -> list[dict]:
             if dims:
                 views.append(dims)
 
-    # If view doesn't have all dimensions, use '-'
-    dim_names = {n for v in views for n in v.keys()}
-    for view in views:
-        for dim in dim_names:
-            # If dimension is missing in a view, use '-'
-            if dim not in view:
-                view[dim] = "-"
+    views = _fill_missing_dimensions(views)
 
     return views
 

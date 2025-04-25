@@ -10,10 +10,11 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
+from apps.wizard.app_pages.explorer_diff.app import _extract_all_dimensions, _fill_missing_dimensions
 from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import mdim_chart, url_persist
 from etl.config import OWID_ENV
-from etl.db import get_engine, read_sql
+from etl.db import read_sql
 from etl.files import yaml_dump
 from etl.grapher import model as gm
 
@@ -188,7 +189,7 @@ def _display_mdim_comparison(mdim_slug: str, catalog_path: str, view: dict):
         mdim_chart(preview_url, **kwargs)
 
 
-def _fetch_explorer_views(slug: str) -> list[dict]:
+def _get_mdim_views(db_mdim: gm.MultiDimDataPage) -> list[dict]:
     """
     Return a list of views for the explorer, e.g.
 
@@ -198,33 +199,16 @@ def _fetch_explorer_views(slug: str) -> list[dict]:
         'Relative to population': 'false'
     }]
     """
-    engine = get_engine()
+    views = [v["dimensions"] for v in db_mdim.config["views"]]
 
-    # TODO: use gm.MultiDimDataPage.load_mdim() to fetch the config
-    q = """
-    select config from multi_dim_data_pages where slug = %(slug)s;
-    """
-    df = pd.read_sql(q, engine, params={"slug": slug})
-    if len(df) != 1:
-        raise ValueError(f"Expected exactly one explorer with slug '{slug}', got {len(df)}.")
-    config = json.loads(df.iloc[0].config)
-
-    views = [v["dimensions"] for v in config["views"]]
-
-    # If view doesn't have all dimensions, use '-'
-    dim_names = {n for v in views for n in v.keys()}
-    for view in views:
-        for dim in dim_names:
-            # If dimension is missing in a view, use '-'
-            if dim not in view:
-                view[dim] = "-"
+    views = _fill_missing_dimensions(views)
 
     return views
 
 
-def _display_explorer_view_options(explorer_slug: str) -> dict:
+def _display_mdim_view_options(db_mdim: gm.MultiDimDataPage) -> dict:
     """Display explorer view options UI and return the selected view."""
-    explorer_views = _fetch_explorer_views(explorer_slug)
+    explorer_views = _get_mdim_views(db_mdim)
     all_dimensions = _extract_all_dimensions(explorer_views)
 
     st.subheader("Select Explorer View Options")
@@ -236,7 +220,7 @@ def _display_explorer_view_options(explorer_slug: str) -> dict:
             random_view = random.choice(explorer_views)
             # Update session state with the random view values
             for dim, val in random_view.items():
-                st.session_state[f"{explorer_slug}_{dim}"] = val
+                st.session_state[f"{db_mdim.slug}_{dim}"] = val
             # Rerun to apply the changes
             st.rerun()
 
@@ -245,7 +229,7 @@ def _display_explorer_view_options(explorer_slug: str) -> dict:
 
     selected_options = {}
     for i, (dim, values) in enumerate(all_dimensions.items()):
-        selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{explorer_slug}_{dim}")
+        selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{db_mdim.slug}_{dim}")
 
     view = selected_options if selected_options else (explorer_views[0] if explorer_views else {})
 
@@ -263,19 +247,6 @@ def _display_explorer_view_options(explorer_slug: str) -> dict:
         )
 
     return view
-
-
-def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
-    dim_names = list(explorer_views[0].keys())
-
-    # Extract all unique dimensions across views
-    all_dimensions = {dim: set() for dim in dim_names}
-    for view in explorer_views:
-        for dim in dim_names:
-            all_dimensions[dim].add(view[dim])
-
-    # Convert sets to lists for selectboxes
-    return {dim: sorted(list(values)) for dim, values in all_dimensions.items()}
 
 
 def main():
@@ -301,7 +272,7 @@ def main():
     assert source_mdim.slug, f"MDIM slug does not exist for {mdim_catalog_path}"
     assert source_mdim.catalogPath, f"MDIM catalogPath does not exist for {mdim_catalog_path}"
 
-    view = _display_explorer_view_options(source_mdim.slug)
+    view = _display_mdim_view_options(source_mdim)
 
     # Step 2: Display MDIM comparison
     st.warning("If you see **Sorry, that page doesn’t exist!**, it means the MDIM has not been published yet.")
