@@ -10,7 +10,7 @@ dataset:
 tables:
   long_run_child_mortality:
     variables:
-      child_mortality_rate:
+      child_mortality_rate_full:
         title: Child mortality rate (full)
         unit: deaths per 100 live births
         short_unit: "%"

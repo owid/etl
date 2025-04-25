@@ -40,9 +40,9 @@ def run() -> None:
     max_year = tb_igme["year"].max()
     tb_gap_full = ds_gapminder_v11["under_five_mortality"].reset_index()
     tb_gap_full = tb_gap_full[tb_gap_full["year"] <= max_year].reset_index(drop=True)
-    tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "child_mortality_rate"}, errors="raise")
+    tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "child_mortality_rate_full"}, errors="raise")
     tb_gap_full["source"] = "gapminder"
-    tb_gap_full["child_mortality_rate"] = tb_gap_full["child_mortality_rate"].div(10)
+    tb_gap_full["child_mortality_rate_full"] = tb_gap_full["child_mortality_rate_full"].div(10)
 
     # Load Gapminder data v7 - has the source of the data (unlike v11)
     # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
