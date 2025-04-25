@@ -59,12 +59,6 @@ class Multidim(Collection):
         # TODO: I think we could move this to the Grapher side.
         config = replace_catalog_paths_with_ids(self.to_dict())
 
-        # Export config to local directory in addition to uploading it to MySQL for debugging.
-        log.info(f"Exporting config to {self.local_config_path}")
-        Path(self.local_config_path).parent.mkdir(parents=True, exist_ok=True)
-        with open(self.local_config_path, "w") as f:
-            yaml_dump(config, f)
-
         # Convert config from snake_case to camelCase
         config = camelize(config, exclude_keys={"dimensions"})
 
