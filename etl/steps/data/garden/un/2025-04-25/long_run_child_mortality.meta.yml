@@ -3,10 +3,10 @@ definitions:
     presentation:
       topic_tags:
         - Child & Infant Mortality
-      attribution: Gapminder (2020); UN Inter-agency Group for Child Mortality Estimation (2024)
+      attribution: Gapminder (2015); UN Inter-agency Group for Child Mortality Estimation (2025)
 
 dataset:
-  title: Long-run child mortality (Gapminder; UN IGME)
+  title: Long-run data – Gapminder & UN IGME
 tables:
   long_run_child_mortality:
     variables:
@@ -37,8 +37,10 @@ tables:
           numDecimalPlaces: 1
         description_short: The long-run estimated share of newborns who die before reaching the age of five.
         description_key:
-          - This long-run indicator is a combination of two data sources, Gapminder and the UN Inter-agency Group for Child Mortality Estimation (UN IGME).
-          - The historical data is compiled by Gapminder, the full range of sources used can be found in the [Gapminder documentation](https://www.gapminder.org/data/documentation/gd005/).
+          - "This long-run indicator combines two data sources: Gapminder and the UN Inter-agency Group for Child Mortality Estimation (UN IGME)."
+          - "[Gapminder](https://www.gapminder.org/data/documentation/gd005/) provides estimates of child mortality rates for the years 1800 to 2015. The full range of sources used can be found in [their documentation](https://www.gapminder.org/data/documentation/gd005/)."
+          - The [UN Inter-agency Group for Child Mortality Estimation (UN IGME)](https://childmortality.org/all-cause-mortality/data) provides estimates of child mortality rates for some countries from 1932 onward.
+          - For years where data from both sources is available, we prioritize the UN IGME data.
         description_processing: >-
           This indicator is a combination of data from two sources:
             - The UN Inter-agency Group for Child Mortality Estimation (UN IGME) provides estimates of child mortality rates, which is available for some countries from 1932.
@@ -48,12 +50,12 @@ tables:
         presentation:
           title_public: Child mortality rate
           title_variant: Long-run data
-          attribution_short: UN IGME; Gapminder
+          attribution_short: Gapminder; UN IGME
           grapher_config:
             title: Child mortality rate
             subtitle: The estimated share of newborns who die before reaching the age of five.
-            variantName: Long-run data; Gapminder & UN IGME
-            sourceDesc: UN IGME (2023); Gapminder (2015)
+            variantName: Long-run data – Gapminder & UN IGME
+            sourceDesc: UN IGME (2025); Gapminder (2015)
             originUrl: https://ourworldindata.org/child-mortality
             hasMapTab: true
             yAxis:
