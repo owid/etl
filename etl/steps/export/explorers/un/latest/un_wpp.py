@@ -1,6 +1,4 @@
 """
-TODO: Remove usage of `hack_metadata_propagation` once https://owid.slack.com/archives/C46U9LXRR/p1742416990042489 is solved.
-
 This step creates the population and demography explorer. It uses MDIM-based configuration, and some custom processing.
 
 Strategy:
@@ -16,7 +14,6 @@ NOTE: This pipeline assumes that there is a TSV template in owid-content, this s
 """
 
 from etl.collections.beta import combine_explorers
-from etl.collections.explorer import hack_metadata_propagation
 from etl.helpers import PathFinder
 
 from .utils import ExplorerCreator
@@ -67,9 +64,6 @@ def run() -> None:
     # Object used to edit view configs: Some of the views need extra-curation (this includes adding map brackets, renaming titles, etc.)
     view_editor = ViewEditor(map_brackets_yaml=paths.side_file("map_brackets.yml"))
 
-    # HACK
-    tbs = _get_tables(explorer_creator)
-
     #################################################################################################
     # Create individual explorers (building blocks)
     #
@@ -93,10 +87,6 @@ def run() -> None:
         explorer_name="population-and-demography",
     )
     view_editor.edit_views_pop(explorer_pop)
-    hack_metadata_propagation(
-        explorer_pop,
-        tbs,
-    )
 
     # Save explorer (upsert to DB)
     ########## Dependency ratio explorer
@@ -111,10 +101,6 @@ def run() -> None:
         },
     )
     view_editor.edit_views_dr(explorer_dep)
-    hack_metadata_propagation(
-        explorer_dep,
-        tbs,
-    )
 
     ########## Sex ratio explorer
     explorer_sr = explorer_creator.create(
@@ -129,10 +115,6 @@ def run() -> None:
         choice_renames={"age": AGES_SR},
     )
     view_editor.edit_views_sr(explorer_sr)
-    hack_metadata_propagation(
-        explorer_sr,
-        tbs,
-    )
 
     ########## Migration explorer
     explorer_mig = explorer_creator.create(
@@ -150,10 +132,6 @@ def run() -> None:
         choice_renames={"age": AGES_SR},
     )
     view_editor.edit_views_mig(explorer_mig)
-    hack_metadata_propagation(
-        explorer_mig,
-        tbs,
-    )
 
     ########## Deaths explorer
     explorer_deaths = explorer_creator.create(
@@ -168,10 +146,6 @@ def run() -> None:
         choice_renames={"age": AGES_DEATHS},
     )
     view_editor.edit_views_deaths(explorer_deaths)
-    hack_metadata_propagation(
-        explorer_deaths,
-        tbs,
-    )
 
     ########## Births explorer
     explorer_b = explorer_creator.create(
@@ -186,10 +160,6 @@ def run() -> None:
         choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
     )
     view_editor.edit_views_b(explorer_b)
-    hack_metadata_propagation(
-        explorer_b,
-        tbs,
-    )
 
     ########## Median age explorer
     explorer_ma = explorer_creator.create(
@@ -204,10 +174,6 @@ def run() -> None:
         choice_renames={"age": lambda x: {"all": "None"}.get(x, None)},
     )
     view_editor.edit_views_ma(explorer_ma)
-    hack_metadata_propagation(
-        explorer_ma,
-        tbs,
-    )
 
     ########## Life expectancy explorer
     explorer_le = explorer_creator.create(
@@ -229,10 +195,6 @@ def run() -> None:
         },
     )
     view_editor.edit_views_le(explorer_le)
-    hack_metadata_propagation(
-        explorer_le,
-        tbs,
-    )
 
     ########## Fertility rate explorer
     explorer_fr = explorer_creator.create(
@@ -247,20 +209,12 @@ def run() -> None:
         choice_renames={"age": lambda x: f"Mothers aged {x} years" if x != "all" else None},
     )
     view_editor.edit_views_fr(explorer_fr)
-    hack_metadata_propagation(
-        explorer_fr,
-        tbs,
-    )
 
     ########## Manual explorer: views with grouped indicators, and others
     explorer_manual = explorer_creator.create_manual(
         config=paths.load_explorer_config("un_wpp.manual.config.yml"),
     )
     view_editor.edit_views_manual(explorer_manual)
-    hack_metadata_propagation(
-        explorer_manual,
-        tbs,
-    )
 
     #################################################################################################
     # Combine explorers
@@ -318,24 +272,3 @@ def run() -> None:
 
     # # Save explorer (upsert to DB)
     explorer.save(tolerate_extra_indicators=True)
-
-
-def _get_tables(explorer_creator):
-    tbs = []
-    for tname in explorer_creator.ds_proj.table_names:
-        tb = explorer_creator.ds_proj.read(tname, load_data=False)
-        cols = []
-        for col in tb.columns:
-            if tb[col].m.dimensions and (tb[col].m.dimensions["variant"] in {"low", "medium", "high"}):
-                cols.append(col)
-        tb_ = tb[cols]
-        tbs.append(tb_)
-    for tname in explorer_creator.ds.table_names:
-        tb = explorer_creator.ds.read(tname, load_data=False)
-        cols = []
-        for col in tb.columns:
-            if tb[col].m.dimensions and (tb[col].m.dimensions["variant"] in {"estimates"}):
-                cols.append(col)
-        tb_ = tb[cols]
-        tbs.append(tb_)
-    return tbs

@@ -261,12 +261,15 @@ def main():
         st_show_diff(diff_str, height=800)
 
         # Create columns to show TSV files side by side
-        st.subheader("TSV Files")
+        st.subheader("Side by side")
+
         col1, col2 = st.columns(2)
         with col1:
+            st.subheader("Production")
             st.code(truncate_lines(target_data.tsv, MAX_DIFF_LINES), line_numbers=True, language="diff")
         with col2:
-            st.code(truncate_lines(target_data.tsv, MAX_DIFF_LINES), line_numbers=True, language="diff")
+            st.subheader("Staging")
+            st.code(truncate_lines(source_data.tsv, MAX_DIFF_LINES), line_numbers=True, language="diff")
 
     with yaml_tab:
         # Show diff

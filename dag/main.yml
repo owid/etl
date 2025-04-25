@@ -627,14 +627,6 @@ steps:
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
 
-  # IMF World Economic Outlook
-  data://meadow/imf/2024-11-25/world_economic_outlook:
-    - snapshot://imf/2024-11-25/world_economic_outlook.xls
-  data://garden/imf/2024-11-25/world_economic_outlook:
-    - data://meadow/imf/2024-11-25/world_economic_outlook
-  data://grapher/imf/2024-11-25/world_economic_outlook:
-    - data://garden/imf/2024-11-25/world_economic_outlook
-
   # GDP per capita vs. living conditions indicators
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
     - data://garden/worldbank_wdi/2025-01-24/wdi
@@ -685,6 +677,14 @@ steps:
     - data://meadow/happiness/2025-04-01/happiness_by_age
   data://grapher/happiness/2025-04-01/happiness_by_age:
     - data://garden/happiness/2025-04-01/happiness_by_age
+
+  # IMF World Economic Outlook
+  data://meadow/imf/2025-04-25/world_economic_outlook:
+    - snapshot://imf/2025-04-25/world_economic_outlook.xls
+  data://garden/imf/2025-04-25/world_economic_outlook:
+    - data://meadow/imf/2025-04-25/world_economic_outlook
+  data://grapher/imf/2025-04-25/world_economic_outlook:
+    - data://garden/imf/2025-04-25/world_economic_outlook
 
 include:
   - dag/open_numbers.yml

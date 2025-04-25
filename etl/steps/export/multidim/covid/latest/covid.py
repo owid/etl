@@ -74,4 +74,5 @@ def run() -> None:
 
 
 def fname_to_mdim_name(fname: str) -> str:
+    """Custom MDIM name generator."""
     return f"{fname.replace('.yml', '').replace('.', '_')}"

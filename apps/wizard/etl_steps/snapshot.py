@@ -720,7 +720,7 @@ if st.session_state["run_step"]:
     command_str = f"`{' '.join(commands)}`"
 
     # Run step
-    with st.spinner(f"Running snapshot step... {command_str}"):
+    with st.spinner(f"Running snapshot step... {command_str}", show_time=True):
         try:
             output = subprocess.check_output(args=commands)
         except Exception as e:
