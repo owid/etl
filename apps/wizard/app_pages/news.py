@@ -20,7 +20,7 @@ if (not DB_IS_SET_UP) | (not ENV_IS_REMOTE):
     st.stop()
 
 # GPT
-MODEL_NAME = "gpt-4o"
+MODEL_NAME = "gpt-4.1"
 # Map window types
 WINDOW_TYPES = {
     "7d": "Last 7 days",
@@ -90,7 +90,7 @@ with tab_1:
     # Summary
     st.subheader(f"Summary {window_suffix}")
     # with st.popover("Config"):
-    with st.spinner():
+    with st.spinner(show_time=True):
         result = WizardDB.get_news_summary(window_type=st.session_state.window_type)
         if result:
             summary, dt, cost = result

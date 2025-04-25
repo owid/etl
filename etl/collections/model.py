@@ -9,7 +9,7 @@ THINGS TO SOLVE:
 
 import json
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
 
@@ -17,10 +17,16 @@ import fastjsonschema
 import pandas as pd
 import yaml
 from owid.catalog.meta import GrapherConfig, MetaBase
+from structlog import get_logger
 
+from etl.collections.exceptions import DuplicateCollectionViews
 from etl.collections.utils import merge_common_metadata_by_dimension
 from etl.files import yaml_dump
-from etl.paths import SCHEMAS_DIR
+from etl.paths import EXPORT_DIR, SCHEMAS_DIR
+
+# Initialize logger.
+log = get_logger()
+
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 T = TypeVar("T")
@@ -470,10 +476,17 @@ class Collection(MDIMBase):
 
     dimensions: List[Dimension]
     views: List[Any]
+    catalog_path: str
 
     # Private for fast access
     # _views_hash: Optional[Dict[str, Any]] = None
     # _dimensions_hash: Optional[Dict[str, Dimension]] = None
+
+    # Internal use. For save() method.
+    _collection_type: Optional[str] = field(init=False, default=None)
+
+    def __post_init__(self):
+        assert "#" in self.catalog_path, "Catalog path should be in the format `path#name`."
 
     @property
     def v(self):
@@ -482,6 +495,25 @@ class Collection(MDIMBase):
     @property
     def d(self):
         return self.dimensions
+
+    @property
+    def local_config_path(self) -> Path:
+        # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
+        if self._collection_type is None:
+            raise ValueError("_collection_type must have a value!")
+        collection_dir = "explorers" if self._collection_type == "explorer" else self._collection_type
+        return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
+
+    @property
+    def name(self):
+        _, name = self.catalog_path.split("#")
+        return name
+
+    def save_config_local(self) -> None:
+        log.info(f"Exporting config to {self.local_config_path}")
+        self.save_file(self.local_config_path)
+        # with open(self.local_config_path, "w") as f:
+        #     yaml_dump(config, f)
 
     def save(self):  # type: ignore[override]
         raise NotImplementedError("This method should be implemented in the children class")
@@ -563,7 +595,7 @@ class Collection(MDIMBase):
         for view in self.views:
             dims = tuple(view.dimensions.items())
             if dims in seen_dims:
-                raise ValueError(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
+                raise DuplicateCollectionViews(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
             seen_dims.add(dims)
 
         # NOTE: this is allowed, some views might contain other views

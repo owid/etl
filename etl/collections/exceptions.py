@@ -1,0 +1,2 @@
+class DuplicateCollectionViews(Exception):
+    pass
