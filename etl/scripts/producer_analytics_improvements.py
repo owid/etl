@@ -461,7 +461,21 @@ def run():
     insert_image(google_doc, image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
     insert_list(google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
     insert_list(google_doc, df=df_top_articles, placeholder=r"{{top_articles_list}}")
-    insert_list(google_doc, df=df_top_insights, placeholder=r"{{top_insights_list}}")
+    if not df_top_insights.empty:
+        # Get the index of the position of the data_insights placeholder.
+        insert_index = google_doc.find_marker_index(doc_id=report_id, marker=r"{{data_insights}}")
+
+        if len(df_top_insights) == 1:
+            text = f"""
+During {quarter_date_humanized}, the following data insight was also published:
+            """
+        else:
+            text = f"""
+During {quarter_date_humanized}, the following data insights were also published:
+            """
+        edits = [{"insertText": {"location": {"index": insert_index}, "text": text}}]
+        google_doc.edit(doc_id=report_id, requests=edits)
+        insert_list(google_doc, df=df_top_insights, placeholder=r"{{data_insights}}")
 
 
 if __name__ == "__main__":
