@@ -335,12 +335,12 @@ def combine_mdims(
                 slug=MDIM_SLUG,
                 name=mdim_dimension_name,
                 choices=[
-                    DimensionChoice(slug=mdim.name, name=choice),
+                    DimensionChoice(slug=mdim.short_name, name=choice),
                 ],
             )
             mdim.dimensions = [dimension_mdim] + mdim.dimensions
             for v in mdim.views:
-                v.dimensions[MDIM_SLUG] = mdim.name
+                v.dimensions[MDIM_SLUG] = mdim.short_name
 
     # 0) Preliminary work #
     # Create dictionary with MDIMs, so to have identifiers for them
@@ -404,7 +404,7 @@ def combine_mdims(
             log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
             for _, subgroup in group.groupby("choice_slug_id"):
                 collection_ids = subgroup["collection_id"].unique().tolist()
-                explorer_names = [mdims_by_id[i].name for i in collection_ids]
+                explorer_names = [mdims_by_id[i].short_name for i in collection_ids]
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
                 log.warning(f" MDIMs {explorer_names} map to {record[0]}")
