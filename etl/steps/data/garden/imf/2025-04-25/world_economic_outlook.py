@@ -27,24 +27,31 @@ def run() -> None:
         countries_file=paths.country_mapping_path,
     )
 
-    # Convert 'year' to datetime if using time interpolation
-    tb["year_dt"] = pd.to_datetime(tb["year"], format="%Y")
-    tb = tb.sort_values(["country", "year_dt"]).reset_index(drop=True)
+    tb = tb.sort_values(["country", "year"]).reset_index(drop=True)
     for col in tb.columns:
         if col in [
             "gross_domestic_product__constant_prices__percent_change_observation",
             "unemployment_rate__percent_of_total_labor_force_observation",
         ]:
-            print(tb)
-            # Apply interpolation and rolling per group
+            # 1. Identify the last observed (non-null) year per country for this column
+            last_obs = tb.loc[tb[col].notnull()].groupby("country")["year"].max()
+
+            # 2. Add helper column to mark if the row is beyond last observation
+            tb["last_obs_year"] = tb["country"].map(last_obs)
+            mask = tb["year"] <= tb["last_obs_year"]  # only keep rows up to last non-null year
+
+            # 3. Apply rolling mean **only on rows up to last observation**
             tb["rolling_" + col] = (
-                tb[[col, "year_dt", "country"]]
-                .groupby("country")
-                .apply(lambda g: g.set_index("year_dt")[col].interpolate(method="time").rolling(10, center=True).mean())
-                .reset_index(drop=True)
+                tb[mask]  # restrict to valid rows
+                .groupby("country")[col]
+                .transform(lambda x: x.rolling(10, min_periods=5).mean())
             )
-    tb = tb.drop(columns=["year_dt"])
-    print(tb.columns)
+
+            # 4. Clean up: make sure other rows (after last obs) are NaN in the rolling column
+            tb["rolling_" + col] = tb["rolling_" + col].where(mask)
+
+    # Drop helper column if not needed
+    tb = tb.drop(columns="last_obs_year")
     tb = tb.format(["country", "year"])
 
     #
