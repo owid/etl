@@ -35,10 +35,11 @@ def run() -> None:
             # Apply interpolation and rolling per group
             tb["rolling_" + col] = (
                 tb.groupby("country")
-                .apply(lambda g: g.set_index("year_dt")[col].interpolate(method="time").rolling(10).mean())
+                .apply(lambda g: g.set_index("year_dt")[col].interpolate(method="time").rolling(10, center=True).mean())
                 .reset_index(drop=True)
             )
     tb = tb.drop(columns=["year_dt"])
+    print(tb)
     tb = tb.format(["country", "year"])
 
     #
