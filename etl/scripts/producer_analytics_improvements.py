@@ -1,13 +1,12 @@
 """Play around with producer analytics."""
 
-import re
 from datetime import datetime
 
 import pandas as pd
 import requests
-from IPython.display import HTML, display
 from structlog import get_logger
 
+from apps.utils.google import GoogleDocHandler
 from apps.wizard.app_pages.producer_analytics.data_io import get_analytics
 from etl.config import OWID_ENV
 from etl.data_helpers.misc import round_to_sig_figs
@@ -19,32 +18,52 @@ log = get_logger()
 # Initialize database engine.
 engine = get_engine()
 
+# Folder ID for reports.
+FOLDER_ID = "1SySOSNXgNLEJe2L1k7985p-zSeUoU4kN"
+
+# Document ID of template.
+TEMPLATE_ID = "149cLrJK9VI-BNjnM-LxnWgbQoB7mwjSpgjO497rzxeU"
+
 
 # TODO: Move to data_helpers.
 def humanize_number(number, sig_figs=2):
-    scale_factors = {
-        "quadrillion": 1e15,
-        "trillion": 1e12,
-        "billion": 1e9,
-        "million": 1e6,
-    }
-    for scale_name, threshold in scale_factors.items():
-        if number >= threshold:
-            value = round_to_sig_figs(number / threshold, sig_figs)
-            break
+    if isinstance(number, int) and (number < 11):
+        humanized = {
+            1: "one",
+            2: "two",
+            3: "three",
+            4: "four",
+            5: "five",
+            6: "six",
+            7: "seven",
+            8: "eight",
+            9: "nine",
+            10: "ten",
+        }[number]
     else:
-        value = round_to_sig_figs(number, sig_figs)
-        scale_name = ""
+        scale_factors = {
+            "quadrillion": 1e15,
+            "trillion": 1e12,
+            "billion": 1e9,
+            "million": 1e6,
+        }
+        for scale_name, threshold in scale_factors.items():
+            if number >= threshold:
+                value = round_to_sig_figs(number / threshold, sig_figs)
+                break
+        else:
+            value = round_to_sig_figs(number, sig_figs)
+            scale_name = ""
 
-    # Format number with commas.
-    value_str = f"{value:,}"
+        # Format number with commas.
+        value_str = f"{value:,}"
 
-    # Remove trailing zeros.
-    if ("." in value_str) and (len(value_str.split(".")[0]) >= sig_figs):
-        value_str = value_str.split(".")[0]
+        # Remove trailing zeros.
+        if ("." in value_str) and (len(value_str.split(".")[0]) >= sig_figs):
+            value_str = value_str.split(".")[0]
 
-    # Combine number and scale.
-    humanized = f"{value_str} {scale_name}".strip()
+        # Combine number and scale.
+        humanized = f"{value_str} {scale_name}".strip()
 
     return humanized
 
@@ -77,11 +96,12 @@ def run():
 
     df_top_charts = (
         df_producer.sort_values("views_custom", ascending=False)[["chart_url", "views_custom"]]
+        .rename(columns={"chart_url": "url", "views_custom": "views"})
         .reset_index(drop=True)
         .head(10)
     )
     # Fetch titles from chart API.
-    df_top_charts["chart_title"] = df_top_charts["chart_url"].apply(get_chart_title_from_url)
+    df_top_charts["title"] = df_top_charts["url"].apply(get_chart_title_from_url)
 
     # I need to find references of charts in articles.
     # NOTE: A priori, the query could be as simple as follows:
@@ -99,7 +119,7 @@ def run():
         pg.published,
         pg.authors,
         pg.publishedAt,
-        JSON_UNQUOTE(JSON_EXTRACT(pg.content, '$.title')) AS article_title,
+        JSON_UNQUOTE(JSON_EXTRACT(pg.content, '$.title')) AS title,
         pgl.target,
         pgl.linkType,
         pgl.componentType,
@@ -209,7 +229,7 @@ def run():
         df_links[
             (df_links["componentType"].isin(ALLOWED_COMPONENT_TYPES))
             & (df_links["chart_url"].isin(df_producer["chart_url"]))
-        ][["type", "content_url", "publishedAt", "article_title"]]
+        ][["type", "content_url", "publishedAt", "title"]]
         .rename(columns={"publishedAt": "publication_date"})
         .drop_duplicates()
         .reset_index(drop=True)
@@ -242,7 +262,7 @@ def run():
     # Execute the query.
     df_views = pd.read_gbq(query, project_id="owid-analytics")
     df_views = df_views.merge(
-        df_content[["content_url", "article_title"]].rename(columns={"content_url": "url"}), on="url", how="left"
+        df_content[["content_url", "title"]].rename(columns={"content_url": "url"}), on="url", how="left"
     )
 
     df_articles = (
@@ -272,25 +292,26 @@ def run():
     df_top_insights = df_insights.head(10)
 
     ####################################################################################################################
-    # From Metabase policy_mentions (selecting the right date range):
-    # I manually selected 2025 Q1, and downloaded the file.
-    # TODO: Gather this programmatically from policy_mentions
-    df_policy = pd.read_csv("~/Downloads/query_result_2025-04-18T13_25_42.754831862Z.csv")
+    # The following code was discarded.
+    # We decided that citations need to be inspected by a human, instead of fetched automatically.
+    # # From Metabase policy_mentions (selecting the right date range):
+    # # I manually selected 2025 Q1, and downloaded the file.
+    # df_policy = pd.read_csv("~/Downloads/query_result_2025-04-18T13_25_42.754831862Z.csv")
 
-    # Compile the regex pattern once
-    regex_pattern = re.compile(r'https:\/\/ourworldindata\.org\/[^\s"\'\)\]\.,;:]+')
-    df_policy["owid_urls"] = df_policy["matched_mentions"].apply(lambda x: regex_pattern.findall(x or ""))
-    # Create one row per mention.
-    df_policy = df_policy.explode("owid_urls").dropna(subset="owid_urls").reset_index(drop=True)
+    # # Compile the regex pattern once
+    # regex_pattern = re.compile(r'https:\/\/ourworldindata\.org\/[^\s"\'\)\]\.,;:]+')
+    # df_policy["owid_urls"] = df_policy["matched_mentions"].apply(lambda x: regex_pattern.findall(x or ""))
+    # # Create one row per mention.
+    # df_policy = df_policy.explode("owid_urls").dropna(subset="owid_urls").reset_index(drop=True)
 
-    # Clean owid urls.
-    df_policy["owid_urls"] = [url.split("?")[0] for url in df_policy["owid_urls"]]
+    # # Clean owid urls.
+    # df_policy["owid_urls"] = [url.split("?")[0] for url in df_policy["owid_urls"]]
 
-    # Identify policy mentions of the content (charts and articles) that display data from the data producer.
-    df_policy = df_policy[df_policy["owid_urls"].isin(content_urls)].reset_index(drop=True)
+    # # Identify policy mentions of the content (charts and articles) that display data from the data producer.
+    # df_policy = df_policy[df_policy["owid_urls"].isin(content_urls)].reset_index(drop=True)
 
-    # It seems there are duplicates, remove them.
-    df_policy = df_policy.drop_duplicates(subset=["url", "pdf_url"]).reset_index(drop=True)
+    # # It seems there are duplicates, remove them.
+    # df_policy = df_policy.drop_duplicates(subset=["url", "pdf_url"]).reset_index(drop=True)
 
     # This returns a list of policy documents that cite one of our articles, that displays data from a data producer.
 
@@ -305,181 +326,107 @@ def run():
     n_days_in_quarter = (datetime.strptime(max_date, "%Y-%m-%d") - datetime.strptime(min_date, "%Y-%m-%d")).days + 1
     n_daily_chart_views = n_chart_views / n_days_in_quarter
     n_daily_article_views = n_article_views / n_days_in_quarter
-    n_policy_papers = len(df_policy)
-    # TODO: Figure out a way to get this number automatically.
-    # For now, gather these manually:
-    # * Print df_insights, and, for each one (or at least the most popular one):
-    # * Identify the insight in https://admin.owid.io/admin/data-insights
-    # * Identify (and download) the corresponding static chart in https://admin.owid.io/admin/images
-    # * Scroll through insta and select any post where Data Source is the current producer.
-    #   Stop scrolling beyond the current quarter.
-    # * Add up likes and comments of that post, and write it here.
-    n_max_social_media_interactions = 7100
 
     # Humanize numbers.
     n_charts_humanized = humanize_number(n_charts)
     n_articles_humanized = humanize_number(n_articles)
     n_chart_views_humanized = humanize_number(n_chart_views)
-    n_daily_views_humanized = humanize_number(n_daily_chart_views)
-    n_policy_papers_humanized = humanize_number(n_policy_papers)
-    n_max_social_media_interactions_humanized = humanize_number(n_max_social_media_interactions)
+    n_daily_chart_views_humanized = humanize_number(n_daily_chart_views)
+    n_article_views_humanized = humanize_number(n_article_views)
+    n_daily_article_views_humanized = humanize_number(n_daily_article_views)
+    n_insights_humanized = humanize_number(n_insights)
     max_date_humanized = datetime.strptime(max_date, "%Y-%m-%d").strftime("%B %d, %Y")
     quarter_date_humanized = f"the {quarters[quarter]['name']} quarter of {year}"
 
     ####################################################################################################################
     # Prepare text for report.
-    # TODO: For now, the content is manually copy/pasted. Eventually, we'll have to figure out how to generate a gdoc.
-    # NOTE: paste only the content, and keep the titles untouched.
     # TODO: Handle plurals and cases where no DIs are published in the quarter. For now, manually edit the text.
 
     # Executive summary.
-    intro = f"""As of {max_date_humanized}, Our World in Data features your data in {n_charts_humanized} charts, {n_articles_humanized} articles and {n_insights} data insights.<br><br>
-    During {quarter_date_humanized}, those charts generated <b>{n_chart_views_humanized} views</b>. This amounts to an average of <b>{n_daily_views_humanized} views per day</b>.<br><br>"""
-    if n_policy_papers == 1:
-        intro += f"""During this period, that content has also been cited by <b>{n_policy_papers_humanized} policy document</b>.<br><br>"""
-    elif n_policy_papers > 1:
-        intro += f"""During this period, that content has also been cited by <b>{n_policy_papers_humanized} policy documents</b>.<br><br>"""
-    if n_max_social_media_interactions > 0:
-        intro += f"""We also share content across various social media platforms, where we've built a cumulative audience of over 100,000 followers. Our most popular post featuring your data accumulated a total of <b>{n_max_social_media_interactions_humanized} interactions</b>.<br>"""
-    display_format_prefix = """<div style="font-family: 'Lato', sans-serif; font-size: 13px; color: black;">"""
-    display(HTML(display_format_prefix + intro + "</div>"))
+    executive_summary_intro = f"""As of {max_date_humanized}, Our World in Data features your data in"""
+    if n_charts == 0:
+        raise AssertionError("Expected at least one chart to report.")
+    elif n_charts == 1:
+        executive_summary_intro += f""" {n_charts_humanized} chart"""
+    else:
+        executive_summary_intro += f""" {n_charts_humanized} charts"""
+    if n_articles == 0:
+        raise AssertionError("Expected at least one article to report.")
+
+    plural_articles = "s" if n_articles > 1 else ""
+    plural_insights = "s" if n_insights > 1 else ""
+    if n_insights == 0:
+        executive_summary_intro += f""" and {n_articles_humanized} article{plural_articles}."""
+    else:
+        executive_summary_intro += f""", {n_articles_humanized} article{plural_articles}, and {n_insights_humanized} data insight{plural_insights}."""
 
     ####################################################################################################################
 
-    # Top performing charts.
-    chart_list_html = ""
+    # TODO: Make into a function.
+    # def create_report(producer: str, quarter: int, year: int):
+    report_title = f"{year}-Q{quarter} Our World in Data analytics report for {producer}"
+    # Initialize a google doc object.
+    google_doc = GoogleDocHandler()
+    # google_doc.list_files_in_folder(folder_id=FOLDER_ID)
+    # Duplicate template report.
+    # NOTE: Unclear why sometimes we need to use "title" and sometimes "name".
+    report_id = google_doc.copy(doc_id=TEMPLATE_ID, body={"name": report_title})
 
-    # Build list of clickable titles.
-    chart_list_html = "\n".join(
-        [
-            f"""<li>
-            <a href="{row['chart_url']}" target="_blank" style="color: #1155cc; text-decoration: none;">
-                {row['chart_title']}
-            </a> – {row['views_custom']:,} views
-        </li>"""
-            for _, row in df_top_charts.iterrows()
-        ]
-    )
-    top_charts = f"""
-    <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000;">
-        Your data is featured in {n_charts_humanized} charts at Our World in Data.
-    </p>
+    # Replace simple placeholders.
+    replacements = {
+        r"{{producer}}": "Global Carbon Project",
+        r"{{year}}": "2025",
+        r"{{quarter}}": "Q1",
+        r"{{executive_summary_intro}}": executive_summary_intro,
+        r"{{n_charts_humanized}}": n_charts_humanized,
+        r"{{n_articles_humanized}}": n_articles_humanized,
+        r"{{n_article_views_humanized}}": n_article_views_humanized,
+        r"{{quarter_date_humanized}}": quarter_date_humanized,
+        r"{{n_chart_views_humanized}}": n_chart_views_humanized,
+        r"{{n_daily_chart_views_humanized}}": n_daily_chart_views_humanized,
+        r"{{n_daily_article_views_humanized}}": n_daily_article_views_humanized,
+    }
+    google_doc.replace_text(doc_id=report_id, mapping=replacements)
 
-    <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000;">
-        During {quarter_date_humanized}, these charts received:
-    </p>
+    def insert_list(google_doc, df, placeholder):
+        # For chart lists, get the index of the position where it should be introduced.
+        insert_index = google_doc.find_marker_index(doc_id=report_id, marker=placeholder)
 
-    <ul style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000; margin-top: -8px; margin-bottom: 16px;">
-        <li>A total of {n_chart_views:,} views.</li>
-        <li>An average of {int(n_daily_chart_views):,} daily views.</li>
-    </ul>
+        requests = []
+        end_index = insert_index
+        for i, (_, row) in enumerate(df.iterrows(), start=1):
+            title = row["title"]
+            url = row["url"]
+            views = f"{row['views']:,}"
 
-    <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000;">
-        The charts that received most views were:
-    </p>
+            numbered_title = f"{i}. {title}"
+            line = f"{numbered_title} – {views} views\n"
 
-    <ol style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000; margin-top: 8px;">
-        {chart_list_html}
-    </ol>
-    """
-    display(HTML(top_charts))
-    # Then manually add the png of the top chart.
+            # Insert line of text.
+            requests.append({"insertText": {"location": {"index": end_index}, "text": line}})
+            # Apply link to just the title (excluding "1. ").
+            title_start = end_index + len(f"{i}. ")
+            title_end = title_start + len(title)
+            requests.append(
+                {
+                    "updateTextStyle": {
+                        "range": {"startIndex": title_start, "endIndex": title_end},
+                        "textStyle": {"link": {"url": url}},
+                        "fields": "link",
+                    }
+                }
+            )
+            end_index += len(line)
 
-    ####################################################################################################################
+        # Apply edits to insert list in the right place.
+        google_doc.edit(doc_id=report_id, requests=requests)
 
-    # Top performing articles.
-    article_list_html = ""
+        # Remove the original placeholder text.
+        google_doc.replace_text(doc_id=report_id, mapping={placeholder: ""})
 
-    # Build list of clickable titles.
-    article_list_html = "\n".join(
-        [
-            f"""<li>
-            <a href="{row['url']}" target="_blank" style="color: #1155cc; text-decoration: none;">
-                {row['article_title']}
-            </a> – {row['views']:,} views
-        </li>"""
-            for _, row in df_top_articles.iterrows()
-        ]
-    )
-    top_articles = f"""
-    <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000;">
-        Your data is featured in {n_articles_humanized} articles at Our World in Data.
-    </p>
-
-    <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000;">
-        During {quarter_date_humanized}, these articles received:
-    </p>
-
-    <ul style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000; margin-top: -8px; margin-bottom: 16px;">
-        <li>A total of {n_article_views:,} views.</li>
-        <li>An average of {int(n_daily_article_views):,} daily views.</li>
-    </ul>
-
-    <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000;">
-        The articles that received most views were:
-    </p>
-
-    <ol style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000; margin-top: 8px;">
-        {article_list_html}
-    </ol>
-    """
-    display(HTML(top_articles))
-
-    ####################################################################################################################
-
-    # Top performing data insights.
-    insight_list_html = ""
-
-    # Build list of clickable titles.
-    insight_list_html = "\n".join(
-        [
-            f"""<li>
-            <a href="{row['url']}" target="_blank" style="color: #1155cc; text-decoration: none;">
-                {row['article_title']}
-            </a>
-        </li>"""
-            for _, row in df_top_insights.iterrows()
-        ]
-    )
-    top_insights = f"""
-    <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000;">
-        During {quarter_date_humanized}, the top performing data insights in terms of views are the following:
-    </p>
-
-    <ol style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000; margin-top: 8px;">
-        {insight_list_html}
-    </ol>
-    """
-    display(HTML(top_insights))
-
-    ####################################################################################################################
-
-    # Mentions in policy documents.
-    policy_list_html = ""
-
-    # Build list of clickable titles.
-    policy_list_html = "\n".join(
-        [
-            f"""<li>
-            <a href="{row['url']}" target="_blank" style="color: #1155cc; text-decoration: none;">
-                {row['title']}
-            </a>
-        </li>"""
-            for _, row in df_policy.iterrows()
-        ]
-    )
-    policy_mentions = f"""
-    <p style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000;">
-        During {quarter_date_humanized}, your data has been mentioned in {len(df_policy)} policy documents:
-    </p>
-
-    <ol style="font-family: 'Lato', sans-serif; font-size: 13px; color: #000000; margin-top: 8px;">
-        {policy_list_html}
-    </ol>
-    """
-    display(HTML(policy_mentions))
-
-    ####################################################################################################################
+    insert_list(google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
+    insert_list(google_doc, df=df_top_articles, placeholder=r"{{top_articles_list}}")
+    insert_list(google_doc, df=df_top_insights, placeholder=r"{{top_insights_list}}")
 
 
 if __name__ == "__main__":
