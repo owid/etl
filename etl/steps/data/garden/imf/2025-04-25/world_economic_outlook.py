@@ -31,15 +31,20 @@ def run() -> None:
     tb["year_dt"] = pd.to_datetime(tb["year"], format="%Y")
     tb = tb.sort_values(["country", "year_dt"]).reset_index(drop=True)
     for col in tb.columns:
-        if col not in ["country", "year", "year_dt"]:
+        if col in [
+            "gross_domestic_product__constant_prices__percent_change_observation",
+            "unemployment_rate__percent_of_total_labor_force_observation",
+        ]:
+            print(tb)
             # Apply interpolation and rolling per group
             tb["rolling_" + col] = (
-                tb.groupby("country")
+                tb[[col, "year_dt", "country"]]
+                .groupby("country")
                 .apply(lambda g: g.set_index("year_dt")[col].interpolate(method="time").rolling(10, center=True).mean())
                 .reset_index(drop=True)
             )
     tb = tb.drop(columns=["year_dt"])
-    print(tb)
+    print(tb.columns)
     tb = tb.format(["country", "year"])
 
     #
