@@ -11,13 +11,14 @@ import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Dict, List, Optional, Self, TypeGuard, TypeVar, Union
+from typing import Any, Callable, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
 
 import fastjsonschema
 import pandas as pd
 import yaml
 from owid.catalog.meta import GrapherConfig, MetaBase
 from structlog import get_logger
+from typing_extensions import Self
 
 from etl.collections.exceptions import DuplicateCollectionViews
 from etl.collections.utils import merge_common_metadata_by_dimension, validate_indicators_in_db
