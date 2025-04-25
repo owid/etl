@@ -96,17 +96,17 @@ def _display_mdim_selection(hide_unchanged_mdims: bool) -> str | None:
     return mdim_catalog_path
 
 
-def _fetch_mdim_data(mdim_catalog_path: str):
-    """Fetch MDIM configuration data from both environments."""
+def _fetch_mdims(mdim_catalog_path: str) -> tuple[gm.MultiDimDataPage, gm.MultiDimDataPage]:
+    """Fetch MDIMs from both environments."""
 
-    def load_mdim_config(engine):
+    def load_mdim_config(engine) -> gm.MultiDimDataPage:
         with Session(engine) as session:
-            return gm.MultiDimDataPage.load_mdim(session, catalogPath=mdim_catalog_path).config  # type: ignore
+            return gm.MultiDimDataPage.load_mdim(session, catalogPath=mdim_catalog_path)  # type: ignore
 
-    config_source = load_mdim_config(SOURCE_ENGINE)
-    config_target = load_mdim_config(TARGET_ENGINE)
+    source_mdim = load_mdim_config(SOURCE_ENGINE)
+    target_mdim = load_mdim_config(TARGET_ENGINE)
 
-    return config_source, config_target
+    return source_mdim, target_mdim
 
 
 def _display_config_diff(config_source, config_target):
@@ -170,18 +170,20 @@ def _display_mdim_comparison(mdim_slug: str, view: dict):
     # Create columns for side by side comparison
     col1, col2 = st.columns(2)
 
-    # kwargs = {"explorer_slug": explorer_slug, "view": view, "default_display": st.session_state.get("default_display")}
+    # TODO: use proper view!
+    view = {}
+
+    kwargs = {"mdim_slug": mdim_slug, "view": view, "default_display": st.session_state.get("default_display")}
 
     with col1:
         st.subheader("Production MDIM")
-        # explorer_chart(base_url="https://ourworldindata.org/explorers", **kwargs)
-        mdim_chart("energy_prices")
+        mdim_chart(base_url="https://ourworldindata.org/grapher", **kwargs)
 
     with col2:
         st.subheader("Staging MDIM")
         assert OWID_ENV.site
-        mdim_chart("energy_prices")
-        # explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
+        # TODO: can we use preview URL here?
+        mdim_chart(base_url=OWID_ENV.site + "/grapher", **kwargs)
 
 
 def main():
@@ -202,17 +204,19 @@ def main():
     if not mdim_catalog_path:
         return
 
-    # Step 2: Display MDIM comparison
-    _display_mdim_comparison(None, None)
+    # Fetch MDIMs
+    source_mdim, target_mdim = _fetch_mdims(mdim_catalog_path)
+    assert source_mdim.slug, f"MDIM slug does not exist for {mdim_catalog_path}"
 
-    # Step 2: Fetch MDIM data
-    config_source, config_target = _fetch_mdim_data(mdim_catalog_path)
+    # Step 2: Display MDIM comparison
+    # TODO: use view instead of None
+    _display_mdim_comparison(source_mdim.slug, None)
 
     # Step 3: Display config diff
-    _display_config_diff(config_source, config_target)
+    _display_config_diff(source_mdim.config, target_mdim.config)
 
     # Step 4: Display config sections in tabs
-    _display_config_in_tabs(config_target, config_source, MAX_DIFF_LINES)
+    _display_config_in_tabs(source_mdim.config, target_mdim.config, MAX_DIFF_LINES)
 
 
 main()

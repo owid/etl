@@ -176,8 +176,32 @@ def explorer_chart(
     return st.components.v1.html(HTML, height=height)  # type: ignore
 
 
-def mdim_chart(mdim_slug: str, height: int = 600):
-    url = "http://staging-site-mdim-iframe/grapher/mdd-energy-prices"
+def mdim_chart(base_url: str, mdim_slug: str, view: dict, height: int = 600, default_display: Optional[str] = None):
+    # First HTML definition with parameters
+    url = f"{base_url}/{mdim_slug}"
+
+    params = {
+        "hideControls": "true",
+        **view,
+    }
+    if default_display is not None:
+        dd = default_display.lower()
+        if dd in ["map", "table", "chart"]:
+            params["tab"] = dd
+
+    query_string = "?" + urllib.parse.urlencode(params)
+
+    query_string = ""
+
+    HTML = f"""
+    <!-- Redirect to the external URL -->
+    <meta http-equiv="refresh" content="0; url={url}{query_string}">
+    """
+
+    # Render the HTML
+    return st.components.v1.html(HTML, height=height)  # type: ignore
+
+    url = f"http://staging-site-mdim-iframe/grapher/{mdim_slug}"
     # query_string = "?country=OWID_WRL~OWID_EUR~OWID_ASI~ALB&amp;povertyLine=3.65&amp;metric=absolute"
     query_string = "?hideControls=true"
 
