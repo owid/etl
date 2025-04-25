@@ -61,6 +61,50 @@ MDIM_TITLE = "MDIM"
 #     )
 
 
+def mdim_to_explorer(mdim: Multidim):
+    """Experimental."""
+    # Convert MDIM config to raw dict and check that it has the required fields.
+    mdim_dict = mdim.to_dict()
+    assert "title" in mdim_dict, "MDIM should have a title."
+    assert "title_variant" in mdim_dict["title"], "MDIM['title'] should have a title variant."
+    assert "title" in mdim_dict["title"], "MDIM['title'] should have a title."
+    assert "default_selection" in mdim_dict, "MDIM should have a default_selection."
+
+    # Build explorer config
+    config = {
+        "explorerTitle": mdim.title["title"],
+        "explorerSubtitle": mdim.title["title_variant"],
+        "selection": mdim.default_selection,
+    }
+
+    # Tweak views so they have only explorer-valid fields.
+    # NOTE 1: currently we just drop `config`!
+    # NOTE 2: we should also check the display settings for indicators and translate them into explorer-valid settings!
+    assert "views" in mdim_dict, "MDIM should have views."
+    views = []
+    for view in mdim_dict["views"]:
+        view_new = {
+            "dimensions": view["dimensions"],
+            "indicators": view["indicators"],
+        }
+        views.append(view_new)
+
+    # Create explorer config dict
+    assert "dimensions" in mdim_dict, "MDIM should have dimensions."
+    assert "catalog_path" in mdim_dict, "MDIM should have catalog_path."
+    explorer_dict = {
+        "config": config,
+        "dimensions": mdim_dict["dimensions"],
+        "views": views,
+        "catalog_path": mdim.catalog_path,
+    }
+
+    # Construct explorer
+    explorer = Explorer.from_dict(explorer_dict)
+
+    return explorer
+
+
 def create_explorer_experimental(
     paths: PathFinder,
     config_yaml: Dict[str, Any],
@@ -377,7 +421,7 @@ def combine_mdims(
         explorer_views = explorer.views
         views.extend(explorer_views)
 
-    # 3) Ad-hoc change: update explorer_name #
+    # 3) Ad-hoc change: update short_name #
     assert isinstance(mdims[0].catalog_path, str), "Catalog path is not set. Please set it before saving."
     catalog_path = mdims[0].catalog_path.split("#")[0] + "#" + mdim_name
 
@@ -395,7 +439,11 @@ def combine_mdims(
         config["default_selection"] = mdims[0].default_selection
 
     # Set dimensions and views
-    config["dimensions"] = dimensions
+    config["dimensions"] = combine_config_dimensions(
+        config_dimensions=[d.to_dict() for d in dimensions],
+        config_dimensions_yaml=config["dimensions"],
+    )  # type: ignore
+    # dimensions
     config["views"] = views
 
     # 4) Create final explorer #
@@ -404,6 +452,8 @@ def combine_mdims(
         dependencies=dependencies if dependencies is not None else set(),
         catalog_path=catalog_path,
     )
+    dim_slugs_ordered = [MDIM_SLUG] + [d.slug for d in mdim.dimensions if d.slug != MDIM_SLUG]
+    mdim.sort_dimensions(dim_slugs_ordered)
 
     # 5) Announce conflicts
     df_conflict = df_choices.loc[df_choices["in_conflict"]]
