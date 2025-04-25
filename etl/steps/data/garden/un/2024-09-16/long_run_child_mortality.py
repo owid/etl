@@ -4,7 +4,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 REGIONS = geo.REGIONS
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -24,13 +24,13 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset and filter out the main indicator, under five mortality, central estimate, both sexes, all wealth quintiles.
     tb_igme = ds_igme["igme"].reset_index()
     tb_igme = tb_igme[
-        (tb_igme["indicator"] == "Under-five mortality rate")
+        (tb_igme["indicator"] == "Child mortality rate")
         & (tb_igme["sex"] == "Total")
         & (tb_igme["wealth_quintile"] == "Total")
     ]
     assert len(tb_igme) > 0, "Check you are using the right terms to filter the data"
-    tb_igme = tb_igme.rename(columns={"obs_value": "under_five_mortality"}).drop(
-        columns=["lower_bound", "upper_bound", "sex", "wealth_quintile", "indicator", "unit_of_measure"]
+    tb_igme = tb_igme.rename(columns={"observation_value": "child_mortality_rate"}, errors="raise").drop(
+        columns=["sex", "wealth_quintile", "indicator", "unit_of_measure"]
     )
     # Select out columns of interest.
     tb_igme["source"] = "igme"
@@ -40,15 +40,16 @@ def run(dest_dir: str) -> None:
     max_year = tb_igme["year"].max()
     tb_gap_full = ds_gapminder_v11["under_five_mortality"].reset_index()
     tb_gap_full = tb_gap_full[tb_gap_full["year"] <= max_year].reset_index(drop=True)
-    tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
+    tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "child_mortality_rate"}, errors="raise")
     tb_gap_full["source"] = "gapminder"
-    tb_gap_full["under_five_mortality"] = tb_gap_full["under_five_mortality"].div(10)
+    tb_gap_full["child_mortality_rate"] = tb_gap_full["child_mortality_rate"].div(10)
 
     # Load Gapminder data v7 - has the source of the data (unlike v11)
     # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
     tb_gap_sel["source"] = "gapminder"
-    tb_gap_sel["under_five_mortality"] = tb_gap_sel["under_five_mortality"].div(10)
+    tb_gap_sel = tb_gap_sel.rename(columns={"under_five_mortality": "child_mortality_rate"}, errors="raise")
+    tb_gap_sel["child_mortality_rate"] = tb_gap_sel["child_mortality_rate"].div(10)
     # Remove the early years for Austria - there is a signicant jump in the data in 1830 which suggests an incongruency in method or data availability
     tb_gap_sel = remove_early_years_austria(tb_gap_sel)
 
@@ -68,7 +69,7 @@ def run(dest_dir: str) -> None:
 
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_combined_full, tb_combined_sel], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_combined_full, tb_combined_sel], check_variables_metadata=True)
     # Save changes in the new garden dataset.
     ds_garden.save()
 
@@ -127,9 +128,9 @@ def calculate_share_surviving_first_five_years(tb_combined: Table) -> Table:
 
     # Add global labels and calculate the share of children surviving/dying in their first five years
 
-    tb_world["share_dying_first_five_years"] = tb_world["under_five_mortality"]
-    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["under_five_mortality"])
+    tb_world["share_dying_first_five_years"] = tb_world["child_mortality_rate"]
+    tb_world["share_surviving_first_five_years"] = 100 - (tb_world["child_mortality_rate"])
 
-    tb_world = tb_world.drop(columns=["under_five_mortality"])
+    tb_world = tb_world.drop(columns=["child_mortality_rate"])
 
     return tb_world
