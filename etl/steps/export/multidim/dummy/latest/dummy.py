@@ -3,7 +3,7 @@
 TODO: Look in etl.collections.beta for more details.
 """
 
-from etl.collections.beta import combine_mdims
+from etl.collections.beta import combine_mdims, mdim_to_explorer
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -29,6 +29,8 @@ def run() -> None:
     )
 
     # TODO: Translate MDIM to explorer!
+    explorer = mdim_to_explorer(mdim)
+    explorer.save()
 
     # Save & upload
     mdim.save()
