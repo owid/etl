@@ -67,7 +67,15 @@ class Explorer(Collection):
         where `widget_name` is actually not displayed anywhere, but used as header name in explorer config.
         """
         mapping = {}
+        seen_names = set()
         for dim in self.dimensions:
+            # Check if there are duplicate dimension names! This would create column name collisions
+            if dim.name in seen_names:
+                raise ValueError(
+                    f"Duplicate dimension name in explorer! {dim.name}. This is not allowed, because it would create column name collisions in the TSV config."
+                )
+            seen_names.add(dim.name)
+
             dix = {
                 "widget_name": f"{dim.name} {dim.ui_type.title()}",
                 "choices": {choice.slug: choice.name for choice in dim.choices},
@@ -393,7 +401,9 @@ def _order_explorer_views(df: pd.DataFrame, dimensions_display: Dict[str, Any]) 
         choices_ordered = list(properties["choices"].values())
         # Check if all DataFrame values exist in the predefined lists
         if not set(df[column]).issubset(set(choices_ordered)):
-            raise ValueError(f"Column `{column}` contains values not present in `choices_ordered`.")
+            raise ValueError(
+                f"Column `{column}` contains values not present in `choices_ordered`: {set(df[column])} != {choices_ordered}."
+            )
 
         # Convert columns to categorical with the specified order
         df[column] = pd.Categorical(df[column], categories=choices_ordered, ordered=True)
