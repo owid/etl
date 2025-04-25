@@ -24,6 +24,11 @@ def run() -> None:
         df=tb,
         countries_file=paths.country_mapping_path,
     )
+    tb = tb.sort_values(["country", "year"])
+    for col in tb.columns:
+        if col not in ["country", "year"]:
+            tb["rolling_" + col] = tb.groupby("country")[col].transform(lambda x: x.rolling(10).mean())
+
     tb = tb.format(["country", "year"])
 
     #
