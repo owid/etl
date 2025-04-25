@@ -27,7 +27,7 @@ def run() -> None:
     ds_vintage = paths.load_dataset("igme", version="2018")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["igme"].reset_index()
+    tb = ds_meadow.read("igme")
     tb_vintage = ds_vintage["igme"].reset_index()
     tb_vintage = process_vintage_data(tb_vintage)
     tb_vintage["unit_of_measure"] = tb_vintage["unit_of_measure"].str.replace(",", "", regex=False)
