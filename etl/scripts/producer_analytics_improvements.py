@@ -392,7 +392,7 @@ def run():
         # For chart lists, get the index of the position where it should be introduced.
         insert_index = google_doc.find_marker_index(doc_id=report_id, marker=placeholder)
 
-        requests = []
+        edits = []
         end_index = insert_index
         for i, (_, row) in enumerate(df.iterrows(), start=1):
             title = row["title"]
@@ -403,11 +403,11 @@ def run():
             line = f"{numbered_title} – {views} views\n"
 
             # Insert line of text.
-            requests.append({"insertText": {"location": {"index": end_index}, "text": line}})
+            edits.append({"insertText": {"location": {"index": end_index}, "text": line}})
             # Apply link to just the title (excluding "1. ").
             title_start = end_index + len(f"{i}. ")
             title_end = title_start + len(title)
-            requests.append(
+            edits.append(
                 {
                     "updateTextStyle": {
                         "range": {"startIndex": title_start, "endIndex": title_end},
@@ -419,11 +419,46 @@ def run():
             end_index += len(line)
 
         # Apply edits to insert list in the right place.
-        google_doc.edit(doc_id=report_id, requests=requests)
+        google_doc.edit(doc_id=report_id, requests=edits)
 
         # Remove the original placeholder text.
         google_doc.replace_text(doc_id=report_id, mapping={placeholder: ""})
 
+    def insert_image(google_doc, image_url, placeholder, width=350):
+        # Get the index of the position where the image should be inserted.
+        insert_index = google_doc.find_marker_index(doc_id=report_id, marker=placeholder)
+
+        edits = [
+            {
+                "insertInlineImage": {
+                    "location": {"index": insert_index},
+                    "uri": image_url,
+                    "objectSize": {
+                        # "height": {
+                        #     "magnitude": 200,
+                        #     "unit": "PT"
+                        # },
+                        "width": {"magnitude": width, "unit": "PT"}
+                    },
+                }
+            },
+            {
+                "updateParagraphStyle": {
+                    "range": {"startIndex": insert_index, "endIndex": insert_index + 1},
+                    "paragraphStyle": {"alignment": "CENTER"},
+                    "fields": "alignment",
+                }
+            },
+        ]
+
+        # Apply both image insert and alignment.
+        google_doc.edit(doc_id=report_id, requests=edits)
+
+        # Remove the original placeholder text.
+        google_doc.replace_text(doc_id=report_id, mapping={placeholder: ""})
+
+    top_chart_url = df_top_charts.iloc[0]["url"] + ".png"
+    insert_image(google_doc, image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
     insert_list(google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
     insert_list(google_doc, df=df_top_articles, placeholder=r"{{top_articles_list}}")
     insert_list(google_doc, df=df_top_insights, placeholder=r"{{top_insights_list}}")
