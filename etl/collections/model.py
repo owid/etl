@@ -18,9 +18,11 @@ import pandas as pd
 import yaml
 from owid.catalog.meta import GrapherConfig, MetaBase
 from structlog import get_logger
+from typing_extensions import Self
 
 from etl.collections.exceptions import DuplicateCollectionViews
-from etl.collections.utils import merge_common_metadata_by_dimension
+from etl.collections.utils import merge_common_metadata_by_dimension, validate_indicators_in_db
+from etl.config import OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
@@ -343,16 +345,16 @@ class View(MDIMBase):
         return indicators
 
 
-@dataclass
-class ExplorerView(View):
-    """https://github.com/owid/owid-grapher/blob/cb01ebb366d22f255b0acb791347981867225e8b/packages/%40ourworldindata/explorer/src/GrapherGrammar.ts"""
+# @dataclass
+# class ExplorerView(View):
+#     """https://github.com/owid/owid-grapher/blob/cb01ebb366d22f255b0acb791347981867225e8b/packages/%40ourworldindata/explorer/src/GrapherGrammar.ts"""
 
-    pass
+#     pass
 
 
-@dataclass
-class MDIMView(View):
-    pass
+# @dataclass
+# class MDIMView(View):
+#     pass
 
 
 @pruned_json
@@ -469,14 +471,19 @@ class Dimension(MDIMBase):
             raise ValueError(f"Dimension choices for '{self.slug}' must have unique names!")
 
 
+T = TypeVar("T")
+
+
 @pruned_json
 @dataclass
 class Collection(MDIMBase):
     """Overall MDIM/Explorer config"""
 
     dimensions: List[Dimension]
-    views: List[Any]
+    views: List[View]
     catalog_path: str
+
+    _definitions: Definitions
 
     # Private for fast access
     # _views_hash: Optional[Dict[str, Any]] = None
@@ -485,8 +492,29 @@ class Collection(MDIMBase):
     # Internal use. For save() method.
     _collection_type: Optional[str] = field(init=False, default=None)
 
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> Self:
+        """Coerce the dictionary into the expected shape before passing it to the parent class."""
+        # Make a shallow copy so we don't mutate the user's dictionary in-place
+        data = dict(d)
+
+        # If dictionary contains field 'definitions', change it for '_definitions'
+        if "definitions" in data:
+            data["_definitions"] = data["definitions"]
+            del data["definitions"]
+        else:
+            data["_definitions"] = Definitions()
+
+        # Now that data is in the expected shape, let the parent class handle the rest
+        return super().from_dict(data)
+
     def __post_init__(self):
+        # Sanity check
         assert "#" in self.catalog_path, "Catalog path should be in the format `path#name`."
+
+    @property
+    def definitions(self) -> Definitions:
+        return self._definitions
 
     @property
     def v(self):
@@ -505,9 +533,13 @@ class Collection(MDIMBase):
         return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
 
     @property
-    def name(self):
+    def short_name(self):
         _, name = self.catalog_path.split("#")
         return name
+
+    @property
+    def schema_path(self) -> Path:
+        return SCHEMAS_DIR / f"{self._collection_type}-schema.json"
 
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")
@@ -515,8 +547,35 @@ class Collection(MDIMBase):
         # with open(self.local_config_path, "w") as f:
         #     yaml_dump(config, f)
 
-    def save(self):  # type: ignore[override]
-        raise NotImplementedError("This method should be implemented in the children class")
+    # def save(self):  # type: ignore[override]
+    #     pass
+
+    def save(  # type: ignore[override]
+        self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False, prune_dimensions: bool = True
+    ):
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
+
+        # Prune non-used dimensions
+        if prune_dimensions:
+            self.prune_dimension_choices()
+
+        # Check that no choice name is repeated
+        self.validate_choice_names()
+
+        # Check that all indicators in explorer exist
+        indicators = self.indicators_in_use(tolerate_extra_indicators)
+        validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Export config to local directory in addition to uploading it to MySQL for debugging.
+        self.save_config_local()
+
+        # Upsert to DB
+        self.upsert_to_db(owid_env)
+
+    def upsert_to_db(self, owid_env: OWIDEnv):
+        raise NotImplementedError("Upser to DB must be implemented in children classes!")
 
     def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)
@@ -545,8 +604,10 @@ class Collection(MDIMBase):
                     view.dimensions[dim_slug] in choice_slugs
                 ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
 
-    def validate_schema(self, schema_path):
+    def validate_schema(self, schema_path: Optional[Union[str, Path]] = None):
         """Validate class against schema."""
+        if schema_path is None:
+            schema_path = self.schema_path
         with open(schema_path) as f:
             s = f.read()
 
