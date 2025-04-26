@@ -10,8 +10,8 @@ dataset:
 tables:
   long_run_child_mortality:
     variables:
-      child_mortality_rate:
-        title: Child mortality rate (full)
+      under_five_mortality:
+        title: Under-five mortality rate (full)
         unit: deaths per 100 live births
         short_unit: "%"
         display:
@@ -29,8 +29,8 @@ tables:
         description_key: []
   long_run_child_mortality_selected:
     variables:
-      child_mortality_rate:
-        title: Child mortality rate
+      under_five_mortality:
+        title: Under-five mortality rate
         unit: deaths per 100 live births
         short_unit: "%"
         display:
@@ -44,9 +44,9 @@ tables:
             - The UN Inter-agency Group for Child Mortality Estimation (UN IGME) provides estimates of child mortality rates, which is available for some countries from 1932.
             - Gapminder provides estimates of child mortality rates for the years 1800 to 2015.
 
-          We combine the two datasets, for years where both are available, we use the UN IGME data.
+          We combine the two datasets, for years where both are available, we have a preference for the UN IGME data.
         presentation:
-          title_public: Child mortality rate
+          title_public: Under-five mortality rate
           title_variant: Long-run data
           attribution_short: UN IGME; Gapminder
           grapher_config:
