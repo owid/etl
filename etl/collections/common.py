@@ -304,9 +304,15 @@ class CollectionConfigExpander:
         # Support dimension is None
         ## If dimensions is None, use a list with all dimension names (in no particular order)
         if dimensions is None:
-            # If table defines dimensions, use them
+            # Get list of all dimension names (in no particular order)
+            dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]
+            # If table defines dimensions, use them instead!
             if self.tb_dims:
-                dimensions = [str(d["slug"]) for d in self.tb_dims]
+                dimensions_tb = [str(d["slug"]) for d in self.tb_dims]
+                assert (
+                    set(dimensions) == set(dimensions_tb)
+                ), f"Dimensions in given table are not complete! Expected: {dimensions}, found: {dimensions_tb}. This might be due to some manual adjustments done to the metadata."
+                dimensions = dimensions_tb
             else:
                 # If dimensions is None, use a list with all dimension names (in no particular order)
                 dimensions = [col for col in self.df_dims.columns if col not in ["short_name"]]

@@ -580,7 +580,7 @@ class Collection(MDIMBase):
     def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)
         if drop_definitions:
-            dix = {k: v for k, v in dix.items() if k != "definitions"}
+            dix = {k: v for k, v in dix.items() if k not in {"_definitions", "definitions"}}
         return dix
 
     def validate_views_with_dimensions(self):
