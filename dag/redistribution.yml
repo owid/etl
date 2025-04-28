@@ -111,13 +111,13 @@ steps:
   ############################################################
 
   # SIPRI Military Expenditure Database
-  data://meadow/sipri/2024-07-08/military_expenditure:
-    - snapshot://sipri/2024-07-08/military_expenditure.xlsx
-  data://garden/sipri/2024-07-08/military_expenditure:
-    - data://meadow/sipri/2024-07-08/military_expenditure
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-  data://grapher/sipri/2024-07-08/military_expenditure:
-    - data://garden/sipri/2024-07-08/military_expenditure
+  data://meadow/sipri/2025-04-28/military_expenditure:
+    - snapshot://sipri/2025-04-28/military_expenditure.xlsx
+  data://garden/sipri/2025-04-28/military_expenditure:
+    - data://meadow/sipri/2025-04-28/military_expenditure
+    - data://garden/worldbank_wdi/2025-01-24/wdi
+  data://grapher/sipri/2025-04-28/military_expenditure:
+    - data://garden/sipri/2025-04-28/military_expenditure
 
   # Global Military Spending Dataset
   data://meadow/harvard/2024-11-26/global_military_spending_dataset:
@@ -139,3 +139,4 @@ steps:
     - data://garden/countries/2023-09-29/cow_ssm
   data://grapher/cow/2024-07-26/national_material_capabilities:
     - data://garden/cow/2024-07-26/national_material_capabilities
+
