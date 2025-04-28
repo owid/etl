@@ -9,6 +9,10 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define milex indicator to use
+MILEX_INDICATOR = "milex_con_2022_sipri"
+
+# Define burden indicators I need
 BURDEN_INDICATORS = ["milexgdp", "milexsurplus1095", "milexsurplus365", "milexsurplus730"]
 
 
@@ -97,7 +101,7 @@ def pick_gmsd_estimates(tb: Table) -> Table:
     Pick the mean GMSD estimates in SIPRI units for military spending.
     """
 
-    tb = tb[tb["indicator"] == "milex_con_sipri"].reset_index(drop=True).copy()
+    tb = tb[tb["indicator"] == MILEX_INDICATOR].reset_index(drop=True).copy()
 
     # Keep only country, year and mean for tb
     tb = tb[["gwno", "year", "mean"]]

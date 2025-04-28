@@ -51,7 +51,7 @@ tables:
     variables:
       milex_estimate:
         title: Military expenditure (constant US$)
-        unit: "constant 2021 US$"
+        unit: "constant 2022 US$"
         short_unit: "$"
         description_short: "This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries."
         description_key:
@@ -67,7 +67,7 @@ tables:
 
       milex_estimate_per_capita:
         title: Military expenditure per capita (constant US$)
-        unit: "constant 2021 US$"
+        unit: "constant 2022 US$"
         short_unit: "$"
         description_short: "This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries."
         description_key:
@@ -165,7 +165,7 @@ tables:
 
       milex_per_military_personnel:
         title: Military expenditure per military personnel (constant US$)
-        unit: "constant 2021 US$"
+        unit: "constant 2022 US$"
         short_unit: "$"
         description_short: "This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries."
         description_key:
