@@ -162,6 +162,7 @@ tables:
         display:
           name: Military expenditure per armed forces personnel
           numDecimalPlaces: 0
+          numSignificantFigures: 3
           tolerance: 5
 
 
