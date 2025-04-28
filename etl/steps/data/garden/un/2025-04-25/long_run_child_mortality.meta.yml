@@ -27,10 +27,6 @@ tables:
         short_unit: "%"
         unit: "%"
         description_key: []
-      source:
-        title: Source used (full)
-        description_short: This variable is a combination of data from Gapminder and UN IGME, this shows the source used for each data point.
-        unit: ""
   long_run_child_mortality_selected:
     variables:
       source:

@@ -67,8 +67,9 @@ def run() -> None:
     )
 
     # Save outputs.
-    tb_combined_full = tb_combined_full.format(["country", "year"])
+    tb_combined_full = tb_combined_full.drop(columns=["source"]).format(["country", "year"])
     tb_combined_sel = tb_combined_sel.format(["country", "year"])
+    tb_combined_sel["source"].metadata.origin = tb_combined_sel["child_mortality_rate"].metadata.origin
 
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
