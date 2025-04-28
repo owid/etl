@@ -6,7 +6,7 @@ definitions:
       attribution: Gapminder (2020); UN Inter-agency Group for Child Mortality Estimation (2024)
 
 dataset:
-  title: Long-run child mortality (Gapminder; UN IGME)
+  title: Long-run child mortality estimates (Gapminder; UN IGME)
 tables:
   long_run_child_mortality:
     variables:
@@ -53,7 +53,7 @@ tables:
             title: Child mortality rate
             subtitle: The estimated share of newborns who die before reaching the age of five.
             variantName: Long-run data; Gapminder & UN IGME
-            sourceDesc: UN IGME (2023); Gapminder (2015)
+            sourceDesc: Gapminder (2015); UN IGME (2023)
             originUrl: https://ourworldindata.org/child-mortality
             hasMapTab: true
             yAxis:
