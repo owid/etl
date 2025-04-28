@@ -11,7 +11,7 @@ tables:
   long_run_child_mortality:
     variables:
       under_five_mortality:
-        title: Under-five mortality rate (full)
+        title: Child mortality rate (full)
         unit: deaths per 100 live births
         short_unit: "%"
         display:
@@ -30,7 +30,7 @@ tables:
   long_run_child_mortality_selected:
     variables:
       under_five_mortality:
-        title: Under-five mortality rate
+        title: Child mortality rate
         unit: deaths per 100 live births
         short_unit: "%"
         display:
@@ -46,7 +46,7 @@ tables:
 
           We combine the two datasets, for years where both are available, we have a preference for the UN IGME data.
         presentation:
-          title_public: Under-five mortality rate
+          title_public: Child mortality rate
           title_variant: Long-run data
           attribution_short: UN IGME; Gapminder
           grapher_config:
