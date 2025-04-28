@@ -32,6 +32,10 @@ class ExplorerCreator:
         return self.tbs["proj"][table_name]
 
     def create_manual(self, config: Dict[str, Any], **kwargs):
+        # Remove duplicate 'catalog_path' if present
+        if "catalog_path" in kwargs:
+            kwargs = kwargs.copy()
+            kwargs.pop("catalog_path")
         explorer = create_explorer_experimental(self.paths, config, indicator_as_dimension=True, **kwargs)
         return explorer
 
@@ -44,6 +48,11 @@ class ExplorerCreator:
     ):
         """Creates an explorer based on `tb` (1950-2023) and `tb_proj` (1950-2100)."""
         self.paths.log.info(f"Creating explorer for {table_name}")
+
+        # Remove duplicate 'catalog_path' if present
+        if "catalog_path" in kwargs:
+            kwargs = kwargs.copy()
+            kwargs.pop("catalog_path")
 
         # Load tables
         tb = self.table(table_name)
