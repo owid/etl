@@ -33,7 +33,7 @@ def run() -> None:
         columns=["sex", "wealth_quintile", "indicator", "unit_of_measure"]
     )
     # Select out columns of interest.
-    tb_igme["source"] = "igme"
+    tb_igme["source"] = "UN IGME"
 
     # Load full Gapminder data v11, v11 includes projections, so we need to remove years beyond the last year of IGME data
 
@@ -41,13 +41,13 @@ def run() -> None:
     tb_gap_full = ds_gapminder_v11["under_five_mortality"].reset_index()
     tb_gap_full = tb_gap_full[tb_gap_full["year"] <= max_year].reset_index(drop=True)
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "child_mortality_rate"}, errors="raise")
-    tb_gap_full["source"] = "gapminder"
+    tb_gap_full["source"] = "Gapminder"
     tb_gap_full["child_mortality_rate"] = tb_gap_full["child_mortality_rate"].div(10)
 
     # Load Gapminder data v7 - has the source of the data (unlike v11)
     # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
-    tb_gap_sel["source"] = "gapminder"
+    tb_gap_sel["source"] = "Gapminder"
     tb_gap_sel = tb_gap_sel.rename(columns={"under_five_mortality": "child_mortality_rate"}, errors="raise")
     tb_gap_sel["child_mortality_rate"] = tb_gap_sel["child_mortality_rate"].div(10)
     # Remove the early years for Austria - there is a signicant jump in the data in 1830 which suggests an incongruency in method or data availability
@@ -67,8 +67,8 @@ def run() -> None:
     )
 
     # Save outputs.
-    tb_combined_full = tb_combined_full.drop(columns=["source"]).format(["country", "year"])
-    tb_combined_sel = tb_combined_sel.drop(columns=["source"]).format(["country", "year"])
+    tb_combined_full = tb_combined_full.format(["country", "year"])
+    tb_combined_sel = tb_combined_sel.format(["country", "year"])
 
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -83,7 +83,7 @@ def combine_datasets(tb_igme: Table, tb_gap: Table, table_name: str) -> Table:
     """
     tb_combined = pr.concat([tb_igme, tb_gap]).sort_values(["country", "year", "source"])
     tb_combined.metadata.short_name = table_name
-    tb_combined = remove_duplicates(tb_combined, preferred_source="igme")
+    tb_combined = remove_duplicates(tb_combined, preferred_source="UN IGME")
 
     return tb_combined
 

@@ -27,8 +27,16 @@ tables:
         short_unit: "%"
         unit: "%"
         description_key: []
+      source:
+        title: Source used (full)
+        description_short: This variable is a combination of data from Gapminder and UN IGME, this shows the source used for each data point.
+        unit: ""
   long_run_child_mortality_selected:
     variables:
+      source:
+        title: Source used
+        description_short: This variable is a combination of data from Gapminder and UN IGME, this shows the source used for each data point.
+        unit: ""
       child_mortality_rate:
         title: Child mortality rate
         unit: deaths per 100 live births
