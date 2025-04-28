@@ -83,8 +83,6 @@ tables:
           {definitions.description_short_includes} {definitions.description_short_constant_usd}
         description_from_producer: |-
           {definitions.description_from_producer_constant_usd}
-        presentation:
-          title_public: Military expenditure
         display:
           name: Military expenditure
           numDecimalPlaces: 0
@@ -98,8 +96,6 @@ tables:
           {definitions.description_short_includes}
         description_from_producer: |-
           {definitions.description_from_producer_military_expenditure}
-        presentation:
-          title_public: Military expenditure (% of GDP)
         display:
           name: Military expenditure (% of GDP)
           numDecimalPlaces: 1
@@ -115,8 +111,6 @@ tables:
           Figures are in current US$.
 
           {definitions.description_from_producer_military_expenditure}
-        presentation:
-          title_public: Military expenditure per capita
         display:
           name: Military expenditure per capita
           numDecimalPlaces: 0
@@ -130,8 +124,6 @@ tables:
           {definitions.description_short_includes}
         description_from_producer: |-
           {definitions.description_from_producer_military_expenditure}
-        presentation:
-          title_public: Military expenditure (% of government spending)
         display:
           name: Military expenditure (% of government spending)
           numDecimalPlaces: 1
@@ -157,8 +149,6 @@ tables:
         processing_level: major
         description_processing: |-
           We calculated this indicator by dividing the military expenditure provided by SIPRI (in constant US$) by the [armed forces personnel](https://ourworldindata.org/grapher/armed-forces-personnel) estimated by the International Institute for Strategic Studies (IISS) and published by the World Bank's World Development Indicators.
-        presentation:
-          title_public: Military expenditure per armed forces personnel
         display:
           name: Military expenditure per armed forces personnel
           numDecimalPlaces: 0
