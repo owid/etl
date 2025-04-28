@@ -127,7 +127,6 @@ steps:
   data://grapher/technology/2023-03-16/hcctad:
     - data://garden/technology/2023-03-16/hcctad
 
-
   # World Happiness report (2025)
   data://meadow/happiness/2025-03-28/happiness:
     - snapshot://happiness/2025-03-28/happiness.xlsx
@@ -140,7 +139,6 @@ steps:
 
   data://grapher/happiness/2025-03-28/happiness:
     - data://garden/happiness/2025-03-28/happiness
-
 
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
@@ -391,7 +389,6 @@ steps:
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
 
-
   ######################################################################################################################
   # Map (Natural Earth)
   data://meadow/geography/2023-11-28/nat_earth_110:
@@ -535,7 +532,7 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
-  # Child Mortality Estimates - UN IGME
+  # Child Mortality Estimates - UN IGME - to archive
   data://meadow/un/2024-09-11/igme:
     - snapshot://un/2024-09-11/igme.zip
   data://garden/un/2024-09-11/igme:
@@ -546,13 +543,32 @@ steps:
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
-  # Long-run child mortality, Gapminder + UN IGME
+  # Child Mortality Estimates - UN IGME
+  data://meadow/un/2025-03-25/igme:
+    - snapshot://un/2025-03-25/igme.zip
+  data://garden/un/2025-03-25/igme:
+    - data://meadow/un/2025-03-25/igme
+    - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2025-03-25/igme:
+    - data://garden/un/2025-03-25/igme
+
+  # Long-run child mortality, Gapminder + UN IGME - to archive
   data://garden/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-11/igme
     - data://garden/gapminder/2023-09-18/under_five_mortality
     - data://garden/gapminder/2023-09-21/under_five_mortality
   data://grapher/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-16/long_run_child_mortality
+
+    # Long-run child mortality, Gapminder + UN IGME - to update
+  data://garden/un/2025-04-25/long_run_child_mortality:
+    - data://garden/un/2025-03-25/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2025-04-25/long_run_child_mortality:
+    - data://garden/un/2025-04-25/long_run_child_mortality
 
   # UN SDG (2024)
   data://meadow/un/2024-08-27/un_sdg:
@@ -662,7 +678,6 @@ steps:
   data://grapher/atus/2025-01-06/atus_who:
     - data://garden/atus/2025-01-06/atus_who
 
-
   # Happiness by age groups (World Happiness Report 2024)
   data://meadow/happiness/2025-04-01/happiness_by_age:
     - snapshot://happiness/2025-04-01/happiness_by_age.csv
@@ -670,7 +685,6 @@ steps:
     - data://meadow/happiness/2025-04-01/happiness_by_age
   data://grapher/happiness/2025-04-01/happiness_by_age:
     - data://garden/happiness/2025-04-01/happiness_by_age
-
 
   # IMF World Economic Outlook
   data://meadow/imf/2025-04-25/world_economic_outlook:
