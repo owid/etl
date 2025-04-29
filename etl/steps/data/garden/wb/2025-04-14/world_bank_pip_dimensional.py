@@ -155,12 +155,7 @@ def run() -> None:
     tb = sanity_checks(tb=tb)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb_inc_ppp_old, tb_cons_ppp_old, tb_inc_or_cons_ppp_old_unsmoothed, tb_inc_or_cons_ppp_old = inc_or_cons_data(
-        tb_ppp_old
-    )
-    tb_inc_ppp_current, tb_cons_ppp_current, tb_inc_or_cons_ppp_current_unsmoothed, tb_inc_or_cons_ppp_current = (
-        inc_or_cons_data(tb_ppp_current)
-    )
+    tb = inc_or_cons_data(tb)
 
     # Create regional headcount variable, by patching missing values with the difference between world and regional headcount
     tb_inc_or_cons_ppp_current = regional_headcount(tb_inc_or_cons_ppp_current)
@@ -536,6 +531,9 @@ def identify_rural_urban(tb: Table) -> Table:
         tb.loc[(condition_urban_rural), "country"] + " (" + tb.loc[(condition_urban_rural), "reporting_level"] + ")"
     )
 
+    # Drop reporting_level column
+    tb = tb.drop(columns=["reporting_level"])
+
     return tb
 
 
@@ -559,7 +557,6 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
         [
             "country",
             "year",
-            "reporting_level",
             "welfare_type",
             "ppp_version",
             "poverty_line",
@@ -572,7 +569,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     # Pivot and obtain the poverty lines dictionary
     tb_pivot, povlines_dict = pivot_and_obtain_povlines_dict(
         tb=tb_pivot,
-        index=["country", "year", "reporting_level", "welfare_type"],
+        index=["country", "year", "welfare_type"],
         columns=["ppp_version", "poverty_line"],
     )
 
@@ -617,7 +614,6 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
             [
                 "country",
                 "year",
-                "reporting_level",
                 "welfare_type",
                 "headcount_between",
                 "headcount_ratio_between",
@@ -633,7 +629,7 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     tb = pr.merge(
         tb,
         tb_pivot,
-        on=["country", "year", "reporting_level", "welfare_type", "poverty_line", "ppp_version"],
+        on=["country", "year", "welfare_type", "poverty_line", "ppp_version"],
         how="outer",
     )
 
@@ -677,7 +673,7 @@ def sanity_checks(
     """
 
     # Define index for pivot
-    index = ["country", "year", "reporting_level", "welfare_type"]
+    index = ["country", "year", "welfare_type"]
 
     # Pivot and obtain the poverty lines dictionary
     tb_pivot, povlines_dict = pivot_and_obtain_povlines_dict(
@@ -958,7 +954,7 @@ def sanity_checks(
         if not tb_error.empty:
             log.warning(
                 f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
-                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
             tb_pivot = tb_pivot[~mask].reset_index(drop=True)
 
@@ -979,7 +975,7 @@ def sanity_checks(
         if not tb_error.empty:
             log.warning(
                 f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
-                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                {tabulate(tb_error[index + ['sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
             # Make columns None if mask is True
             tb_pivot.loc[mask, [("top90_99_share", ppp_year, povlines[1]), ("top1_share", ppp_year, povlines[1])]] = (
@@ -993,6 +989,12 @@ def sanity_checks(
         obs_after_checks = len(tb_pivot)
         log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_year} PPPs.")
 
+    # Restore the format of the table
+    tb = tb_pivot.set_index(index).stack(future_stack=True).reset_index()
+
+    # Stack again to remove the level for ppp_version
+    tb = tb.set_index(index + ["poverty_line"]).stack(future_stack=True).reset_index()
+
     return tb
 
 
@@ -1001,17 +1003,48 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
     Separate income and consumption data
     """
 
-    # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb_inc = tb[tb["welfare_type"] == "income"].reset_index(drop=True).copy()
-    tb_cons = tb[tb["welfare_type"] == "consumption"].reset_index(drop=True).copy()
-    tb_inc_or_cons = tb.copy()
-    tb_inc_or_cons_unsmoothed = tb.copy()
+    # Make a copy of the table
+    tb_spells = tb.copy()
+    tb_no_spells = tb.copy()
 
-    tb_inc_or_cons = create_smooth_inc_cons_series(tb_inc_or_cons)
+    # Generate tb_inc_spells and tb_cons_spells
+    tb_inc_spells = tb_spells[tb_spells["welfare_type"] == "income"].reset_index(drop=True)
+    tb_cons_spells = tb_spells[tb_spells["welfare_type"] == "consumption"].reset_index(drop=True)
 
-    tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons)
+    # Add the column table, identifying the type of table to use in Grapher
+    tb_spells["table"] = "Income or consumption with spells"
+    tb_inc_spells["table"] = "Income with spells"
+    tb_cons_spells["table"] = "Consumption with spells"
 
-    return tb_inc, tb_cons, tb_inc_or_cons_unsmoothed, tb_inc_or_cons
+    # Drop the survey_comparability column for tb_no_spells
+    tb_no_spells = tb_no_spells.drop(columns=["survey_comparability"])
+
+    # Generate tb_inc_no_spells and tb_cons_no_spells
+    tb_inc_no_spells = tb_no_spells[tb_no_spells["welfare_type"] == "income"].reset_index(drop=True)
+    tb_cons_no_spells = tb_no_spells[tb_no_spells["welfare_type"] == "consumption"].reset_index(drop=True)
+
+    # Add the column table, identifying the type of table to use in Grapher
+    tb_no_spells["table"] = "Income or consumption"
+    tb_inc_no_spells["table"] = "Income"
+    tb_cons_no_spells["table"] = "Consumption"
+
+    # Concatenate all these tables
+    tb = pr.concat(
+        [tb_spells, tb_inc_spells, tb_cons_spells, tb_no_spells, tb_inc_no_spells, tb_cons_no_spells],
+    )
+
+    tb_no_spells_smooth = create_smooth_inc_cons_series(tb_no_spells)
+
+    check_jumps_in_grapher_dataset(tb_no_spells_smooth)
+
+    # Name the table column as "Income or consumption consolidated"
+    tb_no_spells_smooth["table"] = "Income or consumption consolidated"
+    tb_no_spells_smooth["welfare_type"] = "income or consumption"
+
+    # Add this table to the main table
+    tb = pr.concat([tb, tb_no_spells_smooth], ignore_index=True)
+
+    return tb
 
 
 def create_smooth_inc_cons_series(tb: Table) -> Table:
@@ -1023,25 +1056,40 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
 
     # Flag duplicates per year – indicating multiple welfare_types
     # Sort values to ensure the welfare_type consumption is marked as False when there are multiple welfare types
-    tb = tb.sort_values(by=["country", "year", "welfare_type"], ignore_index=True)
-    tb["duplicate_flag"] = tb.duplicated(subset=["country", "year"], keep=False)
+    tb = tb.sort_values(by=["country", "year", "welfare_type", "ppp_version", "poverty_line"], ignore_index=True)
+    tb["duplicate_flag"] = tb.duplicated(subset=["country", "year", "ppp_version", "poverty_line"], keep=False)
 
     # Create a boolean column that is true if each ppp_version, country, reporting_level has only income or consumption
-    tb["only_inc_or_cons"] = tb.groupby(["country"])["welfare_type"].transform(lambda x: x.nunique() == 1)
+    tb["only_inc_or_cons"] = tb.groupby(["country", "ppp_version", "poverty_line"])["welfare_type"].transform(
+        lambda x: x.nunique() == 1
+    )
 
     # Select only the rows with only income or consumption
-    tb_only_inc_or_cons = tb[tb["only_inc_or_cons"]].reset_index(drop=True).copy()
+    tb_only_inc_or_cons = tb[tb["only_inc_or_cons"]].reset_index(drop=True)
 
     # Create a table with the rest
-    tb_both_inc_and_cons = tb[~tb["only_inc_or_cons"]].reset_index(drop=True).copy()
+    tb_both_inc_and_cons = tb[~tb["only_inc_or_cons"]].reset_index(drop=True)
 
     # Create a list of the countries with both income and consumption in the series
     countries_inc_cons = list(tb_both_inc_and_cons["country"].unique())
 
     # Assert that the countries with both income and consumption are expected
-    assert countries_inc_cons == COUNTRIES_WITH_INCOME_AND_CONSUMPTION, log.fatal(
-        f"Unexpected countries with both income and consumption: {countries_inc_cons}."
+    unexpected_countries = set(countries_inc_cons) - set(COUNTRIES_WITH_INCOME_AND_CONSUMPTION)
+    missing_countries = set(COUNTRIES_WITH_INCOME_AND_CONSUMPTION) - set(countries_inc_cons)
+    assert not unexpected_countries and not missing_countries, log.fatal(
+        f"Unexpected countries with both income and consumption: {unexpected_countries}. "
+        f"Missing expected countries: {missing_countries}."
     )
+
+    # Pivot and obtain the poverty lines dictionary
+    tb_both_inc_and_cons, povlines_dict = pivot_and_obtain_povlines_dict(
+        tb=tb_both_inc_and_cons,
+        index=["country", "year", "welfare_type"],
+        columns=["ppp_version", "poverty_line"],
+    )
+
+    # Reset index in tb_both_inc_and_cons
+    tb_both_inc_and_cons = tb_both_inc_and_cons.reset_index()
 
     # Define empty table to store the smoothed series
     tb_both_inc_and_cons_smoothed = Table()
@@ -1052,7 +1100,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         # Save the max_year for the country
         max_year = tb_country["year"].max()
 
-        # Define welfare_type for income and consumption. If both, list is saved as ['income', 'consumption']
+        # Define last_welfare_type for income and consumption. If both, list is saved as ['income', 'consumption']
         last_welfare_type = list(tb_country[tb_country["year"] == max_year]["welfare_type"].unique())
         last_welfare_type.sort()
 
@@ -1124,6 +1172,20 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
 
         tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
 
+    # Restore the format of the table
+    tb_both_inc_and_cons_smoothed = (
+        tb_both_inc_and_cons_smoothed.set_index(["country", "year", "welfare_type"])
+        .stack(future_stack=True)
+        .reset_index()
+    )
+
+    # Stack again to remove the level for ppp_version
+    tb_both_inc_and_cons_smoothed = (
+        tb_both_inc_and_cons_smoothed.set_index(["country", "year", "welfare_type", "poverty_line"])
+        .stack(future_stack=True)
+        .reset_index()
+    )
+
     tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
 
     # Drop the columns created in this function
@@ -1132,48 +1194,53 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     return tb_inc_or_cons
 
 
-def check_jumps_in_grapher_dataset(tb: Table) -> Table:
+def check_jumps_in_grapher_dataset(tb: Table) -> None:
     """
     Check for jumps in the dataset, which can be caused by combining income and consumption estimates for one country series.
     """
     tb = tb.copy()
 
+    # Pivot and obtain the poverty lines dictionary
+    tb, povlines_dict = pivot_and_obtain_povlines_dict(
+        tb=tb,
+        index=["country", "year", "welfare_type"],
+        columns=["ppp_version", "poverty_line"],
+    )
+
     # For each country, year, welfare_type and reporting_level, check if the difference between the columns is too high
 
-    # Define columns to check: all the headcount ratio columns
-    cols_to_check = [
-        col for col in tb.columns if "headcount_ratio" in col and "above" not in col and "between" not in col
-    ]
+    for ppp_year, povlines in povlines_dict.items():
+        # Define columns to check: all the headcount ratio columns
+        cols_to_check = [("headcount_ratio", ppp_year, povline) for povline in povlines]
+        for col in cols_to_check:
+            # Create a new column, shift_col, that is the same as col but shifted one row down for each country
+            tb["shift_col"] = tb.groupby(["country"])[col].shift(1)
 
-    for col in cols_to_check:
-        # Create a new column, shift_col, that is the same as col but shifted one row down for each country, year, welfare_type and reporting_level
-        tb["shift_col"] = tb.groupby(["country", "reporting_level"])[col].shift(1)
+            # Create shift_year column
+            tb["shift_year"] = tb.groupby(["country"])["year"].shift(1)
 
-        # Create shift_year column
-        tb["shift_year"] = tb.groupby(["country", "reporting_level"])["year"].shift(1)
+            # Create shift_welfare_type column
+            tb["shift_welfare_type"] = tb.groupby(["country"])["welfare_type"].shift(1)
 
-        # Create shift_welfare_type column
-        tb["shift_welfare_type"] = tb.groupby(["country", "reporting_level"])["welfare_type"].shift(1)
+            # Calculate the difference between col and shift_col
+            tb["check_diff_column"] = tb[col] - tb["shift_col"]
 
-        # Calculate the difference between col and shift_col
-        tb["check_diff_column"] = tb[col] - tb["shift_col"]
+            # Calculate the difference between years
+            tb["check_diff_year"] = tb["year"] - tb["shift_year"]
 
-        # Calculate the difference between years
-        tb["check_diff_year"] = tb["year"] - tb["shift_year"]
+            # Calculate if the welfare type is the same
+            tb["check_diff_welfare_type"] = tb["welfare_type"] == tb["shift_welfare_type"]
 
-        # Calculate if the welfare type is the same
-        tb["check_diff_welfare_type"] = tb["welfare_type"] == tb["shift_welfare_type"]
+            # Check if the difference is too high
+            mask = (abs(tb["check_diff_column"]) > 10) & (tb["check_diff_year"] <= 5) & ~tb["check_diff_welfare_type"]
+            tb_error = tb[mask].reset_index(drop=True)
 
-        # Check if the difference is too high
-        mask = (abs(tb["check_diff_column"]) > 10) & (tb["check_diff_year"] <= 5) & ~tb["check_diff_welfare_type"]
-        tb_error = tb[mask].reset_index(drop=True).copy()
-
-        if not tb_error.empty:
-            log.warning(
-                f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
-                {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-            )
-            # tb = tb[~mask].reset_index(drop=True)
+            if not tb_error.empty:
+                log.warning(
+                    f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
+                    {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                )
+                # tb = tb[~mask].reset_index(drop=True)
 
     # Drop the columns created for the check
     tb = tb.drop(
@@ -1187,7 +1254,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
         ]
     )
 
-    return tb
+    return None
 
 
 def regional_headcount(tb: Table) -> Table:
