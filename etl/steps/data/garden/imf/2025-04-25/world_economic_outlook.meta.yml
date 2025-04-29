@@ -56,14 +56,4 @@ tables:
           numDecimalPlaces: 1
           tableDisplay:
             hideRelativeChange: True
-      # Rolling averages
-      rolling_gross_domestic_product__constant_prices__percent_change_observation:
-        title: Gross domestic product, constant prices - Percent change - Observations (rolling 10 year average)
-        unit: "%"
-        short_unit: "%"
-        description_short: "Annual percent change in gross domestic product. This data is adjusted for inflation."
-        description_from_producer: "Gross domestic product, constant prices. Percent change. Annual percentages of constant price GDP are year-on-year changes; the base year is country-specific. Expenditure-based GDP is total final expenditures at purchasers' prices (including the f.o.b. value of exports of goods and services), less the f.o.b. value of imports of goods and services. [SNA 1993]"
-        display:
-          numDecimalPlaces: 1
-          tableDisplay:
-            hideRelativeChange: True
+
