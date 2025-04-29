@@ -14,6 +14,7 @@ SNAPSHOT_NAMES = [
     "govt_glance_public_finance",
     "govt_glance_size_public_procurement",
     "govt_glance_public_finance_economic_transaction",
+    "govt_glance_public_finance_by_function",
 ]
 
 

@@ -1,4 +1,5 @@
 #
+
 dataset:
   update_period_days: 365
 tables:
@@ -5302,3 +5303,16 @@ tables:
         title: Carbon intensity of GDP (kg CO2e per constant 2021 US$ of GDP)
       en_ghg_fgas_ip_mt_ce_ar5:
         title: Fluorinated greenhouse gases (F-gases) emissions from Industrial Processes (Mt CO2e)
+      eg_elc_accs_zs_without:
+       title:  Access to electricity (% of population with no access)
+      eg_cft_accs_zs_without:
+        title: Access to clean fuels and technologies for cooking (% of population with no access)
+      eg_elc_accs_zs_number:
+       title: Access to electricity (number of people with access)
+      eg_elc_accs_zs_without_number:
+       title: Access to electricity (number of people with no access)
+      eg_cft_accs_zs_number:
+       title: Access to clean fuels and technologies for cooking (number with access)
+      eg_cft_accs_zs_without_number:
+       title: Access to clean fuels and technologies for cooking (number with no access)
+

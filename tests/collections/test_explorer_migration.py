@@ -1,4 +1,5 @@
 import re
+from unittest import mock
 
 import pytest
 
@@ -7,36 +8,103 @@ from etl.files import yaml_dump
 from etl.helpers import PathFinder
 from etl.paths import STEP_DIR
 
-influenza = """
-explorerTitle	Influenza
-explorerSubtitle	Explore global data produced by the World Health Organization on influenza symptoms and cases.
-selection	Northern Hemisphere	Southern Hemisphere
-isPublished	true
-thumbnail
-hideAlertBanner	true
-hideAnnotationFieldsInTitle	true
-yAxisMin	0
-wpBlockId	56732
-hasMapTab	true
-pickerColumnSlugs	Country
-downloadDataLink
-graphers
-	title	subtitle	ySlugs	tableSlug	type	Confirmed cases or Symptoms Radio	Metric Dropdown	Interval Radio	Surveillance type Dropdown	timelineMinTime	selectedFacetStrategy	facetYDomain	hasMapTab	note	defaultView	tab	relatedQuestionText	relatedQuestionUrl
-	Weekly reported cases of acute respiratory infections	Acute...	reported_ari_cases	flu_weekly	LineChart	Symptoms	Acute respiratory infections	Weekly		-4043
-	Monthly reported cases of acute respiratory infections	Acute...	reported_ari_cases	flu_monthly	LineChart	Symptoms	Acute respiratory infections	Monthly		-4043
-table	https://catalog.ourworldindata.org/explorers/who/latest/flu/flu.csv	flu_weekly
-columns	flu_weekly
-	slug	name	type	tolerance	sourceName	additionalInfo	colorScaleNumericMinValue	color	colorScaleScheme	colorScaleNumericBins	unit	shortUnit	sourceLink	dataPublishedBy
-	country	Country	EntityName				0
-	date	Day	Date				0
-	reported_ari_cases	Cases of acute respiratory infections	Integer	30	FluID by the World Health Organization (2023)	**Dataset Description**:\\n- FluID...release.	0		YlOrRd		reported cases		https://source	Global...
-table	https://catalog.ourworldindata.org/explorers/who/latest/flu/flu_monthly.csv	flu_monthly
-columns	flu_monthly
-	slug	name	type	tolerance	sourceName	additionalInfo	colorScaleNumericMinValue	color	colorScaleScheme	colorScaleNumericBins	unit	shortUnit	sourceLink	dataPublishedBy
-	country	Country	EntityName				0
-	month_date	Month	Date				0
-	reported_ari_cases	Reported cases of acute respiratory infections	Integer	30	FluID by the World Health Organization (2023)	**Dataset Description:**\\n- FluID...	0		YlOrRd		reported cases		https://source	Global...
-"""
+influenza_config = {
+    "_version": 1,
+    "explorerTitle": "Influenza",
+    "explorerSubtitle": "Explore global data produced by the World Health Organization on influenza symptoms and cases.",
+    "selection": ["Northern Hemisphere", "Southern Hemisphere"],
+    "isPublished": "true",
+    "thumbnail": None,
+    "hideAlertBanner": "true",
+    "hideAnnotationFieldsInTitle": "true",
+    "yAxisMin": "0",
+    "wpBlockId": "56732",
+    "hasMapTab": "true",
+    "pickerColumnSlugs": ["Country"],
+    "downloadDataLink": None,
+    "blocks": [
+        {
+            "type": "graphers",
+            "args": [],
+            "block": [
+                {
+                    "title": "Weekly reported cases of acute respiratory infections",
+                    "subtitle": "Acute...",
+                    "ySlugs": "reported_ari_cases",
+                    "tableSlug": "flu_weekly",
+                    "type": "LineChart",
+                    "Confirmed cases or Symptoms Radio": "Symptoms",
+                    "Metric Dropdown": "Acute respiratory infections",
+                    "Interval Radio": "Weekly",
+                    "timelineMinTime": "-4043",
+                },
+                {
+                    "title": "Monthly reported cases of acute respiratory infections",
+                    "subtitle": "Acute...",
+                    "ySlugs": "reported_ari_cases",
+                    "tableSlug": "flu_monthly",
+                    "type": "LineChart",
+                    "Confirmed cases or Symptoms Radio": "Symptoms",
+                    "Metric Dropdown": "Acute respiratory infections",
+                    "Interval Radio": "Monthly",
+                    "timelineMinTime": "-4043",
+                },
+            ],
+        },
+        {
+            "type": "table",
+            "args": ["https://catalog.ourworldindata.org/explorers/who/latest/flu/flu.csv", "flu_weekly"],
+            "block": None,
+        },
+        {
+            "type": "columns",
+            "args": ["flu_weekly"],
+            "block": [
+                {"slug": "country", "name": "Country", "type": "EntityName", "colorScaleNumericMinValue": "0"},
+                {"slug": "date", "name": "Day", "type": "Date", "colorScaleNumericMinValue": "0"},
+                {
+                    "slug": "reported_ari_cases",
+                    "name": "Cases of acute respiratory infections",
+                    "type": "Integer",
+                    "tolerance": "30",
+                    "sourceName": "FluID by the World Health Organization (2023)",
+                    "additionalInfo": "**Dataset Description**:\\n- FluID...release.",
+                    "colorScaleNumericMinValue": "0",
+                    "colorScaleScheme": "YlOrRd",
+                    "unit": "reported cases",
+                    "sourceLink": "https://source",
+                    "dataPublishedBy": "Global...",
+                },
+            ],
+        },
+        {
+            "type": "table",
+            "args": ["https://catalog.ourworldindata.org/explorers/who/latest/flu/flu_monthly.csv", "flu_monthly"],
+            "block": None,
+        },
+        {
+            "type": "columns",
+            "args": ["flu_monthly"],
+            "block": [
+                {"slug": "country", "name": "Country", "type": "EntityName", "colorScaleNumericMinValue": "0"},
+                {"slug": "month_date", "name": "Month", "type": "Date", "colorScaleNumericMinValue": "0"},
+                {
+                    "slug": "reported_ari_cases",
+                    "name": "Reported cases of acute respiratory infections",
+                    "type": "Integer",
+                    "tolerance": "30",
+                    "sourceName": "FluID by the World Health Organization (2023)",
+                    "additionalInfo": "**Dataset Description:**\\n- FluID...",
+                    "colorScaleNumericMinValue": "0",
+                    "colorScaleScheme": "YlOrRd",
+                    "unit": "reported cases",
+                    "sourceLink": "https://source",
+                    "dataPublishedBy": "Global...",
+                },
+            ],
+        },
+    ],
+}
 
 expected_influenza = """
 config:
@@ -127,13 +195,10 @@ views:
 """.strip()
 
 
-def test_migrate_csv_explorer(tmp_path):
-    temp_explorer = tmp_path / "influenza.explorer.tsv"
-    with open(temp_explorer, "w") as f:
-        f.write(influenza)
-
-    config = migrate_csv_explorer(temp_explorer)
-    out_yaml = yaml_dump(config)
+def test_migrate_csv_explorer():
+    with mock.patch("etl.collections.explorer_migration._get_explorer_config", return_value=influenza_config):
+        config = migrate_csv_explorer("influenza")
+        out_yaml = yaml_dump(config)
 
     assert out_yaml.strip() == expected_influenza
 
@@ -152,24 +217,19 @@ wpBlockId	56732
 hasMapTab	true
 pickerColumnSlugs	Country
 graphers
-	yVariableIds	ySlugs	Confirmed cases or Symptoms Radio	Metric Dropdown	Interval Radio	title	subtitle	type	timelineMinTime
-		grapher__who__latest__flu__flu__reported_ari_cases__0	Symptoms	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart	-4043
-		grapher__who__latest__flu__flu_monthly__reported_ari_cases__1	Symptoms	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart	-4043
+	yVariableIds	Confirmed cases or Symptoms Radio	Metric Dropdown	Interval Radio	title	subtitle	type	timelineMinTime
+	grapher/who/latest/flu/flu#reported_ari_cases	Symptoms	Acute respiratory infections	Weekly	Weekly reported cases of acute respiratory infections	Acute...	LineChart	-4043
+	grapher/who/latest/flu/flu_monthly#reported_ari_cases	Symptoms	Acute respiratory infections	Monthly	Monthly reported cases of acute respiratory infections	Acute...	LineChart	-4043
 
 columns
-	catalogPath	slug	transform	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit
-		grapher__who__latest__flu__flu__reported_ari_cases__0	duplicate IND_ID	**Dataset Description**:\\n- FluID...release.	0	YlOrRd	Global...	Cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
-		grapher__who__latest__flu__flu_monthly__reported_ari_cases__1	duplicate IND_ID	**Dataset Description:**\\n- FluID...	0	YlOrRd	Global...	Reported cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
+	catalogPath	additionalInfo	colorScaleNumericMinValue	colorScaleScheme	dataPublishedBy	name	sourceLink	sourceName	tolerance	type	unit
+	grapher/who/latest/flu/flu#reported_ari_cases	**Dataset Description**:\\n- FluID...release.	0	YlOrRd	Global...	Cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
+	grapher/who/latest/flu/flu_monthly#reported_ari_cases	**Dataset Description:**\\n- FluID...	0	YlOrRd	Global...	Reported cases of acute respiratory infections	https://source	FluID by the World Health Organization (2023)	30	Integer	reported cases
 """
 
 
 @pytest.mark.integration
 def test_explorer_legacy(tmp_path, monkeypatch):
-    # Create TSV file
-    tsv_path = tmp_path / "influenza.explorer.tsv"
-    with open(tsv_path, "w") as f:
-        f.write(influenza)
-
     # Monkeypatch ExplorerLegacy.save() to return its content
     from etl.collections.explorer_legacy import ExplorerLegacy
 
@@ -182,9 +242,13 @@ def test_explorer_legacy(tmp_path, monkeypatch):
     monkeypatch.setattr(ExplorerLegacy, "save", patch_save)
 
     # Dump config to YAML file
-    config = migrate_csv_explorer(tsv_path)
+    with mock.patch("etl.collections.explorer_migration._get_explorer_config", return_value=influenza_config):
+        config = migrate_csv_explorer("influenza")
+
     # Make sure explorer can deal with int values
     config["config"]["wpBlockId"] = int(config["config"]["wpBlockId"])
+
+    # Create config file
     config_path = tmp_path / "influenza.config.yml"
     with open(config_path, "w") as f:
         yaml_dump(config, f)
@@ -209,5 +273,4 @@ def test_explorer_legacy(tmp_path, monkeypatch):
 
     # Replace string "duplicate 12345" with "duplicate IND_ID"
     content = re.sub(r"duplicate\s+\d+", "duplicate IND_ID", content)
-
     assert content.strip() == expected_tsv.strip()

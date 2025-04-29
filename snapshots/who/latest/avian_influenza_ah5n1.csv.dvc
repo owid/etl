@@ -18,6 +18,6 @@ meta:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: f2e7ea82d0c490ec646b37349f7f106f
-    size: 25020
+  - md5: dbc9712739ab5f0e2020935685d21c1d
+    size: 25088
     path: avian_influenza_ah5n1.csv

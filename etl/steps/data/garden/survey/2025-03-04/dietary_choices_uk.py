@@ -2,7 +2,7 @@
 
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -31,7 +31,7 @@ def run_sanity_checks(tb: Table) -> None:
     assert ((100 * abs(_tb["base"] - _tb["base_unweighted"]) / _tb["base_unweighted"]) < 1).all()
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -73,7 +73,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb])
 
     # Save garden dataset.
     ds_garden.save()
