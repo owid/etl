@@ -1,3 +1,4 @@
+import numpy as np
 import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
@@ -59,9 +60,15 @@ def run() -> None:
         tb[f"{col}_per_mil"] = tb[col] / (tb["population"] / 1e6)
 
     tb = tb.drop("population", axis=1)
-    # Remove regional aggregates except "World" as these are not meaningful in the context of this dataset
-    tb = tb[~tb["country"].isin(["North America", "South America", "Europe", "Africa", "Asia", "Oceania"])]
+    # Set values to NaN for regional aggregates except for specific columns
+    columns_to_exclude = ["num_articles_per_mil", "num_citations", "num_articles"]
+    regional_aggregates = ["North America", "South America", "Europe", "Africa", "Asia", "Oceania"]
 
+    # Identify columns to set to NaN
+    columns_to_nan = [col for col in tb.columns if col not in columns_to_exclude + ["country", "year", "field"]]
+
+    # Set values to NaN for the specified regions and columns
+    tb.loc[tb["country"].isin(regional_aggregates), columns_to_nan] = np.nan
     tb = tb.format(["country", "year", "field"])
     #
     # Save outputs.

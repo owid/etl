@@ -56,3 +56,4 @@ tables:
           numDecimalPlaces: 1
           tableDisplay:
             hideRelativeChange: True
+
