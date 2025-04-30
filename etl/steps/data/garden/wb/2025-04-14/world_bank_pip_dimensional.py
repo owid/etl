@@ -645,7 +645,7 @@ def pivot_and_obtain_povlines_dict(tb: Table, index: List[str], columns: List[st
     # Pivot the table to calculate indicator more easily
     tb_pivot = tb.pivot(index=index, columns=columns)
 
-    # Create a dictionary with the ppp_version and their corresponding poverty_line for headcount_ratio column, without repeating the values
+    # Create a dictionary with the ppp_version and their corresponding poverty_line for headcount column, without repeating the values
     povlines_dict = {}
     for ppp_version in tb_pivot.columns.levels[1]:
         povlines_dict[ppp_version] = sorted(
@@ -654,13 +654,15 @@ def pivot_and_obtain_povlines_dict(tb: Table, index: List[str], columns: List[st
                     [
                         col[1]
                         for col in tb_pivot.xs(ppp_version, level="ppp_version", axis=1).columns
-                        if col[0] == "headcount_ratio"
+                        if col[0] == "headcount"
                         and not tb_pivot.xs(ppp_version, level="ppp_version", axis=1)[col].isna().all()
                     ]
                 )
             ),
             key=int,
         )
+
+    print(povlines_dict)
 
     return tb_pivot, povlines_dict
 
@@ -1095,7 +1097,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb_both_inc_and_cons_smoothed = Table()
     for country in countries_inc_cons:
         # Filter country
-        tb_country = tb_both_inc_and_cons[tb_both_inc_and_cons["country"] == country].reset_index(drop=True).copy()
+        tb_country = tb_both_inc_and_cons[tb_both_inc_and_cons["country"] == country].reset_index(drop=True)
 
         # Save the max_year for the country
         max_year = tb_country["year"].max()
@@ -1294,16 +1296,20 @@ def regional_headcount(tb: Table) -> Table:
             "World (excluding India)",
         ]
     ]
+
     # Keep only regional data
     tb_regions = tb[tb["country"].isin(regions_for_headcount)].reset_index(drop=True)
 
+    # Keep only the data for the table "Income or consumption consolidated"
+    tb_regions = tb_regions[tb_regions["table"] == "Income or consumption consolidated"].reset_index(drop=True)
+
     # Select needed columns and pivot
-    tb_regions = tb_regions[["country", "year", "ppp_version", "poverty_line", "headcount"]]
+    tb_regions = tb_regions[["country", "year", "ppp_version", "poverty_line", "table", "headcount"]]
 
     # Pivot and obtain the poverty lines dictionary
     tb_regions_aux, povlines_dict = pivot_and_obtain_povlines_dict(
         tb=tb_regions,
-        index=["country", "year"],
+        index=["country", "year", "table"],
         columns=["ppp_version", "poverty_line"],
     )
 
@@ -1312,6 +1318,8 @@ def regional_headcount(tb: Table) -> Table:
 
     # Filter the table to keep only the rows with the poverty line we are interested in
     tb_regions = tb_regions[tb_regions["poverty_line"].isin(ipl_list)].reset_index(drop=True)
+
+    print(tb_regions)
 
     # Pivot the table to have one column per region
     tb_regions = tb_regions.pivot(
