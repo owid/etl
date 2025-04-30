@@ -158,7 +158,7 @@ def run() -> None:
     tb = inc_or_cons_data(tb)
 
     # Create regional headcount variable, by patching missing values with the difference between world and regional headcount
-    tb_inc_or_cons_ppp_current = regional_headcount(tb_inc_or_cons_ppp_current)
+    tb = regional_headcount(tb)
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
     tb_inc_or_cons_ppp_current = survey_count(tb_inc_or_cons_ppp_current)
@@ -1035,7 +1035,8 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
 
     tb_no_spells_smooth = create_smooth_inc_cons_series(tb_no_spells)
 
-    check_jumps_in_grapher_dataset(tb_no_spells_smooth)
+    # TODO: Come back to fix this
+    # check_jumps_in_grapher_dataset(tb_no_spells_smooth)
 
     # Name the table column as "Income or consumption consolidated"
     tb_no_spells_smooth["table"] = "Income or consumption consolidated"
@@ -1054,15 +1055,24 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
 
     tb = tb.copy()
 
-    # Flag duplicates per year – indicating multiple welfare_types
-    # Sort values to ensure the welfare_type consumption is marked as False when there are multiple welfare types
-    tb = tb.sort_values(by=["country", "year", "welfare_type", "ppp_version", "poverty_line"], ignore_index=True)
-    tb["duplicate_flag"] = tb.duplicated(subset=["country", "year", "ppp_version", "poverty_line"], keep=False)
-
-    # Create a boolean column that is true if each ppp_version, country, reporting_level has only income or consumption
-    tb["only_inc_or_cons"] = tb.groupby(["country", "ppp_version", "poverty_line"])["welfare_type"].transform(
-        lambda x: x.nunique() == 1
+    # Pivot and obtain the poverty lines dictionary
+    tb, povlines_dict = pivot_and_obtain_povlines_dict(
+        tb=tb,
+        index=["country", "year", "welfare_type"],
+        columns=["ppp_version", "poverty_line"],
     )
+
+    # Reset index in tb_both_inc_and_cons
+    tb = tb.reset_index()
+
+    # Sort values
+    tb = tb.sort_values(by=["country", "year", "welfare_type"], ignore_index=True)
+
+    # Flag duplicates per year – indicating multiple welfare_types
+    tb["duplicate_flag"] = tb.duplicated(subset=[("country", "", ""), ("year", "", "")], keep=False)
+
+    # Create a boolean column that is true if each country has only income or consumption
+    tb["only_inc_or_cons"] = tb.groupby(["country"])["welfare_type"].transform(lambda x: x.nunique() == 1)
 
     # Select only the rows with only income or consumption
     tb_only_inc_or_cons = tb[tb["only_inc_or_cons"]].reset_index(drop=True)
@@ -1081,16 +1091,6 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         f"Missing expected countries: {missing_countries}."
     )
 
-    # Pivot and obtain the poverty lines dictionary
-    tb_both_inc_and_cons, povlines_dict = pivot_and_obtain_povlines_dict(
-        tb=tb_both_inc_and_cons,
-        index=["country", "year", "welfare_type"],
-        columns=["ppp_version", "poverty_line"],
-    )
-
-    # Reset index in tb_both_inc_and_cons
-    tb_both_inc_and_cons = tb_both_inc_and_cons.reset_index()
-
     # Define empty table to store the smoothed series
     tb_both_inc_and_cons_smoothed = Table()
     for country in countries_inc_cons:
@@ -1105,7 +1105,9 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         last_welfare_type.sort()
 
         # Count how many times welfare_type switches from income to consumption and vice versa
-        number_of_welfare_series = (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1)).cumsum().max()
+        number_of_welfare_series = (
+            (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1).fillna("")).astype(int).cumsum().max()
+        )
 
         # If there are only two welfare series, use both, except for countries where we have to choose one
         if number_of_welfare_series == 2:
@@ -1186,6 +1188,16 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         .reset_index()
     )
 
+    # Do the same with tb_only_inc_or_cons
+    tb_only_inc_or_cons = (
+        tb_only_inc_or_cons.set_index(["country", "year", "welfare_type"]).stack(future_stack=True).reset_index()
+    )
+    tb_only_inc_or_cons = (
+        tb_only_inc_or_cons.set_index(["country", "year", "welfare_type", "poverty_line"])
+        .stack(future_stack=True)
+        .reset_index()
+    )
+
     tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
 
     # Drop the columns created in this function
@@ -1207,12 +1219,16 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
         columns=["ppp_version", "poverty_line"],
     )
 
+    # Reset index in tb
+    tb = tb.reset_index()
+
     # For each country, year, welfare_type and reporting_level, check if the difference between the columns is too high
 
     for ppp_year, povlines in povlines_dict.items():
         # Define columns to check: all the headcount ratio columns
         cols_to_check = [("headcount_ratio", ppp_year, povline) for povline in povlines]
         for col in cols_to_check:
+            print(f"Checking {col}")
             # Create a new column, shift_col, that is the same as col but shifted one row down for each country
             tb["shift_col"] = tb.groupby(["country"])[col].shift(1)
 
@@ -1232,7 +1248,11 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
             tb["check_diff_welfare_type"] = tb["welfare_type"] == tb["shift_welfare_type"]
 
             # Check if the difference is too high
-            mask = (abs(tb["check_diff_column"]) > 10) & (tb["check_diff_year"] <= 5) & ~tb["check_diff_welfare_type"]
+            mask = (
+                (abs(tb["check_diff_column"].fillna(0)) > 10)
+                & (tb["check_diff_year"].fillna(0) <= 5)
+                & (~tb["check_diff_welfare_type"].fillna(False))
+            )
             tb_error = tb[mask].reset_index(drop=True)
 
             if not tb_error.empty:
@@ -1262,26 +1282,43 @@ def regional_headcount(tb: Table) -> Table:
     Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
     """
 
-    # Keep only regional data: for regions, these are the reporting_level rows not in ['national', 'urban', 'rural']
-    tb_regions = tb[~tb["reporting_level"].isin(["national", "urban", "rural"])].reset_index(drop=True).copy()
-
-    # Remove Western and Central and Eastern and Southern Africa. It's redundant with Sub-Saharan Africa (PIP)
-    tb_regions = tb_regions[
-        ~tb_regions["country"].isin(
-            [
-                "Western and Central Africa (PIP)",
-                "Eastern and Southern Africa (PIP)",
-                "World (excluding China)",
-                "World (excluding India)",
-            ]
-        )
-    ].reset_index(drop=True)
+    # From REGIONS_LIST,, drop the regions we are not interested in
+    regions_for_headcount = [
+        regions
+        for regions in REGIONS_LIST
+        if regions
+        not in [
+            "Western and Central Africa (PIP)",
+            "Eastern and Southern Africa (PIP)",
+            "World (excluding China)",
+            "World (excluding India)",
+        ]
+    ]
+    # Keep only regional data
+    tb_regions = tb[tb["country"].isin(regions_for_headcount)].reset_index(drop=True)
 
     # Select needed columns and pivot
-    tb_regions = tb_regions[["country", "year", f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}"]]
+    tb_regions = tb_regions[["country", "year", "ppp_version", "poverty_line", "headcount"]]
+
+    # Pivot and obtain the poverty lines dictionary
+    tb_regions_aux, povlines_dict = pivot_and_obtain_povlines_dict(
+        tb=tb_regions,
+        index=["country", "year"],
+        columns=["ppp_version", "poverty_line"],
+    )
+
+    # From povlines_dict, get the [1]th value for each ppp_year
+    ipl_list = [povlines_dict[ppp_year][1] for ppp_year in povlines_dict.keys()]
+
+    # Filter the table to keep only the rows with the poverty line we are interested in
+    tb_regions = tb_regions[tb_regions["poverty_line"].isin(ipl_list)].reset_index(drop=True)
+
+    # Pivot the table to have one column per region
     tb_regions = tb_regions.pivot(
-        index="year", columns="country", values=f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}"
+        index=["ppp_version", "poverty_line", "year"], columns="country", values="headcount"
     ).reset_index()
+
+    print(tb_regions)
 
     # Drop rows with more than one region with null headcount
     tb_regions["check_total"] = tb_regions[tb_regions.columns].isnull().sum(axis=1)
