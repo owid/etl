@@ -107,13 +107,13 @@ class ChartDiffShow:
         label = f"{self.diff.slug}  "
         tags = []
         if self.diff.is_new:
-            tags.append(" :blue-background[:material/grade: **NEW**]")
+            tags.append(" :green-background[:material/grade: **NEW**]")
         if self.diff.is_draft:
             tags.append(" :gray-background[:material/draft: **DRAFT**]")
         if self.diff.error:
             tags.append(" :red-background[:material/error: **ERROR**]")
         for change in self.diff.change_types:
-            tags.append(f":red-background[:material/refresh: **{change.upper()} CHANGE**]")
+            tags.append(f":blue-background[:material/commit: **{change.upper()} CHANGE**]")
 
         # Add TAG if modified and no change_types is provided
         if (self.diff.is_modified) and (tags == []):
@@ -262,9 +262,9 @@ class ChartDiffShow:
                 "No conflicts found actually. Unsure why you were prompted with the conflict resolver. Please report."
             )
 
-    def _show_chart_diff_controls(self):
+    def _show_chart_diff_header(self):
         # Three columns: status, refresh, link
-        col1, col2, col3 = st.columns([2, 1, 3], vertical_alignment="bottom")
+        col1, col2, col3 = st.columns([2, 3, 1], vertical_alignment="bottom")
 
         # Status of chart diff: approve, pending, reject
         with col1:
@@ -310,8 +310,30 @@ class ChartDiffShow:
                     # label_visibility="collapsed",
                 )
 
-        # Refresh chart
+        # Scores (analytics, anomalies, etc.)
         with col2:
+            texts = [
+                f":material/remove_red_eye: {self.diff.scores.chart_views} views",
+                f":material/scatter_plot: {self.diff.scores.anomaly_pretty} %",
+            ]
+            st.markdown(
+                " | ".join(texts),
+                help=":material/remove_red_eye:: **Number of chart views** in the last X days.\n\n"
+                ":material/scatter_plot:: **Anomaly score of the chart**, as estimated by Anomalist. This is a measure of the worst anomaly in the chart's indicators. A score of 0% means that the chart doesn't have noticeable outliers, while a score closer to 100% means that there is an indicator with a substantial outlier.",
+            )
+
+            # scores = {}
+            # if self.diff.scores.chart_views is not None:
+            #     scores["chart_views"] = self.diff.scores.chart_views
+            # if self.diff.scores.anomaly is not None:
+            #     scores["anomaly"] = round(self.diff.scores.anomaly, 2)
+            # text = ""
+            # for score_name, score in scores.items():
+            #     text += f"**{score_name}**: {score}\n"
+            # st.markdown(text)
+
+        # Refresh chart
+        with col3:
             st.button(
                 label="Refresh charts",
                 icon=":material/refresh:",
@@ -320,17 +342,6 @@ class ChartDiffShow:
                 on_click=self._refresh_chart_diff,
                 type="secondary",
             )
-
-        with col3:
-            scores = {}
-            if self.diff.scores.chart_views is not None:
-                scores["chart_views"] = self.diff.scores.chart_views
-            if self.diff.scores.anomaly is not None:
-                scores["anomaly"] = round(self.diff.scores.anomaly, 2)
-            text = ""
-            for score_name, score in scores.items():
-                text += f"**{score_name}**: {score}\n"
-            st.markdown(text)
 
     def _show_metadata_diff(self) -> None:
         """Show metadata diff (if applicable).
@@ -574,8 +585,8 @@ class ChartDiffShow:
         else:
             st.empty()
 
-        # Show controls: status approval, refresh, link
-        self._show_chart_diff_controls()
+        # Show header: approval/reject controls, refresh btn, scores
+        self._show_chart_diff_header()
 
         if "metadata" in self.diff.change_types:
             self._show_metadata_diff()

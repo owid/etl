@@ -37,6 +37,14 @@ class ChartDiffScores:
     chart_views: Optional[float]
     anomaly: Optional[float]
 
+    @property
+    def anomaly_pretty(self) -> str:
+        """Get anomaly score as string."""
+        if self.anomaly is not None:
+            return f"{self.anomaly * 100:.2f}"
+        else:
+            return "N/A"
+
 
 class ChartDiff:
     # Chart in source environment
@@ -267,10 +275,10 @@ class ChartDiff:
         # Get all slugs from target
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
-        # Get chart views
+        # TODO: Get chart views
         chart_views = {chart_id: random.uniform(0.0, 1000) for chart_id in chart_ids}
 
-        # Anomalies
+        # TODO: Anomalies
         chart_anomalies = {chart_id: random.uniform(0.0, 1) for chart_id in chart_ids}
 
         # Build chart diffs

@@ -1,3 +1,12 @@
+"""
+TODO: Add sorting mechanism to the chart diff list.
+
+- get_chart_diffs: Right after when we get charts, sort them based on what is the value in the chart-diff-sort-by-results selectbox.
+- filter_chart_diffs: Add sorting whenever the user edits anything in the options popover?
+- Question: How to reconcile selectbox/URL Query params?
+- At which stage should we get the analytics / anomalist scores? In ChartDiff.from_charts_df! (look for "TODO")
+"""
+
 import re
 from pathlib import Path
 
@@ -71,6 +80,7 @@ def get_chart_diffs():
         with st.spinner("Getting charts from database...", show_time=True):
             st.session_state.chart_diffs = get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)
 
+    # TODO: Sort differently?
     # Sort charts
     st.session_state.chart_diffs = dict(
         sorted(
@@ -94,6 +104,7 @@ def filter_chart_diffs():
     This is based on the query parameters.
     """
 
+    # TODO: Add sorting too?
     def _slugs_match(chart_slug_1, chart_slug_2):
         pattern = r"[,\s\-]+"
         chart_slug_1 = set(re.split(pattern, chart_slug_1.lower()))
@@ -209,7 +220,7 @@ def _show_options_filters():
         # Change type filter
         _apply_search_filters("chart-diff-change-type", "change_type")
 
-    st.markdown("#### Filters")
+    st.markdown("#### Search filters")
     st.toggle(
         "**Hide** reviewed charts",
         key="hide-reviewed-charts",
@@ -229,7 +240,7 @@ def _show_options_filters():
         if not default:
             default = ["new", "config"]
         st.multiselect(
-            label="Chart changes type",
+            label="Chart change types",
             options=["new", "data", "metadata", "config"],  # type: ignore
             format_func=lambda x: x if x == "new" else f"{x} modified",
             default=default,  # type: ignore
@@ -238,28 +249,28 @@ def _show_options_filters():
             placeholder="config, data, metadata",
         )
         st.multiselect(
-            label="Select chart IDs",
+            label="Chart IDs",
             options=[c.chart_id for c in st.session_state.chart_diffs.values()],
             default=[int(n) for n in st.query_params.get_all("chart_id")],  # type: ignore
             key="chart-diff-filter-id",
             help="Filter chart diffs with charts with given IDs.",
             placeholder="Select chart IDs",
         )
-        st.text_input(
-            label="Search by slug name",
-            value=st.query_params.get("chart_slug", ""),  # type: ignore
-            placeholder="Search for a slug",
-            key="chart-diff-filter-slug",
-            help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
-        )
         st.multiselect(
-            label="Select indicators",
+            label="Indicator IDs",
             options=sorted(st.session_state.indicators_in_charts.keys()),
             format_func=lambda s: f"[{s}] {st.session_state.indicators_in_charts[s]}",
             default=[int(n) for n in st.query_params.get_all("indicator_id")],  # type: ignore
             key="chart-diff-filter-indicator",
             help="Filter chart diffs to charts containing any of the selected indicators.",
             placeholder="Select indicator IDs",
+        )
+        st.text_input(
+            label="Chart slug",
+            value=st.query_params.get("chart_slug", ""),  # type: ignore
+            placeholder="Search for a slug",
+            key="chart-diff-filter-slug",
+            help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
         )
 
         st.form_submit_button(
@@ -277,7 +288,26 @@ def _show_options_display():
         )
 
     # Display options
-    st.markdown("#### Display")
+    st.markdown("#### Results page")
+
+    ## Sorting
+    st.selectbox(
+        label="Sort by",
+        options=[
+            "Relevance",
+            "Chart views (last 14-day): Most to least",
+            "Chart views (last 14-day): Least to most",
+            "Anomalies: Most to least",
+            "Anomalies: Least to most",
+            "Last updated",
+        ],
+        key="chart-diff-sort-by-results",
+        help="Sort chart diffs by relevance, user chart views, anomaly score, last updated, etc.",
+        index=0,
+        # default="Updated",
+    )
+
+    ## Display options
     st.toggle(
         "Use **vertical arrangement** for chart diffs",
         key="arrange-charts-vertically",
@@ -297,16 +327,6 @@ def _show_options_display():
         help="Select the number of charts to display per page.",
         index=1,
     )
-
-
-def _show_options_sorting():
-    st.markdown("#### Sorting")
-    st.segmented_control(
-        label="Sort by",
-        options=["Updated", "Chart views", "Anomaly"],
-        default="Updated",
-    )
-    st.selectbox
 
 
 def _show_options_misc():
@@ -341,7 +361,6 @@ def _show_options():
         # Display
         with col2:
             _show_options_display()
-            _show_options_sorting()
         # Buttons (refresh, unreview)
         with col3:
             _show_options_misc()
