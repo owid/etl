@@ -638,7 +638,7 @@ steps:
     - data://garden/tourism/2024-08-17/unwto
     - data://garden/ggdc/2022-11-28/penn_world_table
     - data://garden/wb/2024-11-04/edstats
-    - data://garden/unesco/2024-06-25/education_sdgs
+    - data://garden/unesco/2025-05-01/education_sdgs
     - data://garden/happiness/2025-03-28/happiness
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
