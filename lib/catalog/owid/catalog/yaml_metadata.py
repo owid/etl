@@ -173,11 +173,17 @@ def _merge_table_metadata(meta: dict, new: dict) -> dict:
 
 
 def _validate_variables(t_annot: dict, tb: Table) -> None:
-    yaml_variable_names = (t_annot.get("variables") or {}).keys()
-    table_variable_names = tb.columns
-    extra_variable_names = yaml_variable_names - table_variable_names
-    if extra_variable_names:
-        raise ValueError(f"Table {tb.metadata.short_name} has extra variables: {sorted(list(extra_variable_names))}")
+    yaml_variable_names = set((t_annot.get("variables") or {}).keys())
+    table_variable_names = set(tb.columns)
+    extra_yaml_variable_names = yaml_variable_names - table_variable_names
+    extra_table_variable_names = table_variable_names - yaml_variable_names
+    if extra_yaml_variable_names:
+        msg = (
+            f"Table {tb.metadata.short_name} has extra variables in YAML file {sorted(list(extra_yaml_variable_names))}"
+        )
+        if extra_table_variable_names:
+            msg += f" and extra variables in table {sorted(list(extra_table_variable_names))}"
+        raise ValueError(msg)
 
 
 def _flatten(lst: List[Any]) -> List[str]:
