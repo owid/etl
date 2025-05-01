@@ -20,7 +20,7 @@ from apps.backport.datasync.data_metadata import (
 from apps.utils.gpt import OpenAIWrapper, get_cost_and_tokens
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader
 from apps.wizard.app_pages.chart_diff.conflict_resolver import ChartDiffConflictResolver
-from apps.wizard.app_pages.chart_diff.utils import SOURCE, TARGET, prettify_date
+from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS, SOURCE, TARGET, prettify_date
 from apps.wizard.utils.components import grapher_chart
 from etl.config import OWID_ENV
 from etl.grapher.io import variable_metadata_df_from_s3
@@ -313,7 +313,7 @@ class ChartDiffShow:
         articles_md = "- " + "\n- ".join([f"{art.url}: {art.num_views} views" for art in self.diff.article_refs])
         # Scores (analytics, anomalies, etc.)
         help_txt = (
-            ":primary-badge[:material/remove_red_eye:] **Number of chart views** in the last 30 days.\n\n"
+            f":primary-badge[:material/remove_red_eye:] **Number of chart views** in the last {ANALYTICS_NUM_DAYS} days.\n\n"
             f":primary-badge[:material/article:] **Number of articles** that use this chart. This is a measure of the number of articles that use this chart:\n{articles_md}\n\n"
             ":primary-badge[:material/scatter_plot:] **Anomaly score of the chart**, as estimated by Anomalist. This is a measure of the worst anomaly in the chart's indicators. A score of 0% means that the chart doesn't have noticeable outliers, while a score closer to 100% means that there is an indicator with a substantial outlier.\n\n"
         )
