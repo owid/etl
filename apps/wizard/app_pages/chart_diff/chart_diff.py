@@ -47,7 +47,7 @@ class ChartDiffScores:
     def anomaly_pretty(self) -> str:
         """Get anomaly score as string."""
         if self.anomaly is not None:
-            return f"{self.anomaly * 100:.2f}"
+            return f"{int(self.anomaly * 100)}"
         else:
             return "N/A"
 
@@ -82,11 +82,11 @@ class ChartDiffScores:
 
     def to_md(self) -> str:
         text = (
-            f":primary-badge[:material/remove_red_eye: {self.chart_views} chart views]",
-            f"  :primary-badge[:material/article: {self.num_articles} article mentions]"
+            f":primary-badge[:material/remove_red_eye: **{self.chart_views}** chart views]",
+            f" :primary-badge[:material/article: **{self.num_articles}** ref{'' if self.num_articles == 1 else 's'}]"
             if self.num_articles and (self.num_articles >= 0)
             else "",
-            f"  :primary-badge[:material/scatter_plot: {self.anomaly_pretty} % anomaly]",
+            f" :primary-badge[:material/scatter_plot: **{self.anomaly_pretty}**% anomaly]",
         )
         return "".join(text)
 
