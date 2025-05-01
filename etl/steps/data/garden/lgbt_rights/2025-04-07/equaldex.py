@@ -424,7 +424,7 @@ def add_metadata_for_aggregated_columns(col: str, status: str, count_or_pop: str
         meta = VariableMeta(
             title=f"{col.capitalize()} - {status.capitalize()} (Population)",
             description_short=f"Population of countries with the status '{status}' for {col}.",
-            unit="persons",
+            unit="people",
             short_unit="",
             sort=[],
             origins=origins,
