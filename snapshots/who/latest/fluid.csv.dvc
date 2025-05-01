@@ -1,19 +1,19 @@
 meta:
-  name: FluID, World Health Organization (2023)
-  publication_year: 2023
-  publication_date: 2023-02-16
-  source_name: FluID, World Health Organization (2023)
-  source_published_by: FluID, World Health Organization (2023)
-  url: https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid
-  source_data_url: https://xmart-api-public.who.int/FLUMART/VIW_FID_EPI?$format=csv
-  license_url: https://www.who.int/about/policies/publishing/copyright
-  license_name: CC BY-NC-SA 3.0 IGO
-  date_accessed: 2023-02-16
-  is_public: true
-  description: |
-    FluID is a global platform for data sharing that links regional influenza epidemiological data into a single global database. The platform provides connections between existing databases and can also be used to directly enter data by the national focal points through a web-based interface. It complements the existing virological data collection tool FluNet.
+  origin:
+    title: "FluID"
+    description: |-
+      FluID is a global platform for data sharing that links regional influenza epidemiological data into a single global database. The platform provides connections between existing databases and can also be used to directly enter data by the national focal points through a web-based interface. It complements the existing virological data collection tool FluNet.
 
-    The platform accommodates both qualitative and quantitative data which facilitates the tracking of global trends, spread, intensity, and impact of influenza. These data are made freely available to health policy makers in order to assist them in making informed decisions regarding the management of influenza.
+      The platform accommodates both qualitative and quantitative data which facilitates the tracking of global trends, spread, intensity, and impact of influenza. These data are made freely available to health policy makers in order to assist them in making informed decisions regarding the management of influenza.
+    producer: "World Health Organization"
+    citation_full: "World Health Organization. FluID: A global platform for influenza epidemiological data. World Health Organization. Available at: https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid."
+    url_main: "https://www.who.int/teams/global-influenza-programme/surveillance-and-monitoring/fluid"
+    url_download: "https://xmart-api-public.who.int/FLUMART/VIW_FID_EPI?$format=csv"
+    date_accessed: "2023-02-16"
+    date_published: "2023-02-16"
+    license:
+      name: "CC BY-NC-SA 3.0 IGO"
+      url: "https://www.who.int/about/policies/publishing/copyright"
 wdir: ../../../data/snapshots/who/latest
 outs:
   - md5: c489df5a2cc9d5e94f58f560e22d4cda
