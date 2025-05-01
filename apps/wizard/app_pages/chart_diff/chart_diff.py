@@ -36,6 +36,12 @@ EXCLUDE_METADATA_CHANGES = [
 class ChartDiffScores:
     chart_views: Optional[float]
     anomaly: Optional[float]
+    num_articles: Optional[int]
+
+    # Internal scale factor to regularize score for chart views
+    _chart_views_reg: Optional[float] = None
+    _anomaly_reg: Optional[float] = None
+    _normalization_chart_views: Optional[float] = None
 
     @property
     def anomaly_pretty(self) -> str:
@@ -44,6 +50,51 @@ class ChartDiffScores:
             return f"{self.anomaly * 100:.2f}"
         else:
             return "N/A"
+
+    @property
+    def relevance(self) -> float:
+        """Get relevance score as a combination of chart views and anomaly."""
+        # Weights for relevance operation
+        w_views = 1.0
+        w_anomalies = 1.0
+
+        # Get scores
+        if self.chart_views is None:
+            chart_views = 0.0
+        else:
+            chart_views = self.chart_views
+        if self.anomaly is None:
+            anomaly = 0.0
+        else:
+            anomaly = self.anomaly
+
+        relevance = (w_views * chart_views + w_anomalies * anomaly) / (w_views + w_anomalies)
+
+        return relevance
+
+    @property
+    def relevance_pretty(self) -> str:
+        """Get anomaly score as string."""
+        if self.relevance is not None:
+            return f"{self.relevance * 100:.2f}"
+        else:
+            return "N/A"
+
+    def to_md(self) -> str:
+        text = (
+            f":primary-badge[:material/remove_red_eye: {self.chart_views} chart views]",
+            f"  :primary-badge[:material/article: {self.num_articles} article mentions]"
+            if self.num_articles and (self.num_articles >= 0)
+            else "",
+            f"  :primary-badge[:material/scatter_plot: {self.anomaly_pretty} % anomaly]",
+        )
+        return "".join(text)
+
+
+@dataclass
+class ArticleRef:
+    url: str
+    num_views: int
 
 
 class ChartDiff:
@@ -69,8 +120,9 @@ class ChartDiff:
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
         error: Optional[str] = None,
-        score_chart_views: Optional[float] = None,
+        chart_views: Optional[float] = None,
         score_indicators_anomalies: Optional[float] = None,
+        article_refs: Optional[List[ArticleRef]] = None,
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
@@ -87,8 +139,13 @@ class ChartDiff:
         self.df_approvals = self.get_all_approvals_df()
         self.last_chart_revision_approved = None
 
-        # Analytics
-        self.scores = ChartDiffScores(score_chart_views, score_indicators_anomalies)
+        # Analytics, anomalies and other scores
+        self.article_refs = article_refs if article_refs else {}
+        self.scores = ChartDiffScores(
+            chart_views=chart_views,
+            anomaly=score_indicators_anomalies,
+            num_articles=len(self.article_refs),
+        )
 
         # Cached
         self._in_conflict = None
@@ -276,10 +333,25 @@ class ChartDiff:
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
         # TODO: Get chart views
-        chart_views = {chart_id: random.uniform(0.0, 1000) for chart_id in chart_ids}
+        chart_views_all = {chart_id: random.uniform(0.0, 1000) for chart_id in chart_ids}
 
         # TODO: Anomalies
-        chart_anomalies = {chart_id: random.uniform(0.0, 1) for chart_id in chart_ids}
+        chart_anomalies_all = {chart_id: random.uniform(0.0, 1) for chart_id in chart_ids}
+
+        # TODO: Articles
+        article_refs_all = {
+            chart_id: [
+                ArticleRef(
+                    url="https://ourworldindata.org/1",
+                    num_views=random.randint(0, 10),
+                ),
+                ArticleRef(
+                    url="https://ourworldindata.org/2",
+                    num_views=random.randint(0, 10),
+                ),
+            ]
+            for chart_id in chart_ids
+        }
 
         # Build chart diffs
         chart_diffs = []
@@ -316,22 +388,26 @@ class ChartDiff:
                 error = None
 
             # Chart views
-            chart_views_score = int(chart_views[chart_id])
+            chart_views_score = int(chart_views_all[chart_id])
 
             # Anomalies score
-            chart_anomalies_score = chart_anomalies.get(chart_id)
+            chart_anomalies_score = chart_anomalies_all.get(chart_id)
+
+            # Article refs
+            article_refs = article_refs_all.get(chart_id, [])
 
             # Build Chart Diff object
-            chart_diff = cls(
-                source_chart,
-                target_chart,
-                approval,
-                conflict,
-                modified_checksum,
-                edited_in_staging,
-                error,
-                chart_views_score,
-                chart_anomalies_score,
+            chart_diff: "ChartDiff" = cls(
+                source_chart=source_chart,
+                target_chart=target_chart,
+                approval=approval,
+                conflict=conflict,
+                modified_checksum=modified_checksum,
+                edited_in_staging=edited_in_staging,
+                error=error,
+                chart_views=chart_views_score,
+                score_indicators_anomalies=chart_anomalies_score,
+                article_refs=article_refs,
             )
 
             # Add last revision
