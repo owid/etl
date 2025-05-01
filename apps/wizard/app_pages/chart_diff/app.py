@@ -3,7 +3,7 @@ TODO: Add sorting mechanism to the chart diff list.
 
 - get_chart_diffs: Right after when we get charts, sort them based on what is the value in the chart-diff-sort-by-results selectbox.
 - filter_chart_diffs: Add sorting whenever the user edits anything in the options popover?
-- Question: How to reconcile selectbox/URL Query params?
+- x Question: How to reconcile selectbox/URL Query params?
 - At which stage should we get the analytics / anomalist scores? In ChartDiff.from_charts_df! (look for "TODO")
 """
 
@@ -21,7 +21,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_gra
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import Pagination
+from apps.wizard.utils.components import Pagination, url_persist
 from etl.config import OWID_ENV
 from etl.grapher import model as gm
 
@@ -45,6 +45,27 @@ CURRENT_DIR = Path(__file__).resolve().parent
 # Create connections to DB
 SOURCE_ENGINE, TARGET_ENGINE = get_engines()
 
+
+# Sorting options
+class SortMethods:
+    relevance: str = "relevance"
+    chart_views_most_to_least: str = "chart_views_most_to_least"
+    chart_views_least_to_most: str = "chart_views_least_to_most"
+    anomalies_most_to_least: str = "anomalies_most_to_least"
+    anomalies_least_to_most: str = "anomalies_least_to_most"
+    last_updated: str = "last_updated"
+
+
+SORTING_METHODS = {
+    SortMethods.relevance: "Relevance",
+    SortMethods.chart_views_most_to_least: "Chart views (last 14-day): Most to least",
+    SortMethods.chart_views_least_to_most: "Chart views (last 14-day): Least to most",
+    SortMethods.anomalies_most_to_least: "Anomalies: Most to least",
+    SortMethods.anomalies_least_to_most: "Anomalies: Least to most",
+    SortMethods.last_updated: "Last updated",
+}
+
+SORTING_QUERY_PARAM = "chart-diff-sort-by-results"
 
 ########################################
 # SESSION STATE
@@ -163,7 +184,11 @@ def filter_chart_diffs():
             if set(v.change_types) & set(change_types) or v.is_new
         }
 
+    # SORT chart diffs
+    sort_chart_diffs()
+
     # Return boolean if there was any filter applied (except for hiding approved charts)
+    # Not really used!
     if (
         "chart_id" in st.query_params
         or "chart_slug" in st.query_params
@@ -172,6 +197,56 @@ def filter_chart_diffs():
     ):
         return True
     return False
+
+
+def sort_chart_diffs():
+    """Sort chart diffs."""
+    if SORTING_QUERY_PARAM in st.query_params:
+        sort_by = st.query_params.get(SORTING_QUERY_PARAM, SortMethods.relevance)
+        if sort_by == SortMethods.relevance:
+            pass
+        elif sort_by == SortMethods.chart_views_most_to_least:
+            st.session_state.chart_diffs_filtered = dict(
+                sorted(
+                    st.session_state.chart_diffs_filtered.items(),
+                    key=lambda item: item[1].scores.chart_views,
+                    reverse=True,
+                )
+            )
+        elif sort_by == SortMethods.chart_views_least_to_most:
+            st.session_state.chart_diffs_filtered = dict(
+                sorted(
+                    st.session_state.chart_diffs_filtered.items(),
+                    key=lambda item: item[1].scores.chart_views,
+                    reverse=False,
+                )
+            )
+        elif sort_by == SortMethods.anomalies_most_to_least:
+            st.session_state.chart_diffs_filtered = dict(
+                sorted(
+                    st.session_state.chart_diffs_filtered.items(),
+                    key=lambda item: item[1].scores.anomaly,
+                    reverse=True,
+                )
+            )
+        elif sort_by == SortMethods.anomalies_least_to_most:
+            st.session_state.chart_diffs_filtered = dict(
+                sorted(
+                    st.session_state.chart_diffs_filtered.items(),
+                    key=lambda item: item[1].scores.anomaly,
+                    reverse=False,
+                )
+            )
+        elif sort_by == SortMethods.last_updated:
+            st.session_state.chart_diffs_filtered = dict(
+                sorted(
+                    st.session_state.chart_diffs_filtered.items(),
+                    key=lambda item: item[1].latest_update,
+                    reverse=True,
+                )
+            )
+        else:
+            raise ValueError(f"Unknown sorting method: {sort_by}!")
 
 
 @st.dialog(title="Set all charts to Pending")
@@ -291,20 +366,13 @@ def _show_options_display():
     st.markdown("#### Results page")
 
     ## Sorting
-    st.selectbox(
+    url_persist(st.selectbox)(
         label="Sort by",
-        options=[
-            "Relevance",
-            "Chart views (last 14-day): Most to least",
-            "Chart views (last 14-day): Least to most",
-            "Anomalies: Most to least",
-            "Anomalies: Least to most",
-            "Last updated",
-        ],
-        key="chart-diff-sort-by-results",
+        options=SORTING_METHODS.keys(),
+        format_func=lambda x: SORTING_METHODS[x],
+        key=SORTING_QUERY_PARAM,
         help="Sort chart diffs by relevance, user chart views, anomaly score, last updated, etc.",
         index=0,
-        # default="Updated",
     )
 
     ## Display options
