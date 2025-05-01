@@ -2,6 +2,8 @@ import datetime as dt
 import difflib
 import json
 import pprint
+import random
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -30,6 +32,12 @@ EXCLUDE_METADATA_CHANGES = [
 ]
 
 
+@dataclass
+class ChartDiffScores:
+    chart_views: Optional[float]
+    anomaly: Optional[float]
+
+
 class ChartDiff:
     # Chart in source environment
     source_chart: gm.Chart
@@ -53,6 +61,8 @@ class ChartDiff:
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
         error: Optional[str] = None,
+        score_chart_views: Optional[float] = None,
+        score_indicators_anomalies: Optional[float] = None,
     ):
         self.source_chart = source_chart
         self.target_chart = target_chart
@@ -68,6 +78,9 @@ class ChartDiff:
         # Get revisions
         self.df_approvals = self.get_all_approvals_df()
         self.last_chart_revision_approved = None
+
+        # Analytics
+        self.scores = ChartDiffScores(score_chart_views, score_indicators_anomalies)
 
         # Cached
         self._in_conflict = None
@@ -254,6 +267,12 @@ class ChartDiff:
         # Get all slugs from target
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
+        # Get chart views
+        chart_views = {chart_id: random.uniform(0.0, 1000) for chart_id in chart_ids}
+
+        # Anomalies
+        chart_anomalies = {chart_id: random.uniform(0.0, 1) for chart_id in chart_ids}
+
         # Build chart diffs
         chart_diffs = []
         for chart_id, source_chart in source_charts.items():
@@ -288,9 +307,23 @@ class ChartDiff:
             else:
                 error = None
 
+            # Chart views
+            chart_views_score = int(chart_views[chart_id])
+
+            # Anomalies score
+            chart_anomalies_score = chart_anomalies.get(chart_id)
+
             # Build Chart Diff object
             chart_diff = cls(
-                source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, error
+                source_chart,
+                target_chart,
+                approval,
+                conflict,
+                modified_checksum,
+                edited_in_staging,
+                error,
+                chart_views_score,
+                chart_anomalies_score,
             )
 
             # Add last revision

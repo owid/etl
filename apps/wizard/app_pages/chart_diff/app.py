@@ -299,6 +299,16 @@ def _show_options_display():
     )
 
 
+def _show_options_sorting():
+    st.markdown("#### Sorting")
+    st.segmented_control(
+        label="Sort by",
+        options=["Updated", "Chart views", "Anomaly"],
+        default="Updated",
+    )
+    st.selectbox
+
+
 def _show_options_misc():
     """Show other options."""
     st.button(
@@ -331,6 +341,7 @@ def _show_options():
         # Display
         with col2:
             _show_options_display()
+            _show_options_sorting()
         # Buttons (refresh, unreview)
         with col3:
             _show_options_misc()

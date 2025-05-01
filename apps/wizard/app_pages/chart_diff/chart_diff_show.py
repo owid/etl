@@ -313,7 +313,8 @@ class ChartDiffShow:
         # Refresh chart
         with col2:
             st.button(
-                label=":material/refresh: Refresh charts",
+                label="Refresh charts",
+                icon=":material/refresh:",
                 key=f"refresh-btn-{self.diff.chart_id}",
                 help="Get the latest version of the chart from the staging server.",
                 on_click=self._refresh_chart_diff,
@@ -321,20 +322,15 @@ class ChartDiffShow:
             )
 
         with col3:
-            # Copy link
-            if self.show_link:
-                # with col3:
-                query_params = f"chart_id={self.diff.chart_id}"
-                # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
-                if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
-                    url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
-                    st.caption(
-                        body=url,
-                        help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
-                    )
-                else:
-                    url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
-                    st.caption(body=url)
+            scores = {}
+            if self.diff.scores.chart_views is not None:
+                scores["chart_views"] = self.diff.scores.chart_views
+            if self.diff.scores.anomaly is not None:
+                scores["anomaly"] = round(self.diff.scores.anomaly, 2)
+            text = ""
+            for score_name, score in scores.items():
+                text += f"**{score_name}**: {score}\n"
+            st.markdown(text)
 
     def _show_metadata_diff(self) -> None:
         """Show metadata diff (if applicable).
@@ -613,6 +609,21 @@ class ChartDiffShow:
                 _ = self._show_chart_comparison()
             with tab2:
                 self._show_approval_history(self.diff.df_approvals)
+
+        # Copy link
+        if self.show_link:
+            # with col3:
+            query_params = f"chart_id={self.diff.chart_id}"
+            # st.caption(f"**{OWID_ENV.wizard_url}?{query_params}**")
+            if OWID_ENV.wizard_url != OWID_ENV.wizard_url_remote:
+                url = f"{OWID_ENV.wizard_url_remote}/chart-diff?{query_params}"
+                st.caption(
+                    body=url,
+                    help=f"Shown is the link to the remote chart-diff.\n\n Alternatively, local link: {OWID_ENV.wizard_url}?{query_params}",
+                )
+            else:
+                url = f"{OWID_ENV.wizard_url}/chart-diff?{query_params}"
+                st.caption(body=url)
 
     @st.fragment
     def show(self):
