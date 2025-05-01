@@ -56,7 +56,7 @@ CATEGORIES_RENAMING = {
         "Married couples only": "Married couples only",
         "Second parent adoption only": "Second parent adoption only",
         "Varies by Region": "Varies by region",
-        "Single only": "Single only",
+        "Single only": "Individual only",
         "Ambiguous": "Ambiguous",
         "Illegal": "Illegal",
     },
