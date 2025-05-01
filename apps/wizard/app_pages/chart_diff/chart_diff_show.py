@@ -107,17 +107,17 @@ class ChartDiffShow:
         label = f"{self.diff.slug}  "
         tags = []
         if self.diff.is_new:
-            tags.append(" :green-background[:material/grade: **NEW**]")
+            tags.append(" :green-badge[:material/grade: **NEW**]")
         if self.diff.is_draft:
-            tags.append(" :gray-background[:material/draft: **DRAFT**]")
+            tags.append(" :gray-badge[:material/draft: **DRAFT**]")
         if self.diff.error:
-            tags.append(" :red-background[:material/error: **ERROR**]")
+            tags.append(" :red-badge[:material/error: **ERROR**]")
         for change in self.diff.change_types:
-            tags.append(f":blue-background[:material/commit: **{change.upper()} CHANGE**]")
+            tags.append(f":blue-badge[:material/commit: **{change.upper()} CHANGE**]")
 
         # Add TAG if modified and no change_types is provided
         if (self.diff.is_modified) and (tags == []):
-            label += ":rainbow-background[**UNKNOWN -- REPORT THIS**]"
+            label += ":rainbow-badge[**UNKNOWN -- REPORT THIS**]"
         else:
             label += f"{' '.join(tags)}"
         return label
@@ -310,17 +310,22 @@ class ChartDiffShow:
                     # label_visibility="collapsed",
                 )
 
+        articles_md = "- " + "\n- ".join([f"{art.url}: {art.num_views} views" for art in self.diff.article_refs])
         # Scores (analytics, anomalies, etc.)
+        help_txt = (
+            ":primary-badge[:material/remove_red_eye:] **Number of chart views** in the last X days.\n\n"
+            f":primary-badge[:material/article:] **Number of articles** that use this chart. This is a measure of the number of articles that use this chart:\n{articles_md}\n\n"
+            ":primary-badge[:material/scatter_plot:] **Anomaly score of the chart**, as estimated by Anomalist. This is a measure of the worst anomaly in the chart's indicators. A score of 0% means that the chart doesn't have noticeable outliers, while a score closer to 100% means that there is an indicator with a substantial outlier.\n\n"
+        )
         with col2:
-            texts = [
-                f":material/remove_red_eye: {self.diff.scores.chart_views} views",
-                f":material/scatter_plot: {self.diff.scores.anomaly_pretty} %",
-            ]
             st.markdown(
-                " | ".join(texts),
-                help=":material/remove_red_eye:: **Number of chart views** in the last X days.\n\n"
-                ":material/scatter_plot:: **Anomaly score of the chart**, as estimated by Anomalist. This is a measure of the worst anomaly in the chart's indicators. A score of 0% means that the chart doesn't have noticeable outliers, while a score closer to 100% means that there is an indicator with a substantial outlier.",
+                self.diff.scores.to_md(),
+                help=help_txt,
             )
+            # with st.popover(
+            #     self.diff.scores.to_md(),
+            # ):
+            #     st.markdown(help_txt)
 
             # scores = {}
             # if self.diff.scores.chart_views is not None:
