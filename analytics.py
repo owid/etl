@@ -5,10 +5,9 @@ TODO: We currently have many functions reading analytics (from MySQL and GBQ) in
 
 from datetime import datetime
 
-from typing import List, Dict, Any, Optional
+from typing import List, Optional
 import pandas as pd
 from structlog import get_logger
-from etl.db import get_engine
 import pandas as pd
 import urllib.parse
 
@@ -17,9 +16,6 @@ import urllib.parse
 
 # Initialize logger.
 log = get_logger()
-
-# Initialize database engine.
-engine = get_engine()
 
 # First day when we started collecting chart render views.
 # TODO: Find out this exact date.
@@ -137,5 +133,26 @@ def get_chart_views_by_chart_id(
 
     # Fix infs (for charts that were published in the last day).
     df_views.loc[df_views["views_daily"] == float("inf"), "views_daily"] = 0
+
+    return df_views
+
+def get_chart_views_last_n_days(
+    chart_ids: Optional[List[int]] = None,
+    n_days: int = 30,
+) -> pd.DataFrame:
+    """
+    Fetch number of chart views per chart for the last n_days.
+
+    """
+    # Calculate date range.
+    date_max = str(datetime.today().date())
+    date_min = str((datetime.today() - pd.Timedelta(days=n_days)).date())
+
+    # Get views.
+    df_views = get_chart_views_by_chart_id(
+        chart_ids=chart_ids,
+        date_min=date_min,
+        date_max=date_max
+    )
 
     return df_views
