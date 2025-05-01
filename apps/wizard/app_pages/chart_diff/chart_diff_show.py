@@ -313,7 +313,7 @@ class ChartDiffShow:
         articles_md = "- " + "\n- ".join([f"{art.url}: {art.num_views} views" for art in self.diff.article_refs])
         # Scores (analytics, anomalies, etc.)
         help_txt = (
-            f":primary-badge[:material/remove_red_eye:] **Number of chart views** in the last {ANALYTICS_NUM_DAYS} days.\n\n"
+            f":primary-badge[:material/remove_red_eye:] **Average number of daily chart views** in the last {ANALYTICS_NUM_DAYS} days.\n\n"
             f":primary-badge[:material/article:] **Number of articles** that use this chart. This is a measure of the number of articles that use this chart:\n{articles_md}\n\n"
             ":primary-badge[:material/scatter_plot:] **Anomaly score of the chart**, as estimated by Anomalist. This is a measure of the worst anomaly in the chart's indicators. A score of 0% means that the chart doesn't have noticeable outliers, while a score closer to 100% means that there is an indicator with a substantial outlier.\n\n"
         )

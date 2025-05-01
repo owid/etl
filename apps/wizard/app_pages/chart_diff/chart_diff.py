@@ -15,6 +15,7 @@ from structlog import get_logger
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.io import get_all_changed_catalog_paths
+from etl.analytics import get_chart_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files, log_time
@@ -35,7 +36,7 @@ EXCLUDE_METADATA_CHANGES = [
 
 @dataclass
 class ChartDiffScores:
-    chart_views: Optional[float]
+    chart_views: Optional[float]  # Last 30 day average
     anomaly: Optional[float]
     num_articles: Optional[int]
 
@@ -49,6 +50,14 @@ class ChartDiffScores:
         """Get anomaly score as string."""
         if self.anomaly is not None:
             return f"{int(self.anomaly * 100)}"
+        else:
+            return "N/A"
+
+    @property
+    def chart_views_pretty(self) -> str:
+        """Get anomaly score as string."""
+        if self.anomaly is not None:
+            return f"{self.chart_views:.2f}"
         else:
             return "N/A"
 
@@ -83,7 +92,7 @@ class ChartDiffScores:
 
     def to_md(self) -> str:
         text = (
-            f":primary-badge[:material/remove_red_eye: **{self.chart_views}** views (last 30d)]",
+            f":primary-badge[:material/remove_red_eye: **{self.chart_views_pretty}** daily views]",
             f" :primary-badge[:material/article: **{self.num_articles}** ref{'' if self.num_articles == 1 else 's'}]"
             if self.num_articles and (self.num_articles >= 0)
             else "",
@@ -334,10 +343,8 @@ class ChartDiff:
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
         # TODO: Get chart views
-        from analytics import get_chart_views_last_n_days
-
         df_analytics = get_chart_views_last_n_days(chart_ids, ANALYTICS_NUM_DAYS)
-        chart_views_all = df_analytics.set_index("chart_id")["views"].to_dict()
+        chart_views_all = df_analytics.set_index("chart_id")["views_daily"].to_dict()
 
         # TODO: Anomalies
         chart_anomalies_all = {chart_id: random.uniform(0.0, 1) for chart_id in chart_ids}
@@ -392,7 +399,7 @@ class ChartDiff:
                 error = None
 
             # Chart views
-            chart_views_score = int(chart_views_all[chart_id])
+            chart_views_score = chart_views_all[chart_id]
 
             # Anomalies score
             chart_anomalies_score = chart_anomalies_all.get(chart_id)
