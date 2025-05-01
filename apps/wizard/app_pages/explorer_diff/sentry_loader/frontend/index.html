@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- nothing here but our injector -->
+</head>
+<body>
+  <script>
+    // 1) grab the real page’s <head>
+    const parentHead = window.parent.document.head;
+
+    // 2) create & insert the Sentry loader script into parent <head>
+    const loader = document.createElement('script');
+    loader.src = 'https://js-de.sentry-cdn.com/47523dad16368d2c0a59beea90103381.min.js';
+    loader.crossOrigin = 'anonymous';
+
+    parentHead.appendChild(loader);
+
+    // 3) once it’s loaded, inject the init snippet
+    loader.onload = () => {
+      console.log('🔥 Sentry loader injected into parent page');
+      const initScript = document.createElement('script');
+      initScript.text = `
+        Sentry.onLoad(function() {
+          Sentry.init({
+            integrations: [ Sentry.replayIntegration({
+              maskAllText: false,
+              blockAllMedia: false,
+              maskAllInputs: false
+            }) ],
+            replaysSessionSampleRate: 1.0,
+            replaysOnErrorSampleRate: 1.0,
+            tracesSampleRate: 1.0
+          });
+        });
+      `;
+      parentHead.appendChild(initScript);
+    };
+
+    // 4) tell Streamlit the component is ready (and shrink back to 1px)
+    function send(msg, data) {
+      window.parent.postMessage(
+        { isStreamlitMessage: true, type: msg, ...data },
+        "*"
+      );
+    }
+    window.addEventListener("DOMContentLoaded", () => {
+      send("streamlit:componentReady", { apiVersion: 1 });
+      send("streamlit:setFrameHeight", { height: 1 });
+    });
+  </script>
+</body>
+</html>

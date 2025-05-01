@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pandas as pd
+import sentry_loader
 import streamlit as st
 from sqlalchemy.orm import Session
 from structlog import get_logger
@@ -29,6 +30,9 @@ st.set_page_config(
         "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
     },
 )
+
+# At the very top of your script:
+sentry_loader.load_sentry()
 
 EXPLORER_CONTROLS = ["Radio", "Checkbox", "Dropdown"]
 
