@@ -201,58 +201,57 @@ def filter_chart_diffs():
 
 def sort_chart_diffs():
     """Sort chart diffs."""
-    if SORTING_QUERY_PARAM in st.query_params:
-        sort_by = st.query_params.get(SORTING_QUERY_PARAM, SortMethods.relevance)
-        if sort_by == SortMethods.relevance:
-            st.session_state.chart_diffs_filtered = dict(
-                sorted(
-                    st.session_state.chart_diffs_filtered.items(),
-                    key=lambda item: item[1].scores.relevance,
-                    reverse=True,
-                )
+    sort_by = st.query_params.get(SORTING_QUERY_PARAM, SortMethods.relevance)
+    if sort_by == SortMethods.relevance:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.relevance,
+                reverse=True,
             )
-        elif sort_by == SortMethods.chart_views_most_to_least:
-            st.session_state.chart_diffs_filtered = dict(
-                sorted(
-                    st.session_state.chart_diffs_filtered.items(),
-                    key=lambda item: item[1].scores.chart_views,
-                    reverse=True,
-                )
+        )
+    elif sort_by == SortMethods.chart_views_most_to_least:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.chart_views,
+                reverse=True,
             )
-        elif sort_by == SortMethods.chart_views_least_to_most:
-            st.session_state.chart_diffs_filtered = dict(
-                sorted(
-                    st.session_state.chart_diffs_filtered.items(),
-                    key=lambda item: item[1].scores.chart_views,
-                    reverse=False,
-                )
+        )
+    elif sort_by == SortMethods.chart_views_least_to_most:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.chart_views,
+                reverse=False,
             )
-        elif sort_by == SortMethods.anomalies_most_to_least:
-            st.session_state.chart_diffs_filtered = dict(
-                sorted(
-                    st.session_state.chart_diffs_filtered.items(),
-                    key=lambda item: item[1].scores.anomaly,
-                    reverse=True,
-                )
+        )
+    elif sort_by == SortMethods.anomalies_most_to_least:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.anomaly,
+                reverse=True,
             )
-        elif sort_by == SortMethods.anomalies_least_to_most:
-            st.session_state.chart_diffs_filtered = dict(
-                sorted(
-                    st.session_state.chart_diffs_filtered.items(),
-                    key=lambda item: item[1].scores.anomaly,
-                    reverse=False,
-                )
+        )
+    elif sort_by == SortMethods.anomalies_least_to_most:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.anomaly,
+                reverse=False,
             )
-        elif sort_by == SortMethods.last_updated:
-            st.session_state.chart_diffs_filtered = dict(
-                sorted(
-                    st.session_state.chart_diffs_filtered.items(),
-                    key=lambda item: item[1].latest_update,
-                    reverse=True,
-                )
+        )
+    elif sort_by == SortMethods.last_updated:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].latest_update,
+                reverse=True,
             )
-        else:
-            raise ValueError(f"Unknown sorting method: {sort_by}!")
+        )
+    else:
+        raise ValueError(f"Unknown sorting method: {sort_by}!")
 
 
 @st.dialog(title="Set all charts to Pending")
