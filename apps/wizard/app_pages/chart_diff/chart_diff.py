@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+import streamlit as st
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
@@ -325,7 +326,11 @@ class ChartDiff:
 
     @classmethod
     def from_charts_df(
-        cls, df_charts: pd.DataFrame, source_session: Session, target_session: Session, estimate_relevance: bool = True
+        cls,
+        df_charts: pd.DataFrame,
+        source_session: Session,
+        target_session: Session,
+        estimate_relevance: bool = True,
     ) -> List["ChartDiff"]:
         """Get chart diffs from chart ids.
 
@@ -361,20 +366,13 @@ class ChartDiff:
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
         # Get chart views
-        df_analytics = get_chart_views_last_n_days(chart_ids, ANALYTICS_NUM_DAYS)
-        chart_views_all = df_analytics.set_index("chart_id")["views_daily"].to_dict()
+        chart_views_all = get_chart_views_cached(chart_ids)
 
         # Anomalies
-        df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("time_change",))
-        chart_anomalies_all = df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()
+        chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
 
         # Articles
-        df_articles = get_article_views_last_n_days(chart_ids, 30)
-        article_refs_all = (
-            df_articles.groupby("chart_id")[["url", "views_daily", "title"]]
-            .apply(lambda x: [ArticleRef(row["url"], row["title"], row["views_daily"]) for _, row in x.iterrows()])
-            .to_dict()
-        )
+        article_refs_all = get_chart_in_article_views_cached(chart_ids)
 
         # Build chart diffs
         chart_diffs = []
@@ -707,10 +705,18 @@ class ChartDiffsLoader:
         df_charts = self.get_charts_df(config, data, metadata)
 
         if source_session and target_session:
-            chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
+            chart_diffs = ChartDiff.from_charts_df(
+                df_charts=df_charts,
+                source_session=source_session,
+                target_session=target_session,
+            )
         else:
             with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
-                chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
+                chart_diffs = ChartDiff.from_charts_df(
+                    df_charts=df_charts,
+                    source_session=source_session,
+                    target_session=target_session,
+                )
 
         self._diffs = chart_diffs
 
@@ -991,3 +997,28 @@ def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbos
             print(line)
 
     return False
+
+
+@st.cache_data
+def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
+    # Get chart views
+    df_analytics = get_chart_views_last_n_days(chart_ids, ANALYTICS_NUM_DAYS)
+    return df_analytics.set_index("chart_id")["views_daily"].to_dict()  # type: ignore
+
+
+@st.cache_data
+def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
+    # Anomalies
+    df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("time_change",))
+    return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # type: ignore
+
+
+@st.cache_data
+def get_chart_in_article_views_cached(chart_ids: List[int]) -> Dict[int, List[ArticleRef]]:
+    # Articles
+    df_articles = get_article_views_last_n_days(chart_ids, 30)
+    return (
+        df_articles.groupby("chart_id")[["url", "views_daily", "title"]]
+        .apply(lambda x: [ArticleRef(row["url"], row["title"], row["views_daily"]) for _, row in x.iterrows()])
+        .to_dict()
+    )

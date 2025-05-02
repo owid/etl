@@ -101,7 +101,6 @@ def get_chart_diffs():
         with st.spinner("Getting charts from database...", show_time=True):
             st.session_state.chart_diffs = get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)
 
-    # TODO: Sort differently?
     # Sort charts
     st.session_state.chart_diffs = dict(
         sorted(
@@ -160,7 +159,7 @@ def filter_chart_diffs():
             st.session_state.chart_diffs_filtered = {
                 k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
             }
-        if "hide_reviewed" in st.query_params:
+        if "show_reviewed" not in st.query_params:
             st.session_state.chart_diffs_filtered = {
                 k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
             }
@@ -266,15 +265,15 @@ def set_chart_diffs_to_pending(engine: Engine) -> None:
 
 
 def _show_options_filters():
-    def hide_reviewed():
-        # st.toast(f"ENTERING hide: {st.session_state['hide-reviewed-charts']}")
-        if st.session_state["hide-reviewed-charts"]:
-            st.query_params.update({"hide_reviewed": ""})  # type: ignore
+    def show_reviewed():
+        # st.toast(f"ENTERING hide: {st.session_state['show-reviewed-charts']}")
+        if st.session_state["show-reviewed-charts"]:
+            st.query_params.update({"show_reviewed": ""})  # type: ignore
         else:
-            st.query_params.pop("hide_reviewed", None)
+            st.query_params.pop("show_reviewed", None)
 
     def show_all():
-        # st.toast(f"ENTERING hide: {st.session_state['hide-reviewed-charts']}")
+        # st.toast(f"ENTERING hide: {st.session_state['show-reviewed-charts']}")
         if st.session_state["show-all-charts"]:
             st.query_params.update({"show_all": ""})  # type: ignore
         else:
@@ -302,10 +301,10 @@ def _show_options_filters():
 
     st.markdown("#### Search filters")
     st.toggle(
-        "**Hide** reviewed charts",
-        key="hide-reviewed-charts",
-        value="hide_reviewed" in st.query_params,
-        on_change=hide_reviewed,  # type: ignore
+        "**Show** reviewed charts",
+        key="show-reviewed-charts",
+        value="show_reviewed" in st.query_params,
+        on_change=show_reviewed,  # type: ignore
         help="Show only chart diffs that are pending approval (or rejection).",
     )
     st.toggle(
@@ -446,13 +445,12 @@ def _show_summary_top(chart_diffs):
     num_charts_listed = len(chart_diffs)
     num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
     text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
-    st.markdown(text)
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
-        st.warning(
-            f"**Some charts are hidden due to filtering**. {num_charts_listed}/{num_charts_total} charts listed."
-        )
+        text_warning = f"Some charts are hidden due to filtering. {num_charts_listed}/{num_charts_total} charts listed."
+        text += f" :small[{text_warning}]"
+    st.markdown(text)
 
 
 def render_app():
