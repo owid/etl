@@ -131,12 +131,18 @@ tables:
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal average years of schooling between men and women. Values below 1 favor men, and above 1 favor women.
         unit: "index"
         description_key:
-          - This indicator assesses gender equality in mean years of schooling by comparing the average number of completed years of education between women and men aged 25 and older.
-          - It is based on the adjusted gender parity index (GPIA), which is calculated by dividing the female value for mean years of schooling by the male value. If the result is greater than 1, the ratio is inverted and subtracted from 2 to keep the scale symmetrical between 0 and 2.
-          - A value of 1 means that men and women have equal average years of schooling. A value below 1 indicates that men have more years of schooling, while a value above 1 indicates that women have more.
+          - In many countries, men and women have spent different amounts of time in school—this indicator shows how close they are to achieving equality in educational attainment.
+          - It captures gender equality in *average years of schooling* by comparing how many years of formal education have been completed on average by women and men aged 25 and older.
+          - The *adjusted gender parity index (GPIA)* is calculated by dividing the average years of schooling for women by that of men. If the result is greater than 1, it is inverted and subtracted from 2. This creates a scale from 0 to 2, centered around 1.
+          - A GPIA value of 1 means men and women have the same average number of completed school years. A value below 1 shows a gap in favour of men, and a value above 1 shows a gap in favour of women.
+          - This indicator is useful for highlighting long-term trends in gender inequality in education and assessing the lasting effects of policies aimed at closing the gender gap.
+          - The data comes from household surveys or population censuses, where individuals report the highest level of education they have completed. These levels are then converted into years of schooling based on standard durations defined by ISCED.
+          - Because this indicator reflects accumulated schooling over time, it shows how gender disparities have developed across generations.
+          - Some limitations include differences in education system structures between countries and challenges in mapping survey responses to ISCED levels. The indicator measures duration of schooling, not its quality or outcomes.
+          - Even so, the GPIA for *average years of schooling* provides a clear measure of gender equality in education over the life course, and is an important complement to indicators focused on current enrolment or access.
 
       mean_years_of_schooling__isced_1_or_higher__population_25plus_years__female:
-        title: Av erage years of schooling for women
+        title: Average years of schooling for women
         description_short: Average number of years women older than 25 participated in formal education.
         unit: "years"
         description_key: *desc_key_mye
@@ -174,12 +180,17 @@ tables:
         short_unit: "%"
         description_key: *desc_key_ger
 
-      gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
-        title: Gross enrolment ratio in tertiary education
-        description_short: Percentage of children of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education) or higher.
-        unit: "%"
-        short_unit: "%"
-        description_key: *desc_key_ger
-
-
-
+      total_net_enrolment_rate__primary__adjusted_gender_parity_index__gpia:
+        title: Net enrollment rates in primary education, adjusted gender parity index
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        unit: "index"
+        description_key:
+          - Boys and girls don’t always have equal access to primary education—this indicator shows how close we are to gender parity in age-appropriate school enrolment.
+          - It captures gender equality in *net enrolment rates* for primary education by comparing the percentage of girls and boys of official primary school age who are enrolled at the primary level.
+          - The *adjusted gender parity index (GPIA)* is calculated by dividing the female net enrolment rate by the male net enrolment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
+          - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favour of boys, while a value above 1 shows a gap in favour of girls.
+          - This indicator is useful for identifying gender-based barriers to primary school enrolment and for monitoring progress toward equitable access to basic education.
+          - The data comes from administrative records reporting enrolment by age and sex, as well as population estimates for children of official primary school age.
+          - It’s important to interpret this indicator alongside others, such as attendance rates or completion rates, to get a full picture of gender disparities in education.
+          - As with all indicators based on enrolment and population estimates, small inconsistencies between data sources may affect accuracy. Differences may also arise due to early or delayed school entry, which can influence age-specific enrolment.
+          - Despite these limitations, the GPIA for *net enrolment in primary education* is a valuable measure of progress toward inclusive and equitable education for all children, regardless of gender.
