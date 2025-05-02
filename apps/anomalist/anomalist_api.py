@@ -736,3 +736,40 @@ def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]
         new_n=len(sample_ids),
     )
     return [v for v in variables if v.id in sample_ids]
+
+
+def get_anomalies_for_chart_ids(chart_ids: Optional[List[int]]) -> pd.DataFrame:
+    """Get datasets of the variables used in a list of charts, given the chart ids.
+
+    NOTE: It's unclear what the most relevant information is for a given chart. For now, get the average anomaly score and average scale score of the datasets of variables used in those charts.
+
+    """
+    query = """SELECT DISTINCT cd.chartId AS chart_id, v.datasetId AS dataset_id
+    FROM variables v
+    JOIN chart_dimensions cd
+    ON cd.variableId = v.id
+    """
+    if chart_ids:
+        id_list = ", ".join(str(cid) for cid in chart_ids)
+        query += f" AND cd.chartId IN ({id_list})"
+    df = OWID_ENV.read_sql(sql=query)
+
+    # Get all anomalies from DB for the relevant datasets.
+    with Session(OWID_ENV.engine) as session:
+        anomalies = gm.Anomaly.load_anomalies(session=session, dataset_id=sorted(set(df["dataset_id"])))
+
+    # Simplify the original dataframe to only contain the charts and datasets for which there are anomalies calculated.
+    dataset_ids_with_anomalies = [anomaly.datasetId for anomaly in anomalies]
+    df = df[df["dataset_id"].isin(dataset_ids_with_anomalies)].reset_index(drop=True)
+
+    # Get the average anomaly and scale scores for the relevant datasets.
+    df["anomaly_mean"] = None
+    df["scale_mean"] = None
+    for anomaly in anomalies:
+        # Get the df_reduced for each anomaly.
+        df_reduced = anomaly.dfReduced
+        mask = df["dataset_id"] == anomaly.datasetId
+        df.loc[mask, "anomaly_mean"] = df_reduced["anomaly_score"].mean()  # type: ignore
+        df.loc[mask, "scale_mean"] = df_reduced["score_scale"].mean()  # type: ignore
+
+    return df
