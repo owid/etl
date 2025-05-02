@@ -2,7 +2,6 @@ import datetime as dt
 import difflib
 import json
 import pprint
-import random
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -12,10 +11,11 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
+from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.io import get_all_changed_catalog_paths
-from etl.analytics.common import get_chart_views_last_n_days
+from etl.analytics.common import get_article_views_last_n_days, get_chart_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files, log_time
@@ -54,7 +54,7 @@ class ChartDiffScores:
     @property
     def chart_views_pretty(self) -> str:
         """Get anomaly score as string."""
-        if self.anomaly is not None:
+        if self.chart_views is not None:
             return f"{self.chart_views:.2f}"
         else:
             return "N/A"
@@ -63,7 +63,7 @@ class ChartDiffScores:
     def relevance(self) -> Optional[float]:
         return self._relevance
 
-    def estimate_relevance(self, scale_chart_views: float, reg_num_articles: float, reg_anomaly: float) -> None:
+    def estimate_relevance(self, reg_chart_views: float, reg_num_articles: float, reg_anomaly: float) -> None:
         """Get relevance score as a combination of chart views and anomaly."""
         # Weights for relevance operation
         weights = [
@@ -72,7 +72,7 @@ class ChartDiffScores:
             1.0,
         ]
         regularization = [
-            scale_chart_views,
+            reg_chart_views,
             reg_num_articles,
             reg_anomaly,
         ]
@@ -93,19 +93,18 @@ class ChartDiffScores:
 
     @property
     def relevance_pretty(self) -> str:
-        """Get anomaly score as string."""
+        """Get relevance score as string."""
         if self.relevance is not None:
-            return f"{self.relevance * 100:.2f}"
+            return str(int(self.relevance * 100))
         else:
             return "N/A"
 
     def to_md(self) -> str:
         text = (
-            f":primary-badge[:material/remove_red_eye: **{self.chart_views_pretty}** daily views]",
-            f" :primary-badge[:material/article: **{self.num_articles}** ref{'' if self.num_articles == 1 else 's'}]"
-            if self.num_articles and (self.num_articles >= 0)
-            else "",
-            f" :primary-badge[:material/scatter_plot: **{self.anomaly_pretty}**% anomaly]",
+            f":violet-badge[:material/auto_awesome: **{self.relevance_pretty}**% relevance]",
+            f" :primary-badge[:material/remove_red_eye: **{self.chart_views_pretty}** daily views]",
+            f" :primary-badge[:material/article: **{self.num_articles}** ref{'' if self.num_articles == 1 else 's'}]",
+            f" :primary-badge[:material/scatter_plot: **{self.anomaly_pretty}**% anomaly]" if self.anomaly else "",
         )
         return "".join(text)
 
@@ -113,7 +112,17 @@ class ChartDiffScores:
 @dataclass
 class ArticleRef:
     url: str
-    num_views: int
+    title: str
+    # num_views: int
+    views_daily: float
+
+    @property
+    def views_daily_pretty(self) -> str:
+        """Get views daily as string."""
+        if self.views_daily is not None:
+            return f"{self.views_daily:.2f}"
+        else:
+            return "0"
 
 
 class ChartDiff:
@@ -162,7 +171,7 @@ class ChartDiff:
         self.article_refs = article_refs if article_refs else {}
         self.scores = ChartDiffScores(
             chart_views=chart_views,
-            anomaly=score_indicators_anomalies,
+            anomaly=score_indicators_anomalies if score_indicators_anomalies else 0,
             num_articles=len(self.article_refs),
         )
 
@@ -316,7 +325,7 @@ class ChartDiff:
 
     @classmethod
     def from_charts_df(
-        cls, df_charts: pd.DataFrame, source_session: Session, target_session: Session
+        cls, df_charts: pd.DataFrame, source_session: Session, target_session: Session, estimate_relevance: bool = True
     ) -> List["ChartDiff"]:
         """Get chart diffs from chart ids.
 
@@ -351,27 +360,21 @@ class ChartDiff:
         # Get all slugs from target
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
 
-        # TODO: Get chart views
+        # Get chart views
         df_analytics = get_chart_views_last_n_days(chart_ids, ANALYTICS_NUM_DAYS)
         chart_views_all = df_analytics.set_index("chart_id")["views_daily"].to_dict()
 
-        # TODO: Anomalies
-        chart_anomalies_all = {chart_id: random.uniform(0.0, 1) for chart_id in chart_ids}
+        # Anomalies
+        df_anomalies_all = get_anomalies_for_chart_ids(chart_ids)
+        chart_anomalies_all = df_anomalies_all.set_index("chart_id")["anomaly_mean"].to_dict()
 
-        # TODO: Articles
-        article_refs_all = {
-            chart_id: [
-                ArticleRef(
-                    url="https://ourworldindata.org/1",
-                    num_views=random.randint(0, 10),
-                ),
-                ArticleRef(
-                    url="https://ourworldindata.org/2",
-                    num_views=random.randint(0, 10),
-                ),
-            ]
-            for chart_id in chart_ids
-        }
+        # Articles
+        df_articles = get_article_views_last_n_days([6500, 6513], 30)
+        article_refs_all = (
+            df_articles.groupby("chart_id")[["url", "views_daily", "title"]]
+            .apply(lambda x: [ArticleRef(row["url"], row["title"], row["views_daily"]) for _, row in x.iterrows()])
+            .to_dict()
+        )
 
         # Build chart diffs
         chart_diffs = []
@@ -434,6 +437,23 @@ class ChartDiff:
             chart_diff.set_last_approved_chart_revision(source_session)
 
             chart_diffs.append(chart_diff)
+
+        if estimate_relevance:
+            # Estimate relevance
+            reg_chart_views = 1
+            reg_num_articles = 1
+            reg_anomaly = 1
+
+            for chart_diff in chart_diffs:
+                reg_chart_views = max(reg_chart_views, chart_diff.scores.chart_views or 1)
+                reg_num_articles = max(reg_num_articles, chart_diff.scores.num_articles or 1)
+                reg_anomaly = max(reg_anomaly, chart_diff.scores.anomaly or 1)
+            for chart_diff in chart_diffs:
+                chart_diff.scores.estimate_relevance(
+                    reg_chart_views=reg_chart_views,
+                    reg_num_articles=reg_num_articles,
+                    reg_anomaly=reg_anomaly,
+                )
 
         return chart_diffs
 

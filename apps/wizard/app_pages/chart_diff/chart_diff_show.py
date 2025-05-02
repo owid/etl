@@ -310,11 +310,19 @@ class ChartDiffShow:
                     # label_visibility="collapsed",
                 )
 
-        articles_md = "- " + "\n- ".join([f"{art.url}: {art.num_views} views" for art in self.diff.article_refs])
+        if len(self.diff.article_refs) > 0:
+            articles_md = "- " + "\n- ".join(
+                [f"[{art.title}]({art.url}): {art.views_daily_pretty} views" for art in self.diff.article_refs]
+            )
+            articles_md = f" **Articles using this chart**:\n\n{articles_md}"
+        else:
+            articles_md = ""
+
         # Scores (analytics, anomalies, etc.)
         help_txt = (
+            f":violet-badge[:material/auto_awesome: **Relevance**]: Estimated by combining chart views, article views and anomaly scores.\n\n"
             f":primary-badge[:material/remove_red_eye:] **Average number of daily chart views** in the last {ANALYTICS_NUM_DAYS} days.\n\n"
-            f":primary-badge[:material/article:] **Number of articles** that use this chart. This is a measure of the number of articles that use this chart:\n{articles_md}\n\n"
+            f":primary-badge[:material/article:] **Number of articles** that use this chart.{articles_md}\n\n"
             ":primary-badge[:material/scatter_plot:] **Anomaly score of the chart**, as estimated by Anomalist. This is a measure of the worst anomaly in the chart's indicators. A score of 0% means that the chart doesn't have noticeable outliers, while a score closer to 100% means that there is an indicator with a substantial outlier.\n\n"
         )
         with col2:

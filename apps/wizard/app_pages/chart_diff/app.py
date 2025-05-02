@@ -204,7 +204,13 @@ def sort_chart_diffs():
     if SORTING_QUERY_PARAM in st.query_params:
         sort_by = st.query_params.get(SORTING_QUERY_PARAM, SortMethods.relevance)
         if sort_by == SortMethods.relevance:
-            pass
+            st.session_state.chart_diffs_filtered = dict(
+                sorted(
+                    st.session_state.chart_diffs_filtered.items(),
+                    key=lambda item: item[1].scores.relevance,
+                    reverse=True,
+                )
+            )
         elif sort_by == SortMethods.chart_views_most_to_least:
             st.session_state.chart_diffs_filtered = dict(
                 sorted(
