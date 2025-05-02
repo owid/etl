@@ -6,37 +6,35 @@ definitions:
         - Global Education
 
   desc_key_net_enr: &desc_key_net_enr
-    - The *net enrolment rate* (NER) shows the percentage of children in the official age group for a given level of education who are enrolled at that same level.
-    - It helps measure how well an education system covers the population it is designed to serve, focusing only on children who are the correct age for that level.
-    - The indicator is calculated by dividing the number of students of the official age who are enrolled at a specific level of education by the total population of that age group.
-    - For example, if primary education in a country begins at age 7 and lasts six years, the official primary school age group would be ages 7 to 12.
-    - A high *net enrolment rate* indicates that most children of the correct age are enrolled in school at the appropriate level. The maximum theoretical value is 100%.
-    - Data for the *net enrolment rate* comes from school administrative records, which provide enrolment figures by single year of age, and from population data, usually derived from national statistics offices or UN estimates.
-    - The indicator is useful for tracking progress toward universal primary and secondary education, but it does not account for students who are over-age or under-age for their grade level.
-    - When compared to the *gross enrolment rate* (GER), the *net enrolment rate* highlights how many students are enrolled at the expected age, while the *gross enrolment rate* includes students of all ages.
-    - There are some important limitations. *Net enrolment rate* values may be distorted if there are inconsistencies in enrolment or population data, and in some cases, values slightly above 100% may occur.
-    - Challenges also arise when official entry ages do not align with actual birth dates or when many students begin school earlier or later than expected.
-    - The *net enrolment rate* is not applicable at the tertiary level due to wide variations in the age at which people enter and complete higher education.
+    - Many children who are the right age for a given level of education are not enrolled at that level—this indicator shows how many are being reached as expected.
+    - It captures the percentage of children in the official age group for a specific education level who are enrolled at that same level, such as primary or lower secondary.
+    - The indicator is calculated by dividing the number of students of the correct age enrolled in that level by the total number of children in that age group.
+    - For example, if primary education starts at age 7 and lasts six years, the official primary school age range would be 7 to 12 years.
+    - A high *net enrolment rate* means that most children are enrolled where they are expected to be. The highest possible value is 100%.
+    - The data comes from school administrative records, which track enrolment by single year of age, and from population estimates provided by national statistics offices or UN sources.
+    - This indicator is especially useful for monitoring progress toward universal primary and secondary education.
+    - However, it does not account for children who are enrolled in the correct level but are too young or too old, and it may miss students enrolled in the “wrong” grade for their age.
+    - Differences between enrolment and population data can lead to small errors. In some cases, the *net enrolment rate* may slightly exceed 100%.
+    - It's also not applied to tertiary education because of the wide range of entry ages and programme lengths at that level.
 
   desc_key_mye: &desc_key_mye
-     - The *mean years of schooling* (MYS) indicator measures the average number of completed years of formal education for a specific population group, typically adults aged 25 and older, excluding repeated years.
-     - The data comes from population censuses and household or labour force surveys, which collect information on the highest level of education completed. These levels are matched with their official durations using the International Standard Classification of Education (ISCED).
-     - This indicator helps track long-term gender disparities in educational attainment and provides insight into the distribution of educational opportunities over time.
-     - It is important to note that this measure reflects only the duration of schooling, not the quality of education or learning outcomes.
-     - Comparisons across countries can be challenging, as education systems differ and some qualifications may be classified differently.
+    - Adults around the world have spent different amounts of time in school—this indicator shows the average number of years completed by people aged 25 and older.
+    - It reflects the total years of formal education that adults have successfully finished, excluding any years they may have repeated.
+    - The data comes from censuses and household surveys, where adults report the highest level of education they completed. These levels are then matched to standard durations using the ISCED framework.
+    - This is a valuable indicator for understanding long-term trends in educational attainment and gender equality.
+    - However, it only measures how long people stayed in school—not what they learned or whether they received a quality education.
+    - Cross-country comparisons can be challenging. Education systems differ in how long programmes last, and qualifications may not be classified in the same way.
 
   desc_key_ger: &desc_key_ger
-    - The *gross enrolment ratio* (GER) shows the total number of students enrolled in a specific level of education, regardless of age, as a percentage of the population in the official age group for that level.
-    - It provides a broad measure of participation in education and helps indicate the capacity of the education system to serve its population.
-    - The indicator is calculated by dividing total enrolment in a given level of education by the total population of the age group officially corresponding to that level.
-    - For example, if primary school starts at age 7 and lasts six years, the official age group would be ages 7 to 12.
-    - A high *gross enrolment ratio* suggests that the system accommodates a large number of students, but it does not mean all students are from the intended age group.
-    - The *gross enrolment ratio* includes both over-aged and under-aged students due to factors like late school entry, early entry, or grade repetition.
-    - A GER value close to or above 100% means that the number of enrolled students equals or exceeds the size of the official age group. This can indicate widespread access but does not necessarily reflect age-appropriate enrolment.
-    - The data comes from administrative records, including school registers and censuses, and population estimates are typically sourced from the United Nations Population Division (UNPD) or national statistics offices.
-    - Although GER is useful for gauging system capacity, it cannot on its own determine whether all children of the correct age are in school. It should be interpreted alongside the *net enrolment rate* to assess age-appropriate participation.
-    - One limitation of GER is that values can exceed 100% due to the inclusion of over-aged and under-aged students. Additional data is needed to fully understand the causes, such as grade repetition or delayed entry.
-    - The *gross enrolment ratio* is not a direct measure of efficiency or equity but offers a useful overview of how many people the education system is currently serving.
+    - Many students are enrolled in school at different ages—this indicator shows how many are participating in a given level of education, regardless of whether they are the “right” age for it.
+    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
+    - For example, if upper secondary school is designed for ages 15 to 17, the *gross enrolment ratio* compares total enrolment at that level to the population of 15- to 17-year-olds.
+    - A high value means many people are accessing education at that level, but it doesn’t necessarily mean that they are in the appropriate grade for their age.
+    - The GER includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
+    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by UN or national sources.
+    - A GER close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
+    - This indicator is best understood when used together with the *net enrolment rate*, which focuses on age-appropriate participation.
+    - One limitation is that the *gross enrolment ratio* can exceed 100%, which may require further data to understand the reasons—such as whether students are repeating grades or starting school late.
 
   desc_key_prim_out_school: &desc_key_prim_out_school
     - Many children who are old enough for primary school are not attending any kind of school—this indicator tells us how many.
@@ -47,6 +45,26 @@ definitions:
     - There are some important limitations to consider. Inconsistencies between enrolment and population data from different sources may lead to inaccurate estimates.
     - Surveys conducted late in the school year may count children as out of school even if they are about to enrol, leading to overestimates.
     - Children who are enrolled but not attending regularly may not always be captured correctly, depending on how data is collected and defined.
+
+  deck_key_low_out_school: &deck_key_low_out_school
+    - Many adolescents who are old enough for lower secondary school are not attending any kind of school—this indicator tells us how many.
+    - It captures the number of children in the official lower secondary school age range, typically around 12 to 14 or 13 to 15 years old, who are not enrolled in any level of education—neither lower secondary nor any other level.
+    - The indicator is calculated by subtracting the number of enrolled lower secondary-age children from the total number of children in that age group.
+    - These adolescents may have never transitioned from primary school, may have dropped out early, or may be delayed in entering the lower secondary level.
+    - The data comes from school administrative records, which report enrolment figures by single year of age, and from household surveys, which help capture students missed in administrative data.
+    - There are some important limitations to consider. Inconsistencies between enrolment and population data from different sources may lead to inaccurate estimates.
+    - Surveys conducted late in the school year may count students as out of school even if they are about to enrol, which can lead to overestimates.
+    - Adolescents who are technically enrolled but do not attend regularly may not be captured accurately, depending on how the data is collected.
+
+  desc_key_up_out_school: &desc_key_up_out_school
+    - Many young people who are old enough for upper secondary school are not enrolled—this indicator shows how many are missing from education.
+    - It captures the number of youth in the official upper secondary age range, typically around 15 to 17 or 16 to 18 years old, who are not enrolled in any school level.
+    - The indicator is calculated by subtracting the number of enrolled upper secondary-age students from the total number of youth in that age group.
+    - These youth may have never transitioned from lower secondary, may have dropped out due to academic, economic, or social reasons, or may be delayed in their education.
+    - The data comes from administrative records, such as school censuses, and household surveys that track school attendance and enrolment by age.
+    - There are important limitations to note. Differences between data sources and definitions of age or enrolment status may result in under- or over-estimates.
+    - If surveys are carried out late in the school year, they may miscount youth who are late entrants or re-enrolling, leading to overestimates of those out of school.
+    - Some young people may be enrolled but not attending classes regularly, which may not be reflected in the data depending on the collection method.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -84,6 +102,18 @@ tables:
         display:
           name: Boys
 
+      out_of_school_youth_of_lower_secondary_school_age__both_sexes__number:
+        title: Out-of-school youth of lower secondary school age
+        unit: "youth"
+        description_short: Youth in the official lower secondary school age range who are not enrolled in either [lower secondary](#dod:lower-secondary-education) or [upper secondary](#dod:upper-secondary-education) education.
+        description_key: *desc_key_prim_out_school
+
+      out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
+        title: Out-of-school youth of upper secondary school age
+        unit: "youth"
+        description_short: Youth in the official upper secondary school age range who are not enrolled in either [upper secondary](#dod:upper-secondary-education) or [post-secondary non-tertiary](#dod:post-secondary-non-tertiary-education) education.
+        description_key: *desc_key_prim_out_school
+
       mean_years_of_schooling__isced_1_or_higher__population_25plus_years__adjusted_gender_parity_index__gpia:
         title: Average years of schooling, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal average years of schooling between men and women. Values below 1 favor men, and above 1 favor women.
@@ -92,11 +122,22 @@ tables:
           - This indicator assesses gender equality in mean years of schooling by comparing the average number of completed years of education between women and men aged 25 and older.
           - It is based on the adjusted gender parity index (GPIA), which is calculated by dividing the female value for mean years of schooling by the male value. If the result is greater than 1, the ratio is inverted and subtracted from 2 to keep the scale symmetrical between 0 and 2.
           - A value of 1 means that men and women have equal average years of schooling. A value below 1 indicates that men have more years of schooling, while a value above 1 indicates that women have more.
-          - *desc_key_mye
 
       mean_years_of_schooling__isced_1_or_higher__population_25plus_years__female:
         title: Av erage years of schooling for women
         description_short: Average number of years women older than 25 participated in formal education.
+        unit: "years"
+        description_key: *desc_key_mye
+
+      mean_years_of_schooling__isced_1_or_higher__population_25plus_years__male:
+        title: Average years of schooling for men
+        description_short: Average number of years men older than 25 participated in formal education.
+        unit: "years"
+        description_key: *desc_key_mye
+
+      mean_years_of_schooling__isced_1_or_higher_population_25plus_years__both_sexes:
+        title: Average years of schooling
+        description_short: Average number of years people older than 25 participated in formal education.
         unit: "years"
         description_key: *desc_key_mye
 
