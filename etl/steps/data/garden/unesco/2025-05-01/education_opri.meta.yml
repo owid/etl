@@ -78,6 +78,17 @@ definitions:
     - Older cohorts can also be harder to classify accurately when countries change the duration or structure of education over time.
     - Despite these challenges, completion rate is a key indicator for understanding how many children and youth make it through the education system—and where they may be falling behind.
 
+  desc_key_private_enrolment: &desc_key_private_enrolment
+    - In many countries, education is provided not only by the government but also by private institutions—this indicator shows how much of total enrolment is taking place in privately run schools or educational programmes.
+    - It captures the share of students enrolled in private institutions at a given level of education as a percentage of all students enrolled at that level, including both public and private schools.
+    - The indicator is calculated by dividing the number of students in private institutions by the total number of students enrolled at the same education level, then multiplying by 100.
+    - A high percentage means that non-governmental providers—such as private individuals, companies, religious bodies, or community organizations—play a significant role in delivering education at that level.
+    - The data comes from school censuses and other administrative records that report enrolment numbers by type of institution and education level.
+    - This indicator is often disaggregated by level of education and by sex, allowing for analysis of how the role of private education differs across schooling stages and between boys and girls.
+    - There are some important limitations. In some countries, the distinction between public and private institutions is blurred—especially where private schools receive government subsidies or public funds are used to support student enrolment through scholarships.
+    - Additionally, some private schools may operate without formal registration or may not follow national curricula, which can lead to underreporting and incomplete data in official statistics.
+    - Despite these challenges, this indicator helps assess the scale and role of the private education sector within a national education system and informs discussions about education financing, accessibility, and regulation.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -114,7 +125,7 @@ tables:
         display:
           name: Boys
 
-      out_of_school_youth_of_lower_secondary_school_age__both_sexes__number:
+      out_of_school_adolescents_of_lower_secondary_school_age__both_sexes__number:
         title: Out-of-school youth of lower secondary school age
         unit: "youth"
         description_short: Youth in the official lower secondary school age range who are not enrolled in either [lower secondary](#dod:lower-secondary-education) or [upper secondary](#dod:upper-secondary-education) education.
@@ -153,12 +164,6 @@ tables:
         unit: "years"
         description_key: *desc_key_mye
 
-      mean_years_of_schooling__isced_1_or_higher_population_25plus_years__both_sexes:
-        title: Average years of schooling
-        description_short: Average number of years people older than 25 participated in formal education.
-        unit: "years"
-        description_key: *desc_key_mye
-
       total_net_enrolment_rate__primary__both_sexes__pct:
         title: Net enrolment rate in primary education
         description_short: Percentage of children of official primary school age who are enrolled in [primary education](#dod:primary-education).
@@ -194,3 +199,17 @@ tables:
           - It’s important to interpret this indicator alongside others, such as attendance rates or completion rates, to get a full picture of gender disparities in education.
           - As with all indicators based on enrolment and population estimates, small inconsistencies between data sources may affect accuracy. Differences may also arise due to early or delayed school entry, which can influence age-specific enrolment.
           - Despite these limitations, the GPIA for *net enrolment in primary education* is a valuable measure of progress toward inclusive and equitable education for all children, regardless of gender.
+
+      percentage_of_enrolment_in_pre_primary_education_in_private_institutions__both_sexes__pct:
+        title: Percentage of enrolment in pre-primary education in private institutions
+        description_short: Percentage of students enrolled in [pre-primary education](#dod:pre-primary-education) who are in private institutions.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_private_enrolment
+
+      percentage_of_enrolment_in_primary_education_in_private_institutions__both_sexes__pct:
+        title: Percentage of enrolment in primary education in private institutions
+        description_short: Percentage of students enrolled in [primary education](#dod:primary-education) who are in private institutions.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_private_enrolment
