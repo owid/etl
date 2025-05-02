@@ -369,7 +369,7 @@ class ChartDiff:
         chart_anomalies_all = df_anomalies_all.set_index("chart_id")["anomaly_mean"].to_dict()
 
         # Articles
-        df_articles = get_article_views_last_n_days([6500, 6513], 30)
+        df_articles = get_article_views_last_n_days(chart_ids, 30)
         article_refs_all = (
             df_articles.groupby("chart_id")[["url", "views_daily", "title"]]
             .apply(lambda x: [ArticleRef(row["url"], row["title"], row["views_daily"]) for _, row in x.iterrows()])
@@ -411,7 +411,7 @@ class ChartDiff:
                 error = None
 
             # Chart views
-            chart_views_score = chart_views_all[chart_id]
+            chart_views_score = chart_views_all.get(chart_id, 0)
 
             # Anomalies score
             chart_anomalies_score = chart_anomalies_all.get(chart_id)
