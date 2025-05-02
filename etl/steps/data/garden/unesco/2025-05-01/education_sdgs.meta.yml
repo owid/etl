@@ -4,9 +4,61 @@ definitions:
     presentation:
       topic_tags:
         - Global Education
+  desc_key_completion: &desc_key_completion
+    - Many children and young people never make it to the final grade of their school level—this indicator shows how many complete their education by a slightly older age than expected.
+    - It captures the percentage of a population group, aged 3 to 5 years above the official age for the last grade of a given level of education, who have successfully completed that level.
+    - The completion age group is defined based on the age at which students would finish schooling if they started on time, progressed without repeating, and followed the expected path. For example, if primary school starts at age 6 and lasts six years, the completion rate is measured among 14- to 16-year-olds.
+    - The indicator is calculated by dividing the number of people in this older age group who have completed the final grade of the education level by the total number of people in that group.
+    - A high completion rate—close to 100%—means that nearly all children have completed a given level by the expected time with some allowance for delays. A low rate may indicate late school entry, dropout, repetition, or other disruptions.
+    - The data comes primarily from household surveys and censuses that ask about the highest grade completed by each person, along with information about their age. This is combined with official data on school structure, including starting ages and duration of each level.
+    - Completion rates can be broken down by sex, urban or rural location, and household wealth to help identify gaps in access and progression.
+    - There are limitations to keep in mind. If survey responses on completed grades don’t match national ISCED classifications, cross-country comparability can be affected. Programme completion may be underestimated if official durations differ from what individuals actually experience.
+    - Older cohorts can also be harder to classify accurately when countries change the duration or structure of education over time.
+    - Despite these challenges, completion rate is a key indicator for understanding how many children and youth make it through the education system—and where they may be falling behind.
+  desc_key_ger: &desc_key_ger
+    - Many students are enrolled in school at different ages—this indicator shows how many are participating in a given level of education, regardless of whether they are the “right” age for it.
+    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
+    - For example, if upper secondary school is designed for ages 15 to 17, the *gross enrolment ratio* compares total enrolment at that level to the population of 15- to 17-year-olds.
+    - A high value means many people are accessing education at that level, but it doesn’t necessarily mean that they are in the appropriate grade for their age.
+    - The GER includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
+    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by UN or national sources.
+    - A GER close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
+    - This indicator is best understood when used together with the *net enrolment rate*, which focuses on age-appropriate participation.
+    - One limitation is that the *gross enrolment ratio* can exceed 100%, which may require further data to understand the reasons—such as whether students are repeating grades or starting school late.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
   title: UNESCO Institute for Statistics (UIS) - Education (SDGs)
+
+tables:
+ education_sdgs:
+    variables:
+      completion_rate__primary_education__both_sexes__pct__cr_1:
+        title: Completion rate in primary education
+        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion
+
+      completion_rate__lower_secondary_education__both_sexes__pct__cr_2:
+        title: Completion rate in lower secondary education
+        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion
+
+      completion_rate__upper_secondary_education__both_sexes__pct__cr_3:
+        title: Completion rate in upper secondary education
+        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion
+
+      gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
+        title: Gross enrolment ratio in tertiary education
+        description_short: Percentage of children of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education) or higher.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger

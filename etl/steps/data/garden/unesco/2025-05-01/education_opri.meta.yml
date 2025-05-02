@@ -66,6 +66,18 @@ definitions:
     - If surveys are carried out late in the school year, they may miscount youth who are late entrants or re-enrolling, leading to overestimates of those out of school.
     - Some young people may be enrolled but not attending classes regularly, which may not be reflected in the data depending on the collection method.
 
+  desc_key_completion: &desc_key_completion
+    - Many children and young people never make it to the final grade of their school level—this indicator shows how many complete their education by a slightly older age than expected.
+    - It captures the percentage of a population group, aged 3 to 5 years above the official age for the last grade of a given level of education, who have successfully completed that level.
+    - The completion age group is defined based on the age at which students would finish schooling if they started on time, progressed without repeating, and followed the expected path. For example, if primary school starts at age 6 and lasts six years, the completion rate is measured among 14- to 16-year-olds.
+    - The indicator is calculated by dividing the number of people in this older age group who have completed the final grade of the education level by the total number of people in that group.
+    - A high completion rate—close to 100%—means that nearly all children have completed a given level by the expected time with some allowance for delays. A low rate may indicate late school entry, dropout, repetition, or other disruptions.
+    - The data comes primarily from household surveys and censuses that ask about the highest grade completed by each person, along with information about their age. This is combined with official data on school structure, including starting ages and duration of each level.
+    - Completion rates can be broken down by sex, urban or rural location, and household wealth to help identify gaps in access and progression.
+    - There are limitations to keep in mind. If survey responses on completed grades don’t match national ISCED classifications, cross-country comparability can be affected. Programme completion may be underestimated if official durations differ from what individuals actually experience.
+    - Older cohorts can also be harder to classify accurately when countries change the duration or structure of education over time.
+    - Despite these challenges, completion rate is a key indicator for understanding how many children and youth make it through the education system—and where they may be falling behind.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -147,3 +159,27 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
+
+      gross_enrolment_ratio__primary__both_sexes__pct:
+        title: Gross enrolment ratio in primary education
+        description_short: Percentage of children of official primary school age who are enrolled in [primary education](#dod:primary-education) or higher.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+
+      gross_enrolment_ratio__secondary__both_sexes__pct:
+        title: Gross enrolment ratio in secondary education
+        description_short: Percentage of children of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education) or higher.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+
+      gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
+        title: Gross enrolment ratio in tertiary education
+        description_short: Percentage of children of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education) or higher.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+
+
+
