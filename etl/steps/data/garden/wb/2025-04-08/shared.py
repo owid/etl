@@ -92,7 +92,7 @@ var_dict = {
     },
     "poverty_severity": {
         "title": "Poverty severity",
-        "description": "It is calculated as the square of the income gap ratio, the average shortfall expressed as a share of the poverty line.",
+        "description": "This is calculated as the square of the income gap ratio, the average shortfall expressed as a share of the poverty line.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
@@ -106,7 +106,7 @@ var_dict = {
     },
     "spr": {
         "title": "Share of population in societal poverty",
-        "description": "Percentage of population living in households with an {inc_cons_dict[wel]['name']} per person below the Societal Poverty Line.",
+        "description": "Percentage of population living in households with an {inc_cons_dict[wel]['name']} below the Societal Poverty Line.",
         "unit": "%",
         "short_unit": "%",
         "numDecimalPlaces": 1,
@@ -262,18 +262,14 @@ inc_cons_dict = {
         "name_distribution": "after tax income",
         "verb": "received",
         "description": "The data relates to income measured after taxes and benefits per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).",
-        "processing_description": """To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on income data.
-
-You can find the data with all available income and consumption data points in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.""",
+        "processing_description": """To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on income data.""",
     },
     "consumption": {
         "name": "consumption",
         "name_distribution": "consumption",
         "verb": "spent",
         "description": "The data relates to consumption per capita. 'Per capita' means that the consumption of each household is attributed equally to each member of the household (including children).",
-        "processing_description": """To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on consumption data.
-
-You can find the data with all available income and consumption data points in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.""",
+        "processing_description": """To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on consumption data.""",
     },
     "income_consumption": {
         "name": "income or consumption",
@@ -284,7 +280,7 @@ You can find the data with all available income and consumption data points in o
 
 In most of our charts, we present the data with some data points dropped in order to present single series for each country. This allows us to make readable visualizations that combine multiple countries and metrics. In choosing which data points to drop, we try to strike a balance between maintaining comparability over time and showing as long a time series as possible. As such, the exact approach varies somewhat across countries.
 
-If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER). You can also download this data in our [complete dataset](https://github.com/owid/poverty-data#a-global-dataset-of-poverty-and-inequality-measures-prepared-by-our-world-in-data-from-the-world-banks-poverty-and-inequality-platform-pip-database) of the World Bank PIP data.""",
+If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).""",
     },
 }
 

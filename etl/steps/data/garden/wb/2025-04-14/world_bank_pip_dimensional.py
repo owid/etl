@@ -623,8 +623,9 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     ]
 
     # Stack table
-    tb_pivot = tb_pivot.stack(future_stack=True)
-    tb_pivot = tb_pivot.stack(future_stack=True).reset_index()
+    tb_pivot = unpivot_table(
+        tb=tb_pivot.reset_index(), index=["country", "year", "welfare_type"], level=["ppp_version", "poverty_line"]
+    )
 
     # Merge with tb
     tb = pr.merge(
@@ -663,9 +664,17 @@ def pivot_and_obtain_povlines_dict(tb: Table, index: List[str], columns: List[st
             key=int,
         )
 
-    print(povlines_dict)
-
     return tb_pivot, povlines_dict
+
+
+def unpivot_table(tb: Table, index: List[str], level: List[str]) -> Table:
+    tb = (
+        tb.set_index(index)  # Set the desired index, including the additional columns
+        .stack(level=level, future_stack=True)  # Stack the MultiIndex columns
+        .reset_index()  # Reset the index to flatten the table
+    )
+
+    return tb
 
 
 def sanity_checks(
@@ -990,10 +999,7 @@ def sanity_checks(
         log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_year} PPPs.")
 
     # Restore the format of the table
-    tb = tb_pivot.set_index(index).stack(future_stack=True).reset_index()
-
-    # Stack again to remove the level for ppp_version
-    tb = tb.set_index(index + ["poverty_line"]).stack(future_stack=True).reset_index()
+    tb = unpivot_table(tb=tb_pivot, index=index, level=["ppp_version", "poverty_line"])
 
     return tb
 
@@ -1180,19 +1186,15 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
 
     # Restore the format of the table
-    tb_both_inc_and_cons_smoothed = (
-        tb_both_inc_and_cons_smoothed.set_index(
-            ["country", "year", "welfare_type"]
-        )  # Set the desired index, including the additional columns
-        .stack(level=["ppp_version", "poverty_line"], future_stack=True)  # Stack the MultiIndex columns
-        .reset_index()  # Reset the index to flatten the table
+    tb_both_inc_and_cons_smoothed = unpivot_table(
+        tb=tb_both_inc_and_cons_smoothed,
+        index=["country", "year", "welfare_type"],
+        level=["ppp_version", "poverty_line"],
     )
-
-    # Do the same with tb_only_inc_or_cons
-    tb_only_inc_or_cons = (
-        tb_only_inc_or_cons.set_index(["country", "year", "welfare_type"])
-        .stack(level=["ppp_version", "poverty_line"], future_stack=True)
-        .reset_index()
+    tb_only_inc_or_cons = unpivot_table(
+        tb=tb_only_inc_or_cons,
+        index=["country", "year", "welfare_type"],
+        level=["ppp_version", "poverty_line"],
     )
 
     tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
@@ -1678,5 +1680,4 @@ def make_shares_and_thresholds_long(tb: Table) -> Table:
     # Do the same with "_thr"
     tb["decile"] = tb["decile"].str.replace("_thr", "")
 
-    return tb
     return tb

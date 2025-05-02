@@ -1,11 +1,192 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    processing_level: major
     presentation:
+      attribution_short: World Bank
       topic_tags:
         - Poverty
         - Economic Inequality
         - Economic Growth
+    display: &common_display
+      tolerance: 5
+      entityAnnotationsMap: |-
+        Other high income countries (PIP): e.g. US, Western Europe, Australia, Japan, South Korea and Saudi Arabia
+
+  description_short_welfare_type: |-
+    <% if welfare_type == "consumption" %>
+    a <<welfare_type>>
+    <%- else %>
+    an <<welfare_type>>
+    <%- endif %>
+
+  poverty_line: |-
+    <%if poverty_line == "190" %>
+    $1.90 a day
+    <%- elif poverty_line == "320" %>
+    $3.20 a day
+    <%- elif poverty_line == "550" %>
+    $5.50 a day
+    <% elif poverty_line == "100 and 190" %>
+    $1 and $1.90 a day
+    <%- elif poverty_line == "190 and 320" %>
+    $1.90 and $3.20 a day
+    <%- elif poverty_line == "320 and 550" %>
+    $3.20 and $5.50 a day
+    <%- elif poverty_line == "550 and 1000" %>
+    $5.50 and $10 a day
+    <%- elif poverty_line == "215" %>
+    $2.15 a day
+    <%- elif poverty_line == "365" %>
+    $3.65 a day
+    <%- elif poverty_line == "685" %>
+    $6.85 a day
+    <%- elif poverty_line == "100 and 215" %>
+    $1 and $2.15 a day
+    <%- elif poverty_line == "215 and 365" %>
+    $2.15 and $3.65 a day
+    <%- elif poverty_line == "365 and 685" %>
+    $3.65 and $6.85 a day
+    <%- elif poverty_line == "100" %>
+    $1 a day
+    <%- elif poverty_line == "1000" %>
+    $10 a day
+    <%- elif poverty_line == "2000" %>
+    $20 a day
+    <%- elif poverty_line == "3000" %>
+    $30 a day
+    <%- elif poverty_line == "4000" %>
+    $40 a day
+    <%- elif poverty_line == "1000 and 2000" %>
+    $10 and $20 a day
+    <%- elif poverty_line == "2000 and 3000" %>
+    $20 and $30 a day
+    <%- elif poverty_line == "3000 and 4000" %>
+    $30 and $40 a day
+    <%- else %>
+    <<poverty_line>>
+    <%- endif %>
+
+  percentiles_avg_share: |-
+    <% if decile == 1 %>
+    Poorest decile
+    <%- elif decile == 2 %>
+    2nd decile
+    <%- elif decile == 3 %>
+    3rd decile
+    <%- elif decile == 4 %>
+    4th decile
+    <%- elif decile == 5 %>
+    5th decile
+    <%- elif decile == 6 %>
+    6th decile
+    <%- elif decile == 7 %>
+    7th decile
+    <%- elif decile == 8 %>
+    8th decile
+    <%- elif decile == 9 %>
+    9th decile
+    <%- elif decile == 10 %>
+    Richest decile
+    <%- endif %>
+
+  percentiles_thr: |-
+    <% if decile == 1 %>
+    Poorest decile
+    <%- elif decile == 2 %>
+    2nd decile
+    <%- elif decile == 3 %>
+    3rd decile
+    <%- elif decile == 4 %>
+    4th decile
+    <%- elif decile == 5 %>
+    5th decile
+    <%- elif decile == 6 %>
+    6th decile
+    <%- elif decile == 7 %>
+    7th decile
+    <%- elif decile == 8 %>
+    8th decile
+    <%- elif decile == 9 %>
+    Richest decile
+    <%- endif %>
+
+  description_key_poverty_line: |-
+    <% if poverty_line == "190" or poverty_line == "215" %>
+    Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line}.
+    <%- elif poverty_line == "320" or poverty_line == "365" %>
+    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in lower-middle-income countries."
+    <%- elif poverty_line == "550" or poverty_line == "685" %>
+    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in upper-middle-income countries."
+    <%- elif poverty_line == "3000" %>
+    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in high-income countries."
+    <%- elif poverty_line == "40% of median" or poverty_line == "50% of median" or poverty_line == "60% of median" %>
+    This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
+    <%- else %>
+
+  description_key_ppp: |-
+    The data is measured in international-$ at <<<ppp_version>> prices – this adjusts for inflation and for differences in living costs between countries.
+
+  description_key_per_capita: _Per capita_ means that the income of each household is attributed equally to each member of the household (including children).
+
+  description_key_welfare_type: |-
+    <% if welfare_type == "income" %>
+    The data relates to income measured after taxes and benefits per capita. {definitions.description_key_per_capita}
+    <%- elif welfare_type == "consumption" %>
+    The data relates to consumption per capita. {definitions.description_key_per_capita}
+    <%- else %>
+    Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. {definitions.description_key_per_capita}
+    <%- endif %>
+
+  description_key_not_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+
+  description_key_nowcasts: Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+
+
+  prosperity_gap_threshold: |-
+    <% if ppp_version == 2017 %>
+    $25
+    <%- elif ppp_version == 2021 %>
+    $28
+    <%- endif %>
+  description_key_prosperity_gap : The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as {definitions.prosperity_gap_threshold} per person per day. This gives a sense of how far global incomes are from a basic prosperity standard.
+
+  description_processing_main: |-
+    <% if welfare_type == "income" or welfare_type == "consumption" %>
+    To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
+    <%- elif welfare_type == "income and consumption" %>
+    For most countries in the PIP dataset, estimates relate to _either_ disposable income or consumption, for all available years. A number of countries, however, have a mix of income and consumption data points, with both data types sometimes available for particular years.
+
+    In most of our charts, we present the data with some data points dropped in order to present single series for each country. This allows us to make readable visualizations that combine multiple countries and metrics. In choosing which data points to drop, we try to strike a balance between maintaining comparability over time and showing as long a time series as possible. As such, the exact approach varies somewhat across countries.
+
+    If you would like to see the original data with _all_ available income and consumption data points shown separately, you can do so in our [Poverty Data Explorer](https://ourworldindata.org/explorers/poverty-explorer?Indicator=Share+in+poverty&Poverty+line=%2410+per+day&Household+survey+data+type=Show+data+from+both+income+and+consumption+surveys&Show+breaks+between+less+comparable+surveys=true&country=ROU~CHN~BLR~PER).
+
+  description_processing_surveys_past_decade: |-
+    For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only one of the estimates, to strike a balance between maintaining comparability over time and showing as long a time series as possible. This means the indicator is estimating the number of years at least one survey was conducted in the past decade, rather than the number of surveys.
+
+  description_processing_relative_poverty: |-
+    <% if poverty_line == "40% of median" or poverty_line == "50% of median" or poverty_line == "60% of median" %>
+    Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case <<poverty_line>> – and then run a specific query on the PIP API to return the share of population below that line.
+    <%- endif %>
+
+  description_processing_thr: |-
+    Income and consumption thresholds by decile are not directly available in the World Bank PIP API. We extract the metric primarily from [auxiliary percentiles data provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646). Missing country values and regional aggregations of the indicator are calculated by running multiple queries on the API to obtain the closest poverty line to each threshold.
+
+  # NOTE: Modify depending on the final data structure
+  description_processing_share_90_99: |-
+    The income share of the population between the 90th and 99th percentiles is not directly available in the World Bank PIP API. We calculate the metric by subtracting the share of the population in the 99th percentile (available in the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles)) from the share of the population in the 90th percentile (available in the API).
+
+  description_processing_avg: |-
+    Income and consumption averages by decile are not directly available in the World Bank PIP API. We calculate the metric by multiplying the share of each decile by the mean income or consumption of the distribution and dividing by the population share of the decile (10%).
+
+  welfare_type_verb: |-
+    <% if welfare_type == "income" %>
+    received
+    <%- elif welfare_type == "consumption" %>
+    spent
+    <%- else %>
+    received
+    <%- endif %>
 
 
 # Learn more about the available fields:
@@ -17,44 +198,643 @@ dataset:
 tables:
   world_bank_pip_dimensional:
     variables:
-      # testing_variable:
-      #   title: Testing variable title
-      #   unit: arbitrary units
-      #   short_unit: au
-      #   description_short: Short description of testing variable.
-      #   description_processing: Description of processing of testing variable.
-      #   description_key: List of key points about the indicator.
-      #   description_from_producer: Description of testing variable from producer.
-      #   processing_level: minor
-      #   type:
-      #   sort:
-      #   presentation:
-      #     attribution:
-      #     attribution_short:
-      #     faqs:
-      #     grapher_config:
-      #     title_public:
-      #     title_variant:
-      #     topic_tags:
-      #   display:
-      #     name: Testing variable
-      #     numDecimalPlaces: 0
-      #     tolerance: 0
-      #     color:
-      #     conversionFactor: 1
-      #     description:
-      #     entityAnnotationsMap: Test annotation
-      #     includeInTable:
-      #     isProjection: false
-      #     unit: arbitrary units
-      #     shortUnit: au
-      #     tableDisplay:
-      #       hideAbsoluteChange:
-      #       hideRelativeChange:
-      #     yearIsDay: false
-      #     zeroDay:
-      #     roundingMode:
-      #     numSignificantFigures:
-      #
-      {}
+
+    # POVERTY
+
+      headcount_ratio:
+        title: Share of population in poverty ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line}.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Share of population in poverty ({definitions.poverty_line})
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      headcount_ratio_above:
+        title: Share of population not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line}.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Share of population not in poverty (above {definitions.poverty_line})
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      headcount_ratio_between:
+        title: Share of population in poverty (between {definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line}.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Share of population in poverty (between {definitions.poverty_line})
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      headcount:
+        title: Number of people in poverty ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "people"
+        short_unit: ""
+        description_short: Number of people living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line}.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Number of people in poverty ({definitions.poverty_line})
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      headcount_above:
+        title: Number of people not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "people"
+        short_unit: ""
+        description_short: Number of people living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line}.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Number of people not in poverty (above {definitions.poverty_line})
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      headcount_between:
+        title: Number of people in poverty (between {definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "people"
+        short_unit: ""
+        description_short: Number of people living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line}.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Number of people in poverty (between {definitions.poverty_line})
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      headcount_regions:
+        title: Number in poverty by region ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "people"
+        short_unit: ""
+        description_short: Number of people living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line} by region.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Number in poverty by region ({definitions.poverty_line})
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      total_shortfall:
+        title: Total shortfall ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they would bring about.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Total shortfall ({definitions.poverty_line})
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      avg_shortfall:
+        title: Average shortfall ($) ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}, averaged across the population in poverty.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Average shortfall ($) ({definitions.poverty_line})
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      income_gap_ratio:
+        title: Average shortfall (%) ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_. It captures the depth of poverty of those living on less than {definitions.poverty_line}.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Average shortfall (%) ({definitions.poverty_line})
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      poverty_gap_index:
+        title: Poverty gap index ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Poverty gap index ({definitions.poverty_line})
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      watts:
+        title: Watts index ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: This is the mean across the population of the proportionate poverty gaps, as measured by the log of the ratio of the poverty line to income, where the mean is formed over the whole population, counting the nonpoor as having a zero poverty gap.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Watts index ({definitions.poverty_line})
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      poverty_severity:
+        title: Poverty severity ({definitions.poverty_line}, <<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: This is calculated as the square of the income gap ratio, the average shortfall expressed as a share of the poverty line.
+        description_key:
+          - "{definitions.description_key_poverty_line}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_relative_poverty}
+          {definitions.description_processing_main}
+        display:
+          name: Poverty severity ({definitions.poverty_line})
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      spl:
+        title: Societal poverty line (<<ppp_version>> prices)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: The Societal Poverty Line (SPL) is defined to account for national definitions of poverty around the world. The SPL is the International Poverty Line when the national median is sufficiently low and it grows as the median income or consumption grows.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Societal poverty line
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      spr:
+        title: Share of population in societal poverty (<<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} below the Societal Poverty Line.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Share of population in societal poverty
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      pg:
+        title: Prosperity gap (<<ppp_version>> prices)
+        unit: ""
+        short_unit: ""
+        description_short: Average factor by which incomes need to be multiplied to bring everyone to the prosperity standard of {definitions.prosperity_gap_threshold} per person per day.
+        description_key:
+          - "{definitions.description_key_prosperity_gap}"
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+          - "{definitions.description_key_nowcasts}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Prosperity gap
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      # INEQUALITY
+      gini:
+        title: Gini coefficient
+        unit: ""
+        short_unit: ""
+        description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Gini coefficient
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      palma_ratio:
+        title: Palma ratio
+        unit: ""
+        short_unit: ""
+        description_short: The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Palma ratio
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      s80_s20_ratio:
+        title: S80/S20 ratio
+        unit: ""
+        short_unit: ""
+        description_short: The S80/S20 ratio is a measure of inequality that divides the share received by the richest 20% by the share of the poorest 20%. Higher values indicate higher inequality.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: S80/S20 ratio
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      p90_p10_ratio:
+        title: P90/P10 ratio
+        unit: ""
+        short_unit: ""
+        description_short: P90 and P10 are the levels of <<welfare_type>> below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: P90/P10 ratio
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      p90_p50_ratio:
+        title: P90/P50 ratio
+        unit: ""
+        short_unit: ""
+        description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median <<welfare_type>>.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: P90/P50 ratio
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      p50_p10_ratio:
+        title: P50/P10 ratio
+        unit: ""
+        short_unit: ""
+        description_short: The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median <<welfare_type>> is two times higher than that of someone just falling in the poorest tenth of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: P50/P10 ratio
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      mld:
+        title: Mean log deviation
+        unit: ""
+        short_unit: ""
+        description_short: The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Mean log deviation
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      polarization:
+        title: Polarization
+        unit: ""
+        short_unit: ""
+        description_short: The polarization index, also known as the Wolfson polarization index, measures the extent to which the distribution of income or consumption is “spread out” and bi-modal. Like the Gini coefficient, the polarization index ranges from 0 (no polarization) to 1 (complete polarization).
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Polarization
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      # DISTRIBUTIONAL INDICATORS
+      mean:
+        title: Mean (<<ppp_version>> prices)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: The mean is the average <<welfare_type>> of the population.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Mean
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      median:
+        title: Median (<<ppp_version>> prices)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: The median is the value of <<welfare_type>> below which 50% of the population live.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Median
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      # NOTE: Edit these indicators once the final data structure is confirmed
+      avg:
+        title: Average ({definitions.percentiles_avg_share}, <<ppp_version>> prices)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: The mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population).
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_avg}
+          {definitions.description_processing_main}
+        display:
+          name: Average ({definitions.percentiles_avg_share})
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      share:
+        title: Share (<<ppp_version>> prices)
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population)
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Share ({definitions.percentiles_avg_share})
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      thr:
+        title: Threshold ({definitions.percentiles_thr}, <<ppp_version>> prices)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: The level of <<welfare_type>> per day below which <<decile>>% of the population falls.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_thr}
+          {definitions.description_processing_main}
+        display:
+          name: Threshold ({definitions.percentiles_thr})
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      bottom50_share:
+        title: Share (bottom 50%)
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Share (bottom 50%)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      middle40_share:
+        title: Share (middle 40%)
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Share (middle 40%)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      top1_share:
+        title: Share (top 1%)
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: Share (top 1%)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      top90_99_share:
+        title: Share (between 90th and 99th percentiles)
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_share_90_99}
+          {definitions.description_processing_main}
+        display:
+          name: Share (top 90-99%)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      top1_thr:
+        title: Threshold (top 1%)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: The level of <<welfare_type>> per day below which 99% of the population falls.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_thr}
+          {definitions.description_processing_main}
+        display:
+          name: Threshold (top 1%)
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      top1_avg:
+        title: Average (top 1%)
+        unit: international-$ in <<<ppp_version>> prices
+        short_unit: $
+        description_short: The mean <<welfare_type>> per day within the richest 1% of the population.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_avg}
+          {definitions.description_processing_main}
+        display:
+          name: Average (top 1%)
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      # ADDITIONAL VARIABLES
+      surveys_past_decade:
+        title: Number of surveys in the past decade
+        unit: "surveys"
+        short_unit: ""
+        description_short: The number of income or consumption surveys available in the past decade. Each decade comprises the current year and the nine years before.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_surveys_past_decade}
+        display:
+          name: Number of surveys in the past decade
+          numDecimalPlaces: 0
+          <<: *common_display
+
+      region_name:
+        title: World Bank PIP region
+        unit: ""
+        short_unit: ""
+        description_short: Regions of the world as defined by the World Bank Poverty and Inequality Platform (PIP).
+        description_key:
+          - The regions employed by the World Bank PIP differ from the regional groupings used by the World Bank in other contexts.
+          - Some economies, mostly high-income economies, are excluded from the geographical regions and are included as a separate group referred to as _other high income_ (or _industrialized economies_ or _rest of the world_ in earlier publications).
+        description_processing: |-
+          {definitions.description_processing_main}
+        display:
+          name: World Bank PIP region
+          numDecimalPlaces: 0
+          <<: *common_display
+
+
+
+
+
+ 'top1_thr',
+ 'top1_share',
+ 'top1_avg',
+ 'top90_99_share',
 
