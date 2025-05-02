@@ -20,9 +20,9 @@ definitions:
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
     - For example, if upper secondary school is designed for ages 15 to 17, the *gross enrolment ratio* compares total enrolment at that level to the population of 15- to 17-year-olds.
     - A high value means many people are accessing education at that level, but it doesn’t necessarily mean that they are in the appropriate grade for their age.
-    - The GER includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
+    - The *gross enrolment ratio* includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by UN or national sources.
-    - A GER close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
+    - A *gross enrolment ratio* close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
     - This indicator is best understood when used together with the *net enrolment rate*, which focuses on age-appropriate participation.
     - One limitation is that the *gross enrolment ratio* can exceed 100%, which may require further data to understand the reasons—such as whether students are repeating grades or starting school late.
 
