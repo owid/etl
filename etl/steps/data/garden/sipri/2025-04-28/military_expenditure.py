@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+# NOTE: Delete correction of Sierra Leone data when fixed
+
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
@@ -46,6 +48,8 @@ def run() -> None:
     )
 
     tb = calculate_milex_per_military_personnel(tb, tb_wdi)
+    # NOTE: Delete correction of Sierra Leone data when fixed
+    tb = correct_sierra_leone(tb)
     tb = tb.format(["country", "year"])
 
     #
@@ -99,5 +103,15 @@ def calculate_milex_per_military_personnel(tb: Table, tb_wdi: Table) -> Table:
 
     # Drop columns
     tb = tb.drop(columns=["ms_mil_totl_p1"])
+
+    return tb
+
+
+def correct_sierra_leone(tb: Table) -> Table:
+    """
+    Correct Sierra Leone data: the military expenditure as share of government spending is extremely low only because SIPRI adjusted the spending with the redomination of their currency (they took off 1000), while the World Bank (providers of the govt spending data) did not.
+    """
+    # For Sierra Leone, multiply share_govt_spending by 1000
+    tb.loc[tb["country"] == "Sierra Leone", "share_govt_spending"] *= 1000
 
     return tb
