@@ -89,6 +89,21 @@ definitions:
     - Additionally, some private schools may operate without formal registration or may not follow national curricula, which can lead to underreporting and incomplete data in official statistics.
     - Despite these challenges, this indicator helps assess the scale and role of the private education sector within a national education system and informs discussions about education financing, accessibility, and regulation.
 
+  desc_key_total_net_attendance: &desc_key_total_net_attendance
+    - Many children who are the right age for a level of education are not actually attending school—this indicator shows how many are, regardless of what level they attend.
+    - It captures the percentage of children in the official age group for a given education level who are attending school, whether at the intended level or any other.
+    - The indicator is calculated by dividing the number of children of the official age group who are attending school at any level by the total population of children in that age group.
+    - For example, if primary education starts at age 7 and lasts six years, the total net attendance rate would be calculated for children aged 7 to 12.
+    - A high *total net attendance rate* means most children of the expected age are participating in school. A low rate signals greater exclusion and highlights where education access needs to be improved.
+    - This indicator is the complement to the out-of-school rate. If the attendance rate is low, the equivalent out-of-school rate is high.
+    - Data for this indicator comes from household surveys and population censuses, which record attendance status and age. Accurate reference age is critical to ensure that children are grouped correctly.
+    - The indicator can be disaggregated by sex, urban or rural location, and household wealth quintiles to help identify population groups that are being left out.
+    - There are important technical considerations. Survey data may be collected months after the academic year starts, so the child’s age at data collection may not match the age at the start of the school year.
+    - To address this, the UIS adjusts age data when possible using birth month and year. If only the age in years is reported and the survey was conducted more than six months after the start of the academic year, one year is subtracted from the recorded age.
+    - When survey data is collected within five months of the school year’s start, the recorded age is used as-is.
+    - Despite adjustments, differences between survey responses and national education structures may affect comparability. Incomplete data—such as missing age, attendance status, or grade—are excluded from the calculation.
+    - Even with these limitations, the *total net attendance rate* is a valuable measure of school participation that complements enrolment data and helps track progress toward universal access to education.
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -173,14 +188,14 @@ tables:
 
       gross_enrolment_ratio__primary__both_sexes__pct:
         title: Gross enrolment ratio in primary education
-        description_short: Percentage of children of official primary school age who are enrolled in [primary education](#dod:primary-education) or higher.
+        description_short: Number of children of any age group who are enrolled in [primary](#dod:primary-education) education expressed as a percentage of the total population of the official primary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
 
       gross_enrolment_ratio__secondary__both_sexes__pct:
         title: Gross enrolment ratio in secondary education
-        description_short: Percentage of children of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education) or higher.
+        description_short: Number of children of any age group who are enrolled in [secondary](#dod:secondary-education) education expressed as a percentage of the total population of the official secondary school age.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
@@ -200,16 +215,165 @@ tables:
           - As with all indicators based on enrolment and population estimates, small inconsistencies between data sources may affect accuracy. Differences may also arise due to early or delayed school entry, which can influence age-specific enrolment.
           - Despite these limitations, the GPIA for *net enrolment in primary education* is a valuable measure of progress toward inclusive and equitable education for all children, regardless of gender.
 
+      total_net_enrolment_rate__lower_secondary__adjusted_gender_parity_index__gpia:
+        title: Net enrolment rates in lower secondary education
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [lower-secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        unit: "index"
+        description_key:
+          - Boys and girls don’t always have equal access to lower secondary education—this indicator shows how close we are to gender parity in age-appropriate school enrolment at that level.
+          - It captures gender equality in *net enrolment rates* for lower secondary education by comparing the percentage of girls and boys of official lower secondary school age who are enrolled at that level.
+          - The *adjusted gender parity index (GPIA)* is calculated by dividing the female net enrolment rate by the male net enrolment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
+          - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favour of boys, while a value above 1 shows a gap in favour of girls.
+          - This indicator is useful for identifying gender-based disparities in lower secondary school enrolment and for tracking progress toward equitable access to post-primary education.
+          - The data comes from administrative records reporting enrolment by age and sex, along with population estimates for children in the official lower secondary school age range.
+          - It should be interpreted alongside related indicators—such as attendance, progression, and completion rates—to build a clearer picture of gender equity in education beyond access alone.
+          - Like all indicators derived from enrolment and population estimates, data inconsistencies or timing issues, such as early or delayed school entry, may affect the accuracy of age-specific enrolment figures.
+          - Despite these limitations, the GPIA for *net enrolment in lower secondary education* remains a powerful tool for assessing gender equity and informing inclusive education policy.
+
       percentage_of_enrolment_in_pre_primary_education_in_private_institutions__both_sexes__pct:
         title: Percentage of enrolment in pre-primary education in private institutions
-        description_short: Percentage of students enrolled in [pre-primary education](#dod:pre-primary-education) who are in private institutions.
+        description_short: Private [pre-primary education](#dod:pre-primary-education) institutions are managed by private entities, such as NGOs, religious groups, or businesses, rather than public authorities, regardless of profit motive.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_private_enrolment
 
       percentage_of_enrolment_in_primary_education_in_private_institutions__both_sexes__pct:
         title: Percentage of enrolment in primary education in private institutions
-        description_short: Percentage of students enrolled in [primary education](#dod:primary-education) who are in private institutions.
+        description_short: Private [primary](#dod:primary-education) institutions are managed by private entities, such as NGOs, religious groups, or businesses, rather than public authorities, regardless of profit motive.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_private_enrolment
+
+      total_net_attendance_rate__primary__both_sexes__pct:
+        title: Total net attendance rate in primary education
+        description_short: Total number of students of the official age group for [primary education](#dod:primary-education) who are attending school at any level of education, expressed as a percentage of the corresponding population.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_total_net_attendance
+
+
+      school_life_expectancy__primary__adjusted_gender_parity_index__gpia:
+        title: School life expectancy in primary education
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equality in the expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        unit: "index"
+        description_key:
+          - In many countries, boys and girls spend different lengths of time in school—this indicator shows how close they are to parity in the total number of years of schooling they can expect to receive.
+          - It captures gender equality in *school life expectancy* by comparing the average number of years of education a girl can expect to receive with that of a boy, based on current enrolment rates at each age.
+          - The *adjusted gender parity index (GPIA)* is calculated by dividing the female school life expectancy by the male school life expectancy. If the result exceeds 1, it is inverted and subtracted from 2, producing a scale from 0 to 2, with 1 indicating exact parity.
+          - A value of 1 means girls and boys are expected to spend the same number of years in school. A value below 1 indicates boys are expected to stay longer in school, and a value above 1 means the advantage is with girls.
+          - School life expectancy is based on the assumption that current age-specific enrolment patterns continue in the future. It includes children who may never enrol and reflects system-wide participation across all levels of education.
+          - The data comes from administrative records, including school registers and censuses, and from population estimates by single year of age, typically provided by national sources or the United Nations Population Division.
+          - This indicator is disaggregated by sex and level of education, helping to identify gaps in participation across different stages of schooling.
+          - As with all school expectancy measures, this does not reflect the quality of education or actual grade completion. It also does not account for grade repetition or part-time study, which can vary by country.
+          - While limitations exist, the *GPIA for school life expectancy* is a valuable tool for understanding gender disparities in access and continuity within the education system over a child’s expected schooling years.
+
+      outbound_mobility_ratio__all_regions__both_sexes__pct:
+        title: Share of students studying abroad
+        description_short: Percentage of a country's [tertiary](#dod:tertiary-education) level students studying abroad as international students. International students are those that move from their home countries for education, identified based on their past education, residence, or distinct immigration regulations.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Many students leave their home country to pursue higher education abroad—this indicator shows what share of a country's tertiary students choose to study in another country.
+          - It captures the percentage of students from a given country who are enrolled in tertiary education abroad, relative to the total number of students enrolled in tertiary education at home.
+          - The outbound mobility ratio is calculated by dividing the number of students from a country who are studying abroad by the total number of students enrolled in tertiary education within that country.
+          - A high outbound mobility ratio means a significant portion of students are going abroad for their studies, which may indicate limited domestic capacity or quality concerns in the home country’s tertiary education system.
+          - The data comes from international education surveys and administrative records, including national higher education management systems and institutional reports.
+          - This indicator can be broken down by sex, ISCED level, and destination region, helping to analyze patterns of international study and gender dynamics in student mobility.
+          - There are some important limitations. Not all countries have a system for tracking outbound students, and some receiving countries may not report enrolment figures by country of origin.
+          - Definitions of what counts as a “mobile student” can vary, affecting comparability between countries and over time.
+          - Despite these challenges, the *outbound mobility ratio* offers valuable insight into global student flows and highlights international dimensions of access, choice, and demand in tertiary education.
+
+      inbound_mobility_rate__both_sexes__pct:
+        title: Share of students from abroad
+        description_short: International students as a share of the country's overall [tertiary](#dod:tertiary-education) enrolment. International students are those who move from their home countries for education, identified based on their past education, residence, or distinct immigration regulations.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on secondary education relative to the overall economy.
+          - It captures the percentage of students from other countries who are enrolled in all levels of tertiary education (ISCED 5 to 8) in a given country, relative to total tertiary enrolment in that same country.
+          - The inbound mobility rate is calculated by dividing the number of internationally mobile students studying in the country by the total number of students enrolled in tertiary education within that country.
+          - A high inbound mobility rate reflects a strong capacity to attract foreign students and signals that the country may be seen as a hub for international higher education.
+          - The data comes from administrative records, such as national higher education information systems and surveys, and includes enrolment disaggregated by country of origin, ISCED level, and sex.
+          - This indicator is useful for assessing the international openness of a country's higher education system and understanding student flow patterns across borders.
+          - There are several limitations to consider. The indicator may not capture students studying at foreign university branches or campuses within the reporting country, which can lead to underestimation.
+          - In addition, how countries define and report “mobile students” can vary, making comparisons between countries less straightforward.
+          - Despite these challenges, the *inbound mobility rate* provides important insights into a country’s role in global education and its attractiveness as a destination for international students.
+
+      official_entrance_age_to_compulsory_education__years:
+        title: Official entrance age to compulsory education
+        description_short: The official age for entering compulsory education is based on students starting at the earliest entrance age, studying full-time, and advancing without grade repetition or skipping.
+        unit: "years"
+        description_key:
+        - Children around the world begin formal education at different ages—this indicator shows the age at which students are officially expected to start a given level of education in their country.
+        - It assumes that students begin schooling on time, attend full-time, and progress without repeating or skipping any grades.
+        - The official entrance age is typically determined by national laws or education policies and usually reflects the most common age of entry, though not always.
+        - This indicator is essential for understanding how an education system is structured and is used as a reference point when calculating other key indicators like enrolment rates or school-age population estimates.
+        - It helps identify the age-specific demand for education services and supports national planning for staffing, infrastructure, and learning materials at each education level.
+        - Data on official entrance age is reported by national ministries of education and compiled by the UNESCO Institute for Statistics, following ISCED classifications to ensure international comparability.
+        - While this provides a standard benchmark, actual school entry may vary due to parental choices, local policies, or flexibility in school admissions.
+        - To fully interpret this indicator, it should be considered alongside the *theoretical duration* of the level of education, which indicates how long students are expected to remain in that level if they follow the system as designed.
+
+      duration_of_compulsory_education__years:
+        title: Duration of compulsory education
+        description_short: The number of years of compulsory education is based on students starting at the earliest entrance age, studying full-time, and advancing without grade repetition or skipping.
+        unit: "years"
+        description_key:
+          - The *theoretical duration of compulsory education* refers to the number of years that children are legally required to attend school, as defined by national laws or regulations.
+          - This indicator helps determine the school-age population by level of education and is a key input for producing education indicators and assessing a country's education supply capacity in relation to demand.
+          - The duration is typically calculated based on the official starting and ending ages for compulsory education, assuming students progress through the system without repeating or skipping grades.
+          - For example, if compulsory education starts at age 6 and ends at age 15, the theoretical duration would be 9 years.
+          - Data on compulsory education duration are collected from national legislation and formal education standards, and are mapped to the International Standard Classification of Education (ISCED) to ensure international comparability.
+          - It's important to note that while legislation may define the duration of compulsory education, actual implementation and enforcement can vary, and some children may not attend school for the full duration.
+          - Changes in national education policies, such as extending or reducing the years of compulsory education, can impact this indicator and should be considered when analyzing trends over time.
+          - This indicator is useful for understanding government commitment to education and for planning resource allocation, but it should be interpreted alongside other indicators like enrolment rates and completion rates for a comprehensive view.
+          - Limitations include potential discrepancies between legal provisions and actual practice, and differences in how countries define and implement compulsory education.
+
+      government_expenditure_on_primary_education_as_a_percentage_of_gdp__pct:
+        title: Government expenditure on primary education as share of GDP
+        description_short: Government spending on [primary education](#dod:primary-education), encompassing all levels and types of expenditure, as a percentage of GDP, including funds from international government transfers.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on primary education relative to the overall economy.
+          - It captures the share of total general government expenditure on education that goes to primary education, including spending by local, regional, and central government authorities.
+          - The indicator is calculated by dividing government expenditure on primary education by total expenditure on education across all levels, and multiplying by 100.
+          - A higher percentage means that a greater share of education funding is being directed toward primary education, which may reflect a government’s priority for foundational learning.
+          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education (ISCED) to ensure global comparability.
+          - This indicator is useful for understanding how governments prioritize different stages of education. It should be interpreted alongside data on enrolment and per-student costs, which can influence how funding is allocated.
+          - There are some limitations. In some cases, expenditure by education level is estimated, and it may be difficult to separate primary from pre-primary or lower from upper secondary education.
+          - The reference year usually reflects the end of the school year, which may span two calendar years depending on the country.
+          - Despite these challenges, the *share of education spending on primary education* offers valuable insight into national priorities and the public investment made in the earliest years of formal learning.
+
+      government_expenditure_on_secondary_education_as_a_percentage_of_gdp__pct:
+        title: Government expenditure on secondary education as share of GDP
+        description_short: Government expenditure on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education (including local, regional, central, current, capital, and transfers) as a percentage of GDP, inclusive of international transfers.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on secondary education relative to the overall economy.
+          - It captures public expenditure on secondary education (both lower and upper secondary) as a percentage of a country’s gross domestic product (GDP).
+          - The indicator is calculated by dividing total government spending on secondary education by the country’s GDP and multiplying by 100.
+          - A higher value indicates a greater public investment in secondary education relative to national income, which may reflect policy priorities, levels of educational development, or student population size.
+          - The data come from national education finance records and are typically reported to the UNESCO Institute for Statistics (UIS) through standardized annual surveys.
+          - GDP data are sourced from national accounts compiled by central statistical offices or international organizations like the World Bank or IMF.
+          - This indicator is useful for comparing education investment efforts across countries or tracking trends over time within a country.
+          - It should be interpreted alongside other indicators, such as enrolment rates and per-student spending, to understand the efficiency and equity of education financing.
+          - Some limitations apply. Differences in accounting practices, data availability, and timing between education expenditure and GDP reporting can affect comparability.
+          - Despite these challenges, the *government expenditure on secondary education as a share of GDP* offers valuable insight into how much a country invests in the development of its adolescent and youth population through formal education.
+
+      government_expenditure_on_tertiary_education_as_a_percentage_of_gdp__pct:
+        title: Government expenditure on tertiary education as share of GDP
+        description_short: Government expenditure on [tertiary education](#dod:tertiary-education) (including local, regional, central, current, capital, and transfers) as a percentage of GDP, inclusive of international transfers.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on tertiary education relative to the overall economy.
+          - It captures public expenditure on tertiary education as a percentage of a country’s gross domestic product (GDP).
+          - The indicator is calculated by dividing total government spending on tertiary education by the country’s GDP and multiplying by 100.
+          - A higher value indicates a greater public investment in tertiary education relative to national income, which may reflect policy priorities, levels of educational development, or student population size.
+          - The data come from national education finance records and are typically reported to the UNESCO Institute for Statistics (UIS) through standardized annual surveys.
+          - GDP data are sourced from national accounts compiled by central statistical offices or international organizations like the World Bank or IMF.
+          - This indicator is useful for comparing education investment efforts across countries or tracking trends over time within a country.
+          - It should be interpreted alongside other indicators, such as enrolment rates and per-student spending, to understand the efficiency and equity of education financing.
+          - Some limitations apply. Differences in accounting practices, data availability, and timing between education expenditure and GDP reporting can affect comparability.
+          - Despite these challenges, the *government expenditure on tertiary education as a share of GDP* offers valuable insight into how much a country invests in the development of its adult population through formal education.
