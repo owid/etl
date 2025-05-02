@@ -258,7 +258,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on secondary education relative to the overall economy.
+          - Many students cross borders to pursue higher education—this indicator shows how many are choosing a given country as their destination.
           - It captures the percentage of students from other countries who are enrolled in all levels of tertiary education (ISCED 5 to 8) in a given country, relative to total tertiary enrolment in that same country.
           - The inbound mobility rate is calculated by dividing the number of internationally mobile students studying in the country by the total number of students enrolled in tertiary education within that country.
           - A high inbound mobility rate reflects a strong capacity to attract foreign students and signals that the country may be seen as a hub for international higher education.
@@ -296,6 +296,21 @@ tables:
           - Changes in national education policies, such as extending or reducing the years of compulsory education, can impact this indicator and should be considered when analyzing trends over time.
           - This indicator is useful for understanding government commitment to education and for planning resource allocation, but it should be interpreted alongside other indicators like enrolment rates and completion rates for a comprehensive view.
           - Limitations include potential discrepancies between legal provisions and actual practice, and differences in how countries define and implement compulsory education.
+
+      theoretical_duration_of_pre_primary_education__years:
+        title: Theoretical duration of pre-primary education
+        description_short: The average number of years that a child is expected to spend in [pre-primary](#dod:pre-primary-education) education, defined by country's official educational regulations or laws.
+        unit: "years"
+        description_key:
+          - The *theoretical duration of pre-primary education* refers to the number of years that children are expected to attend pre-primary education, as defined by national laws or regulations.
+          - This indicator helps determine the school-age population by level of education and is a key input for producing education indicators and assessing a country's education supply capacity in relation to demand.
+          - The duration is typically calculated based on the official starting and ending ages for pre-primary education, assuming students progress through the system without repeating or skipping grades.
+          - For example, if pre-primary education starts at age 3 and ends at age 6, the theoretical duration would be 3 years.
+          - Data on pre-primary education duration are collected from national legislation and formal education standards, and are mapped to the International Standard Classification of Education (ISCED) to ensure international comparability.
+          - It's important to note that while legislation may define the duration of pre-primary education, actual implementation and enforcement can vary, and some children may not attend school for the full duration.
+          - Changes in national education policies, such as extending or reducing the years of pre-primary education, can impact this indicator and should be considered when analyzing trends over time.
+          - This indicator is useful for understanding government commitment to early childhood education and for planning resource allocation, but it should be interpreted alongside other indicators like enrolment rates and completion rates for a comprehensive view.
+          - Limitations include potential discrepancies between legal provisions and actual practice, and differences in how countries define and implement pre-primary education.
 
       government_expenditure_on_primary_education_as_a_percentage_of_gdp__pct:
         title: Government expenditure on primary education as share of GDP
@@ -376,3 +391,118 @@ tables:
           - It should be interpreted alongside related indicators—such as attendance, progression, and completion rates—to build a clearer picture of gender equity in education beyond access alone.
           - Like all indicators derived from enrolment and population estimates, data inconsistencies or timing issues, such as early or delayed school entry, may affect the accuracy of age-specific enrolment figures.
           - Despite these limitations, the GPIA for *net enrolment in lower-secondary education* remains a powerful tool for assessing gender equity and informing inclusive education policy.
+
+      all_staff_compensation_as_a_percentage_of_total_expenditure_in_public_institutions__pct:
+        title: Share of total public education expenditure allocated to staff compensation
+        description_short: Compensation for staff across all levels of education, both teaching and non-teaching, covers salaries, retirement contributions by employers, and additional benefits.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on staff compensation relative to the overall education budget.
+          - It captures the percentage of total public education expenditure in public institutions that is allocated specifically to staff compensation, including both teaching and non-teaching personnel.
+          - The indicator is calculated by dividing staff compensation expenditure by total public education expenditure, and multiplying by 100. It can also be further broken down by staff type or level of education.
+          - A higher percentage suggests a larger portion of education funding is directed toward salaries and benefits, which can reflect government policy priorities and investment in teacher recruitment, retention, and motivation.
+          - The data comes from administrative financial records, often sourced from ministries of finance or education, or from national statistical offices through the UIS or UNESCO-OECD-Eurostat (UOE) surveys.
+          - This indicator is disaggregated by level of education, making it possible to compare spending patterns across primary, secondary, or tertiary education.
+          - It should be interpreted in context, alongside indicators on capital investment, material spending (such as textbooks), and total expenditure per student.
+          - Over time, changes in this indicator may reflect shifts in education budgeting priorities—such as reforms to teacher salary structures or investments in learning materials.
+          - Limitations include incomplete coverage when data from only one ministry is reported, or when education-related spending by other government bodies is excluded. Differences in fiscal and academic years may also affect the timing of reported expenditure.
+          - Despite these challenges, the *share of education spending on staff compensation* offers key insights into how resources are distributed within education systems and the role that teachers and support staff play in public education investment.
+
+
+      government_expenditure_on_pre_primary_education_as_a_percentage_of_gdp__pct:
+        title: Government expenditure on pre-primary education as share of GDP
+        description_short: Government spending on [pre-primary education](#dod:pre-primary-education), encompassing all levels and types of expenditure, as a percentage of GDP, including funds from international government transfers.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on pre-primary education relative to the overall economy.
+          - It captures the share of total general government expenditure on education that goes to pre-primary education, including spending by local, regional, and central government authorities.
+          - The indicator is calculated by dividing government expenditure on pre-primary education by total expenditure on education across all levels, and multiplying by 100.
+          - A higher percentage means that a greater share of education funding is being directed toward pre-primary education, which may reflect a government’s priority for early childhood development and learning.
+          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education (ISCED) to ensure global comparability.
+          - This indicator is useful for understanding how governments prioritize different stages of education. It should be interpreted alongside data on enrolment and per-student costs, which can influence how funding is allocated.
+          - There are some limitations. In some cases, expenditure by education level is estimated, and it may be difficult to separate pre-primary from primary or lower from upper-secondary education.
+          - The reference year usually reflects the end of the school year, which may span two calendar years depending on the country.
+          - Despite these challenges, the *share of education spending on pre-primary education* offers valuable insight into national priorities and the public investment made in early childhood learning.
+
+      government_expenditure_on_education__pppdollar__millions:
+        title: Government expenditure on education
+        description_short: Total government expenditure on education, including all levels and types of expenditure, expressed in purchasing power parity (PPP) dollars.
+        unit: "international $"
+        short_unit: "$"
+        description_key:
+          - This indicator shows the total amount a government spends on education at all levels, expressed in millions of purchasing power parity (PPP)-adjusted US dollars to account for differences in cost of living across countries.
+          - It includes current expenditure, capital spending, and transfers from both domestic sources and international donors to the government.
+          - Educational spending covers both core education services—like teacher salaries, school infrastructure, and learning materials—and peripheral services such as administration and student support.
+          - The amount is originally reported in national currency and converted into PPP$ using GDP-based conversion factors from the World Bank. When expressed in constant prices, a GDP deflator is used to adjust for inflation.
+          - The constant prices base year is normally set to three years before the year of the data release. For example, in the September 2021 data release, constant PPP$ values are expressed in 2018 prices.
+          - This indicator enables comparison of education spending volumes across countries and over time, regardless of national income levels or currency differences.
+          - Data are submitted to the UNESCO Institute for Statistics (UIS) through its annual education finance survey or the joint UNESCO-OECD-Eurostat (UOE) data collection.
+          - In some cases, reported totals may only reflect spending by the Ministry of Education, excluding other ministries that also finance education, which may lead to underestimation.
+          - As an absolute measure, this indicator reflects the volume of public investment but should be interpreted alongside related indicators, such as education spending as a share of GDP or per student.
+          - Country-specific fiscal and school year timing differences should also be considered when comparing data.
+          - Despite its limitations, *government expenditure on education (PPP$)* is a core measure of a government’s financial commitment to providing education.
+
+      percentage_of_teachers_in_primary_education_who_are_female__pct:
+        title: Share of primary school teachers who are women
+        description_short: Percentage of female teachers among all teachers at the [primary](#dod:primary-education) education level during a given school year.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Teachers play a central role in shaping learning environments—this indicator shows what share of the teaching workforce in primary education is made up of women.
+          - It captures the percentage of teachers in primary education who are female, calculated by dividing the number of female teachers by the total number of teachers (male and female) at the primary level and multiplying by 100.
+          - A value close to 50% indicates gender parity in the primary teaching workforce. Higher values suggest that women are more strongly represented, while lower values may signal barriers to their participation in teaching.
+          - The data come from administrative records, typically based on school censuses or national education staff registries that report the number of teachers by sex and education level.
+          - This indicator helps assess the gender balance in the teaching profession and may highlight areas where there is a need for policy action or incentives to support women’s participation in teaching.
+          - It is disaggregated by level of education and may be further refined by programme type, grade, or institutional setting.
+          - Where possible, part-time teaching staff should be converted to full-time equivalent (FTE) positions to ensure consistent comparison across different types of employment contracts.
+          - While this indicator provides insight into gender representation, it does not measure teacher qualifications, performance, or the quality of teaching.
+          - Limitations may arise if part-time staff are not converted to FTE, or if the data exclude private or informal education institutions. Consistency in reporting between male and female teacher counts is also essential.
+          - Despite these challenges, the *percentage of female teachers in primary education* is a key measure of gender representation in the education workforce and can support broader efforts toward inclusive and equitable education systems.
+
+      percentage_of_teachers_in_secondary_education_who_are_female__pct:
+        title: Share of secondary school teachers who are women
+        description_short: Percentage of female teachers among all teachers at the [secondary](#dod:secondary-education) education level during a given school year.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Teachers play a central role in shaping learning environments—this indicator shows what share of the teaching workforce in secondary education is made up of women.
+          - It captures the percentage of teachers at the secondary level (including both lower and upper secondary) who are female, calculated by dividing the number of female teachers by the total number of teachers and multiplying by 100.
+          - A value close to 50% indicates gender parity, while values above or below that threshold reflect gender imbalances in the secondary teaching profession.
+          - The data come from school censuses or education management systems that record teaching staff by sex and education level.
+          - This indicator is useful for monitoring gender equality in the teaching profession and for identifying areas where women may face barriers to participating in education roles beyond the primary level.
+          - The indicator can be disaggregated further by grade, subject area, or full-time/part-time status, where data allow.
+          - When feasible, part-time teachers should be converted to full-time equivalents (FTE) to ensure comparability.
+          - While this indicator reflects gender representation, it does not provide information on teacher qualifications, working conditions, or the quality of instruction.
+          - Nonetheless, the *share of secondary school teachers who are women* remains an important measure for assessing inclusion and balance in the education workforce.
+
+      percentage_of_teachers_in_tertiary_education_who_are_female__pct:
+        title: Share of tertiary school teachers who are women
+        description_short: Percentage of female academic staff among all academic staff at the [tertiary](#dod:tertiary-education) education level during a given school year.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Women are underrepresented in many academic and research fields—this indicator shows what share of the teaching workforce in tertiary education is made up of women.
+          - It captures the percentage of teachers in tertiary education who are female, calculated by dividing the number of female teachers by the total number of teachers (male and female) at the tertiary level and multiplying by 100.
+          - A value close to 50% reflects gender parity, while lower values highlight gaps in representation that may be shaped by structural, cultural, or institutional barriers to women’s academic careers.
+          - The data come from administrative sources, including higher education institutions and national education databases, which report teaching staff numbers by sex and ISCED level.
+          - This indicator is useful for tracking gender equality in academic employment, particularly in faculty and teaching roles across universities and other post-secondary institutions.
+          - It is disaggregated by level of education, and where available, may be further broken down by type of institution, field of study, or academic rank.
+          - Full-time equivalent (FTE) adjustments should be made where part-time teachers are present to ensure consistency in comparison across countries and systems.
+          - This indicator reflects gender distribution, not the quality of teaching, academic rank, or research output—additional indicators are needed to assess these dimensions.
+          - Limitations include variation in how countries classify tertiary teachers, whether data include private institutions, and whether gender is reported for all categories of teaching staff.
+          - Still, the *percentage of female teachers in tertiary education* remains a critical measure of gender balance in higher education and helps inform policies to support equal representation at all levels of academia.
+
+      official_entrance_age_to_pre_primary_education__years:
+        title: Official entrance age to pre-primary education
+        description_short: TThe official entry age at which children are expected to start [pre-primary education](#dod:pre-primary-education) according to national legislation or policies.
+        unit: "years"
+        description_key:
+          - Children begin their education journeys at different ages around the world—this indicator shows the age at which they are officially expected to start pre-primary education in a given country.
+          - It captures the official entrance age for pre-primary education, based on the assumption that children begin schooling at the standard age, attend full-time, and progress through the education system without repeating or skipping any grades.
+          - The official entrance age is typically set by national education laws or regulations and often corresponds to the most common age at which children enter pre-primary programmes.
+          - This indicator helps estimate the expected demand for early childhood education services and is a key input for producing many other education statistics, including enrolment rates and school-age population estimates.
+          - The data are reported by ministries of education and compiled by the UNESCO Institute for Statistics, using the International Standard Classification of Education (ISCED) to ensure international comparability.
+          - While the official age provides a national benchmark, actual entry ages may vary due to cultural preferences, availability of early childhood programmes, or local policy flexibility.
+          - Understanding the *official entrance age to pre-primary education* is essential for education planning and for identifying gaps in access to early learning opportunities that support school readiness and long-term development.
