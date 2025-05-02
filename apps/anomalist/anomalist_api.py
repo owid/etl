@@ -738,13 +738,15 @@ def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]
     return [v for v in variables if v.id in sample_ids]
 
 
-def get_anomalies_for_chart_ids(chart_ids: Optional[List[int]]) -> pd.DataFrame:
+def get_anomalies_for_chart_ids(
+    chart_ids: Optional[List[int]], anomaly_types: Optional[Tuple[str, ...]] = ("version_change",)
+) -> pd.DataFrame:
     """Get datasets of the variables used in a list of charts, given the chart ids.
 
     NOTE: It's unclear what the most relevant information is for a given chart. For now, get the average anomaly score and average scale score of the datasets of variables used in those charts.
 
     """
-    query = """SELECT DISTINCT cd.chartId AS chart_id, v.datasetId AS dataset_id
+    query = """SELECT DISTINCT cd.chartId AS chart_id, v.id AS variable_id, v.datasetId AS dataset_id
     FROM variables v
     JOIN chart_dimensions cd
     ON cd.variableId = v.id
@@ -763,13 +765,32 @@ def get_anomalies_for_chart_ids(chart_ids: Optional[List[int]]) -> pd.DataFrame:
     df = df[df["dataset_id"].isin(dataset_ids_with_anomalies)].reset_index(drop=True)
 
     # Get the average anomaly and scale scores for the relevant datasets.
-    df["anomaly_mean"] = None
-    df["scale_mean"] = None
+    df_anomalies = pd.DataFrame()
     for anomaly in anomalies:
         # Get the df_reduced for each anomaly.
         df_reduced = anomaly.dfReduced
-        mask = df["dataset_id"] == anomaly.datasetId
-        df.loc[mask, "anomaly_mean"] = df_reduced["anomaly_score"].mean()  # type: ignore
-        df.loc[mask, "scale_mean"] = df_reduced["score_scale"].mean()  # type: ignore
+        # Select the variables that are used by the given charts, and calculate their average anomaly and scale scores.
+        df_reduced_mean = (
+            df_reduced.groupby(["variable_id"], as_index=False, observed=True)  # type: ignore
+            .agg({"anomaly_score": "mean", "score_scale": "mean"})
+            .assign(**{"dataset_id": anomaly.datasetId, "anomaly_type": anomaly.anomalyType})
+        )
+        df_anomalies = pd.concat([df_anomalies, df_reduced_mean], ignore_index=True)
 
-    return df
+    # TODO: Could we calculate the relevance score here too?
+
+    # Check that for each variable id and anomaly type there is only one row.
+    assert df_anomalies[df_anomalies.duplicated(subset=["variable_id", "anomaly_type"])].empty
+
+    # It's also unclear which anomalies to consider, or how to combine them.
+    df_anomalies[df_anomalies["anomaly_type"].isin(anomaly_types)].reset_index(drop=True)  # type: ignore
+
+    # Add anomalies of each variable and anomaly type to the original dataframe.
+    df_with_anomalies = df.merge(df_anomalies, on=["dataset_id", "variable_id"], how="inner")
+    # In the end we need just one anomaly score for each chart.
+    # This would correspond to the maximum anomaly (among all selected anomaly types and variables in the chart).
+    df_with_anomalies = df_with_anomalies.groupby(["chart_id"], as_index=False).agg(
+        {"anomaly_score": "max", "score_scale": "max"}
+    )
+
+    return df_with_anomalies
