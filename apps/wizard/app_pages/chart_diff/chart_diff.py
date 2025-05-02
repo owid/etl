@@ -365,8 +365,8 @@ class ChartDiff:
         chart_views_all = df_analytics.set_index("chart_id")["views_daily"].to_dict()
 
         # Anomalies
-        df_anomalies_all = get_anomalies_for_chart_ids(chart_ids)
-        chart_anomalies_all = df_anomalies_all.set_index("chart_id")["anomaly_mean"].to_dict()
+        df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("time_change",))
+        chart_anomalies_all = df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()
 
         # Articles
         df_articles = get_article_views_last_n_days(chart_ids, 30)
