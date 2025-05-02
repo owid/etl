@@ -20,7 +20,7 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/demography/2023-03-31/population
     - data://garden/worldbank_wdi/2024-05-20/wdi
-    - data://garden/unesco/2024-11-21/enrolment_rates
+    - data://garden/unesco/2025-05-01/education_opri
   data://grapher/education/2023-07-17/education_lee_lee:
     - data://garden/education/2023-07-17/education_lee_lee
 
