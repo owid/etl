@@ -6,8 +6,8 @@ definitions:
         - Global Education
 
   desc_key_net_enr: &desc_key_net_enr
-    - Many children who are the right age for a given level of education are not enrolled at that level—this indicator shows how many are being reached as expected.
-    - It captures the percentage of children in the official age group for a specific education level who are enrolled at that same level, such as primary or lower secondary.
+    - Not all children of the right age are enrolled in the level of education intended for them—this indicator shows how many are.
+    - It captures the percentage of children in the official age group for a specific education level who are enrolled at that same level, such as primary or lower-secondary.
     - The indicator is calculated by dividing the number of students of the correct age enrolled in that level by the total number of children in that age group.
     - For example, if primary education starts at age 7 and lasts six years, the official primary school age range would be 7 to 12 years.
     - A high *net enrolment rate* means that most children are enrolled where they are expected to be. The highest possible value is 100%.
@@ -28,7 +28,7 @@ definitions:
   desc_key_ger: &desc_key_ger
     - Many students are enrolled in school at different ages—this indicator shows how many are participating in a given level of education, regardless of whether they are the “right” age for it.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
-    - For example, if upper secondary school is designed for ages 15 to 17, the *gross enrolment ratio* compares total enrolment at that level to the population of 15- to 17-year-olds.
+    - For example, if upper-secondary school is designed for ages 15 to 17, the *gross enrolment ratio* compares total enrolment at that level to the population of 15- to 17-year-olds.
     - A high value means many people are accessing education at that level, but it doesn’t necessarily mean that they are in the appropriate grade for their age.
     - The GER includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
     - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by UN or national sources.
@@ -47,20 +47,20 @@ definitions:
     - Children who are enrolled but not attending regularly may not always be captured correctly, depending on how data is collected and defined.
 
   deck_key_low_out_school: &deck_key_low_out_school
-    - Many adolescents who are old enough for lower secondary school are not attending any kind of school—this indicator tells us how many.
-    - It captures the number of children in the official lower secondary school age range, typically around 12 to 14 or 13 to 15 years old, who are not enrolled in any level of education—neither lower secondary nor any other level.
-    - The indicator is calculated by subtracting the number of enrolled lower secondary-age children from the total number of children in that age group.
-    - These adolescents may have never transitioned from primary school, may have dropped out early, or may be delayed in entering the lower secondary level.
+    - Many adolescents who are old enough for lower-secondary school are not attending any kind of school—this indicator tells us how many.
+    - It captures the number of children in the official lower-secondary school age range, typically around 12 to 14 or 13 to 15 years old, who are not enrolled in any level of education—neither lower-secondary nor any other level.
+    - The indicator is calculated by subtracting the number of enrolled lower-secondary-age children from the total number of children in that age group.
+    - These adolescents may have never transitioned from primary school, may have dropped out early, or may be delayed in entering the lower-secondary level.
     - The data comes from school administrative records, which report enrolment figures by single year of age, and from household surveys, which help capture students missed in administrative data.
     - There are some important limitations to consider. Inconsistencies between enrolment and population data from different sources may lead to inaccurate estimates.
     - Surveys conducted late in the school year may count students as out of school even if they are about to enrol, which can lead to overestimates.
     - Adolescents who are technically enrolled but do not attend regularly may not be captured accurately, depending on how the data is collected.
 
   desc_key_up_out_school: &desc_key_up_out_school
-    - Many young people who are old enough for upper secondary school are not enrolled—this indicator shows how many are missing from education.
-    - It captures the number of youth in the official upper secondary age range, typically around 15 to 17 or 16 to 18 years old, who are not enrolled in any school level.
-    - The indicator is calculated by subtracting the number of enrolled upper secondary-age students from the total number of youth in that age group.
-    - These youth may have never transitioned from lower secondary, may have dropped out due to academic, economic, or social reasons, or may be delayed in their education.
+    - Many young people who are old enough for upper-secondary school are not enrolled—this indicator shows how many are missing from education.
+    - It captures the number of youth in the official upper-secondary age range, typically around 15 to 17 or 16 to 18 years old, who are not enrolled in any school level.
+    - The indicator is calculated by subtracting the number of enrolled upper-secondary-age students from the total number of youth in that age group.
+    - These youth may have never transitioned from lower-secondary, may have dropped out due to academic, economic, or social reasons, or may be delayed in their education.
     - The data comes from administrative records, such as school censuses, and household surveys that track school attendance and enrolment by age.
     - There are important limitations to note. Differences between data sources and definitions of age or enrolment status may result in under- or over-estimates.
     - If surveys are carried out late in the school year, they may miscount youth who are late entrants or re-enrolling, leading to overestimates of those out of school.
@@ -141,16 +141,16 @@ tables:
           name: Boys
 
       out_of_school_adolescents_of_lower_secondary_school_age__both_sexes__number:
-        title: Out-of-school youth of lower secondary school age
+        title: Out-of-school youth of lower-secondary school age
         unit: "youth"
-        description_short: Youth in the official lower secondary school age range who are not enrolled in either [lower secondary](#dod:lower-secondary-education) or [upper secondary](#dod:upper-secondary-education) education.
-        description_key: *desc_key_prim_out_school
+        description_short: Youth in the official lower-secondary school age range who are not enrolled in either [lower-secondary](#dod:lower-secondary-education) or [upper-secondary](#dod:upper-secondary-education) education.
+        description_key: *deck_key_low_out_school
 
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
-        title: Out-of-school youth of upper secondary school age
+        title: Out-of-school youth of upper-secondary school age
         unit: "youth"
-        description_short: Youth in the official upper secondary school age range who are not enrolled in either [upper secondary](#dod:upper-secondary-education) or [post-secondary non-tertiary](#dod:post-secondary-non-tertiary-education) education.
-        description_key: *desc_key_prim_out_school
+        description_short: Youth in the official upper-secondary school age range who are not enrolled in either [upper-secondary](#dod:upper-secondary-education) or [post-secondary non-tertiary](#dod:post-secondary-non-tertiary-education) education.
+        description_key: *desc_key_up_out_school
 
       mean_years_of_schooling__isced_1_or_higher__population_25plus_years__female:
         title: Average years of schooling for women
@@ -309,18 +309,18 @@ tables:
           - A higher percentage means that a greater share of education funding is being directed toward primary education, which may reflect a government’s priority for foundational learning.
           - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education (ISCED) to ensure global comparability.
           - This indicator is useful for understanding how governments prioritize different stages of education. It should be interpreted alongside data on enrolment and per-student costs, which can influence how funding is allocated.
-          - There are some limitations. In some cases, expenditure by education level is estimated, and it may be difficult to separate primary from pre-primary or lower from upper secondary education.
+          - There are some limitations. In some cases, expenditure by education level is estimated, and it may be difficult to separate primary from pre-primary or lower from upper-secondary education.
           - The reference year usually reflects the end of the school year, which may span two calendar years depending on the country.
           - Despite these challenges, the *share of education spending on primary education* offers valuable insight into national priorities and the public investment made in the earliest years of formal learning.
 
       government_expenditure_on_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government expenditure on secondary education as share of GDP
-        description_short: Government expenditure on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education (including local, regional, central, current, capital, and transfers) as a percentage of GDP, inclusive of international transfers.
+        description_short: Government expenditure on [lower-secondary](#dod:lowersecondary-education) and [upper-secondary](#dod:upper-secondary-education) education (including local, regional, central, current, capital, and transfers) as a percentage of GDP, inclusive of international transfers.
         unit: "%"
         short_unit: "%"
         description_key:
           - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on secondary education relative to the overall economy.
-          - It captures public expenditure on secondary education (both lower and upper secondary) as a percentage of a country’s gross domestic product (GDP).
+          - It captures public expenditure on secondary education (both lower and upper-secondary) as a percentage of a country’s gross domestic product (GDP).
           - The indicator is calculated by dividing total government spending on secondary education by the country’s GDP and multiplying by 100.
           - A higher value indicates a greater public investment in secondary education relative to national income, which may reflect policy priorities, levels of educational development, or student population size.
           - The data come from national education finance records and are typically reported to the UNESCO Institute for Statistics (UIS) through standardized annual surveys.
@@ -363,16 +363,16 @@ tables:
           - Despite these limitations, the GPIA for *net enrolment in primary education* is a valuable measure of progress toward inclusive and equitable education for all children, regardless of gender.
 
       total_net_enrolment_rate__lower_secondary__adjusted_gender_parity_index__gpia:
-        title: Net enrolment rates in lower secondary education
+        title: Net enrolment rates in lower-secondary education
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [lower-secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
-          - Boys and girls don’t always have equal access to lower secondary education—this indicator shows how close we are to gender parity in age-appropriate school enrolment at that level.
-          - It captures gender equality in *net enrolment rates* for lower secondary education by comparing the percentage of girls and boys of official lower secondary school age who are enrolled at that level.
+          - Boys and girls don’t always have equal access to lower-secondary education—this indicator shows how close we are to gender parity in age-appropriate school enrolment at that level.
+          - It captures gender equality in *net enrolment rates* for lower-secondary education by comparing the percentage of girls and boys of official lower-secondary school age who are enrolled at that level.
           - The *adjusted gender parity index (GPIA)* is calculated by dividing the female net enrolment rate by the male net enrolment rate. If the result is greater than 1, it is inverted and subtracted from 2. This adjustment produces a value between 0 and 2 that is symmetrical around 1.
           - A GPIA value of 1 indicates perfect parity. A value below 1 shows a gap in favour of boys, while a value above 1 shows a gap in favour of girls.
-          - This indicator is useful for identifying gender-based disparities in lower secondary school enrolment and for tracking progress toward equitable access to post-primary education.
-          - The data comes from administrative records reporting enrolment by age and sex, along with population estimates for children in the official lower secondary school age range.
+          - This indicator is useful for identifying gender-based disparities in lower-secondary school enrolment and for tracking progress toward equitable access to post-primary education.
+          - The data comes from administrative records reporting enrolment by age and sex, along with population estimates for children in the official lower-secondary school age range.
           - It should be interpreted alongside related indicators—such as attendance, progression, and completion rates—to build a clearer picture of gender equity in education beyond access alone.
           - Like all indicators derived from enrolment and population estimates, data inconsistencies or timing issues, such as early or delayed school entry, may affect the accuracy of age-specific enrolment figures.
-          - Despite these limitations, the GPIA for *net enrolment in lower secondary education* remains a powerful tool for assessing gender equity and informing inclusive education policy.
+          - Despite these limitations, the GPIA for *net enrolment in lower-secondary education* remains a powerful tool for assessing gender equity and informing inclusive education policy.
