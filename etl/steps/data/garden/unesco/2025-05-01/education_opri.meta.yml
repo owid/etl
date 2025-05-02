@@ -6,7 +6,7 @@ definitions:
         - Global Education
 
   desc_key_net_enr: &desc_key_net_enr
-    - Not all children of the right age are enrolled in the level of education intended for them—this indicator shows how many are.
+    - Not all children of the right age are enrolled in the level of education intended for them— the *net enrolment rate* indicator shows how many are.
     - It captures the percentage of children in the official age group for a specific education level who are enrolled at that same level, such as primary or lower-secondary.
     - The indicator is calculated by dividing the number of students of the correct age enrolled in that level by the total number of children in that age group.
     - For example, if primary education starts at age 7 and lasts six years, the official primary school age range would be 7 to 12 years.
@@ -26,7 +26,7 @@ definitions:
     - Cross-country comparisons can be challenging. Education systems differ in how long programmes last, and qualifications may not be classified in the same way.
 
   desc_key_ger: &desc_key_ger
-    - Many students are enrolled in school at different ages—this indicator shows how many are participating in a given level of education, regardless of whether they are the “right” age for it.
+    - Many students are enrolled in school at different ages—the *gross enrolment ratio* shows how many are participating in a given level of education, regardless of whether they are the “right” age for it.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
     - For example, if upper-secondary school is designed for ages 15 to 17, the *gross enrolment ratio* compares total enrolment at that level to the population of 15- to 17-year-olds.
     - A high value means many people are accessing education at that level, but it doesn’t necessarily mean that they are in the appropriate grade for their age.
@@ -90,7 +90,7 @@ definitions:
     - Despite these challenges, this indicator helps assess the scale and role of the private education sector within a national education system and informs discussions about education financing, accessibility, and regulation.
 
   desc_key_total_net_attendance: &desc_key_total_net_attendance
-    - Many children who are the right age for a level of education are not actually attending school—this indicator shows how many are, regardless of what level they attend.
+    - Many children who are the right age for a level of education are not actually attending school—the *total net attendance rate* indicator shows how many are, regardless of what level they attend.
     - It captures the percentage of children in the official age group for a given education level who are attending school, whether at the intended level or any other.
     - The indicator is calculated by dividing the number of children of the official age group who are attending school at any level by the total population of children in that age group.
     - For example, if primary education starts at age 7 and lasts six years, the total net attendance rate would be calculated for children aged 7 to 12.
