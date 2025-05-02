@@ -207,6 +207,7 @@ def get_article_views_by_chart_id(
 
     """
     # Firstly, I will connect all gdocs with grapher charts.
+    # TODO: Fix the following queries to account for redirected slugs.
     query = """SELECT
         pg.slug AS post_slug,
         pg.type,
@@ -295,6 +296,9 @@ def get_article_views_by_chart_id(
     }
     # Transform slugs or articles, topic pages, and data insights into urls.
     df_links["content_url"] = df_links["type"].map(url_start) + df_links["post_slug"]
+    # In the case of homepage references, post_slug is "owid-homepage", which is not a real slug.
+    # The url in that case should just be the homepage.
+    df_links.loc[df_links["type"] == "homepage", "content_url"] = OWID_BASE_URL
     # Transform slugs of grapher charts into urls.
     # If there is a parent chart id, use that, otherwise, use the target chart.
     df_links["chart_url"] = df_links["linkType"].map(url_start) + df_links["chart_slug"].fillna(df_links["target"])
@@ -361,5 +365,23 @@ def get_article_views_by_chart_id(
         .rename(columns={"content_url": "url"})
         .merge(df_article_views, on="url", how="left")
     )
+
+    return df_views
+
+
+def get_article_views_last_n_days(
+    chart_ids: Optional[List[int]] = None,
+    n_days: int = 30,
+) -> pd.DataFrame:
+    """
+    Fetch number of article views per chart for the last n_days.
+
+    """
+    # Calculate date range.
+    date_max = str(datetime.today().date())
+    date_min = str((datetime.today() - pd.Timedelta(days=n_days)).date())
+
+    # Get views.
+    df_views = get_article_views_by_chart_id(chart_ids=chart_ids, date_min=date_min, date_max=date_max)
 
     return df_views
