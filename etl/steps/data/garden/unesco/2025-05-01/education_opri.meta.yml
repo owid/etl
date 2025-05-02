@@ -10,3 +10,42 @@ definitions:
 dataset:
   update_period_days: 365
   title: UNESCO Institute for Statistics (UIS) - Education (other policy relevant indicators)
+
+
+tables:
+  education_opri:
+    variables:
+      out_of_school_children_of_primary_school_age__both_sexes__number:
+        title: Out-of-school children of primary school age
+        description_short: Children in the official primary school age range who are not enrolled in either [primary](#dod:primary-education) or [secondary](#dod:secondary-education) education.
+        description_key:
+          - Many children who are old enough for primary school are not attending any kind of school—this indicator tells us how many.
+          - It captures the number of children in the official primary school age range, typically 6 to 11 years old, who are not enrolled in either primary or secondary education.
+          - The indicator is calculated by subtracting the number of enrolled primary-age children from the total number of children in that age group.
+          - These children may have never started school, may have dropped out early, or may be starting late and have not yet enrolled.
+          - The data comes from school administrative records, which report enrolment figures, and from household surveys, which help capture children missed by official data sources.
+          - There are some important limitations to consider. Inconsistencies between enrolment and population data from different sources may lead to inaccurate estimates.
+          - Surveys conducted late in the school year may count children as out of school even if they are about to enrol, leading to overestimates.
+          - Children who are enrolled but not attending regularly may not always be captured correctly, depending on how data is collected and defined.
+
+      mean_years_of_schooling__isced_1_or_higher__population_25plus_years__adjusted_gender_parity_index__gpia:
+        title: Average years of schooling, adjusted gender parity index
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal average years of schooling between men and women. Values below 1 favor men, and above 1 favor women.
+        description_key:
+          - This indicator assesses gender equality in mean years of schooling by comparing the average number of completed years of education between women and men aged 25 and older.
+          - It is based on the adjusted gender parity index (GPIA), which is calculated by dividing the female value for mean years of schooling by the male value. If the result is greater than 1, the ratio is inverted and subtracted from 2 to keep the scale symmetrical between 0 and 2.
+          - A value of 1 means that men and women have equal average years of schooling. A value below 1 indicates that men have more years of schooling, while a value above 1 indicates that women have more.
+          - The underlying indicator, mean years of schooling, measures the average number of completed years of formal education for adults aged 25 and older, counting only years successfully finished and excluding repeated years.
+          - The data comes from population censuses and household or labour force surveys, which collect information on the highest level of education completed. These levels are matched with their official durations using the International Standard Classification of Education (ISCED).
+          - This indicator helps track long-term gender disparities in educational attainment and provides insight into the distribution of educational opportunities over time.
+          - It is important to note that this measure reflects only the duration of schooling, not the quality of education or learning outcomes.
+          - Comparisons across countries can be challenging, as education systems differ and some qualifications may be classified differently.
+      mean_years_of_schooling__isced_1_or_higher__population_25plus_years__female:
+        title: Av erage years of schooling for women
+        description_short: Average number of years women older than 25 participated in formal education.
+        description_key:
+            - This indicator measures the average number of completed years of formal education for women aged 25 and older, counting only years successfully finished and excluding repeated years.
+            - The data comes from population censuses and household or labour force surveys, which collect information on the highest level of education completed. These levels are matched with their official durations using the International Standard Classification of Education (ISCED).
+            - This indicator helps track long-term gender disparities in educational attainment and provides insight into the distribution of educational opportunities over time.
+            - It is important to note that this measure reflects only the duration of schooling, not the quality of education or learning outcomes.
+            - Comparisons across countries can be challenging, as education systems differ and some qualifications may be classified differently.
