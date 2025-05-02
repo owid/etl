@@ -15,7 +15,7 @@ from structlog import get_logger
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.io import get_all_changed_catalog_paths
-from etl.analytics import get_chart_views_last_n_days
+from etl.analytics.common import get_chart_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files, log_time
@@ -41,9 +41,7 @@ class ChartDiffScores:
     num_articles: Optional[int]
 
     # Internal scale factor to regularize score for chart views
-    _chart_views_reg: Optional[float] = None
-    _anomaly_reg: Optional[float] = None
-    _normalization_chart_views: Optional[float] = None
+    _relevance: Optional[float] = None
 
     @property
     def anomaly_pretty(self) -> str:
@@ -62,25 +60,36 @@ class ChartDiffScores:
             return "N/A"
 
     @property
-    def relevance(self) -> float:
+    def relevance(self) -> Optional[float]:
+        return self._relevance
+
+    def estimate_relevance(self, scale_chart_views: float, reg_num_articles: float, reg_anomaly: float) -> None:
         """Get relevance score as a combination of chart views and anomaly."""
         # Weights for relevance operation
-        w_views = 1.0
-        w_anomalies = 1.0
+        weights = [
+            5.0,
+            3.0,
+            1.0,
+        ]
+        regularization = [
+            scale_chart_views,
+            reg_num_articles,
+            reg_anomaly,
+        ]
+        params = [
+            self.chart_views,
+            self.num_articles,
+            self.anomaly,
+        ]
 
-        # Get scores
-        if self.chart_views is None:
-            chart_views = 0.0
-        else:
-            chart_views = self.chart_views
-        if self.anomaly is None:
-            anomaly = 0.0
-        else:
-            anomaly = self.anomaly
+        relevance = 0
+        for w, r, p in zip(weights, regularization, params):
+            if p is not None:
+                assert p > 0 or p == 0, f"p={p} should be >= 0"
+                relevance += w * p / r
 
-        relevance = (w_views * chart_views + w_anomalies * anomaly) / (w_views + w_anomalies)
-
-        return relevance
+        relevance /= sum(weights)
+        self._relevance = relevance
 
     @property
     def relevance_pretty(self) -> str:
