@@ -33,19 +33,19 @@ DISPLAY_STATE_OPTIONS = {
     gm.ChartStatus.APPROVED.value: {
         "label": "Approve",
         "color": "green",
-        "material_icon": ":material/done_outline:",
+        "material_icon": ":material/thumb_up:",
         "icon": "✅",
     },
     gm.ChartStatus.PENDING.value: {
         "label": "Pending",
         "color": "gray",
-        "material_icon": ":material/schedule:",
+        "material_icon": "",
         "icon": "⏳",
     },
     gm.ChartStatus.REJECTED.value: {
         "label": "Reject",
         "color": "red",
-        "material_icon": ":material/delete:",
+        "material_icon": ":material/thumb_down:",
         "icon": "❌",
     },
 }
