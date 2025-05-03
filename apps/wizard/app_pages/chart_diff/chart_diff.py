@@ -177,7 +177,7 @@ class ChartDiff:
         self.last_chart_revision_approved = None
 
         # Analytics, anomalies and other scores
-        self.article_refs = article_refs if article_refs else {}
+        self.article_refs = article_refs if article_refs else []
         self.scores = ChartDiffScores(
             chart_views=chart_views,
             anomaly=score_indicators_anomalies if score_indicators_anomalies else 0,
