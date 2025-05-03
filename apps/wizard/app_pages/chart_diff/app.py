@@ -448,9 +448,11 @@ def _show_summary_top(chart_diffs):
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
-        text_warning = f"Some charts are hidden due to filtering. {num_charts_listed}/{num_charts_total} charts listed."
-        text += f" :small[{text_warning}]"
-    st.markdown(text)
+        text_warning = f"{num_charts_total-num_charts_listed} charts are hidden due to filtering."
+        text += f" :orange-badge[:small[{text_warning}]]"
+        st.markdown(text, help="To show all charts, refer to ⚙️ Options menu.")
+    else:
+        st.markdown(text)
 
 
 def render_app():
