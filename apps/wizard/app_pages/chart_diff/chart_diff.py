@@ -152,7 +152,12 @@ class ChartDiff:
         chart_views: Optional[float] = None,
         score_indicators_anomalies: Optional[float] = None,
         article_refs: Optional[List[ArticleRef]] = None,
+        df_approvals: Optional[pd.DataFrame] = None,
     ):
+        """Constructor of ChartDiff.
+
+        In most cases, ChartDiff objects are created by calling class method from_charts_df, which optimizes array loading.
+        """
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval = approval
@@ -165,7 +170,10 @@ class ChartDiff:
         self.edited_in_staging = edited_in_staging
 
         # Get revisions
-        self.df_approvals = self.get_all_approvals_df()
+        if df_approvals is None:
+            self.df_approvals = pd.DataFrame()
+        else:
+            self.df_approvals = df_approvals
         self.last_chart_revision_approved = None
 
         # Analytics, anomalies and other scores
@@ -374,6 +382,9 @@ class ChartDiff:
         # Articles
         article_refs_all = get_chart_in_article_views_cached(chart_ids)
 
+        # Get approvals
+        df_approvals_all = OWID_ENV.read_sql(f"SELECT * FROM chart_diff_approvals WHERE chartId in {tuple(chart_ids)}")
+
         # Build chart diffs
         chart_diffs = []
         for chart_id, source_chart in source_charts.items():
@@ -417,6 +428,9 @@ class ChartDiff:
             # Article refs
             article_refs = article_refs_all.get(chart_id, [])
 
+            # Get approval history
+            df_approvals = df_approvals_all[df_approvals_all["chartId"] == chart_id]
+
             # Build Chart Diff object
             chart_diff: "ChartDiff" = cls(
                 source_chart=source_chart,
@@ -429,6 +443,7 @@ class ChartDiff:
                 chart_views=chart_views_score,
                 score_indicators_anomalies=chart_anomalies_score,
                 article_refs=article_refs,
+                df_approvals=df_approvals,
             )
 
             # Add last revision
@@ -464,11 +479,6 @@ class ChartDiff:
             chart_id=self.chart_id,
         )
         return history
-
-    def get_all_approvals_df(self) -> pd.DataFrame:
-        """Get history of chart diff."""
-        df = OWID_ENV.read_sql(f"SELECT * FROM chart_diff_approvals WHERE chartId = {self.chart_id}")
-        return df
 
     def get_last_chart_revision(self, session: Session, timestamp=None) -> gm.ChartRevisions:
         """Get history of chart diff."""
@@ -856,10 +866,7 @@ def _modified_chart_configs_on_staging(
     select
         c.id as chartId,
         MD5(cc.full) as chartChecksum,
-        cc.full as chartConfig,
-        c.lastEditedByUserId as chartLastEditedByUserId,
-        c.publishedByUserId as chartPublishedByUserId,
-        c.lastEditedAt as chartLastEditedAt
+        cc.full as chartConfig
     from charts as c
     join chart_configs as cc on c.configId = cc.id
     where
