@@ -143,6 +143,7 @@ fasttrack: .venv
 	@echo '==> Starting Fast-track on http://localhost:8082/'
 	.venv/bin/fasttrack --skip-auto-open --port 8082
 
+# Use `etlwiz --debug` to enable performance profiling
 wizard: .venv
 	@echo '==> Starting Wizard on http://localhost:8053/'
 	.venv/bin/etlwiz

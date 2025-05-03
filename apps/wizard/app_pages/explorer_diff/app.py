@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import random
 from concurrent.futures import ThreadPoolExecutor
@@ -8,6 +9,7 @@ import streamlit as st
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
+from apps.utils.google import read_gbq
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
 from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
@@ -18,6 +20,10 @@ from etl.files import yaml_dump
 from etl.grapher import model as gm
 
 log = get_logger()
+
+
+TODAY = dt.datetime.today()
+
 
 # Config
 st.set_page_config(
@@ -146,6 +152,55 @@ def _set_tab_title_size(font_size="2rem"):
     st.markdown(css, unsafe_allow_html=True)
 
 
+@st.cache_data(show_spinner=False, persist="disk")
+def get_explorer_pageviews(
+    explorer_slug: str,
+    date_end: str = TODAY.strftime("%Y-%m-%d"),
+    lookback_days: int = 5,
+) -> pd.DataFrame:
+    # Calculate start date from end date and lookback days
+    date_end_dt = dt.datetime.strptime(date_end, "%Y-%m-%d")
+    date_start = (date_end_dt - pd.Timedelta(days=lookback_days)).strftime("%Y-%m-%d")
+
+    # Convert date format for table suffixes (YYYY-MM-DD to YYYYMMDD)
+    date_start_suffix = date_start.replace("-", "")
+    date_end_suffix = date_end.replace("-", "")
+
+    # Prepare the query with table suffix filtering
+    query = f"""
+        WITH raw_views AS (
+            SELECT
+                PARSE_DATE('%Y%m%d', event_date) AS day,
+                (
+                    SELECT value.string_value
+                    FROM UNNEST(event_params) WHERE key = 'explorer_path'
+                ) AS explorer_path,
+                (
+                    SELECT value.string_value
+                    FROM UNNEST(event_params) WHERE key = 'explorer_view'
+                ) AS explorer_view
+            FROM `owid-analytics.analytics_253393922.events_*`
+            WHERE _TABLE_SUFFIX BETWEEN '{date_start_suffix}' AND '{date_end_suffix}'
+            AND event_name = 'owid.explorer_view'
+        )
+
+        SELECT
+            explorer_view,
+            COUNT(*) AS pageviews
+        FROM raw_views
+        WHERE explorer_path  = '/explorers/{explorer_slug}'
+        GROUP BY
+            explorer_view
+        ORDER BY
+            pageviews DESC
+    """
+
+    # Execute the query.
+    df_views = read_gbq(query, project_id="owid-analytics")
+
+    return df_views
+
+
 def main():
     st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
     st.title(
@@ -181,7 +236,68 @@ def main():
 
     all_dimensions = _extract_all_dimensions(explorer_views)
 
-    st.subheader("Select Explorer View Options")
+    # Sort dimensions alphabetically
+    dim_names = sorted(list(all_dimensions.keys()))
+
+    # Get pageviews
+    pageviews = get_explorer_pageviews(
+        explorer_slug,
+    )
+
+    def safe_json_loads(s):
+        try:
+            return json.loads(s)
+        except Exception:
+            return None
+
+    pageviews["explorer_view"] = pageviews["explorer_view"].apply(safe_json_loads)
+
+    pageviews["view"] = pageviews["explorer_view"].apply(lambda d: tuple(d[k] for k in dim_names) if d else None)
+
+    # Create columns for side by side comparison
+    col1, col2 = st.columns(2)
+    with col1:
+        st.subheader("Production Explorer")
+    with col2:
+        st.subheader("Staging Explorer")
+
+    for k, tup in enumerate(pageviews.iloc[:5].itertuples(index=False)):
+        view = tup.explorer_view
+
+        # TODO: we have to fix this!!!
+        if view is None:
+            continue
+
+        # Display pageviews and view dimensions using columns
+        cols = st.columns([1] + [1] * len(view))
+        with cols[0]:
+            st.metric("Pageviews", tup.pageviews)
+        for idx, (dim, val) in enumerate(view.items(), start=1):
+            with cols[idx]:
+                # Display each dimension in a read-only dropdown
+                st.selectbox(dim, options=[val], disabled=True, key=f"{k}_{explorer_slug}_{dim}_view")
+
+        # Create columns for side by side comparison
+        col1, col2 = st.columns(2)
+
+        kwargs = {
+            "explorer_slug": explorer_slug,
+            "view": view,
+            "default_display": st.session_state.get("default_display"),
+        }
+
+        with col1:
+            # This is the non-preview version of an explorer
+            explorer_chart(base_url="https://ourworldindata.org/explorers", **kwargs)
+
+        with col2:
+            assert OWID_ENV.site
+            # Show preview from a staging server to see changes instantly
+            explorer_chart(base_url=OWID_ENV.site + "/admin/explorers/preview", **kwargs)
+
+    return
+
+    st.subheader("Explorer Views")
 
     # Create random view button
     if st.button(f"🎲 Random view ({len(explorer_views)} views available)"):
@@ -231,6 +347,9 @@ def main():
         assert OWID_ENV.site
         # Show preview from a staging server to see changes instantly
         explorer_chart(base_url=OWID_ENV.site + "/admin/explorers/preview", **kwargs)
+
+    # TODO: don't end, make it possible to use both views and selection
+    return
 
     # Helper function to load explorer data
     def load_explorer_data(engine, columns):
