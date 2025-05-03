@@ -443,16 +443,21 @@ def _show_summary_top(chart_diffs):
     # Review status
     num_charts_total = len(st.session_state.chart_diffs)
     num_charts_listed = len(chart_diffs)
-    num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
-    text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
+    num_charts_approved = len([chart for chart in st.session_state.chart_diffs.values() if chart.is_approved])
+    num_charts_rejected = len([chart for chart in st.session_state.chart_diffs.values() if chart.is_rejected])
+    num_charts_reviewed = num_charts_approved + num_charts_rejected
+    text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed :small[:gray[(:material/thumb_up: {num_charts_approved} :material/thumb_down: {num_charts_rejected})]]"
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
         text_warning = f"{num_charts_total-num_charts_listed} charts are hidden due to filtering."
         text += f" :orange-badge[:small[{text_warning}]]"
-        st.markdown(text, help="To show all charts, refer to ⚙️ Options menu.")
+        st.markdown(
+            text,
+            help="The number of reviewed charts is only updated when the page is loaded. To show all charts, refer to ⚙️ Options menu.",
+        )
     else:
-        st.markdown(text)
+        st.markdown(text, help="The number of reviewed charts is only updated when the page is loaded.")
 
 
 def render_app():
