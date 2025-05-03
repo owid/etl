@@ -323,7 +323,7 @@ class ChartDiffShow:
             f":violet-badge[:material/auto_awesome: **Relevance**]: Estimated by combining chart views, article views and anomaly scores.\n\n"
             f":primary-badge[:material/remove_red_eye:] **Average number of daily chart views** in the last {ANALYTICS_NUM_DAYS} days.\n\n"
             f":primary-badge[:material/article:] **Number of articles** that use this chart.{articles_md}\n\n"
-            ":primary-badge[:material/scatter_plot:] **Anomaly score of the chart**, as estimated by Anomalist. This is a measure of the worst anomaly in the chart's indicators. A score of 0% means that the chart doesn't have noticeable outliers, while a score closer to 100% means that there is an indicator with a substantial outlier.\n\n"
+            ":primary-badge[:material/scatter_plot:] **Anomaly score of the chart**, as estimated by Anomalist. It is based on noticeable anomalies in the updated indicators in the chart compared to the old ones. A score of 0% means that the chart doesn't have noticeable outliers (relative to the previous indicators), while a score closer to 100% means that there is an indicator with a substantial outlier.\n\n"
         )
         with col2:
             st.markdown(
