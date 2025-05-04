@@ -686,6 +686,7 @@ def _create_explorer_legacy(
             name=explorer_name,
         )
     else:
+        raise NotImplementedError("Updating explorer in DB has been deprecated. Create it from scratch instead.")
         # Load explorer from database.
         explorer = ExplorerLegacy.from_db(explorer_name)
 
