@@ -376,7 +376,7 @@ tables:
           - Disaggregating this indicator by urban/rural location, region, or public/private management can help identify disparities in access to gender-sensitive school infrastructure.
           - Some limitations include potential discrepancies in how countries define or report "usable" or "functional" toilets, and whether cleanliness, maintenance, or disability access are accounted for.
 
-      initial_government_funding_per_primary_student__constant_international_dollar__xunit_intconst_1_fsgov_ffntr:
+      initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
         title: Initial government funding per primary student
         description_short: Government funding for each student enrolled in [primary education](#dod:primary-education), measured in constant international dollars.
         unit: "international $"
@@ -416,17 +416,6 @@ tables:
           - A higher percentage means more children are learning to read by the time they leave primary school.
           - Different countries may test students in different ways, which affects how results can be compared.
 
-      share_of_students_achieving_minimum_math_proficiency_in_early_primary_education:
-        title: Share of students achieving minimum math proficiency in early primary education
-        description_short: Minimum math proficiency for early [primary](#dod:primary-education) education means students in Grades 2 or 3 can demonstrate skills in number sense and computation, shape recognition, and spatial orientation.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows what share of students in Grades 2 or 3 meet basic expectations in mathematics.
-          - It measures whether children can work with numbers under 100, recognize basic shapes, and understand simple spatial ideas.
-          - A high value suggests that most students in early primary school are learning foundational math skills.
-          - The data comes from learning assessments taken during school—children not in school are not included.
-          - Differences in national testing methods can make comparisons between countries less reliable.
 
       share_of_students_achieving_minimum_math_proficiency_by_end_of_primary_education:
         title: Share of students achieving minimum math proficiency by the end of primary education
@@ -453,18 +442,6 @@ tables:
           - The data comes from school-based assessments, so it does not include students who left school before this stage.
           - Differences in national assessments mean results may not be perfectly comparable across countries.
           - Even so, this indicator helps track progress in making sure all students gain essential math skills by the end of compulsory education.
-
-      share_of_students_achieving_minimum_reading_proficiency_in_early_primary_education:
-        title: Share of students in early primary education achieving at least minimum reading proficiency
-        description_short: Minimum reading proficiency for early [primary](#dod:primary-education) education means students in grade 2 can read familiar words and extract information from sentences, while in grade 3, they read aloud fluently, understand short texts, and identify the main topic.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows the percentage of students in grades 2 or 3 who have developed basic reading skills.
-          - It includes recognizing familiar words, understanding sentences, and reading simple stories or information texts.
-          - A high value suggests that children are learning to read early, giving them a strong foundation for future learning.
-          - The data comes from tests given in schools, so it does not include children who are not enrolled or have dropped out.
-          - Results may vary depending on how each country designs and scores its reading assessments.
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
         title: Share of children achieving minimum reading proficiency by the end of lower-secondary age
