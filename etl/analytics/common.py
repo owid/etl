@@ -3,16 +3,19 @@
 TODO: We currently have many functions reading analytics (from MySQL and GBQ) in different places. We should gather those functions in this module.
 """
 
+import json
 import re
 import urllib.error
 import urllib.parse
 from datetime import datetime
+from io import BytesIO
 from typing import List, Optional
 
 import pandas as pd
+import requests
 from structlog import get_logger
 
-from etl.config import OWID_ENV
+from etl.config import METABASE_API_KEY, METABASE_SEMANTIC_LAYER_DATABASE_ID, METABASE_URL, OWID_ENV
 
 # Initialize logger.
 log = get_logger()
@@ -102,10 +105,57 @@ def read_datasette(
     return df
 
 
+def read_metabase(sql: str) -> pd.DataFrame:
+    """Retrieve data from the Metabase API using an arbitrary sql query.
+
+    NOTE: This function has been adapted from the analytics repo:
+    https://github.com/owid/analytics/blob/main/tutorials/metabase_data_download.py
+
+    """
+    # Prepare the header and body of the request to send to the Metabase API.
+    headers = {
+        "x-api-key": METABASE_API_KEY,
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        "Accept": "application/json",
+    }
+    body = {
+        "query": {
+            # Database corresponding to the Semantic Layer (DuckDB).
+            "database": METABASE_SEMANTIC_LAYER_DATABASE_ID,
+            "type": "native",
+            "native": {"query": re.sub(r"\s+", " ", sql.strip())},
+        }
+    }
+
+    # Note (copied from Bobbie in the analytics repo):
+    # Despite the documentation (https://www.metabase.com/docs/latest/api#tag/apidataset/POST/api/dataset/{export-format}),
+    # I cannot get the /api/dataset/csv endpoint to work when sending a dict (or json.dumps(dict)) to the POST body,
+    # so I instead urlencode the body. The url encoding is a little awkward – we cannot simply use urllib.parse.urlencode(body)
+    # b/c python dict single quotes need to be changed to double quotes. But we can't naively change all single quotes to
+    # double quotes b/c the sql query might include single quotes (and DuckDB doesn't allow double quotes). So the line below
+    # executes the url encoding without replacing any quotes within the sql query.
+    urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
+
+    # Send request.
+    response = requests.post(
+        f"{METABASE_URL}/api/dataset/csv",
+        headers=headers,
+        data=urlencoded,
+        timeout=30,
+    )
+    if not response.ok:
+        raise RuntimeError(f"Metabase API request failed with status code {response.status_code}: {response.text}")
+
+    # Create a dataframe with the returned data.
+    df = pd.read_csv(BytesIO(response.content))
+
+    return df
+
+
 def get_chart_events_by_chart_id(
     chart_ids: Optional[List[int]] = None,
-    min_date: str = DATE_MIN,
-    max_date: str = DATE_MAX,
+    date_min: str = DATE_MIN,
+    date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
     Fetch chart view events from Datasette, optionally filtered by chart IDs and minimum date.
@@ -113,10 +163,10 @@ def get_chart_events_by_chart_id(
     TODO: This function may not be necessary. Consider deleting.
     """
     where_clauses = []
-    if min_date:
-        where_clauses.append(f"v.day > '{min_date}'")
-    if max_date:
-        where_clauses.append(f"v.day <= '{max_date}'")
+    if date_min:
+        where_clauses.append(f"v.day > '{date_min}'")
+    if date_max:
+        where_clauses.append(f"v.day <= '{date_max}'")
     if chart_ids:
         id_list = ", ".join(str(cid) for cid in chart_ids)
         where_clauses.append(f"c.chart_id IN ({id_list})")
