@@ -17,3 +17,26 @@ steps:
   data://grapher/imf/2024-06-12/public_finances_modern_history:
     - data://garden/imf/2024-06-12/public_finances_modern_history
 
+  # SIPRI Military Expenditure Database
+  data://meadow/sipri/2024-07-08/military_expenditure:
+    - snapshot://sipri/2024-07-08/military_expenditure.xlsx
+  data://garden/sipri/2024-07-08/military_expenditure:
+    - data://meadow/sipri/2024-07-08/military_expenditure
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+  data://grapher/sipri/2024-07-08/military_expenditure:
+    - data://garden/sipri/2024-07-08/military_expenditure
+
+
+  # Global Military Spending Dataset
+  data://meadow/harvard/2024-11-26/global_military_spending_dataset:
+    - snapshot://harvard/2024-07-22/global_military_spending_dataset.rds
+    - snapshot://harvard/2024-11-26/global_military_spending_dataset_burden.rds
+  data://garden/harvard/2024-11-26/global_military_spending_dataset:
+    - data://meadow/harvard/2024-11-26/global_military_spending_dataset
+    - data://garden/demography/2024-07-15/population
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://garden/cow/2024-07-26/national_material_capabilities
+  data://grapher/harvard/2024-11-26/global_military_spending_dataset:
+    - data://garden/harvard/2024-11-26/global_military_spending_dataset
+
+
