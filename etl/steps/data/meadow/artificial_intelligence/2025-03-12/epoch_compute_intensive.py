@@ -18,6 +18,8 @@ def run() -> None:
     # Load data from snapshot.
     tb = snap.read()
 
+    tb = tb.rename(columns={"Country (of organization)": "Country (from Organization)"})
+
     #
     # Process data.
     #
