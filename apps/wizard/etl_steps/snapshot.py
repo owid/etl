@@ -154,7 +154,19 @@ def render_fields_init() -> List[str]:
 
     # namespace
     with col1:
-        field = ["namespace", st.empty(), st.container()]
+        prop_uri = "namespace"
+        args = {
+            "st_widget": st.selectbox,
+            "label": create_display_name_init_section("Namespace"),
+            "options": OPTIONS_NAMESPACES,
+            "help": "## Description\n\nInstitution or topic name",
+            "key": prop_uri,
+            "default_last": OPTIONS_NAMESPACES[0],
+            "accept_new_options": True,
+        }
+        if APP_STATE.args.dummy_data:
+            args["default_last"] = dummy_values[prop_uri]
+        field = APP_STATE.st_widget(**args)
         form.append(field)
     # short name
     with col2:
@@ -189,7 +201,9 @@ def render_fields_init() -> List[str]:
         field = APP_STATE.st_widget(**args)
         form.append(field)
 
-    with st_horizontal(vertical_alignment="flex-end"):
+    cols = st.columns([2, 3])
+    with cols[0]:
+        # with st_horizontal(vertical_alignment="flex-end"):
         key = "file_extension"
         args = {
             "st_widget": st.text_input,
@@ -204,25 +218,25 @@ def render_fields_init() -> List[str]:
 
         field = APP_STATE.st_widget(**args)
         form.append(field)
-
-    # Private dataset?
-    field = APP_STATE.st_widget(
-        st.toggle,
-        label="Make dataset private",
-        help="Check if you want to make the dataset private.",
-        key="is_private",
-        default_last=False,
-    )
-    form.append(field)
-    # Import local file?
-    field = APP_STATE.st_widget(
-        st.toggle,
-        label="Import dataset from local file",
-        help="Check if you want to import the snapshot from a local file.",
-        key="local_import",
-        default_last=False,
-    )
-    form.append(field)
+    with cols[1]:
+        # Private dataset?
+        field = APP_STATE.st_widget(
+            st.toggle,
+            label="Make dataset private",
+            help="Check if you want to make the dataset private.",
+            key="is_private",
+            default_last=False,
+        )
+        form.append(field)
+        # Import local file?
+        field = APP_STATE.st_widget(
+            st.toggle,
+            label="Import dataset from local file",
+            help="Check if you want to import the snapshot from a local file.",
+            key="local_import",
+            default_last=False,
+        )
+        form.append(field)
 
     return form
 
@@ -494,73 +508,6 @@ Only in rare occasions you will need to define a custom attribution.
     return form
 
 
-def render_namespace_field(form: List[Any]) -> List[str]:
-    """Render the namespace field within the form.
-
-    We want the namespace field to be a selectbox, but with the option to add a custom namespace.
-
-    This is a workaround to have repsonsive behaviour within a form.
-
-    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
-    """
-    # Assert there is only one element of type list
-    assert (
-        len([field for field in form if isinstance(field, list)]) == 1
-    ), "Only one element in the form is allowed to be of type list!"
-
-    # Get relevant values from schema
-    prop_uri = "namespace"
-    display_name = create_display_name_init_section("Namespace")
-
-    # Main decription
-    help_text = "## Description\n\nInstitution or topic name"
-
-    # Options
-    DEFAULT_OPTION = OPTIONS_NAMESPACES[0]
-
-    # Default option in select box for custom license
-    CUSTOM_OPTION = "Custom namespace..."
-    # Render and get element depending on selection in selectbox
-    for field in form:
-        if isinstance(field, list) and field[0] == "namespace":
-            with field[1]:
-                if APP_STATE.args.dummy_data:
-                    namespace_field = APP_STATE.st_widget(
-                        st.selectbox,
-                        label=display_name,
-                        options=[CUSTOM_OPTION] + OPTIONS_NAMESPACES,
-                        help=help_text,
-                        key=prop_uri,
-                        default_last=dummy_values[prop_uri],
-                    )
-                else:
-                    namespace_field = APP_STATE.st_widget(
-                        st.selectbox,
-                        label=display_name,
-                        options=[CUSTOM_OPTION] + OPTIONS_NAMESPACES,
-                        help=help_text,
-                        key=prop_uri,
-                        default_last=DEFAULT_OPTION,
-                    )
-            with field[2]:
-                if namespace_field == CUSTOM_OPTION:
-                    namespace_field = APP_STATE.st_widget(
-                        st.text_input,
-                        label="↳ *Use custom namespace*",
-                        placeholder="",
-                        help="Enter custom namespace.",
-                        key=f"{prop_uri}_custom",
-                    )
-
-    # Remove list from form (former license st.empty tuple)
-    form = [f for f in form if not isinstance(f, list)]
-
-    # Add license field
-    form.append(namespace_field)  # type: ignore
-
-    return form
-
-
 def update_state() -> None:
     """Submit form."""
     # Create form
@@ -596,8 +543,10 @@ if st.session_state["show_form"]:
     with form_widget.form("form"):
         # 1) Show fields for initial configuration (create directories, etc.)
         # st.header("Config")
-        st.markdown("Note that sometimes some fields might not be available (even if they are labelled as required)")
-        form_init = render_fields_init()
+        st.markdown(
+            ":small[:gray[Some fields might not be available sometimes (even if they are labelled as required)]]"
+        )
+        render_fields_init()
 
         # 2) Show fields for metadata fields
         # st.header("Metadata")
@@ -605,11 +554,11 @@ if st.session_state["show_form"]:
         #     "Fill the following fields to help us fill all the created files for you! Note that sometimes some fields might not be available (even if they are labelled as required)."
         # )
         # Get categories
-        for k, v in SCHEMA_ORIGIN.items():
-            if "category" not in v:
-                print(k)
-                print(v)
-                # raise ValueError(f"Category not found for {k}")
+        # for k, v in SCHEMA_ORIGIN.items():
+        # if "category" not in v:
+        #     print(k)
+        #     print(v)
+        # raise ValueError(f"Category not found for {k}")
         categories_in_schema = {v["category"] for k, v in SCHEMA_ORIGIN.items()}
         assert categories_in_schema == set(
             ACCEPTED_CATEGORIES
@@ -619,9 +568,6 @@ if st.session_state["show_form"]:
 
         # 3) Submit
         submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=update_state)
-
-    # 2.1) Create fields for namespace (responsive within form)
-    form = render_namespace_field(form_init)
 
     # 2.1) Create fields for attribution (responsive within form)
     form = render_attribution_field(form_metadata)

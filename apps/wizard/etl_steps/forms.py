@@ -445,10 +445,6 @@ class SnapshotForm(StepForm):
         data["origin_version"] = data["origin.version_producer"]
         data["dataset_manual_import"] = data["local_import"]
 
-        # Handle custom namespace
-        if "namespace_custom" in data:
-            data["namespace"] = str(data["namespace_custom"])
-
         # Handle custom license
         if "origin.license.name_custom" in data:
             data["license_name"] = data["origin.license.name_custom"]
