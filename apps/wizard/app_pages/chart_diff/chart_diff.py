@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
-import streamlit as st
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
@@ -1010,6 +1009,7 @@ def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbos
     return False
 
 
+# TODO: the following functions rely on streamlit. However, we would like to decouple this module from streamlit.
 @st_cache_data(custom_text="Retrieving analytics on chart views...")
 def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
     # Get chart views
