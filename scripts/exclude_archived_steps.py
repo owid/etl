@@ -132,12 +132,8 @@ def main(settings_scope, dry_run):
             if key not in ["files.exclude", "search.exclude"]:
                 reordered_settings[key] = value
 
-        # Sort the exclude entries
-        files_exclude = OrderedDict(sorted(settings["files.exclude"].items()))
-        search_exclude = OrderedDict(sorted(settings["search.exclude"].items()))
-
-        reordered_settings["files.exclude"] = files_exclude
-        reordered_settings["search.exclude"] = search_exclude
+        reordered_settings["files.exclude"] = settings["files.exclude"]
+        reordered_settings["search.exclude"] = settings["search.exclude"]
 
         settings_path.write_text(commentjson.dumps(reordered_settings, indent=2))
 
