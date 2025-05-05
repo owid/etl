@@ -491,11 +491,11 @@ class SnapshotForm(StepForm):
         self.check_is_version(fields_version)
 
         # License
-        if self.license_name != "":
+        if self.license_name == "":
             raise ValueError("License name must be present!")
 
         # Attribution
-        if self.attribution != "":
+        if self.attribution == "":
             raise ValueError("attribution must be present!")
 
     @property
