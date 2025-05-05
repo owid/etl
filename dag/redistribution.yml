@@ -128,6 +128,7 @@ steps:
     - data://garden/cow/2024-07-26/national_material_capabilities
     - data://garden/countries/2024-08-27/gleditsch
     - data://meadow/harvard/2025-04-28/global_military_spending_dataset
+    - data://garden/regions/2023-01-01/regions
   data://grapher/harvard/2025-04-28/global_military_spending_dataset:
     - data://garden/harvard/2025-04-28/global_military_spending_dataset
 

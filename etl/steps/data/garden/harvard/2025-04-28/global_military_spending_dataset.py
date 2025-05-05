@@ -15,6 +15,12 @@ MILEX_INDICATOR = "milex_con_2022_sipri"
 # Define burden indicators I need
 BURDEN_INDICATORS = ["milexgdp", "milexsurplus1095", "milexsurplus365", "milexsurplus730"]
 
+# Define regions to aggregate
+REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
+
+# Define maximum fraction of allowed nans per year for regional aggregations
+FRAC_ALLOWED_NANS_PER_YEAR = 0.2
+
 
 def run() -> None:
     #
@@ -25,6 +31,7 @@ def run() -> None:
     ds_population = paths.load_dataset("population")
     ds_gleditsch = paths.load_dataset("gleditsch")
     ds_nmc = paths.load_dataset("national_material_capabilities")
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow["global_military_spending_dataset"].reset_index()
@@ -55,6 +62,15 @@ def run() -> None:
     tb = calculate_milex_per_capita(tb=tb, ds_population=ds_population)
 
     tb = calculate_milex_per_military_personnel(tb=tb, tb_nmc=tb_nmc)
+
+    # Add regional aggregations
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        ds_regions=ds_regions,
+        regions=REGIONS,
+        aggregations={"milex_estimate": "sum"},
+        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    )
 
     tb = tb.format(["country", "year"])
 
