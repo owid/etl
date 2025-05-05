@@ -179,25 +179,43 @@ tables:
           - Includes all categories of operations during which spills occurred.
 
       decadal_bel_700t:
-        title: Decadal medium oil spills (7–700 tonnes)
+        title: Decadal average number of medium oil spills (7–700 tonnes)
         unit: spills
+        description_key:
+          - Medium oil spills are defined as those involving between 7 and 700 tonnes of oil.
+          - These spills are significant but generally less severe than large spills.
+          - They often result from operational errors or equipment failures.
+        description_processing: |-
+          The decadal average number of medium oil spills is calculated as the average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
         presentation:
           grapher_config:
             note: |-
               {definitions.footnote_decadal}
 
       decadal_ab_700t:
-        title: Decadal large oil spills (>700 tonnes)
+        title: Decadal average number of large oil spills (>700 tonnes)
         unit: spills
+        description_key:
+          - Large oil spills involve the release of more than 700 tonnes of oil.
+          - Such spills are typically associated with major incidents like collisions or groundings.
+        description_processing: |-
+          The decadal average number of large oil spills is calculated as the average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
         presentation:
           grapher_config:
             note: |-
               {definitions.footnote_decadal}
 
       decadal_oil_spilled:
-        title: Decadal quantity of oil spilled
+        title: Decadal average quantity of oil spilled
         unit: tonnes
         short_unit: t
+        description_short: Decadal average quantity of oil spilled.
+        description_key:
+          - Decadal average quantity of oil lost to the environment from tanker spills.
+          - Includes oil that was burned, remained in sunken vessels, or otherwise unrecovered.
+          - Annual figures can vary significantly due to the occurrence of large spills.
+        description_processing: |-
+          The decadal average quantity of oil spilled is calculated as the average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
         presentation:
           grapher_config:
             note: |-
