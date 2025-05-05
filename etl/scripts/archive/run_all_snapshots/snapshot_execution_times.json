@@ -1262,5 +1262,19 @@
             "identical": false,
             "duration": 2.433
         }
+    ],
+    "Surface temperature": [
+        {
+            "name": "Surface temperature",
+            "status": "SUCCESS",
+            "identical": false,
+            "duration": 876.56
+        },
+        {
+            "name": "Surface temperature",
+            "status": "SUCCESS",
+            "identical": false,
+            "duration": 4.102
+        }
     ]
 }

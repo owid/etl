@@ -19,7 +19,7 @@ import time
 from collections import defaultdict
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Set
+from typing import Optional, Set
 
 import click
 import requests
@@ -207,7 +207,7 @@ class ExecutionResult:
 def run_updates(
     group_updates: list[SnapshotUpdate],
     create_pr: bool,
-    timeout: int,
+    timeout: Optional[int] = None,
     continue_on_failure: bool = False,
     dry_run: bool = False,
 ) -> list[ExecutionResult]:
@@ -250,8 +250,11 @@ def run_updates(
             original_outs = yaml.safe_load(original_dvc_content)["outs"][0]
 
             # Try to execute snapshot.
+            kwargs = {}
+            if timeout:
+                kwargs["timeout"] = timeout
             subprocess.run(
-                ["python", snapshot_script, "--upload"], check=True, capture_output=True, timeout=timeout, text=True
+                ["python", snapshot_script, "--upload"], check=True, capture_output=True, text=True, **kwargs
             )
 
             # Load md5 and size from the (possibly) updated file
@@ -308,11 +311,24 @@ def run_updates(
 @click.option("--dry-run", is_flag=True, help="Run the script in dry-run mode.")
 @click.option("--create-pr", is_flag=True, help="If there's an update, create a PR.")
 @click.option("--filter", type=str, help="Process only snapshots that include the given substring.")
-@click.option("--timeout", type=int, default=100, help="Timeout in seconds for each snapshot.")
+@click.option(
+    "--timeout",
+    type=int,
+    default=None,
+    help="Timeout in seconds for each snapshot.",
+)
 @click.option("--skip", is_flag=True, help="Skip snapshots that have already been processed.")
 @click.option("--all", is_flag=True, help="Run snapshots even if they don't have `autoupdate` set.")
 @click.option("--continue-on-failure", is_flag=True, help="Continue running snapshots even if some fail.")
-def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool, all: bool, continue_on_failure: bool):
+def main(
+    dry_run: bool,
+    create_pr: bool,
+    filter: str,
+    timeout: Optional[int],
+    skip: bool,
+    all: bool,
+    continue_on_failure: bool,
+):
     # Create a dictionary to store the execution results: duration (in seconds) or "FAILED"
     if OUTPUT_FILE.exists():
         # Load existing results from the JSON file to allow resuming.
