@@ -46,6 +46,8 @@
       "file": ".copilot-commit-message-instructions.md"
     }
   ],
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "chat.promptFiles": true,
 
   // Settings for the "Run Until Cursor" extension
   "runUntilCursor.execDelay": 100,    // Delay before executing code (default: 100ms)
