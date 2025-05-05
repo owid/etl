@@ -1020,7 +1020,7 @@ def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
 @st_cache_data(custom_text="Retrieving anomalies in indicators used in charts to review...", show_time=True)
 def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
     # Anomalies
-    df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("time_change",))
+    df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("version_change",))
     return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # type: ignore
 
 
