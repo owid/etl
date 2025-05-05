@@ -107,6 +107,8 @@ def run() -> None:
 
     tb_garden = add_energy_access_variables(tb_garden)
 
+    tb_garden = add_patents_articles_per_million_people(tb_garden)
+
     ####################################################################################################################
 
     #
@@ -792,5 +794,19 @@ def add_energy_access_variables(tb: Table) -> Table:
     # Calculate number of people with and without access to clean cooking fuels
     tb["eg_cft_accs_zs_number"] = tb["eg_cft_accs_zs"] / 100 * tb["sp_pop_totl"]
     tb["eg_cft_accs_zs_without_number"] = tb["eg_cft_accs_zs_without"] / 100 * tb["sp_pop_totl"]
+    tb = tb.format(["country", "year"])
+    return tb
+
+
+def add_patents_articles_per_million_people(tb: Table) -> Table:
+    """
+    Add patents and articles per million people.
+    """
+    tb = tb.reset_index()
+
+    # Calculate patents and articles per million people
+    tb["patents_per_million_people"] = tb["ip_pat_resd"] / tb["sp_pop_totl"] * 1000000
+    tb["articles_per_million_people"] = tb["ip_jrn_artc_sc"] / tb["sp_pop_totl"] * 1000000
+
     tb = tb.format(["country", "year"])
     return tb

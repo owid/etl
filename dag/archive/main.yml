@@ -473,6 +473,20 @@ steps:
   data://grapher/imf/2024-11-25/world_economic_outlook:
     - data://garden/imf/2024-11-25/world_economic_outlook
 
+  # Patents & journal articles (World Bank, United Nations)
+  data://garden/research_development/2024-05-20/patents_articles:
+    - data://garden/worldbank_wdi/2024-05-20/wdi
+    - data://garden/demography/2023-03-31/population
+  data://grapher/research_development/2024-05-20/patents_wdi_unwpp:
+    - data://garden/research_development/2024-05-20/patents_articles
+
+  # Oil Spills
+  data://meadow/itopf/2024-10-16/oil_spills:
+    - snapshot://itopf/2024-10-16/oil_spills.pdf
+  data://garden/itopf/2024-10-16/oil_spills:
+    - data://meadow/itopf/2024-10-16/oil_spills
+  data://grapher/itopf/2024-10-16/oil_spills:
+    - data://garden/itopf/2024-10-16/oil_spills
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
