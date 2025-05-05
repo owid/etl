@@ -68,7 +68,6 @@ def run(dest_dir: str) -> None:
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["spill_type", "year"])
-    print(tb)
     for column in tb.columns:
         tb[column].metadata.origins = [snap.metadata.origin]
 
@@ -134,7 +133,7 @@ def extract_spill_number(text):
     """
 
     # Define pattern to extract number of spills data
-    pattern = r"(?<!\d)(19[7-9]\d|20[0-1]\d|2020|2021|2022|2023)(?:\s+(\d+)\s+(\d+))?"
+    pattern = r"(?<!\d)(19[7-9]\d|20[0-1]\d|2020|2021|2022|2023|2024)(?:\s+(\d+)\s+(\d+))?"
 
     # Extract matches of number of spills data
     matches = re.findall(pattern, text)
