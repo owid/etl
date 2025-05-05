@@ -213,7 +213,6 @@ tables:
         description_key:
           - Decadal average quantity of oil lost to the environment from tanker spills.
           - Includes oil that was burned, remained in sunken vessels, or otherwise unrecovered.
-          - Annual figures can vary significantly due to the occurrence of large spills.
         description_processing: |-
           The decadal average quantity of oil spilled is calculated as the average over the subsequent ten-year period. For example, the figures for the 1990s is the average from 1990 (inclusive) to 1999.
         presentation:
