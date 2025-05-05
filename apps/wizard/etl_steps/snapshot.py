@@ -32,7 +32,6 @@ FIELD_TYPES_SELECTBOX = [
     "origin.attribution",
     "origin.license.name",
 ]
-FIELD_TYPES_SELECT = ["origin.license.name"]
 # Get current directory
 CURRENT_DIR = Path(__file__).parent
 # Accepted schema categories
@@ -69,6 +68,15 @@ if "snapshot_file" not in st.session_state:
 #########################################################
 # FUNCTIONS & CLASSES ###################################
 #########################################################
+
+
+def _add_dummy_default(
+    args, key: str, default_colname: Optional[str] = None, default_value: Optional[Any] = None
+) -> None:
+    if default_colname is None:
+        default_colname = "value"
+    if APP_STATE.args.dummy_data:
+        args[default_colname] = dummy_values.get(key, default_value)
 
 
 def _color_req_level(req_level: str) -> str:
@@ -166,8 +174,7 @@ def render_fields_init():
             "default_last": OPTIONS_NAMESPACES[0],
             "accept_new_options": True,
         }
-        if APP_STATE.args.dummy_data:
-            args["default_last"] = dummy_values[prop_uri]
+        _add_dummy_default(args, prop_uri, "default_last")
         APP_STATE.st_widget(**args)
 
     # short name
@@ -175,15 +182,13 @@ def render_fields_init():
         key = "short_name"
         args = {
             "st_widget": st.text_input,
+            "key": key,
             "label": create_display_name_init_section("short name"),
             "help": "## Description\n\nDataset short name using [snake case](https://en.wikipedia.org/wiki/Snake_case). Example: natural_disasters",
             "placeholder": "Example: 'cherry_blossom'",
-            "key": key,
             "default_last": "",
         }
-        if APP_STATE.args.dummy_data:
-            args["value"] = dummy_values[key]
-
+        _add_dummy_default(args, key)
         APP_STATE.st_widget(**args)
 
     # snapshot version
@@ -191,14 +196,13 @@ def render_fields_init():
         key = "snapshot_version"
         args = {
             "st_widget": st.text_input,
+            "key": key,
             "label": create_display_name_init_section("version"),
             "help": "## Description\n\nVersion of the snapshot dataset (by default, the current date, or exceptionally the publication date).",
             "placeholder": f"Example: '{utils.DATE_TODAY}'",
-            "key": key,
             "default_last": utils.DATE_TODAY,
         }
-        if APP_STATE.args.dummy_data:
-            args["value"] = dummy_values[key]
+        _add_dummy_default(args, key)
 
         APP_STATE.st_widget(**args)
 
@@ -209,13 +213,12 @@ def render_fields_init():
         args = {
             "st_widget": st.text_input,
             "label": create_display_name_init_section("file extension"),
+            "key": key,
             "help": "## Description\n\nFile extension (without the '.') of the file to be downloaded.",
             "placeholder": "'csv', 'xls', 'zip'",
-            "key": key,
             "default_last": "",
         }
-        if APP_STATE.args.dummy_data:
-            args["value"] = dummy_values[key]
+        _add_dummy_default(args, key)
 
         APP_STATE.st_widget(**args)
 
@@ -270,29 +273,21 @@ def render_fields_from_schema(
                 render_fields_from_schema(props["properties"], prop_uri)
         # Render
         else:
-            # Define display, help and placeholder texts
-            display_name = create_display_name_snap_section(props, name, property_name)
-            # Render field
-            ## Text areas
-            if prop_uri in FIELD_TYPES_TEXTAREA:
-                # Use text area for these fields
-                kwargs = {
-                    "label": display_name,
-                    "help": create_description(field=props),
-                    "placeholder": props["examples"][:3] if isinstance(props["examples"], str) else "",
-                    "key": prop_uri,
-                }
-                if APP_STATE.args.dummy_data:
-                    kwargs["value"] = dummy_values.get(prop_uri, "")
+            ## Default arguments
+            kwargs = {
+                # Define display, help and placeholder texts
+                "label": create_display_name_snap_section(props, name, property_name),
+                "help": create_description(field=props),
+                "key": prop_uri,
+            }
 
-                if categories:
-                    with containers[props["category"]]:
-                        APP_STATE.st_widget(st_widget=st.text_area, **kwargs)  # type: ignore
-                elif container:
-                    with container:
-                        APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
-                else:
-                    APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
+            ## Text area
+            if prop_uri in FIELD_TYPES_TEXTAREA:
+                kwargs = {
+                    "st_widget": st.text_area,
+                    **kwargs,
+                    "placeholder": props["examples"][:3] if isinstance(props["examples"], str) else "",
+                }
 
             ## Select box (with custom values option)
             elif prop_uri in FIELD_TYPES_SELECTBOX:
@@ -305,46 +300,36 @@ def render_fields_from_schema(
                 else:
                     options = sorted(props["options"])
                 kwargs = {
-                    "label": display_name,
-                    "help": create_description(field=props),
-                    "key": prop_uri,
+                    "st_widget": st.selectbox,
+                    **kwargs,
                     "options": options,
                     "default_last": options[0],
                     "accept_new_options": True,
                 }
 
-                if categories:
-                    with containers[props["category"]]:
-                        APP_STATE.st_widget(st.selectbox, **kwargs)  # type: ignore
-                elif container:
-                    with container:
-                        APP_STATE.st_widget(st.selectbox, **kwargs)  # type: ignore
-                else:
-                    APP_STATE.st_widget(st.selectbox, **kwargs)  # type: ignore
-
             ## Text input
             else:
-                # default_value = DEFAULT_VALUES.get(prop_uri, "")
-                # Simple text input for the rest
                 kwargs = {
-                    "label": display_name,
-                    "help": create_description(field=props),
-                    "key": prop_uri,
+                    "st_widget": st.text_input,
+                    **kwargs,
                     "placeholder": "Examples: " + ", ".join([f"'{ex}'" for ex in props["examples"]])
                     if props["examples"]
                     else "",
                 }
-                if APP_STATE.args.dummy_data:
-                    kwargs["value"] = dummy_values.get(prop_uri, "")
 
-                if categories:
-                    with containers[props["category"]]:
-                        APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
-                elif container:
-                    with container:
-                        APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
-                else:
-                    APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
+            ## Dummy data
+            if prop_uri not in FIELD_TYPES_SELECTBOX:
+                _add_dummy_default(kwargs, prop_uri, default_value="")
+
+            # Render field in corresponding container
+            if categories:
+                with containers[props["category"]]:
+                    APP_STATE.st_widget(**kwargs)  # type: ignore
+            elif container:
+                with container:
+                    APP_STATE.st_widget(**kwargs)  # type: ignore
+            else:
+                APP_STATE.st_widget(**kwargs)  # type: ignore
 
 
 def update_state() -> None:
@@ -440,7 +425,6 @@ if submitted:
             st.markdown("Verify that generated files are correct and update them if necessary.")
             # 2/ Run snapshot step
             st.markdown("#### 2. Run snapshot step")
-            args = []
             if form.dataset_manual_import:
                 s_file = st.text_input(
                     label="Select local file to import", placeholder="path/to/file.csv", key="snapshot_file"
@@ -457,8 +441,6 @@ if submitted:
 
             st.markdown("#### 3. Proceed to next step")
             st_wizard_page_link("data", use_container_width=True, border=True)
-            # st.markdown("Or use **Express** mode to create a Meadow, Garden and Grapher steps at once.")
-            # st_wizard_page_link("express", use_container_width=True, border=True)
 
         # User message
         st.toast("Templates generated. Read the next steps.", icon="✅")
@@ -482,7 +464,6 @@ if st.session_state["run_step"]:
     script_path = f"{SNAPSHOTS_DIR}/{form.namespace}/{form.snapshot_version}/{form.short_name}.py"
 
     # Build command
-    command = f"uv run python {script_path}"
     commands = ["uv", "run", "python", script_path]
     if form.dataset_manual_import:
         # Get snapshot local file
@@ -498,4 +479,4 @@ if st.session_state["run_step"]:
             tb_str = "".join(traceback.format_exception(e))
             st.error(tb_str)
         else:
-            st.write("Snapshot should be uploaded!")
+            st.write("Snapshot should have been uploaded!")

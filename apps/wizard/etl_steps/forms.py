@@ -168,7 +168,6 @@ class DataForm(StepForm):
     steps_to_create: List[str]
     # Common
     namespace: str
-    namespace_custom: Optional[str] = None  # Custom
     short_name: str
     version: str
     dag_file: str
@@ -187,10 +186,6 @@ class DataForm(StepForm):
     def __init__(self: Self, **data: Any) -> None:  # type: ignore[reportInvalidTypeVarUse]
         """Construct class."""
         data["add_to_dag"] = data["dag_file"] != ADD_DAG_OPTIONS[0]
-
-        # Handle custom namespace
-        if ("namespace_custom" in data) and data["namespace_custom"] is not None:
-            data["namespace"] = str(data["namespace_custom"])
 
         # Handle update_period_days. Obtain from date.
         if "update_period_date" in data:
