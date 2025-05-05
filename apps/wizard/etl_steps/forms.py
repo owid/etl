@@ -491,10 +491,12 @@ class SnapshotForm(StepForm):
         self.check_is_version(fields_version)
 
         # License
-        assert self.license_name != "", "License name must be present!"
+        if self.license_name != "":
+            raise ValueError("License name must be present!")
 
         # Attribution
-        assert self.attribution != "", "attribution must be present!"
+        if self.attribution != "":
+            raise ValueError("attribution must be present!")
 
     @property
     def metadata(self: Self) -> Dict[str, Any]:  # type: ignore[reportIncompatibleMethodOverride]
