@@ -574,12 +574,12 @@ steps:
     - data://garden/un/2024-08-27/un_sdg
 
   # Oil Spills
-  data://meadow/itopf/2024-10-16/oil_spills:
-    - snapshot://itopf/2024-10-16/oil_spills.pdf
-  data://garden/itopf/2024-10-16/oil_spills:
-    - data://meadow/itopf/2024-10-16/oil_spills
-  data://grapher/itopf/2024-10-16/oil_spills:
-    - data://garden/itopf/2024-10-16/oil_spills
+  data://meadow/itopf/2025-05-05/oil_spills:
+    - snapshot://itopf/2025-05-05/oil_spills.pdf
+  data://garden/itopf/2025-05-05/oil_spills:
+    - data://meadow/itopf/2025-05-05/oil_spills
+  data://grapher/itopf/2025-05-05/oil_spills:
+    - data://garden/itopf/2025-05-05/oil_spills
 
   # UN SD census data
   data://meadow/un/2024-10-21/census_dates:
