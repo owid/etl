@@ -46,7 +46,7 @@ class ChartDiffScores:
 
     @property
     def anomaly_pretty(self) -> str:
-        """Get anomaly score as string."""
+        """Get anomaly score as string ready to show."""
         if self.anomaly is not None:
             return f"{int(self.anomaly * 100)}"
         else:
@@ -54,7 +54,7 @@ class ChartDiffScores:
 
     @property
     def chart_views_pretty(self) -> str:
-        """Get anomaly score as string."""
+        """Get chart views as string ready to show."""
         if self.chart_views is not None:
             return f"{self.chart_views:.2f}"
         else:
@@ -180,7 +180,7 @@ class ChartDiff:
         self.article_refs = article_refs if article_refs else []
         self.scores = ChartDiffScores(
             chart_views=chart_views,
-            anomaly=score_indicators_anomalies if score_indicators_anomalies else 0,
+            anomaly=score_indicators_anomalies if score_indicators_anomalies is not None else 0,
             num_articles=len(self.article_refs),
         )
 
