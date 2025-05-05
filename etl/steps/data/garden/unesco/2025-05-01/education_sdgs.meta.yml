@@ -416,33 +416,6 @@ tables:
           - A higher percentage means more children are learning to read by the time they leave primary school.
           - Different countries may test students in different ways, which affects how results can be compared.
 
-
-      share_of_students_achieving_minimum_math_proficiency_by_end_of_primary_education:
-        title: Share of students achieving minimum math proficiency by the end of primary education
-        description_short: Minimum math proficiency for the end of [primary](#dod:primary-education) education means students can demonstrate skills in number sense and computation, basic measurement, reading, interpreting, and constructing graphs, spatial orientation, and number patterns.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows what share of students have mastered key math skills by the end of primary school.
-          - It includes skills like working with numbers, measuring objects, understanding graphs, recognizing shapes in space, and spotting patterns.
-          - Students are usually assessed around Grade 6, depending on when primary school ends in each country.
-          - A high value suggests that many students are leaving primary school with a solid foundation in mathematics.
-          - The data comes from school-based assessments, so it does not reflect the learning levels of children who are not in school.
-          - Different assessment systems across countries can limit how directly results can be compared.
-
-      share_of_students_achieving_minimum_math_proficiency_by_end_of_lower_secondary_education:
-        title: Share of students achieving minimum math proficiency by the end of lower-secondary education
-        description_short: Minimum math proficiency for the end of [lower-secondary](#dod:lower-secondary-education) education means students demonstrate skills in computation, application problems, matching tables and graphs, and making use of algebraic representations.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows what share of students have mastered key math skills by the time they finish lower-secondary school.
-          - It includes solving real-world problems, using graphs and tables, doing calculations, and understanding basic algebra.
-          - A high value means most students are building strong mathematical skills that can prepare them for higher education or work.
-          - The data comes from school-based assessments, so it does not include students who left school before this stage.
-          - Differences in national assessments mean results may not be perfectly comparable across countries.
-          - Even so, this indicator helps track progress in making sure all students gain essential math skills by the end of compulsory education.
-
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
         title: Share of children achieving minimum reading proficiency by the end of lower-secondary age
         description_short: Percentage of children at [lower-secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards, including the ability to connect main ideas across different text types, understand the author’s intentions, and draw conclusions from the text, adjusted for national school completion rates.
