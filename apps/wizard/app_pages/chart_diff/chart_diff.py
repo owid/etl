@@ -15,6 +15,7 @@ from structlog import get_logger
 from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
+from apps.wizard.utils.components import st_cache_data
 from apps.wizard.utils.io import get_all_changed_catalog_paths
 from etl.analytics.common import get_article_views_last_n_days, get_chart_views_last_n_days
 from etl.config import OWID_ENV
@@ -462,11 +463,14 @@ class ChartDiff:
                 reg_num_articles = max(reg_num_articles, chart_diff.scores.num_articles or 1)
                 reg_anomaly = max(reg_anomaly, chart_diff.scores.anomaly or 1)
             for chart_diff in chart_diffs:
-                chart_diff.scores.estimate_relevance(
-                    reg_chart_views=reg_chart_views,
-                    reg_num_articles=reg_num_articles,
-                    reg_anomaly=reg_anomaly,
-                )
+                if chart_diff.is_draft:
+                    chart_diff.scores._relevance = 0
+                else:
+                    chart_diff.scores.estimate_relevance(
+                        reg_chart_views=reg_chart_views,
+                        reg_num_articles=reg_num_articles,
+                        reg_anomaly=reg_anomaly,
+                    )
 
         return chart_diffs
 
@@ -1006,21 +1010,21 @@ def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbos
     return False
 
 
-@st.cache_data
+@st_cache_data(custom_text="Retrieving analytics on chart views...")
 def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
     # Get chart views
     df_analytics = get_chart_views_last_n_days(chart_ids, ANALYTICS_NUM_DAYS)
     return df_analytics.set_index("chart_id")["views_daily"].to_dict()  # type: ignore
 
 
-@st.cache_data
+@st_cache_data(custom_text="Retrieving anomalies in indicators used in charts to review...", show_time=True)
 def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
     # Anomalies
-    df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("version_change",))
+    df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("time_change",))
     return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # type: ignore
 
 
-@st.cache_data
+@st_cache_data(custom_text="Retrieving analytics on article references...")
 def get_chart_in_article_views_cached(chart_ids: List[int]) -> Dict[int, List[ArticleRef]]:
     # Articles
     df_articles = get_article_views_last_n_days(chart_ids, 30)
