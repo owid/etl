@@ -450,11 +450,11 @@ def _show_summary_top(chart_diffs):
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
-        text_warning = f"{num_charts_total-num_charts_listed} charts are hidden due to filtering."
+        text_warning = f"{num_charts_total-num_charts_listed} charts are hidden (already reviewed, or filtered)."
         text += f" :orange-badge[:small[{text_warning}]]"
         st.markdown(
             text,
-            help="The number of reviewed charts is only updated when the page is loaded. To show all charts, refer to ⚙️ Options menu.",
+            help="**Notes**\n\n- By default, only charts that haven't been reviewed are shown. You can change this behavior in the ⚙️ Options menu.\n- The displayed information on the number of charts reviewed or hidden is not updated dynamically, but only when the page is refreshed.",
         )
     else:
         st.markdown(text, help="The number of reviewed charts is only updated when the page is loaded.")
@@ -476,7 +476,10 @@ def render_app():
 
         # Show diffs
         if len(st.session_state.chart_diffs_filtered) == 0:
-            st.warning("No charts to be shown. Try changing the filters in the Options menu.")
+            if len(st.session_state.chart_diffs) == 0:
+                st.warning("No charts to be shown. Try changing the filters in the Options menu.")
+            else:
+                _show_summary_top([chart for chart in st.session_state.chart_diffs_filtered.values()])
         else:
             # Show changed charts (modified, new, etc.)
             if st.session_state.chart_diffs_filtered:
