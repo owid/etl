@@ -11,7 +11,7 @@ from apps.utils.files import generate_step
 from apps.wizard import utils
 from apps.wizard.etl_steps.forms import SnapshotForm
 from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT, SCHEMA_ORIGIN
-from apps.wizard.utils.components import preview_file, st_horizontal, st_wizard_page_link
+from apps.wizard.utils.components import preview_file, st_wizard_page_link
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 
@@ -27,6 +27,10 @@ FIELD_TYPES_TEXTAREA = [
     "origin.description_snapshot",
     "origin.description",
     "origin.citation_full",
+]
+FIELD_TYPES_SELECTBOX = [
+    "origin.attribution",
+    "origin.license.name",
 ]
 FIELD_TYPES_SELECT = ["origin.license.name"]
 # Get current directory
@@ -146,10 +150,8 @@ def create_description(field: Dict[str, Any]) -> str:
     return description
 
 
-def render_fields_init() -> List[str]:
+def render_fields_init():
     """Render fields to create directories and all."""
-    form = []
-
     col1, col2, col3 = st.columns([2, 2, 1], vertical_alignment="bottom")
 
     # namespace
@@ -166,8 +168,8 @@ def render_fields_init() -> List[str]:
         }
         if APP_STATE.args.dummy_data:
             args["default_last"] = dummy_values[prop_uri]
-        field = APP_STATE.st_widget(**args)
-        form.append(field)
+        APP_STATE.st_widget(**args)
+
     # short name
     with col2:
         key = "short_name"
@@ -182,8 +184,8 @@ def render_fields_init() -> List[str]:
         if APP_STATE.args.dummy_data:
             args["value"] = dummy_values[key]
 
-        field = APP_STATE.st_widget(**args)
-        form.append(field)
+        APP_STATE.st_widget(**args)
+
     # snapshot version
     with col3:
         key = "snapshot_version"
@@ -198,8 +200,7 @@ def render_fields_init() -> List[str]:
         if APP_STATE.args.dummy_data:
             args["value"] = dummy_values[key]
 
-        field = APP_STATE.st_widget(**args)
-        form.append(field)
+        APP_STATE.st_widget(**args)
 
     cols = st.columns([2, 3])
     with cols[0]:
@@ -216,38 +217,34 @@ def render_fields_init() -> List[str]:
         if APP_STATE.args.dummy_data:
             args["value"] = dummy_values[key]
 
-        field = APP_STATE.st_widget(**args)
-        form.append(field)
+        APP_STATE.st_widget(**args)
+
     with cols[1]:
         # Private dataset?
-        field = APP_STATE.st_widget(
+        APP_STATE.st_widget(
             st.toggle,
             label="Make dataset private",
             help="Check if you want to make the dataset private.",
             key="is_private",
             default_last=False,
         )
-        form.append(field)
+
         # Import local file?
-        field = APP_STATE.st_widget(
+        APP_STATE.st_widget(
             st.toggle,
             label="Import dataset from local file",
             help="Check if you want to import the snapshot from a local file.",
             key="local_import",
             default_last=False,
         )
-        form.append(field)
-
-    return form
 
 
 def render_fields_from_schema(
     schema: Dict[str, Any],
     property_name: str,
-    form_fields: List[str],
     categories: Optional[List[Any]] = None,
     container: Optional[Any] = None,
-) -> List[str]:
+):
     """Render fields from schema.
 
     This function is quite complex, and includes some recursion. Could probably be improved, but it is OK for now.
@@ -261,16 +258,17 @@ def render_fields_from_schema(
     # Iterate over schema
     for name, props in schema.items():
         prop_uri = f"{property_name}.{name}"
+        # Go deeper
         if "properties" in props:
             if categories:
-                form_fields = render_fields_from_schema(
+                render_fields_from_schema(
                     props["properties"],
                     prop_uri,
-                    form_fields,
                     container=containers[cat],  # type: ignore
                 )
             else:
-                form_fields = render_fields_from_schema(props["properties"], prop_uri, form_fields)
+                render_fields_from_schema(props["properties"], prop_uri)
+        # Render
         else:
             # Define display, help and placeholder texts
             display_name = create_display_name_snap_section(props, name, property_name)
@@ -289,23 +287,41 @@ def render_fields_from_schema(
 
                 if categories:
                     with containers[props["category"]]:
-                        field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)  # type: ignore
+                        APP_STATE.st_widget(st_widget=st.text_area, **kwargs)  # type: ignore
                 elif container:
                     with container:
-                        field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
+                        APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
                 else:
-                    field = APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
-            ## Special case: license name (select box)
-            elif prop_uri in ["origin.license.name", "origin.attribution"]:
-                # Special one, need to have responsive behaviour inside form (work around)
+                    APP_STATE.st_widget(st_widget=st.text_area, **kwargs)
+
+            ## Select box (with custom values option)
+            elif prop_uri in FIELD_TYPES_SELECTBOX:
+                if prop_uri == "origin.attribution":
+                    options = [
+                        "{producer} ({year})",
+                        "{producer} - {title} {version_producer} ({year})",
+                        # "{title} {version_producer} - {producer} ({year})",
+                    ]
+                else:
+                    options = sorted(props["options"])
+                kwargs = {
+                    "label": display_name,
+                    "help": create_description(field=props),
+                    "key": prop_uri,
+                    "options": options,
+                    "default_last": options[0],
+                    "accept_new_options": True,
+                }
+
                 if categories:
                     with containers[props["category"]]:
-                        field = [prop_uri, st.empty(), st.container()]  # type: ignore
+                        APP_STATE.st_widget(st.selectbox, **kwargs)  # type: ignore
                 elif container:
                     with container:
-                        field = [prop_uri, st.empty(), st.container()]
+                        APP_STATE.st_widget(st.selectbox, **kwargs)  # type: ignore
                 else:
-                    field = [prop_uri, st.empty(), st.container()]
+                    APP_STATE.st_widget(st.selectbox, **kwargs)  # type: ignore
+
             ## Text input
             else:
                 # default_value = DEFAULT_VALUES.get(prop_uri, "")
@@ -313,199 +329,22 @@ def render_fields_from_schema(
                 kwargs = {
                     "label": display_name,
                     "help": create_description(field=props),
+                    "key": prop_uri,
                     "placeholder": "Examples: " + ", ".join([f"'{ex}'" for ex in props["examples"]])
                     if props["examples"]
                     else "",
-                    "key": prop_uri,
                 }
                 if APP_STATE.args.dummy_data:
                     kwargs["value"] = dummy_values.get(prop_uri, "")
 
                 if categories:
                     with containers[props["category"]]:
-                        field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
+                        APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
                 elif container:
                     with container:
-                        field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
+                        APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
                 else:
-                    field = APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
-            # Add field to list
-            form_fields.append(cast(str, field))
-    return form_fields
-
-
-def render_license_field(form: List[Any]) -> List[str]:
-    """Render the license field within the form.
-
-    We want the license field to be a selectbox, but with the option to add a custom license.
-
-    This is a workaround to have repsonsive behaviour within a form.
-
-    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
-    """
-    # Assert there is only one element of type list
-    assert (
-        len([field for field in form if isinstance(field, list)]) == 2
-    ), "More than one element in the form is of type list!"
-
-    # Get relevant values from schema
-    property_name = "origin.license"
-    name = "name"
-    prop_uri = f"{property_name}.{name}"
-    props_license = SCHEMA_ORIGIN["license"]
-    props = props_license["properties"][name]
-    display_name = create_display_name_snap_section(props, name, property_name)
-
-    # Main decription
-    toc = "[Description](#description) "
-    help_text = (
-        "## Description\n\n" + props["description"] + "\n\n" + props_license["description"].replace("\n", "\n\n\n")
-    )
-    # Guidelines
-    if props.get("guidelines"):
-        help_text += "\n## Guidelines" + guidelines_to_markdown(guidelines=props["guidelines"])
-        toc += "| [Guidelines](#guidelines) "
-    # Examples (good vs bad)
-    if props.get("examples"):
-        if "examples_bad" in props:
-            help_text += "\n## Examples" + examples_to_markdown(
-                examples=props["examples"],
-                examples_bad=props["examples_bad"],
-                extra_tab=0,
-                do_sign="✅",
-                dont_sign="❌",
-            )
-        else:
-            help_text += "\n## Examples" + examples_to_markdown(
-                examples=props["examples"], examples_bad=[], extra_tab=0, do_sign="✅", dont_sign="❌"
-            )
-        toc += "| [Examples](#examples) "
-    help_text = toc.strip() + "\n\n" + help_text
-    options = sorted(props["options"])
-
-    # Default option in select box for custom license
-    CUSTOM_OPTION = "Custom license..."
-    # Render and get element depending on selection in selectbox
-    for field in form:
-        if isinstance(field, list) and field[0] == "origin.license.name":
-            with field[1]:
-                license_field = APP_STATE.st_widget(
-                    st.selectbox,
-                    label=display_name,
-                    options=[CUSTOM_OPTION] + options,
-                    help=help_text,
-                    key=prop_uri,
-                    default_last=options[0],
-                )
-            with field[2]:
-                if license_field == CUSTOM_OPTION:
-                    license_field = APP_STATE.st_widget(
-                        st.text_input,
-                        label="↳ *Use custom license*",
-                        placeholder="© GISAID 2023",
-                        help="Enter custom license",
-                        key=f"{prop_uri}_custom",
-                    )
-
-    # Remove list from form (former license st.empty tuple)
-    form = [f for f in form if not isinstance(f, list)]
-
-    # Add license field
-    form.append(license_field)  # type: ignore
-
-    return form
-
-
-def render_attribution_field(form: List[Any]) -> List[str]:
-    """Render the attribution field within the form.
-
-    We want the attribution field to be a selectbox, but with the option to add a custom attribution.
-
-    This is a workaround to have repsonsive behaviour within a form.
-
-    Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
-    """
-    # Assert there is only one element of type list
-    assert (
-        len([field for field in form if isinstance(field, list)]) == 2
-    ), "More than one element in the form is of type list!"
-
-    # Get relevant values from schema
-    parent = "origin"
-    name = "attribution"
-    prop_uri = f"{parent}.{name}"
-    props = SCHEMA_ORIGIN[name]
-    display_name = create_display_name_snap_section(props, name, parent, title="Attribution format")
-
-    # Main decription
-    toc = "[Description](#description) "
-    description_add = """Use this dropdown to select the desired `attribution` format.
-
-The default option should be used in most cases. Alternatively other common format options are available.
-
-Only in rare occasions you will need to define a custom attribution.
-    """
-    help_text = "## Description\n\n" + description_add
-    # Guidelines
-    if props.get("guidelines"):
-        help_text += "\n## Guidelines" + guidelines_to_markdown(guidelines=props["guidelines"])
-        toc += "| [Guidelines](#guidelines) "
-    # Examples (good vs bad)
-    if props.get("examples"):
-        if "examples_bad" in props:
-            help_text += "\n## Examples" + examples_to_markdown(
-                examples=props["examples"],
-                examples_bad=props["examples_bad"],
-                extra_tab=0,
-                do_sign="✅",
-                dont_sign="❌",
-            )
-        else:
-            help_text += "\n## Examples" + examples_to_markdown(
-                examples=props["examples"], examples_bad=[], extra_tab=0, do_sign="✅", dont_sign="❌"
-            )
-        toc += "| [Examples](#examples) "
-    help_text = toc.strip() + "\n\n" + help_text
-
-    # Options
-    DEFAULT_OPTION = "{producer} ({year})"
-    options = [
-        DEFAULT_OPTION,
-        "{producer} - {title} {version_producer} ({year})",
-        # "{title} {version_producer} - {producer} ({year})",
-    ]
-
-    # Default option in select box for custom license
-    CUSTOM_OPTION = "Custom attribution..."
-    # Render and get element depending on selection in selectbox
-    for field in form:
-        if isinstance(field, list) and field[0] == "origin.attribution":
-            with field[1]:
-                attribution_field = APP_STATE.st_widget(
-                    st.selectbox,
-                    label=display_name,
-                    options=["Custom attribution..."] + options,
-                    help=help_text,
-                    key=prop_uri,
-                    default_last=options[0],
-                )
-            with field[2]:
-                if attribution_field == CUSTOM_OPTION:
-                    attribution_field = APP_STATE.st_widget(
-                        st.text_input,
-                        label="↳ *Use custom attribution*",
-                        placeholder="",
-                        help="Enter custom attribution. Make sure to add the explicit attribution and not its format (as in the dropdown options)!",
-                        key=f"{prop_uri}_custom",
-                    )
-
-    # Remove list from form (former license st.empty tuple)
-    form = [f for f in form if not isinstance(f, list)]
-
-    # Add license field
-    form.append(attribution_field)  # type: ignore
-
-    return form
+                    APP_STATE.st_widget(st.text_input, **kwargs)  # type: ignore
 
 
 def update_state() -> None:
@@ -549,31 +388,16 @@ if st.session_state["show_form"]:
         render_fields_init()
 
         # 2) Show fields for metadata fields
-        # st.header("Metadata")
-        # st.markdown(
-        #     "Fill the following fields to help us fill all the created files for you! Note that sometimes some fields might not be available (even if they are labelled as required)."
-        # )
-        # Get categories
-        # for k, v in SCHEMA_ORIGIN.items():
-        # if "category" not in v:
-        #     print(k)
-        #     print(v)
-        # raise ValueError(f"Category not found for {k}")
         categories_in_schema = {v["category"] for k, v in SCHEMA_ORIGIN.items()}
         assert categories_in_schema == set(
             ACCEPTED_CATEGORIES
         ), f"Unknown categories in schema: {categories_in_schema - set(ACCEPTED_CATEGORIES)}"
 
-        form_metadata = render_fields_from_schema(SCHEMA_ORIGIN, "origin", [], categories=ACCEPTED_CATEGORIES)
+        render_fields_from_schema(SCHEMA_ORIGIN, "origin", categories=ACCEPTED_CATEGORIES)
 
         # 3) Submit
         submitted = st.form_submit_button("Submit", type="primary", use_container_width=True, on_click=update_state)
 
-    # 2.1) Create fields for attribution (responsive within form)
-    form = render_attribution_field(form_metadata)
-
-    # 2.1) Create fields for License (responsive within form)
-    form = render_license_field(form_metadata)
 else:
     submitted = False
     form_widget = st.empty()

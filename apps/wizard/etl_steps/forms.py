@@ -445,11 +445,8 @@ class SnapshotForm(StepForm):
         data["origin_version"] = data["origin.version_producer"]
         data["dataset_manual_import"] = data["local_import"]
 
-        # Handle custom license
-        if "origin.license.name_custom" in data:
-            data["license_name"] = data["origin.license.name_custom"]
-        else:
-            data["license_name"] = data["origin.license.name"]
+        # Handle license
+        data["license_name"] = data["origin.license.name"]
 
         # Remove unused fields
         data = {k: v for k, v in data.items() if k not in ["origin.license.url", "origin.license.name"]}
@@ -459,12 +456,9 @@ class SnapshotForm(StepForm):
         # Init object (includes schema validation)
         super().__init__(**data)
 
-        # Handle custom attribution
+        # Handle attribution
         if not self.errors:
-            if "attribution_custom" in data:
-                self.attribution = str(data["attribution_custom"])
-            else:
-                self.attribution = self.parse_attribution(data)
+            self.attribution = self.parse_attribution(data)
 
     def parse_attribution(self: Self, data: Dict[str, str | int]) -> str | None:
         """Parse the field attribution.
@@ -502,12 +496,10 @@ class SnapshotForm(StepForm):
         self.check_is_version(fields_version)
 
         # License
-        if self.license_name == "":
-            self.errors["origin.license.name_custom"] = "Please introduce the name of the custom license!"
+        assert self.license_name != "", "License name must be present!"
 
         # Attribution
-        if self.attribution == "":
-            self.errors["origin.attribution_custom"] = "Please introduce the name of the custom attribute!"
+        assert self.attribution != "", "attribution must be present!"
 
     @property
     def metadata(self: Self) -> Dict[str, Any]:  # type: ignore[reportIncompatibleMethodOverride]
