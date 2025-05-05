@@ -1,6 +1,8 @@
 """Exclude archived steps from files tab and search in VSCode."""
 
+import shutil
 from collections import OrderedDict
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Set, Tuple
 
@@ -9,6 +11,22 @@ import commentjson
 
 from etl.dag_helpers import load_dag
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
+
+# Time cutoff for recent modifications (1 month)
+RECENT_MODIFICATION_CUTOFF = datetime.now() - timedelta(days=30)
+
+
+def should_exclude(path: Path) -> bool:
+    """Determine if a path should be excluded based on shared content and modification time."""
+    # Skip if path contains 'shared'
+    if "shared" in str(path):
+        return False
+
+    # Skip if modified is recent
+    if path.is_dir() and path.exists() and datetime.fromtimestamp(path.stat().st_mtime) > RECENT_MODIFICATION_CUTOFF:
+        return False
+
+    return True
 
 
 def active_steps_and_snapshots() -> Tuple[Set[str], Set[str]]:
@@ -34,10 +52,13 @@ def snapshots_to_exclude(active_snapshots: Set[str]) -> Set[str]:
     to_exclude = set()
 
     for d in SNAPSHOTS_DIR.rglob("*"):
-        d = d.relative_to(SNAPSHOTS_DIR)
-        if len(d.parts) == 2:
-            if str(d) not in active_snapshots:
-                to_exclude.add(f"snapshots/{d}")
+        d_rel = d.relative_to(SNAPSHOTS_DIR)
+        if len(d_rel.parts) == 2:
+            if not should_exclude(d):
+                continue
+
+            if str(d_rel) not in active_snapshots:
+                to_exclude.add(f"snapshots/{d_rel}")
 
     return to_exclude
 
@@ -46,10 +67,13 @@ def steps_to_exclude(active_steps: Set[str]) -> Set[str]:
     to_exclude = set()
 
     for d in STEPS_DATA_DIR.rglob("*"):
-        d = d.relative_to(STEPS_DATA_DIR)
-        if len(d.parts) == 3 and d.parts[0] in ("meadow", "garden", "grapher"):
-            if str(d) not in active_steps:
-                to_exclude.add(f"etl/steps/data/{d}")
+        d_rel = d.relative_to(STEPS_DATA_DIR)
+        if len(d_rel.parts) == 3 and d_rel.parts[0] in ("meadow", "garden", "grapher"):
+            if not should_exclude(d):
+                continue
+
+            if str(d_rel) not in active_steps:
+                to_exclude.add(f"etl/steps/data/{d_rel}")
 
     return to_exclude
 
@@ -80,6 +104,11 @@ def main(settings_scope, dry_run):
         else:
             settings_path = Path.home() / "Library/Application Support/Code/User/settings.json"
 
+        # Create a backup of the settings file
+        backup_path = settings_path.with_suffix(".json.bak")
+        shutil.copy2(settings_path, backup_path)
+        print(f"Created backup at {backup_path}")
+
         # Update settings file
         settings_text = settings_path.read_text()
         settings = commentjson.loads(settings_text)
@@ -88,6 +117,13 @@ def main(settings_scope, dry_run):
         for col in ("files.exclude", "search.exclude"):
             if col not in settings:
                 settings[col] = {}
+
+            # Remove all existing exclusions
+            for k in list(settings[col].keys()):
+                if k.startswith("etl/steps/data/") or k.startswith("snapshots/"):
+                    del settings[col][k]
+
+            # Add new exclusions
             settings[col].update(to_exclude)
 
         # Reorder settings to move 'files.exclude' and 'search.exclude' to the end
@@ -95,8 +131,13 @@ def main(settings_scope, dry_run):
         for key, value in settings.items():
             if key not in ["files.exclude", "search.exclude"]:
                 reordered_settings[key] = value
-        reordered_settings["files.exclude"] = settings["files.exclude"]
-        reordered_settings["search.exclude"] = settings["search.exclude"]
+
+        # Sort the exclude entries
+        files_exclude = OrderedDict(sorted(settings["files.exclude"].items()))
+        search_exclude = OrderedDict(sorted(settings["search.exclude"].items()))
+
+        reordered_settings["files.exclude"] = files_exclude
+        reordered_settings["search.exclude"] = search_exclude
 
         settings_path.write_text(commentjson.dumps(reordered_settings, indent=2))
 
