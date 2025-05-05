@@ -455,7 +455,7 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
         # Write the recorded execution times to the file after all steps have been executed
         _write_execution_times(execution_times)
 
-    if config.CONTINUE_ON_FAILURE:
+    if config.CONTINUE_ON_FAILURE and exceptions:
         for step, exception in zip(failing_steps, exceptions):
             log.error("step_exception", step=str(step), exception=str(exception))
         # Raise the first exception

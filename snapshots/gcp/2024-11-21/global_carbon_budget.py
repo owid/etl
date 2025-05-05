@@ -54,6 +54,9 @@ def main(path_to_folder: str, upload: bool) -> None:
         snap.metadata.origin.citation_full = CITATION_FULL  # type: ignore
         snap.metadata.origin.description = DESCRIPTION  # type: ignore
 
+        # Rewrite metadata to dvc file.
+        snap.metadata_path.write_text(snap.metadata.to_yaml())
+
         # Download data from source, add file to DVC and upload to S3.
         ################################################################################################################
         # snap.create_snapshot(upload=upload)

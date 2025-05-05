@@ -1,5 +1,6 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
+autoupdate: true
 meta:
   origin:
     # Data product / Snapshot
