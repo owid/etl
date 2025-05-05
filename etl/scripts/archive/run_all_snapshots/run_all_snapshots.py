@@ -17,6 +17,8 @@ import json
 import random
 import subprocess
 import time
+from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Set
 
@@ -28,9 +30,9 @@ from structlog import get_logger
 from tqdm.auto import tqdm
 
 from etl.config import GITHUB_API_BASE, GITHUB_TOKEN
+from etl.dag_helpers import load_dag
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 from etl.snapshot import Snapshot
-from etl.steps import load_dag
 
 log = get_logger()
 
@@ -179,85 +181,53 @@ def create_autoupdate_pr(snapshot: str):
         log.info(f"Pull request created: {pr_resp.json()['html_url']}")
 
 
-@click.command()
-@click.option("--dry-run", is_flag=True, help="Run the script in dry-run mode.")
-@click.option("--create-pr", is_flag=True, help="If there's an update, create a PR.")
-@click.option("--filter", type=str, help="Process only snapshots that include the given substring.")
-@click.option("--timeout", type=int, default=100, help="Timeout in seconds for each snapshot.")
-@click.option("--skip", is_flag=True, help="Skip snapshots that have already been processed.")
-def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool):
-    # Create a dictionary to store the execution results: duration (in seconds) or "FAILED"
-    if OUTPUT_FILE.exists():
-        # Load existing results from the JSON file to allow resuming.
-        with open(OUTPUT_FILE, "r") as f:
-            execution_results = json.load(f)
-    else:
-        # Initialize dictionary of results.
-        execution_results = {}
+@dataclass
+class SnapshotUpdate:
+    """Class to store the snapshot update information."""
 
-    active_snapshots = get_active_snapshots()
-    if filter:
-        active_snapshots = {s for s in active_snapshots if filter in s}
+    name: str
+    snapshot_script: Path
+    dvc_files: list[Path]
 
-    # Filter fasttrack snapshots
-    active_snapshots = {s for s in active_snapshots if not s.startswith("fasttrack/")}
 
-    # Loop over all snapshot scripts.
-    for snapshot in tqdm(active_snapshots):
-        snapshot_script = SNAPSHOTS_DIR / snapshot
+@dataclass
+class ExecutionResult:
+    """Class to store the execution result of a snapshot."""
 
-        # Find .dvc file belonging to the snapshot script
-        dvc_files = list(snapshot_script.parent.glob(f"{snapshot_script.stem}.*.dvc"))
-        assert len(dvc_files) >= 1, f"Expected to find at least one .dvc file for {snapshot}"
+    name: str
+    status: str = ""
+    identical: bool = False
+    duration: float = 0.0
 
-        # Quite rare but possible to have multiple .dvc files for a single snapshot.
+
+def run_updates(
+    group_updates: list[SnapshotUpdate],
+    create_pr: bool,
+    timeout: int,
+    continue_on_failure: bool = False,
+    dry_run: bool = False,
+) -> list[ExecutionResult]:
+    """Update all snapshots in a group."""
+
+    exec_results = []
+
+    for update in group_updates:
+        # Extract attributes from the update.
+        snapshot = update.name
+        snapshot_script = update.snapshot_script
+        dvc_files = update.dvc_files
         dvc_file = dvc_files[0]
-
-        # Check if autoupdate is enabled.
-        with open(dvc_file, "r") as f:
-            meta = yaml.safe_load(f)
-            if not meta.get("autoupdate"):
-                # log.info("run_all_snapshots.skip", snapshot=snapshot, reason="autoupdate not enabled")
-                continue
-
-        # Raise warning when using multiple .dvc files.
-        if len(dvc_files) > 1:
-            log.warning(f"Multiple .dvc files found for {snapshot}. Using the first one.")
-
-        # Skip snapshots that have already been processed.
-        if skip and snapshot in execution_results:
-            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="already processed")
-            continue
 
         # Start timer.
         start_time = time.time()
 
-        if not snapshot_script.exists():
-            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="script not found")
-            continue
-
-        # Read the script file.
-        with open(snapshot_script, "r") as f:
-            snapshot_text = f.read()
-
-        # Skip script files that are not snapshots (or at least do not have an "--upload" flag explicitly defined).
-        if "--upload" not in snapshot_text:
-            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="no --upload flag")
-            continue
-        # Skip scripts that require the use of a local file.
-        if ("--path-to-file" in snapshot_text) or ("-f " in snapshot_text):
-            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="requires local file")
-            continue
-
-        execution_results[snapshot] = {}
+        exec_result = ExecutionResult(name=snapshot)
 
         if dry_run:
             log.info(f"[DRY-RUN] Would execute {snapshot}.")
-            execution_results[snapshot] = {"status": "DRY-RUN"}
-            save_json(data=execution_results, json_file=OUTPUT_FILE, indent=4, sort_keys=False)
+            exec_result.status = "DRY-RUN"
+            exec_results.append(exec_result)
             continue
-
-        execution_results[snapshot_script_relative] = {}
 
         try:
             log.info(f"Executing {snapshot}.")
@@ -278,46 +248,152 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool):
             with open(dvc_file, "r") as f:
                 new_outs = yaml.safe_load(f)["outs"][0]
 
-            execution_results[snapshot]["status"] = "SUCCESS"
+            exec_result.status = "SUCCESS"
 
             # Data is not new, MD5 or size is identical.
             # NOTE: Some snapshots may have the same data but different md5s (e.g. scraped htmls).
             if original_outs["md5"] == new_outs["md5"]:
-                execution_results[snapshot]["identical"] = True
+                exec_result.identical = True
 
             elif original_outs["size"] == new_outs["size"]:
-                execution_results[snapshot]["identical"] = True
+                exec_result.identical = True
                 subprocess.run(["git", "restore", "--"] + [str(f) for f in dvc_files])
 
             else:
-                execution_results[snapshot]["identical"] = False
+                exec_result.identical = False
 
             # If the snapshot is different, update origin.date_accessed
-            if not execution_results[snapshot]["identical"]:
+            if not exec_result.identical:
                 for f in dvc_files:
                     snap = Snapshot(str(dvc_files[0].relative_to(SNAPSHOTS_DIR)).replace(".dvc", ""))
                     if snap.m.origin:
-                        snap.update_metadata_file({"meta": {"origin": {"date_accessed": str(dt.date.today())}}})
+                        snap._update_metadata_file({"meta": {"origin": {"date_accessed": str(dt.date.today())}}})
 
             # Add duration time for successfully executed snapshot.
-            duration = time.time() - start_time
-            execution_results[snapshot]["duration"] = round(duration, 3)
-
-            # If MD5 has changed, create a PR.
-            if not execution_results[snapshot]["identical"]:
-                if create_pr:
-                    create_autoupdate_pr(snapshot)
+            exec_result.duration = round(time.time() - start_time, 3)
 
         except subprocess.TimeoutExpired:
             # Stop snapshot that is taking too long and mark it as timeout.
-            execution_results[snapshot]["status"] = "TIMEOUT"
+            exec_result.status = "TIMEOUT"
             log.error(f"Timeout expired for {snapshot}. Marking as 'TIMEOUT'.")
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError as e:
             # Mark snapshot as failed.
-            execution_results[snapshot]["status"] = "FAILED"
-            log.error(f"Error executing {snapshot}. Marking as 'FAILED'.")
+            exec_result.status = "FAILED"
+            if continue_on_failure:
+                log.warning(f"Continuing despite failure in {snapshot}.")
+            else:
+                log.error(f"Failed to execute {snapshot}.")
+                raise e
 
-        # Save the current results to a JSON file.
+        exec_results.append(exec_result)
+
+    __import__("ipdb").set_trace()
+
+    # If MD5 has changed, create a PR.
+    if create_pr and not any(exec_result.identical for exec_result in exec_results):
+        create_autoupdate_pr(update.name)
+
+    return exec_results
+
+
+@click.command()
+@click.option("--dry-run", is_flag=True, help="Run the script in dry-run mode.")
+@click.option("--create-pr", is_flag=True, help="If there's an update, create a PR.")
+@click.option("--filter", type=str, help="Process only snapshots that include the given substring.")
+@click.option("--timeout", type=int, default=100, help="Timeout in seconds for each snapshot.")
+@click.option("--skip", is_flag=True, help="Skip snapshots that have already been processed.")
+@click.option("--all", is_flag=True, help="Run snapshots even if they don't have `autoupdate` set.")
+@click.option("--continue-on-failure", is_flag=True, help="Continue running snapshots even if some fail.")
+def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool, all: bool, continue_on_failure: bool):
+    # Create a dictionary to store the execution results: duration (in seconds) or "FAILED"
+    if OUTPUT_FILE.exists():
+        # Load existing results from the JSON file to allow resuming.
+        with open(OUTPUT_FILE, "r") as f:
+            execution_results = json.load(f)
+    else:
+        execution_results = []
+
+    active_snapshots = get_active_snapshots()
+    if filter:
+        active_snapshots = {s for s in active_snapshots if filter in s}
+
+    # Filter fasttrack snapshots
+    active_snapshots = {s for s in active_snapshots if not s.startswith("fasttrack/")}
+
+    # Create a group of updates by name.
+    updates: dict[str, list[SnapshotUpdate]] = defaultdict(list)
+
+    # Loop over all snapshot scripts.
+    for snapshot in active_snapshots:
+        snapshot_script = SNAPSHOTS_DIR / snapshot
+
+        # Find .dvc file belonging to the snapshot script
+        dvc_files = list(snapshot_script.parent.glob(f"{snapshot_script.stem}.*.dvc"))
+        assert len(dvc_files) >= 1, f"Expected to find at least one .dvc file for {snapshot}"
+
+        # Quite rare but possible to have multiple .dvc files for a single snapshot.
+        dvc_file = dvc_files[0]
+
+        # If all is set, run all snapshots, even if they don't have autoupdate set.
+        if all:
+            # Create artificial autoupdate.
+            meta = {
+                "autoupdate": {
+                    "name": snapshot,
+                }
+            }
+        else:
+            with open(dvc_file, "r") as f:
+                meta = yaml.safe_load(f)
+                if not meta.get("autoupdate"):
+                    # log.info("run_all_snapshots.skip", snapshot=snapshot, reason="autoupdate not enabled")
+                    continue
+
+        # Raise warning when using multiple .dvc files.
+        if len(dvc_files) > 1:
+            log.warning(f"Multiple .dvc files found for {snapshot}. Using the first one.")
+
+        # Skip snapshots that have already been processed.
+        if skip and snapshot in [r["name"] for r in execution_results]:
+            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="already processed")
+            continue
+
+        # Snapshot script does not exist.
+        if not snapshot_script.exists():
+            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="script not found")
+            continue
+
+        # Read the script file.
+        with open(snapshot_script, "r") as f:
+            snapshot_text = f.read()
+
+        # Skip script files that are not snapshots (or at least do not have an "--upload" flag explicitly defined).
+        if "--upload" not in snapshot_text:
+            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="no --upload flag")
+            continue
+        # Skip scripts that require the use of a local file.
+        if ("--path-to-file" in snapshot_text) or ("-f " in snapshot_text):
+            log.info("run_all_snapshots.skip", snapshot=snapshot, reason="requires local file")
+            continue
+
+        updates[meta["autoupdate"]["name"]].append(
+            SnapshotUpdate(
+                name=meta["autoupdate"]["name"],
+                snapshot_script=snapshot_script,
+                dvc_files=dvc_files,
+            )
+        )
+
+    for name, group_updates in tqdm(updates.items()):
+        execution_results += run_updates(
+            group_updates,
+            create_pr=create_pr,
+            timeout=timeout,
+            continue_on_failure=continue_on_failure,
+            dry_run=dry_run,
+        )
+
+        # Save intermediate results to a JSON file.
         save_json(data=execution_results, json_file=OUTPUT_FILE, indent=4, sort_keys=False)
 
     return execution_results

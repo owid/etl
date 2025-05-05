@@ -195,7 +195,26 @@ class Snapshot:
         assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
 
-        meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
+        self._update_metadata_file({"outs": [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]})
+
+    def _update_metadata_file(self, d: dict[str, Any]) -> None:
+        """Update metadata YAML file with given dictionary."""
+        with open(self.metadata_path, "r") as f:
+            meta = ruamel_load(f)
+
+        # Update everything from `meta`
+        update_meta = d.pop("meta", {})
+        for k, v in update_meta.items():
+            if k in meta["meta"]:
+                if isinstance(meta["meta"][k], dict):
+                    meta["meta"][k].update(v)
+                else:
+                    meta["meta"][k] = v
+            else:
+                meta["meta"][k] = v
+
+        # Update remaining fields
+        meta.update(d)
 
         with open(self.metadata_path, "w") as f:
             f.write(ruamel_dump(meta))

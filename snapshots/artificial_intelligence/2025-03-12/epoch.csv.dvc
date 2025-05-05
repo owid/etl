@@ -1,6 +1,7 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
-autoupdate: true
+autoupdate:
+  name: Epoch datasets
 meta:
   origin:
     # Data product / Snapshot
@@ -36,6 +37,6 @@ meta:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 outs:
-  - md5: e92dd16288c14963087815f8e954cdb4
-    size: 1759979
+  - md5: 9b6a5311fa2e99088d1a2abec80958c1
+    size: 1739788
     path: epoch.csv
