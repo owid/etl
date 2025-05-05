@@ -6,11 +6,11 @@ definitions:
       topic_tags:
         - Military Personnel & Spending
 
-  description_short_includes: Includes military and civil personnel, operation and maintenance, procurement, military research and development, infrastructure, and aid. Civil defense and current expenditures for previous military activities are excluded.
-
   description_short_constant_usd: This data is expressed in US dollars. It is adjusted for inflation but does not account for differences in the cost of living between countries.
 
   description_short_current_usd: This data is expressed in US dollars. It is not adjusted for inflation or differences in the cost of living between countries.
+
+  description_key_includes: This data includes military and civil personnel, operation and maintenance, procurement, military research and development, infrastructure, and aid. Civil defense and current expenditures for previous military activities are excluded.
 
   description_from_producer_military_expenditure:
     "Although the lack of sufficiently detailed data makes it difficult to apply a common definition of military expenditure on a worldwide basis, SIPRI has adopted a definition as a guideline. Where possible, SIPRI military expenditure data include all current and capital expenditure on:
@@ -80,7 +80,9 @@ tables:
         unit: "constant 2023 US$"
         short_unit: "$"
         description_short: |-
-          {definitions.description_short_includes} {definitions.description_short_constant_usd}
+          {definitions.description_short_constant_usd}
+        description_key:
+          - "{definitions.description_key_includes}"
         description_from_producer: |-
           {definitions.description_from_producer_constant_usd}
         display:
@@ -93,7 +95,9 @@ tables:
         unit: "% of GDP"
         short_unit: "%"
         description_short: |-
-          {definitions.description_short_includes}
+          Total military expenditure divided by [gross domestic product](#dod:gdp), expressed as a percentage.
+        description_key:
+          - "{definitions.description_key_includes}"
         description_from_producer: |-
           {definitions.description_from_producer_military_expenditure}
         display:
@@ -106,7 +110,9 @@ tables:
         unit: "current US$"
         short_unit: "$"
         description_short: |-
-          {definitions.description_short_includes} {definitions.description_short_current_usd}
+          Total military expenditure divided by population. {definitions.description_short_current_usd}
+        description_key:
+          - "{definitions.description_key_includes}"
         description_from_producer: |-
           Figures are in current US$.
 
@@ -121,7 +127,9 @@ tables:
         unit: "% of government spending"
         short_unit: "%"
         description_short: |-
-          {definitions.description_short_includes}
+          Total military expenditure divided by government spending.
+        description_key:
+          - "{definitions.description_key_includes}"
         description_from_producer: |-
           {definitions.description_from_producer_military_expenditure}
         display:
@@ -134,8 +142,9 @@ tables:
         unit: "constant 2023 US$"
         short_unit: "$"
         description_short: |-
-          {definitions.description_short_includes} {definitions.description_short_constant_usd}
+          Total military expenditure divided by armed forces personnel. {definitions.description_short_constant_usd}
         description_key:
+          - "{definitions.description_key_includes}"
           - Armed forces personnel are active duty military personnel, including paramilitary forces if the training, organization, equipment, and control suggest they may be used to support or replace regular military forces.
         description_from_producer: |-
           {definitions.description_from_producer_constant_usd}
