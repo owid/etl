@@ -16,6 +16,8 @@ WARN_MSG = []
 SOURCE = OWID_ENV
 assert OWID_ENV.env_remote != "production", "Your .env points to production DB, please use a staging environment."
 
+ANALYTICS_NUM_DAYS = 30
+
 # Try to compare against production DB if possible, otherwise compare against staging-site-master
 if config.ENV_FILE_PROD:
     TARGET = OWIDEnv.from_env_file(config.ENV_FILE_PROD)

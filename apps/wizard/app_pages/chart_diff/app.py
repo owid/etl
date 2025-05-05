@@ -1,3 +1,12 @@
+"""
+TODO: Add sorting mechanism to the chart diff list.
+
+- get_chart_diffs: Right after when we get charts, sort them based on what is the value in the chart-diff-sort-by-results selectbox.
+- filter_chart_diffs: Add sorting whenever the user edits anything in the options popover?
+- x Question: How to reconcile selectbox/URL Query params?
+- At which stage should we get the analytics / anomalist scores? In ChartDiff.from_charts_df! (look for "TODO")
+"""
+
 import re
 from pathlib import Path
 
@@ -12,7 +21,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_gra
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import Pagination
+from apps.wizard.utils.components import Pagination, url_persist
 from etl.config import OWID_ENV
 from etl.grapher import model as gm
 
@@ -36,6 +45,27 @@ CURRENT_DIR = Path(__file__).resolve().parent
 # Create connections to DB
 SOURCE_ENGINE, TARGET_ENGINE = get_engines()
 
+
+# Sorting options
+class SortMethods:
+    relevance: str = "relevance"
+    chart_views_most_to_least: str = "chart_views_most_to_least"
+    chart_views_least_to_most: str = "chart_views_least_to_most"
+    anomalies_most_to_least: str = "anomalies_most_to_least"
+    anomalies_least_to_most: str = "anomalies_least_to_most"
+    last_updated: str = "last_updated"
+
+
+SORTING_METHODS = {
+    SortMethods.relevance: "Relevance",
+    SortMethods.chart_views_most_to_least: "Chart views (last 14-day): Most to least",
+    SortMethods.chart_views_least_to_most: "Chart views (last 14-day): Least to most",
+    SortMethods.anomalies_most_to_least: "Anomalies: Most to least",
+    SortMethods.anomalies_least_to_most: "Anomalies: Least to most",
+    SortMethods.last_updated: "Last updated",
+}
+
+SORTING_QUERY_PARAM = "chart-diff-sort-by-results"
 
 ########################################
 # SESSION STATE
@@ -94,6 +124,7 @@ def filter_chart_diffs():
     This is based on the query parameters.
     """
 
+    # TODO: Add sorting too?
     def _slugs_match(chart_slug_1, chart_slug_2):
         pattern = r"[,\s\-]+"
         chart_slug_1 = set(re.split(pattern, chart_slug_1.lower()))
@@ -128,7 +159,7 @@ def filter_chart_diffs():
             st.session_state.chart_diffs_filtered = {
                 k: v for k, v in st.session_state.chart_diffs_filtered.items() if _slugs_match(chart_slug, v.slug)
             }
-        if "hide_reviewed" in st.query_params:
+        if "show_reviewed" not in st.query_params:
             st.session_state.chart_diffs_filtered = {
                 k: v for k, v in st.session_state.chart_diffs_filtered.items() if not v.is_reviewed
             }
@@ -152,7 +183,11 @@ def filter_chart_diffs():
             if set(v.change_types) & set(change_types) or v.is_new
         }
 
+    # SORT chart diffs
+    sort_chart_diffs()
+
     # Return boolean if there was any filter applied (except for hiding approved charts)
+    # Not really used!
     if (
         "chart_id" in st.query_params
         or "chart_slug" in st.query_params
@@ -161,6 +196,61 @@ def filter_chart_diffs():
     ):
         return True
     return False
+
+
+def sort_chart_diffs():
+    """Sort chart diffs."""
+    sort_by = st.query_params.get(SORTING_QUERY_PARAM, SortMethods.relevance)
+    if sort_by == SortMethods.relevance:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.relevance,
+                reverse=True,
+            )
+        )
+    elif sort_by == SortMethods.chart_views_most_to_least:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.chart_views,
+                reverse=True,
+            )
+        )
+    elif sort_by == SortMethods.chart_views_least_to_most:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.chart_views,
+                reverse=False,
+            )
+        )
+    elif sort_by == SortMethods.anomalies_most_to_least:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.anomaly,
+                reverse=True,
+            )
+        )
+    elif sort_by == SortMethods.anomalies_least_to_most:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.anomaly,
+                reverse=False,
+            )
+        )
+    elif sort_by == SortMethods.last_updated:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].latest_update,
+                reverse=True,
+            )
+        )
+    else:
+        raise ValueError(f"Unknown sorting method: {sort_by}!")
 
 
 @st.dialog(title="Set all charts to Pending")
@@ -175,15 +265,15 @@ def set_chart_diffs_to_pending(engine: Engine) -> None:
 
 
 def _show_options_filters():
-    def hide_reviewed():
-        # st.toast(f"ENTERING hide: {st.session_state['hide-reviewed-charts']}")
-        if st.session_state["hide-reviewed-charts"]:
-            st.query_params.update({"hide_reviewed": ""})  # type: ignore
+    def show_reviewed():
+        # st.toast(f"ENTERING hide: {st.session_state['show-reviewed-charts']}")
+        if st.session_state["show-reviewed-charts"]:
+            st.query_params.update({"show_reviewed": ""})  # type: ignore
         else:
-            st.query_params.pop("hide_reviewed", None)
+            st.query_params.pop("show_reviewed", None)
 
     def show_all():
-        # st.toast(f"ENTERING hide: {st.session_state['hide-reviewed-charts']}")
+        # st.toast(f"ENTERING hide: {st.session_state['show-reviewed-charts']}")
         if st.session_state["show-all-charts"]:
             st.query_params.update({"show_all": ""})  # type: ignore
         else:
@@ -209,12 +299,12 @@ def _show_options_filters():
         # Change type filter
         _apply_search_filters("chart-diff-change-type", "change_type")
 
-    st.markdown("#### Filters")
+    st.markdown("#### Search filters")
     st.toggle(
-        "**Hide** reviewed charts",
-        key="hide-reviewed-charts",
-        value="hide_reviewed" in st.query_params,
-        on_change=hide_reviewed,  # type: ignore
+        "**Show** reviewed charts",
+        key="show-reviewed-charts",
+        value="show_reviewed" in st.query_params,
+        on_change=show_reviewed,  # type: ignore
         help="Show only chart diffs that are pending approval (or rejection).",
     )
     st.toggle(
@@ -229,7 +319,7 @@ def _show_options_filters():
         if not default:
             default = ["new", "config"]
         st.multiselect(
-            label="Chart changes type",
+            label="Chart change types",
             options=["new", "data", "metadata", "config"],  # type: ignore
             format_func=lambda x: x if x == "new" else f"{x} modified",
             default=default,  # type: ignore
@@ -238,28 +328,28 @@ def _show_options_filters():
             placeholder="config, data, metadata",
         )
         st.multiselect(
-            label="Select chart IDs",
+            label="Chart IDs",
             options=[c.chart_id for c in st.session_state.chart_diffs.values()],
             default=[int(n) for n in st.query_params.get_all("chart_id")],  # type: ignore
             key="chart-diff-filter-id",
             help="Filter chart diffs with charts with given IDs.",
             placeholder="Select chart IDs",
         )
-        st.text_input(
-            label="Search by slug name",
-            value=st.query_params.get("chart_slug", ""),  # type: ignore
-            placeholder="Search for a slug",
-            key="chart-diff-filter-slug",
-            help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
-        )
         st.multiselect(
-            label="Select indicators",
+            label="Indicator IDs",
             options=sorted(st.session_state.indicators_in_charts.keys()),
             format_func=lambda s: f"[{s}] {st.session_state.indicators_in_charts[s]}",
             default=[int(n) for n in st.query_params.get_all("indicator_id")],  # type: ignore
             key="chart-diff-filter-indicator",
             help="Filter chart diffs to charts containing any of the selected indicators.",
             placeholder="Select indicator IDs",
+        )
+        st.text_input(
+            label="Chart slug",
+            value=st.query_params.get("chart_slug", ""),  # type: ignore
+            placeholder="Search for a slug",
+            key="chart-diff-filter-slug",
+            help="Filter chart diffs with charts with slugs containing any of the given words (fuzzy match).",
         )
 
         st.form_submit_button(
@@ -277,7 +367,19 @@ def _show_options_display():
         )
 
     # Display options
-    st.markdown("#### Display")
+    st.markdown("#### Results page")
+
+    ## Sorting
+    url_persist(st.selectbox)(
+        label="Sort by",
+        options=SORTING_METHODS.keys(),
+        format_func=lambda x: SORTING_METHODS[x],
+        key=SORTING_QUERY_PARAM,
+        help="Sort chart diffs by relevance, user chart views, anomaly score, last updated, etc.",
+        index=0,
+    )
+
+    ## Display options
     st.toggle(
         "Use **vertical arrangement** for chart diffs",
         key="arrange-charts-vertically",
@@ -341,15 +443,21 @@ def _show_summary_top(chart_diffs):
     # Review status
     num_charts_total = len(st.session_state.chart_diffs)
     num_charts_listed = len(chart_diffs)
-    num_charts_reviewed = len([chart for chart in chart_diffs if chart.is_reviewed])
-    text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed."
-    st.markdown(text)
+    num_charts_approved = len([chart for chart in st.session_state.chart_diffs.values() if chart.is_approved])
+    num_charts_rejected = len([chart for chart in st.session_state.chart_diffs.values() if chart.is_rejected])
+    num_charts_reviewed = num_charts_approved + num_charts_rejected
+    text = f"ℹ️ {num_charts_reviewed}/{num_charts_total} charts reviewed :small[:gray[(:material/thumb_up: {num_charts_approved} :material/thumb_down: {num_charts_rejected})]]"
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
-        st.warning(
-            f"**Some charts are hidden due to filtering**. {num_charts_listed}/{num_charts_total} charts listed."
+        text_warning = f"{num_charts_total-num_charts_listed} charts are hidden (already reviewed, or filtered)."
+        text += f" :orange-badge[:small[{text_warning}]]"
+        st.markdown(
+            text,
+            help="**Notes**\n\n- By default, only charts that haven't been reviewed are shown. You can change this behavior in the ⚙️ Options menu.\n- The displayed information on the number of charts reviewed or hidden is not updated dynamically, but only when the page is refreshed.",
         )
+    else:
+        st.markdown(text, help="The number of reviewed charts is only updated when the page is loaded.")
 
 
 def render_app():
@@ -368,7 +476,10 @@ def render_app():
 
         # Show diffs
         if len(st.session_state.chart_diffs_filtered) == 0:
-            st.warning("No charts to be shown. Try changing the filters in the Options menu.")
+            if len(st.session_state.chart_diffs) == 0:
+                st.warning("No charts to be shown. Try changing the filters in the Options menu.")
+            else:
+                _show_summary_top([chart for chart in st.session_state.chart_diffs_filtered.values()])
         else:
             # Show changed charts (modified, new, etc.)
             if st.session_state.chart_diffs_filtered:
