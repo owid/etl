@@ -151,13 +151,6 @@ steps:
   data://grapher/eth/2023-03-15/ethnic_power_relations:
     - data://garden/eth/2023-03-15/ethnic_power_relations
 
-  # Patents & journal articles (World Bank, United Nations)
-  data://garden/research_development/2024-05-20/patents_articles:
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-    - data://garden/demography/2023-03-31/population
-  data://grapher/research_development/2024-05-20/patents_wdi_unwpp:
-    - data://garden/research_development/2024-05-20/patents_articles
-
   # World Bank's Women, Business and the Law additional data
   data://meadow/wb/2023-05-12/women_business_law_additional:
     - snapshot://wb/2023-05-12/women_business_law_additional.xlsx
