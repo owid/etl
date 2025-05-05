@@ -480,6 +480,13 @@ steps:
   data://grapher/research_development/2024-05-20/patents_wdi_unwpp:
     - data://garden/research_development/2024-05-20/patents_articles
 
+  # Oil Spills
+  data://meadow/itopf/2024-10-16/oil_spills:
+    - snapshot://itopf/2024-10-16/oil_spills.pdf
+  data://garden/itopf/2024-10-16/oil_spills:
+    - data://meadow/itopf/2024-10-16/oil_spills
+  data://grapher/itopf/2024-10-16/oil_spills:
+    - data://garden/itopf/2024-10-16/oil_spills
 include:
   # Include all active steps plus all archive steps.
   - dag/main.yml
