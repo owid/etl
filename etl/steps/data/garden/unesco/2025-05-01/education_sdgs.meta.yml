@@ -11,7 +11,6 @@ definitions:
     - The indicator is calculated by dividing the number of people in this older age group who have completed the final grade of the education level by the total number of people in that group.
     - A high completion rate—close to 100%—means that nearly all children have completed a given level by the expected time with some allowance for delays. A low rate may indicate late school entry, dropout, repetition, or other disruptions.
     - The data comes primarily from household surveys and censuses that ask about the highest grade completed by each person, along with information about their age. This is combined with official data on school structure, including starting ages and duration of each level.
-    - Completion rates can be broken down by sex, urban or rural location, and household wealth to help identify gaps in access and progression.
     - There are limitations to keep in mind. If survey responses on completed grades don’t match national ISCED classifications, cross-country comparability can be affected. Programme completion may be underestimated if official durations differ from what individuals actually experience.
     - Older cohorts can also be harder to classify accurately when countries change the duration or structure of education over time.
     - Despite these challenges, completion rate is a key indicator for understanding how many children and youth make it through the education system—and where they may be falling behind.
@@ -25,7 +24,15 @@ definitions:
     - A *gross enrolment ratio* close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
     - This indicator is best understood when used together with the *net enrolment rate*, which focuses on age-appropriate participation.
     - One limitation is that the *gross enrolment ratio* can exceed 100%, which may require further data to understand the reasons—such as whether students are repeating grades or starting school late.
-
+  desc_literacy: &desc_literacy
+    - Literacy unlocks access to education, employment, and civic participation—this indicator shows what share of youth and adults can read and write a short, simple sentence with understanding.
+    - It captures the percentage of individuals in a given age group (such as youth aged 15–24 or adults aged 15 and above) who are considered literate, based on their ability to both read and write.
+    - The literacy rate is calculated by dividing the number of literate persons by the total number of individuals in the same age group, excluding those with unknown literacy status.
+    - A high literacy rate signals that most people have acquired basic reading and writing skills, often through primary education or literacy programs. Low rates may indicate gaps in access, retention, or effectiveness of foundational education.
+    - Data typically come from population censuses or household surveys and are often self-reported. In some countries, respondents may be asked to read or write a simple sentence or complete basic tasks to verify literacy.
+    - The UIS and its partners also use statistical models to estimate literacy rates for years or regions where recent data are not available, supporting regional and global comparisons.
+    - For most countries literacy is self-reported but there may be some challenges associated to changes over time in a given country and to differences in definition across countries.
+    - Literacy should not be confused with functional literacy. This indicator reflects basic abilities but does not measure whether individuals can apply these skills effectively in daily life, work, or learning.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -41,6 +48,11 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion
+        presentation:
+          title_public: Completion rate in primary education
+        display:
+          name:  Primary education
+          numDecimalPlaces: 1
 
       completion_rate__lower_secondary_education__both_sexes__pct__cr_2:
         title: Completion rate in lower secondary education
@@ -48,6 +60,11 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion
+        presentation:
+          title_public: Completion rate in lower secondary education
+        display:
+          name:  Secondary education
+          numDecimalPlaces: 1
 
       completion_rate__upper_secondary_education__both_sexes__pct__cr_3:
         title: Completion rate in upper secondary education
@@ -55,10 +72,98 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion
+        presentation:
+          title_public: Completion rate in upper secondary education
+        display:
+          name:  Upper secondary education
+          numDecimalPlaces: 1
 
       gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
         title: Gross enrolment ratio in tertiary education
-        description_short: Percentage of children of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education) or higher.
+        description_short: Number of people of any age group who are enrolled in [tertiary](#dod:tertiary-education) education expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment ratio in tertiary education
+        display:
+          name: Tertiary education
+          numDecimalPlaces: 1
+
+      adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99:
+        title: Adult literacy rate
+        description_short: Percentage of the population aged 15 years and older who can read and write.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_literacy
+        presentation:
+          title_public: Adult literacy rate
+        display:
+          name: Adult literacy
+          numDecimalPlaces: 1
+
+      educational_attainment_rate__completed_post_secondary_non_tertiary_education_or_higher__population_25plus_years__both_sexes__pct__ea_4t8_ag25t99:
+        title: Share of the population with post-secondary education (25+)
+        description_short: Percentage of adults aged 25 and older who have completed  [post-secondary education](#dod:post-secondary-education), including [tertiary](#dod:tertiary-education) qualifications.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This indicator shows what portion of the adult population (aged 25 and above) has attained at least a post-secondary level of education, including vocational or university-level qualifications.
+          - It is calculated by dividing the number of adults who have completed at least post-secondary education by the total population in the same age group, and multiplying by 100.
+          - Post-secondary education includes ISCED levels 4 (post-secondary non-tertiary), 5 (short-cycle tertiary), 6 (bachelor's or equivalent), 7 (master's or equivalent), and 8 (doctoral or equivalent).
+          - The 25+ age group is used because most people have completed their formal education by this age, making it a reliable population for tracking educational attainment.
+          - The data come from national censuses, labour force surveys, or other household surveys, and are usually mapped to the ISCED-11 framework after data collection.
+          - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, and some educational programmes may not be easily classified.
+          - In addition, the indicator reflects only the level of education completed—not the quality of education or whether the person uses their qualification in the labour market.
+        presentation:
+          title_public: Share of the population with post-secondary education (25+)
+        display:
+          name: Post-secondary education
+          numDecimalPlaces: 1
+
+      educational_attainment_rate__completed_lower_secondary_education_or_higher__population_25plus_years__both_sexes__pct__ea_2t8_ag25t99:
+        title: Share of the population with lower secondary education (25+)
+        description_short: Percentage of adults aged 25 and older who have completed [lower secondary education](#dod:lower-secondary-education) or higher.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This indicator shows what portion of the adult population (aged 25 and above) has attained at least a lower secondary level of education.
+          - It is calculated by dividing the number of adults who have completed at least lower secondary education by the total population in the same age group, and multiplying by 100.
+          - Lower secondary education includes ISCED levels 2 (lower secondary) and above, which typically corresponds to ages 12 to 15 or 16.
+          - The 25+ age group is used because most people have completed their formal education by this age, making it a reliable population for tracking educational attainment.
+          - The data come from national censuses, labour force surveys, or other household surveys, and are usually mapped to the ISCED-11 framework after data collection.
+          - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, and some educational programmes may not be easily classified.
+          - In addition, the indicator reflects only the level of education completed—not the quality of education or whether the person uses their qualification in the labour market.
+
+      pupil_qualified_teacher_ratio_in_primary_education__headcount_basis__ptrhc_1_qualified:
+        description_short: A qualified teacher is one who has the minimum academic qualifications necessary to teach at a [primary](#dod:primary-education) level of education in a given country.
+        unit: ""
+        description_key:
+          - This indicator shows how many pupils are taught, on average, by each qualified teacher at a specific level of education.
+          - A qualified teacher is defined as someone who has met the minimum academic and professional requirements to teach at the relevant level in their country, often specific to the subjects they are assigned to.
+          - The indicator is calculated by dividing the total number of pupils enrolled at a given level of education by the number of qualified teachers at that same level.
+          - A lower ratio generally suggests more individual attention per student and potentially higher teaching quality, while higher ratios may signal teacher shortages or large class sizes.
+          - Data are based on headcounts, but where possible, adjustments are made for part-time teachers (converted to full-time equivalents), double-shift teachers (counted twice), and other teaching practices such as multi-grade classrooms.
+          - Teachers included are professionals whose main role is to deliver formal curriculum content to students in recognized educational institutions.
+          - This indicator is useful for assessing the adequacy of the teaching workforce and for evaluating education quality and equity.
+          - However, it should be interpreted with care, as national definitions of “qualified” vary and the ratio may not reflect actual classroom conditions or teaching effectiveness.
+          - Other contextual factors, such as school schedules, subject specialization, and administrative responsibilities, may also influence the interpretation of the ratio.
+        presentation:
+          title_public: Pupil-qualified teacher ratio in primary education
+        display:
+          name: Pupil-qualified teacher ratio
+          numDecimalPlaces: 1
+
+      completion_rate__primary_education__adjusted_gender_parity_index__gpia__cr_1_gpia:
+        title: Completion rate in primary education, adjusted gender parity index (GPIA)
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal primary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
+        unit: "index"
+        description_key:
+          - Many children and young people never make it to the final grade of their school level—this indicator shows how close boys and girls are to completing primary education by a slightly older age than expected.
+          - It captures gender equality in *completion rates* for [primary education](#dod:primary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of primary school, who have successfully completed that level.
+          - The completion age group is based on the expected school path—if children start school on time and progress without repeating or skipping grades. For example, if primary starts at age 6 and lasts 6 years, completion is measured among 14–16-year-olds.
+          - The *adjusted gender parity index (GPIA)* is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
+          - A value of 1 means girls and boys complete primary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
+          - A high completion rate—close to 100%—means nearly all children complete primary school by the benchmark age, allowing for delays. Lower rates may point to late school entry, dropouts, repetition, or other barriers to completion.
+          - The data comes primarily from household surveys and population censuses that collect information about each individual’s highest completed grade and age. This is combined with official data on school starting ages and duration.
+          - Limitations include inconsistencies in how countries map completed grades to international standards (ISCED), changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
