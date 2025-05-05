@@ -1254,13 +1254,13 @@
             "name": "Epoch",
             "status": "SUCCESS",
             "identical": false,
-            "duration": 3.616
+            "duration": 2.446
         },
         {
             "name": "Epoch",
             "status": "SUCCESS",
             "identical": false,
-            "duration": 3.516
+            "duration": 2.433
         }
     ]
 }

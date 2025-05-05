@@ -129,8 +129,18 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
         log.info(f"No changes in {update_name}")
         return
 
+    # Get the base tree SHA to use
+    base_tree_sha = master_sha
+    parent_sha = master_sha
+
+    # If branch exists, use its latest commit as parent instead of master
+    if branch_exists:
+        branch_info = branch_resp.json()
+        parent_sha = branch_info["object"]["sha"]
+        base_tree_sha = parent_sha  # Use the branch's latest commit as base for the tree
+
     # Create a tree for all files
-    tree_data = {"base_tree": master_sha, "tree": tree_items}
+    tree_data = {"base_tree": base_tree_sha, "tree": tree_items}
     create_tree_resp = requests.post(f"{GITHUB_API_BASE}/git/trees", json=tree_data, headers=headers)
     create_tree_resp.raise_for_status()
     tree_sha = create_tree_resp.json()["sha"]
@@ -139,14 +149,14 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
     commit_data = {
         "message": title,
         "tree": tree_sha,
-        "parents": [master_sha],
+        "parents": [parent_sha],  # Use the appropriate parent commit
     }
     create_commit_resp = requests.post(f"{GITHUB_API_BASE}/git/commits", json=commit_data, headers=headers)
     create_commit_resp.raise_for_status()
     new_commit_sha = create_commit_resp.json()["sha"]
 
     # Update the branch to point to the new commit
-    update_ref_data = {"sha": new_commit_sha, "force": True}
+    update_ref_data = {"sha": new_commit_sha}  # Removed force:True to avoid overwriting other commits
     update_ref_resp = requests.patch(
         f"{GITHUB_API_BASE}/git/refs/heads/{branch_name}", json=update_ref_data, headers=headers
     )
@@ -227,14 +237,17 @@ def run_updates(
             continue
 
         try:
-            log.info(f"Executing {snapshot}.")
+            log.info(f"Executing {snapshot} / {snapshot_script.relative_to(SNAPSHOTS_DIR)}")
 
-            # Restore the .dvc file to its original state before running the snapshot.
-            subprocess.run(["git", "restore", "--"] + [str(f) for f in dvc_files])
+            # Get the original .dvc file content from origin/master branch
+            dvc_path_relative = str(dvc_file.relative_to(BASE_DIR))
+            result = subprocess.run(
+                ["git", "show", f"origin/master:{dvc_path_relative}"], capture_output=True, text=True, check=True
+            )
+            original_dvc_content = result.stdout
 
-            # Load md5 and size from the .dvc file from YAML
-            with open(dvc_file, "r") as f:
-                original_outs = yaml.safe_load(f)["outs"][0]
+            # Parse the original YAML content
+            original_outs = yaml.safe_load(original_dvc_content)["outs"][0]
 
             # Try to execute snapshot.
             subprocess.run(
