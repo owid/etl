@@ -13,7 +13,7 @@ definitions:
     - The data comes primarily from household surveys and censuses that ask about the highest grade completed by each person, along with information about their age. This is combined with official data on school structure, including starting ages and duration of each level.
     - There are limitations to keep in mind. If survey responses on completed grades don’t match national ISCED classifications, cross-country comparability can be affected. Programme completion may be underestimated if official durations differ from what individuals actually experience.
     - Older cohorts can also be harder to classify accurately when countries change the duration or structure of education over time.
-    - Despite these challenges, completion rate is a key indicator for understanding how many children and youth make it through the education system—and where they may be falling behind.
+
   desc_key_ger: &desc_key_ger
     - Many students are enrolled in school at different ages—this indicator shows how many are participating in a given level of education, regardless of whether they are the “right” age for it.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
@@ -24,6 +24,7 @@ definitions:
     - A *gross enrolment ratio* close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
     - This indicator is best understood when used together with the *net enrolment rate*, which focuses on age-appropriate participation.
     - One limitation is that the *gross enrolment ratio* can exceed 100%, which may require further data to understand the reasons—such as whether students are repeating grades or starting school late.
+
   desc_literacy: &desc_literacy
     - Literacy unlocks access to education, employment, and civic participation—this indicator shows what share of youth and adults can read and write a short, simple sentence with understanding.
     - It captures the percentage of individuals in a given age group (such as youth aged 15–24 or adults aged 15 and above) who are considered literate, based on their ability to both read and write.
@@ -91,16 +92,73 @@ tables:
           numDecimalPlaces: 1
 
       adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99:
-        title: Adult literacy rate
-        description_short: Percentage of the population aged 15 years and older who can read and write.
+        title: Literacy rate among adults
+        description_short: Share of the population aged 15 years and older who can read and write.
         unit: "%"
         short_unit: "%"
         description_key: *desc_literacy
         presentation:
           title_public: Adult literacy rate
         display:
-          name: Adult literacy
           numDecimalPlaces: 1
+
+      youth_literacy_rate__population_15_24_years__male__pct__lr_ag15t24_m:
+        title: Literacy rate among young men
+        description_short:  Share of men aged 15 to 24 years who can read and write.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_literacy
+        presentation:
+          title_public: Youth literacy rate among men
+        display:
+          numDecimalPlaces: 1
+
+      youth_literacy_rate__population_15_24_years__female__pct__lr_ag15t24_f:
+        title: Literacy rate among young women
+        description_short: Share of women aged 15 to 24 years who can read and write.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_literacy
+        presentation:
+          title_public: Youth literacy rate among women
+        display:
+          numDecimalPlaces: 1
+
+      elderly_literacy_rate__population_65plus_years__both_sexes__pct__lr_ag65t99:
+        title: Literacy rate among older adults
+        description_short: Share of the population aged 65 years and older who can read and write.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_literacy
+        presentation:
+          title_public: Elderly literacy rate
+        display:
+          numDecimalPlaces: 1
+
+      youth_literacy_rate__population_15_24_years__both_sexes__pct__lr_ag15t24:
+        title: Literacy rate among youth (15–24 years)
+        description_short: Share of the population aged 15 to 24 years who can read and write.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_literacy
+        presentation:
+          title_public: Youth literacy rate
+        display:
+          numDecimalPlaces: 1
+
+      youth_literacy_rate__population_15_24_years__adjusted_gender_parity_index__gpia__lr_ag15t24_gpia:
+        title: Literacy rate among youth (15–24 years), adjusted gender parity index
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal basic literacy rates among young men and women aged 15–24. Values below 1 favor young men, and above 1 favor young women.
+        unit: "index"
+        description_key:
+          - Literacy unlocks access to education, employment, and civic participation—this indicator shows how equally those opportunities are available to boys and girls in their youth.
+          - It captures gender equality in *basic literacy* by comparing literacy rates between young women and young men aged 15–24.
+          - The *adjusted gender parity index (GPIA)* is calculated by dividing the female youth literacy rate by the male youth literacy rate. If the result exceeds 1, it is inverted and subtracted from 2, producing a scale from 0 to 2, with 1 indicating parity.
+          - A GPIA value of 1 means young men and women are equally likely to be literate. A value below 1 indicates a gap in favor of males, and a value above 1 suggests a gap in favor of females.
+          - Literacy is usually defined as the ability to both read and write a short, simple sentence with understanding. The rate is based on self-reported data or, in some cases, assessed through basic reading or writing tasks.
+          - Data sources include national censuses and household surveys. The UIS and partners may also use modelled estimates when recent or complete data are not available.
+          - This indicator measures basic literacy, not functional literacy. It reflects the presence of foundational skills, but not whether they are applied effectively in everyday contexts.
+          - Cross-country comparability may be affected by differences in definitions, data collection methods, and the extent to which responses are self-reported or verified.
 
       educational_attainment_rate__completed_post_secondary_non_tertiary_education_or_higher__population_25plus_years__both_sexes__pct__ea_4t8_ag25t99:
         title: Share of the population with post-secondary education (25+)
@@ -151,7 +209,25 @@ tables:
         presentation:
           title_public: Pupil-qualified teacher ratio in primary education
         display:
-          name: Pupil-qualified teacher ratio
+          numDecimalPlaces: 1
+
+      pupil_qualified_teacher_ratio_in_pre_primary_education__headcount_basis__ptrhc_02_qualified:
+        title: Pupil-qualified teacher ratio in pre-primary education
+        description_short: A qualified teacher is one who has the minimum academic qualifications necessary to teach at a [pre-primary](#dod:pre-primary-education) level of education in a given country.
+        unit: ""
+        description_key:
+          - This indicator shows how many pupils are taught, on average, by each qualified teacher at a specific level of education.
+          - A qualified teacher is defined as someone who has met the minimum academic and professional requirements to teach at the relevant level in their country, often specific to the subjects they are assigned to.
+          - The indicator is calculated by dividing the total number of pupils enrolled at a given level of education by the number of qualified teachers at that same level.
+          - A lower ratio generally suggests more individual attention per student and potentially higher teaching quality, while higher ratios may signal teacher shortages or large class sizes.
+          - Data are based on headcounts, but where possible, adjustments are made for part-time teachers (converted to full-time equivalents), double-shift teachers (counted twice), and other teaching practices such as multi-grade classrooms.
+          - Teachers included are professionals whose main role is to deliver formal curriculum content to students in recognized educational institutions.
+          - This indicator is useful for assessing the adequacy of the teaching workforce and for evaluating education quality and equity.
+          - However, it should be interpreted with care, as national definitions of “qualified” vary and the ratio may not reflect actual classroom conditions or teaching effectiveness.
+          - Other contextual factors, such as school schedules, subject specialization, and administrative responsibilities, may also influence the interpretation of the ratio.
+        presentation:
+          title_public: Pupil-qualified teacher ratio in pre-primary education
+        display:
           numDecimalPlaces: 1
 
       completion_rate__primary_education__adjusted_gender_parity_index__gpia__cr_1_gpia:
@@ -167,3 +243,284 @@ tables:
           - A high completion rate—close to 100%—means nearly all children complete primary school by the benchmark age, allowing for delays. Lower rates may point to late school entry, dropouts, repetition, or other barriers to completion.
           - The data comes primarily from household surveys and population censuses that collect information about each individual’s highest completed grade and age. This is combined with official data on school starting ages and duration.
           - Limitations include inconsistencies in how countries map completed grades to international standards (ISCED), changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
+
+      out_of_school_rate_for_children_of_primary_school_age__both_sexes__pct__rofst_1_cp:
+        title: Out-of-school rate for children of primary school age
+        description_short: Percentage of children in the official primary school age group who are not enrolled in any level of education.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Many children who are old enough for primary school are not attending any kind of school—this indicator shows how many are missing out on education.
+          - It captures the share of children in the official primary school age range who are not enrolled in pre-primary, primary, secondary, or higher education.
+          - The indicator is calculated by subtracting the number of enrolled primary-age children (regardless of the level of education) from the total number of children in that age group, and expressing the result as a percentage.
+          - These children may have never enrolled, may have dropped out, or may be starting late and not yet entered school.
+          - A high out-of-school rate highlights the need for improved access and targeted policies to reach excluded groups. When disaggregated, the indicator helps identify gaps by sex, location, or socioeconomic status.
+          - The data comes from administrative records and household surveys that collect information on enrolment by single year of age and compare it with population estimates for the same group.
+          - As with all estimates, there are limitations. Differences in data sources, enrolment definitions, and the timing of data collection (especially if late in the school year) can affect accuracy.
+
+      expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf:
+        title: Expenditure on education as share of government expenditure
+        description_short: Percentage of total government spending (across all sectors) that is allocated to education, across all levels.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments must make choices about where to invest public funds—this indicator shows how much priority is given to education relative to other sectors.
+          - It captures the proportion of total general government expenditure (including health, social services, and other sectors) that is allocated to education, based on local, regional, and central budgets.
+          - The indicator is calculated by dividing total government expenditure on education (including all levels) by total government expenditure on all sectors, and expressing the result as a percentage.
+          - A higher percentage reflects stronger prioritization of education in public budgeting, while a lower value may indicate limited fiscal space or other spending priorities.
+          - The Education 2030 Framework for Action recommends that governments allocate at least 15–20% of their total expenditure to education.
+          - Data come from a combination of national sources—such as finance ministry reports and education budget documents—and international sources like the IMF’s World Economic Outlook for total government expenditure figures.
+          - The UNESCO Institute for Statistics (UIS) compiles and validates this data through its Formal Education Survey and Dynamic Template, cross-referencing with IMF data to ensure consistency.
+          - While useful for comparing education financing efforts across countries, differences in budget structures, spending classifications, and demographic factors (e.g. age distribution) can affect comparability.
+          - Countries with younger populations may naturally allocate more to education, while those with older populations may invest more in healthcare or pensions—these context differences should be considered when interpreting this indicator.
+
+      government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov:
+        title: Government expenditure on education as share of GDP
+        description_short: Share of a country’s gross domestic product (GDP) that is allocated to education from the national budget.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This indicator shows how much of a country’s overall economic resources are invested in its education system.
+          - It captures government spending on education—both current and capital—as a percentage of national GDP for a given year.
+          - The indicator is calculated by dividing total government expenditure on education by the country's gross domestic product (GDP) and multiplying by 100.
+          - A higher value suggests a stronger policy commitment to education and potentially greater availability of funding for schools, teachers, materials, and infrastructure.
+          - The Education 2030 Framework for Action recommends allocating at least 4% to 6% of GDP to education as a benchmark for sufficient public investment.
+          - Data on education expenditure are gathered from national finance or education ministries through the annual UIS education survey or the UNESCO-OECD-Eurostat (UOE) collection.
+          - GDP data come from the World Bank’s World Development Indicators and are updated quarterly, with the June release typically used for reporting this indicator.
+          - Disaggregated values by level of education (e.g. primary, secondary) can reveal how resources are distributed across the system.
+          - While useful for comparing education investment across countries, the indicator may underestimate total spending if education budgets from ministries other than the Ministry of Education are not included.
+          - Changes in economic output (GDP) can also affect the indicator, so it’s important to interpret trends in the context of both economic and education sector developments.
+
+      completion_rate__upper_secondary_education__adjusted_gender_parity_index__gpia__cr_3_gpia:
+        title: Completion rate in upper secondary education, adjusted gender parity index (GPIA)
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [upper-secondary](#dod:upper-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        unit: "index"
+        description_key:
+          - Many young people never reach the final grade of upper secondary education—this indicator shows how close girls and boys are to parity in completing this level by a slightly older age than expected.
+          - It captures the percentage of youth, typically aged 3 to 5 years older than the official age for the last grade of upper secondary school, who have successfully completed that level of education, disaggregated by sex.
+          - The *adjusted gender parity index (GPIA)* is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2, producing a value between 0 and 2 that is symmetrical around 1.
+          - A GPIA of 1 signals parity. A value below 1 means boys are more likely to complete upper secondary, while a value above 1 means the advantage is with girls.
+          - The completion age group is defined using national data on entry age and duration—e.g. if upper secondary begins at age 15 and lasts 3 years, the indicator is based on youth aged 21 to 23.
+          - The completion rate reflects whether students reach the final grade of the level, regardless of whether they graduated on time, late, or after repeating a year.
+          - The data comes primarily from household surveys and censuses that ask individuals about their highest level of education completed, combined with national data on the structure and duration of schooling.
+          - There are limitations. Survey results may not align neatly with national ISCED mappings, and differences in school structure can make cross-country comparisons challenging.
+
+      completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__cr_2_gpia:
+        title: Completion rate in lower secondary education, adjusted gender parity index (GPIA)
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [lower-secondary](#dod:lower-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        unit: "index"
+        description_key:
+          - Many adolescents never reach the end of lower secondary school—this indicator shows how close girls and boys are to parity in completing this level by a slightly older age than expected.
+          - It captures the percentage of youth, typically aged 3 to 5 years older than the official age for the last grade of lower secondary education, who have successfully completed that level, disaggregated by sex.
+          - The *adjusted gender parity index (GPIA)* is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2, producing a value between 0 and 2 that is symmetrical around 1.
+          - A GPIA of 1 indicates parity. A value below 1 means boys are more likely to complete lower secondary, while a value above 1 signals an advantage for girls.
+          - The age range used reflects the expected age of completion plus a 3–5 year window to account for delayed entry or grade repetition. For example, if lower secondary ends at age 15, the indicator is based on the population aged 18 to 20.
+          - Completion rate data come from household surveys or censuses that collect information on the highest grade completed, together with national education structure data on the official start age and duration of lower secondary.
+          - Interpretation of results should consider potential mismatches between reported educational attainment and national ISCED classifications, as well as any recent changes to school duration or structure.
+
+      out_of_school_rate_for_adolescents_of_lower_secondary_school_age__both_sexes__pct__rofst_2_cp:
+        title: Out-of-school rate for adolescents of lower secondary school age
+        description_short: Percentage of adolescents in the official age group for [lower-secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Many adolescents who are old enough for lower secondary school are not enrolled—this indicator shows how many are missing out on education during this critical stage.
+          - It captures the share of young people in the official lower secondary age range who are not enrolled in any formal education, including pre-primary, primary, secondary, or tertiary levels.
+          - The indicator is calculated by subtracting the number of enrolled lower secondary-aged adolescents (regardless of the education level they attend) from the total population in that age group, and expressing the result as a percentage.
+          - These adolescents may have never made the transition from primary school, may have dropped out early, or may be late entrants who haven’t yet re-entered the system.
+          - A high out-of-school rate signals the need for better policies and programmes that promote continued schooling through early adolescence, particularly in underserved communities.
+          - The data is drawn from a combination of administrative records on school enrolment by age and household surveys that track participation in education, compared with population estimates for the relevant age group.
+          - As with all education indicators, results should be interpreted with caution—differences in data sources, how enrolment is defined, and the timing of surveys (especially if conducted late in the school year) may affect the accuracy of estimates.
+
+      percentage_of_qualified_teachers_in_secondary_education__both_sexes__pct__qutp_2t3:
+        title: Percentage of qualified teachers in secondary education
+        description_short: Share of qualified teachers in [secondary](#dod:secondary-education) education represent those with the necessary academic qualifications to teach at that level in a given country.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Trained teachers are essential for delivering quality education—this indicator shows what share of secondary school teachers have the minimum required qualifications.
+          - It captures the percentage of lower and upper secondary teachers who have received at least the minimum organized pedagogical training, either pre-service or in-service, required to teach at their level according to national standards.
+          - The indicator is calculated by dividing the number of trained teachers in secondary education by the total number of teachers at that level, and multiplying the result by 100.
+          - A high value indicates that most students in secondary education are being taught by teachers who are considered pedagogically qualified to teach at that level.
+          - The data comes from administrative records collected at the school or national level and typically includes information on teacher training credentials and employment status.
+          - This indicator is disaggregated by sex and level of education (lower and upper secondary), allowing for a closer look at training disparities across groups.
+          - Limitations arise from the fact that national standards for minimum teacher qualifications vary widely, making it difficult to compare levels of training across countries.
+          - Additionally, in many countries, data may not distinguish between subject-specific training and general pedagogical training, which can affect how meaningful the figures are for judging teacher preparedness.
+
+      proportion_of_primary_schools_with_access_to_basic_drinking_water__pct__schbsp_1_wwata:
+        title: Share of primary schools with access to drinking water
+        description_short: Share of public [primary](#dod:primary-education) schools with a drinking water facility or water delivery point that is designed to protect water from external contamination, particularly of fecal origin.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Safe drinking water is essential for a healthy learning environment—this indicator shows how many primary schools provide students with access to clean water.
+          - It measures the percentage of primary schools that have access to basic drinking water services, meaning water from an improved source that is available on school grounds or within a short walking distance.
+          - Improved sources include piped water, boreholes, protected wells or springs, rainwater, or packaged/tank water that meets national safety standards.
+          - A high value reflects adequate infrastructure for supporting health, hygiene, and student well-being, which are essential for school participation and performance.
+          - The data is typically collected through school censuses or education management information systems (EMIS) and is reported by school administrators or district education offices.
+          - This indicator can be disaggregated by location (urban/rural), public/private management, or region to identify equity gaps in access to basic services across schools.
+          - In some contexts, data may rely on school-reported access, without verifying water quality or availability throughout the year.
+          - While access alone does not guarantee regular availability or safety, this measure is a key starting point for understanding school readiness to support children’s health and learning needs.
+
+      proportion_of_primary_schools_with_single_sex_basic_sanitation_facilities__pct__schbsp_1_wtoila:
+        title: Share of primary schools with single-sex sanitation facilities
+        description_short: Percentage of [primary schools](#dod:primary-education) that have access to single-sex basic sanitation facilities, as defined by international standards.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Access to separate toilets for girls and boys is essential for dignity, privacy, and hygiene—this indicator shows how many primary schools provide this basic facility.
+          - It measures the proportion of primary schools with basic sanitation facilities that are single-sex, meaning there are separate, usable toilets for male and female students on site.
+          - Basic sanitation facilities include functional and private toilets that hygienically separate human waste from human contact and are not shared with other buildings or the public.
+          - A high percentage indicates better readiness of the school system to provide a safe and inclusive learning environment, especially for girls, who may be more likely to miss school without such facilities.
+          - The data is typically collected through national school censuses or Education Management Information Systems (EMIS) and is reported by school officials.
+          - Disaggregating this indicator by urban/rural location, region, or public/private management can help identify disparities in access to gender-sensitive school infrastructure.
+          - Some limitations include potential discrepancies in how countries define or report "usable" or "functional" toilets, and whether cleanliness, maintenance, or disability access are accounted for.
+
+      initial_government_funding_per_primary_student__constant_international_dollar__xunit_intconst_1_fsgov_ffntr:
+        title: Initial government funding per primary student
+        description_short: Government funding for each student enrolled in [primary education](#dod:primary-education), measured in constant international dollars.
+        unit: "international $"
+        short_unit: "$"
+        description_key:
+          - This indicator shows how much governments are investing, on average, in each primary school student.
+          - It captures total general (local, regional, and central) government expenditure on [primary education](#dod:primary-education)—including current and capital spending and transfers paid (such as scholarships)—but excludes international transfers received by the government.
+          - To reflect purchasing power across countries and allow comparisons over time, the amount is expressed in constant international dollars, which adjust for price level differences and inflation.
+          - The value is calculated by subtracting any international transfers to government from total government expenditure on primary education, and dividing by the total number of students enrolled at the primary level.
+          - A higher value indicates greater government investment per child in primary school, which can support better infrastructure, teaching, and learning outcomes.
+          - The data comes from administrative financial records, including national education accounts, and are reported to international bodies like the UNESCO Institute for Statistics (UIS).
+          - It’s important to note that in some cases, expenditure data may only include spending from the Ministry of Education and exclude spending by other government bodies. Where international transfers cannot be separately identified, they may remain included, leading to slight overestimation.
+
+
+      proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_lowersec:
+        title: Share of students at the end of lower-secondary education with minimum reading skills
+        description_short: Percentage of students who meet basic reading skills by the end of [lower-secondary](#dod:lower-secondary-education) school.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This shows how many students at the end of lower-secondary school have learned basic reading skills.
+          - It is based only on children who are in school and does not include those who never attend.
+          - Students are considered proficient if they can understand main ideas and make simple inferences from written texts.
+          - Data comes from school tests and surveys such as PISA or national exams.
+          - A higher value means more students are reading at a basic level, while a lower value suggests many are falling behind.
+          - Some countries may not test all students, or use different standards, which makes comparison harder.
+
+      proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_primary:
+        title: Share of students with minimum reading skills by the end of primary school
+        description_short: Percentage of students who meet basic reading skills by the end of [primary](#dod:primary-education) school.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This shows how many students finish primary school able to read simple stories and understand what they mean.
+          - It only includes students who are still in school—not those who dropped out or never enrolled.
+          - Reading skills are measured by exams or surveys, often organized nationally or internationally.
+          - A higher percentage means more children are learning to read by the time they leave primary school.
+          - Different countries may test students in different ways, which affects how results can be compared.
+
+      share_of_students_achieving_minimum_math_proficiency_in_early_primary_education:
+        title: Share of students achieving minimum math proficiency in early primary education
+        description_short: Minimum math proficiency for early [primary](#dod:primary-education) education means students in Grades 2 or 3 can demonstrate skills in number sense and computation, shape recognition, and spatial orientation.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This indicator shows what share of students in Grades 2 or 3 meet basic expectations in mathematics.
+          - It measures whether children can work with numbers under 100, recognize basic shapes, and understand simple spatial ideas.
+          - A high value suggests that most students in early primary school are learning foundational math skills.
+          - The data comes from learning assessments taken during school—children not in school are not included.
+          - Differences in national testing methods can make comparisons between countries less reliable.
+
+      share_of_students_achieving_minimum_math_proficiency_by_end_of_primary_education:
+        title: Share of students achieving minimum math proficiency by the end of primary education
+        description_short: Minimum math proficiency for the end of [primary](#dod:primary-education) education means students can demonstrate skills in number sense and computation, basic measurement, reading, interpreting, and constructing graphs, spatial orientation, and number patterns.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This indicator shows what share of students have mastered key math skills by the end of primary school.
+          - It includes skills like working with numbers, measuring objects, understanding graphs, recognizing shapes in space, and spotting patterns.
+          - Students are usually assessed around Grade 6, depending on when primary school ends in each country.
+          - A high value suggests that many students are leaving primary school with a solid foundation in mathematics.
+          - The data comes from school-based assessments, so it does not reflect the learning levels of children who are not in school.
+          - Different assessment systems across countries can limit how directly results can be compared.
+
+      share_of_students_achieving_minimum_math_proficiency_by_end_of_lower_secondary_education:
+        title: Share of students achieving minimum math proficiency by the end of lower-secondary education
+        description_short: Minimum math proficiency for the end of [lower-secondary](#dod:lower-secondary-education) education means students demonstrate skills in computation, application problems, matching tables and graphs, and making use of algebraic representations.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This indicator shows what share of students have mastered key math skills by the time they finish lower-secondary school.
+          - It includes solving real-world problems, using graphs and tables, doing calculations, and understanding basic algebra.
+          - A high value means most students are building strong mathematical skills that can prepare them for higher education or work.
+          - The data comes from school-based assessments, so it does not include students who left school before this stage.
+          - Differences in national assessments mean results may not be perfectly comparable across countries.
+          - Even so, this indicator helps track progress in making sure all students gain essential math skills by the end of compulsory education.
+
+      share_of_students_achieving_minimum_reading_proficiency_in_early_primary_education:
+        title: Share of students in early primary education achieving at least minimum reading proficiency
+        description_short: Minimum reading proficiency for early [primary](#dod:primary-education) education means students in grade 2 can read familiar words and extract information from sentences, while in grade 3, they read aloud fluently, understand short texts, and identify the main topic.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - This indicator shows the percentage of students in grades 2 or 3 who have developed basic reading skills.
+          - It includes recognizing familiar words, understanding sentences, and reading simple stories or information texts.
+          - A high value suggests that children are learning to read early, giving them a strong foundation for future learning.
+          - The data comes from tests given in schools, so it does not include children who are not enrolled or have dropped out.
+          - Results may vary depending on how each country designs and scores its reading assessments.
+
+      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
+        title: Share of children achieving minimum reading proficiency by the end of lower-secondary age
+        description_short: Percentage of children at [lower-secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards, including the ability to connect main ideas across different text types, understand the author’s intentions, and draw conclusions from the text, adjusted for national school completion rates.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Many children never get the chance to finish school—this indicator shows how many children, in total, are reaching basic reading skills by the time they should complete lower-secondary education.
+          - It combines two elements - how many students reach the end of lower-secondary school, and how many of them meet minimum reading standards.
+          - Minimum reading proficiency means understanding texts, making connections across ideas, and drawing conclusions from what is read.
+          - This provides a more realistic picture than school assessments alone, since it includes children who dropped out or never enrolled.
+          - A high value indicates that most children are not only finishing school but also learning essential reading skills.
+          - The calculation multiplies the share of children who complete lower-secondary school by the share of those who meet reading standards.
+          - Data come from learning assessments (such as PISA, TIMSS, and regional tests) and adjusted completion estimates based on household surveys.
+          - While this approach improves equity and accuracy, it inherits some limitations from both sources—especially where completion and assessment years don’t match exactly.
+
+      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_1_read:
+        title: Share of children achieving minimum reading proficiency by the end of primary age
+        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum reading proficiency for the end of [primary](#dod:primary-education) education. This means children can identify key ideas in texts and connect them to their own experiences.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Many children do not complete primary school—this indicator estimates how many reach basic reading skills by the expected age for finishing primary education.
+          - It adjusts for school completion, showing the share of all children (not just those still enrolled) who meet reading proficiency standards.
+          - Minimum reading proficiency at this level means understanding simple texts, locating key ideas, and linking them to personal knowledge or experience.
+          - A high value reflects both good school access and quality of learning.
+          - The indicator is calculated by multiplying the percentage of children who complete primary school by the percentage of those who meet the reading benchmark.
+          - Data come from large-scale assessments (like PIRLS, TIMSS, ERCE) and completion data from household surveys or modeled estimates.
+          - This combined measure gives a fuller picture of progress toward universal, effective education.
+          - Limitations include possible mismatch in data timing and variations in assessment tools across countries, but it still helps track how well systems serve all children—not only those who stay in school.
+
+      proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_2_math:
+        title: Share of children achieving minimum math proficiency by the end of lower-secondary age
+        description_short: Percentage of children at [lower-secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower-secondary](#dod:lower-secondary-education) education. This means children can apply algebra, interpret graphs, and solve real-world problems.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Many children drop out before completing lower-secondary school—this indicator estimates how many reach essential math skills by the expected age of completion.
+          - It combines school completion rates with test results to reflect the percentage of all children (not just enrolled students) who meet math proficiency standards.
+          - Minimum math proficiency includes computation, interpreting data, and using algebraic representations in everyday contexts.
+          - A higher percentage indicates that more children are both staying in school and achieving foundational math skills.
+          - The indicator is calculated by multiplying the share of completers by the share of those who meet the minimum math benchmark.
+          - Data sources include international learning assessments and modeled estimates of completion from surveys.
+          - This approach helps capture learning outcomes for an entire age group—not just students in classrooms.
+          - Limitations include gaps in data availability and alignment of assessments and age groups, but it provides a more inclusive view of education system performance.
+
+      proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_1_math:
+        title: Share of children achieving minimum math proficiency by the end of primary age
+        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This means children can solve basic problems involving number sense, measurement, and interpreting simple data.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Many children do not complete primary education—this indicator estimates how many gain essential math skills by the expected completion age.
+          - It reflects both school access and learning outcomes by adjusting test results for primary completion rates.
+          - Minimum math proficiency includes basic operations, spatial understanding, measurement, and interpreting graphs.
+          - High values show effective systems where children both stay in school and acquire core math competencies.
+          - It is calculated by multiplying the percentage who complete primary with the percentage achieving math proficiency.
+          - Data are drawn from assessments and modeled completion rates to cover entire age groups, not just those enrolled.
+          - While subject to some limitations, such as timing mismatches or assessment variation, this combined metric better tracks real progress toward universal foundational learning.

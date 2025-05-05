@@ -226,16 +226,14 @@ tables:
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equality in the expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
-          - In many countries, boys and girls spend different lengths of time in school—this indicator shows how close they are to parity in the total number of years of schooling they can expect to receive.
-          - It captures gender equality in *school life expectancy* by comparing the average number of years of education a girl can expect to receive with that of a boy, based on current enrolment rates at each age.
-          - The *adjusted gender parity index (GPIA)* is calculated by dividing the female school life expectancy by the male school life expectancy. If the result exceeds 1, it is inverted and subtracted from 2, producing a scale from 0 to 2, with 1 indicating exact parity.
-          - A value of 1 means girls and boys are expected to spend the same number of years in school. A value below 1 indicates boys are expected to stay longer in school, and a value above 1 means the advantage is with girls.
-          - School life expectancy is based on the assumption that current age-specific enrolment patterns continue in the future. It includes children who may never enrol and reflects system-wide participation across all levels of education.
-          - The data comes from administrative records, including school registers and censuses, and from population estimates by single year of age, typically provided by national sources or the United Nations Population Division.
-          - This indicator is disaggregated by sex and level of education, helping to identify gaps in participation across different stages of schooling.
-          - As with all school expectancy measures, this does not reflect the quality of education or actual grade completion. It also does not account for grade repetition or part-time study, which can vary by country.
-          - While limitations exist, the *GPIA for school life expectancy* is a valuable tool for understanding gender disparities in access and continuity within the education system over a child’s expected schooling years.
-
+            - In many countries, boys and girls do not spend the same amount of time in primary school—this indicator shows how close they are to parity in expected school duration at the primary level.
+            - It focuses specifically on *school life expectancy* in [primary education](#dod:primary-education), comparing the average number of years girls and boys are expected to spend in primary school based on current age-specific enrolment rates.
+            - The *adjusted gender parity index (GPIA)* is calculated by dividing the female school life expectancy in primary education by the male school life expectancy. If the result exceeds 1, it is inverted and subtracted from 2 to produce a symmetrical scale from 0 to 2, with 1 representing perfect parity.
+            - A value of 1 means boys and girls are expected to spend the same number of years in primary school. Values below 1 indicate boys are expected to spend more time in school; values above 1 indicate girls are.
+            - This indicator assumes current enrolment trends continue over time and includes all children, even those who may never enrol, giving a comprehensive view of participation in primary education.
+            - The data comes from administrative sources such as school censuses and registers, as well as population estimates by age, typically provided by national statistical offices or the United Nations Population Division.
+            - Disaggregated by sex, this indicator helps identify gender gaps in access to and retention in primary schooling.
+            - As with all expectancy-based indicators, it does not reflect actual completion or quality of education and may not account for repetition or part-time attendance, which can vary across contexts.
       outbound_mobility_ratio__all_regions__both_sexes__uis_estimate__pct:
         title: Share of students studying abroad
         description_short: Percentage of a country's [tertiary](#dod:tertiary-education) level students studying abroad as international students. International students are those that move from their home countries for education, identified based on their past education, residence, or distinct immigration regulations.
@@ -409,6 +407,21 @@ tables:
           - Limitations include incomplete coverage when data from only one ministry is reported, or when education-related spending by other government bodies is excluded. Differences in fiscal and academic years may also affect the timing of reported expenditure.
           - Despite these challenges, the *share of education spending on staff compensation* offers key insights into how resources are distributed within education systems and the role that teachers and support staff play in public education investment.
 
+      all_staff_compensation_as_a_percentage_of_total_expenditure_in_primary_public_institutions__pct:
+        title: Share of total public education expenditure allocated to staff compensation in primary education
+        description_short: Compensation for staff in [primary](#dod:primary-education) education, both teaching and non-teaching, covers salaries, retirement contributions by employers, and additional benefits.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education—this indicator shows how much is spent specifically on staff compensation relative to the overall education budget.
+          - It captures the percentage of total public education expenditure in primary education that is allocated specifically to staff compensation, including both teaching and non-teaching personnel.
+          - The indicator is calculated by dividing staff compensation expenditure by total public education expenditure, and multiplying by 100. It can also be further broken down by staff type or level of education.
+          - A higher percentage suggests a larger portion of education funding is directed toward salaries and benefits, which can reflect government policy priorities and investment in teacher recruitment, retention, and motivation.
+          - The data comes from administrative financial records, often sourced from ministries of finance or education, or from national statistical offices through the UIS or UNESCO-OECD-Eurostat (UOE) surveys.
+          - This indicator is disaggregated by level of education, making it possible to compare spending patterns across primary, secondary, or tertiary education.
+          - It should be interpreted in context, alongside indicators on capital investment, material spending (such as textbooks), and total expenditure per student.
+          - Over time, changes in this indicator may reflect shifts in education budgeting priorities—such as reforms to teacher salary structures or investments in learning materials.
+          - Limitations include incomplete coverage when data from only one ministry is reported, or when education-related spending by other government bodies is excluded. Differences in fiscal and academic years may also affect the timing of reported expenditure.
 
       government_expenditure_on_pre_primary_education_as_a_percentage_of_gdp__pct:
         title: Government expenditure on pre-primary education as share of GDP
