@@ -79,7 +79,8 @@
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the autoupdate. Snapshots that should belong to the same autoupdate should have the same name."
         }
       },
       "required": [

@@ -12,19 +12,19 @@ All results are stored in the accompanying file: snapshot_execution_times.json
 
 import base64
 import datetime as dt
-import hashlib
 import json
 import random
 import subprocess
 import time
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Set
 
 import click
 import requests
 import yaml
+from owid.catalog.utils import underscore
 from owid.datautils.io import save_json
 from structlog import get_logger
 from tqdm.auto import tqdm
@@ -71,14 +71,13 @@ def fetch_file(file_path, branch):
     return base64.b64decode(content_base64).decode("utf-8")
 
 
-def create_autoupdate_pr(snapshot: str):
-    assert snapshot.endswith(".py"), f"Expected snapshot to end with .py, got {snapshot}"
-
-    name = Path(snapshot).stem.replace("_", "-")
-    version = snapshot.split("/")[1]
-    snapshot_hash = hashlib.md5(snapshot.encode()).hexdigest()[:3]
-    branch_name = f"auto-{name}-{version}-{snapshot_hash}"
-    title = f"🤖 Update snapshot `{snapshot.replace('.py', '')}`"
+def create_autoupdate_pr(update_name: str, files: list[Path]):
+    """Create a pull request with given files. It creates it via API without modifying the local repo."""
+    # name = Path(snapshot).stem.replace("_", "-")
+    # version = snapshot.split("/")[1]
+    # snapshot_hash = hashlib.md5(snapshot.encode()).hexdigest()[:3]
+    branch_name = f"auto-{underscore(update_name)}"
+    title = f"🤖 Autoupdate: {update_name}"
 
     headers = {
         "Authorization": f"token {GITHUB_TOKEN}",
@@ -104,13 +103,8 @@ def create_autoupdate_pr(snapshot: str):
         create_ref_resp.raise_for_status()
 
     # Gather files in snapshot_dir
-    snapshot_dir = (Path(SNAPSHOTS_DIR) / snapshot).parent
     tree_items = []
-    for filepath in snapshot_dir.rglob("*.dvc"):
-        # Must match snapshot name
-        if snapshot.replace(".py", ".") not in str(filepath):
-            continue
-
+    for filepath in files:
         with filepath.open("r", encoding="utf-8") as fp:
             content = fp.read()
 
@@ -132,7 +126,7 @@ def create_autoupdate_pr(snapshot: str):
 
     # Don't update if there are no changes
     if not tree_items:
-        log.info(f"No changes in {snapshot}")
+        log.info(f"No changes in {update_name}")
         return
 
     # Create a tree for all files
@@ -143,7 +137,7 @@ def create_autoupdate_pr(snapshot: str):
 
     # Create a commit
     commit_data = {
-        "message": f"Update snapshot {snapshot}",
+        "message": title,
         "tree": tree_sha,
         "parents": [master_sha],
     }
@@ -210,6 +204,7 @@ def run_updates(
     """Update all snapshots in a group."""
 
     exec_results = []
+    files_to_update = []
 
     for update in group_updates:
         # Extract attributes from the update.
@@ -217,6 +212,8 @@ def run_updates(
         snapshot_script = update.snapshot_script
         dvc_files = update.dvc_files
         dvc_file = dvc_files[0]
+
+        files_to_update += update.dvc_files
 
         # Start timer.
         start_time = time.time()
@@ -267,7 +264,7 @@ def run_updates(
                 for f in dvc_files:
                     snap = Snapshot(str(dvc_files[0].relative_to(SNAPSHOTS_DIR)).replace(".dvc", ""))
                     if snap.m.origin:
-                        snap._update_metadata_file({"meta": {"origin": {"date_accessed": str(dt.date.today())}}})
+                        snap.m._update_metadata_file({"meta": {"origin": {"date_accessed": str(dt.date.today())}}})
 
             # Add duration time for successfully executed snapshot.
             exec_result.duration = round(time.time() - start_time, 3)
@@ -287,11 +284,9 @@ def run_updates(
 
         exec_results.append(exec_result)
 
-    __import__("ipdb").set_trace()
-
     # If MD5 has changed, create a PR.
     if create_pr and not any(exec_result.identical for exec_result in exec_results):
-        create_autoupdate_pr(update.name)
+        create_autoupdate_pr(update_name=update.name, files=files_to_update)
 
     return exec_results
 
@@ -311,7 +306,7 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool, 
         with open(OUTPUT_FILE, "r") as f:
             execution_results = json.load(f)
     else:
-        execution_results = []
+        execution_results = {}
 
     active_snapshots = get_active_snapshots()
     if filter:
@@ -354,7 +349,7 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool, 
             log.warning(f"Multiple .dvc files found for {snapshot}. Using the first one.")
 
         # Skip snapshots that have already been processed.
-        if skip and snapshot in [r["name"] for r in execution_results]:
+        if skip and snapshot in execution_results:
             log.info("run_all_snapshots.skip", snapshot=snapshot, reason="already processed")
             continue
 
@@ -385,13 +380,16 @@ def main(dry_run: bool, create_pr: bool, filter: str, timeout: int, skip: bool, 
         )
 
     for name, group_updates in tqdm(updates.items()):
-        execution_results += run_updates(
+        execution_results[name] = run_updates(
             group_updates,
             create_pr=create_pr,
             timeout=timeout,
             continue_on_failure=continue_on_failure,
             dry_run=dry_run,
         )
+
+        # Convert results to a list of dictionaries.
+        execution_results[name] = [asdict(result) for result in execution_results[name]]
 
         # Save intermediate results to a JSON file.
         save_json(data=execution_results, json_file=OUTPUT_FILE, indent=4, sort_keys=False)
