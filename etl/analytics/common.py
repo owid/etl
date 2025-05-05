@@ -3,6 +3,7 @@
 TODO: We currently have many functions reading analytics (from MySQL and GBQ) in different places. We should gather those functions in this module.
 """
 
+import re
 import urllib.error
 import urllib.parse
 from datetime import datetime
@@ -24,21 +25,79 @@ DATE_MAX = str(datetime.today().date())
 # Base url for Datasette csv queries.
 ANALYTICS_CSV_URL = "http://analytics.owid.io/analytics.csv"
 
+# Maximum number of rows that a single Datasette csv call can return.
+MAX_DATASETTE_N_ROWS = 10000
 
-def read_datasette(sql: str, datasette_csv_url: str = ANALYTICS_CSV_URL) -> pd.DataFrame:
+
+def _try_to_execute_datasette_query(sql_url: str, warn: bool = False) -> pd.DataFrame:
+    try:
+        df = pd.read_csv(sql_url)
+        return df
+    except urllib.error.HTTPError as e:
+        if e.code == 414:
+            raise ValueError("HTTP 414: Query too long. Consider simplifying or batching the request.")
+        else:
+            raise
+
+
+def clean_sql(sql: str) -> str:
+    """
+    Normalize an SQL string for use in Datasette URL queries.
+    """
+    return " ".join(sql.strip().rstrip(";").split())
+
+
+def read_datasette(
+    sql: str, datasette_csv_url: str = ANALYTICS_CSV_URL, chunk_size: int = MAX_DATASETTE_N_ROWS
+) -> pd.DataFrame:
     """
     Execute a query in the Datasette semantic layer.
-
-    NOTE: This function will attempt to fetch all rows at once, and, if it exceeds the number of rows, it raises a warning. If that happens, you may need to simplify your query and combine results. I don't know if there's any simple workaround for this function.
     """
-    # Prepare a query to use in the URL of datasette.
-    query = urllib.parse.urlencode({"sql": sql, "_size": "max"})
-    full_url = f"{datasette_csv_url}?{query}"
-    # Read csv results returned by datasette, and create a dataframe.
-    df = pd.read_csv(full_url)
+    # Check if the query contains a LIMIT clause.
+    limit_match = re.search(r"\bLIMIT\s+(\d+)(?:\s+OFFSET\s+(\d+))?\b", sql, re.IGNORECASE)
 
-    if len(df) == 10000:
-        log.warning("Datasette cannot return more than 10,000 rows in one query. Simplify the query.")
+    # Clean the query.
+    sql_clean = clean_sql(sql)
+
+    if limit_match:
+        # If a LIMIT clause already exists, check if it's larger than the limit.
+        limit_value = int(limit_match.group(1))
+        if limit_value > MAX_DATASETTE_N_ROWS:
+            raise ValueError(
+                f"Query LIMIT ({limit_value}) exceeds Datasette's maximum row limit ({MAX_DATASETTE_N_ROWS}). Either use a lower value for the limit, or set no limit (and pagination will be used)."
+            )
+        else:
+            # Given that there is a LIMIT clause, and the value is small, execute the query as-is.
+            full_url = f"{datasette_csv_url}?" + urllib.parse.urlencode({"sql": sql_clean, "_size": "max"})
+            # Fetch data as a dataframe, or raise an error (e.g. if query is too long).
+            df = _try_to_execute_datasette_query(sql_url=full_url, warn=True)
+    else:
+        # If there is no LIMIT clause, paginate using LIMIT/OFFSET.
+        offset = 0
+        dfs = []
+        while True:
+            # Prepare query for this chunk.
+            full_url = f"{datasette_csv_url}?" + urllib.parse.urlencode(
+                {"sql": f"{sql_clean} LIMIT {chunk_size} OFFSET {offset}", "_size": "max"}
+            )
+            # Fetch data for current chunk.
+            df_chunk = _try_to_execute_datasette_query(sql_url=full_url)
+            if len(df_chunk) == chunk_size:
+                # Add data for current chunk to the list.
+                dfs.append(df_chunk)
+                # Update offset.
+                offset += chunk_size
+            else:
+                # If fewer rows than the maximum (or even zero rows) are fetched, this must be the last chunk.
+                dfs.append(df_chunk)
+                break
+
+        if len(dfs) == 0:
+            # If no data was fetched, return an empty dataframe.
+            df = pd.DataFrame()
+        else:
+            # Concatenate all chunks of data.
+            df: pd.DataFrame = pd.concat(dfs, ignore_index=True)  # type: ignore
 
     return df
 
