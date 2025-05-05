@@ -196,7 +196,6 @@ tables:
           - Anocracies have neither clearly democratic nor autocratic characteristics.
           - Autocracies have mostly autocratic/non-democratic characteristics.
           - "It uses the conventional coding rules (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) of coding Polity regimes given here: https://www.systemicpeace.org/polityproject.html"
-
       democracy_recod_polity:
         title: Democracy (recoded 0-20)
         unit: ""
