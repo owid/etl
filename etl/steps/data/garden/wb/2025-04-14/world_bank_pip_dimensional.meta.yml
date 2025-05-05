@@ -829,12 +829,3 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
 
-
-
-
-
- 'top1_thr',
- 'top1_share',
- 'top1_avg',
- 'top90_99_share',
-
