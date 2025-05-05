@@ -1185,6 +1185,10 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
 
         tb_both_inc_and_cons_smoothed = pr.concat([tb_both_inc_and_cons_smoothed, tb_country])
 
+    # Drop the columns created in this function
+    tb_both_inc_and_cons_smoothed = tb_both_inc_and_cons_smoothed.drop(columns=["only_inc_or_cons", "duplicate_flag"])
+    tb_only_inc_or_cons = tb_only_inc_or_cons.drop(columns=["only_inc_or_cons", "duplicate_flag"])
+
     # Restore the format of the table
     tb_both_inc_and_cons_smoothed = unpivot_table(
         tb=tb_both_inc_and_cons_smoothed,
@@ -1198,9 +1202,6 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     )
 
     tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
-
-    # Drop the columns created in this function
-    tb_inc_or_cons = tb_inc_or_cons.drop(columns=["only_inc_or_cons", "duplicate_flag"])
 
     return tb_inc_or_cons
 
