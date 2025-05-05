@@ -299,7 +299,7 @@ def run_updates(
 
     # If MD5 has changed, create a PR.
     if create_pr and not any(exec_result.identical for exec_result in exec_results):
-        create_autoupdate_pr(update_name=update.name, files=files_to_update)
+        create_autoupdate_pr(update_name=update.name, files=files_to_update)  # type: ignore
 
     return exec_results
 
