@@ -116,7 +116,9 @@ def get_chart_diffs():
     )
 
     # Get indicators used in charts
-    st.session_state.indicators_in_charts = indicators_in_charts(list(st.session_state.chart_diffs.keys()))
+    st.session_state.indicators_in_charts = indicators_in_charts(
+        SOURCE_ENGINE, list(st.session_state.chart_diffs.keys())
+    )
 
     # Init, can be changed by the toggle
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
