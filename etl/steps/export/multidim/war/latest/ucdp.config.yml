@@ -1,0 +1,29 @@
+title:
+  title: War and Peace
+  title_variant: "1989-today"
+default_selection:
+  - Spain
+
+dimensions:
+  - name: Country
+    slug: country_select
+  - name: Metric
+    slug: metric
+    choices:
+      - slug: "emigrants"
+        name: "Emigrants"
+        description: People moving away from country
+      - slug: "immigrants"
+        name: "Immigrants"
+        description: People moving to country
+  - name: Gender
+    slug: "gender"
+    choices:
+      - slug: "all"
+        name: "All migrants"
+      - slug: "female"
+        name: "Female migrants"
+      - slug: "male"
+        name: "Male migrants"
+
+views: []

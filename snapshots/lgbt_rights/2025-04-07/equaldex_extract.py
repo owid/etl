@@ -35,9 +35,6 @@ PARENT_DIR = Path(__file__).parent.absolute()
 # Import API key (it is stored in .env file)
 API_KEY = os.getenv("EQUALDEX_KEY")
 
-# Get where is the env file
-
-print(f"API key: {API_KEY}")
 
 # Set parameter to extract data from the API or not (this is useful to avoid running the API query every time)
 GET_DATA_FROM_API = True

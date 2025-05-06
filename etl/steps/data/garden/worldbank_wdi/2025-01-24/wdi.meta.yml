@@ -5315,4 +5315,11 @@ tables:
        title: Access to clean fuels and technologies for cooking (number with access)
       eg_cft_accs_zs_without_number:
        title: Access to clean fuels and technologies for cooking (number with no access)
+      patents_per_million_people:
+        title: Patents granted per million people
+        unit: patents per million people
+      articles_per_million_people:
+        title: Scientific and technical journal articles per million people
+        unit: articles per million people
+
 

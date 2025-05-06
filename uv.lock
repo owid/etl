@@ -1214,7 +1214,7 @@ requires-dist = [
     { name = "sparqlwrapper", specifier = ">=1.8.5" },
     { name = "sqlalchemy", specifier = ">=2.0.30" },
     { name = "statsmodels", marker = "extra == 'wizard'", specifier = ">=0.14.4" },
-    { name = "streamlit", marker = "extra == 'wizard'", specifier = ">=1.44.0" },
+    { name = "streamlit", marker = "extra == 'wizard'", specifier = ">=1.45.0" },
     { name = "streamlit-ace", marker = "extra == 'wizard'", specifier = ">=0.1.1" },
     { name = "streamlit-aggrid", specifier = ">=1.0.5" },
     { name = "streamlit-aggrid", marker = "extra == 'wizard'", specifier = ">=0.3.4.post3" },
@@ -6338,7 +6338,7 @@ wheels = [
 
 [[package]]
 name = "streamlit"
-version = "1.44.1"
+version = "1.45.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "altair" },
@@ -6360,9 +6360,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "watchdog", marker = "platform_system != 'Darwin'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3e/c0/7286284567e5045f0c587c426d0c41aee5d10c0a2e360e627a83037e9f0c/streamlit-1.44.1.tar.gz", hash = "sha256:c6914ed6d5b76870b461510476806db370f36425ae0e6654d227c988288198d3", size = 9423685 }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/52/83d46b4c5044477e9c6dee779704a9d4041610439533af9c0a5084921098/streamlit-1.45.0.tar.gz", hash = "sha256:4e99014e113a11a7163b9da5ac079efb1ae5f8575a09c5a6a9c43cd6877a2a88", size = 9462166 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/eb/17/fc425e1d4d86e31b2aaf0812a2ef2163763a0670d671720c7c36e8679323/streamlit-1.44.1-py3-none-any.whl", hash = "sha256:9fe355f58b11f4eb71e74f115ce1f38c4c9eaff2733e6bcffb510ac1298a5990", size = 9812242 },
+    { url = "https://files.pythonhosted.org/packages/43/ff/f41cfaf1bb58223fe77ff87213a689f6c9c82f7363f9d7c879d294dbe985/streamlit-1.45.0-py3-none-any.whl", hash = "sha256:b7d03ec68a23de0f1922ec9a28fbe3fe37d9fb31ad31d6c429d262c3631c2943", size = 9856265 },
 ]
 
 [[package]]

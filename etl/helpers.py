@@ -26,7 +26,7 @@ from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstring
 from etl import paths
 from etl.collections.explorer import Explorer, create_explorer
 from etl.collections.explorer_legacy import ExplorerLegacy, _create_explorer_legacy
-from etl.collections.multidim import Multidim, create_mdim
+from etl.collections.multidim import Multidim, MultidimSet, create_mdim
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -520,8 +520,8 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
         is_private: Optional[bool] = None,
-    ) -> Union[catalog.Dataset, Snapshot]:
-        """Load a dataset dependency, given its attributes (at least its short name)."""
+    ) -> Union[catalog.Dataset, Snapshot, MultidimSet]:
+        """Load a (dataset or export) dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
             step_type=step_type,
             short_name=short_name,
@@ -533,6 +533,11 @@ class PathFinder:
         dependency = self._get_attributes_from_step_name(step_name=dependency_step_name)
         if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
+        elif (step_type == "export") and (dependency["channel"] in "multidim"):
+            mdims_path = (
+                paths.EXPORT_MDIMS_DIR / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
+            )
+            return MultidimSet(mdims_path)
         else:
             dataset_path = (
                 paths.DATA_DIR
@@ -568,6 +573,22 @@ class PathFinder:
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
+    def load_mdims(
+        self,
+        short_name: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[Union[str, int]] = None,
+    ) -> MultidimSet:
+        mdims = self.load_dependency(
+            step_type="export",
+            short_name=short_name or self.short_name,
+            channel="multidim",
+            namespace=namespace,
+            version=version,
+        )
+        assert isinstance(mdims, MultidimSet)
+        return mdims
+
     def load_etag_url(self) -> str:
         """Load etag url dependency and return its URL."""
         deps = [dep for dep in self.dependencies if dep.startswith("etag://")]
@@ -579,7 +600,10 @@ class PathFinder:
             path = self.directory / Path(filename)
         elif path is None:
             path = self.config_path
-        config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
+        try:
+            config = catalog.utils.dynamic_yaml_to_dict(catalog.utils.dynamic_yaml_load(path))
+        except AttributeError as e:
+            raise AttributeError(f"There was a problem loading config from {path}, please review!. Original error: {e}")
         return config
 
     def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
@@ -635,11 +659,11 @@ class PathFinder:
             Name of the MDIM page. Default is short_name from mdim catalog path.
         """
         # Create Multidim
-        mdim = create_mdim(config, self.dependencies)
-
-        # Get and set catalog path
-        mdim_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}"
-        mdim.catalog_path = mdim_catalog_path
+        mdim = create_mdim(
+            config,
+            self.dependencies,
+            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}",
+        )
 
         return mdim
 
@@ -661,11 +685,8 @@ class PathFinder:
         explorer = create_explorer(
             config=config,
             dependencies=self.dependencies,
+            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}",
         )
-
-        # Get and set catalog path
-        explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}"
-        explorer.catalog_path = explorer_catalog_path
 
         return explorer
 
