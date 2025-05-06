@@ -121,7 +121,8 @@ def prompt_dataset_options(dataset_options):
         help="By default, only non-archived datasets from ETL are shown. However, if you search for an archived (or pre-ETL) one via QUERY PARAMS, the list will show all datasets. To use QUERY PARAMS, add `?datasetId=YOUR_DATASET_ID` to the URL.",
     )
 
-    return dataset_id
+    if dataset_id is not None:
+        return int(dataset_id)
 
 
 def prompt_display_charts():

@@ -951,7 +951,8 @@ class ExportStep(DataStep):
         ds.save()
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("ExportStep should not be used as an input")
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
 
     @property
     def _search_path(self) -> Path:

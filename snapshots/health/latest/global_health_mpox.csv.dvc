@@ -1,26 +1,15 @@
-# Learn more at:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 meta:
   origin:
-    # Data product / Snapshot
-    title: Mpox - 2024
-    date_published: "2024-09-02"
-
-    # Citation
     producer: Global.health
-    citation_full: |-
-      Global.health Mpox (accessed on 2024-09-02)
-
-    # Files
+    title: Mpox - 2024
+    citation_full: Global.health Mpox (accessed on 2024-09-02)
     url_main: https://global.health/
     url_download: https://mpox-2024.s3.eu-central-1.amazonaws.com/latest.csv
-    date_accessed: 2024-09-02
-
-    # License
+    date_accessed: '2024-09-02'
+    date_published: '2024-09-02'
     license:
       name: CC BY 4.0
       url: https://global.health/terms-of-use/
-
 outs:
   - md5: 579bd1a5c8d1cae804c064bb5125de1c
     size: 16814215

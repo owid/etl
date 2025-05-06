@@ -32,4 +32,18 @@ def run() -> None:
     config["views"] += grouped_views
 
     mdim = paths.create_mdim(config=config)
+
+    mdim.sort_choices(
+        {
+            "age": [
+                "All ages",
+                "Age-standardized",
+                "<5 years",
+                "5-14 years",
+                "15-49 years",
+                "50-69 years",
+                "70+ years",
+            ]
+        }
+    )
     mdim.save()

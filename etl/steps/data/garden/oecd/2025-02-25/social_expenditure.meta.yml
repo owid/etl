@@ -124,8 +124,6 @@ tables:
           - "{definitions.key_expenditure_source}"
           - "{definitions.key_spending_type}"
           - "{definitions.key_programme_type}"
-        presentation:
-          title_public: Social expenditure as a share of GDP
         display:
           name: Social expenditure as a share of GDP
           numDecimalPlaces: 1
@@ -141,8 +139,6 @@ tables:
           - "{definitions.key_expenditure_source}"
           - "{definitions.key_spending_type}"
           - "{definitions.key_programme_type}"
-        presentation:
-          title_public: Social expenditure as a share of government expenditure
         display:
           name: Social expenditure as a share of government expenditure
           numDecimalPlaces: 1
@@ -161,7 +157,6 @@ tables:
           - "{definitions.ppp_adjustment}"
           - "{definitions.ppp_prices}"
         presentation:
-          title_public: Social expenditure per capita
           faqs:
             - fragment_id: poverty-international-dollars
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw

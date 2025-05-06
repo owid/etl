@@ -617,9 +617,9 @@ def update_food_explorer_dependency_version() -> None:
         dag_lines = _dag_file.read()
 
     # Exact dag line for the OWID food explorer.
-    dag_line_explorer = "data://explorer/owid/latest/food_explorer"
+    dag_line_explorer = "data://garden/faostat/latest/food_explorer"
     # Find the latest version of the FAOSTAT food explorer dataset in garden.
-    new_version = find_latest_version_for_step(channel="garden", step_name=f"{NAMESPACE}_food_explorer")
+    new_version = find_latest_version_for_step(channel="garden", step_name="food_explorer")
     if new_version is None:
         raise FileNotFoundError("Food explorer step file not found.")
     # To begin with, assume old version is identical to new.
@@ -719,7 +719,7 @@ def apply_custom_rules_to_list_of_steps_to_create(step_names: List[str], channel
 
     # In garden, if either fbsc or qcl were updated, update food explorer.
     if (channel == "garden") and (any({f"{NAMESPACE}_fbsc", f"{NAMESPACE}_qcl"} & set(step_names))):
-        step_names += [f"{NAMESPACE}_food_explorer"]
+        step_names += ["food_explorer"]
 
     # In grapher there is never a step for metadata.
     if channel == "grapher":

@@ -1,5 +1,6 @@
 import json
 import random
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pandas as pd
@@ -9,9 +10,11 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
+from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import explorer_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
+from etl.files import yaml_dump
 from etl.grapher import model as gm
 
 log = get_logger()
@@ -35,6 +38,9 @@ CURRENT_DIR = Path(__file__).resolve().parent
 # DB access
 # Create connections to DB
 SOURCE_ENGINE, TARGET_ENGINE = get_engines()
+
+# Params
+MAX_DIFF_LINES = 100
 
 
 def _show_options():
@@ -84,6 +90,14 @@ def _fetch_explorer_views(slug: str) -> list[dict]:
             if dims:
                 views.append(dims)
 
+    # If view doesn't have all dimensions, use '-'
+    dim_names = {n for v in views for n in v.keys()}
+    for view in views:
+        for dim in dim_names:
+            # If dimension is missing in a view, use '-'
+            if dim not in view:
+                view[dim] = "-"
+
     return views
 
 
@@ -109,15 +123,27 @@ def _fetch_explorer_slugs(hide_unchanged_explorers: bool) -> list[str]:
 
 
 def _extract_all_dimensions(explorer_views: list[dict]) -> dict[str, list]:
+    dim_names = list(explorer_views[0].keys())
+
     # Extract all unique dimensions across views
-    all_dimensions = {}
+    all_dimensions = {dim: set() for dim in dim_names}
     for view in explorer_views:
-        for dim, val in view.items():
-            if dim not in all_dimensions:
-                all_dimensions[dim] = set()
-            all_dimensions[dim].add(val)
+        for dim in dim_names:
+            all_dimensions[dim].add(view[dim])
+
     # Convert sets to lists for selectboxes
     return {dim: sorted(list(values)) for dim, values in all_dimensions.items()}
+
+
+def _set_tab_title_size(font_size="2rem"):
+    css = f"""
+    <style>
+        .stTabs [data-baseweb="tab-list"] button [data-testid="stMarkdownContainer"] p {{
+        font-size:{font_size};
+        }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
 
 
 def main():
@@ -197,24 +223,63 @@ def main():
 
     with col1:
         st.subheader("Production Explorer")
+        # This is the non-preview version of an explorer
         explorer_chart(base_url="https://ourworldindata.org/explorers", **kwargs)
 
     with col2:
         st.subheader("Staging Explorer")
         assert OWID_ENV.site
-        explorer_chart(base_url=OWID_ENV.site + "/explorers", **kwargs)
+        # Show preview from a staging server to see changes instantly
+        explorer_chart(base_url=OWID_ENV.site + "/admin/explorers/preview", **kwargs)
 
-    st.subheader("TSV Diff")
+    # Helper function to load explorer data
+    def load_explorer_data(engine, columns):
+        """Load explorer data from database."""
+        with Session(engine) as session:
+            return gm.Explorer.load_explorer(session, explorer_slug, columns=columns)
 
-    with Session(SOURCE_ENGINE) as session:
-        tsv_source = gm.Explorer.load_explorer(session, explorer_slug).tsv  # type: ignore
+    # NOTE: loading data for some explorers can take >10s!
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        future_source = executor.submit(load_explorer_data, SOURCE_ENGINE, ["tsv", "config"])
+        future_target = executor.submit(load_explorer_data, TARGET_ENGINE, ["tsv", "config"])
 
-    with Session(TARGET_ENGINE) as session:
-        tsv_target = gm.Explorer.load_explorer(session, explorer_slug).tsv  # type: ignore
+        source_data = future_source.result()
+        target_data = future_target.result()
+        assert source_data and target_data, "Failed to load explorer data"
 
-    # DRY with chart_diff_show.py
-    diff_str = compare_strings(tsv_target, tsv_source, fromfile="production", tofile="staging")
-    st_show_diff(diff_str)
+        # Move blocks as the last key in config
+        source_data.config["blocks"] = source_data.config.pop("blocks")
+        target_data.config["blocks"] = target_data.config.pop("blocks")
+
+    # Create tabs for diffs
+    tsv_tab, yaml_tab = st.tabs(["**TSV Diff**", "**YAML Diff**"])
+    _set_tab_title_size("1.5rem")
+
+    with tsv_tab:
+        # Show diff
+        diff_str = compare_strings(target_data.tsv, source_data.tsv, fromfile="production", tofile="staging")
+        st_show_diff(diff_str, height=800)
+
+        # Create columns to show TSV files side by side
+        st.subheader("Side by side")
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.subheader("Production")
+            st.code(truncate_lines(target_data.tsv, MAX_DIFF_LINES), line_numbers=True, language="diff")
+        with col2:
+            st.subheader("Staging")
+            st.code(truncate_lines(source_data.tsv, MAX_DIFF_LINES), line_numbers=True, language="diff")
+
+    with yaml_tab:
+        # Show diff
+        diff_str = compare_strings(
+            yaml_dump(target_data.config).strip(),
+            yaml_dump(source_data.config).strip(),
+            fromfile="production",
+            tofile="staging",
+        )
+        st_show_diff(diff_str, height=800)
 
 
 main()

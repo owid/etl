@@ -32,11 +32,13 @@ def run() -> None:
     snap_public_finance_economic_transaction = paths.load_snapshot(
         "govt_glance_public_finance_economic_transaction.csv"
     )
+    snap_public_finance_by_function = paths.load_snapshot("govt_glance_public_finance_by_function.csv")
 
     # Load data from snapshot.
     tb_public_finance = snap_public_finance.read()
     tb_size_public_procurement = snap_size_public_procurement.read()
     tb_public_finance_economic_transaction = snap_public_finance_economic_transaction.read()
+    tb_public_finance_by_function = snap_public_finance_by_function.read()
 
     #
     # Process data.
@@ -53,9 +55,18 @@ def run() -> None:
         tb=tb_public_finance_economic_transaction,
         short_name="public_finance_economic_transaction",
     )
+    tb_public_finance_by_function = filter_columns_and_format(
+        tb=tb_public_finance_by_function,
+        short_name="public_finance_by_function",
+    )
 
     # Define tables list
-    tables = [tb_public_finance, tb_size_public_procurement, tb_public_finance_economic_transaction]
+    tables = [
+        tb_public_finance,
+        tb_size_public_procurement,
+        tb_public_finance_economic_transaction,
+        tb_public_finance_by_function,
+    ]
 
     #
     # Save outputs.
@@ -85,6 +96,16 @@ def filter_columns_and_format(tb: Table, short_name: str) -> Table:
 
         # Add " by economic transaction" to each row in Measure column
         tb["Measure"] = tb["Measure"].apply(lambda x: f"{x} by economic transaction")
+
+    elif short_name == "public_finance_by_function":
+        # Add {"Expenditure": "function"} to columns_to_keep
+        columns_to_keep["Expenditure"] = "function"
+
+        # Add "function" to index_columns
+        index_columns.append("function")
+
+        # Add " by function" to each row in Measure column
+        tb["Measure"] = tb["Measure"].apply(lambda x: f"{x} by function")
 
     # Keep only columns in columns_to_keep
     tb = tb[columns_to_keep.keys()]

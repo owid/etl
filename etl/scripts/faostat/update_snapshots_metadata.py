@@ -56,14 +56,8 @@ def run():
         snapshot.metadata.origin.description = description  # type: ignore
         snapshot.metadata.origin.attribution = attribution  # type: ignore
 
-        # Rewrite metadata to dvc file.
-        ################################################################################################################
-        # TODO: Ideally, it should suffice to do snapshot.metadata.save(), which would write the outs part of the snapshot as well, but that fails. So we'll add the outs part "manually" here.
-        new_yaml = snapshot.metadata.to_yaml()
-        outs = snapshot.metadata.outs[0]
-        new_yaml += f"\nouts:\n  - md5: {outs['md5']}\n    size: {outs['size']}\n    path: {outs['path']}\n"
-        snapshot.metadata_path.write_text(new_yaml)
-        ################################################################################################################
+        # Save snapshot metadata.
+        snapshot.metadata.save()
 
 
 if __name__ == "__main__":

@@ -1006,7 +1006,7 @@ def run() -> None:
     # Define path to current step file.
     current_step_file = (CURRENT_DIR / "faostat_metadata").with_suffix(".py")
 
-    # Get paths and naming conventions for current data step.
+    # Get paths and naming conventions for current step.
     paths = PathFinder(current_step_file.as_posix())
 
     # Path to file with custom dataset titles and descriptions.

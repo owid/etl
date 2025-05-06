@@ -5,13 +5,13 @@ from owid.catalog import Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -28,7 +28,6 @@ def run(dest_dir: str) -> None:
     # Read table from meadow dataset.
     tb = ds_meadow.read("measles_state_level")
 
-    origins = tb["countvalue"].metadata.origins
     tb_cdc_historical = ds_measles_cdc_historical.read_csv()
     tb_cdc_historical = tb_cdc_historical[tb_cdc_historical["cases"] != "NN"].dropna(subset=["cases"])
     tb_cdc_archive = ds_measles_cdc_archive.read_csv()
@@ -49,21 +48,16 @@ def run(dest_dir: str) -> None:
     # Combine with population
     tb = tb.merge(tb_pop, left_on=["country", "year"], right_on=["state", "year"], how="left")
 
-    tb["case_count"] = pd.to_numeric(tb["case_count"], errors="coerce")
-    tb["population"] = pd.to_numeric(tb["population"], errors="coerce")
+    tb["case_count"] = pr.to_numeric(tb["case_count"], errors="coerce")
+    tb["population"] = pr.to_numeric(tb["population"], errors="coerce")
     tb["case_rate"] = tb["case_count"] / tb["population"] * 100000
     tb = tb.drop(columns=["state", "population"])
-    tb["case_count"].metadata.origins = origins
-    tb["case_rate"].metadata.origins = origins
-    tb["source"].metadata.origins = origins
     tb = tb.format(["country", "year"], short_name="measles")
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

@@ -7,6 +7,13 @@ steps:
     - data://meadow/nasa/2023-03-06/ozone_hole_area
   data://grapher/nasa/2023-03-06/ozone_hole_area:
     - data://garden/nasa/2023-03-06/ozone_hole_area
+  data://meadow/nasa/2024-05-31/ozone_hole_area:
+    - snapshot://nasa/2024-05-31/ozone_hole_area_p2.txt
+    - snapshot://nasa/2024-05-31/ozone_hole_area_p1.txt
+  data://garden/nasa/2024-05-31/ozone_hole_area:
+    - data://meadow/nasa/2024-05-31/ozone_hole_area
+  data://grapher/nasa/2024-05-31/ozone_hole_area:
+    - data://garden/nasa/2024-05-31/ozone_hole_area
 
   # Living planet
   data://meadow/living_planet/2020-09-10/lpd:

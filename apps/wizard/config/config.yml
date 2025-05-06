@@ -116,6 +116,15 @@ sections:
         image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
         disable:
           production: True
+      - title: "MDIM Diff"
+        alias: mdim-diff
+        entrypoint: app_pages/mdim_diff/app.py
+        description: Compare MDIMs in staging and prod
+        maintainer: "@mojmir"
+        icon: ":material/difference:"
+        image_url: "https://images.squarespace-cdn.com/content/v1/5ea8287254c2e00f35d1cc48/1595511684480-6RM6YK3XZGB2SD21GPGP/20140620appletoapplescomparison.jpg"
+        disable:
+          production: True
       - title: "Harmonizer"
         alias: harmonizer
         description: "Harmonize a column of a table"
@@ -168,7 +177,7 @@ sections:
         entrypoint: app_pages/indicator_search/app.py
         icon: ":material/search:"
         image_url: "https://www.shutterstock.com/image-vector/standard-ph-chart-aqueous-solution-600nw-2007387788.jpg"
-      - title: "Similar charts"
+      - title: "Similar charts (deprecated)"
         alias: similar_charts
         description: "Find similar charts"
         maintainer: "@mojmir"
@@ -264,42 +273,6 @@ sections:
   #       disable:
   #         "production": True
   #         "staging": True
-
-  # - title: "ETL Steps (legacy)"
-  #   description: "Keeping this temporary"
-  #   apps:
-  #     - alias: express
-  #       title: "Express"
-  #       description: "Add all data steps."
-  #       entrypoint: etl_steps_old/express.py
-  #       icon: ":material/bolt:"
-  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/b/b3/Indochinese_leopard.jpg"
-  #       disable:
-  #         "production": True
-  #     - alias: meadow
-  #       title: "Meadow"
-  #       description: "Add meadow step."
-  #       entrypoint: etl_steps_old/meadow.py
-  #       icon: ":material/nature:"
-  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Blumenwiese_bei_Obermaiselstein05.jpg/1024px-Blumenwiese_bei_Obermaiselstein05.jpg"
-  #       disable:
-  #         "production": True
-  #     - alias: garden
-  #       title: "Garden"
-  #       description: "Add garden step."
-  #       entrypoint: etl_steps_old/garden.py
-  #       icon: ":material/deceased:"
-  #       image_url: "https://upload.wikimedia.org/wikipedia/commons/2/27/Butchart_gardens.JPG"
-  #       disable:
-  #         "production": True
-  #     - alias: grapher
-  #       title: "Grapher"
-  #       description: "Add grapher step."
-  #       entrypoint: etl_steps_old/grapher.py
-  #       icon: ":material/database:"
-  #       image_url: "https://pbs.twimg.com/media/EbHwdjwUcAEfen4?format=jpg&name=large"
-  #       disable:
-  #         "production": True
 # legacy:
 #   description: |-
 #     The pages below are legacy now. They are kept in case the new pages are not working properly.

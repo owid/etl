@@ -184,8 +184,8 @@ def _update_variables_metadata(table: catalog.Table) -> None:
 
 
 def check_table(table: Table) -> None:
-    assert set(table.index.names) == {"year", "entityId", "entityCode", "entityName"}, (
-        "Table to be upserted must have 4 indices: year, entityId, entityCode, entityName. Instead"
+    assert set(table.index.names) >= {"year", "entityId", "entityCode", "entityName"}, (
+        "Table to be upserted must have those 4 indices: year, entityId, entityCode, entityName. Instead"
         f" they have: {table.index.names}"
     )
 
@@ -206,11 +206,19 @@ def check_table(table: Table) -> None:
     utils.validate_underscore(table.columns[0], "Variable's name")
 
     # make sure we have unique (year, entity_id) pairs
-    pairs = table.index.get_level_values("entityName").astype(str) + table.index.get_level_values("year").astype(str)
-    vc = pairs.value_counts()
-    if (vc > 1).any():
-        duplicates = vc[vc > 1].index.tolist()
-        raise AssertionError(f"Duplicates (entityName, year):\n {duplicates}")
+    if not table.index.is_unique:
+        pairs = table.index.get_level_values("entityName").astype(str)
+        index_names = ["entityName"]
+        for col in table.index.names:
+            if col in ("entityCode", "entityId", "entityName"):
+                continue
+            pairs += ", " + table.index.get_level_values(col).astype(str)
+            index_names.append(col)
+
+        vc = pairs.value_counts()
+        if (vc > 1).any():
+            duplicates = vc[vc > 1].index.tolist()
+            raise AssertionError(f"Duplicates ({', '.join(index_names)}):\n {duplicates}")
 
 
 def _check_upserted_variable(variable: Variable) -> None:

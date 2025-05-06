@@ -33,7 +33,7 @@ def run() -> None:
     tb_taxes = ds_meadow.read("taxes_as_a_pct_of_price__total_tax")
     tb_ads = ds_meadow.read("enforce_bans_on_tobacco_advertising")
     tb_quit = ds_meadow.read("offer_help_to_quit_tobacco_use")
-  
+
 
     tbs = []
 
