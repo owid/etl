@@ -1,5 +1,3 @@
-import json
-import random
 import urllib.parse
 from pathlib import Path
 
@@ -10,7 +8,10 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
-from apps.wizard.app_pages.explorer_diff.app import _extract_all_dimensions, _fill_missing_dimensions
+from apps.wizard.app_pages.explorer_diff.app import (
+    _display_view_options,
+    _fill_missing_dimensions,
+)
 from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import mdim_chart, url_persist
 from etl.config import OWID_ENV
@@ -206,49 +207,6 @@ def _get_mdim_views(db_mdim: gm.MultiDimDataPage) -> list[dict]:
     return views
 
 
-def _display_mdim_view_options(db_mdim: gm.MultiDimDataPage) -> dict:
-    """Display explorer view options UI and return the selected view."""
-    explorer_views = _get_mdim_views(db_mdim)
-    all_dimensions = _extract_all_dimensions(explorer_views)
-
-    st.subheader("Select Explorer View Options")
-
-    # Create random view button
-    if st.button(f"🎲 Random view ({len(explorer_views)} views available)"):
-        # Select a random view from explorer_views
-        if explorer_views:
-            random_view = random.choice(explorer_views)
-            # Update session state with the random view values
-            for dim, val in random_view.items():
-                st.session_state[f"{db_mdim.slug}_{dim}"] = val
-            # Rerun to apply the changes
-            st.rerun()
-
-    # Arrange selectboxes horizontally using columns
-    cols = st.columns(len(all_dimensions)) if all_dimensions else []
-
-    selected_options = {}
-    for i, (dim, values) in enumerate(all_dimensions.items()):
-        selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{db_mdim.slug}_{dim}")
-
-    view = selected_options if selected_options else (explorer_views[0] if explorer_views else {})
-
-    # Check if the selected combination exists in any of the views
-    combination_exists = False
-    for explorer_view in explorer_views:
-        if all(dim in explorer_view and explorer_view[dim] == val for dim, val in view.items()):
-            combination_exists = True
-            break
-
-    # Display warning if combination doesn't exist
-    if not combination_exists and view:
-        st.warning(
-            "⚠️ This specific combination of options does not exist in the explorer views. The explorer may show unexpected results."
-        )
-
-    return view
-
-
 def main():
     st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
     st.title(
@@ -272,7 +230,8 @@ def main():
     assert source_mdim.slug, f"MDIM slug does not exist for {mdim_catalog_path}"
     assert source_mdim.catalogPath, f"MDIM catalogPath does not exist for {mdim_catalog_path}"
 
-    view = _display_mdim_view_options(source_mdim)
+    explorer_views = _get_mdim_views(source_mdim)
+    view = _display_view_options(source_mdim.slug, explorer_views)
 
     # Step 2: Display MDIM comparison
     st.warning("If you see **Sorry, that page doesn’t exist!**, it means the MDIM has not been published yet.")

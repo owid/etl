@@ -178,21 +178,20 @@ def _display_explorer_selection(hide_unchanged_explorers: bool) -> str | None:
     return explorer_slug
 
 
-def _display_explorer_view_options(explorer_slug: str) -> dict:
+def _display_view_options(slug: str, views: list[dict]) -> dict:
     """Display explorer view options UI and return the selected view."""
-    explorer_views = _fetch_explorer_views(explorer_slug)
-    all_dimensions = _extract_all_dimensions(explorer_views)
+    all_dimensions = _extract_all_dimensions(views)
 
     st.subheader("Select Explorer View Options")
 
     # Create random view button
-    if st.button(f"🎲 Random view ({len(explorer_views)} views available)"):
-        # Select a random view from explorer_views
-        if explorer_views:
-            random_view = random.choice(explorer_views)
+    if st.button(f"🎲 Random view ({len(views)} views available)"):
+        # Select a random view from views
+        if views:
+            random_view = random.choice(views)
             # Update session state with the random view values
             for dim, val in random_view.items():
-                st.session_state[f"{explorer_slug}_{dim}"] = val
+                st.session_state[f"{slug}_{dim}"] = val
             # Rerun to apply the changes
             st.rerun()
 
@@ -203,11 +202,11 @@ def _display_explorer_view_options(explorer_slug: str) -> dict:
     for i, (dim, values) in enumerate(all_dimensions.items()):
         selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{explorer_slug}_{dim}")
 
-    view = selected_options if selected_options else (explorer_views[0] if explorer_views else {})
+    view = selected_options if selected_options else (views[0] if views else {})
 
     # Check if the selected combination exists in any of the views
     combination_exists = False
-    for explorer_view in explorer_views:
+    for explorer_view in views:
         if all(dim in explorer_view and explorer_view[dim] == val for dim, val in view.items()):
             combination_exists = True
             break
@@ -317,7 +316,8 @@ def main():
         return
 
     # Step 2: Display explorer view options UI
-    view = _display_explorer_view_options(explorer_slug)
+    explorer_views = _fetch_explorer_views(explorer_slug)
+    view = _display_view_options(explorer_slug, explorer_views)
 
     # Step 3: Display side-by-side explorer comparison
     _display_explorer_comparison(explorer_slug, view)
