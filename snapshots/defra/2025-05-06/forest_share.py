@@ -31,7 +31,7 @@ df = pd.DataFrame(
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def run(upload: bool) -> None:
     # Initialize a new snapshot.
-    snap = Snapshot(f"forests/{SNAPSHOT_VERSION}/forest_share_defra.csv")
+    snap = Snapshot(f"forests/{SNAPSHOT_VERSION}/forest_share.csv")
 
     # Save snapshot.
     snap.create_snapshot(upload=upload, data=df)
