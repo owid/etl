@@ -104,6 +104,41 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
 # Set table format when printing
 TABLEFMT = "pretty"
 
+# Define indicators that don't depend on poverty lines
+INDICATORS_NOT_DEPENDENT_ON_POVLINES = [
+    "mean",
+    "median",
+    "mld",
+    "gini",
+    "polarization",
+    "cpi",
+    "ppp",
+    "reporting_pop",
+    "reporting_gdp",
+    "reporting_pce",
+    "spl",
+    "spr",
+    "pg",
+    "estimate_type",
+    "pop_in_poverty",
+    "bottom_50_share",
+    "middle_40_share",
+    "palma_ratio",
+    "s80_s20_ratio",
+    "p90_p10_ratio",
+    "p90_p50_ratio",
+    "p50_p10_ratio",
+    "top1_thr",
+    "top1_share",
+    "top1_avg",
+    "top90_99_share",
+    "surveys_past_decade",
+    "region_name",
+    "share",
+    "thr",
+    "avg",
+]
+
 
 def run() -> None:
     #
@@ -155,157 +190,32 @@ def run() -> None:
     # # Sanity checks. I don't run for percentile tables because that process was done in the extraction
     # tb = sanity_checks(tb=tb)
 
-    # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb = inc_or_cons_data(tb)
+    tb = make_distributional_indicators_long(tb)
 
-    # Create regional headcount variable, by patching missing values with the difference between world and regional headcount
-    tb = regional_headcount(tb)
+    tb = make_relative_poverty_long(tb)
+
+    # Separate out consumption-only, income-only. Also, create a table with both income and consumption
+    tb, tb_inc_or_cons_smooth = inc_or_cons_data(tb)
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
-    tb_inc_or_cons_ppp_current = survey_count(tb_inc_or_cons_ppp_current)
+    tb_inc_or_cons_smooth = survey_count(tb_inc_or_cons_smooth)
 
     # Add region definitions
-    tb_inc_or_cons_ppp_current = add_region_definitions(
-        tb=tb_inc_or_cons_ppp_current, tb_region_definitions=tb_region_definitions
+    tb_inc_or_cons_smooth = add_region_definitions(
+        tb=tb_inc_or_cons_smooth, tb_region_definitions=tb_region_definitions
     )
 
-    # Add metadata by code
-    tb_inc_ppp_old = add_metadata_vars(tb_garden=tb_inc_ppp_old, ppp_version=PPP_YEAR_OLD, welfare_type="income")
-    tb_cons_ppp_old = add_metadata_vars(tb_garden=tb_cons_ppp_old, ppp_version=PPP_YEAR_OLD, welfare_type="consumption")
-    tb_inc_or_cons_ppp_old_unsmoothed = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_ppp_old_unsmoothed,
-        ppp_version=PPP_YEAR_OLD,
-        welfare_type="income_consumption",
-    )
-    tb_inc_or_cons_ppp_old_unsmoothed.m.short_name = f"income_consumption_{PPP_YEAR_OLD}_unsmoothed"
-    tb_inc_or_cons_ppp_old = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_ppp_old,
-        ppp_version=PPP_YEAR_OLD,
-        welfare_type="income_consumption",
-    )
-
-    tb_inc_ppp_current = add_metadata_vars(
-        tb_garden=tb_inc_ppp_current, ppp_version=PPP_YEAR_CURRENT, welfare_type="income"
-    )
-    tb_cons_ppp_current = add_metadata_vars(
-        tb_garden=tb_cons_ppp_current, ppp_version=PPP_YEAR_CURRENT, welfare_type="consumption"
-    )
-    tb_inc_or_cons_ppp_current_unsmoothed = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_ppp_current_unsmoothed,
-        ppp_version=PPP_YEAR_CURRENT,
-        welfare_type="income_consumption",
-    )
-    tb_inc_or_cons_ppp_current_unsmoothed.m.short_name = f"income_consumption_{PPP_YEAR_CURRENT}_unsmoothed"
-    tb_inc_or_cons_ppp_current = add_metadata_vars(
-        tb_garden=tb_inc_or_cons_ppp_current,
-        ppp_version=PPP_YEAR_CURRENT,
-        welfare_type="income_consumption",
-    )
-
-    tb_percentiles_ppp_old = add_metadata_vars_percentiles(
-        tb_garden=tb_percentiles_ppp_old,
-        ppp_version=PPP_YEAR_OLD,
-        welfare_type="income_consumption",
-    )
-    tb_percentiles_ppp_current = add_metadata_vars_percentiles(
-        tb_garden=tb_percentiles_ppp_current,
-        ppp_version=PPP_YEAR_CURRENT,
-        welfare_type="income_consumption",
-    )
-
-    # Set index and sort
-    # Define index cols
-    index_cols = ["country", "year"]
-    index_cols_unsmoothed = ["country", "year", "reporting_level", "welfare_type"]
-    index_cols_percentiles = ["country", "year", "reporting_level", "welfare_type", "percentile"]
-    tb_inc_ppp_old = tb_inc_ppp_old.format(keys=index_cols)
-    tb_cons_ppp_old = tb_cons_ppp_old.format(keys=index_cols)
-    tb_inc_or_cons_ppp_old_unsmoothed = tb_inc_or_cons_ppp_old_unsmoothed.format(keys=index_cols_unsmoothed)
-    tb_inc_or_cons_ppp_old = tb_inc_or_cons_ppp_old.format(keys=index_cols)
-
-    tb_inc_ppp_current = tb_inc_ppp_current.format(keys=index_cols)
-    tb_cons_ppp_current = tb_cons_ppp_current.format(keys=index_cols)
-    tb_inc_or_cons_ppp_current_unsmoothed = tb_inc_or_cons_ppp_current_unsmoothed.format(keys=index_cols_unsmoothed)
-    tb_inc_or_cons_ppp_current = tb_inc_or_cons_ppp_current.format(keys=index_cols)
-
-    tb_percentiles_ppp_old = tb_percentiles_ppp_old.format(keys=index_cols_percentiles)
-    tb_percentiles_ppp_current = tb_percentiles_ppp_current.format(keys=index_cols_percentiles)
-
-    # Create spell tables to separate different survey spells in the explorers
-    spell_tables_inc = create_survey_spells(tb=tb_inc_ppp_current)
-    spell_tables_cons = create_survey_spells(tb=tb_cons_ppp_current)
-
-    # For income and consumption we combine the tables to not lose information from tb_inc_or_cons_ppp_current
-    spell_tables_inc_or_cons = create_survey_spells_inc_cons(tb_inc=tb_inc_ppp_current, tb_cons=tb_cons_ppp_current)
+    # Concatenate the final table
+    tb = pr.concat([tb, tb_inc_or_cons_smooth], ignore_index=True)
 
     # Drop columns not needed
-    tb_inc_ppp_old = drop_columns(tb_inc_ppp_old)
-    tb_cons_ppp_old = drop_columns(tb_cons_ppp_old)
-    tb_inc_or_cons_ppp_old = drop_columns(tb_inc_or_cons_ppp_old)
-
-    tb_inc_ppp_current = drop_columns(tb_inc_ppp_current)
-    tb_cons_ppp_current = drop_columns(tb_cons_ppp_current)
-    tb_inc_or_cons_ppp_current = drop_columns(tb_inc_or_cons_ppp_current)
-
-    # Merge tables for PPP comparison explorer
-    tb_inc_ppp_comparison = combine_tables_ppp_comparison(
-        tb_ppp_old=tb_inc_ppp_old,
-        tb_ppp_current=tb_inc_ppp_current,
-        short_name=f"income_{PPP_YEAR_OLD}_{PPP_YEAR_CURRENT}",
-    )
-    tb_cons_ppp_comparison = combine_tables_ppp_comparison(
-        tb_ppp_old=tb_cons_ppp_old,
-        tb_ppp_current=tb_cons_ppp_current,
-        short_name=f"consumption_{PPP_YEAR_OLD}_{PPP_YEAR_CURRENT}",
-    )
-    tb_inc_or_cons_ppp_comparison = combine_tables_ppp_comparison(
-        tb_ppp_old=tb_inc_or_cons_ppp_old,
-        tb_ppp_current=tb_inc_or_cons_ppp_current,
-        short_name=f"income_consumption_{PPP_YEAR_OLD}_{PPP_YEAR_CURRENT}",
-    )
-
-    # Define tables to upload
-    # The ones we need in Grapher admin would be tb_inc_or_cons_ppp_old, tb_inc_or_cons_ppp_current
-    tables = (
-        [
-            tb_inc_ppp_old,
-            tb_cons_ppp_old,
-            tb_inc_or_cons_ppp_old_unsmoothed,
-            tb_inc_or_cons_ppp_old,
-            tb_inc_ppp_current,
-            tb_cons_ppp_current,
-            tb_inc_or_cons_ppp_current_unsmoothed,
-            tb_inc_or_cons_ppp_current,
-            tb_inc_ppp_comparison,
-            tb_cons_ppp_comparison,
-            tb_inc_or_cons_ppp_comparison,
-            tb_percentiles_ppp_old,
-            tb_percentiles_ppp_current,
-        ]
-        + spell_tables_inc
-        + spell_tables_cons
-        + spell_tables_inc_or_cons
-    )
-
-    # #
-    # # Save outputs.
-    # #
-    # # Create a new garden dataset with the same metadata as the meadow dataset.
-    # ds_garden = paths.create_dataset(
-    #     tables=tables,
-    #     check_variables_metadata=True,
-    #     default_metadata=ds_meadow.metadata,
-    # )
-
-    # # Save changes in the new garden dataset.
-    # ds_garden.save()
-
-    #
-    # Process data.
-    #
+    tb = drop_columns(tb)
 
     # Improve table format.
-    tb = tb.format(["country", "year"])
+    tb = tb.format(
+        ["country", "year", "ppp_version", "poverty_line", "welfare_type", "table", "survey_comparability"],
+        short_name=paths.short_name,
+    )
 
     #
     # Save outputs.
@@ -634,6 +544,10 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
         on=["country", "year", "welfare_type", "poverty_line", "ppp_version"],
         how="outer",
     )
+
+    # Copy metadata to recover origin
+    tb["headcount_between"] = tb["headcount_between"].copy_metadata(tb["headcount"])
+    tb["headcount_ratio_between"] = tb["headcount_ratio_between"].copy_metadata(tb["headcount_ratio"])
 
     return tb
 
@@ -988,7 +902,7 @@ def sanity_checks(
             )
             # Make columns None if mask is True
             tb_pivot.loc[mask, [("top90_99_share", ppp_year, povlines[1]), ("top1_share", ppp_year, povlines[1])]] = (
-                None
+                pd.NA
             )
 
         ############################
@@ -1004,7 +918,7 @@ def sanity_checks(
     return tb
 
 
-def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
+def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
     """
     Separate income and consumption data
     """
@@ -1027,7 +941,7 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
     # Create tb_no_spells_smooth, which cleans tb_no_spells, by removing jumps generated by changes in welfare_type
     tb_no_spells_smooth = create_smooth_inc_cons_series(tb_no_spells)
 
-    # TODO: Come back to fix this
+    # # TODO: Come back to fix this
     # check_jumps_in_grapher_dataset(tb_no_spells_smooth)
 
     # Add the column table, identifying the type of table to use in Grapher
@@ -1051,12 +965,11 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
             tb_no_spells,
             tb_inc_no_spells,
             tb_cons_no_spells,
-            tb_no_spells_smooth,
         ],
         ignore_index=True,
     )
 
-    return tb
+    return tb, tb_no_spells_smooth
 
 
 def create_smooth_inc_cons_series(tb: Table) -> Table:
@@ -1277,122 +1190,30 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
     return None
 
 
-def regional_headcount(tb: Table) -> Table:
+def survey_count(tb: Table) -> Table:
     """
-    Create regional headcount dataset, by patching missing values with the difference between world and regional headcount
+    Create survey count indicator, by counting the number of surveys available for each country in the past decade
     """
+    tb = tb.copy()
 
-    # From REGIONS_LIST,, drop the regions we are not interested in
-    regions_for_headcount = [
-        regions
-        for regions in REGIONS_LIST
-        if regions
-        not in [
-            "Western and Central Africa (PIP)",
-            "Eastern and Southern Africa (PIP)",
-            "World (excluding China)",
-            "World (excluding India)",
-        ]
-    ]
-
-    # Keep only regional data
-    tb_regions = tb[tb["country"].isin(regions_for_headcount)].reset_index(drop=True)
-
-    # Keep only the data for the table "Income or consumption consolidated"
-    tb_regions = tb_regions[tb_regions["table"] == "Income or consumption consolidated"].reset_index(drop=True)
-
-    # Select needed columns and pivot
-    tb_regions = tb_regions[["country", "year", "ppp_version", "poverty_line", "table", "headcount"]]
+    # Remove regions from the table
+    tb_survey = tb[~tb["country"].isin(REGIONS_LIST)].reset_index(drop=True).copy()
 
     # Pivot and obtain the poverty lines dictionary
-    tb_regions_aux, povlines_dict = pivot_and_obtain_povlines_dict(
-        tb=tb_regions,
-        index=["country", "year", "table"],
+    tb_aux, povlines_dict = pivot_and_obtain_povlines_dict(
+        tb=tb,
+        index=["country", "year", "welfare_type"],
         columns=["ppp_version", "poverty_line"],
     )
 
     # From povlines_dict, get the [1]th value for each ppp_year
     ipl_list = [povlines_dict[ppp_year][1] for ppp_year in povlines_dict.keys()]
 
-    # Filter the table to keep only the rows with the poverty line we are interested in
-    tb_regions = tb_regions[tb_regions["poverty_line"].isin(ipl_list)].reset_index(drop=True)
+    # Define the current value of the IPL as the second value in the list
+    ipl_current = ipl_list[1]
 
-    print(tb_regions)
-
-    # Pivot the table to have one column per region
-    tb_regions = tb_regions.pivot(
-        index=["ppp_version", "poverty_line", "year"], columns="country", values="headcount"
-    ).reset_index()
-
-    print(tb_regions)
-
-    # Drop rows with more than one region with null headcount
-    tb_regions["check_total"] = tb_regions[tb_regions.columns].isnull().sum(axis=1)
-    mask = tb_regions["check_total"] > 1
-
-    tb_out = tb_regions[mask].reset_index()
-    if len(tb_out) > 0:
-        log.info(
-            f"""There are {len(tb_out)} years with more than one null region value so we can't extract regional data for them. Years are:
-            {list(tb_out.year.unique())}"""
-        )
-        tb_regions = tb_regions[~mask].reset_index()
-
-    tb_regions = tb_regions.drop(columns="check_total")
-
-    # Get difference between world and (total) regional headcount, to patch rows with one missing value
-    cols_to_sum = [e for e in list(tb_regions.columns) if e not in ["year", "World"]]
-    tb_regions["sum_regions"] = tb_regions[cols_to_sum].sum(axis=1)
-
-    tb_regions["diff_world_regions"] = tb_regions["World"] - tb_regions["sum_regions"]
-
-    # Fill null values with the difference and drop aux variables
-    col_dictionary = dict.fromkeys(cols_to_sum, tb_regions["diff_world_regions"])
-    tb_regions.loc[:, cols_to_sum] = tb_regions[cols_to_sum].fillna(col_dictionary)
-    tb_regions = tb_regions.drop(columns=["World", "sum_regions", "diff_world_regions"])
-
-    # NOTE: I am not extracting data for China and India at least for now, because we are only extracting non filled data
-    # The data originally came from filled data to plot properly.
-
-    # # Get headcount values for China and India
-    # df_chn_ind = tb[(tb["country"].isin(["China", "India"])) & (tb["reporting_level"] == "national")].reset_index(
-    #     drop=True
-    # )
-    # df_chn_ind = df_chn_ind[["country", "year", "headcount_215"]]
-
-    # # Make table wide and merge with regional data
-    # df_chn_ind = df_chn_ind.pivot(index="year", columns="country", values="headcount_215").reset_index()
-    # tb_regions = pr.merge(tb_regions, df_chn_ind, on="year", how="left")
-
-    # tb_regions["East Asia and Pacific excluding China"] = (
-    #     tb_regions["East Asia and Pacific (PIP)"] - tb_regions["China"]
-    # )
-    # tb_regions["South Asia excluding India"] = tb_regions["South Asia (PIP)"] - tb_regions["India"]
-
-    tb_regions = pr.melt(
-        tb_regions, id_vars=["year"], var_name="country", value_name=f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}"
-    )
-    tb_regions = tb_regions[["country", "year", f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}"]]
-
-    # Rename headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT} to headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}_regions, to distinguish it from the original headcount when merging
-    tb_regions = tb_regions.rename(
-        columns={
-            f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}": f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}_regions"
-        }
-    )
-
-    # Merge with original table
-    tb = pr.merge(tb, tb_regions, on=["country", "year"], how="outer")
-
-    return tb
-
-
-def survey_count(tb: Table) -> Table:
-    """
-    Create survey count indicator, by counting the number of surveys available for each country in the past decade
-    """
-    # Remove regions from the table
-    tb_survey = tb[~tb["country"].isin(REGIONS_LIST)].reset_index(drop=True).copy()
+    # Filter for the current value
+    tb_survey = tb_survey[tb_survey["poverty_line"] == ipl_current].reset_index(drop=True)
 
     min_year = int(tb_survey["year"].min())
     max_year = int(tb_survey["year"].max())
@@ -1424,13 +1245,19 @@ def survey_count(tb: Table) -> Table:
     )
 
     # Copy metadata
-    tb_survey["surveys_past_decade"] = tb_survey["surveys_past_decade"].copy_metadata(tb["reporting_level"])
+    tb_survey["surveys_past_decade"] = tb_survey["surveys_past_decade"].copy_metadata(tb["headcount"])
 
     # Keep columns needed
     tb_survey = tb_survey[["country", "year", "surveys_past_decade"]]
 
+    # Define ppp_version and poverty_line columns, empty
+    tb_survey["ppp_version"] = pd.NA
+    tb_survey["poverty_line"] = pd.NA
+
     # Merge with original table
-    tb = pr.merge(tb_survey, tb, on=["country", "year"], how="outer")
+    tb = pr.merge(tb_survey, tb, on=["country", "year", "ppp_version", "poverty_line"], how="outer")
+
+    tb.to_csv("tb.csv", index=False)
 
     return tb
 
@@ -1443,167 +1270,10 @@ def drop_columns(tb: Table) -> Table:
     # Remove columns
     tb = tb.drop(
         columns=[
-            "ppp_version",
             "reporting_pop",
             "is_interpolated",
-            "distribution_type",
-            "estimation_type",
-            "survey_comparability",
-            "comparable_spell",
         ]
     )
-
-    return tb
-
-
-def create_survey_spells(tb: Table) -> list:
-    """
-    Create tables for each indicator and survey spells, to be able to graph them in explorers.
-    """
-
-    tb = tb.copy()
-
-    # drop rows where survey coverage = nan (This is just regions)
-    tb = tb[tb["survey_comparability"].notna()].reset_index()
-
-    # Add 1 to make comparability var run from 1, not from 0
-    tb["survey_comparability"] += 1
-
-    # Note the welfare type in the comparability spell
-    tb["survey_comparability"] = (
-        tb["welfare_type"].astype(str) + "_spell_" + tb["survey_comparability"].astype(int).astype(str)
-    )
-
-    # Remove columns not needed: stacked, above, etc
-    drop_list = ["above", "between", "poverty_severity", "watts"]
-    for var in drop_list:
-        tb = tb[tb.columns.drop(list(tb.filter(like=var)))]
-
-    vars = [
-        i
-        for i in tb.columns
-        if i
-        not in [
-            "country",
-            "year",
-            "ppp_version",
-            "reporting_level",
-            "welfare_type",
-            "reporting_pop",
-            "is_interpolated",
-            "distribution_type",
-            "estimation_type",
-            "survey_comparability",
-            "comparable_spell",
-            f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}_regions",
-            "surveys_past_decade",
-        ]
-    ]
-
-    # Define spell table list
-    spell_tables = []
-
-    # Loop over the variables in the main dataset
-    for select_var in vars:
-        tb_var = tb[["country", "year", select_var, "survey_comparability"]].copy()
-
-        # convert to wide
-        tb_var = pr.pivot(
-            tb_var,
-            index=["country", "year"],
-            columns=["survey_comparability"],
-            values=select_var,
-        )
-
-        tb_var.metadata.short_name = f"{tb_var.metadata.short_name}_{select_var}"
-
-        spell_tables.append(tb_var)
-
-    return spell_tables
-
-
-def create_survey_spells_inc_cons(tb_inc: Table, tb_cons: Table) -> list:
-    """
-    Create table for each indicator and survey spells, to be able to graph them in explorers.
-    This version recombines income and consumption tables to not lose dropped rows.
-    """
-
-    tb_inc = tb_inc.reset_index().copy()
-    tb_cons = tb_cons.reset_index().copy()
-
-    # Concatenate the two tables
-    tb_inc_or_cons_spells = pr.concat(
-        [tb_inc, tb_cons], ignore_index=True, short_name=f"income_consumption_{PPP_YEAR_CURRENT}"
-    )
-
-    # Set index and sort
-    tb_inc_or_cons_spells = tb_inc_or_cons_spells.format(keys=["country", "year", "reporting_level", "welfare_type"])
-
-    # Create spells
-    spell_tables = create_survey_spells(tb_inc_or_cons_spells)
-
-    return spell_tables
-
-
-def combine_tables_ppp_comparison(tb_ppp_old: Table, tb_ppp_current: Table, short_name: str) -> Table:
-    """
-    Combine income and consumption tables from PPP_YEAR_OLD and PPP_YEAR_CURRENT PPPs.
-    We will use this table for the Poverty Data Explorer: World Bank data - PPP_YEAR_OLD vs. PPP_YEAR_CURRENT prices.
-    """
-
-    # Identify columns to use (ID + indicators)
-    id_cols = ["country", "year"]
-
-    tb_ppp_old = define_columns_for_ppp_comparison(tb=tb_ppp_old, id_cols=id_cols, ppp_version=PPP_YEAR_OLD)
-    tb_ppp_current = define_columns_for_ppp_comparison(tb=tb_ppp_current, id_cols=id_cols, ppp_version=PPP_YEAR_CURRENT)
-
-    # Rename all the non-id columns with the suffix _ppp(year)
-    # (the suffix option in merge only adds suffix when columns coincide)
-    tb_ppp_old = tb_ppp_old.rename(
-        columns={c: c + f"_ppp{PPP_YEAR_OLD}" for c in tb_ppp_old.columns if c not in id_cols}
-    )
-    tb_ppp_current = tb_ppp_current.rename(
-        columns={c: c + f"_ppp{PPP_YEAR_CURRENT}" for c in tb_ppp_current.columns if c not in id_cols}
-    )
-
-    # Merge the two files (it's OK to have an inner join, because we want to keep country-year pairs that are in both files)
-    tb_ppp_comparison = pr.merge(tb_ppp_old, tb_ppp_current, on=id_cols, validate="one_to_one", short_name=short_name)
-
-    # Add index and sort
-    tb_ppp_comparison = tb_ppp_comparison.format(["country", "year"])
-
-    return tb_ppp_comparison
-
-
-def define_columns_for_ppp_comparison(tb: Table, id_cols: list, ppp_version: int) -> Table:
-    """
-    Define columns to use for the comparison of PPP_VERSIONS
-    """
-
-    tb = tb.reset_index()
-    # Define poverty lines
-    povlines_list = POVLINES_DICT[ppp_version]
-
-    # Define groups of columns
-    headcount_absolute_cols = [f"headcount_{p}" for p in povlines_list]
-    headcount_ratio_absolute_cols = [f"headcount_ratio_{p}" for p in povlines_list]
-
-    headcount_relative_cols = [f"headcount_{rel}_median" for rel in [40, 50, 60]]
-    headcount_ratio_relative_cols = [f"headcount_ratio_{rel}_median" for rel in [40, 50, 60]]
-
-    # Define all the columns to filter
-
-    cols_list = (
-        id_cols
-        + headcount_absolute_cols
-        + headcount_ratio_absolute_cols
-        + headcount_relative_cols
-        + headcount_ratio_relative_cols
-        + ["mean", "median", "decile1_thr", "decile9_thr"]
-    )
-
-    # Filter columns
-    tb = tb[cols_list]
 
     return tb
 
@@ -1630,17 +1300,20 @@ def show_not_dimensional_data_once(tb: Table) -> Table:
     return tb
 
 
-def make_shares_and_thresholds_long(tb: Table) -> Table:
+def make_distributional_indicators_long(tb: Table) -> Table:
     """
     Convert decile1, ..., decile10 and decile1_thr, ..., decile9_thr to a long format.
     """
     tb = tb.copy()
 
-    # Define index columns
-    index_columns = ["country", "year", "reporting_level", "welfare_type", "ppp_version"]
+    print("Converting distributional indicators to long format")
 
+    # Define index columns
+    index_columns = ["country", "year", "welfare_type", "ppp_version", "poverty_line"]
+
+    # SHARE
     # Define share columns
-    share_columns = [f"decile{i}" for i in range(1, 11)]
+    share_columns = [f"decile{i}_share" for i in range(1, 11)]
     tb_share = tb.melt(
         id_vars=index_columns,
         value_vars=share_columns,
@@ -1648,9 +1321,7 @@ def make_shares_and_thresholds_long(tb: Table) -> Table:
         value_name="share",
     )
 
-    # Add an empty poverty_line column
-    tb_share["poverty_line"] = None
-
+    # THRESHOLD
     # Define threshold columns
     thr_columns = [f"decile{i}_thr" for i in range(1, 10)]
     tb_thr = tb.melt(
@@ -1660,25 +1331,74 @@ def make_shares_and_thresholds_long(tb: Table) -> Table:
         value_name="thr",
     )
 
-    # Add an empty poverty_line column
-    tb_thr["poverty_line"] = None
+    # AVERAGE
+    # Define average columns
+    avg_columns = [f"decile{i}_avg" for i in range(1, 11)]
+    tb_avg = tb.melt(
+        id_vars=index_columns,
+        value_vars=avg_columns,
+        var_name="decile",
+        value_name="avg",
+    )
 
     # Create an empty decile column in tb
-    tb["decile"] = None
+    tb["decile"] = pd.NA
 
     # Merge tb and tb_share
-    tb = pr.merge(tb, tb_share, on=index_columns + ["decile", "poverty_line"], how="outer")
-
-    # Merge tb and tb_thr
-    tb = pr.merge(tb, tb_thr, on=index_columns + ["decile", "poverty_line"], how="outer")
+    tb = pr.multi_merge([tb, tb_share, tb_thr, tb_avg], on=index_columns + ["decile"], how="outer")
 
     # Remove share_columns and threshold_columns
-    tb = tb.drop(columns=share_columns + thr_columns)
+    tb = tb.drop(columns=share_columns + thr_columns + avg_columns, errors="raise")
 
     # Remove "decile" from the decile column
     tb["decile"] = tb["decile"].str.replace("decile", "")
 
-    # Do the same with "_thr"
-    tb["decile"] = tb["decile"].str.replace("_thr", "")
+    # Do the same with "_share", "_thr", and "_avg"
+    for indicator in ["share", "thr", "avg"]:
+        tb["decile"] = tb["decile"].str.replace(f"_{indicator}", "")
+
+    return tb
+
+
+def make_relative_poverty_long(tb: Table) -> Table:
+    """
+    Convert relative poverty columns to a long format.
+    """
+    tb = tb.copy()
+
+    print("Converting relative poverty columns to long format")
+
+    # Define index columns
+    index_columns = ["country", "year", "welfare_type", "ppp_version", "decile"]
+
+    # Define relative poverty columns. They are all the columns that contain "_median"
+    rel_pov_columns = [col for col in tb.columns if "_median" in col]
+
+    # Define all the poverty indicators
+    poverty_indicators = [
+        "headcount_ratio",
+        "headcount",
+        "poverty_gap_index",
+        "poverty_severity",
+        "watts",
+        "total_shortfall",
+        "avg_shortfall",
+        "income_gap_ratio",
+    ]
+
+    # Melt the table
+    tb_rel_pov = tb.melt(
+        id_vars=index_columns,
+        value_vars=rel_pov_columns,
+        var_name="indicator",
+        value_name="value",
+    )
+
+    tb_rel_pov.to_csv("tb_rel_pov.csv", index=False)
+
+    # Split the indicator column into two columns: indicator and poverty_line. Poverty line would be in the format "40_median", "50_median", or "60_median"
+    tb_rel_pov[["indicator", "poverty_line"]] = tb_rel_pov["indicator"].str.extract(r"(\d+)_median_(.*)")
+
+    print(tb_rel_pov)
 
     return tb
