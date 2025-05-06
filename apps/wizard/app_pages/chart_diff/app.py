@@ -51,6 +51,8 @@ class SortMethods:
     relevance: str = "relevance"
     chart_views_most_to_least: str = "chart_views_most_to_least"
     chart_views_least_to_most: str = "chart_views_least_to_most"
+    articles_most_to_least: str = "articles_most_to_least"
+    articles_least_to_most: str = "articles_least_to_most"
     anomalies_most_to_least: str = "anomalies_most_to_least"
     anomalies_least_to_most: str = "anomalies_least_to_most"
     last_updated: str = "last_updated"
@@ -58,8 +60,10 @@ class SortMethods:
 
 SORTING_METHODS = {
     SortMethods.relevance: "Relevance",
-    SortMethods.chart_views_most_to_least: "Chart views (last 14-day): Most to least",
-    SortMethods.chart_views_least_to_most: "Chart views (last 14-day): Least to most",
+    SortMethods.chart_views_most_to_least: "Chart views (last 30-day): Most to least",
+    SortMethods.chart_views_least_to_most: "Chart views (last 30-day): Least to most",
+    SortMethods.articles_most_to_least: "Articles (last 30-day): Most to least",
+    SortMethods.articles_least_to_most: "Articles (last 30-day): Least to most",
     SortMethods.anomalies_most_to_least: "Anomalies: Most to least",
     SortMethods.anomalies_least_to_most: "Anomalies: Least to most",
     SortMethods.last_updated: "Last updated",
@@ -112,9 +116,7 @@ def get_chart_diffs():
     )
 
     # Get indicators used in charts
-    st.session_state.indicators_in_charts = indicators_in_charts(
-        SOURCE_ENGINE, list(st.session_state.chart_diffs.keys())
-    )
+    st.session_state.indicators_in_charts = indicators_in_charts(list(st.session_state.chart_diffs.keys()))
 
     # Init, can be changed by the toggle
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
@@ -224,6 +226,22 @@ def sort_chart_diffs():
             sorted(
                 st.session_state.chart_diffs_filtered.items(),
                 key=lambda item: item[1].scores.chart_views,
+                reverse=False,
+            )
+        )
+    elif sort_by == SortMethods.articles_most_to_least:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.num_articles,
+                reverse=True,
+            )
+        )
+    elif sort_by == SortMethods.articles_least_to_most:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.num_articles,
                 reverse=False,
             )
         )
