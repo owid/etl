@@ -79,6 +79,7 @@ def call_etl_diff(include: str) -> list[str]:
         "diff",
         "REMOTE",
         "data/",
+        "--changed",
         "--include",
         include,
         "--exclude",
