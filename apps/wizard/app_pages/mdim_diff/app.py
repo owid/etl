@@ -11,6 +11,7 @@ from apps.wizard.app_pages.chart_diff.utils import get_engines
 from apps.wizard.app_pages.explorer_diff.app import (
     _display_view_options,
     _fill_missing_dimensions,
+    _set_page_config,
 )
 from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import mdim_chart, url_persist
@@ -21,16 +22,7 @@ from etl.grapher import model as gm
 
 log = get_logger()
 
-# Config
-st.set_page_config(
-    page_title="Wizard: MDIM Diff",
-    layout="wide",
-    page_icon="🪄",
-    initial_sidebar_state="collapsed",
-    menu_items={
-        "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
-    },
-)
+_set_page_config("MDIM Diff")
 
 # Paths
 CURRENT_DIR = Path(__file__).resolve().parent

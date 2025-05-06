@@ -19,16 +19,21 @@ from etl.grapher import model as gm
 
 log = get_logger()
 
-# Config
-st.set_page_config(
-    page_title="Wizard: Explorer Diff",
-    layout="wide",
-    page_icon="🪄",
-    initial_sidebar_state="collapsed",
-    menu_items={
-        "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
-    },
-)
+
+def _set_page_config(title: str):
+    # Config
+    st.set_page_config(
+        page_title=f"Wizard: {title}",
+        layout="wide",
+        page_icon="🪄",
+        initial_sidebar_state="collapsed",
+        menu_items={
+            "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
+        },
+    )
+
+
+_set_page_config("Explorer Diff")
 
 EXPLORER_CONTROLS = ["Radio", "Checkbox", "Dropdown"]
 
@@ -200,7 +205,7 @@ def _display_view_options(slug: str, views: list[dict]) -> dict:
 
     selected_options = {}
     for i, (dim, values) in enumerate(all_dimensions.items()):
-        selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{explorer_slug}_{dim}")
+        selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{slug}_{dim}")
 
     view = selected_options if selected_options else (views[0] if views else {})
 
