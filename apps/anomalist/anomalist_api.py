@@ -739,7 +739,7 @@ def _sample_variables(variables: List[gm.Variable], n: int) -> List[gm.Variable]
 
 
 def get_anomalies_for_chart_ids(
-    chart_ids: Optional[List[int]] = None, anomaly_types: Optional[Tuple[str, ...]] = ("version_change",)
+    chart_ids: Optional[List[int]] = None, anomaly_types: Optional[Tuple[str, ...]] = ("upgrade_change",)
 ) -> pd.DataFrame:
     """Get datasets of the variables used in a list of charts, given the chart ids.
 
