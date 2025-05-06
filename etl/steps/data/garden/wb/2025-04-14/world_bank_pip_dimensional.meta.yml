@@ -315,24 +315,6 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
 
-      headcount_regions:
-        title: Number in poverty by region ({definitions.poverty_line}, <<ppp_version>> prices)
-        unit: "people"
-        short_unit: ""
-        description_short: Number of people living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line} by region.
-        description_key:
-          - "{definitions.description_key_poverty_line}"
-          - "{definitions.description_key_ppp}"
-          - "{definitions.description_key_welfare_type}"
-          - "{definitions.description_key_not_market_income}"
-          - "{definitions.description_key_nowcasts}"
-        description_processing: |-
-          {definitions.description_processing_main}
-        display:
-          name: Number in poverty by region ({definitions.poverty_line})
-          numDecimalPlaces: 0
-          <<: *common_display
-
       total_shortfall:
         title: Total shortfall ({definitions.poverty_line}, <<ppp_version>> prices)
         unit: international-$ in <<<ppp_version>> prices
