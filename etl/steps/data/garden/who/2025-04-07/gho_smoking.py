@@ -1,4 +1,5 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Loads relevant smoking indicators from the GHO database and harmonizes them.
+This step includes both smoking prevalence estimates and the MPOWER indicators on tobacco control policies."""
 
 from owid.catalog import processing as pr
 
@@ -11,6 +12,12 @@ paths = PathFinder(__file__)
 REGIONS = [r for r in geo.REGIONS.keys() if r != "European Union (27)"] + ["World"]
 
 LAST_YEAR = 2022
+
+# short table names
+afford_gdp = "affordability_of_cigarettes__percentage_of_gdp_per_capita_required_to_purchase_2000_cigarettes_of_the_most_sold_brand"
+taxes = "taxes_as_a_pct_of_price__total_tax"
+ad_bans = "enforce_bans_on_tobacco_advertising"
+help_quit = "offer_help_to_quit_tobacco_use"
 
 
 def run() -> None:
@@ -30,10 +37,33 @@ def run() -> None:
 
     smoking_estimates = [ind for ind in all_rel_indicators if "estimate" in ind.lower()]
 
-    tb_taxes = ds_meadow.read("taxes_as_a_pct_of_price__total_tax")
-    tb_ads = ds_meadow.read("enforce_bans_on_tobacco_advertising")
-    tb_quit = ds_meadow.read("offer_help_to_quit_tobacco_use")
+    # read tables for policy indicators
+    tb_taxes = ds_meadow.read(taxes)
+    tb_ads = ds_meadow.read(ad_bans)
+    tb_quit = ds_meadow.read(help_quit)
+    tb_afford = ds_meadow.read(afford_gdp)
 
+    ### clean up policy indicators
+    # taxes
+    tb_taxes = tb_taxes[tb_taxes["tobacco_and_nicotine_product"] == "Most sold brand of cigarettes (20 sticks)"]
+    tb_taxes = tb_taxes.drop(columns=["tobacco_and_nicotine_product", "comments"], errors="raise")
+
+
+    tb_empower = pr.multi_merge(
+        [tb_taxes, tb_ads, tb_quit, tb_afford],  # type: ignore
+        on=["country", "year"],
+        how="outer",
+    )
+
+    tb_empower = tb_empower.rename(
+        columns={
+            "affordability_of_cigarettes__percentage_of_gdp_per_capita_required_to_purchase_2000_cigarettes_of_the_most_sold_brand": "cig_afford_pct_gdp",
+            "taxes_as_a_pct_of_price__total_tax": "cig_tax_pct",
+            "enforce_bans_on_tobacco_advertising": "tobacco_ad_ban",
+            "offer_help_to_quit_tobacco_use": "tobacco_help_quit",
+        },
+        errors="raise",
+    )
 
     tbs = []
 
@@ -128,12 +158,13 @@ def run() -> None:
 
     # Improve table format.
     tb = tb.format(["country", "year", "sex"], short_name="gho_smoking")
+    tb_empower = tb_empower.format(["country", "year"], short_name="gho_smoking_empower")
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb, tb_empower], default_metadata=ds_meadow.metadata)
 
     # Save garden dataset.
     ds_garden.save()

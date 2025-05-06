@@ -108,3 +108,39 @@ tables:
         display:
           numDecimalPlaces: 0
 
+
+  # Empower indicators (policy measures)
+  gho_smoking_empower:
+    variables:
+      cig_tax_pct:
+        title: Taxes as a share of cigarette price
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of taxes on the retail price of a pack of cigarettes. This includes all taxes and is based on one pack (20 cigarettes) of the most sold brand in the country.
+        presentation:
+          grapher_config:
+            note: "In Canada and the USA, the tax share is calculated as the sum of federal and state taxes."
+      tobacco_ad_ban:
+        title: Bans on tobacco advertising
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          The level of bans on tobacco advertising are defined as follows: 1) no ban, or ban that does not cover national TV, radio and print media; 2) ban on national TV, radio and print media advertising only; 3) ban on national TV, radio and print media, as well as on some but not all other forms of direct and indirect advertising and 4) complete ban on all forms of advertising.
+        presentation:
+          grapher_config:
+            note: "Direct advertising includes all classic forms of advertising, such as TV, radio, print media and billboard ads. Indirect advertising includes sponsorships, product placement or promotional discounts."
+      cig_afford_pct_gdp:
+        title: Affordability of cigarettes (as a share of GDP per capita)
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The price of 100 packs of cigarettes as a share of GDP per capita. This price is based on the most-sold brand of cigarettes in a given country and includes taxes. Lower values indicate that cigarettes are more affordable.
+      tobacco_help_quit:
+        title: Support to help quit tobacco use
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          National support for the cessation of tobacco use has different levels:
+          - Countries in dark blue offer a national quitline and cover costs for nicotine replacement therapy (NRT) or other cessation services.
+          - Countries in light blue cover the costs of some services, but not all.
+          - Countries in orange offer some services, but do not cover any costs.
