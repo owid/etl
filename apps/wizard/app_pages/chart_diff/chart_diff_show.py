@@ -311,10 +311,10 @@ class ChartDiffShow:
                 )
 
         if len(self.diff.article_refs) > 0:
-            articles_md = "  - " + "\n  - ".join(
-                [f"[{art.title}]({art.url}): {art.views_daily_pretty} views" for art in self.diff.article_refs]
+            articles_md = "\n\n".join(
+                [f"- [{art.title}]({art.url}): {art.views_daily_pretty} daily views" for art in self.diff.article_refs]
             )
-            articles_md = f" **Articles using this chart**:\n\n{articles_md}"
+            articles_md = f" Articles using this chart:\n\n{articles_md}"
         else:
             articles_md = ""
 
