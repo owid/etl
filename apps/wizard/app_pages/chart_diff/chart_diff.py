@@ -1027,7 +1027,9 @@ def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
 @st_cache_data(custom_text="Retrieving analytics on article references...")
 def get_chart_in_article_views_cached(chart_ids: List[int]) -> Dict[int, List[ArticleRef]]:
     # Articles
-    df_articles = get_article_views_last_n_days(chart_ids, 30)
+    df_articles = get_article_views_last_n_days(chart_ids, 30).rename(
+        columns={"post_url": "url", "post_title": "title"}
+    )
     return (
         df_articles.groupby("chart_id")[["url", "views_daily", "title"]]
         .apply(lambda x: [ArticleRef(row["url"], row["title"], row["views_daily"]) for _, row in x.iterrows()])

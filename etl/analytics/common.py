@@ -359,7 +359,7 @@ def get_article_views_by_url(
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
-    Fetch number of article views per URL from Datasette.
+    Fetch number of GDoc views per URL from Datasette.
     """
     where_clauses = []
     if date_min:
@@ -398,7 +398,42 @@ def get_article_views_by_url(
     return df_views
 
 
-def get_gdoc_references_of_charts(chart_ids: Optional[List[int]] = None, component_types: Optional[List[str]] = None):
+def _get_gdocs_references_of_charts_via_narrative_charts(chart_ids: Optional[List[int]] = None):
+    """Get GDocs (e.g. articles, topic pages, or data insights) that use narrative chart, and link them to the original (parent) chart."""
+    # Prepare query.
+    query = """SELECT
+        cv.id AS chart_id,
+        pg.content ->> '$.title' AS post_title,
+        pg.slug AS post_slug,
+        pg.type AS post_type,
+        cc.slug AS chart_slug,
+        pgl.linkType AS link_type,
+        pgl.componentType AS component_type,
+        pg.publishedAt AS post_publication_date,
+        pgl.target AS narrative_chart_slug
+    FROM posts_gdocs pg
+    JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
+    LEFT JOIN chart_views cv ON pgl.target = cv.name
+    LEFT JOIN charts c ON cv.parentChartId = c.id
+    LEFT JOIN chart_configs cc ON c.configId = cc.id
+    WHERE pg.published = 1
+    AND cv.id IS NOT NULL
+    """
+    if chart_ids:
+        chart_ids_str = ", ".join(str(cid) for cid in chart_ids)
+        query += f" AND cv.id IN ({chart_ids_str})"
+
+    # Execute query and create a dataframe.
+    df = OWID_ENV.read_sql(query)
+
+    return df
+
+
+def get_gdoc_references_of_charts(
+    chart_ids: Optional[List[int]] = None,
+    component_types: Optional[List[str]] = None,
+    include_parents_of_narrative_charts: bool = True,
+):
     """Get GDocs (e.g. articles, topic pages, or data insights) that use charts, given a list of chart ids.
 
     A chart may be used by a gdoc in different ways: it can be embedded, cited as a URL, etc. The argument component_types defines which ways to consider (e.g. 'chart' corresponds to embedded charts).
@@ -409,7 +444,7 @@ def get_gdoc_references_of_charts(chart_ids: Optional[List[int]] = None, compone
     * If a charts appears in the all-charts block of a topic page, the topic page may not appear in the list of gdoc references. The "all-charts" component in the post_gdocs_links table includes only the top charts (explicitly cited in the [.top] part of the {.all-charts} section of the gdoc).
       * TODO: We need to include topic pages in a different way, using tags (see https://owid.slack.com/archives/C46U9LXRR/p1746521259960689?thread_ts=1746520668.463959&cid=C46U9LXRR ).
     * References to narrative charts are only included if the id of the narrative chart is in the list of chart_ids. But, if a chart in the list of chart_ids is the parent of a narrative chart, references to this narrative chart are not included.
-      * TODO: Confirm that this is the case, and optionally include references to children narrative charts.
+      * For this reason, we include an argument include_parents_of_narrative_charts. If True, we check if any of the chart_ids corresponds to a parent of a narrative chart used in a gdoc, and, if so, include the reference of that gdoc.
 
     """
     # Prepare list of component types to consider.
@@ -470,6 +505,12 @@ def get_gdoc_references_of_charts(chart_ids: Optional[List[int]] = None, compone
     # Execute query and create a dataframe.
     df = OWID_ENV.read_sql(sql=query)
 
+    if include_parents_of_narrative_charts:
+        # If a gdoc uses a narrative chart, we want to identify the parent chart, and, if that parent chart is among the given chart_ids, include those gdocs.
+        df_narrative_charts = _get_gdocs_references_of_charts_via_narrative_charts(chart_ids=chart_ids)
+        if not df_narrative_charts.empty:
+            df = pd.concat([df, df_narrative_charts], ignore_index=True)
+
     # Transform slugs of the gdoc posts (articles, topic pages, and data insights) into full urls.
     df["post_url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
     # In the case of gdocs of type "homepage", the post_slug seems to always be "owid-homepage", which is not a real slug. Fix those cases.
@@ -477,6 +518,9 @@ def get_gdoc_references_of_charts(chart_ids: Optional[List[int]] = None, compone
 
     # Transform slugs of the target content (usually grapher charts or explorers) into urls.
     df["chart_url"] = df["link_type"].map(POST_LINK_TYPES_TO_URL) + df["chart_slug"]
+
+    # Adapt publication date format.
+    df["post_publication_date"] = df["post_publication_date"].dt.date.astype(str)
 
     # Delete rows without a valid post url.
     # This may happen to fragments, since didn't know how to map them into a url.
@@ -490,139 +534,22 @@ def get_article_views_by_chart_id(
     date_min: str = DATE_MIN,
     date_max: str = DATE_MAX,
 ):
-    """Given a list of chart ids, get all article URLs (and their views) that display that chart.
-
-    TODO: I suppose the logic of this function can be simplified, it's quite convoluted.
-
-    """
-    # Firstly, I will connect all gdocs with grapher charts.
-    # TODO: Fix the following queries to account for redirected slugs.
-    query = """SELECT
-        pg.slug AS post_slug,
-        pg.type,
-        pg.published,
-        pg.authors,
-        pg.publishedAt,
-        JSON_UNQUOTE(JSON_EXTRACT(pg.content, '$.title')) AS title,
-        pgl.target,
-        pgl.linkType,
-        pgl.componentType,
-        cc.slug AS chart_slug,
-        CAST(JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.id')) AS UNSIGNED) AS chart_id
-    FROM
-        posts_gdocs pg
-    JOIN
-        posts_gdocs_links pgl ON pg.id = pgl.sourceId
-    JOIN
-        chart_configs cc ON cc.slug = pgl.target
-    WHERE
-        pg.published = 1
-        AND JSON_EXTRACT(cc.full, '$.id') IS NOT NULL"""
-    if chart_ids:
-        id_list = ", ".join(str(cid) for cid in chart_ids)
-        query += f" AND JSON_EXTRACT(cc.full, '$.id') IN ({id_list})"
-    df_chart_links = OWID_ENV.read_sql(query)
-
-    # When a gdoc cites a narrative chart, we want to link it to its parent chart. To do that, we need a different query.
-    query = """SELECT
-        pg.slug AS post_slug,
-        pg.type,
-        pg.published,
-        pg.authors,
-        pg.publishedAt,
-        JSON_UNQUOTE(JSON_EXTRACT(pg.content, '$.title')) AS title,
-        pgl.target,
-        pgl.linkType,
-        pgl.componentType,
-        cc.slug AS chart_slug,
-        cv.id AS chart_id
-    FROM
-        posts_gdocs pg
-    INNER JOIN
-        posts_gdocs_links pgl ON pg.id = pgl.sourceId
-    LEFT JOIN
-        chart_views cv ON pgl.target = cv.name
-    LEFT JOIN
-        charts c ON cv.parentChartId = c.id
-    LEFT JOIN
-        chart_configs cc ON c.configId = cc.id
-    WHERE
-        pg.published = 1
-    AND cv.id IS NOT NULL
-    """
-    if chart_ids:
-        id_list = ", ".join(str(cid) for cid in chart_ids)
-        query += f" AND cv.id IN ({id_list})"
-    df_narrative_chart_links = OWID_ENV.read_sql(query)
-
-    # Combine both tables.
-    if not df_narrative_chart_links.empty:
-        df_links = pd.concat([df_chart_links, df_narrative_chart_links])
-    else:
-        df_links = df_chart_links
-
-    # Construct URLs for all the different contents.
-    url_start = {
-        # Content "type":
-        "article": OWID_BASE_URL,
-        "linear-topic-page": OWID_BASE_URL,
-        "topic-page": OWID_BASE_URL,
-        "data-insight": OWID_BASE_URL + "data-insights/",
-        # 'about-page',
-        # 'fragment',
-        # 'author',
-        # 'homepage',
-        # Cited object "linkType":
-        "grapher": OWID_BASE_URL + "grapher/",
-        # Chart views, in theory, refer to narrative charts, which don't have a public URL.
-        # They are handled separately.
-        # NOTE: there are chart views for non-narrative charts, so there may be other cases I'm not considering.
-        "chart-view": OWID_BASE_URL + "grapher/",
-        # "explorer": OWID_BASE_URL + "explorers/",
-        # 'gdoc',
-        # "url": "",
-    }
-    # Transform slugs or articles, topic pages, and data insights into urls.
-    df_links["content_url"] = df_links["type"].map(url_start) + df_links["post_slug"]
-    # In the case of homepage references, post_slug is "owid-homepage", which is not a real slug.
-    # The url in that case should just be the homepage.
-    df_links.loc[df_links["type"] == "homepage", "content_url"] = OWID_BASE_URL
-    # Transform slugs of grapher charts into urls.
-    # If there is a parent chart id, use that, otherwise, use the target chart.
-    df_links["chart_url"] = df_links["linkType"].map(url_start) + df_links["chart_slug"].fillna(df_links["target"])
-
-    # Remove rows without content or charts.
-    df_links = df_links.dropna(subset=["content_url", "chart_url"], how="any").reset_index(drop=True)
-
-    # By eye, I can tell that 'span-link' refers to links in the text (sometimes those links are grapher charts), and 'chart' or 'chart-view' refer to embedded grapher charts.
-    # As an example, see
-    # df_links[(df_links["content_url"]=="https://ourworldindata.org/what-is-foreign-aid")]
-    # which has both grapher charts cited and embedded.
-    # Find all articles, topic pages and data insights that display grapher charts.
-    df_content = (
-        df_links[(df_links["componentType"].isin(COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS))][
-            ["type", "content_url", "publishedAt", "title", "chart_id", "chart_url"]
-        ]
-        .rename(columns={"publishedAt": "publication_date"})
-        .drop_duplicates()
-        .reset_index(drop=True)
-    )
-    df_content["publication_date"] = df_content["publication_date"].dt.date.astype(str)
+    """Given a list of chart ids, get all article URLs (and their views) that display that chart."""
+    # Get a dataframe connecting chart ids with post urls that refer to those charts.
+    df_content = get_gdoc_references_of_charts(chart_ids=chart_ids)
 
     # TODO: Ideally, we would get analytics only for the relevant article urls, but the query is too long for Datasette and fails. Generalize this, either by reading from metabase API or from Duck DB.
     # Gather analytics for the writtent content in this dataframe, i.e. number of views in articles, topic pages (and possibly DIs).
     try:
         df_article_views = get_article_views_by_url(
-            urls=list(set(df_content["content_url"])), date_min=date_min, date_max=date_max
+            urls=list(set(df_content["post_url"])), date_min=date_min, date_max=date_max
         )
     except urllib.error.HTTPError:
         df_article_views = get_article_views_by_url(urls=None, date_min=date_min, date_max=date_max)
 
     # Combine data.
-    df_views = (
-        df_content[["content_url", "title", "chart_id", "chart_url"]]
-        .rename(columns={"content_url": "url"})
-        .merge(df_article_views, on="url", how="left")
+    df_views = df_content[["post_url", "post_title", "chart_id", "chart_url"]].merge(
+        df_article_views.rename(columns={"url": "post_url"}), on="post_url", how="left"
     )
 
     return df_views
