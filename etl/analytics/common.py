@@ -31,6 +31,99 @@ ANALYTICS_CSV_URL = "http://analytics.owid.io/analytics.csv"
 # Maximum number of rows that a single Datasette csv call can return.
 MAX_DATASETTE_N_ROWS = 10000
 
+# Base OWID URL, used to find views in articles and topic pages.
+OWID_BASE_URL = "https://ourworldindata.org/"
+
+# Complete list of component types in the posts_gdocs_links.
+# Each component type corresponds to a way in which a gdoc can be linked to another piece of content (e.g. a grapher chart, or an explorer).
+COMPONENT_TYPES_ALL = [
+    # Gdoc (usually of a topic page, but also possibly articles, e.g. https://ourworldindata.org/human-development-index ) cites a grapher chart as part of the all-charts block.
+    # NOTE: Only charts that are specifically cited as top charts will be included.
+    # To link gdocs of topic pages with charts that appear in the all-charts block, we need to use tags.
+    "all-charts",
+    # Gdoc (usually of an article) embeds a grapher chart.
+    "chart",
+    # Gdoc (only the SDG tracker) embeds grapher charts in a special story style.
+    "chart-story",
+    # Gdoc of homepage links to a few explorers (showing a thumbnail, no data).
+    "explorer-tiles",
+    # Gdoc of data insights cites the grapher-url in the metadata.
+    # We can use this field to connect data insights to the original grapher chart.
+    # NOTE: Not all data insights can be linked to a grapher chart (either because grapher-url is not defined, or because it uses a custom static visualization).
+    "front-matter",
+    # Gdoc of homepage cites other content (usually other gdocs).
+    "homepage-intro",
+    # Gdoc of homepage cites key indicators (usually grapher charts).
+    "key-indicator",
+    # Gdoc of a topic page cites key insights (usually grapher charts).
+    "key-insights",
+    # Gdoc (usually of an article) cites a narrative chart.
+    "narrative-chart",
+    # Gdoc of team page cites a person.
+    "person",
+    # Gdoc of homepage or author page cites topics to be shown in a "row of pills".
+    "pill-row",
+    # Gdoc (usually of articles) cites content (usually URLs, but also grapher charts) that appear in a special box.
+    # NOTE: When it's linked to a chart, the box displays a small thumbnail of the grapher chart.
+    "prominent-link",
+    # Gdoc (usually topic pages) cite other content (usually articles).
+    "research-and-writing",
+    # Gdoc (of any kind of content) cites a URL (usually an external URL, a grapher chart, or an explorer).
+    "span-link",
+    # Gdoc of a topic page cites other content (usually related topics).
+    "topic-page-intro",
+    # Gdoc (articles about our site, or data insights) cite a video.
+    "video",
+]
+# Component types to consider when linking gdocs with views (of charts, explorers, or narrative charts).
+COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS = [
+    # NOTE: 'all-charts' only includes top charts in the all-charts block. To link charts with topic pages, we need to use tags.
+    # 'all-charts',
+    "chart",
+    "chart-story",
+    # 'explorer-tiles',
+    "front-matter",
+    # 'homepage-intro',
+    "key-indicator",
+    "key-insights",
+    "narrative-chart",
+    # 'person',
+    # 'pill-row',
+    # 'prominent-link',
+    # 'research-and-writing',
+    # NOTE: Grapher charts are often cited as URLs. It's unclear whether we want to count these references. But I'd say that in most cases, we'd prefer to ignore these. For example, when counting views of articles that use charts, we should count articles that display the chart, but not articles that simply cite the URL of the chart. Therefore, for now, ignore 'span-link'.
+    # 'span-link',
+    # 'topic-page-intro',
+    # 'video',
+]
+# Dictionary that maps the type of a gdoc post (as defined in the posts_gdocs DB table) to its base URL; adding the post's slug to this base URL gives the complete URL to the corresponding post.
+POST_TYPE_TO_URL = {
+    "about-page": OWID_BASE_URL,
+    "article": OWID_BASE_URL,
+    "author": f"{OWID_BASE_URL}team/",
+    "data-insight": f"{OWID_BASE_URL}data-insights/",
+    # Fragments are used just a handful of times, and seems to be used for data pages FAQ.
+    # It's not clear to me how to link them to specific posts, so, ignore them for now.
+    "fragment": None,
+    # Gdocs of type 'homepage' have an arbitrary slug "owid-homepage". They will be manually fixed later on.
+    "homepage": None,
+    "linear-topic-page": OWID_BASE_URL,
+    "topic-page": OWID_BASE_URL,
+}
+# Dictionary that maps a link type (as defined in the posts_gdocs_links DB table) to the base url; adding the target to this base url gives a full URL to the linked content (e.g. a grapher chart).
+POST_LINK_TYPES_TO_URL = {
+    "grapher": OWID_BASE_URL + "grapher/",
+    # Chart views, in theory, refer to narrative charts, which don't have a public URL.
+    # They are handled separately.
+    # NOTE: there are chart views for non-narrative charts, so there may be other cases I'm not considering.
+    "chart-view": OWID_BASE_URL + "grapher/",
+    "explorer": OWID_BASE_URL + "explorers/",
+    "gdoc": "https://docs.google.com/document/d/",
+    # A "url" link type links to an arbitrary URL.
+    # NOTE: In a handful of cases, there are links of type "url" and component type "chart". It's not clear to me why they are not of link types "grapher" with type "chart". But what's clear is that, when the link type is "grapher" the target corresponds to a slug, and when the link type is "url" the target is a full URL to a grapher chart. So, simply map these urls to their targets without modification.
+    "url": "",
+}
+
 
 def _try_to_execute_datasette_query(sql_url: str, warn: bool = False) -> pd.DataFrame:
     try:
@@ -305,6 +398,93 @@ def get_article_views_by_url(
     return df_views
 
 
+def get_gdoc_references_of_charts(chart_ids: Optional[List[int]] = None, component_types: Optional[List[str]] = None):
+    """Get GDocs (e.g. articles, topic pages, or data insights) that use charts, given a list of chart ids.
+
+    A chart may be used by a gdoc in different ways: it can be embedded, cited as a URL, etc. The argument component_types defines which ways to consider (e.g. 'chart' corresponds to embedded charts).
+
+    The main query used in this function was adapted from owid-grapher/db/model/Post.ts (getGdocsPostReferencesByChartId). That is the query that determines the articles and topic pages that reference a given chart id. The resulting list is what appears in the Refs tab of the chart admin.
+
+    That query has some limitations:
+    * If a charts appears in the all-charts block of a topic page, the topic page may not appear in the list of gdoc references. The "all-charts" component in the post_gdocs_links table includes only the top charts (explicitly cited in the [.top] part of the {.all-charts} section of the gdoc).
+      * TODO: We need to include topic pages in a different way, using tags (see https://owid.slack.com/archives/C46U9LXRR/p1746521259960689?thread_ts=1746520668.463959&cid=C46U9LXRR ).
+    * References to narrative charts are only included if the id of the narrative chart is in the list of chart_ids. But, if a chart in the list of chart_ids is the parent of a narrative chart, references to this narrative chart are not included.
+      * TODO: Confirm that this is the case, and optionally include references to children narrative charts.
+
+    """
+    # Prepare list of component types to consider.
+    if component_types is None:
+        # If not specified, assume a specific list (defined above).
+        component_types = COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS
+    component_types_str = ", ".join(f"'{chart_id}'" for chart_id in component_types)
+
+    # Prepare query.
+    ####################################################################################################################
+    # TODO: Adding the OR for redirects make the query take significantly longer. This could be optimized.
+    #  Maybe they could be separate queries (similar to the narrative charts one).
+    include_redirects = False
+    ####################################################################################################################
+
+    query = """SELECT DISTINCT
+        c.id AS chart_id,
+        pg.content ->> '$.title' AS post_title,
+        pg.slug AS post_slug,
+        pg.type AS post_type,
+        cc.slug AS chart_slug,
+        pgl.linkType AS link_type,
+        pgl.componentType AS component_type,
+        pg.publishedAt AS post_publication_date
+    FROM
+        posts_gdocs pg
+        JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
+        JOIN chart_configs cc ON pgl.target = cc.slug
+        JOIN charts c ON c.configId = cc.id
+    """
+    if include_redirects:
+        query += """\
+        OR pgl.target IN (
+            SELECT
+                cr.slug
+            FROM
+                chart_slug_redirects cr
+            WHERE
+                cr.chart_id = c.id
+        )
+        """
+    query += f"""
+    WHERE
+        pgl.componentType IN ({component_types_str})
+        AND pg.published = 1"""
+
+    # Specify chart ids to consider (otherwise all charts will be considered).
+    if chart_ids is not None:
+        chart_ids_str = ", ".join(f"{chart_id}" for chart_id in chart_ids)
+        query += f"""
+        AND c.id IN ({chart_ids_str})"""
+
+    # Sort query results conveniently.
+    query += """
+    ORDER BY c.id ASC
+    """
+
+    # Execute query and create a dataframe.
+    df = OWID_ENV.read_sql(sql=query)
+
+    # Transform slugs of the gdoc posts (articles, topic pages, and data insights) into full urls.
+    df["post_url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
+    # In the case of gdocs of type "homepage", the post_slug seems to always be "owid-homepage", which is not a real slug. Fix those cases.
+    df.loc[df["post_type"] == "homepage", "post_url"] = OWID_BASE_URL
+
+    # Transform slugs of the target content (usually grapher charts or explorers) into urls.
+    df["chart_url"] = df["link_type"].map(POST_LINK_TYPES_TO_URL) + df["chart_slug"]
+
+    # Delete rows without a valid post url.
+    # This may happen to fragments, since didn't know how to map them into a url.
+    df = df.dropna(subset=["post_url"]).reset_index(drop=True)
+
+    return df
+
+
 def get_article_views_by_chart_id(
     chart_ids: Optional[List[int]] = None,
     date_min: str = DATE_MIN,
@@ -382,7 +562,6 @@ def get_article_views_by_chart_id(
         df_links = df_chart_links
 
     # Construct URLs for all the different contents.
-    OWID_BASE_URL = "https://ourworldindata.org/"
     url_start = {
         # Content "type":
         "article": OWID_BASE_URL,
@@ -415,42 +594,13 @@ def get_article_views_by_chart_id(
     # Remove rows without content or charts.
     df_links = df_links.dropna(subset=["content_url", "chart_url"], how="any").reset_index(drop=True)
 
-    ALLOWED_COMPONENT_TYPES = [
-        # All-charts blocks embedded in topic pages (and exceptionally one article: https://ourworldindata.org/human-development-index )
-        "all-charts",
-        # Embedded grapher charts.
-        "chart",
-        # Charts embedded in a special way for the SDG tracker.
-        "chart-story",
-        # Charts embedded as key insights of topic pages.
-        "key-insights",
-        # This refers to embedded narrative charts.
-        "narrative-chart",
-        # This seems to refer to cited links, so ignore them.
-        # 'span-link',
-        # This refers to videos (which are just a few).
-        # 'video',
-        # This is used for the grapher-url defined in the metadata of data insights.
-        # We will use this field to connect data insights to the original grapher chart.
-        # NOTE: Data insights using a static chart (that didn't come from any grapher chart) will not be considered.
-        "front-matter",
-        # This is used for links that appear in a special box.
-        # When it's linked to a chart, it shows a very small thumbnail, so we can exclude it.
-        # 'prominent-link',
-        # Content shown (as a thumbnail) in the Research & Writing tab of topic pages.
-        # Given that it simply shows a dummy thumbnail, exclude it.
-        # 'research-and-writing',
-        # This seems to be just links that appear as "RELATED TOPICS" section of topic pages.
-        # They don't show any data, so exclude them.
-        # 'topic-page-intro',
-    ]
     # By eye, I can tell that 'span-link' refers to links in the text (sometimes those links are grapher charts), and 'chart' or 'chart-view' refer to embedded grapher charts.
     # As an example, see
     # df_links[(df_links["content_url"]=="https://ourworldindata.org/what-is-foreign-aid")]
     # which has both grapher charts cited and embedded.
     # Find all articles, topic pages and data insights that display grapher charts.
     df_content = (
-        df_links[(df_links["componentType"].isin(ALLOWED_COMPONENT_TYPES))][
+        df_links[(df_links["componentType"].isin(COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS))][
             ["type", "content_url", "publishedAt", "title", "chart_id", "chart_url"]
         ]
         .rename(columns={"publishedAt": "publication_date"})
