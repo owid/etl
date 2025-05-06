@@ -12,32 +12,17 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 # Data for 1949
 df = pd.DataFrame(
     {
-        "country": ["England"] * 18,
+        "country": ["England"] * 3,
         "year": [
             1086,
             1350,
             1650,
-            1870,
-            1878,
-            1891,
-            1900,
-            1910,
-            1920,
-            1930,
-            1940,
-            1949,
-            1962,
-            1969,
-            1980,
-            1990,
-            2000,
-            2019,
         ],
-        "forest_share": [15, 10, 8, 4.8, 5.1, 5.7, 6.1, 6.1, 5.6, 5.6, 6, 6.3, 6.7, 7, 7.3, 8, 8.5, 10],
+        "forest_share": [15, 10, 8],
         "source": [
             "https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/221023/pb13871-forestry-policy-statement.pdf"
         ]
-        * 18,
+        * 3,
     }
 )
 

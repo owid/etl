@@ -13,6 +13,6 @@ meta:
       name: Open Government Licence
       url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
 outs:
-  - md5: 13b07a6c435fd0a607f24b01f873a98e
-    size: 2880
+  - md5: 7787a1f1a5bb5ecbb25ddf49f315aa44
+    size: 503
     path: forest_share_england.csv
