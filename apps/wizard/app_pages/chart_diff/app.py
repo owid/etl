@@ -21,7 +21,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff import get_chart_diffs_from_gra
 from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
-from apps.wizard.utils.components import Pagination, url_persist
+from apps.wizard.utils.components import Pagination, st_horizontal, st_wizard_page_link, url_persist
 from etl.config import OWID_ENV
 from etl.grapher import model as gm
 
@@ -556,6 +556,7 @@ def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, targe
 # MAIN
 ########################################
 def main():
+    # Title and links
     st.title(
         ":material/difference: Chart Diff",
         help=f"""
@@ -566,6 +567,10 @@ It lists all those charts that have been modified in the `{OWID_ENV.name}` envir
 If you want any of the modified charts in `{OWID_ENV.name}` to be migrated to `production`, you can approve them by clicking on the toggle button.
 """,
     )
+    with st_horizontal(vertical_alignment="center"):
+        st.markdown("Other links: ")
+        st_wizard_page_link("mdim-diff")
+        st_wizard_page_link("explorer-diff")
 
     # Get actual charts
     get_chart_diffs()
