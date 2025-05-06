@@ -51,6 +51,8 @@ class SortMethods:
     relevance: str = "relevance"
     chart_views_most_to_least: str = "chart_views_most_to_least"
     chart_views_least_to_most: str = "chart_views_least_to_most"
+    articles_most_to_least: str = "articles_most_to_least"
+    articles_least_to_most: str = "articles_least_to_most"
     anomalies_most_to_least: str = "anomalies_most_to_least"
     anomalies_least_to_most: str = "anomalies_least_to_most"
     last_updated: str = "last_updated"
@@ -58,8 +60,10 @@ class SortMethods:
 
 SORTING_METHODS = {
     SortMethods.relevance: "Relevance",
-    SortMethods.chart_views_most_to_least: "Chart views (last 14-day): Most to least",
-    SortMethods.chart_views_least_to_most: "Chart views (last 14-day): Least to most",
+    SortMethods.chart_views_most_to_least: "Chart views (last 30-day): Most to least",
+    SortMethods.chart_views_least_to_most: "Chart views (last 30-day): Least to most",
+    SortMethods.articles_most_to_least: "Articles (last 30-day): Most to least",
+    SortMethods.articles_least_to_most: "Articles (last 30-day): Least to most",
     SortMethods.anomalies_most_to_least: "Anomalies: Most to least",
     SortMethods.anomalies_least_to_most: "Anomalies: Least to most",
     SortMethods.last_updated: "Last updated",
@@ -112,7 +116,9 @@ def get_chart_diffs():
     )
 
     # Get indicators used in charts
-    st.session_state.indicators_in_charts = indicators_in_charts(list(st.session_state.chart_diffs.keys()))
+    st.session_state.indicators_in_charts = indicators_in_charts(
+        SOURCE_ENGINE, list(st.session_state.chart_diffs.keys())
+    )
 
     # Init, can be changed by the toggle
     st.session_state.chart_diffs_filtered = st.session_state.chart_diffs
@@ -222,6 +228,22 @@ def sort_chart_diffs():
             sorted(
                 st.session_state.chart_diffs_filtered.items(),
                 key=lambda item: item[1].scores.chart_views,
+                reverse=False,
+            )
+        )
+    elif sort_by == SortMethods.articles_most_to_least:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.num_articles,
+                reverse=True,
+            )
+        )
+    elif sort_by == SortMethods.articles_least_to_most:
+        st.session_state.chart_diffs_filtered = dict(
+            sorted(
+                st.session_state.chart_diffs_filtered.items(),
+                key=lambda item: item[1].scores.num_articles,
                 reverse=False,
             )
         )
@@ -369,36 +391,41 @@ def _show_options_display():
     # Display options
     st.markdown("#### Results page")
 
+    col1, col2, col3 = st.columns(3, vertical_alignment="bottom")
     ## Sorting
-    url_persist(st.selectbox)(
-        label="Sort by",
-        options=SORTING_METHODS.keys(),
-        format_func=lambda x: SORTING_METHODS[x],
-        key=SORTING_QUERY_PARAM,
-        help="Sort chart diffs by relevance, user chart views, anomaly score, last updated, etc.",
-        index=0,
-    )
+    with col1:
+        url_persist(st.selectbox)(
+            label="Sort by",
+            options=SORTING_METHODS.keys(),
+            format_func=lambda x: SORTING_METHODS[x],
+            key=SORTING_QUERY_PARAM,
+            help="Sort chart diffs by relevance, user chart views, anomaly score, last updated, etc.",
+            index=0,
+        )
 
     ## Display options
-    st.toggle(
-        "Use **vertical arrangement** for chart diffs",
-        key="arrange-charts-vertically",
-        on_change=arrange_charts,  # type: ignore
-    )
-    st.selectbox(
-        "Number of charts per page",
-        options=[
-            # 1,
-            5,
-            10,
-            20,
-            50,
-            100,
-        ],
-        key="charts-per-page",
-        help="Select the number of charts to display per page.",
-        index=1,
-    )
+    with col2:
+        st.selectbox(
+            "Number of charts per page",
+            options=[
+                # 1,
+                5,
+                10,
+                20,
+                50,
+                100,
+            ],
+            key="charts-per-page",
+            help="Select the number of charts to display per page.",
+            index=1,
+        )
+
+    with col3:
+        st.toggle(
+            "Use **vertical arrangement** for chart diffs",
+            key="arrange-charts-vertically",
+            on_change=arrange_charts,  # type: ignore
+        )
 
 
 def _show_options_misc():
@@ -409,7 +436,6 @@ def _show_options_misc():
         on_click=lambda: set_states({"chart_diffs": get_chart_diffs_from_grapher(SOURCE_ENGINE, TARGET_ENGINE)}),
         help="Get the latest chart versions, both from the staging and production servers.",
     )
-    st.divider()
     with st.container(border=True):
         st.markdown("Danger zone ⚠️")
         if st.button(
@@ -425,17 +451,18 @@ def _show_options():
     """Show options pane."""
 
     with st.popover("⚙️ Options", use_container_width=True):
-        col1, col2, col3 = st.columns(3)
+        # col1, col2, col3 = st.columns(3)
 
         # Filters
-        with col1:
-            _show_options_filters()
+        # with col1:
+        _show_options_filters()
         # Display
-        with col2:
-            _show_options_display()
+        # with col2:
+        _show_options_display()
         # Buttons (refresh, unreview)
-        with col3:
-            _show_options_misc()
+        # with col3:
+        st.divider()
+        _show_options_misc()
 
 
 def _show_summary_top(chart_diffs):
@@ -472,15 +499,20 @@ def render_app():
         _ = filter_chart_diffs()
 
         # Show all of the charts
-        _show_options()
+        col1, col2 = st.columns([1, 1], vertical_alignment="top")
+        with col2:
+            _show_options()
 
         # Show diffs
-        if len(st.session_state.chart_diffs_filtered) == 0:
-            if len(st.session_state.chart_diffs) == 0:
-                st.warning("No charts to be shown. Try changing the filters in the Options menu.")
-            else:
-                _show_summary_top([chart for chart in st.session_state.chart_diffs_filtered.values()])
+        if len(st.session_state.chart_diffs) == 0:
+            with col1:
+                with st.container(border=True):
+                    st.warning("No charts to be shown. Try changing the filters in the Options menu.")
         else:
+            with col1:
+                with st.container(border=True):
+                    _show_summary_top([chart for chart in st.session_state.chart_diffs_filtered.values()])
+            # if len(st.session_state.chart_diffs_filtered) != 0:
             # Show changed charts (modified, new, etc.)
             if st.session_state.chart_diffs_filtered:
                 # Render chart diffs
@@ -491,10 +523,10 @@ def render_app():
                         source_session,
                         target_session,
                     )
-            else:
-                st.warning(
-                    "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
-                )
+            # else:
+            #     st.warning(
+            #         "No chart changes found in the staging environment. Try unchecking the 'Hide approved charts' toggle in case there are hidden ones."
+            #     )
 
 
 def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, target_session: Session) -> None:
@@ -502,7 +534,7 @@ def show_chart_diffs(chart_diffs, pagination_key, source_session: Session, targe
     # Pagination menu
     with st.container(border=True):
         # Information
-        _show_summary_top(chart_diffs)
+        # _show_summary_top(chart_diffs)
 
         # Pagination
         pagination = Pagination(
