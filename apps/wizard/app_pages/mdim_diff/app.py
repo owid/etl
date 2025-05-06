@@ -8,12 +8,12 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
-from apps.wizard.app_pages.explorer_diff.app import (
+from apps.wizard.app_pages.explorer_diff.utils import (
     _display_view_options,
     _fill_missing_dimensions,
     _set_page_config,
+    truncate_lines,
 )
-from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
 from apps.wizard.utils.components import mdim_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import read_sql
@@ -102,6 +102,11 @@ def _fetch_mdims(mdim_catalog_path: str) -> tuple[gm.MultiDimDataPage, gm.MultiD
 
     source_mdim = load_mdim_config(SOURCE_ENGINE)
     target_mdim = load_mdim_config(TARGET_ENGINE)
+
+    if source_mdim.slug is None:
+        source_mdim.slug = source_mdim.catalogPath.split("/")[-1]  # type: ignore
+    if target_mdim.slug is None:
+        target_mdim.slug = target_mdim.catalogPath.split("/")[-1]  # type: ignore
 
     return source_mdim, target_mdim
 

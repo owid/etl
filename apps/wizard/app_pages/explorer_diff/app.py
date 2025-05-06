@@ -1,5 +1,4 @@
 import json
-import random
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -10,7 +9,12 @@ from structlog import get_logger
 
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
-from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
+from apps.wizard.app_pages.explorer_diff.utils import (
+    _display_view_options,
+    _fill_missing_dimensions,
+    _set_page_config,
+    truncate_lines,
+)
 from apps.wizard.utils.components import explorer_chart, url_persist
 from etl.config import OWID_ENV
 from etl.db import get_engine, read_sql
@@ -18,20 +22,6 @@ from etl.files import yaml_dump
 from etl.grapher import model as gm
 
 log = get_logger()
-
-
-def _set_page_config(title: str):
-    # Config
-    st.set_page_config(
-        page_title=f"Wizard: {title}",
-        layout="wide",
-        page_icon="🪄",
-        initial_sidebar_state="collapsed",
-        menu_items={
-            "Report a bug": "https://github.com/owid/etl/issues/new?assignees=marigold%2Clucasrodes&labels=wizard&projects=&template=wizard-issue---.md&title=wizard%3A+meaningful+title+for+the+issue",
-        },
-    )
-
 
 _set_page_config("Explorer Diff")
 
@@ -62,21 +52,6 @@ def _show_options():
             url_persist(st.selectbox)(
                 "Explorer Display", value="Default", options=["Default", "Map", "Table", "Chart"], key="default_display"
             )
-
-
-def _fill_missing_dimensions(views: list[dict]) -> list[dict]:
-    """
-    Fill missing dimensions in views with '-'.
-    This is to ensure that all views have the same dimensions for comparison.
-    """
-    # If view doesn't have all dimensions, use '-'
-    dim_names = {n for v in views for n in v.keys()}
-    for view in views:
-        for dim in dim_names:
-            # If dimension is missing in a view, use '-'
-            if dim not in view:
-                view[dim] = "-"
-    return views
 
 
 def _fetch_explorer_views(slug: str) -> list[dict]:
@@ -181,48 +156,6 @@ def _display_explorer_selection(hide_unchanged_explorers: bool) -> str | None:
         return None
 
     return explorer_slug
-
-
-def _display_view_options(slug: str, views: list[dict]) -> dict:
-    """Display explorer view options UI and return the selected view."""
-    all_dimensions = _extract_all_dimensions(views)
-
-    st.subheader("Select Explorer View Options")
-
-    # Create random view button
-    if st.button(f"🎲 Random view ({len(views)} views available)"):
-        # Select a random view from views
-        if views:
-            random_view = random.choice(views)
-            # Update session state with the random view values
-            for dim, val in random_view.items():
-                st.session_state[f"{slug}_{dim}"] = val
-            # Rerun to apply the changes
-            st.rerun()
-
-    # Arrange selectboxes horizontally using columns
-    cols = st.columns(len(all_dimensions)) if all_dimensions else []
-
-    selected_options = {}
-    for i, (dim, values) in enumerate(all_dimensions.items()):
-        selected_options[dim] = url_persist(cols[i].selectbox)(f"{dim}", options=values, key=f"{slug}_{dim}")
-
-    view = selected_options if selected_options else (views[0] if views else {})
-
-    # Check if the selected combination exists in any of the views
-    combination_exists = False
-    for explorer_view in views:
-        if all(dim in explorer_view and explorer_view[dim] == val for dim, val in view.items()):
-            combination_exists = True
-            break
-
-    # Display warning if combination doesn't exist
-    if not combination_exists and view:
-        st.warning(
-            "⚠️ This specific combination of options does not exist in the explorer views. The explorer may show unexpected results."
-        )
-
-    return view
 
 
 def _display_explorer_comparison(explorer_slug: str, view: dict):
