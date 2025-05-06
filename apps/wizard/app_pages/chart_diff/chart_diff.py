@@ -2,6 +2,7 @@ import datetime as dt
 import difflib
 import json
 import pprint
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -10,8 +11,12 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Session
 from structlog import get_logger
 
+from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
+from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
+from apps.wizard.utils.components import st_cache_data
 from apps.wizard.utils.io import get_all_changed_catalog_paths
+from etl.analytics.common import get_article_views_last_n_days, get_chart_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files, log_time
@@ -28,6 +33,97 @@ EXCLUDE_METADATA_CHANGES = [
     "grapher/climate/.*/surface_temperature_annual_average",
     "grapher/artificial_intelligence/.*/epoch",
 ]
+
+
+@dataclass
+class ChartDiffScores:
+    chart_views: Optional[float]  # Last 30 day average
+    anomaly: Optional[float]
+    num_articles: Optional[int]
+
+    # Internal scale factor to regularize score for chart views
+    _relevance: Optional[float] = None
+
+    @property
+    def anomaly_pretty(self) -> str:
+        """Get anomaly score as string ready to show."""
+        if self.anomaly is not None:
+            return f"{int(self.anomaly * 100)}"
+        else:
+            return "N/A"
+
+    @property
+    def chart_views_pretty(self) -> str:
+        """Get chart views as string ready to show."""
+        if self.chart_views is not None:
+            return f"{self.chart_views:.2f}"
+        else:
+            return "N/A"
+
+    @property
+    def relevance(self) -> Optional[float]:
+        return self._relevance
+
+    def estimate_relevance(self, reg_chart_views: float, reg_num_articles: float, reg_anomaly: float) -> None:
+        """Get relevance score as a combination of chart views and anomaly."""
+        # Weights for relevance operation
+        weights = [
+            5.0,
+            3.0,
+            1.0,
+        ]
+        regularization = [
+            reg_chart_views,
+            reg_num_articles,
+            reg_anomaly,
+        ]
+        params = [
+            self.chart_views,
+            self.num_articles,
+            self.anomaly,
+        ]
+
+        relevance = 0
+        for w, r, p in zip(weights, regularization, params):
+            if p is not None:
+                assert p > 0 or p == 0, f"p={p} should be >= 0"
+                relevance += w * p / r
+
+        relevance /= sum(weights)
+        self._relevance = relevance
+
+    @property
+    def relevance_pretty(self) -> str:
+        """Get relevance score as string."""
+        if self.relevance is not None:
+            return str(int(self.relevance * 100))
+        else:
+            return "N/A"
+
+    def to_md(self) -> str:
+        text = (
+            f":violet-badge[:material/auto_awesome: **{self.relevance_pretty}**% relevance]",
+            f" :primary-badge[:material/remove_red_eye: **{self.chart_views_pretty}** daily views]",
+            f" :primary-badge[:material/article: **{self.num_articles}** ref{'' if self.num_articles == 1 else 's'}]",
+            f" :primary-badge[:material/scatter_plot: **{self.anomaly_pretty}**% anomaly]" if self.anomaly else "",
+        )
+        return "".join(text)
+
+
+@dataclass
+class ArticleRef:
+    url: str
+    title: str
+    # num_views: int
+    views_daily: float
+
+    @property
+    def views_daily_pretty(self) -> str:
+        """Get views daily as string."""
+        if self.views_daily is not None:
+            return f"{self.views_daily:.2f}"
+        else:
+            return "0"
 
 
 class ChartDiff:
@@ -53,7 +149,15 @@ class ChartDiff:
         modified_checksum: Optional[pd.DataFrame] = None,
         edited_in_staging: Optional[bool] = None,
         error: Optional[str] = None,
+        chart_views: Optional[float] = None,
+        score_indicators_anomalies: Optional[float] = None,
+        article_refs: Optional[List[ArticleRef]] = None,
+        df_approvals: Optional[pd.DataFrame] = None,
     ):
+        """Constructor of ChartDiff.
+
+        In most cases, ChartDiff objects are created by calling class method from_charts_df, which optimizes array loading.
+        """
         self.source_chart = source_chart
         self.target_chart = target_chart
         self.approval = approval
@@ -66,8 +170,19 @@ class ChartDiff:
         self.edited_in_staging = edited_in_staging
 
         # Get revisions
-        self.df_approvals = self.get_all_approvals_df()
+        if df_approvals is None:
+            self.df_approvals = pd.DataFrame()
+        else:
+            self.df_approvals = df_approvals
         self.last_chart_revision_approved = None
+
+        # Analytics, anomalies and other scores
+        self.article_refs = article_refs if article_refs else []
+        self.scores = ChartDiffScores(
+            chart_views=chart_views,
+            anomaly=score_indicators_anomalies if score_indicators_anomalies is not None else 0,
+            num_articles=len(self.article_refs),
+        )
 
         # Cached
         self._in_conflict = None
@@ -135,7 +250,7 @@ class ChartDiff:
     @property
     def is_draft(self) -> bool:
         """Check if the chart is a draft."""
-        return self.source_chart.publishedAt is None
+        return (self.source_chart.publishedAt is None) or (self.source_chart.config.get("isPublished") is False)
 
     @property
     def latest_update(self) -> dt.datetime:
@@ -219,7 +334,11 @@ class ChartDiff:
 
     @classmethod
     def from_charts_df(
-        cls, df_charts: pd.DataFrame, source_session: Session, target_session: Session
+        cls,
+        df_charts: pd.DataFrame,
+        source_session: Session,
+        target_session: Session,
+        estimate_relevance: bool = True,
     ) -> List["ChartDiff"]:
         """Get chart diffs from chart ids.
 
@@ -253,6 +372,18 @@ class ChartDiff:
 
         # Get all slugs from target
         slugs_in_target = cls._get_chart_slugs(target_session, slugs={c.slug for c in source_charts.values()})  # type: ignore
+
+        # Get chart views
+        chart_views_all = get_chart_views_cached(chart_ids)
+
+        # Anomalies
+        chart_anomalies_all = get_chart_anomalies_cached(chart_ids)
+
+        # Articles
+        article_refs_all = get_chart_in_article_views_cached(chart_ids)
+
+        # Get approvals
+        df_approvals_all = OWID_ENV.read_sql(f"SELECT * FROM chart_diff_approvals WHERE chartId in {tuple(chart_ids)}")
 
         # Build chart diffs
         chart_diffs = []
@@ -288,15 +419,57 @@ class ChartDiff:
             else:
                 error = None
 
+            # Chart views
+            chart_views_score = chart_views_all.get(chart_id, 0)
+
+            # Anomalies score
+            chart_anomalies_score = chart_anomalies_all.get(chart_id)
+
+            # Article refs
+            article_refs = article_refs_all.get(chart_id, [])
+
+            # Get approval history
+            df_approvals = df_approvals_all[df_approvals_all["chartId"] == chart_id]
+
             # Build Chart Diff object
-            chart_diff = cls(
-                source_chart, target_chart, approval, conflict, modified_checksum, edited_in_staging, error
+            chart_diff: "ChartDiff" = cls(
+                source_chart=source_chart,
+                target_chart=target_chart,
+                approval=approval,
+                conflict=conflict,
+                modified_checksum=modified_checksum,
+                edited_in_staging=edited_in_staging,
+                error=error,
+                chart_views=chart_views_score,
+                score_indicators_anomalies=chart_anomalies_score,
+                article_refs=article_refs,
+                df_approvals=df_approvals,
             )
 
             # Add last revision
             chart_diff.set_last_approved_chart_revision(source_session)
 
             chart_diffs.append(chart_diff)
+
+        if estimate_relevance:
+            # Estimate relevance
+            reg_chart_views = 1
+            reg_num_articles = 1
+            reg_anomaly = 1
+
+            for chart_diff in chart_diffs:
+                reg_chart_views = max(reg_chart_views, chart_diff.scores.chart_views or 1)
+                reg_num_articles = max(reg_num_articles, chart_diff.scores.num_articles or 1)
+                reg_anomaly = max(reg_anomaly, chart_diff.scores.anomaly or 1)
+            for chart_diff in chart_diffs:
+                if chart_diff.is_draft:
+                    chart_diff.scores._relevance = 0
+                else:
+                    chart_diff.scores.estimate_relevance(
+                        reg_chart_views=reg_chart_views,
+                        reg_num_articles=reg_num_articles,
+                        reg_anomaly=reg_anomaly,
+                    )
 
         return chart_diffs
 
@@ -309,11 +482,6 @@ class ChartDiff:
             chart_id=self.chart_id,
         )
         return history
-
-    def get_all_approvals_df(self) -> pd.DataFrame:
-        """Get history of chart diff."""
-        df = OWID_ENV.read_sql(f"SELECT * FROM chart_diff_approvals WHERE chartId = {self.chart_id}")
-        return df
 
     def get_last_chart_revision(self, session: Session, timestamp=None) -> gm.ChartRevisions:
         """Get history of chart diff."""
@@ -550,10 +718,18 @@ class ChartDiffsLoader:
         df_charts = self.get_charts_df(config, data, metadata)
 
         if source_session and target_session:
-            chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
+            chart_diffs = ChartDiff.from_charts_df(
+                df_charts=df_charts,
+                source_session=source_session,
+                target_session=target_session,
+            )
         else:
             with Session(self.source_engine) as source_session, Session(self.target_engine) as target_session:
-                chart_diffs = ChartDiff.from_charts_df(df_charts, source_session, target_session)
+                chart_diffs = ChartDiff.from_charts_df(
+                    df_charts=df_charts,
+                    source_session=source_session,
+                    target_session=target_session,
+                )
 
         self._diffs = chart_diffs
 
@@ -693,10 +869,7 @@ def _modified_chart_configs_on_staging(
     select
         c.id as chartId,
         MD5(cc.full) as chartChecksum,
-        cc.full as chartConfig,
-        c.lastEditedByUserId as chartLastEditedByUserId,
-        c.publishedByUserId as chartPublishedByUserId,
-        c.lastEditedAt as chartLastEditedAt
+        cc.full as chartConfig
     from charts as c
     join chart_configs as cc on c.configId = cc.id
     where
@@ -834,3 +1007,29 @@ def configs_are_equal(config_1: Dict[str, Any], config_2: Dict[str, Any], verbos
             print(line)
 
     return False
+
+
+# TODO: the following functions rely on streamlit. However, we would like to decouple this module from streamlit.
+@st_cache_data(custom_text="Retrieving analytics on chart views...")
+def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
+    # Get chart views
+    df_analytics = get_chart_views_last_n_days(chart_ids, ANALYTICS_NUM_DAYS)
+    return df_analytics.set_index("chart_id")["views_daily"].to_dict()  # type: ignore
+
+
+@st_cache_data(custom_text="Retrieving anomalies in indicators used in charts to review...", show_time=True)
+def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
+    # Anomalies
+    df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("version_change",))
+    return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # type: ignore
+
+
+@st_cache_data(custom_text="Retrieving analytics on article references...")
+def get_chart_in_article_views_cached(chart_ids: List[int]) -> Dict[int, List[ArticleRef]]:
+    # Articles
+    df_articles = get_article_views_last_n_days(chart_ids, 30)
+    return (
+        df_articles.groupby("chart_id")[["url", "views_daily", "title"]]
+        .apply(lambda x: [ArticleRef(row["url"], row["title"], row["views_daily"]) for _, row in x.iterrows()])
+        .to_dict()
+    )

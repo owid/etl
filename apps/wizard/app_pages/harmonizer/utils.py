@@ -17,7 +17,9 @@ from etl.steps import load_from_uri
 # RANK OF PREFERED TABLE NAMES
 TABLE_NAME_PRIORITIES = ["main", "core"]
 # RANK OF PREFERED COLUMN NAMES (for country)
-COLUMN_NAME_PRIORITIES = ["country", "state", "location", "region", "iso"]
+COLUMN_NAME_PRIORITIES = ["country", "state", "location", "region", "iso", "entity"]
+# Number of suggestions to show per entity
+NUM_SUGGESTIONS = 1000
 
 
 ####################################################################################################
@@ -84,31 +86,12 @@ def sort_indicators(indicators: List[str]) -> List[str]:
     return indicators
 
 
-def render(step_uri):
-    # Page config
-    st.title(":material/music_note: Entity Harmonizer")
-
-    # Set states
-    st.session_state["show_all"] = st.session_state.get("show_all", False)
-    st.session_state["entity_mapping"] = st.session_state.get("entity_mapping", {})
-
-    # OTHER PARAMS
-    NUM_SUGGESTIONS = 1000
-
-    # INTRO
-    st.markdown(
-        "Harmonize entity names with this tool. Start by loading an indicator from a dataset below. If you find any problem, remember you can still run `etl harmonize` in the terminal."
-    )
-    ####################################################################################################
-    # SELECT DATASET, TABLE and INDICATOR
-    ####################################################################################################
-    # 1/ DATASET
-    # show_all = False
+def ask_for_dataset(step_uri):
     options = get_datasets_in_etl(
         snapshots=False,
         prefixes=None if st.session_state.show_all else ["data://meadow"],
     )
-    option = st.selectbox(
+    dataset_uri = st.selectbox(
         label="Select a dataset",
         placeholder="Select a dataset",
         options=options,
@@ -121,34 +104,121 @@ def render(step_uri):
         on_change=lambda: set_states({"show_all": not st.session_state.show_all}),
     )
 
-    if option:
+    return dataset_uri
+
+
+@st.cache_data
+def load_dataset_cached(dataset_uri):
+    try:
+        dataset = cast(Dataset, load_from_uri(dataset_uri))
+        return dataset
+    except FileNotFoundError as e:
+        st.error(e)
+        st.stop()
+
+
+def ask_for_table(dataset):
+    table_names = sort_table_names(dataset)
+    table_name = st.selectbox(
+        "Select a table",
+        options=table_names,
+        placeholder="Choose a table",
+        index=None if len(table_names) != 1 else 0,
+    )
+    if table_name:
+        return dataset[table_name].reset_index()
+    return
+
+
+def ask_for_indicator(tb):
+    columns = sort_indicators(tb.columns)
+    column_name = st.selectbox(
+        label="Select the entity column",
+        options=columns,
+        placeholder="Choose an indicator",
+        index=0 if set(COLUMN_NAME_PRIORITIES).intersection(set(columns)) else None,
+    )
+    return column_name
+
+
+def validate_indicator(tb, column_name):
+    # Raise error if nan
+    if tb[column_name].isna().any():
+        st.error(f"Column '{column_name}' contains missing values. Please clean the data before harmonizing.")
+        st.stop()
+
+    # Sanity check on typing: only support for indicators of type string
+    if not tb[column_name].apply(type).eq(str).all():
+        # if tb[column_name].dtype not in ["object", "category"]:
+        st.error(
+            f"Column '{column_name}' is of type `{tb[column_name].dtype}` but 'string' is expected. Harmonization for non-string columns is not supported yet."
+        )
+        st.stop()
+
+
+@st.fragment
+def show_manual_mapping(harmonizer, entity, i, border=False):
+    # Get suggestions for entity
+    suggestions = harmonizer.get_suggestions(
+        region=entity,
+        institution=None,
+        num_suggestions=NUM_SUGGESTIONS,
+    )
+
+    # Col1: selectbox, Col2: ignore checkbox
+    with st.container(border=border):
+        col1, col2 = st.columns([3, 1], vertical_alignment="bottom")
+        with col1:
+            value_selected = st.selectbox(
+                label=f"**{entity}** (original name)",
+                options=suggestions,
+                index=0,
+                # label_visibility="collapsed",
+                key=f"region_suggestion_new_{i}",
+                accept_new_options=True,
+            )
+        with col2:
+            value_ignore = st.checkbox(
+                label="Ignore",
+                key=f"region_ignore_{i}",
+            )
+
+    # Add defined mapping (only if not ignored)
+    if not value_ignore:
+        st.session_state.entity_mapping[entity] = value_selected
+
+
+def render(step_uri):
+    # Page config
+    st.title(":material/music_note: Entity Harmonizer")
+
+    # Set states
+    st.session_state["show_all"] = st.session_state.get("show_all", False)
+    st.session_state["entity_mapping"] = st.session_state.get("entity_mapping", {})
+
+    # INTRO
+    st.markdown(
+        "Harmonize entity names with this tool. Start by loading an indicator from a dataset below. If you find any problem, remember you can still run `etl harmonize` in the terminal."
+    )
+    ####################################################################################################
+    # SELECT DATASET, TABLE and INDICATOR
+    ####################################################################################################
+    # 1/ DATASET
+    dataset_uri = ask_for_dataset(step_uri)
+
+    if dataset_uri:
         # Load dataset
-        try:
-            dataset = cast(Dataset, load_from_uri(option))
-        except FileNotFoundError as e:
-            st.error(e)
-            st.stop()
+        dataset = load_dataset_cached(dataset_uri)
 
         # 2/ TABLE
-        table_names = sort_table_names(dataset)
-        table_name = st.selectbox(
-            "Select a table",
-            options=table_names,
-            placeholder="Choose a table",
-            index=None if len(table_names) != 1 else 0,
-        )
+        col1, col2 = st.columns(2, gap="small")
+        with col1:
+            tb = ask_for_table(dataset)
 
-        if table_name:
-            tb = dataset[table_name].reset_index()
-
+        if tb is not None:
             # 3/ INDICATOR
-            columns = sort_indicators(tb.columns)
-            column_name = st.selectbox(
-                label="Select the entity column",
-                options=columns,
-                placeholder="Choose an indicator",
-                index=0 if set(COLUMN_NAME_PRIORITIES).intersection(set(columns)) else None,
-            )
+            with col2:
+                column_name = ask_for_indicator(tb)
 
             ####################################################################################################
             # HARMONIZATION (generation)
@@ -158,87 +228,50 @@ def render(step_uri):
                 if tb[column_name].apply(type).eq("category").all():
                     tb[column_name] = tb[column_name].astype(str)
 
-                # Raise error if nan
-                if tb[column_name].isna().any():
-                    st.error(
-                        f"Column '{column_name}' contains missing values. Please clean the data before harmonizing."
-                    )
-                    st.stop()
+                # Validate indicator
+                validate_indicator(tb, column_name)
 
-                # Sanity check on typing: only support for indicators of type string
-                if not tb[column_name].apply(type).eq(str).all():
-                    # if tb[column_name].dtype not in ["object", "category"]:
-                    st.error(
-                        f"Column '{column_name}' is of type `{tb[column_name].dtype}` but 'string' is expected. Harmonization for non-string columns is not supported yet."
-                    )
-                    st.stop()
-
+                # HARMONIZER
+                # Build harmonizer
                 harmonizer = Harmonizer(
                     tb=tb,
                     colname=column_name,
                     output_file=f"{STEP_DIR}/data/garden/{dataset.m.namespace}/{dataset.m.version}/{dataset.m.short_name}.countries.json",
                 )
+
+                # Automatic harmonization (no user input needed)
                 harmonizer.run_automatic()
 
-                ambiguous = cast(List, harmonizer.ambiguous)
-                mapping = harmonizer.mapping
-
+                # Manual harmonization (user input needed)
                 st.divider()
 
+                # Show automatic mapping
+                if harmonizer.mapping:
+                    with st.popover("Automatically mapped entities"):
+                        st.dataframe(harmonizer.mapping)
+
+                ambiguous = cast(List, harmonizer.ambiguous)
+
                 ## 1/ AUTOMATIC
-                st.session_state.entity_mapping = mapping
-                if mapping:
-                    with st.expander("Automatically mapped entities", expanded=False):
-                        st.dataframe(mapping)
+                st.session_state.entity_mapping = harmonizer.mapping
 
                 ## 2/ MANUAL (user input needed)
                 with st.container(border=True):
-                    # with st.form("form"):
                     # Title
-                    st.markdown("#### Manual entity mapping needed")
-                    st.markdown(f"{len(ambiguous)} ambiguous regions")
+                    st.markdown(f"#### Manual mapping needed :small[:gray-badge[{len(ambiguous)} ambiguous regions]]")
+                    # st.markdown(f"{len(ambiguous)} ambiguous regions")
 
                     # Create a container for each region with:
-                    # - three columns: original entity name, suggestions (as a selectbox), and free text input for custom name
+                    # - selectbox to choose name (with suggestions, and accepting new values)
                     # - a toggle to ignore the region (no mapping)
-                    for i, region in enumerate(ambiguous, 1):
-                        # no exact match, get nearby matches
-                        suggestions = harmonizer.get_suggestions(
-                            region, institution=None, num_suggestions=NUM_SUGGESTIONS
+                    for i, entity in enumerate(ambiguous, 1):
+                        show_manual_mapping(
+                            harmonizer=harmonizer,
+                            entity=entity,
+                            i=i,
+                            border=False,
                         )
-                        with st.container(border=True):
-                            # Original name
-                            st.markdown(f"**{region}**")
-                            col1, col2 = st.columns(2)
 
-                            # New name, custom (useful if no suggestion is good enough)
-                            with col2:
-                                value_custom = st.text_input(
-                                    label="Enter custom name",
-                                    key=f"region_custom_{i}",
-                                    # placeholder="Enter custom name",
-                                    # label_visibility="collapsed",
-                                    help="Use this when no suggestion is good enough",
-                                )
-                            # New name, from selectbox
-                            with col1:
-                                value_selected = st.selectbox(
-                                    label="Select a region",
-                                    options=suggestions,
-                                    index=0,
-                                    # label_visibility="collapsed",
-                                    key=f"region_suggestion_{i}",
-                                    disabled=value_custom != "",
-                                )
-                            value_ignore = st.toggle(
-                                label="Ignore",
-                                key=f"region_ignore_{i}",
-                            )
-                            # Add defined mapping (only if not ignored)
-                            if not value_ignore:
-                                st.session_state.entity_mapping[region] = cast(
-                                    str, value_custom if value_custom not in ("", None) else value_selected
-                                )
                     # 3/ PATH to export & export button
                     path_export = cast(str, harmonizer.output_file)
                     if ENV_IS_REMOTE:
@@ -286,7 +319,8 @@ def render(step_uri):
                             st.stop()
 
                         # Export
-                        st.json(st.session_state.entity_mapping, expanded=False)
+                        with st.popover("Show entity mapping"):
+                            st.json(st.session_state.entity_mapping, expanded=True)
                         with open(path_export, "w") as ostream:
                             json.dump(st.session_state.entity_mapping, ostream, indent=2)
 
