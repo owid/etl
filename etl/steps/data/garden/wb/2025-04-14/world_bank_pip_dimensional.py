@@ -30,8 +30,8 @@ log = get_logger()
 # NOTE: Modify if poverty lines are updated from source
 # TODO: Modify the lines in 2021 prices
 POVLINES_DICT = {
-    2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
-    2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
+    2011: ["100", "190", "320", "550", "1000", "2000", "3000", "4000"],
+    2017: ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
 }
 
 # Define PPP versions from POVLINES_DICT
@@ -40,10 +40,8 @@ PPP_VERSIONS = list(POVLINES_DICT.keys())
 PPP_YEAR_OLD = PPP_VERSIONS[0]
 PPP_YEAR_CURRENT = PPP_VERSIONS[1]
 
-# Define current International Poverty Line (in cents)
-# NOTE: Modify if poverty lines are updated from source
-# TODO: Modify the lines in 2021 prices
-INTERNATIONAL_POVERTY_LINE_CURRENT = 215
+# Define international poverty lines as the second value in each list in POVLINES_DICT
+INTERNATIONAL_POVERTY_LINES = {ppp_year: poverty_lines[1] for ppp_year, poverty_lines in POVLINES_DICT.items()}
 
 # Set precision of sanity checks for percentages
 PRECISION_PERCENTAGE = 0.1
@@ -478,13 +476,13 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     ].copy()
 
     # Pivot and obtain the poverty lines dictionary
-    tb_pivot, povlines_dict = pivot_and_obtain_povlines_dict(
+    tb_pivot = pivot_and_obtain_povlines_dict(
         tb=tb_pivot,
         index=["country", "year", "welfare_type"],
         columns=["ppp_version", "poverty_line"],
     )
 
-    for ppp_year, povlines in povlines_dict.items():
+    for ppp_year, povlines in POVLINES_DICT.items():
         for i in range(len(povlines)):
             # if it's the first value only continue
             if i == 0:
@@ -552,36 +550,21 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     return tb
 
 
-def pivot_and_obtain_povlines_dict(tb: Table, index: List[str], columns: List[str]) -> Tuple[Table, dict]:
+def pivot_and_obtain_povlines_dict(tb: Table, index: List[str], columns: List[str]) -> Table:
     """
-    Pivot the table to calculate indicator more easily and create a dictionary with the ppp_version and their corresponding poverty_line
+    Pivot the table to calculate indicator more easily
     """
-    tb = tb.copy()
 
     # Pivot the table to calculate indicator more easily
     tb_pivot = tb.pivot(index=index, columns=columns)
 
-    # Create a dictionary with the ppp_version and their corresponding poverty_line for headcount column, without repeating the values
-    povlines_dict = {}
-    for ppp_version in tb_pivot.columns.levels[1]:
-        povlines_dict[ppp_version] = sorted(
-            list(
-                set(
-                    [
-                        col[1]
-                        for col in tb_pivot.xs(ppp_version, level="ppp_version", axis=1).columns
-                        if col[0] == "headcount"
-                        and not tb_pivot.xs(ppp_version, level="ppp_version", axis=1)[col].isna().all()
-                    ]
-                )
-            ),
-            key=int,
-        )
-
-    return tb_pivot, povlines_dict
+    return tb_pivot
 
 
 def unpivot_table(tb: Table, index: List[str], level: List[str]) -> Table:
+    """
+    Unpivot table, using set_index and stack
+    """
     tb = (
         tb.set_index(index)  # Set the desired index, including the additional columns
         .stack(level=level, future_stack=True)  # Stack the MultiIndex columns
@@ -602,9 +585,7 @@ def sanity_checks(
     index = ["country", "year", "welfare_type"]
 
     # Pivot and obtain the poverty lines dictionary
-    tb_pivot, povlines_dict = pivot_and_obtain_povlines_dict(
-        tb=tb, index=index, columns=["ppp_version", "poverty_line"]
-    )
+    tb_pivot = pivot_and_obtain_povlines_dict(tb=tb, index=index, columns=["ppp_version", "poverty_line"])
 
     # Reset index in tb_pivot
     tb_pivot = tb_pivot.reset_index()
@@ -632,7 +613,7 @@ def sanity_checks(
         if i != 10:
             col_decile_thr.append(f"decile{i}_thr")
 
-    for ppp_year, povlines in povlines_dict.items():
+    for ppp_year, povlines in POVLINES_DICT.items():
         log.info(f"SANITY CHECKS FOR {ppp_year} PRICES")
         # Save the number of observations before the checks
         obs_before_checks = len(tb_pivot)
@@ -980,7 +961,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb = tb.copy()
 
     # Pivot and obtain the poverty lines dictionary
-    tb, povlines_dict = pivot_and_obtain_povlines_dict(
+    tb = pivot_and_obtain_povlines_dict(
         tb=tb,
         index=["country", "year", "welfare_type"],
         columns=["ppp_version", "poverty_line"],
@@ -1126,7 +1107,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
     tb = tb.copy()
 
     # Pivot and obtain the poverty lines dictionary
-    tb, povlines_dict = pivot_and_obtain_povlines_dict(
+    tb = pivot_and_obtain_povlines_dict(
         tb=tb,
         index=["country", "year", "welfare_type"],
         columns=["ppp_version", "poverty_line"],
@@ -1137,11 +1118,10 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
 
     # For each country, year, welfare_type and reporting_level, check if the difference between the columns is too high
 
-    for ppp_year, povlines in povlines_dict.items():
+    for ppp_year, povlines in POVLINES_DICT.items():
         # Define columns to check: all the headcount ratio columns
         cols_to_check = [("headcount_ratio", ppp_year, povline) for povline in povlines]
         for col in cols_to_check:
-            print(f"Checking {col}")
             # Create a new column, shift_col, that is the same as col but shifted one row down for each country
             tb["shift_col"] = tb.groupby(["country"])[col].shift(1)
 
@@ -1199,18 +1179,9 @@ def survey_count(tb: Table) -> Table:
     # Remove regions from the table
     tb_survey = tb[~tb["country"].isin(REGIONS_LIST)].reset_index(drop=True).copy()
 
-    # Pivot and obtain the poverty lines dictionary
-    tb_aux, povlines_dict = pivot_and_obtain_povlines_dict(
-        tb=tb,
-        index=["country", "year", "welfare_type"],
-        columns=["ppp_version", "poverty_line"],
-    )
-
-    # From povlines_dict, get the [1]th value for each ppp_year
-    ipl_list = [povlines_dict[ppp_year][1] for ppp_year in povlines_dict.keys()]
-
-    # Define the current value of the IPL as the second value in the list
-    ipl_current = ipl_list[1]
+    # Obtain the value of the second key in INTERNATIONAL_POVERTY_LINES
+    # This is the value of the poverty line for the current year
+    ipl_current = INTERNATIONAL_POVERTY_LINES[list(INTERNATIONAL_POVERTY_LINES.keys())[1]]
 
     # Filter for the current value
     tb_survey = tb_survey[tb_survey["poverty_line"] == ipl_current].reset_index(drop=True)
@@ -1257,8 +1228,6 @@ def survey_count(tb: Table) -> Table:
     # Merge with original table
     tb = pr.merge(tb_survey, tb, on=["country", "year", "ppp_version", "poverty_line"], how="outer")
 
-    tb.to_csv("tb.csv", index=False)
-
     return tb
 
 
@@ -1304,17 +1273,21 @@ def make_distributional_indicators_long(tb: Table) -> Table:
     """
     Convert decile1, ..., decile10 and decile1_thr, ..., decile9_thr to a long format.
     """
-    tb = tb.copy()
+    tb_base = tb.copy()
 
-    print("Converting distributional indicators to long format")
+    # Extract both values from INTERNATIONAL_POVERTY_LINES. They are the values of the dictionary
+    ipl_list = list(INTERNATIONAL_POVERTY_LINES.values())
+
+    # Filter only for values in the list
+    tb_base = tb_base[tb_base["poverty_line"].isin(ipl_list)].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version", "poverty_line"]
+    index_columns = ["country", "year", "welfare_type", "ppp_version"]
 
     # SHARE
     # Define share columns
     share_columns = [f"decile{i}_share" for i in range(1, 11)]
-    tb_share = tb.melt(
+    tb_share = tb_base.melt(
         id_vars=index_columns,
         value_vars=share_columns,
         var_name="decile",
@@ -1324,7 +1297,7 @@ def make_distributional_indicators_long(tb: Table) -> Table:
     # THRESHOLD
     # Define threshold columns
     thr_columns = [f"decile{i}_thr" for i in range(1, 10)]
-    tb_thr = tb.melt(
+    tb_thr = tb_base.melt(
         id_vars=index_columns,
         value_vars=thr_columns,
         var_name="decile",
@@ -1334,28 +1307,51 @@ def make_distributional_indicators_long(tb: Table) -> Table:
     # AVERAGE
     # Define average columns
     avg_columns = [f"decile{i}_avg" for i in range(1, 11)]
-    tb_avg = tb.melt(
+    tb_avg = tb_base.melt(
         id_vars=index_columns,
         value_vars=avg_columns,
         var_name="decile",
         value_name="avg",
     )
 
-    # Create an empty decile column in tb
-    tb["decile"] = pd.NA
-
-    # Merge tb and tb_share
-    tb = pr.multi_merge([tb, tb_share, tb_thr, tb_avg], on=index_columns + ["decile"], how="outer")
-
-    # Remove share_columns and threshold_columns
-    tb = tb.drop(columns=share_columns + thr_columns + avg_columns, errors="raise")
+    # Merge newly created tables
+    tb_distributional = pr.multi_merge(
+        [tb_share, tb_thr, tb_avg],
+        on=index_columns + ["decile"],
+        how="outer",
+    )
 
     # Remove "decile" from the decile column
-    tb["decile"] = tb["decile"].str.replace("decile", "")
+    tb_distributional["decile"] = tb_distributional["decile"].str.replace("decile", "")
 
     # Do the same with "_share", "_thr", and "_avg"
     for indicator in ["share", "thr", "avg"]:
-        tb["decile"] = tb["decile"].str.replace(f"_{indicator}", "")
+        tb_distributional["decile"] = tb_distributional["decile"].str.replace(f"_{indicator}", "")
+
+    # Group the rows by country, year, welfare_type, ppp_version, and decile
+    tb_distributional = (
+        tb_distributional.groupby(
+            index_columns + ["decile"],
+            as_index=False,
+        )
+        .agg(
+            {
+                "share": "first",
+                "thr": "first",
+                "avg": "first",
+            }
+        )
+        .reset_index(drop=True)
+    )
+
+    # Create an empty decile column in tb
+    tb["decile"] = pd.NA
+
+    # Concatenate tb and tb_distributional
+    tb = pr.concat([tb, tb_distributional], ignore_index=True)
+
+    # Remove share_columns and threshold_columns
+    tb = tb.drop(columns=share_columns + thr_columns + avg_columns, errors="raise")
 
     return tb
 
@@ -1364,41 +1360,47 @@ def make_relative_poverty_long(tb: Table) -> Table:
     """
     Convert relative poverty columns to a long format.
     """
-    tb = tb.copy()
+    tb_relative = tb.copy()
 
-    print("Converting relative poverty columns to long format")
+    # Extract both values from INTERNATIONAL_POVERTY_LINES. They are the values of the dictionary
+    ipl_list = list(INTERNATIONAL_POVERTY_LINES.values())
+
+    # Filter only for values in the list
+    tb_relative = tb_relative[tb_relative["poverty_line"].isin(ipl_list)].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version", "decile"]
+    index_columns = ["country", "year", "welfare_type", "ppp_version"]
 
     # Define relative poverty columns. They are all the columns that contain "_median"
     rel_pov_columns = [col for col in tb.columns if "_median" in col]
 
-    # Define all the poverty indicators
-    poverty_indicators = [
-        "headcount_ratio",
-        "headcount",
-        "poverty_gap_index",
-        "poverty_severity",
-        "watts",
-        "total_shortfall",
-        "avg_shortfall",
-        "income_gap_ratio",
-    ]
-
     # Melt the table
-    tb_rel_pov = tb.melt(
+    tb_relative = tb_relative.melt(
         id_vars=index_columns,
         value_vars=rel_pov_columns,
         var_name="indicator",
         value_name="value",
     )
 
-    tb_rel_pov.to_csv("tb_rel_pov.csv", index=False)
-
     # Split the indicator column into two columns: indicator and poverty_line. Poverty line would be in the format "40_median", "50_median", or "60_median"
-    tb_rel_pov[["indicator", "poverty_line"]] = tb_rel_pov["indicator"].str.extract(r"(\d+)_median_(.*)")
+    tb_relative[["indicator", "poverty_line"]] = tb_relative["indicator"].str.extract(
+        r"(.+?)_(\d+_median)", expand=True
+    )
 
-    print(tb_rel_pov)
+    # In poverty_line, replace "_median" with "% of median"
+    tb_relative["poverty_line"] = tb_relative["poverty_line"].str.replace("_median", "% of median")
+
+    # Make tb_relative wide, by pivoting the indicator column
+    tb_relative = tb_relative.pivot(
+        index=index_columns + ["poverty_line"],
+        columns="indicator",
+        values="value",
+    ).reset_index()
+
+    # Concatenate with original table
+    tb = pr.concat([tb, tb_relative], ignore_index=True)
+
+    # Drop the columns that are not needed
+    tb = tb.drop(columns=rel_pov_columns, errors="raise")
 
     return tb
