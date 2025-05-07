@@ -250,7 +250,7 @@ def get_chart_events_by_chart_id(
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
-    Fetch chart view events from Datasette, optionally filtered by chart IDs and minimum date.
+    Fetch chart view events from Metabase, optionally filtered by chart IDs and minimum date.
 
     """
     where_clauses = []
@@ -276,7 +276,7 @@ def get_chart_events_by_chart_id(
     GROUP BY c.chart_id, c.url, v.day
     ORDER BY c.chart_id, v.day ASC;
     """
-    df = read_datasette(query)
+    df = read_metabase(sql=query)
 
     return df
 
@@ -287,7 +287,7 @@ def get_chart_views_by_chart_id(
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
-    Fetch number of chart views (renders) per chart from Datasette, optionally filtered by chart IDs and date range.
+    Fetch number of chart views (renders) per chart from Metabase, optionally filtered by chart IDs and date range.
 
     """
     where_clauses = []
@@ -313,8 +313,7 @@ def get_chart_views_by_chart_id(
     GROUP BY c.chart_id, c.url, c.published_at
     ORDER BY views DESC
     """
-
-    df_views = read_datasette(query)
+    df_views = read_metabase(sql=query)
 
     # To calculate the average daily views, we need to figure out the number of days for which we are counting views.
     # This will be either the first date since we have analytics (DATE_MIN) or the publication date of the chart (if more recent than that).
@@ -357,7 +356,7 @@ def get_article_views_by_url(
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
-    Fetch number of GDoc views per URL from Datasette.
+    Fetch number of GDoc views per URL from Metabase.
     """
     where_clauses = []
     if date_min:
@@ -384,7 +383,7 @@ def get_article_views_by_url(
     GROUP BY url
     ORDER BY views DESC
     """
-    df_views = read_datasette(query)
+    df_views = read_metabase(sql=query)
 
     n_days = (pd.to_datetime(date_max) - pd.to_datetime(date_min)).days
     df_views["n_days"] = n_days
@@ -621,14 +620,10 @@ def get_article_views_by_chart_id(
     # Get a dataframe connecting chart ids with post urls that refer to those charts.
     df_content = get_gdoc_references_of_charts(chart_ids=chart_ids)
 
-    # TODO: Ideally, we would get analytics only for the relevant article urls, but the query is too long for Datasette and fails. Generalize this, either by reading from metabase API or from Duck DB.
-    # Gather analytics for the writtent content in this dataframe, i.e. number of views in articles, topic pages (and possibly DIs).
-    try:
-        df_article_views = get_article_views_by_url(
-            urls=list(set(df_content["post_url"])), date_min=date_min, date_max=date_max
-        )
-    except urllib.error.HTTPError:
-        df_article_views = get_article_views_by_url(urls=None, date_min=date_min, date_max=date_max)
+    # Gather analytics for the gdocs, e.g. number of views in articles and topic pages.
+    df_article_views = get_article_views_by_url(
+        urls=list(set(df_content["post_url"])), date_min=date_min, date_max=date_max
+    )
 
     # Combine data.
     df_views = df_content[["post_url", "post_title", "chart_id", "chart_url"]].merge(
