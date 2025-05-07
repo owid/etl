@@ -509,10 +509,53 @@ def _get_gdocs_references_of_charts_via_narrative_charts(chart_ids: Optional[Lis
     return df
 
 
+def get_topic_tags_for_chart_ids(
+    chart_ids: Optional[List[int]] = None, only_topics_with_all_charts_block: bool = False
+) -> pd.DataFrame:
+    """Get topic tags for a list of chart ids.
+
+    Optionally (if only_topics_with_all_charts_block), return only those whose corresponding page (usually a topic page, but it can also be an article) contains an all-charts block. This allows us to find all pages that display charts as part of the all-charts block.
+    """
+    # Prepare query.
+    # NOTE: It seems that topic_slug is always identical to post_slug (which is not the case for title), however, just in case, keep them separately.
+    query = """SELECT
+        c.id AS chart_id,
+        cc.slug AS chart_slug,
+        t.id AS topic_id,
+        t.name AS topic_name,
+        t.slug AS topic_slug,
+        pg.type AS post_type,
+        pg.content ->> '$.title' AS post_title,
+        pg.slug AS post_slug,
+        pg.publishedAt AS post_publication_date,
+        ct.keyChartLevel AS key_chart_level
+    FROM chart_tags ct
+    JOIN charts c ON ct.chartId = c.id
+    JOIN chart_configs cc ON c.configId = cc.id
+    JOIN tags t ON ct.tagId = t.id
+    JOIN posts_gdocs pg ON pg.slug = t.slug
+    WHERE t.slug IS NOT NULL
+    AND ct.keyChartLevel > 0
+    """
+    if only_topics_with_all_charts_block:
+        # Get only those pages that contain an all-charts block.
+        query += r""" AND pg.content LIKE '%%\"all-charts\"%%'"""
+    if chart_ids:
+        # Optionally reduce the query to a list of chart ids.
+        chart_ids_str = ", ".join(str(cid) for cid in chart_ids)
+        query += f" AND c.id IN ({chart_ids_str})"
+
+    # Execute query and construct a dataframe.
+    df = OWID_ENV.read_sql(query)
+
+    return df
+
+
 def get_gdoc_references_of_charts(
     chart_ids: Optional[List[int]] = None,
     component_types: Optional[List[str]] = None,
     include_parents_of_narrative_charts: bool = True,
+    include_references_of_all_charts_block: bool = True,
 ):
     """Get GDocs (e.g. articles, topic pages, or data insights) that use charts, given a list of chart ids.
 
@@ -524,11 +567,13 @@ def get_gdoc_references_of_charts(
     TODO: Create issue in owid-grapher and suggest a query to handle these limitations.
     * Redirects are not properly handled.
       * For example, chart_id 166 used to have slug "incidence-of-child-labour-in-the-uk". This slug was then renamed "incidence-of-child-labor-in-the-uk" (note "labor" instead of "labour"). But there is still one gdoc article citing the old slug, namely the one with slug "child-labor". If you go to the chart admin for chart_id 166, that article is not included as a reference.
-      * The query in this function solves that (and makes the query significantly faster).
-    * If a charts appears in the all-charts block of a topic page, the topic page may not appear in the list of gdoc references. The "all-charts" component in the post_gdocs_links table includes only the top charts (explicitly cited in the [.top] part of the {.all-charts} section of the gdoc).
-      * TODO: We need to include topic pages in a different way, using tags (see https://owid.slack.com/archives/C46U9LXRR/p1746521259960689?thread_ts=1746520668.463959&cid=C46U9LXRR ).
-    * References to narrative charts are only included if the id of the narrative chart is in the list of chart_ids. But, if a chart in the list of chart_ids is the parent of a narrative chart, references to this narrative chart are not included.
-      * For this reason, we include an argument include_parents_of_narrative_charts. If True, we check if any of the chart_ids corresponds to a parent of a narrative chart used in a gdoc, and, if so, include the reference of that gdoc.
+      -> The query in this function solves that (and makes the query significantly faster).
+    * References to narrative charts are (arguably) not properly handled. References to narrative charts are only included if the id of the narrative chart is in the list of chart_ids. But, if a chart in the list of chart_ids is the parent of a narrative chart, references to this narrative chart are not included.
+      * For example, chart_id 6371 has a narrative chart (chartView id 5). This narrative chart is cited by gdoc post "what-is-the-gini-coefficient". You can see the Ref in the admin of the narrative chart, but (arguably) you would also want to know about this reference in the chart admin of the original (parent) chart 6371.
+      -> For this reason, we include an argument include_parents_of_narrative_charts. If True, we check if any of the chart_ids corresponds to a parent of a narrative chart used in a gdoc, and, if so, include the reference of that gdoc.
+    * References to charts in the all-charts block are ignored. If a charts appears in the all-charts block of a topic page, the topic page may not appear in the list of gdoc references. The "all-charts" component in the post_gdocs_links table includes only the top charts (explicitly cited in the [.top] part of the {.all-charts} section of the gdoc).
+      * For example, the energy topic page has an all-charts block. But none of those chart list the energy topic page as a reference.
+      -> For this reason, we include an argument include_references_of_all_charts_block (True by default) which lets you include references of charts in the all-charts block.
 
     """
     # Find all gdocs that cite chart slugs, including old (redirected) chart slugs.
@@ -539,6 +584,16 @@ def get_gdoc_references_of_charts(
         df_narrative_charts = _get_gdocs_references_of_charts_via_narrative_charts(chart_ids=chart_ids)
         if not df_narrative_charts.empty:
             df = pd.concat([df, df_narrative_charts], ignore_index=True)
+
+    if include_references_of_all_charts_block:
+        df_all_charts_block = get_topic_tags_for_chart_ids(
+            chart_ids=chart_ids, only_topics_with_all_charts_block=True
+        ).drop(columns=["key_chart_level", "topic_id", "topic_name", "topic_slug"])
+        # Add component_type and lint_type, for consistency.
+        df_all_charts_block["component_type"] = "all-charts"
+        df_all_charts_block["link_type"] = "grapher"
+        if not df_all_charts_block.empty:
+            df = pd.concat([df, df_all_charts_block], ignore_index=True)
 
     # Transform slugs of the gdoc posts (articles, topic pages, and data insights) into full urls.
     df["post_url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
