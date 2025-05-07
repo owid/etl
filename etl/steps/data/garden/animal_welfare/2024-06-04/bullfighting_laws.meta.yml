@@ -29,4 +29,4 @@ tables:
               Bullfighting is a physical contest that involves a bullfighter attempting to subdue, immobilize, or kill a bull.
             chartTypes: []
             hasMapTab: true
-            tab: map
+            tab: WorldMap

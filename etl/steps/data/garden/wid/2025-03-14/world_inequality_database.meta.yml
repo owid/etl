@@ -35,7 +35,7 @@ tables:
               Income is measured before payment of taxes and non-pension benefits, but after
               the payment of public and private pensions.
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: WID
             yAxis:
               min: 0
@@ -68,7 +68,7 @@ tables:
               Income is measured before payment of taxes and non-pension benefits, but after
               the payment of public and private pensions.
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: WID
             yAxis:
               min: 0

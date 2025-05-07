@@ -93,7 +93,7 @@ tables:
             sourceDesc: Karlinsky, A. (2024)
             minTime: latest
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             originUrl: https://ourworldindata.org/causes-of-death
             yAxis:
               min: 0

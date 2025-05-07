@@ -1,7 +1,7 @@
 definitions:
   common_views:
     - config:
-        tab: map
+        tab: WorldMap
         originUrl: ourworldindata.org/coronavirus
         hideAnnotationFieldsInTitle:
           entity: true

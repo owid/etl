@@ -256,7 +256,9 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.007.json"
+# TODO: change it back before merging!
+# DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.007.json"
+DEFAULT_GRAPHER_SCHEMA = "https://raw.githubusercontent.com/owid/owid-grapher/refs/heads/migrate-tab-options/packages/%40ourworldindata/grapher/src/schema/grapher-schema.007.yaml"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")

@@ -27,7 +27,7 @@ definitions:
     colorScaleNumericMinValue: -250
 
 config:
-  tab: map
+  tab: WorldMap
   subNavId: explorers
   hasMapTab: true
   selection:

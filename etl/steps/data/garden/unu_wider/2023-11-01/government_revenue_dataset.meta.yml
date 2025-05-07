@@ -225,7 +225,7 @@ tables:
             variantName: UNU-WIDER
             originUrl: https://ourworldindata.org/taxation/
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               min: 0
             hideAnnotationFieldsInTitle:

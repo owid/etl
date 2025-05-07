@@ -21,7 +21,7 @@ config:
   pickerColumnSlugs:
     - entityName
   hideAnnotationFieldsInTitle: true
-  tab: map
+  tab: WorldMap
 
 dimensions:
   - name: Country

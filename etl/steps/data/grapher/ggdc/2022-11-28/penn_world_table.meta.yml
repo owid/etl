@@ -78,7 +78,7 @@ tables:
             variantName: Penn World Table, constant international-$
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               min: 0
               canChangeScaleType: true
@@ -164,7 +164,7 @@ tables:
             yAxis:
               canChangeScaleType: true
               min: 0
-            tab: map
+            tab: WorldMap
             hideRelativeToggle: false
             hasMapTab: true
 

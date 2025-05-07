@@ -58,7 +58,7 @@ tables:
               entity: true
               changeInPrefix: true
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: UNICEF, World Health Organization and World Bank
             originUrl: https://ourworldindata.org/hunger-and-undernourishment
             yAxis:

@@ -6,7 +6,7 @@ definitions:
       topic_tags:
         - Human Development Index (HDI)
       grapher_config:
-        tab: map
+        tab: WorldMap
         selectedEntityNames:
           - World
 
@@ -74,7 +74,7 @@ tables:
             subtitle: "The Human Development Index (HDI) is a summary measure of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. Higher values indicate higher human development."
             originUrl: https://ourworldindata.org/human-development-index/
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               max: 1
               min: 0

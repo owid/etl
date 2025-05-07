@@ -96,7 +96,7 @@ views:
       subtitle: |-
         7-day rolling average. Laboratory testing for mpox is limited in many countries and figures shown here only include laboratory-confirmed cases.
       type: LineChart
-      tab: map
+      tab: WorldMap
   - dimensions:
       metric: confirmed_cases
       frequency: cumulative

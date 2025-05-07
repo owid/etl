@@ -55,7 +55,7 @@ tables:
           <<sex+'s, ' if sex != 'total'>><<"aged " + age + ", " if age != "total">><<estimate.lower()>> estimate
         grapher_config:
           hasMapTab: true
-          tab: map
+          tab: WorldMap
     variables:
       #
       # DEATHS
@@ -606,7 +606,7 @@ tables:
       presentation:
         grapher_config:
           hasMapTab: true
-          tab: map
+          tab: WorldMap
           map:
             timeTolerance: 1
     variables:
@@ -766,7 +766,7 @@ tables:
         presentation:
           grapher_config:
             hasMapTab: false
-            tab: chart
+            tab: Chart
 
       tb_expenditure:
         title: Total TB expenditure
@@ -920,7 +920,7 @@ tables:
           title_public: Knowledge about HIV prevention<<" by young " + sex + "s" if sex != 'total' else ' in young people'>>
           grapher_config:
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               timeTolerance: 1
 
@@ -952,7 +952,7 @@ tables:
           grapher_config:
             title: Annual number of males<<" aged " + age if age != "total" else " ">> voluntarily circumcised
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               timeTolerance: 1
 
@@ -1000,7 +1000,7 @@ tables:
               Experience of HIV-related discrimination in healthcare settings for a non-HIV-related health service
               <% endif %>
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               timeTolerance: 2
 
@@ -1036,7 +1036,7 @@ tables:
             title: |-
               HIV expenditure of resources<<" from " + group if group != "total">>
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               timeTolerance: 1
 
@@ -1075,7 +1075,7 @@ tables:
           grapher_config:
             title: Condoms distributed in prevention programmes for <<group>>
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               timeTolerance: 1
 
@@ -1101,7 +1101,7 @@ tables:
           title_public: Population of <<group>>
           grapher_config:
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               timeTolerance: 1
 
@@ -1111,7 +1111,7 @@ tables:
         title_variant: <<estimate.lower()>> estimate
         grapher_config:
           hasMapTab: true
-          tab: map
+          tab: WorldMap
     variables:
       comanagement_tb_hiv:
         title: Co-management of tuberculosis and HIV treatment - <<estimate.title()>> estimate
@@ -1193,14 +1193,14 @@ tables:
           grapher_config:
             title: Prevalence of hepatitis <<hepatitis>> and HIV in <<group>><<", " + sex + "s" if sex not in ["total", "other"] else "">><<", aged " + age if age != "total" else "">>
             hasMapTab: true
-            tab: map
+            tab: WorldMap
 
   gam_age_group:
     common:
       presentation:
         grapher_config:
           hasMapTab: true
-          tab: map
+          tab: WorldMap
           map:
             timeTolerance: 1
     variables:
@@ -1247,7 +1247,7 @@ tables:
       presentation:
         grapher_config:
           hasMapTab: true
-          tab: map
+          tab: WorldMap
           map:
             timeTolerance: 3
     variables:
@@ -1367,7 +1367,7 @@ tables:
       presentation:
         grapher_config:
           hasMapTab: true
-          tab: map
+          tab: WorldMap
           map:
             timeTolerance: 3
     variables:
@@ -1488,7 +1488,7 @@ tables:
       presentation:
         grapher_config:
           hasMapTab: true
-          tab: map
+          tab: WorldMap
     variables:
       art_coverage:
         title: "Antiretroviral therapy coverage (%) among people living with HIV - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"

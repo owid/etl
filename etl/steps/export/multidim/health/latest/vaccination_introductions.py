@@ -1,4 +1,5 @@
 from etl.collections import multidim
+from etl.config import DEFAULT_GRAPHER_SCHEMA
 
 # from etl.db import get_engine
 from etl.helpers import PathFinder
@@ -6,10 +7,10 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 MULTIDIM_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.007.json",
+    "$schema": DEFAULT_GRAPHER_SCHEMA,
     "hasMapTab": True,
     "chartTypes": [],
-    "tab": "map",
+    "tab": "WorldMap",
     "map": {
         "colorScale": {
             "customCategoryColors": {

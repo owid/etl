@@ -32,7 +32,7 @@ tables:
               Yields are measured in tonnes per hectare. Cereals include wheat, rice, maize, barley, oats, rye, millet, sorghum, buckwheat, and mixed grains.
             originUrl: https://ourworldindata.org/crop-yields
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               max: 0
               min: 0

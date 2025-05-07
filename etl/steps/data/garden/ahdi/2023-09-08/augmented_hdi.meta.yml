@@ -55,7 +55,7 @@ tables:
               historical achievement in four key dimensions of human development: a long and
               healthy life, being knowledgeable, being free and having a decent standard of living.
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             originUrl: https://ourworldindata.org/human-development-index
             yAxis:
               min: 0
@@ -113,7 +113,7 @@ tables:
               historical achievement in three key dimensions of human development: a long and
               healthy life, being knowledgeable, and being free. This version of the indicator excludes national income estimations.
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             originUrl: https://ourworldindata.org/human-development-index
             yAxis:
               min: 0

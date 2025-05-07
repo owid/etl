@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Vaccination
       grapher_config:
-        tab: chart
+        tab: Chart
         hasMapTab: false
         selectedEntityNames:
           - United States

@@ -55,7 +55,7 @@ tables:
             sourceDesc: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP)
             originUrl: ourworldindata.org/sanitation
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               max: 100
               min: 0
@@ -116,7 +116,7 @@ tables:
             sourceDesc: WHO/UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene (JMP)
             originUrl: ourworldindata.org/water-access
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               max: 0
               min: 0

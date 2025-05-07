@@ -73,7 +73,7 @@ tables:
             variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               min: 0
               canChangeScaleType: true
@@ -138,7 +138,7 @@ tables:
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices.
             hideRelativeToggle: false
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: In constant international-$ – World Bank
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:
@@ -223,7 +223,7 @@ tables:
             yAxis:
               canChangeScaleType: true
               min: 0
-            tab: map
+            tab: WorldMap
             hideRelativeToggle: false
             hasMapTab: true
 
@@ -304,7 +304,7 @@ tables:
         yAxis:
           canChangeScaleType: true
           min: 0
-        tab: map
+        tab: WorldMap
         hideRelativeToggle: false
         hasMapTab: true
         hideAnnotationFieldsInTitle:
@@ -368,7 +368,7 @@ tables:
           yAxis:
             canChangeScaleType: true
             min: 0
-          tab: map
+          tab: WorldMap
           hideRelativeToggle: false
           hasMapTab: true
 
@@ -594,7 +594,7 @@ tables:
               entity: true
               changeInPrefix: true
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: UNICEF, World Health Organization and World Bank
             originUrl: https://ourworldindata.org/hunger-and-undernourishment
             yAxis:
@@ -683,7 +683,7 @@ tables:
               entity: true
               changeInPrefix: true
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: UNICEF, World Health Organization and World Bank
             originUrl: https://ourworldindata.org/hunger-and-undernourishment
             yAxis:
