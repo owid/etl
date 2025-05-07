@@ -932,7 +932,7 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
     tb_no_spells_smooth["table"] = "Income or consumption consolidated"
 
     # Also, rename welfare_type to "Income or consumption" for tb_no_spells_smooth
-    tb_no_spells_smooth["welfare_type"] = "Income or consumption"
+    tb_no_spells_smooth["welfare_type"] = "income or consumption"
 
     # Concatenate all these tables
     tb = pr.concat(
