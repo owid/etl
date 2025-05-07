@@ -138,6 +138,16 @@ def _try_to_execute_datasette_query(sql_url: str, warn: bool = False) -> pd.Data
 def clean_sql_query(sql: str) -> str:
     """
     Normalize an SQL string for use in Datasette URL queries.
+
+    Parameters
+    ----------
+    sql : str
+        SQL query to clean.
+    Returns
+    -------
+    str
+        Cleaned SQL query.
+
     """
     return " ".join(sql.strip().rstrip(";").split())
 
@@ -147,6 +157,24 @@ def read_datasette(
 ) -> pd.DataFrame:
     """
     Execute a query in the Datasette semantic layer.
+
+    Parameters
+    ----------
+    sql : str
+        SQL query to execute.
+    datasette_csv_url : str
+        URL of the Datasette CSV endpoint.
+    chunk_size : int
+        Number of rows to fetch in each chunk.
+        The default is 10,000 (which is the maximum number of rows that Datasette can return in a single request).
+        If the query contains a LIMIT clause, it should be smaller than chunk_size (otherwise, an error is raised).
+        If the query does not contain a LIMIT clause, the query is paginated using LIMIT and OFFSET.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the results of the query.
+
     """
     # Check if the query contains a LIMIT clause.
     limit_match = re.search(r"\bLIMIT\s+(\d+)(?:\s+OFFSET\s+(\d+))?\b", sql, re.IGNORECASE)
@@ -203,6 +231,16 @@ def read_metabase(sql: str) -> pd.DataFrame:
     NOTE: This function has been adapted from this example in the analytics repo:
     https://github.com/owid/analytics/blob/main/tutorials/metabase_data_download.py
 
+    Parameters
+    ----------
+    sql : str
+        SQL query to execute.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the results of the query.
+
     """
     # Prepare the header and body of the request to send to the Metabase API.
     headers = {
@@ -244,13 +282,27 @@ def read_metabase(sql: str) -> pd.DataFrame:
     return df
 
 
-def get_chart_events_by_chart_id(
+def get_chart_views_per_day_by_chart_id(
     chart_ids: Optional[List[int]] = None,
     date_min: str = DATE_MIN,
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
     Fetch chart view events from Metabase, optionally filtered by chart IDs and minimum date.
+
+    Parameters
+    ----------
+    chart_ids : list of int, optional
+        List of chart IDs to filter the results. If None, all charts are included.
+    date_min : str, optional
+        Minimum date to filter the results. If None, no minimum date is applied.
+    date_max : str, optional
+        Maximum date to filter the results. If None, no maximum date is applied.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the chart view events.
 
     """
     where_clauses = []
@@ -288,6 +340,20 @@ def get_chart_views_by_chart_id(
 ) -> pd.DataFrame:
     """
     Fetch number of chart views (renders) per chart from Metabase, optionally filtered by chart IDs and date range.
+
+    Parameters
+    ----------
+    chart_ids : list of int, optional
+        List of chart IDs to filter the results. If None, all charts are included.
+    date_min : str, optional
+        Minimum date to filter the results. If None, no minimum date is applied.
+    date_max : str, optional
+        Maximum date to filter the results. If None, no maximum date is applied.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the number of chart views per chart.
 
     """
     where_clauses = []
@@ -339,6 +405,18 @@ def get_chart_views_last_n_days(
     """
     Fetch number of chart views per chart for the last n_days.
 
+    Parameters
+    ----------
+    chart_ids : list of int, optional
+        List of chart IDs to filter the results. If None, all charts are included.
+    n_days : int
+        Number of days to look back for views. Default is 30 days.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the number of chart views per chart for the last n_days.
+
     """
     # Calculate date range.
     date_max = str(datetime.today().date())
@@ -350,13 +428,28 @@ def get_chart_views_last_n_days(
     return df_views
 
 
-def get_article_views_by_url(
+def get_post_views_by_url(
     urls: Optional[List[str]] = None,
     date_min: str = DATE_MIN,
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
     Fetch number of GDoc views per URL from Metabase.
+
+    Parameters
+    ----------
+    urls : list of str, optional
+        List of URLs to filter the results. If None, all URLs are included.
+    date_min : str, optional
+        Minimum date to filter the results. If None, no minimum date is applied.
+    date_max : str, optional
+        Maximum date to filter the results. If None, no maximum date is applied.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the number of GDoc views per URL.
+
     """
     where_clauses = []
     if date_min:
@@ -510,9 +603,22 @@ def _get_post_references_of_charts_via_narrative_charts(chart_ids: Optional[List
 def get_topic_tags_for_chart_ids(
     chart_ids: Optional[List[int]] = None, only_topics_with_all_charts_block: bool = False
 ) -> pd.DataFrame:
-    """Get topic tags for a list of chart ids.
+    """Get topic tags, and their corresponding posts (usually topic pages), for a list of chart ids.
 
     Optionally (if only_topics_with_all_charts_block), return only those whose corresponding page (usually a topic page, but it can also be an article) contains an all-charts block. This allows us to find all pages that display charts as part of the all-charts block.
+
+    Parameters
+    ----------
+    chart_ids : list of int, optional
+        List of chart IDs to filter the results. If None, all charts are included.
+    only_topics_with_all_charts_block : bool, optional
+        If True, return only those topics whose corresponding posts (usually topic pages) contain an all-charts block.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the topic tags for the given chart IDs.
+
     """
     # Prepare query.
     # NOTE: It seems that topic_slug is always identical to post_slug (which is not the case for title), however, just in case, keep them separately.
@@ -573,6 +679,23 @@ def get_post_references_of_charts(
       * For example, the energy topic page has an all-charts block. But none of those chart list the energy topic page as a reference.
       -> For this reason, we include an argument include_references_of_all_charts_block (True by default) which lets you include references of charts in the all-charts block.
 
+    Parameters
+    ----------
+    chart_ids : list of int, optional
+        List of chart IDs to filter the results. If None, all charts are included.
+    component_types : list of str, optional
+        List of component types to filter the results. If None, all component types are included.
+        The complete list of component types is defined in the COMPONENT_TYPES_ALL variable.
+    include_parents_of_narrative_charts : bool, optional
+        If True, include references to narrative charts whose parents are charts among those in chart IDs.
+    include_references_of_all_charts_block : bool, optional
+        If True, include references to charts in the all-charts block of topic pages.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the URLs of posts that display the given chart IDs.
+
     """
     # Find all gdocs that cite chart slugs, including old (redirected) chart slugs.
     df = _get_post_references_of_charts_and_redirected_charts(chart_ids=chart_ids, component_types=component_types)
@@ -618,7 +741,27 @@ def get_post_views_by_chart_id(
     include_parents_of_narrative_charts: bool = True,
     include_references_of_all_charts_block: bool = True,
 ):
-    """Given a list of chart ids, get all article URLs (and their views) that display that chart."""
+    """Given a list of chart ids, get all URLs of posts (including articles, topic pages, and data insights) that display that chart, and their views.
+
+    Parameters
+    ----------
+    chart_ids : list of int, optional
+        List of chart IDs to filter the results. If None, all charts are included.
+    date_min : str, optional
+        Minimum date to filter the results. If None, no minimum date is applied.
+    date_max : str, optional
+        Maximum date to filter the results. If None, no maximum date is applied.
+    include_parents_of_narrative_charts : bool, optional
+        If True, include references to narrative charts whose parents are charts among those in chart IDs.
+    include_references_of_all_charts_block : bool, optional
+        If True, include references to charts in the all-charts block of topic pages.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the URLs of posts that display the given chart IDs, along with their views.
+
+    """
     # Get a dataframe connecting chart ids with post urls that refer to those charts.
     df_content = get_post_references_of_charts(
         chart_ids=chart_ids,
@@ -627,7 +770,7 @@ def get_post_views_by_chart_id(
     )
 
     # Gather analytics for the gdocs, e.g. number of views in articles and topic pages.
-    df_article_views = get_article_views_by_url(
+    df_article_views = get_post_views_by_url(
         urls=list(set(df_content["post_url"])), date_min=date_min, date_max=date_max
     )
 
@@ -647,6 +790,22 @@ def get_post_views_last_n_days(
 ) -> pd.DataFrame:
     """
     Fetch number of post views (including articles, topic pages, and data insights) for the last n_days.
+
+    Parameters
+    ----------
+    chart_ids : list of int, optional
+        List of chart IDs to filter the results. If None, all charts are included.
+    n_days : int
+        Number of days to look back for views. Default is 30 days.
+    include_parents_of_narrative_charts : bool, optional
+        If True, include references to narrative charts whose parents are charts among those in chart IDs.
+    include_references_of_all_charts_block : bool, optional
+        If True, include references to charts in the all-charts block of topic pages.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the number of post views for the last n_days.
 
     """
     # Calculate date range.
