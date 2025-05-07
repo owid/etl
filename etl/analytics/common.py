@@ -1,6 +1,6 @@
 """Module for helper functions related to analytics (e.g. chart views).
 
-TODO: We currently have many functions reading analytics (from MySQL and GBQ) in different places. We should gather those functions in this module.
+TODO: We currently have many functions reading analytics (from MySQL and GBQ) in different places. We should gather those functions in this module. For example, Anomalist should read from this module.
 """
 
 import json
@@ -135,7 +135,7 @@ def _try_to_execute_datasette_query(sql_url: str, warn: bool = False) -> pd.Data
             raise
 
 
-def clean_sql(sql: str) -> str:
+def clean_sql_query(sql: str) -> str:
     """
     Normalize an SQL string for use in Datasette URL queries.
     """
@@ -152,7 +152,7 @@ def read_datasette(
     limit_match = re.search(r"\bLIMIT\s+(\d+)(?:\s+OFFSET\s+(\d+))?\b", sql, re.IGNORECASE)
 
     # Clean the query.
-    sql_clean = clean_sql(sql)
+    sql_clean = clean_sql_query(sql)
 
     if limit_match:
         # If a LIMIT clause already exists, check if it's larger than the limit.
@@ -200,7 +200,7 @@ def read_datasette(
 def read_metabase(sql: str) -> pd.DataFrame:
     """Retrieve data from the Metabase API using an arbitrary sql query.
 
-    NOTE: This function has been adapted from the analytics repo:
+    NOTE: This function has been adapted from this example in the analytics repo:
     https://github.com/owid/analytics/blob/main/tutorials/metabase_data_download.py
 
     """
@@ -395,7 +395,7 @@ def get_article_views_by_url(
     return df_views
 
 
-def _get_gdocs_references_of_charts(
+def _get_post_references_of_charts_and_redirected_charts(
     chart_ids: Optional[List[int]] = None, component_types: Optional[List[str]] = None
 ) -> pd.DataFrame:
     # Prepare list of component types to consider.
@@ -476,8 +476,8 @@ def _get_gdocs_references_of_charts(
     return df
 
 
-def _get_gdocs_references_of_charts_via_narrative_charts(chart_ids: Optional[List[int]] = None) -> pd.DataFrame:
-    """Get GDocs (e.g. articles, topic pages, or data insights) that use narrative chart, and link them to the original (parent) chart."""
+def _get_post_references_of_charts_via_narrative_charts(chart_ids: Optional[List[int]] = None) -> pd.DataFrame:
+    """Get posts (including articles, topic pages, and data insights) that use narrative chart, and link them to the original (parent) chart."""
     # Prepare query.
     query = """SELECT
         cv.id AS chart_id,
@@ -549,13 +549,13 @@ def get_topic_tags_for_chart_ids(
     return df
 
 
-def get_gdoc_references_of_charts(
+def get_post_references_of_charts(
     chart_ids: Optional[List[int]] = None,
     component_types: Optional[List[str]] = None,
     include_parents_of_narrative_charts: bool = True,
     include_references_of_all_charts_block: bool = True,
 ):
-    """Get GDocs (e.g. articles, topic pages, or data insights) that use charts, given a list of chart ids.
+    """Get posts (including articles, topic pages, and data insights) that use charts, given a list of chart ids.
 
     A chart may be used by a gdoc in different ways: it can be embedded, cited as a URL, etc. The argument component_types defines which ways to consider (e.g. 'chart' corresponds to embedded charts).
 
@@ -575,11 +575,11 @@ def get_gdoc_references_of_charts(
 
     """
     # Find all gdocs that cite chart slugs, including old (redirected) chart slugs.
-    df = _get_gdocs_references_of_charts(chart_ids=chart_ids, component_types=component_types)
+    df = _get_post_references_of_charts_and_redirected_charts(chart_ids=chart_ids, component_types=component_types)
 
     if include_parents_of_narrative_charts:
         # If a gdoc uses a narrative chart, we want to identify the parent chart, and, if that parent chart is among the given chart_ids, include those gdocs.
-        df_narrative_charts = _get_gdocs_references_of_charts_via_narrative_charts(chart_ids=chart_ids)
+        df_narrative_charts = _get_post_references_of_charts_via_narrative_charts(chart_ids=chart_ids)
         if not df_narrative_charts.empty:
             df = pd.concat([df, df_narrative_charts], ignore_index=True)
 
@@ -611,14 +611,20 @@ def get_gdoc_references_of_charts(
     return df
 
 
-def get_article_views_by_chart_id(
+def get_post_views_by_chart_id(
     chart_ids: Optional[List[int]] = None,
     date_min: str = DATE_MIN,
     date_max: str = DATE_MAX,
+    include_parents_of_narrative_charts: bool = True,
+    include_references_of_all_charts_block: bool = True,
 ):
     """Given a list of chart ids, get all article URLs (and their views) that display that chart."""
     # Get a dataframe connecting chart ids with post urls that refer to those charts.
-    df_content = get_gdoc_references_of_charts(chart_ids=chart_ids)
+    df_content = get_post_references_of_charts(
+        chart_ids=chart_ids,
+        include_parents_of_narrative_charts=include_parents_of_narrative_charts,
+        include_references_of_all_charts_block=include_references_of_all_charts_block,
+    )
 
     # Gather analytics for the gdocs, e.g. number of views in articles and topic pages.
     df_article_views = get_article_views_by_url(
@@ -633,12 +639,14 @@ def get_article_views_by_chart_id(
     return df_views
 
 
-def get_article_views_last_n_days(
+def get_post_views_last_n_days(
     chart_ids: Optional[List[int]] = None,
     n_days: int = 30,
+    include_parents_of_narrative_charts: bool = True,
+    include_references_of_all_charts_block: bool = True,
 ) -> pd.DataFrame:
     """
-    Fetch number of article views per chart for the last n_days.
+    Fetch number of post views (including articles, topic pages, and data insights) for the last n_days.
 
     """
     # Calculate date range.
@@ -646,6 +654,12 @@ def get_article_views_last_n_days(
     date_min = str((datetime.today() - pd.Timedelta(days=n_days)).date())
 
     # Get views.
-    df_views = get_article_views_by_chart_id(chart_ids=chart_ids, date_min=date_min, date_max=date_max)
+    df_views = get_post_views_by_chart_id(
+        chart_ids=chart_ids,
+        date_min=date_min,
+        date_max=date_max,
+        include_parents_of_narrative_charts=include_parents_of_narrative_charts,
+        include_references_of_all_charts_block=include_references_of_all_charts_block,
+    )
 
     return df_views
