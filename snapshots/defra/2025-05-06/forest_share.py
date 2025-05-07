@@ -9,7 +9,6 @@ from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
-# Data for 1949
 df = pd.DataFrame(
     {
         "country": ["England"] * 3,
@@ -31,7 +30,7 @@ df = pd.DataFrame(
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def run(upload: bool) -> None:
     # Initialize a new snapshot.
-    snap = Snapshot(f"forests/{SNAPSHOT_VERSION}/forest_share.csv")
+    snap = Snapshot(f"defra/{SNAPSHOT_VERSION}/forest_share.csv")
 
     # Save snapshot.
     snap.create_snapshot(upload=upload, data=df)
