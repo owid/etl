@@ -80,13 +80,13 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
     # Create a new branch if it doesn't exist
     if not branch_exists:
         gah.create_branch(branch_name, master_sha)
+    else:
+        # Always merge with master, regardless of whether there are changes
+        merge_successful = gah.merge_branch_with_master(branch_name)
 
-    # Always merge with master, regardless of whether there are changes
-    merge_successful = gah.merge_branch_with_master(branch_name)
-
-    # If merge unsuccessful, log warning but continue to create PR
-    if not merge_successful:
-        log.warning(f"Failed to merge master into {branch_name}, but will still create PR")
+        # If merge unsuccessful, log warning but continue to create PR
+        if not merge_successful:
+            log.warning(f"Failed to merge master into {branch_name}, but will still create PR")
 
     # Prepare parent and base tree SHA
     parent_sha = master_sha

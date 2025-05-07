@@ -64,7 +64,7 @@ def merge_branch_with_master(branch_name: str) -> bool:
     # Get the latest commit SHA on the branch
     branch_resp = requests.get(f"{GITHUB_API_BASE}/git/ref/heads/{branch_name}", headers=headers)
     if branch_resp.status_code != 200:
-        log.error(f"Branch {branch_name} does not exist")
+        log.warning(f"Branch {branch_name} does not exist")
         return False
     branch_sha = branch_resp.json()["object"]["sha"]
 
