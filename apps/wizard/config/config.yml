@@ -96,15 +96,6 @@ sections:
         image_url: "https://wallpapers.com/images/hd/pokemon-evolution-1920-x-1080-wallpaper-h5u6nbg98e3tibyn.jpg"
         disable:
           production: True
-      - title: "Anomalist"
-        alias: anomalist
-        entrypoint: app_pages/anomalist/app.py
-        description: List anomalies in data
-        maintainer: "@lucas"
-        icon: ":material/planner_review:"
-        image_url: "https://www.shutterstock.com/image-illustration/multitude-endless-standing-white-eggs-260nw-310142192.jpg"
-        disable:
-          production: True
       - title: "Chart Diff"
         alias: chart-diff
         entrypoint: app_pages/chart_diff/app.py
@@ -137,6 +128,15 @@ sections:
     description: |-
       Control panel for ETL steps.
     apps:
+      - title: "Anomalist"
+        alias: anomalist
+        entrypoint: app_pages/anomalist/app.py
+        description: List anomalies in data
+        maintainer: "@lucas"
+        icon: ":material/planner_review:"
+        image_url: "https://www.shutterstock.com/image-illustration/multitude-endless-standing-white-eggs-260nw-310142192.jpg"
+        disable:
+          production: True
       - title: "Harmonizer"
         alias: harmonizer
         description: "Harmonize a column of a table"
