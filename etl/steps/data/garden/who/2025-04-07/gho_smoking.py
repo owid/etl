@@ -18,6 +18,7 @@ afford_gdp = "affordability_of_cigarettes__percentage_of_gdp_per_capita_required
 taxes = "taxes_as_a_pct_of_price__total_tax"
 ad_bans = "enforce_bans_on_tobacco_advertising"
 help_quit = "offer_help_to_quit_tobacco_use"
+smoke_free = "number_of_places_smoke_free__national_legislation"  # number_of_places_smoke_free__national_legislation"
 
 
 def run() -> None:
@@ -42,24 +43,33 @@ def run() -> None:
     tb_ads = ds_meadow.read(ad_bans)
     tb_quit = ds_meadow.read(help_quit)
     tb_afford = ds_meadow.read(afford_gdp)
+    tb_smoke_free = ds_meadow.read(smoke_free)
 
     ### clean up policy indicators
     # taxes
     tb_taxes = tb_taxes[tb_taxes["tobacco_and_nicotine_product"] == "Most sold brand of cigarettes (20 sticks)"]
     tb_taxes = tb_taxes.drop(columns=["tobacco_and_nicotine_product", "comments"], errors="raise")
 
+    # smoke free
+    tb_smoke_free = tb_smoke_free.drop(columns=["comments"], errors="raise")
+
+    # support to quit
+    # 1 means no data available, so should be dropped
+    tb_quit = tb_quit[tb_quit[help_quit] != 1]
+
     tb_empower = pr.multi_merge(
-        [tb_taxes, tb_ads, tb_quit, tb_afford],  # type: ignore
+        [tb_taxes, tb_ads, tb_quit, tb_afford, tb_smoke_free],  # type: ignore
         on=["country", "year"],
         how="outer",
     )
 
     tb_empower = tb_empower.rename(
         columns={
-            "affordability_of_cigarettes__percentage_of_gdp_per_capita_required_to_purchase_2000_cigarettes_of_the_most_sold_brand": "cig_afford_pct_gdp",
-            "taxes_as_a_pct_of_price__total_tax": "cig_tax_pct",
-            "enforce_bans_on_tobacco_advertising": "tobacco_ad_ban",
-            "offer_help_to_quit_tobacco_use": "tobacco_help_quit",
+            afford_gdp: "cig_afford_pct_gdp",
+            taxes: "cig_tax_pct",
+            ad_bans: "tobacco_ad_ban",
+            help_quit: "tobacco_help_quit",
+            smoke_free: "tobacco_smoke_free",
         },
         errors="raise",
     )

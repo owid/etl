@@ -184,11 +184,21 @@ tables:
         description_short: |-
           The price of 100 packs of cigarettes as a share of GDP per capita. This price is based on the most-sold brand of cigarettes in a given country and includes taxes. Lower values indicate that cigarettes are more affordable.
       tobacco_help_quit:
-        title: Support to help quit tobacco use
+        title: Support to help quit smoking
         unit: ""
         short_unit: ""
         description_short: |-
-          National support for quitting tobacco use has different levels:
+          National support for quitting smoking or tobacco use has different levels:
           - Countries in dark blue offer a national quitline and cover costs for nicotine replacement therapy or other services.
           - Countries in light blue cover the costs of some services, but not all.
           - Countries in orange offer some services, but do not cover any costs.
+      tobacco_smoke_free:
+        title: Number of smoke-free public places
+        unit: "smoke-free public places"
+        short_unit: ""
+        description_short: |-
+          Categories of indoor public places that are completely covered by smoke-free legislation. This monitors eight types of indoor public places: health care facilities, universities, other educational facilities, government buildings, indoor offices, restaurants, pubs and bars and public transport.
+        presentation:
+          grapher_config:
+            note: |-
+              A smoking ban only counts as complete if it covers all indoor areas under any circumstances and holds nationwide.
