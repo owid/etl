@@ -175,7 +175,11 @@ def make_table_countries(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
     members_tracked = set()
     for region, region_props in REGIONS.items():
         members_tracked |= set(
-            geo.list_members_of_region(region, ds_regions, additional_members=region_props.get("additional_members"))
+            geo.list_members_of_region(
+                region,
+                ds_regions,
+                additional_members=region_props.get("additional_members"),
+            )
         )
     countries_found = set(tb_["country"])
     countries_nottracked = countries_found - members_tracked
@@ -397,7 +401,6 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     tb_ = tb_.drop(columns="population")
 
     # Rename columns
-    # tb_ = tb_.rename(columns={col: f"popw_{col}" for col in INDICATORS_REGION_AVERAGES})
     # Sanity check on output shape
     n_expected = 175
     assert tb_.shape[1] == n_expected, f"Unexpected number of columns. Expected {n_expected} but found {tb_.shape[1]}"
