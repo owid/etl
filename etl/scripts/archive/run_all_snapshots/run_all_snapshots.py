@@ -10,7 +10,6 @@ All results are stored in the accompanying file: snapshot_execution_times.json
 
 """
 
-import base64
 import datetime as dt
 import json
 import random
@@ -22,14 +21,13 @@ from pathlib import Path
 from typing import Optional, Set
 
 import click
-import requests
 import yaml
 from owid.catalog.utils import underscore
 from owid.datautils.io import save_json
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl.config import GITHUB_API_BASE, GITHUB_API_URL, GITHUB_TOKEN
+from etl import git_api_helpers as gah
 from etl.dag_helpers import load_dag
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 from etl.snapshot import Snapshot
@@ -56,77 +54,6 @@ def get_active_snapshots() -> Set[str]:
     return {s.split(".")[0] + ".py" for s in active_snapshots}
 
 
-def fetch_file(file_path, branch):
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-
-    url = f"{GITHUB_API_BASE}/contents/{file_path}?ref={branch}"
-    resp = requests.get(url, headers=headers)
-    resp.raise_for_status()
-    data = resp.json()
-
-    content_base64 = data["content"]  # Base64-encoded
-    return base64.b64decode(content_base64).decode("utf-8")
-
-
-def merge_branch_with_master(branch_name: str, headers: dict) -> bool:
-    """Merge master into the specified branch via GitHub API.
-
-    Args:
-        branch_name: The name of the branch to merge master into
-        headers: GitHub API request headers
-
-    Returns:
-        bool: True if merge was successful, False otherwise
-    """
-    # Get the latest commit SHA on master
-    ref_resp = requests.get(f"{GITHUB_API_BASE}/git/ref/heads/master", headers=headers)
-    ref_resp.raise_for_status()
-    master_sha = ref_resp.json()["object"]["sha"]
-
-    # Get the latest commit SHA on the branch
-    branch_resp = requests.get(f"{GITHUB_API_BASE}/git/ref/heads/{branch_name}", headers=headers)
-    if branch_resp.status_code != 200:
-        log.error(f"Branch {branch_name} does not exist")
-        return False
-    branch_sha = branch_resp.json()["object"]["sha"]
-
-    # If branch is already up to date with master, no need to merge
-    if master_sha == branch_sha:
-        log.info(f"Branch {branch_name} is already up to date with master")
-        return True
-
-    # Create a merge commit
-    merge_data = {"base": branch_name, "head": "master", "commit_message": f"Merge master into {branch_name}"}
-
-    merge_url = f"{GITHUB_API_BASE}/merges"
-    merge_resp = requests.post(merge_url, json=merge_data, headers=headers)
-
-    if merge_resp.status_code == 204:
-        # 204 means branch is up to date, no merge needed
-        log.info(f"Branch {branch_name} is up to date with master, no merge needed")
-        return True
-    elif merge_resp.status_code == 201:
-        # 201 means merge was created successfully
-        log.info(f"Successfully merged master into {branch_name}")
-        return True
-    else:
-        # Handle merge conflicts or other errors
-        log.error(f"Failed to merge master into {branch_name}: {merge_resp.status_code} - {merge_resp.text}")
-        return False
-
-
-def get_open_prs_for_branch(branch_name: str, headers: dict) -> list[dict]:
-    # Check for an existing pull request
-    pr_search_resp = requests.get(
-        GITHUB_API_URL, headers=headers, params={"state": "open", "head": f"owid:{branch_name}"}
-    )
-    pr_search_resp.raise_for_status()
-    return pr_search_resp.json()
-
-
 def create_autoupdate_pr(update_name: str, files: list[Path]):
     """Create a pull request with given files. It creates it via API without modifying the local repo."""
     # name = Path(snapshot).stem.replace("_", "-")
@@ -135,123 +62,60 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
     branch_name = f"auto-{underscore(update_name).replace('_', '-')}"
     title = f"🤖 Autoupdate: {update_name}"
 
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json",
-    }
-
     # Get the latest commit SHA on master
-    ref_resp = requests.get(f"{GITHUB_API_BASE}/git/ref/heads/master", headers=headers)
-    ref_resp.raise_for_status()
-    master_sha = ref_resp.json()["object"]["sha"]
+    master_sha = gah.get_master_commit_sha()
 
     # Check if the branch already exists
-    branch_url = f"{GITHUB_API_BASE}/git/ref/heads/{branch_name}"
-    branch_exists = False
-    branch_resp = requests.get(branch_url, headers=headers)
-    if branch_resp.status_code == 200:
-        branch_exists = True
+    branch_exists, branch_info = gah.check_branch_exists(branch_name)
 
     # If the branch exists, check if there's a PR already. If not, it means that it got either merged or deleted
     #   in which case we delete the branch to start fresh.
     if branch_exists:
-        open_prs = get_open_prs_for_branch(branch_name, headers)
+        open_prs = gah.get_open_prs_for_branch(branch_name)
         if not open_prs:
             # No open PRs for this branch, delete it
-            delete_ref_resp = requests.delete(f"{GITHUB_API_BASE}/git/refs/heads/{branch_name}", headers=headers)
-            delete_ref_resp.raise_for_status()
-            log.info(f"Deleted branch {branch_name} as it had no open PRs")
+            gah.delete_branch(branch_name)
             branch_exists = False
 
     # Create a new branch if it doesn't exist
     if not branch_exists:
-        create_ref_data = {"ref": f"refs/heads/{branch_name}", "sha": master_sha}
-        create_ref_resp = requests.post(f"{GITHUB_API_BASE}/git/refs", json=create_ref_data, headers=headers)
-        create_ref_resp.raise_for_status()
+        gah.create_branch(branch_name, master_sha)
 
     # Always merge with master, regardless of whether there are changes
-    merge_successful = merge_branch_with_master(branch_name, headers)
+    merge_successful = gah.merge_branch_with_master(branch_name)
 
     # If merge unsuccessful, log warning but continue to create PR
     if not merge_successful:
         log.warning(f"Failed to merge master into {branch_name}, but will still create PR")
 
-    # Gather files in snapshot_dir
-    tree_items = []
-    for filepath in files:
-        with filepath.open("r", encoding="utf-8") as fp:
-            content = fp.read()
+    # Prepare parent and base tree SHA
+    parent_sha = master_sha
+    base_tree_sha = master_sha
 
-        # Skip if the remote content is the same
-        remote_content = fetch_file(filepath.relative_to(BASE_DIR), branch_name)
-        if remote_content == content:
-            continue
+    # If branch exists, use its latest commit as parent instead of master
+    if branch_exists:
+        parent_sha = branch_info["object"]["sha"]
+        base_tree_sha = parent_sha
 
-        # Build the tree structure
-        repo_path = str(filepath.relative_to(BASE_DIR))
-        tree_items.append(
-            {
-                "path": repo_path,
-                "mode": "100644",
-                "type": "blob",
-                "content": content,
-            }
-        )
+    # Create commit with files
+    has_changes, _ = gah.create_commit_with_files(
+        files=files, branch_name=branch_name, commit_message=title, parent_sha=parent_sha, base_tree_sha=base_tree_sha
+    )
 
-    # Don't update if there are no changes
-    has_changes = len(tree_items) > 0
+    # Don't create PR if there are no changes
     if not has_changes:
         log.info(f"No changes in {update_name}")
         return
 
-    # Get the base tree SHA to use
-    base_tree_sha = master_sha
-    parent_sha = master_sha
-
-    # If branch exists, use its latest commit as parent instead of master
-    if branch_exists:
-        branch_info = branch_resp.json()
-        parent_sha = branch_info["object"]["sha"]
-        base_tree_sha = parent_sha  # Use the branch's latest commit as base for the tree
-
-    # Create a tree for all files
-    tree_data = {"base_tree": base_tree_sha, "tree": tree_items}
-    create_tree_resp = requests.post(f"{GITHUB_API_BASE}/git/trees", json=tree_data, headers=headers)
-    create_tree_resp.raise_for_status()
-    tree_sha = create_tree_resp.json()["sha"]
-
-    # Create a commit
-    commit_data = {
-        "message": title,
-        "tree": tree_sha,
-        "parents": [parent_sha],  # Use the appropriate parent commit
-    }
-    create_commit_resp = requests.post(f"{GITHUB_API_BASE}/git/commits", json=commit_data, headers=headers)
-    create_commit_resp.raise_for_status()
-    new_commit_sha = create_commit_resp.json()["sha"]
-
-    # Update the branch to point to the new commit
-    update_ref_data = {"sha": new_commit_sha}  # Removed force:True to avoid overwriting other commits
-    update_ref_resp = requests.patch(
-        f"{GITHUB_API_BASE}/git/refs/heads/{branch_name}", json=update_ref_data, headers=headers
-    )
-    update_ref_resp.raise_for_status()
-
-    existing_prs = get_open_prs_for_branch(branch_name, headers)
+    existing_prs = gah.get_open_prs_for_branch(branch_name)
 
     if existing_prs:
         log.info(f"Pull request already exists: {existing_prs[0]['html_url']}")
     else:
         # Create a pull request
-        pr_data = {
-            "title": title,
-            "head": branch_name,
-            "base": "master",
-            "body": "" if has_changes else "This PR was created without file changes but includes a merge with master.",
-        }
-        pr_resp = requests.post(GITHUB_API_URL, json=pr_data, headers=headers)
-        pr_resp.raise_for_status()
-        log.info(f"Pull request created: {pr_resp.json()['html_url']}")
+        body = "" if has_changes else "This PR was created without file changes but includes a merge with master."
+        pr_url = gah.create_pull_request(title, branch_name, body)
+        log.info(f"Pull request created: {pr_url}")
 
 
 @dataclass
