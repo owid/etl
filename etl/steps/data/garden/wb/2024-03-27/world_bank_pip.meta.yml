@@ -49,7 +49,7 @@ tables:
               2017 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: Line chart
             yAxis:
               min: 0
@@ -98,7 +98,7 @@ tables:
               2017 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: Line chart
             yAxis:
               min: 0
@@ -146,7 +146,7 @@ tables:
               2017 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: Line chart
             yAxis:
               min: 0
@@ -191,7 +191,7 @@ tables:
             note: >-
               This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: Line chart
             yAxis:
               min: 0
@@ -236,7 +236,7 @@ tables:
               Depending on the country and year, the data relates to income measured after
               taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               min: 0
             colorScale:
@@ -277,7 +277,7 @@ tables:
               Depending on the country and year, the data relates to income measured after
               taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               min: 0
             colorScale:
@@ -320,7 +320,7 @@ tables:
               Depending on the country and year, the data relates to income measured after
               taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               min: 0
             colorScale:
@@ -371,7 +371,7 @@ tables:
               2017 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: Line chart
             yAxis:
               min: 0
@@ -418,7 +418,7 @@ tables:
               Income and consumption estimates are available separately in this [Data
               Explorer](https://ourworldindata.org/explorers/pip-inequality-explorer).
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: World Bank
             originUrl: https://ourworldindata.org/economic-inequality
             yAxis:
