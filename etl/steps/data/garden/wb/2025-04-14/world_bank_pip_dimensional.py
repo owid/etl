@@ -187,7 +187,7 @@ def run() -> None:
 
     tb = make_relative_poverty_long(tb=tb)
 
-    tb = make_poverty_line_null_for_non_dimensional_indicators(tb=tb)
+    # tb = make_poverty_line_null_for_non_dimensional_indicators(tb=tb)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb, tb_inc_or_cons_smooth = inc_or_cons_data(tb=tb)
@@ -205,8 +205,6 @@ def run() -> None:
 
     # Drop columns not needed
     tb = drop_columns(tb)
-
-    tb.to_csv("world_bank_pip.csv", index=False)
 
     # Improve table format.
     tb = tb.format(
@@ -1223,9 +1221,17 @@ def survey_count(tb: Table) -> Table:
     # Define ppp_version and poverty_line columns, empty
     tb_survey["ppp_version"] = pd.NA
     tb_survey["poverty_line"] = pd.NA
+    tb_survey["welfare_type"] = "income or consumption"
+    tb_survey["table"] = "Income or consumption consolidated"
+    tb_survey["decile"] = pd.NA
 
     # Merge with original table
-    tb = pr.merge(tb_survey, tb, on=["country", "year", "ppp_version", "poverty_line"], how="outer")
+    tb = pr.merge(
+        tb_survey,
+        tb,
+        on=["country", "year", "welfare_type", "ppp_version", "poverty_line", "table", "decile"],
+        how="outer",
+    )
 
     return tb
 
@@ -1262,11 +1268,23 @@ def add_region_definitions(tb: Table, tb_region_definitions: Table) -> Table:
     tb_base["ppp_version"] = pd.NA
     tb_base["poverty_line"] = pd.NA
 
+    # Do the same with tb_region_definitions
+    tb_region_definitions["welfare_type"] = "income or consumption"
+    tb_region_definitions["table"] = "Income or consumption consolidated"
+
     # Merge with original table
-    tb = pr.merge(
+    tb_base = pr.merge(
         tb_base,
         tb_region_definitions,
-        on=["country", "year"],
+        on=["country", "year", "welfare_type", "table"],
+        how="outer",
+    )
+
+    # Now merge with tb
+    tb = pr.merge(
+        tb,
+        tb_base[["country", "year", "welfare_type", "ppp_version", "poverty_line", "table", "region_name"]],
+        on=["country", "year", "welfare_type", "ppp_version", "poverty_line", "table"],
         how="outer",
     )
 
@@ -1425,8 +1443,6 @@ def make_poverty_line_null_for_non_dimensional_indicators(tb: Table) -> Table:
 
     # Define index columns
     index_columns = ["country", "year", "welfare_type", "ppp_version"]
-
-    tb_non_dimensional.to_csv("tb_non_dimensional.csv", index=False)
 
     # Select the columns we want
     tb_non_dimensional = tb_non_dimensional[index_columns + INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES]
