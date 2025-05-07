@@ -119,8 +119,8 @@ INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES = [
     "pg",
     "estimate_type",
     "pop_in_poverty",
-    "bottom_50_share",
-    "middle_40_share",
+    "bottom50_share",
+    "middle40_share",
     "palma_ratio",
     "s80_s20_ratio",
     "p90_p10_ratio",
@@ -130,8 +130,6 @@ INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES = [
     "top1_share",
     "top1_avg",
     "top90_99_share",
-    "surveys_past_decade",
-    "region_name",
 ]
 
 
@@ -176,7 +174,7 @@ def run() -> None:
     tb_percentiles = regional_data_from_1990(tb=tb_percentiles, regions_list=REGIONS_LIST)
 
     # Amend the entity to reflect if data refers to urban or rural only
-    tb = identify_rural_urban(tb)
+    tb = identify_rural_urban(tb=tb)
 
     # Create stacked variables from headcount and headcount_ratio
     tb = create_stacked_variables(tb=tb)
@@ -185,15 +183,17 @@ def run() -> None:
     # # Sanity checks. I don't run for percentile tables because that process was done in the extraction
     # tb = sanity_checks(tb=tb)
 
-    tb = make_distributional_indicators_long(tb)
+    tb = make_distributional_indicators_long(tb=tb)
 
-    tb = make_relative_poverty_long(tb)
+    tb = make_relative_poverty_long(tb=tb)
+
+    tb = make_poverty_line_null_for_non_dimensional_indicators(tb=tb)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb, tb_inc_or_cons_smooth = inc_or_cons_data(tb)
+    tb, tb_inc_or_cons_smooth = inc_or_cons_data(tb=tb)
 
     # Create survey count dataset, by counting the number of surveys available for each country in the past decade
-    tb_inc_or_cons_smooth = survey_count(tb_inc_or_cons_smooth)
+    tb_inc_or_cons_smooth = survey_count(tb=tb_inc_or_cons_smooth)
 
     # Add region definitions
     tb_inc_or_cons_smooth = add_region_definitions(
@@ -205,6 +205,8 @@ def run() -> None:
 
     # Drop columns not needed
     tb = drop_columns(tb)
+
+    tb.to_csv("world_bank_pip.csv", index=False)
 
     # Improve table format.
     tb = tb.format(
@@ -1249,19 +1251,24 @@ def add_region_definitions(tb: Table, tb_region_definitions: Table) -> Table:
     Add region definitions to the main table
     """
 
-    tb = tb.copy()
-    tb_region_definitions = tb_region_definitions.copy()
+    tb_base = tb.copy()
 
-    # Merge with the main table
-    tb = pr.merge(tb, tb_region_definitions, on=["country", "year"], how="outer")
+    ipl_current = INTERNATIONAL_POVERTY_LINES[list(INTERNATIONAL_POVERTY_LINES.keys())[1]]
 
-    return tb
+    # Filter for the current value
+    tb_base = tb_base[tb_base["poverty_line"] == ipl_current].reset_index(drop=True)
 
+    # Define ppp_version and poverty_line columns, empty
+    tb_base["ppp_version"] = pd.NA
+    tb_base["poverty_line"] = pd.NA
 
-def show_not_dimensional_data_once(tb: Table) -> Table:
-    """
-    Make all the columns that are not dimensional (do not depend on dimensions) to be shown once.
-    """
+    # Merge with original table
+    tb = pr.merge(
+        tb_base,
+        tb_region_definitions,
+        on=["country", "year"],
+        how="outer",
+    )
 
     return tb
 
@@ -1399,5 +1406,39 @@ def make_relative_poverty_long(tb: Table) -> Table:
 
     # Drop the columns that are not needed
     tb = tb.drop(columns=rel_pov_columns, errors="raise")
+
+    return tb
+
+
+def make_poverty_line_null_for_non_dimensional_indicators(tb: Table) -> Table:
+    """
+    Avoid repetition of the same values for indicators not depending on poverty lines.
+    """
+
+    tb_non_dimensional = tb.copy()
+
+    # Extract both values from INTERNATIONAL_POVERTY_LINES. They are the values of the dictionary
+    ipl_list = list(INTERNATIONAL_POVERTY_LINES.values())
+
+    # Filter only for values in the list
+    tb_non_dimensional = tb_non_dimensional[tb_non_dimensional["poverty_line"].isin(ipl_list)].reset_index(drop=True)
+
+    # Define index columns
+    index_columns = ["country", "year", "welfare_type", "ppp_version"]
+
+    tb_non_dimensional.to_csv("tb_non_dimensional.csv", index=False)
+
+    # Select the columns we want
+    tb_non_dimensional = tb_non_dimensional[index_columns + INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES]
+
+    # Add a missing poverty_line and decile columns
+    tb_non_dimensional["poverty_line"] = pd.NA
+    tb_non_dimensional["decile"] = pd.NA
+
+    # Drop the columns in tb
+    tb = tb.drop(columns=INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES, errors="raise")
+
+    # Concatenate tb and tb_non_dimensional
+    tb = pr.concat([tb, tb_non_dimensional], ignore_index=True)
 
     return tb
