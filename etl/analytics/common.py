@@ -21,8 +21,7 @@ from etl.config import METABASE_API_KEY, METABASE_SEMANTIC_LAYER_DATABASE_ID, ME
 log = get_logger()
 
 # First day when we started collecting chart render views.
-# TODO: Find out this exact date.
-DATE_MIN = "2025-01-01"
+DATE_MIN = "2024-11-01"
 # Current date.
 DATE_MAX = str(datetime.today().date())
 # Base url for Datasette csv queries.
@@ -269,13 +268,13 @@ def get_chart_events_by_chart_id(
     SELECT
         c.chart_id,
         c.url,
-        c.published_at,
         v.day,
-        v.events
+        SUM(v.events) AS events
     FROM charts c
     JOIN grapher_views_detailed v ON c.url = v.grapher
     {where_sql}
-    ORDER BY v.events DESC;
+    GROUP BY c.chart_id, c.url, v.day
+    ORDER BY c.chart_id, v.day ASC;
     """
     df = read_datasette(query)
 
