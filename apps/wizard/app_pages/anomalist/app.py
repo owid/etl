@@ -596,13 +596,14 @@ with st.form(key="dataset_search"):
     query_dataset_ids = [int(v) for v in st.query_params.get_all("anomalist_datasets_selected")]
 
     st.session_state.anomalist_datasets_selected = st.multiselect(
-        "Select datasets",
+        label="Select datasets",
         # options=cached.load_dataset_uris(),
         options=DATASETS_ALL.keys(),
         # max_selections=1,
         default=query_dataset_ids or DATASETS_NEW.keys(),
-        format_func=DATASETS_ALL.get,
+        format_func=lambda x: DATASETS_ALL[x],
     )
+
     st.query_params["anomalist_datasets_selected"] = st.session_state.anomalist_datasets_selected  # type: ignore
 
     st.form_submit_button(

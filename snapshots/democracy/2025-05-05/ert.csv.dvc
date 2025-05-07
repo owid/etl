@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: V-Dem
+    title: Episodes of Regime Transformation
+    description: |-
+      This dataset captures 680 unique episodes of regime transformation (ERT) from 1900 to 2019.
+
+      These data provide novel insights into regime change over the past 120 years, illustrating the value of developing a unified framework for studying regime transformation. Such transformations, while meaningfully altering the qualities of the regime, only produce a regime transition about 32% of the time. The majority of episodes either end before a transition takes place or do not have the potential for such a transition (i.e. constituted further democratization in democratic regimes or further autocratization in autocratic regimes).
+    citation_full: |-
+      Seraphine Maerz, Amanda Edgell, Joshua Krusell, Laura Maxwell, Sebastian Hellmeier. 'ERT - Episodes of Regime Transformation R package'. Varieties of Democracy (V-Dem) Project. 2025. https://www.v-dem.net/en/ and https://github.com/vdeminstitute/ERT
+    attribution: Episodes of Regime Transformation (2025)
+    version_producer: v15
+    url_main: https://v-dem.net/data/ert-dataset/
+    url_download: https://raw.githubusercontent.com/vdeminstitute/ERT/master/inst/ert.csv
+    date_accessed: "2025-05-05"
+    date_published: "2025-03-17"
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 2841efaf00ba936e9891d42a39873062
+    size: 3137229
+    path: ert.csv

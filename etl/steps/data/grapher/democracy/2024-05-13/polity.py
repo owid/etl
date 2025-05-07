@@ -17,7 +17,6 @@ def run(dest_dir: str) -> None:
     tb = ds_garden["polity"]
     tb_num_countries = ds_garden["num_countries"]
     tb_num_people = ds_garden["num_people"]
-    tb_avg_w_countries = ds_garden["avg_pop"]
 
     #
     # Process data.
@@ -26,7 +25,6 @@ def run(dest_dir: str) -> None:
         tb,
         tb_num_countries,
         tb_num_people,
-        tb_avg_w_countries,
     ]
 
     #

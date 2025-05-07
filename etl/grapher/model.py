@@ -61,7 +61,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, ProgrammingError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
     DeclarativeBase,
@@ -1926,7 +1926,14 @@ class Anomaly(Base):
 
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
-        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        try:
+            return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        except ProgrammingError as e:
+            # anomalies table does not exist (error code 1146), it gets created dynamically
+            # when the first anomaly is created
+            if "1146" in str(e):
+                return []
+            raise
 
 
 class Explorer(Base):

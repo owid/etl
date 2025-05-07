@@ -22,6 +22,8 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 
 from etl.dag_helpers import load_dag
 from etl.files import yaml_dump
+from etl.git_helpers import get_changed_files
+from etl.io import get_all_changed_catalog_paths
 from etl.tempcompare import series_equals
 
 log = structlog.get_logger()
@@ -307,6 +309,11 @@ class RemoteDataset:
     help="Compare only selected channel (subfolder of data/).",
 )
 @click.option(
+    "--changed",
+    is_flag=True,
+    help="Only compare datasets with changes in git. This can significantly speed it up.",
+)
+@click.option(
     "--include",
     type=str,
     help="Compare only datasets matching pattern.",
@@ -349,6 +356,7 @@ def cli(
     path_a: str,
     path_b: str,
     channel: Iterable[CHANNEL],
+    changed: bool,
     include: Optional[str],
     cols: Optional[str],
     tables: Optional[str],
@@ -373,19 +381,40 @@ def cli(
 
     It uses **source checksums** to find candidates for comparison. Source checksum includes all files used to generate the dataset and should be sufficient to find changed datasets, just note that we're not using checksum of the files themselves. So if you change core ETL code or some of the dependencies, e.g. change in owid-datautils-py, core ETL code or updating library version, the change won't be detected. In cases like these you should increment ETL version which is added to all source checksums (not implemented yet).
 
-    **Example 1:** Compare the remote catalog with a local one
+    **Example 1:** Compare the remote catalog with a local one for changed files
+
+    ```
+    $ etl diff REMOTE data/ --changed
+    ```
+
+    **Example 2:** Compare the remote catalog with a local one
 
     ```
     $ etl diff REMOTE data/ --include maddison
     ```
 
-    **Example 2:** Compare two local catalogs
+    **Example 3:** Compare two local catalogs
 
     ```
     $ etl diff other-data/ data/ --include maddison
     ```
     """
     console = Console(tab_size=2, soft_wrap=True)
+
+    if changed:
+        # Get all changed files in the current git repository
+        files_changed = get_changed_files()
+        catalog_paths = get_all_changed_catalog_paths(files_changed)
+
+        if not catalog_paths:
+            console.print("[green]✅ No differences found[/green]")
+            exit(0)
+
+        # Add those files to `include` regex (use positive look-aheads to match on both)
+        if include:
+            include = rf'(?=.*{include})(?=.*{"|".join(catalog_paths)})'
+        else:
+            include = "|".join(catalog_paths)
 
     path_to_ds_a = _load_catalog_datasets(path_a, channel, include, exclude)
     path_to_ds_b = _load_catalog_datasets(path_b, channel, include, exclude)

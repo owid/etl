@@ -149,15 +149,19 @@ def log_time(func):
     return wrapper
 
 
-@log_time
+# @log_time
 def get_changed_files(
     current_branch: Optional[str] = None,
     base_branch: Optional[str] = None,
     repo_path: Union[Path, str] = BASE_DIR,
     only_committed: bool = False,
+    fetch: bool = False,
 ) -> Dict[str, Dict[str, str]]:
     """Return files that are different between the current branch and the specified base branch. This can
-    be really slow if the number of files is large."""
+    be really slow if the number of files is large.
+
+    :param fetch: If True, fetch the latest changes from the remote repository. This can be slow.
+    """
     repo = Repo(repo_path)
 
     if current_branch is None:
@@ -169,11 +173,11 @@ def get_changed_files(
 
     if base_branch is None:
         # If not specified, use "master" branch.
-        # However, if there is a "master-1" branch, that means we are on a staging server; if so, use "master-1".
-        base_branch = "master-1" if "master-1" in [branch.name for branch in repo.branches] else "master"
+        base_branch = "master"
 
     # Fetch the latest changes from the remote repository
-    repo.remotes.origin.fetch()
+    if fetch:
+        repo.remotes.origin.fetch()
 
     # Find the common ancestor of the remote base branch and the current local branch.
     # In other words, "merge_base" is the last common commit between those two branches.

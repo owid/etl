@@ -47,7 +47,10 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog.tables import concat
-from shared import (
+
+from etl.data_helpers import geo
+from etl.helpers import PathFinder
+from etl.steps.data.garden.democracy.shared import (
     add_age_groups,
     add_count_years_in_regime,
     add_imputes,
@@ -57,9 +60,6 @@ from shared import (
     from_wide_to_long,
     make_table_with_dummies,
 )
-
-from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -95,7 +95,7 @@ YEAR_AGG_MIN = 1800
 YEAR_AGG_MAX = 2018
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -105,7 +105,7 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset(short_name="population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["polity"].reset_index()
+    tb = ds_meadow.read("polity")
 
     #
     # Process data.
@@ -158,8 +158,12 @@ def run(dest_dir: str) -> None:
 
     ##################################################
 
-    # Add regions to main table
-    tb = concat([tb, tb_avg_countries], ignore_index=True)
+    # Add regions to main table (including population-weighted averages)
+    assert (
+        tb_avg_countries.shape[0] == tb_avg_w_countries.shape[0]
+    ), "Different number of rows in tb_avg_countries and tb_avg_w_countries"
+    tb_avg_w_countries["country"] = tb_avg_w_countries["country"] + " (population-weighted)"
+    tb = concat([tb, tb_avg_countries, tb_avg_w_countries], ignore_index=True)
 
     # Remove columns
     tb = tb.drop(columns=[col_flag_imputed, "ccode"])
@@ -168,7 +172,6 @@ def run(dest_dir: str) -> None:
     tb = tb.format(["country", "year"])
     tb_num_countries = tb_num_countries.format(["country", "year", "category"], short_name="num_countries")
     tb_num_people = tb_num_people.format(["country", "year", "category"], short_name="num_people")
-    tb_avg_w_countries = tb_avg_w_countries.format(["country", "year"], short_name="avg_pop")
 
     #
     # Save outputs.
@@ -177,13 +180,10 @@ def run(dest_dir: str) -> None:
         tb,
         tb_num_countries,
         tb_num_people,
-        tb_avg_w_countries,
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -414,7 +414,7 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
 
     ## Get missing years (not to miss anyone!) -- Note that this can lead to country overlaps (e.g. USSR and Latvia)
     tb_ppl = expand_observations_without_duplicates(tb_ppl)
-    print(f"{tb_.shape} -> {tb_ppl.shape}")
+    paths.log.info(f"{tb_.shape} -> {tb_ppl.shape}")
 
     # Column per indicator-dimension
     tb_ppl = make_table_with_dummies(tb_ppl, indicators)
@@ -458,11 +458,6 @@ def get_population_data(tb: Table, ds_regions: Dataset, ds_population: Dataset) 
     # Keep only certain year range
     tb_avg = tb_avg.loc[tb_avg["year"].between(YEAR_AGG_MIN, YEAR_AGG_MAX)]
 
-    tb_avg = tb_avg.rename(
-        columns={
-            "democracy_polity": "democracy_polity_weighted",
-        }
-    )
     return tb_ppl, tb_avg
 
 
