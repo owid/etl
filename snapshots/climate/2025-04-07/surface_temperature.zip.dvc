@@ -1,3 +1,5 @@
+autoupdate:
+  name: Surface temperature
 meta:
   origin:
     title_snapshot: ERA5 Monthly Averaged Data on Single Levels from 1940 to Present - Monthly Averages of 2m Surface Temperature
