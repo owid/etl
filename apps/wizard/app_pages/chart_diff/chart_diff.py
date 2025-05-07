@@ -15,12 +15,12 @@ from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.components import st_cache_data
-from apps.wizard.utils.io import get_all_changed_catalog_paths
 from etl.analytics.common import get_article_views_last_n_days, get_chart_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files, log_time
 from etl.grapher import model as gm
+from etl.io import get_all_changed_catalog_paths
 
 log = get_logger()
 

@@ -149,7 +149,7 @@ def log_time(func):
     return wrapper
 
 
-@log_time
+# @log_time
 def get_changed_files(
     current_branch: Optional[str] = None,
     base_branch: Optional[str] = None,

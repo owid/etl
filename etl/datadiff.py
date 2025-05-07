@@ -20,10 +20,10 @@ from rich.panel import Panel
 from rich.syntax import Syntax
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from apps.wizard.utils.io import get_all_changed_catalog_paths
 from etl.dag_helpers import load_dag
 from etl.files import yaml_dump
 from etl.git_helpers import get_changed_files
+from etl.io import get_all_changed_catalog_paths
 from etl.tempcompare import series_equals
 
 log = structlog.get_logger()
@@ -405,6 +405,10 @@ def cli(
         # Get all changed files in the current git repository
         files_changed = get_changed_files()
         catalog_paths = get_all_changed_catalog_paths(files_changed)
+
+        if not catalog_paths:
+            console.print("[green]✅ No differences found[/green]")
+            exit(0)
 
         # Add those files to `include` regex (use positive look-aheads to match on both)
         if include:
