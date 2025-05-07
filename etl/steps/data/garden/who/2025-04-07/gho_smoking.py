@@ -18,7 +18,7 @@ afford_gdp = "affordability_of_cigarettes__percentage_of_gdp_per_capita_required
 taxes = "taxes_as_a_pct_of_price__total_tax"
 ad_bans = "enforce_bans_on_tobacco_advertising"
 help_quit = "offer_help_to_quit_tobacco_use"
-smoke_free = "number_of_places_smoke_free__national_legislation"  # number_of_places_smoke_free__national_legislation"
+smoke_free = "number_of_places_smoke_free__national_legislation"
 
 
 def run() -> None:
@@ -90,7 +90,6 @@ def run() -> None:
     tb = pr.multi_merge(tbs, on=["country", "year", "sex"], how="left")
 
     # drop and rename columns
-
     tb = tb.rename(
         columns={
             "estimate_of_current_cigarette_smoking_prevalence__pct": "cig_smoking_pct",
