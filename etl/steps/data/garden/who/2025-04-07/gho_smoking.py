@@ -48,7 +48,6 @@ def run() -> None:
     tb_taxes = tb_taxes[tb_taxes["tobacco_and_nicotine_product"] == "Most sold brand of cigarettes (20 sticks)"]
     tb_taxes = tb_taxes.drop(columns=["tobacco_and_nicotine_product", "comments"], errors="raise")
 
-
     tb_empower = pr.multi_merge(
         [tb_taxes, tb_ads, tb_quit, tb_afford],  # type: ignore
         on=["country", "year"],

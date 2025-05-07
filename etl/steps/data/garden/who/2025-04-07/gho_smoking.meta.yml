@@ -5,9 +5,6 @@ definitions:
         - Smoking
     display:
       numDecimalPlaces: 1
-    description_key:
-      - "{definitions.notes.smoking_risks}"
-      - "{definitions.notes.survey_data}"
   notes:
     age_standardization: To allow for comparisons between countries and over time, this metric is [age-standardized](#dod:age_standardized).
     users: The number of current smokers/tobacco users is estimated by multiplying the prevalence of smoking/tobacco use by the population aged 15 years and older.
@@ -36,6 +33,9 @@ tables:
         presentation:
           grapher_config:
             note: "{definitions.notes.age_standardization}"
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
       cig_smoking_pct_age_std:
         title: Share of adults who smoke cigarettes (age-standardized)
         unit: "% of adults"
@@ -46,6 +46,9 @@ tables:
         presentation:
           grapher_config:
             note: "{definitions.notes.age_standardization}"
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
       tobacco_smoking_pct:
         title: Share of adults who smoke tobacco
         unit: "% of adults"
@@ -53,6 +56,9 @@ tables:
         description_short: Estimated percentage of adults (15 years and older) who currently smoke tobacco. This includes all forms of tobacco smoking, such as cigarettes, pipes or heated tobacco products, but excludes e-cigarettes and smokeless tobacco products.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
       tobacco_smoking_pct_age_std:
         title: Share of adults who smoke tobacco (age-standardized)
         unit: "% of adults"
@@ -63,6 +69,9 @@ tables:
         presentation:
           grapher_config:
             note: "{definitions.notes.age_standardization}"
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
       tobacco_use_pct:
         title: Share of adults who smoke or use tobacco
         unit: "% of adults"
@@ -70,6 +79,9 @@ tables:
         description_short: Estimated percentage of adults (15 years and older) who currently use tobacco. This includes all forms of tobacco use, such as smoking, chewing or snuffing, but excludes products that do not contain tobacco, such as e-cigarettes.
         description_processing: |-
           - {definitions.notes.regional_aggregates}
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
       tobacco_use_pct_age_std:
         title: Share of adults who smoke or use tobacco (age-standardized)
         unit: "% of adults"
@@ -80,6 +92,9 @@ tables:
         presentation:
           grapher_config:
             note: "{definitions.notes.age_standardization}"
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
       cig_smokers:
         title: Number of adults who smoke cigarettes
         unit: "adults"
@@ -89,6 +104,9 @@ tables:
           - {definitions.notes.users}
         display:
           numDecimalPlaces: 0
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
       tobacco_smokers:
         title: Number of adults who smoke tobacco
         unit: "adults"
@@ -98,6 +116,9 @@ tables:
           - {definitions.notes.users}
         display:
           numDecimalPlaces: 0
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
       tobacco_users:
         title: Number of adults who smoke or use tobacco
         unit: "adults"
@@ -107,6 +128,9 @@ tables:
           - {definitions.notes.users}
         display:
           numDecimalPlaces: 0
+        description_key:
+          - "{definitions.notes.smoking_risks}"
+          - "{definitions.notes.survey_data}"
 
 
   # Empower indicators (policy measures)
@@ -120,15 +144,39 @@ tables:
         presentation:
           grapher_config:
             note: "In Canada and the USA, the tax share is calculated as the sum of federal and state taxes."
+        description_from_producer: |- # This data comes from https://www.who.int/data/gho/data/indicators/indicator-details/GHO/gho-tobacco-control-raise-taxes-national-taxes-pack-of-20
+          ##### Rationale
+          Purpose of this data collection is to monitor the price of tobacco and nicotine products. Monitoring prices of those products helps estimate the burden of applicable indirect/consumption taxes to those products. This also helps monitor change in affordability of those products over time.
+
+          ##### Definition
+          Prices were collected of the most sold brand of cigarettes (pack of 20 sticks).
+
+          Primary collection of price data in this report involved surveying two types of retail outlets from the capital city of each country, defined as follows:
+
+          Supermarket/hypermarket: chain or independent retail outlets with a selling space of over 2500 square metres and a primary focus on selling food/beverages/tobacco and other groceries. Hypermarkets also sell a range of non-grocery merchandise.
+          Kiosk/newsagent/tobacconist/independent food store: small convenience stores, retail outlets selling predominantly food, beverages and tobacco or a combination of these (e.g. kiosk, newsagent or tobacconist) or a wide range of predominantly grocery products (independent food stores or independent small grocers).
+
+          Prices were collected in the local currency in each country. The prices were also converted in international dollars at purchasing power parity (PPP) using the International Monetary Fund (IMF)’s World Economic Outlook implied PPP conversion rates for 2022. Prices were also converted in US$ at official exchange rate using IMF’s exchange rate conversion of national currency per US$, end of period data for July 2022.
+
+
+          ##### Method of measurement
+          Prices provided in different quantities (or volume sizes for e-liquids) were standardized to 20 sticks for cigarettes and Heated Tobacco Products (HTPs).
+
+          Prices in local currency were divided by the IMF’s World Economic Outlook implied PPP conversion rates for 2022 for the conversion in international dollars at purchasing power parity (PPP).
+
+          Prices in local currency were also divided by the IMF’s exchange rate conversion of national currency per US$ end of period data for July 2022 for the conversion in US$ at official exchange rates.
+
+          ##### Limitations
+          In most countries, national level brand-specific price statistics were not available, thus the retail price data were collected from one supermarket/hypermarket or kiosk/newsagent/tobacconist/independent food store usually in the capital city of the country (where survey respondents were mostly located), therefore potentially not being nationally representative.
       tobacco_ad_ban:
         title: Bans on tobacco advertising
         unit: ""
         short_unit: ""
         description_short: |-
-          The level of bans on tobacco advertising are defined as follows: 1) no ban, or ban that does not cover national TV, radio and print media; 2) ban on national TV, radio and print media advertising only; 3) ban on national TV, radio and print media, as well as on some but not all other forms of direct and indirect advertising and 4) complete ban on all forms of advertising.
+          The level of bans on tobacco advertising are defined as follows: 1) no ban, or ban that does not cover national TV, radio and print media advertising; 2) ban on national TV, radio and print media advertising only; 3) ban on national TV, radio and print media, as well as on some, but not all other forms of advertising and 4) complete ban on all forms of advertising.
         presentation:
           grapher_config:
-            note: "Direct advertising includes all classic forms of advertising, such as TV, radio, print media and billboard ads. Indirect advertising includes sponsorships, product placement or promotional discounts."
+            note: This indicator includes both direct advertising such as TV, radio, print media and billboard ads and indirect advertising, such as sponsorships, product placement or promotional discounts.
       cig_afford_pct_gdp:
         title: Affordability of cigarettes (as a share of GDP per capita)
         unit: "%"
@@ -140,7 +188,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-          National support for the cessation of tobacco use has different levels:
-          - Countries in dark blue offer a national quitline and cover costs for nicotine replacement therapy (NRT) or other cessation services.
+          National support for quitting tobacco use has different levels:
+          - Countries in dark blue offer a national quitline and cover costs for nicotine replacement therapy or other services.
           - Countries in light blue cover the costs of some services, but not all.
           - Countries in orange offer some services, but do not cover any costs.
