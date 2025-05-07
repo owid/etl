@@ -383,7 +383,10 @@ class ChartDiff:
         article_refs_all = get_chart_in_article_views_cached(chart_ids)
 
         # Get approvals
-        df_approvals_all = OWID_ENV.read_sql(f"SELECT * FROM chart_diff_approvals WHERE chartId in {tuple(chart_ids)}")
+        df_approvals_all = read_sql(
+            "SELECT * FROM chart_diff_approvals WHERE chartId IN %(chart_ids)s",
+            params={"chart_ids": chart_ids},
+        )
 
         # Build chart diffs
         chart_diffs = []
