@@ -253,7 +253,6 @@ def get_chart_events_by_chart_id(
     """
     Fetch chart view events from Datasette, optionally filtered by chart IDs and minimum date.
 
-    TODO: This function may not be necessary. Consider deleting.
     """
     where_clauses = []
     if date_min:
@@ -398,7 +397,88 @@ def get_article_views_by_url(
     return df_views
 
 
-def _get_gdocs_references_of_charts_via_narrative_charts(chart_ids: Optional[List[int]] = None):
+def _get_gdocs_references_of_charts(
+    chart_ids: Optional[List[int]] = None, component_types: Optional[List[str]] = None
+) -> pd.DataFrame:
+    # Prepare list of component types to consider.
+    if component_types is None:
+        # If not specified, assume a specific list (defined above).
+        component_types = COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS
+    component_types_str = ", ".join(f"'{chart_id}'" for chart_id in component_types)
+
+    # Prepare query.
+    # The following query is a bit complex, but it can be explained as follows:
+    # * First, we define a temporary table "redirect_targets", with the content of ther chart_slug_redirects DB table. For convenience, we call the chart_id column "redirected_chart_id".
+    # * We then define the "main_query", which is the union of two subqueries:
+    #   * A query that searches for citations of existing chart slugs in gdoc posts.
+    #   * A query that searches for citations of redirected chart slugs in gdoc posts.
+    # * Finally, we get only the distinct rows from the main query (which may not be strictly necessary).
+    query = f"""
+    WITH redirect_targets AS (
+        SELECT
+            cr.chart_id AS redirected_chart_id,
+            cr.slug AS chart_slug
+        FROM chart_slug_redirects cr
+    ),
+    main_query AS (
+        SELECT DISTINCT
+            c.id AS chart_id,
+            pg.content ->> '$.title' AS post_title,
+            pg.slug AS post_slug,
+            pg.type AS post_type,
+            cc.slug AS chart_slug,
+            pgl.linkType AS link_type,
+            pgl.componentType AS component_type,
+            pg.publishedAt AS post_publication_date
+        FROM
+            posts_gdocs pg
+            JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
+            JOIN chart_configs cc ON pgl.target = cc.slug
+            JOIN charts c ON c.configId = cc.id
+        WHERE
+            pgl.componentType IN ({component_types_str})
+            AND pg.published = 1
+        UNION
+        SELECT DISTINCT
+            rt.redirected_chart_id AS chart_id,
+            pg.content ->> '$.title' AS post_title,
+            pg.slug AS post_slug,
+            pg.type AS post_type,
+            rt.chart_slug AS chart_slug,
+            pgl.linkType AS link_type,
+            pgl.componentType AS component_type,
+            pg.publishedAt AS post_publication_date
+        FROM
+            posts_gdocs pg
+            JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
+            JOIN redirect_targets rt ON pgl.target = rt.chart_slug
+        WHERE
+            pgl.componentType IN ({component_types_str})
+            AND pg.published = 1
+    )
+    SELECT DISTINCT *
+    FROM main_query
+    """
+
+    # Specify chart ids to consider (otherwise all charts will be considered).
+    if chart_ids is not None:
+        chart_ids_str = ", ".join(f"{chart_id}" for chart_id in chart_ids)
+        query += f"""
+    WHERE chart_id IN ({chart_ids_str})
+    """
+
+    # Sort query results conveniently.
+    query += """
+    ORDER BY chart_id ASC
+    """
+
+    # Execute query and create a dataframe.
+    df = OWID_ENV.read_sql(sql=query)
+
+    return df
+
+
+def _get_gdocs_references_of_charts_via_narrative_charts(chart_ids: Optional[List[int]] = None) -> pd.DataFrame:
     """Get GDocs (e.g. articles, topic pages, or data insights) that use narrative chart, and link them to the original (parent) chart."""
     # Prepare query.
     query = """SELECT
@@ -441,69 +521,18 @@ def get_gdoc_references_of_charts(
     The main query used in this function was adapted from owid-grapher/db/model/Post.ts (getGdocsPostReferencesByChartId). That is the query that determines the articles and topic pages that reference a given chart id. The resulting list is what appears in the Refs tab of the chart admin.
 
     That query has some limitations:
+    TODO: Create issue in owid-grapher and suggest a query to handle these limitations.
+    * Redirects are not properly handled.
+      * For example, chart_id 166 used to have slug "incidence-of-child-labour-in-the-uk". This slug was then renamed "incidence-of-child-labor-in-the-uk" (note "labor" instead of "labour"). But there is still one gdoc article citing the old slug, namely the one with slug "child-labor". If you go to the chart admin for chart_id 166, that article is not included as a reference.
+      * The query in this function solves that (and makes the query significantly faster).
     * If a charts appears in the all-charts block of a topic page, the topic page may not appear in the list of gdoc references. The "all-charts" component in the post_gdocs_links table includes only the top charts (explicitly cited in the [.top] part of the {.all-charts} section of the gdoc).
       * TODO: We need to include topic pages in a different way, using tags (see https://owid.slack.com/archives/C46U9LXRR/p1746521259960689?thread_ts=1746520668.463959&cid=C46U9LXRR ).
     * References to narrative charts are only included if the id of the narrative chart is in the list of chart_ids. But, if a chart in the list of chart_ids is the parent of a narrative chart, references to this narrative chart are not included.
       * For this reason, we include an argument include_parents_of_narrative_charts. If True, we check if any of the chart_ids corresponds to a parent of a narrative chart used in a gdoc, and, if so, include the reference of that gdoc.
 
     """
-    # Prepare list of component types to consider.
-    if component_types is None:
-        # If not specified, assume a specific list (defined above).
-        component_types = COMPONENT_TYPES_TO_LINK_GDOCS_WITH_VIEWS
-    component_types_str = ", ".join(f"'{chart_id}'" for chart_id in component_types)
-
-    # Prepare query.
-    ####################################################################################################################
-    # TODO: Adding the OR for redirects make the query take significantly longer. This could be optimized.
-    #  Maybe they could be separate queries (similar to the narrative charts one).
-    include_redirects = False
-    ####################################################################################################################
-
-    query = """SELECT DISTINCT
-        c.id AS chart_id,
-        pg.content ->> '$.title' AS post_title,
-        pg.slug AS post_slug,
-        pg.type AS post_type,
-        cc.slug AS chart_slug,
-        pgl.linkType AS link_type,
-        pgl.componentType AS component_type,
-        pg.publishedAt AS post_publication_date
-    FROM
-        posts_gdocs pg
-        JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
-        JOIN chart_configs cc ON pgl.target = cc.slug
-        JOIN charts c ON c.configId = cc.id
-    """
-    if include_redirects:
-        query += """\
-        OR pgl.target IN (
-            SELECT
-                cr.slug
-            FROM
-                chart_slug_redirects cr
-            WHERE
-                cr.chart_id = c.id
-        )
-        """
-    query += f"""
-    WHERE
-        pgl.componentType IN ({component_types_str})
-        AND pg.published = 1"""
-
-    # Specify chart ids to consider (otherwise all charts will be considered).
-    if chart_ids is not None:
-        chart_ids_str = ", ".join(f"{chart_id}" for chart_id in chart_ids)
-        query += f"""
-        AND c.id IN ({chart_ids_str})"""
-
-    # Sort query results conveniently.
-    query += """
-    ORDER BY c.id ASC
-    """
-
-    # Execute query and create a dataframe.
-    df = OWID_ENV.read_sql(sql=query)
+    # Find all gdocs that cite chart slugs, including old (redirected) chart slugs.
+    df = _get_gdocs_references_of_charts(chart_ids=chart_ids, component_types=component_types)
 
     if include_parents_of_narrative_charts:
         # If a gdoc uses a narrative chart, we want to identify the parent chart, and, if that parent chart is among the given chart_ids, include those gdocs.
