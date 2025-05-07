@@ -180,7 +180,7 @@ tables:
               entity: true
               changeInPrefix: true
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: UNICEF, World Health Organization and World Bank
             originUrl: https://ourworldindata.org/hunger-and-undernourishment
             yAxis:
@@ -272,7 +272,7 @@ tables:
               entity: true
               changeInPrefix: true
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: UNICEF, World Health Organization and World Bank
             originUrl: https://ourworldindata.org/hunger-and-undernourishment
             yAxis:
@@ -353,7 +353,7 @@ tables:
             variantName: World Bank, constant international-$
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               min: 0
               canChangeScaleType: true
@@ -420,7 +420,7 @@ tables:
             note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
             hideRelativeToggle: false
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: World Bank, constant international-$
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:

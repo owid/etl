@@ -110,7 +110,7 @@ tables:
               time: true
             chartTypes: []
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               time: latest
               hideTimeline: true

@@ -27,7 +27,7 @@ tables:
             note: |-
               Numeric values range from 0 for hardening autocracies to 5 for deepening democracies.
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             selectedFacetStrategy: entity
             selectedEntityNames:
               - Argentina

@@ -91,7 +91,7 @@ tables:
               changeInPrefix: true
             hideRelativeToggle: false
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             originUrl: https://ourworldindata.org/co2-and-greenhouse-gas-emissions
             colorScale:
               binningStrategy: equalInterval

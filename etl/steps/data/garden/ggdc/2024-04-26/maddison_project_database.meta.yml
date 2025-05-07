@@ -67,7 +67,7 @@ tables:
               prices.
             hideRelativeToggle: false
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: In constant international-$. Historical data - Maddison Project Database
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:
@@ -153,7 +153,7 @@ tables:
               2011 prices.
             hideRelativeToggle: false
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             variantName: Maddison Project Database, constant international-$
             originUrl: https://ourworldindata.org/economic-growth
             yAxis:

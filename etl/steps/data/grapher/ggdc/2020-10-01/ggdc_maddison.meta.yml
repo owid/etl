@@ -36,7 +36,7 @@ tables:
             variantName: Maddison Project Database, constant international-$
             originUrl: https://ourworldindata.org/economic-growth
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               min: 0
               canChangeScaleType: true

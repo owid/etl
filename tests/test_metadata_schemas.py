@@ -7,6 +7,7 @@ from jsonschema import (
 from jsonschema.exceptions import ValidationError
 from yaml.loader import SafeLoader
 
+from etl.dag_helpers import load_dag
 from etl.files import read_json_schema
 from etl.paths import SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
 
@@ -39,8 +40,19 @@ def load_yaml_as_string(path):
 def test_dataset_schemas():
     validator = Draft7Validator(DATASET_SCHEMA)
 
+    # Get active steps
+    active_steps = set()
+    DAG = load_dag()
+    for s in set(DAG.keys()) | {x for v in DAG.values() for x in v}:
+        active_steps.add(s.split("://")[1])
+
     # Walk over all files in STEPS_DATA_DIR with *.meta.yml extension
     for meta_file_path in Path(STEPS_DATA_DIR).glob("**/*.meta.yml"):
+        # Ignore inactive steps
+        uri = str(meta_file_path.relative_to(STEPS_DATA_DIR)).replace(".meta.yml", "")
+        if uri not in active_steps:
+            continue
+
         # extract version from path
         version = meta_file_path.relative_to(STEPS_DATA_DIR).parts[2]
 

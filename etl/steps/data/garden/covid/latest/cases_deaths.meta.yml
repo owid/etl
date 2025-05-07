@@ -512,7 +512,7 @@ tables:
             title: Weekly confirmed COVID-19 deaths
             subtitle: *w_deaths
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               colorScale:
                 binningStrategy: manual
@@ -530,7 +530,7 @@ tables:
             title: Weekly confirmed COVID-19 deaths per million people
             subtitle: *w_deaths_pm
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               colorScale:
                 binningStrategy: manual
@@ -552,7 +552,7 @@ tables:
             title: Week by week change of confirmed COVID-19 deaths
             subtitle: The weekly growth rate on any given date measures the percentage change in number of confirmed deaths over the last seven days relative to the number in the previous seven days. {definitions.common_death_note}
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             map:
               colorScale:
                 customNumericColorsActive: true

@@ -27,7 +27,7 @@ tables:
             subtitle: ''
             originUrl: https://ourworldindata.org/fertility-rate
             hasMapTab: true
-            tab: map
+            tab: WorldMap
             yAxis:
               max: 0
               min: 0

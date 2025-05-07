@@ -5,7 +5,7 @@
 definitions:
   common_views:
     - config:
-        tab: map
+        tab: WorldMap
         type: LineChart
         hasMapTab: true
         yScaleToggle: false

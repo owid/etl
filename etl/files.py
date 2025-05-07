@@ -423,4 +423,13 @@ def get_schema_from_url(schema_url: str) -> dict:
     Dict[str, Any]
         Schema of a chart configuration.
     """
-    return requests.get(schema_url, timeout=20, verify=TLS_VERIFY).json()
+    retries = 3
+    for attempt in range(retries):
+        try:
+            response = requests.get(schema_url, timeout=20, verify=TLS_VERIFY)
+            return response.json()
+        except requests.exceptions.JSONDecodeError:
+            if attempt < retries - 1:
+                time.sleep(2)
+            else:
+                raise

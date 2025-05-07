@@ -258,7 +258,7 @@ views:
       note: |-
         The share of positive tests is calculated by dividing the number of tests that were positive to any flu strain by three possible denominators, based on data availability. If both values are available then the denominator is the sum of positive and negative tests; if not then the number specimens processed is used; if neither of those are available then the number of specimens received by the testing facility is used.
       defaultView: true
-      tab: map
+      tab: WorldMap
   - dimensions:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: share_of_positive_tests__pct
