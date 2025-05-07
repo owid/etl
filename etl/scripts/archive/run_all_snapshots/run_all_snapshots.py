@@ -27,8 +27,8 @@ from owid.datautils.io import save_json
 from structlog import get_logger
 from tqdm.auto import tqdm
 
-from etl import git_api_helpers as gah
 from etl.dag_helpers import load_dag
+from etl.git_api_helpers import GithubApiRepo
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR
 from etl.snapshot import Snapshot
 
@@ -39,6 +39,9 @@ random.shuffle(SNAPSHOT_SCRIPTS)
 
 # Kill a subprocess if it takes longer than this many seconds.
 OUTPUT_FILE = BASE_DIR / "etl" / "scripts" / "archive" / "run_all_snapshots" / "snapshot_execution_times.json"
+
+# Create a GitHub API repo instance for all GitHub operations
+github_repo = GithubApiRepo()
 
 
 def get_active_snapshots() -> Set[str]:
@@ -63,26 +66,26 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
     title = f"🤖 Autoupdate: {update_name}"
 
     # Get the latest commit SHA on master
-    master_sha = gah.get_master_commit_sha()
+    master_sha = github_repo.get_master_commit_sha()
 
     # Check if the branch already exists
-    branch_exists, branch_info = gah.check_branch_exists(branch_name)
+    branch_exists, branch_info = github_repo.check_branch_exists(branch_name)
 
     # If the branch exists, check if there's a PR already. If not, it means that it got either merged or deleted
     #   in which case we delete the branch to start fresh.
     if branch_exists:
-        open_prs = gah.get_open_prs_for_branch(branch_name)
+        open_prs = github_repo.get_open_prs(branch_name)
         if not open_prs:
             # No open PRs for this branch, delete it
-            gah.delete_branch(branch_name)
+            github_repo.delete_branch(branch_name)
             branch_exists = False
 
     # Create a new branch if it doesn't exist
     if not branch_exists:
-        gah.create_branch(branch_name, master_sha)
+        github_repo.create_branch(branch_name, master_sha)
     else:
         # Always merge with master, regardless of whether there are changes
-        merge_successful = gah.merge_branch_with_master(branch_name)
+        merge_successful = github_repo.merge_with_master(branch_name)
 
         # If merge unsuccessful, log warning but continue to create PR
         if not merge_successful:
@@ -98,7 +101,7 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
         base_tree_sha = parent_sha
 
     # Create commit with files
-    has_changes, _ = gah.create_commit_with_files(
+    has_changes, _ = github_repo.create_commit_with_files(
         files=files, branch_name=branch_name, commit_message=title, parent_sha=parent_sha, base_tree_sha=base_tree_sha
     )
 
@@ -107,14 +110,14 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
         log.info(f"No changes in {update_name}")
         return
 
-    existing_prs = gah.get_open_prs_for_branch(branch_name)
+    existing_prs = github_repo.get_open_prs(branch_name)
 
     if existing_prs:
         log.info(f"Pull request already exists: {existing_prs[0]['html_url']}")
     else:
         # Create a pull request
         body = "" if has_changes else "This PR was created without file changes but includes a merge with master."
-        pr_url = gah.create_pull_request(title, branch_name, body)
+        pr_url = github_repo.create_pull_request(title, branch_name, body)
         log.info(f"Pull request created: {pr_url}")
 
 
