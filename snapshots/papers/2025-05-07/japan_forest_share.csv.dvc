@@ -12,3 +12,7 @@ meta:
     license:
       name: Copyright © 2009, Cambridge University Press
       url: https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/forest-history-and-the-great-divergence-china-japan-and-the-west-compared/6140D78077980694B07B40B6396C0343
+outs:
+  - md5: 6054553edb53ad9927d44b003995c788
+    size: 703
+    path: japan_forest_share.csv
