@@ -348,6 +348,10 @@ def get_article_views_by_chart_id(
         .drop_duplicates()
         .reset_index(drop=True)
     )
+
+    if df_content.empty:
+        return pd.DataFrame(columns=["url", "views_daily", "title", "chart_id", "chart_url"])
+
     df_content["publication_date"] = df_content["publication_date"].dt.date.astype(str)
 
     # TODO: Ideally, we would get analytics only for the relevant article urls, but the query is too long for Datasette and fails. Generalize this, either by reading from metabase API or from Duck DB.
