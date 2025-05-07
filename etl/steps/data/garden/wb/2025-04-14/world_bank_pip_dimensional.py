@@ -103,7 +103,7 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
 TABLEFMT = "pretty"
 
 # Define indicators that don't depend on poverty lines
-INDICATORS_NOT_DEPENDENT_ON_POVLINES = [
+INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES = [
     "mean",
     "median",
     "mld",
@@ -132,9 +132,6 @@ INDICATORS_NOT_DEPENDENT_ON_POVLINES = [
     "top90_99_share",
     "surveys_past_decade",
     "region_name",
-    "share",
-    "thr",
-    "avg",
 ]
 
 
@@ -211,7 +208,7 @@ def run() -> None:
 
     # Improve table format.
     tb = tb.format(
-        ["country", "year", "ppp_version", "poverty_line", "welfare_type", "table", "survey_comparability"],
+        ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile", "table", "survey_comparability"],
         short_name=paths.short_name,
     )
 
@@ -964,7 +961,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb = pivot_and_obtain_povlines_dict(
         tb=tb,
         index=["country", "year", "welfare_type"],
-        columns=["ppp_version", "poverty_line"],
+        columns=["ppp_version", "poverty_line", "decile"],
     )
 
     # Reset index in tb_both_inc_and_cons
@@ -974,7 +971,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb = tb.sort_values(by=["country", "year", "welfare_type"], ignore_index=True)
 
     # Flag duplicates per year – indicating multiple welfare_types
-    tb["duplicate_flag"] = tb.duplicated(subset=[("country", "", ""), ("year", "", "")], keep=False)
+    tb["duplicate_flag"] = tb.duplicated(subset=[("country", "", "", ""), ("year", "", "", "")], keep=False)
 
     # Create a boolean column that is true if each country has only income or consumption
     tb["only_inc_or_cons"] = tb.groupby(["country"])["welfare_type"].transform(lambda x: x.nunique() == 1)
@@ -1087,12 +1084,12 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb_both_inc_and_cons_smoothed = unpivot_table(
         tb=tb_both_inc_and_cons_smoothed,
         index=["country", "year", "welfare_type"],
-        level=["ppp_version", "poverty_line"],
+        level=["ppp_version", "poverty_line", "decile"],
     )
     tb_only_inc_or_cons = unpivot_table(
         tb=tb_only_inc_or_cons,
         index=["country", "year", "welfare_type"],
-        level=["ppp_version", "poverty_line"],
+        level=["ppp_version", "poverty_line", "decile"],
     )
 
     tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
@@ -1199,7 +1196,7 @@ def survey_count(tb: Table) -> Table:
     cross = pr.merge(entity_tb_survey, year_tb_survey, how="cross")
     cross = cross.rename(columns={"0_x": "country", "0_y": "year"})
 
-    # Merge cross and df_country, to include all the possible rows in the dataset
+    # Merge cross and tb_survey, to include all the possible rows in the dataset
     tb_survey = pr.merge(cross, tb_survey[["country", "year"]], on=["country", "year"], how="left", indicator=True)
 
     # Mark with 1 if there are surveys available, 0 if not (this is done by checking if the row is in both datasets)
