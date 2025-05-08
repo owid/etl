@@ -46,7 +46,7 @@ log = get_logger()
 ########################################
 # HEADER: title, description
 ########################################
-st.title(":material/tv_gen: ETL Dashboard")
+st.title(":material/tv_gen: Step upgrader")
 
 tutorial_html = f"""
 **Example:** Updating a specific Grapher dataset.
