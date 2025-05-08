@@ -64,7 +64,7 @@ with st.sidebar:
     st.selectbox(
         "News period",
         options=list(WINDOW_TYPES.keys()),
-        format_func=lambda x: WINDOW_TYPES.get(x),
+        format_func=lambda x: WINDOW_TYPES[x],
         key="window_type",
     )
 

@@ -186,6 +186,12 @@ DIRTY_STEPS_WORKERS = int(env.get("DIRTY_STEPS_WORKERS", 5))
 # --workers is higher than 1, this will be divided among them
 GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 
+# if a step in ETL fails, keep running the rest of the steps and raise an exception at the end
+# (steps with failing step as dependency won't be run)
+# NOTE: This is potentially useful for nightly builds and for more efficient retries, but if we end up
+#   not using it, it could be as well removed
+CONTINUE_ON_FAILURE = env.get("CONTINUE_ON_FAILURE", "0") in ("True", "true", "1")
+
 # only upsert indicators matching this filter, this is useful for fast development
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
@@ -240,6 +246,10 @@ OWIDBOT_APP_INSTALLATION_ID = env.get("OWIDBOT_APP_INSTALLATION_ID", None)
 
 # Load github token (only used for creating PRs from the command line).
 GITHUB_TOKEN = env.get("GITHUB_TOKEN", None)
+
+# URL of the Github API, to be used to create a draft pull request in the ETL repos.
+GITHUB_API_BASE = "https://api.github.com/repos/owid/etl"
+GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 
 # IMPORTANT: only use locally, no production use!
 # Skip SSL verify

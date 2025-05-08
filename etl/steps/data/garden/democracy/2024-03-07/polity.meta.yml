@@ -4,13 +4,14 @@ definitions:
     presentation:
       topic_tags:
         - Democracy
-
+    description_key:
+      - &other_sources |-
+        We have other democracy data sources that also cover more recent years and have more precise data. You can find them in our [Key Democracy Charts](https://ourworldindata.org/democracy#all-charts) and [Democracy Data Explorer](https://ourworldindata.org/explorers/democracy).
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
 
 tables:
   polity:
@@ -19,7 +20,6 @@ tables:
         Values -66, -77 and -88 are recoded as missing (NAs), as per the rules on page 17 of the Polity 5 codebook.
 
     variables:
-
       democracy_polity:
         title: Democracy
         unit: ""
@@ -28,7 +28,9 @@ tables:
 
           It ranges from -10 to 10 (fully democratic).
         description_processing: |-
-          Values for continents have been obtained by averaging the values of the countries in the continent.
+          Values for continents have been obtained using two different methodologies:
+          - Averaging the values of the countries in the continent. E.g. labeled as "Africa".
+          - Averaging the values of the countries in the continent _weighed by each country's population_. E.g. labeled as "Africa (population-weighted)".
         description_from_producer: |-
           Indicator name: `polity2`
 
@@ -191,18 +193,17 @@ tables:
         description_short: |-
           Identifies the political regime of a country using the Polity 5 data by the Center for Systemic Peace. It distinguishes between autocracies (score 0), anocracies (score 1), and democracies (score 2).
         description_key:
+          - *other_sources
           - Democracies have mostly democratic characteristics, understood as open, multi-party, and competitive elections choosing a chief executive who faces comprehensive institutional constraints, and competitive political participation.
           - Anocracies have neither clearly democratic nor autocratic characteristics.
           - Autocracies have mostly autocratic/non-democratic characteristics.
           - "It uses the conventional coding rules (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) of coding Polity regimes given here: https://www.systemicpeace.org/polityproject.html"
-
       democracy_recod_polity:
         title: Democracy (recoded 0-20)
         unit: ""
         description_short: |-
           It combines information on the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive. It ranges from 0 to 20 (fully democratic).
-        description_processing:
-          It matches the variable `polity2` in Polity 5 (2021), with the values rescaled to range from 0 to 20 instead of -10 to 10.
+        description_processing: It matches the variable `polity2` in Polity 5 (2021), with the values rescaled to range from 0 to 20 instead of -10 to 10.
 
           Values for continents have been obtained by averaging the values of the countries in the continent.
 
@@ -212,6 +213,7 @@ tables:
         description_short: |-
           Number of consecutive years in a democracy.
         description_key:
+          - *other_sources
           - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
 
       experience_dem_polity:
@@ -220,6 +222,7 @@ tables:
         description_short: |-
           Number of total years in a democracy. It sums all periods of a democracy.
         description_key:
+          - *other_sources
           - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
 
       group_age_dem_polity:
@@ -228,10 +231,10 @@ tables:
         description_short: |-
           Identifies the number of years a country was a democracy since 1800.
         description_key:
+          - *other_sources
           - "The identification of democracies is based on the conventional classification of the Polity data (-10 to -6 as autocracies, -5 to 5 as anocracies, and 6 to 10 as democracies) given here: https://www.systemicpeace.org/polityproject.html"
           - Democracies are understood here as having broadly open, multi-party, and competitive elections choosing a chief executive who faces comprehensive institutional constraints, and competitive political participation.
           - The variable distinguishes between autocracies (score of 0), anocracies (score of 1), democracies aged 1-18 years (score of 2), 19-30 years (score of 3), 31-60 years (score of 4), 61-90 years (score of 5), and 91+ years (score of 6).
-
 
   num_countries:
     variables:
@@ -254,7 +257,6 @@ tables:
           <%- endif -%>
         unit: "countries"
 
-
   num_people:
     variables:
       pop_regime_polity:
@@ -275,26 +277,3 @@ tables:
           Number of of people living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups)
           <%- endif -%>
         unit: "people"
-
-  avg_pop:
-    variables:
-      democracy_polity_weighted:
-        title: Democracy (population-weighted)
-        unit: ""
-        description_short: |-
-          It combines information on the extent to which open, multi-party, and competitive elections choose a chief executive who faces comprehensive institutional constraints, and political participation is competitive.
-
-          It ranges from -10 to 10 (fully democratic).
-        description_processing: |-
-          Values for continents have been obtained by averaging the values of the countries in the continent weighed by each country's population.
-        description_from_producer: |-
-          Indicator name: `polity2`
-
-          Revised Combined Polity Score: This variable is a modified version of the POLITY variable added in order to facilitate the use of the POLITY regime measure in time-series analyses. It modifies the combined annual POLITY score by applying a simple treatment, or ““fix,” to convert instances of “standardized authority scores” (i.e., -66, -77, and -88) to conventional polity scores (i.e., within the range, -10 to +10). The values have been converted according to the following rule set:
-
-          -66: Cases of foreign “interruption” are treated as “system missing.”
-          -77 Cases of “interregnum,” or anarchy, are converted to a “neutral” Polity score of “0.”
-          -88 Cases of “transition” are prorated across the span of the transition. For example, country X has a POLITY score of -7 in 1957, followed by three years of -88 and, finally, a score of +5 in 1961. The change (+12) would be prorated over the intervening three years at a rate of per year, so that the converted scores would be as follows: 1957 -7; 1958 -4; 1959 -1; 1960 +2; and 1961 +5.
-
-          Note: Ongoing (-88) transitions in the most recent year (2018) are converted to “system missing” values. Transitions (-88) following a year of independence, interruption (-66), or interregnum (-77) are prorated from the value “0.”
-

@@ -57,7 +57,7 @@ from structlog import get_logger
 
 from apps.pr.categories import PR_CATEGORIES, PR_CATEGORIES_CHOICES
 from apps.utils.gpt import OpenAIWrapper
-from etl.config import GITHUB_TOKEN
+from etl.config import GITHUB_API_URL, GITHUB_TOKEN
 from etl.paths import BASE_DIR
 
 # Initialize logger.
@@ -329,7 +329,7 @@ def create_pr(repo, work_branch, base_branch, pr_title):
         "body": "",
         "draft": True,
     }
-    response = requests.post("https://api.github.com/repos/owid/etl/pulls", json=data, headers=headers)
+    response = requests.post(GITHUB_API_URL, json=data, headers=headers)
     if response.status_code == 201:
         js = response.json()
         log.info(f"Draft pull request created successfully at {js['html_url']}.")

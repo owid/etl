@@ -8,7 +8,7 @@ from structlog import get_logger
 from apps.wizard.app_pages.chart_diff.chart_diff_show import compare_strings, st_show_diff
 from apps.wizard.app_pages.chart_diff.utils import get_engines
 from apps.wizard.app_pages.explorer_diff.utils import truncate_lines
-from apps.wizard.utils.components import url_persist
+from apps.wizard.utils.components import st_horizontal, st_wizard_page_link, url_persist
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.files import yaml_dump
@@ -81,6 +81,11 @@ def main():
 **MDIM diff** is a page that compares mdims between [`production`](http://owid.cloud) and your [`{OWID_ENV.name}`]({OWID_ENV.admin_site}) environment.
 """,
     )
+
+    with st_horizontal(vertical_alignment="center"):
+        st.markdown("Other links: ")
+        st_wizard_page_link("chart-diff")
+        st_wizard_page_link("explorer-diff")
 
     _show_options()
 

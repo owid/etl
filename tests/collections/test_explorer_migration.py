@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-from etl.collections.explorer_migration import migrate_csv_explorer
+from etl.collection.explorer_migration import migrate_csv_explorer
 from etl.files import yaml_dump
 from etl.helpers import PathFinder
 from etl.paths import STEP_DIR
@@ -196,7 +196,7 @@ views:
 
 
 def test_migrate_csv_explorer():
-    with mock.patch("etl.collections.explorer_migration._get_explorer_config", return_value=influenza_config):
+    with mock.patch("etl.collection.explorer_migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
         out_yaml = yaml_dump(config)
 
@@ -231,7 +231,7 @@ columns
 @pytest.mark.integration
 def test_explorer_legacy(tmp_path, monkeypatch):
     # Monkeypatch ExplorerLegacy.save() to return its content
-    from etl.collections.explorer_legacy import ExplorerLegacy
+    from etl.collection.explorer_legacy import ExplorerLegacy
 
     d = {}
 
@@ -242,7 +242,7 @@ def test_explorer_legacy(tmp_path, monkeypatch):
     monkeypatch.setattr(ExplorerLegacy, "save", patch_save)
 
     # Dump config to YAML file
-    with mock.patch("etl.collections.explorer_migration._get_explorer_config", return_value=influenza_config):
+    with mock.patch("etl.collection.explorer_migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
 
     # Make sure explorer can deal with int values

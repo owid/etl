@@ -1,4 +1,4 @@
-from etl.collections import multidim
+from etl.collection import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -74,4 +74,5 @@ def run() -> None:
 
 
 def fname_to_mdim_name(fname: str) -> str:
+    """Custom MDIM name generator."""
     return f"{fname.replace('.yml', '').replace('.', '_')}"

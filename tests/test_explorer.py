@@ -2,8 +2,8 @@ from unittest.mock import patch
 
 import pytest
 
-from etl.collections.explorer import Explorer, extract_explorers_tables
-from etl.collections.model import Dimension
+from etl.collection.explorer import Explorer, extract_explorers_tables
+from etl.collection.model import Dimension
 
 # EXAMPLE explorer. Inspired by Mpox explorer.
 # Summary
@@ -11,6 +11,7 @@ from etl.collections.model import Dimension
 # - monkeypox#total_cases_per_million: view 2
 # - monkeypox#suspected_cases_cumulative: views 3, 4, 5, 6 (all different, except 5=6)
 EXPLORER_CONFIG = {
+    "catalog_path": "",
     "config": {
         "explorerTitle": "Mpox",
         "explorerSubtitle": "Explore the data produced by the World Health Organization and Africa CDC on mpox (monkeypox).",
@@ -251,7 +252,7 @@ def mock_get_mapping_paths_to_id(paths):
     return {p: i for i, p in enumerate(paths)}
 
 
-@patch("etl.collections.explorer.get_mapping_paths_to_id", side_effect=mock_get_mapping_paths_to_id)
+@patch("etl.collection.explorer.get_mapping_paths_to_id", side_effect=mock_get_mapping_paths_to_id)
 def test_explorer_config_legacy(mock_map_func):
     explorer = Explorer.from_dict(EXPLORER_CONFIG)
     assert len(explorer.views) == 7

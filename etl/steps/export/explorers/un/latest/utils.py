@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List, Optional, Union
 
-from etl.collections.beta import combine_explorers, create_explorer_experimental
+from etl.collection.beta import combine_explorers, create_explorer_experimental
 
 
 class ExplorerCreator:
@@ -66,7 +66,7 @@ class ExplorerCreator:
 
         explorer = combine_explorers(
             explorers=[explorer, explorer_proj],
-            explorer_name=explorer.explorer_name,
+            explorer_name=explorer.short_name,
             config=explorer.config,
         )
 
