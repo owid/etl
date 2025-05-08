@@ -206,6 +206,10 @@ def run() -> None:
     # Drop columns not needed
     tb = drop_columns(tb)
 
+    # Make empty values of survey_comparability to "No spells"
+    tb["survey_comparability"] = tb["survey_comparability"].astype(str)
+    tb["survey_comparability"] = tb["survey_comparability"].replace("<NA>", "No spells")
+
     # Improve table format.
     tb = tb.format(
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile", "table", "survey_comparability"],
@@ -1249,6 +1253,13 @@ def drop_columns(tb: Table) -> Table:
         columns=[
             "reporting_pop",
             "is_interpolated",
+            "cpi",
+            "ppp",
+            "reporting_pop",
+            "reporting_gdp",
+            "reporting_pce",
+            "estimate_type",
+            "pop_in_poverty",
         ]
     )
 
