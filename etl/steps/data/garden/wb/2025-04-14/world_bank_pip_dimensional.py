@@ -187,7 +187,7 @@ def run() -> None:
 
     tb = make_relative_poverty_long(tb=tb)
 
-    # tb = make_poverty_line_null_for_non_dimensional_indicators(tb=tb)
+    tb = make_poverty_line_null_for_non_dimensional_indicators(tb=tb)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb, tb_inc_or_cons_smooth = inc_or_cons_data(tb=tb)
@@ -1439,22 +1439,23 @@ def make_poverty_line_null_for_non_dimensional_indicators(tb: Table) -> Table:
     ipl_list = list(INTERNATIONAL_POVERTY_LINES.values())
 
     # Filter only for values in the list
-    tb_non_dimensional = tb_non_dimensional[tb_non_dimensional["poverty_line"].isin(ipl_list)].reset_index(drop=True)
+    tb_non_dimensional = tb_non_dimensional[
+        (tb_non_dimensional["poverty_line"].isin(ipl_list)) & tb_non_dimensional["decile"].isna()
+    ].reset_index(drop=True)
 
     # Define index columns
-    index_columns = ["country", "year", "welfare_type", "ppp_version"]
+    index_columns = ["country", "year", "welfare_type", "ppp_version", "poverty_line", "decile"]
 
     # Select the columns we want
     tb_non_dimensional = tb_non_dimensional[index_columns + INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES]
 
     # Add a missing poverty_line and decile columns
     tb_non_dimensional["poverty_line"] = pd.NA
-    tb_non_dimensional["decile"] = pd.NA
 
     # Drop the columns in tb
     tb = tb.drop(columns=INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES, errors="raise")
 
     # Concatenate tb and tb_non_dimensional
-    tb = pr.concat([tb, tb_non_dimensional], ignore_index=True)
+    tb = pr.merge(tb, tb_non_dimensional, on=index_columns + ["poverty_line", "decile"], how="outer")
 
     return tb
