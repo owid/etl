@@ -32,9 +32,6 @@ dimensions:
       - slug: "others (non-civil)"
         name: "Interstate Wars"
         # description: People moving to country
-      - slug: "combined"
-        name: "Combined"
-        # description: People moving to country
   - slug: estimate
     name: "Estimate"
     choices:

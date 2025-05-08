@@ -22,7 +22,12 @@ from structlog import get_logger
 from typing_extensions import Self
 
 from etl.collections.exceptions import DuplicateCollectionViews
-from etl.collections.utils import merge_common_metadata_by_dimension, validate_indicators_in_db
+from etl.collections.utils import (
+    get_complete_dimensions_filter,
+    merge_common_metadata_by_dimension,
+    unique_records,
+    validate_indicators_in_db,
+)
 from etl.config import OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
@@ -568,22 +573,34 @@ class Collection(MDIMBase):
     #     pass
 
     def save(  # type: ignore[override]
-        self, owid_env: Optional[OWIDEnv] = None, tolerate_extra_indicators: bool = False, prune_dimensions: bool = True
+        self,
+        owid_env: Optional[OWIDEnv] = None,
+        tolerate_extra_indicators: bool = False,
+        prune_choices: bool = True,
+        prune_dimensions: bool = True,
     ):
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
 
         # Prune non-used dimension choices
-        if prune_dimensions:
+        if prune_choices:
             self.prune_dimension_choices()
 
         # TODO: Prune dimensions if only one choice is in use
+        if prune_dimensions:
+            self.prune_dimensions()
+
+        # Ensure that all views are in choices
+        self.validate_views_with_dimensions()
+
+        # Validate duplicate views
+        self.check_duplicate_views()
 
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
 
-        # Check that no choice name is repeated
+        # Check that no choice name or slug is repeated
         self.validate_choice_uniqueness()
 
         # Check that all indicators in explorer exist
@@ -674,19 +691,7 @@ class Collection(MDIMBase):
 
     def check_duplicate_views(self):
         """Check for duplicate views in the collection."""
-        seen_dims = set()
-        for view in self.views:
-            dims = tuple(view.dimensions.items())
-            if dims in seen_dims:
-                raise DuplicateCollectionViews(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
-            seen_dims.add(dims)
-
-        # NOTE: this is allowed, some views might contain other views
-        # Check uniqueness
-        # inds = pd.Series(indicators)
-        # vc = inds.value_counts()
-        # if vc[vc > 1].any():
-        #     raise ValueError(f"Duplicate indicators: {vc[vc > 1].index.tolist()}")
+        check_duplicate_views(self.views)
 
     def sort_choices(self, slug_order: Dict[str, Union[List[str], Callable]]):
         """Sort choices based on the given order."""
@@ -763,9 +768,9 @@ class Collection(MDIMBase):
 
         return dict(all_occurrences)
 
-    def remove_views(
+    def drop_views(
         self,
-        dimensions: Dict[str, Union[List[str], str]],
+        dimensions: Union[Dict[str, Union[List[str], str]], List[Dict[str, Union[List[str], str]]]],
     ):
         """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
 
@@ -780,28 +785,46 @@ class Collection(MDIMBase):
 
             Example 2: dimensions = {"age": ["0-4", "5-9"]}
 
-                Drop all views that have "0-4" or "5-9" in dimension age.
+                Drop all views that have "0-4" OR "5-9" in dimension age.
 
             Example 3: dimensions = {"age": ["0-4", "5-9"], "sex": ["female", "male"]}
 
-                Drop all views that have ("0-4" or "5-9" in dimension age) and ("female" or "male" in dimension "sex"). The rest is kept.
+                Drop all views that have ("0-4" OR "5-9" in dimension age) AND ("female" OR "male" in dimension "sex"). The rest is kept.
 
+            Example 4: dimensions = [{"sex": "female", "age": "0-4"}, {"sex": "male", "age": "5-9"}]
+
+                Drop all views that have { ("0-4" in dimension "age") AND ("female" in dimension "sex") } OR { ("5-9" in dimension "age") AND ("male" in dimension "sex") }
         """
+        # Get dimensions in use, and list of dimension slugs (ordered, used for key-identifying views)
         dimensions_available = self.dimension_choices_in_use()
-        dimensions_drop = {}
 
-        for dim, choices in dimensions_available.items():
-            if dim not in dimensions:
-                dimensions_drop[dim] = choices
-            else:
-                if isinstance(dimensions[dim], str):
-                    assert dimensions[dim] in choices, f"Choice {dimensions[dim]} not found for dimension {dim}!"
-                    dimensions_drop[dim] = [dimensions[dim]]
-                elif isinstance(dimensions[dim], list):
-                    assert all(
-                        choice in choices for choice in dimensions[dim]
-                    ), f"Choices {dimensions[dim]} not found for dimension {dim}!"
-                    dimensions_drop[dim] = dimensions[dim]
+        # Make sure we are dealing with a list
+        if isinstance(dimensions, dict):
+            dimensions = [dimensions]
+
+        # Get list of dimension arrangements to drop: Iterate over each dimension filter, and obtain explicit filter.
+        dimensions_drop = []
+        for dimensions_ in dimensions:
+            dimensions_drop_ = get_complete_dimensions_filter(dimensions_available, dimensions_)
+            dimensions_drop.extend(dimensions_drop_)
+        dimensions_drop = unique_records(dimensions_drop)
+
+        # Function to get key for each view
+        dimensions_order = list(dimensions_available.keys())
+
+        def _get_view_key(dimension_choices: Dict[str, str]):
+            return tuple(dimension_choices[dim] for dim in dimensions_order)
+
+        # Convert the list to set of IDs. Each element in the set identifies a dimension arrangement by a tuple with the choices.
+        drop_keys = {_get_view_key(dimension_drop) for dimension_drop in dimensions_drop}
+
+        # Iterate over all views and drop those that match the given dimensions
+        new_views = []
+        for view in self.views:
+            key = _get_view_key(view.dimensions)
+            if key not in drop_keys:
+                new_views.append(view)
+        self.views = new_views
 
     def group_views(self, params: List[Dict[str, Any]], drop_dimensions_if_single_choice: bool = True):
         """Group views into new ones.
@@ -836,12 +859,14 @@ class Collection(MDIMBase):
                     Slugs of the choices to group.
                 - choice_new_slug: str
                     The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
-                - config_new: Dict[str, Any]
+                - config_new: Optional[Dict[str, Any]], default=None
                     The config for the new choice. E.g. useful to tweak the chart type.
-                - replace: bool
+                - replace: Optional[bool], default=False
                     If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
+                - overwrite_dimension_choice: Optional[bool], default=False
+                    If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
         """
-        new_views = []
+        new_views_all = []
         for p in params:
             assert "dimension" in p, "Dimension must be provided!"
             assert "choices" in p, "Dimension must be provided!"
@@ -849,13 +874,13 @@ class Collection(MDIMBase):
             dimension = p["dimension"]
             choices = p["choices"]
             choice_new_slug = p["choice_new_slug"]
-            config_new = p.get("config_new", None)
+            config_new = p.get("config_new")
 
             # Sanity checks
             self._sanity_check_view_grouping(
-                dimension,
-                choices,
-                choice_new_slug,
+                dimension=dimension,
+                choices=choices,
+                choice_new_slug=choice_new_slug,
             )
 
             # Create new views
@@ -865,7 +890,14 @@ class Collection(MDIMBase):
                 choice_new_slug=choice_new_slug,
                 config_new=config_new,
             )
-            new_views.extend(new_views_)
+            new_views_all.append(
+                {
+                    "overwrite": p.get("overwrite_dimension_choice", False),
+                    "views": new_views_,
+                    "dimension": dimension,
+                    "choice_new": choice_new_slug,
+                }
+            )
 
             # Add dimensions. TODO: Use combine_dimensions instead?
             for dim in self.dimensions:
@@ -875,8 +907,26 @@ class Collection(MDIMBase):
                     dim.choices.append(new_choice)
                     break
 
+        # Get list of new views from dictionary. Also, drop views in existing MDIM if needed (e.g. if there are collisions and overwrite_dimension_choice=True)
+        new_views_list = []
+        for new_views in new_views_all:
+            if new_views["overwrite"]:
+                # 1) TODO: Get list of dimensions to drop
+                dimensions_drop = [v.dimensions for v in new_views["views"]]
+                # 2) Drop dimensions
+                self.drop_views(dimensions_drop)
+            else:
+                try:
+                    check_duplicate_views(new_views["views"] + self.views)
+                except DuplicateCollectionViews:
+                    raise DuplicateCollectionViews(
+                        f"Duplicate views found (dimension '{new_views['dimension']}', new choice '{new_views["choice_new"]}')! If you want to overwrite the existing views, set `overwrite_dimension_choice=True` in the parameters."
+                    )
+            # Add views to list
+            new_views_list.extend(new_views["views"])
+
         # Extend views
-        self.views.extend(new_views)
+        self.views.extend(new_views_list)
 
         # Remove original choices if asked to
         for p in params:
@@ -891,90 +941,6 @@ class Collection(MDIMBase):
         # Drop dimension if it has only one choice in use
         if drop_dimensions_if_single_choice:
             self.prune_dimensions()
-
-    def group_views_single(
-        self,
-        dimension: str,
-        choices: List[str],
-        choice_new_slug: str,
-        config_new: Optional[GrapherConfig] = None,
-        replace: bool = False,
-        drop_dimensions_if_single_choice: bool = True,
-    ):
-        """Group views in a single view.
-
-        Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
-
-        Example:
-        --------
-
-        Suppose you have two dimensions 'sex' and 'age' with the following choices:
-
-            sex: 'female', 'male'
-            age: '0-4', '5-9', '10-14'
-
-        Each view shows a single timeseries. E.g. for sex="female" and age="0-4", you observe a timeseries for the indicator for these specific dimension choices.
-
-        Now, you now want to create a new view, with sex="combined", where the user can observe both timeseries (female and male) in a single view. Hence you'd end up with the following choices:
-
-            sex: 'female', 'male', 'combined'
-            age: '0-4', '5-9', '10-14'
-
-
-        In this example, we have `dimension="sex"`, `choices=["female", "male"]`, and `choice_new_slug="combined"`.
-
-        Args:
-        -----
-
-        dimension: str
-            Slug of the dimension that contains the choices to group.
-        choices: List[str]
-            Slugs of the choices to group.
-        choice_new_slug: str
-            The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
-        config_new: Dict[str, Any]
-            The config for the new choice. E.g. useful to tweak the chart type.
-        replace: bool
-            If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
-        """
-        if self._group_operations_done > 0:
-            log.warning(
-                "If you are doing more than one group operation, consider using `group_views` instead. It is optimized for batch operations, where each grouping is done in parallel."
-            )
-
-        # Sanity checks
-        self._sanity_check_view_grouping(dimension, choices, choice_new_slug)
-
-        # Create new views
-        new_views = self.create_new_grouped_views(
-            dimension=dimension,
-            choices=choices,
-            choice_new_slug=choice_new_slug,
-            config_new=config_new,
-        )
-
-        # Add views to object
-        self.views.extend(new_views)
-
-        for dim in self.dimensions:
-            if (dim.slug == dimension) and (choice_new_slug not in dim.choice_slugs):
-                new_choice = DimensionChoice(slug=choice_new_slug, name=choice_new_slug)
-                # Add new choice to dimension
-                dim.choices.append(new_choice)
-                break
-
-        # Remove original choices if asked to
-        if replace:
-            # Remove views with old choices
-            self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
-            # Remove unused choices
-            self.prune_dimension_choices()
-
-        # Remove dimension if it has only one choice in use
-        if drop_dimensions_if_single_choice:
-            self.prune_dimensions()
-
-        self._group_operations_done += 1
 
     def _sanity_check_view_grouping(
         self,
@@ -992,12 +958,6 @@ class Collection(MDIMBase):
         if not all([choice in dimension_choices[dimension] for choice in choices]):
             raise ValueError(
                 f"Choices {choices} not found in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
-            )
-
-        # Check that the new choice slug is not already in use
-        if choice_new_slug in self.dimension_choices_in_use():
-            raise ValueError(
-                f"Choice slug {choice_new_slug} in dimension {dimension} already in use by at least one view! Please use another one!"
             )
 
     def create_new_grouped_views(
@@ -1047,3 +1007,13 @@ def _combine_view_indicators(views):
 
     indicators = ViewIndicators(y=y_indicators)
     return indicators
+
+
+def check_duplicate_views(views: List[View]):
+    """Check for duplicate views in the collection."""
+    seen_dims = set()
+    for view in views:
+        dims = tuple(view.dimensions.items())
+        if dims in seen_dims:
+            raise DuplicateCollectionViews(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
+        seen_dims.add(dims)
