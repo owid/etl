@@ -476,8 +476,8 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
         ]
     ].copy()
 
-    # Pivot and obtain the poverty lines dictionary
-    tb_pivot = pivot_and_obtain_povlines_dict(
+    # Pivot
+    tb_pivot = pivot_table(
         tb=tb_pivot,
         index=["country", "year", "welfare_type"],
         columns=["ppp_version", "poverty_line"],
@@ -551,12 +551,11 @@ def create_stacked_variables(tb: Table) -> Tuple[Table, list, list]:
     return tb
 
 
-def pivot_and_obtain_povlines_dict(tb: Table, index: List[str], columns: List[str]) -> Table:
+def pivot_table(tb: Table, index: List[str], columns: List[str]) -> Table:
     """
-    Pivot the table to calculate indicator more easily
+    Pivot the table to calculate indicators more easily
     """
 
-    # Pivot the table to calculate indicator more easily
     tb_pivot = tb.pivot(index=index, columns=columns)
 
     return tb_pivot
@@ -585,8 +584,8 @@ def sanity_checks(
     # Define index for pivot
     index = ["country", "year", "welfare_type"]
 
-    # Pivot and obtain the poverty lines dictionary
-    tb_pivot = pivot_and_obtain_povlines_dict(tb=tb, index=index, columns=["ppp_version", "poverty_line"])
+    # Pivot
+    tb_pivot = pivot_table(tb=tb, index=index, columns=["ppp_version", "poverty_line"])
 
     # Reset index in tb_pivot
     tb_pivot = tb_pivot.reset_index()
@@ -961,8 +960,8 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
 
     tb = tb.copy()
 
-    # Pivot and obtain the poverty lines dictionary
-    tb = pivot_and_obtain_povlines_dict(
+    # Pivot
+    tb = pivot_table(
         tb=tb,
         index=["country", "year", "welfare_type"],
         columns=["ppp_version", "poverty_line", "decile"],
@@ -1107,8 +1106,8 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
     """
     tb = tb.copy()
 
-    # Pivot and obtain the poverty lines dictionary
-    tb = pivot_and_obtain_povlines_dict(
+    # Pivot
+    tb = pivot_table(
         tb=tb,
         index=["country", "year", "welfare_type"],
         columns=["ppp_version", "poverty_line"],
