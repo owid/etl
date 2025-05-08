@@ -239,7 +239,7 @@ def combine_explorers(
         "config": config,
         "dimensions": dimensions,
         "views": views,
-        "catalog_path": catalog_path,
+        # "catalog_path": catalog_path,
     }
     explorer = create_explorer(
         config=explorer_config,
