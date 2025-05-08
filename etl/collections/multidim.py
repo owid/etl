@@ -5,10 +5,11 @@
 - We should try to keep explorers in mind, and see this tooling as something we may want to use for them, too.
 """
 
+import inspect
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
 from owid.catalog import Table
 from structlog import get_logger
@@ -21,7 +22,7 @@ from etl.collections.common import (
     map_indicator_path_to_id,
 )
 from etl.collections.model import Collection, pruned_json
-from etl.collections.utils import camelize
+from etl.collections.utils import camelize, has_duplicate_table_names
 from etl.config import OWIDEnv
 
 # Initialize logger.
@@ -117,6 +118,99 @@ def create_mdim(
         catalog_path,
     )
     return mdim
+
+
+def create_mdim_v2(
+    config_yaml: Dict[str, Any],
+    dependencies: Set[str],
+    catalog_path: str,
+    tb: Optional[Table] = None,
+    indicator_names: Optional[Union[str, List[str]]] = None,
+    dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
+    common_view_config: Optional[Dict[str, Any]] = None,
+    indicators_slug: Optional[str] = None,
+    indicator_as_dimension: bool = False,
+    explorer_name: Optional[str] = None,
+    choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
+    catalog_path_full: bool = False,
+) -> Multidim:
+    config = deepcopy(config_yaml)
+
+    # Read from table (programatically expand)
+    config_auto = None
+    if tb is not None:
+        # Check if there are collisions between table names
+        expand_path_mode = _get_expand_path_mode(dependencies, catalog_path_full)
+
+        # Bake config automatically from table
+        config_auto = expand_config(
+            tb=tb,
+            indicator_names=indicator_names,
+            dimensions=dimensions,
+            common_view_config=common_view_config,
+            indicators_slug=indicators_slug,
+            indicator_as_dimension=indicator_as_dimension,
+            expand_path_mode=expand_path_mode,
+        )
+
+        # Combine & bake dimensions
+        config["dimensions"] = combine_config_dimensions(
+            config_dimensions=config_auto["dimensions"],
+            config_dimensions_yaml=config["dimensions"],
+        )
+
+        # Add views
+        config["views"] += config_auto["views"]
+
+        # Default explorer name is table name
+        if explorer_name is None:
+            explorer_name = tb.m.short_name
+    elif explorer_name is None:
+        explorer_name = "unknown"
+        log.info(f"No table provided. Explorer name is not set. Using '{explorer_name}'.")
+
+    # Create actual explorer
+    mdim = create_mdim_or_explorer(
+        Multidim,
+        config,
+        dependencies,
+        catalog_path,
+    )
+
+    # Prune unused dimensions
+    # mdim.prune_dimension_choices()
+
+    # Rename choice names if given
+    _rename_choices(mdim, choice_renames)
+
+    return mdim
+
+
+def _get_expand_path_mode(dependencies, catalog_path_full):
+    # TODO: We should do this at indicator level. Default to 'table' for all indicators, except when there is a collision, then go to 'dataset', otherwise go to 'full'
+    expand_path_mode = "table"
+    if catalog_path_full:
+        expand_path_mode = "full"
+    elif has_duplicate_table_names(dependencies):
+        expand_path_mode = "dataset"
+    return expand_path_mode
+
+
+def _rename_choices(mdim: Multidim, choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None):
+    if choice_renames is not None:
+        for dim in mdim.dimensions:
+            if dim.slug in choice_renames:
+                renames = choice_renames[dim.slug]
+                for choice in dim.choices:
+                    if isinstance(renames, dict):
+                        if choice.slug in renames:
+                            choice.name = renames[choice.slug]
+                    elif inspect.isfunction(renames):
+                        rename = renames(choice.slug)
+                        if rename:
+                            choice.name = renames(choice.slug)
+                    else:
+                        raise ValueError("Invalid choice_renames format.")
 
 
 def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: Dict[str, Table]):

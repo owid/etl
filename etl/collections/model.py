@@ -9,9 +9,10 @@ THINGS TO SOLVE:
 
 import json
 import re
+from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Dict, List, Optional, TypeGuard, TypeVar, Union
+from typing import Any, Callable, ClassVar, Dict, List, Optional, Set, TypeGuard, TypeVar, Union
 
 import fastjsonschema
 import pandas as pd
@@ -152,6 +153,10 @@ class ViewIndicators(MDIMBase):
         """Get the total number of indicators in the view."""
         return sum([1 for dim in CHART_DIMENSIONS if getattr(self, dim, None) is not None])
 
+    def has_non_y_indicators(self) -> bool:
+        """Check if the view has non-y indicators."""
+        return any([getattr(self, dim, None) is not None for dim in CHART_DIMENSIONS[1:]])
+
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "ViewIndicators":
         """Coerce the dictionary into the expected shape before passing it to the parent class."""
@@ -257,6 +262,10 @@ class View(MDIMBase):
     @property
     def d(self):
         return self.dimensions
+
+    def has_non_y_indicators(self) -> bool:
+        """Check if the view has non-y indicators."""
+        return self.indicators.has_non_y_indicators()
 
     @property
     def has_multiple_indicators(self) -> bool:
@@ -470,6 +479,12 @@ class Dimension(MDIMBase):
         if len(names) != len(set(names)):
             raise ValueError(f"Dimension choices for '{self.slug}' must have unique names!")
 
+    def validate_unique_slugs(self):
+        """Validate that all choice names are unique."""
+        slug = [choice.slug for choice in self.choices]
+        if len(slug) != len(set(slug)):
+            raise ValueError(f"Dimension choices for '{self.slug}' must have unique names! Review {self.choice_slugs}")
+
 
 T = TypeVar("T")
 
@@ -562,7 +577,7 @@ class Collection(MDIMBase):
             self.prune_dimension_choices()
 
         # Check that no choice name is repeated
-        self.validate_choice_names()
+        self.validate_choice_uniqueness()
 
         # Check that all indicators in explorer exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
@@ -672,20 +687,35 @@ class Collection(MDIMBase):
             if dim.slug in slug_order:
                 dim.sort_choices(slug_order[dim.slug])
 
+    def validate_choice_uniqueness(self):
+        """Validate that all choice names (and slugs) are unique."""
+        for dim in self.dimensions:
+            dim.validate_unique_names()
+            dim.validate_unique_slugs()
+
     def validate_choice_names(self):
         """Validate that all choice names are unique."""
         for dim in self.dimensions:
             dim.validate_unique_names()
 
-    def prune_dimension_choices(self):
-        from collections import defaultdict
-
+    def prune_dimensions(self):
+        """Remove dimension if only one of its choice is in use."""
         # Get all dimension choices in use
-        all_occurrences = defaultdict(set)
+        all_occurrences = self.dimension_choices_in_use()
 
-        for view in self.views:
-            for key, value in view.dimensions.items():
-                all_occurrences[key].add(value)
+        # Remove those not in use
+        for dim in self.dimensions:
+            if len(all_occurrences[dim.slug]) == 1:
+                # Remove from dimensions
+                self.dimensions.remove(dim)
+                # Remove from views
+                for view in self.views:
+                    if dim.slug in view.dimensions:
+                        del view.dimensions[dim.slug]
+
+    def prune_dimension_choices(self):
+        """Remove all dimension choices that are not used in any view."""
+        all_occurrences = self.dimension_choices_in_use()
 
         # Remove those not in use
         for dim in self.dimensions:
@@ -695,39 +725,146 @@ class Collection(MDIMBase):
     def dimension_slugs(self):
         return [dim.slug for dim in self.dimensions]
 
+    @property
+    def dimension_choices(self) -> Dict[str, List[str]]:
+        """Get all dimension choices in the collection."""
+        return {dim.slug: [choice.slug for choice in dim.choices] for dim in self.dimensions}
 
-# def main():
-# import yaml
+    def dimension_choices_in_use(self) -> Dict[str, Set[str]]:
+        from collections import defaultdict
 
-# from etl.collections.utils import (
-#     get_tables_by_name_mapping,
-# )
+        # Get all dimension choices in use
+        all_occurrences = defaultdict(set)
 
-# f_mdim = "/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.cases_tests.yml"
-# with open(f_mdim) as istream:
-#     cfg_mdim = yaml.safe_load(istream)
-# mdim = Multidim.from_dict(cfg_mdim)
+        for view in self.views:
+            for key, value in view.dimensions.items():
+                all_occurrences[str(key)].add(value)
 
-# dependencies = {
-#     "data://grapher/covid/latest/hospital",
-#     "data://grapher/covid/latest/vaccinations_global",
-#     "data://grapher/covid/latest/vaccinations_manufacturer",
-#     "data://grapher/covid/latest/testing",
-#     "data://grapher/excess_mortality/latest/excess_mortality",
-#     "data-private://grapher/excess_mortality/latest/excess_mortality_economist",
-#     "data://grapher/covid/latest/xm_who",
-#     "data://grapher/covid/latest/cases_deaths",
-#     "data://grapher/covid/latest/covax",
-#     "data://grapher/covid/latest/infections_model",
-#     "data://grapher/covid/latest/google_mobility",
-#     "data://grapher/regions/2023-01-01/regions",
-# }
-# tables_by_name = get_tables_by_name_mapping(dependencies)
+        return dict(all_occurrences)
 
-# mdim.views[0].indicators.expand_paths(tables_by_name)
+    def group_views_in_dimension(self, dimension_slug: str, x: Dict[str, Dict[str, List[str]]]):
+        """
+        1)
+        {
+            choice_slug: [choice_1, choice_2, ...]
+        }
+        """
+        pass
 
-# f_explorer = "/home/lucas/repos/etl/etl/steps/export/explorers/covid/latest/covid.config.yml"
-# with open(f_explorer) as istream:
-#     cfg_explorer = yaml.safe_load(istream)
-# explorer = Explorer.from_dict(cfg_explorer)
-# # cfg.views[0].indicators.y
+    def group_views(
+        self,
+        dimension: str,
+        choices: List[str],
+        choice_new_slug: str,
+        config_new: Optional[GrapherConfig] = None,
+        replace: bool = False,
+        drop_dimensions_single_choice: bool = False,
+    ):
+        """Group views in a single view.
+
+        Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
+
+        Example:
+        --------
+
+        Suppose you have two dimensions 'sex' and 'age' with the following choices:
+
+            sex: 'female', 'male'
+            age: '0-4', '5-9', '10-14'
+
+        Each view shows a single timeseries. E.g. for sex="female" and age="0-4", you observe a timeseries for the indicator for these specific dimension choices.
+
+        Now, you now want to create a new view, with sex="combined", where the user can observe both timeseries (female and male) in a single view. Hence you'd end up with the following choices:
+
+            sex: 'female', 'male', 'combined'
+            age: '0-4', '5-9', '10-14'
+
+
+        In this example, we have `dimension="sex"`, `choices=["female", "male"]`, and `choice_new_slug="combined"`.
+
+        Args:
+        -----
+
+        dimension: str
+            Slug of the dimension that contains the choices to group.
+        choices: List[str]
+            Slugs of the choices to group.
+        choice_new_slug: str
+            The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
+        config_new: Dict[str, Any]
+            The config for the new choice. E.g. useful to tweak the chart type.
+        replace: bool
+            If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
+        """
+        # Sanity checks
+        dimension_choices = self.dimension_choices
+        # Check that the dimension exists
+        if dimension not in set(dimension_choices):
+            raise ValueError(f"Dimension {dimension} not found in dimensions!")
+
+        # Check that the choices exist
+        if not all([choice in dimension_choices[dimension] for choice in choices]):
+            raise ValueError(
+                f"Choices {choices} not found in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
+            )
+
+        # Check that the new choice slug is not already in use
+        if choice_new_slug in self.dimension_choices_in_use():
+            raise ValueError(
+                f"Choice slug {choice_new_slug} in dimension {dimension} already in use by at least one view! Please use another one!"
+            )
+
+        # Prepare groups of views
+        grouped = defaultdict(list)
+        for view in self.views:
+            # Build a key excluding the dimension we're grouping
+            key = tuple((k, v) for k, v in view.dimensions.items() if k != dimension)
+            grouped[key].append(view)
+
+        # Combine views
+        new_views = []
+        new_view_groups = list(grouped.values())
+        for view_group in new_view_groups:
+            new_dimensions = view_group[0].dimensions.copy()
+            new_dimensions[dimension] = choice_new_slug
+            new_view = View(
+                dimensions=new_dimensions,
+                indicators=_combine_view_indicators(view_group),
+                config=config_new,
+            )
+            new_views.append(new_view)
+
+        # Add views to object
+        self.views.extend(new_views)
+
+        # Adjust dimensions: Add new choice to dimension (if it doesn't exist!)
+        for dim in self.dimensions:
+            if (dim.slug == dimension) and (choice_new_slug not in dim.choice_slugs):
+                new_choice = DimensionChoice(slug=choice_new_slug, name=choice_new_slug)
+                # Add new choice to dimension
+                dim.choices.append(new_choice)
+                break
+
+        # Remove original choices if asked to
+        if replace:
+            # Remove views with old choices
+            self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
+            # Remove unused choices
+            self.prune_dimension_choices()
+
+        # Remove dimension if it has only one choice in use
+        if drop_dimensions_single_choice:
+            self.prune_dimensions()
+
+
+def _combine_view_indicators(views):
+    y_indicators = []
+    for view in views:
+        if view.indicators.has_non_y_indicators():
+            raise NotImplementedError(
+                "Merging indicators from views is only implemented for views with *only* y indicators."
+            )
+        y_indicators.extend(view.indicators.y)
+
+    indicators = ViewIndicators(y=y_indicators)
+    return indicators

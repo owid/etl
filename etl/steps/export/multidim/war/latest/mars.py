@@ -1,5 +1,3 @@
-from etl.collections import multidim
-
 # from etl.db import get_engine
 from etl.helpers import PathFinder
 
@@ -41,28 +39,33 @@ def run() -> None:
     # Adjust dimension metadata
     tb = adjust_dimensions(tb)
 
-    config_new = multidim.expand_config(
-        tb,
+    # Create MDIM
+    mdim = paths.create_mdim_v2(
+        config,
+        mdim_name="mars",
+        tb=tb,
         indicator_names=[
             "deaths",
             "death_rate",
             "wars_ongoing",
             "wars_ongoing_country_rate",
         ],
-    )
-    # Combine dimension info from YAML + programmatically obtained
-    config["dimensions"] = multidim.combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config["dimensions"],
+        dimensions={
+            "conflict_type": ["civil war", "others (non-civil)"],
+            "estimate": "*",
+        },
     )
 
-    # Combine views info from YAML + programmatically obtained
-    config["views"] = config["views"] + config_new["views"]
-
-    # Create mdim
-    mdim = paths.create_mdim(
-        config=config,
-        mdim_name="mars",
+    # Test
+    mdim.group_views(
+        dimension="conflict_type",
+        choices=["civil war", "others (non-civil)"],
+        choice_new_slug="combined",
+        config_new={
+            "chartTypes": ["StackedBar"],
+        },
+        replace=True,
+        drop_dimensions_single_choice=True,
     )
 
     # Save & upload
