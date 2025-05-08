@@ -456,6 +456,12 @@ def select_only_sovereign_countries(tb: Table, tb_sovereign_countries: Table) ->
     tb_sovereign_countries = tb_sovereign_countries.drop(columns=["year"])
 
     # Merge the two tables
-    tb = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
+    tb_with_sovereign = pr.merge(tb, tb_sovereign_countries, on=["country"], how="inner")
+
+    # NOTE: This is a fix to include Greenland data
+    # Add Greenland data back from tb
+    tb_greenland = tb[tb["country"] == "Greenland"].reset_index(drop=True)
+
+    tb = pr.concat([tb_with_sovereign, tb_greenland], ignore_index=True)
 
     return tb
