@@ -212,6 +212,10 @@ def run() -> None:
         short_name=paths.short_name,
     )
 
+    # Remove dimensions previously created by pivots
+    for column in tb.columns:
+        tb[column].metadata.dimensions = None
+
     #
     # Save outputs.
     #
