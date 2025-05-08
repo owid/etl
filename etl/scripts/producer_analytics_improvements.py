@@ -7,7 +7,7 @@ import requests
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
-from apps.utils.google import GoogleDocHandler
+from apps.utils.google import GoogleDoc, GoogleDrive
 from apps.wizard.app_pages.producer_analytics.data_io import get_producers_per_chart
 from etl.data_helpers.misc import round_to_sig_figs
 from etl.db import get_engine
@@ -29,6 +29,7 @@ TEMPLATE_ID = "149cLrJK9VI-BNjnM-LxnWgbQoB7mwjSpgjO497rzxeU"
 def humanize_number(number, sig_figs=2):
     if isinstance(number, int) and (number < 11):
         humanized = {
+            0: "zero",
             1: "one",
             2: "two",
             3: "three",
@@ -195,12 +196,14 @@ def run(producer, quarter, year):
     # TODO: Make into a function.
     # def create_report(producer: str, quarter: int, year: int):
     report_title = f"{year}-Q{quarter} Our World in Data analytics report for {producer}"
-    # Initialize a google doc object.
-    google_doc = GoogleDocHandler()
-    # google_doc.list_files_in_folder(folder_id=FOLDER_ID)
+    # Initialize a google drive object.
+    google_drive = GoogleDrive()
+    # google_drive.list_files_in_folder(folder_id=FOLDER_ID)
     # Duplicate template report.
     # NOTE: Unclear why sometimes we need to use "title" and sometimes "name".
-    report_id = google_doc.copy(doc_id=TEMPLATE_ID, body={"name": report_title})
+    report_id = google_drive.copy(file_id=TEMPLATE_ID, body={"name": report_title})
+    # Initialize a google doc object.
+    google_doc = GoogleDoc(doc_id=report_id)
 
     # Replace simple placeholders.
     replacements = {
@@ -216,11 +219,11 @@ def run(producer, quarter, year):
         r"{{n_daily_chart_views_humanized}}": n_daily_chart_views_humanized,
         r"{{n_daily_article_views_humanized}}": n_daily_article_views_humanized,
     }
-    google_doc.replace_text(doc_id=report_id, mapping=replacements)
+    google_doc.replace_text(mapping=replacements)
 
     def insert_list(google_doc, df, placeholder):
         # For chart lists, get the index of the position where it should be introduced.
-        insert_index = google_doc.find_marker_index(doc_id=report_id, marker=placeholder)
+        insert_index = google_doc.find_marker_index(marker=placeholder)
 
         edits = []
         end_index = insert_index
@@ -249,51 +252,18 @@ def run(producer, quarter, year):
             end_index += len(line)
 
         # Apply edits to insert list in the right place.
-        google_doc.edit(doc_id=report_id, requests=edits)
+        google_doc.edit(requests=edits)
 
         # Remove the original placeholder text.
-        google_doc.replace_text(doc_id=report_id, mapping={placeholder: ""})
-
-    def insert_image(google_doc, image_url, placeholder, width=350):
-        # Get the index of the position where the image should be inserted.
-        insert_index = google_doc.find_marker_index(doc_id=report_id, marker=placeholder)
-
-        edits = [
-            {
-                "insertInlineImage": {
-                    "location": {"index": insert_index},
-                    "uri": image_url,
-                    "objectSize": {
-                        # "height": {
-                        #     "magnitude": 200,
-                        #     "unit": "PT"
-                        # },
-                        "width": {"magnitude": width, "unit": "PT"}
-                    },
-                }
-            },
-            {
-                "updateParagraphStyle": {
-                    "range": {"startIndex": insert_index, "endIndex": insert_index + 1},
-                    "paragraphStyle": {"alignment": "CENTER"},
-                    "fields": "alignment",
-                }
-            },
-        ]
-
-        # Apply both image insert and alignment.
-        google_doc.edit(doc_id=report_id, requests=edits)
-
-        # Remove the original placeholder text.
-        google_doc.replace_text(doc_id=report_id, mapping={placeholder: ""})
+        google_doc.replace_text(mapping={placeholder: ""})
 
     top_chart_url = df_top_charts.iloc[0]["url"] + ".png"
-    insert_image(google_doc, image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
+    google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
     insert_list(google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
     insert_list(google_doc, df=df_top_articles, placeholder=r"{{top_articles_list}}")
     if not df_top_insights.empty:
         # Get the index of the position of the data_insights placeholder.
-        insert_index = google_doc.find_marker_index(doc_id=report_id, marker=r"{{data_insights}}")
+        insert_index = google_doc.find_marker_index(marker=r"{{data_insights}}")
 
         if len(df_top_insights) == 1:
             text = f"""During {quarter_date_humanized}, the following data insight was also published:
@@ -302,7 +272,7 @@ def run(producer, quarter, year):
             text = f"""During {quarter_date_humanized}, the following data insights were also published:
             """
         edits = [{"insertText": {"location": {"index": insert_index}, "text": text}}]
-        google_doc.edit(doc_id=report_id, requests=edits)
+        google_doc.edit(requests=edits)
         insert_list(google_doc, df=df_top_insights, placeholder=r"{{data_insights}}")
 
 
