@@ -920,7 +920,7 @@ class Collection(MDIMBase):
                     check_duplicate_views(new_views["views"] + self.views)
                 except DuplicateCollectionViews:
                     raise DuplicateCollectionViews(
-                        f"Duplicate views found (dimension '{new_views['dimension']}', new choice '{new_views["choice_new"]}')! If you want to overwrite the existing views, set `overwrite_dimension_choice=True` in the parameters."
+                        f"Duplicate views found (dimension `{new_views['dimension']}`, new choice `{new_views["choice_new"]}`)! If you want to overwrite the existing views, set `overwrite_dimension_choice=True` in the parameters."
                     )
             # Add views to list
             new_views_list.extend(new_views["views"])
