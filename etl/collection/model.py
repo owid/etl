@@ -20,8 +20,8 @@ from owid.catalog.meta import GrapherConfig, MetaBase
 from structlog import get_logger
 from typing_extensions import Self
 
-from etl.collections.exceptions import DuplicateCollectionViews
-from etl.collections.utils import merge_common_metadata_by_dimension, validate_indicators_in_db
+from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.utils import merge_common_metadata_by_dimension, validate_indicators_in_db
 from etl.config import OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
@@ -699,7 +699,7 @@ class Collection(MDIMBase):
 # def main():
 # import yaml
 
-# from etl.collections.utils import (
+# from etl.collection.utils import (
 #     get_tables_by_name_mapping,
 # )
 
