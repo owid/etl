@@ -1,6 +1,6 @@
 """The code here was developed for population-and-demography explorer.
 
-However, I think there are bits of this that could be migrated into etl.collections so that others can use it. It might need some cleaning, testing, and documenting.
+However, I think there are bits of this that could be migrated into etl.collection so that others can use it. It might need some cleaning, testing, and documenting.
 
 I also think that these functions should both work for MDIMs and Explorers!
 
@@ -29,10 +29,10 @@ import pandas as pd
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.collections.explorer import Explorer, create_explorer, expand_config
-from etl.collections.model import Dimension, DimensionChoice
-from etl.collections.multidim import Multidim, combine_config_dimensions, create_mdim
-from etl.collections.utils import has_duplicate_table_names
+from etl.collection.explorer import Explorer, create_explorer, expand_config
+from etl.collection.model import Dimension, DimensionChoice
+from etl.collection.multidim import Multidim, combine_config_dimensions, create_mdim
+from etl.collection.utils import has_duplicate_table_names
 from etl.helpers import PathFinder
 
 log = get_logger()
@@ -100,7 +100,7 @@ def create_explorer_experimental(
         If True, the full path is used for the catalog. If False, a shorter version is used (e.g. table#indicator` or `dataset/table#indicator`).
 
 
-    NOTE: This function is experimental for this step, but could be used in other steps as well. Consider migrating to etl.collections.explorer once we are happy with it.
+    NOTE: This function is experimental for this step, but could be used in other steps as well. Consider migrating to etl.collection.explorer once we are happy with it.
     """
     config = deepcopy(config_yaml)
 
