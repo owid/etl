@@ -74,18 +74,8 @@ definitions:
     2nd decile
     <%- elif decile == 3 %>
     3rd decile
-    <%- elif decile == 4 %>
-    4th decile
-    <%- elif decile == 5 %>
-    5th decile
-    <%- elif decile == 6 %>
-    6th decile
-    <%- elif decile == 7 %>
-    7th decile
-    <%- elif decile == 8 %>
-    8th decile
-    <%- elif decile == 9 %>
-    9th decile
+    <%- elif decile in [4, 5, 6, 7, 8, 9] %>
+    <<decile>>th decile
     <%- elif decile == 10 %>
     Richest decile
     <%- endif %>
@@ -97,16 +87,8 @@ definitions:
     2nd decile
     <%- elif decile == 3 %>
     3rd decile
-    <%- elif decile == 4 %>
-    4th decile
-    <%- elif decile == 5 %>
-    5th decile
-    <%- elif decile == 6 %>
-    6th decile
-    <%- elif decile == 7 %>
-    7th decile
-    <%- elif decile == 8 %>
-    8th decile
+    <%- elif decile in [4, 5, 6, 7, 8] %>
+    <<decile>>th decile
     <%- elif decile == 9 %>
     Richest decile
     <%- endif %>
@@ -117,15 +99,15 @@ definitions:
     <%- endif %>
 
   description_key_poverty_line: |-
-    <% if poverty_line == "190" or poverty_line == "215" %>
+    <% if poverty_line in ["190", "215"] %>
     Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line}.
-    <%- elif poverty_line == "320" or poverty_line == "365" %>
+    <%- elif poverty_line in ["320", "365"] %>
     A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in lower-middle-income countries."
-    <%- elif poverty_line == "550" or poverty_line == "685" %>
+    <%- elif poverty_line in ["550", "685"] %>
     A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in upper-middle-income countries."
     <%- elif poverty_line == "3000" %>
     A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in high-income countries."
-    <%- elif poverty_line == "40% of median" or poverty_line == "50% of median" or poverty_line == "60% of median" %>
+    <%- elif poverty_line in ["40% of median", "50% of median", "60% of median"] %>
     This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
     <%- endif %>
 
@@ -157,7 +139,7 @@ definitions:
   description_key_prosperity_gap : The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as {definitions.prosperity_gap_threshold} per person per day. This gives a sense of how far global incomes are from a basic prosperity standard.
 
   description_processing_main: |-
-    <% if welfare_type == "income" or welfare_type == "consumption" %>
+    <% if welfare_type in ["income", "consumption"] %>
     To construct a global dataset, the World Bank combines estimates based on income data and estimates based on consumption data. Here we only include the estimates based on <<welfare_type>> data.
     <%- elif welfare_type == "income or consumption" %>
     For most countries in the PIP dataset, estimates relate to _either_ disposable income or consumption, for all available years. A number of countries, however, have a mix of income and consumption data points, with both data types sometimes available for particular years.
@@ -171,7 +153,7 @@ definitions:
     For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only one of the estimates, to strike a balance between maintaining comparability over time and showing as long a time series as possible. This means the indicator is estimating the number of years at least one survey was conducted in the past decade, rather than the number of surveys.
 
   description_processing_relative_poverty: |-
-    <% if poverty_line == "40% of median" or poverty_line == "50% of median" or poverty_line == "60% of median" %>
+    <% if poverty_line in ["40% of median", "50% of median", "60% of median"] %>
     Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case <<poverty_line>> – and then run a specific query on the PIP API to return the share of population below that line.
     <%- endif %>
 
@@ -193,6 +175,41 @@ definitions:
     <%- else %>
     received
     <%- endif %>
+
+  ppp_adjustments_subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+
+  relative_poverty_percentage: |-
+    <% if poverty_line == "40% of median" %>
+    40%
+    <%- elif poverty_line == "50% of median" %>
+    50%
+    <%- elif poverty_line == "60% of median" %>
+    60%
+    <%- endif %>
+
+
+  headcount_ratio_title: |-
+    <% if poverty_line in ["190", "215"] %>
+    Share of population living in extreme poverty
+    <%- elif poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    Relative poverty: Share of population below <<poverty_line>>
+    <%- else %>
+    Poverty: Share of population living below <<poverty_line>>
+    <%- endif %>
+
+  headcount_ratio_subtitle: |-
+    <% if poverty_line in ["190", "215"] %>
+    Extreme poverty is defined as living below the International Poverty Line of {definitions.poverty_line}. {definitions.ppp_adjustments_subtitle}
+    <%- elif poverty_line in ["320", "365"] %>
+    The poverty line of {definitions.poverty_line} is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. {definitions.ppp_adjustments_subtitle}
+    <%- elif poverty_line in ["550", "685"] %>
+    The poverty line of {definitions.poverty_line} is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. {definitions.ppp_adjustments_subtitle}
+    <%- elif poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at {definitions.relative_poverty_percentage} of the median <<welfare_type>>.
+    <%- else %>
+    {definitions.ppp_adjustments_subtitle}
+    <%- endif %>
+
 
 
 # Learn more about the available fields:
@@ -225,6 +242,10 @@ tables:
           name: Share of population in poverty ({definitions.poverty_line})
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.headcount_ratio_title}"
+            subtitle: "{definitions.headcount_ratio_subtitle}"
 
       headcount_ratio_above:
         title: Share of population not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}

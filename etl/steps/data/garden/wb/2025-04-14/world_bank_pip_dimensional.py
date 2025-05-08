@@ -210,6 +210,10 @@ def run() -> None:
     tb["survey_comparability"] = tb["survey_comparability"].astype(str)
     tb["survey_comparability"] = tb["survey_comparability"].replace("<NA>", "No spells")
 
+    # TODO: Check if this is working
+    # Drop empty rows in welfare_type. We miss the regional aggregates except for the consolidated table
+    tb = tb.dropna(subset=["welfare_type"], ignore_index=True)
+
     # Improve table format.
     tb = tb.format(
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile", "table", "survey_comparability"],
@@ -224,7 +228,10 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb],
+        default_metadata=ds_meadow.metadata,
+    )
 
     # Save garden dataset.
     ds_garden.save()
