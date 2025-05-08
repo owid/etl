@@ -31,7 +31,7 @@ def read_gbq(*args, **kwargs) -> pd.DataFrame:
         return pandas_gbq.read_gbq(*args, **kwargs)  # type: ignore
 
 
-class GoogleDocHandler:
+class GoogleDrive:
     # Define relevant scopes.
     SCOPES = [
         # Create and edit docs.
@@ -47,7 +47,20 @@ class GoogleDocHandler:
         self.docs_service = build("docs", "v1", credentials=credentials)
         self.drive_service = build("drive", "v3", credentials=credentials)
 
-    def authenticate(self):
+    def authenticate(self) -> Any:
+        """
+        Authenticate the user and return the credentials object.
+
+        If the token file exists, load the credentials from it.
+        If not, create a new OAuth flow and save the credentials to the token file.
+
+        Returns
+        -------
+        Any
+            The authenticated credentials object.
+
+        """
+        # Check if the token file exists and load the credentials from it.
         # Load the cached OAuth token if it exists.
         if TOKEN_PATH.exists():
             with TOKEN_PATH.open("rb") as token_file:
@@ -69,7 +82,25 @@ class GoogleDocHandler:
         # Return the authenticated credentials object.
         return credentials
 
-    def create(self, body: Optional[Dict[str, str]] = None) -> str:
+    def create_doc(self, body: Optional[Dict[str, str]] = None) -> str:
+        """
+        Create a new Google Doc and return its ID.
+
+        If no body is provided, a document with the title "Untitled document" will be created.
+
+        Parameters
+        ----------
+        body : dict, optional
+            Body of the new document. If None, a document with the title "Untitled document" will be created.
+            Default is None.
+
+        Returns
+        -------
+        str
+            ID of the created document.
+
+        """
+        # Create a new document with the provided body.
         # Fallback to empty dict if no body is provided.
         if body is None:
             # This will create a document titled "Untitled document".
@@ -85,28 +116,70 @@ class GoogleDocHandler:
 
         return doc_id
 
-    def move(self, doc_id: str, folder_id: str) -> None:
+    def move(self, file_id: str, folder_id: str) -> None:
+        """
+        Move a file to a specified folder.
+
+        Parameters
+        ----------
+        file_id : str
+            ID of the file to be moved.
+        folder_id : str
+            ID of the folder to move the file to.
+
+        """
         # Move the file to the appropriate folder.
-        file = self.drive_service.files().get(fileId=doc_id, fields="parents").execute()
+        file = self.drive_service.files().get(fileId=file_id, fields="parents").execute()
         prev_parents = ",".join(file.get("parents", []))
         self.drive_service.files().update(
-            fileId=doc_id, addParents=folder_id, removeParents=prev_parents, fields="id, parents"
+            fileId=file_id, addParents=folder_id, removeParents=prev_parents, fields="id, parents"
         ).execute()
 
-    def copy(self, doc_id: str, body: Optional[Dict[str, str]] = None) -> str:
+    def copy(self, file_id: str, body: Optional[Dict[str, str]] = None) -> str:
+        """
+        Copy a file and return the new file ID.
+
+        If no body is provided, the original title will be used with "Copy of" prepended.
+
+        Parameters
+        ----------
+        file_id : str
+            ID of the file to be copied.
+        body : dict, optional
+            Body of the new file. If None, the original title will be used with "Copy of" prepended.
+            Default is None.
+
+        Returns
+        -------
+        str
+            ID of the copied file.
+
+        """
         # If no body is provided, fetch the original title and generate a default name.
         if body is None:
-            original = self.drive_service.files().get(fileId=doc_id, fields="name").execute()
+            original = self.drive_service.files().get(fileId=file_id, fields="name").execute()
             old_title = original.get("name", "Untitled document")
             body = {"name": f"Copy of {old_title}"}
 
-        copied_file = self.drive_service.files().copy(fileId=doc_id, body=body).execute()
+        copied_file = self.drive_service.files().copy(fileId=file_id, body=body).execute()
         return copied_file["id"]
 
-    def edit(self, doc_id: str, requests: List[Dict[str, Any]]) -> None:
-        self.docs_service.documents().batchUpdate(documentId=doc_id, body={"requests": requests}).execute()
-
     def list_files_in_folder(self, folder_id: str) -> list[dict]:
+        """
+        List all files in a specified folder.
+
+        Parameters
+        ----------
+        folder_id : str
+            The ID of the folder to list files from.
+
+        Returns
+        -------
+        list[dict]
+            A list of dictionaries containing file IDs, names, and MIME types.
+
+        """
+        # Query to list files in the specified folder.
         query = f"'{folder_id}' in parents and trashed = false"
         files = []
         page_token = None
@@ -125,11 +198,67 @@ class GoogleDocHandler:
 
         return files
 
-    @staticmethod
-    def url(doc_id: str) -> str:
-        return f"https://docs.google.com/document/d/{doc_id}/edit"
 
-    def replace_text(self, doc_id: str, mapping: Dict[str, str]) -> None:
+class GoogleDoc:
+    def __init__(self, doc_id: str):
+        self.doc_id = doc_id
+        self.url = f"https://docs.google.com/document/d/{self.doc_id}/edit"
+        self.drive = GoogleDrive()
+
+    def move(self, folder_id: str) -> None:
+        """
+        Move document to a specified folder.
+
+        Parameters
+        ----------
+        folder_id : str
+            The ID of the folder to move the document to.
+
+        """
+        self.drive.move(folder_id=folder_id, file_id=self.doc_id)
+
+    def copy(self, body: Optional[Dict[str, str]] = None) -> str:
+        """
+        Copy the document and return the new document ID.
+
+        If no body is provided, the original title will be used with "Copy of" prepended.
+
+        Parameters
+        ----------
+        body : dict, optional
+            The body of the new document. If None, the original title will be used with "Copy of" prepended.
+            Default is None.
+
+        Returns
+        -------
+        str
+            The ID of the copied document.
+
+        """
+        return self.drive.copy(file_id=self.doc_id, body=body)
+
+    def edit(self, requests: List[Dict[str, Any]]) -> None:
+        """
+        Edit the document using the provided requests.
+
+        Parameters
+        ----------
+        requests : list[dict]
+            A list of dictionaries representing the requests to be made to the Google Docs API. The requests can include operations like inserting text, replacing text, and more.
+
+        """
+        self.drive.docs_service.documents().batchUpdate(documentId=self.doc_id, body={"requests": requests}).execute()
+
+    def replace_text(self, mapping: Dict[str, str]) -> None:
+        """
+        Replace all occurrences of specified placeholders in the document with the corresponding replacements.
+
+        Parameters
+        ----------
+        mapping : dict
+            A dictionary where the keys are the placeholders to be replaced and the values are the replacements.
+
+        """
         edits = []
         for placeholder, replacement in mapping.items():
             edits.append(
@@ -140,10 +269,27 @@ class GoogleDocHandler:
                     }
                 }
             )
-        self.edit(doc_id=doc_id, requests=edits)
+        self.edit(requests=edits)
 
-    def find_marker_index(self, doc_id, marker) -> int:
-        doc = self.docs_service.documents().get(documentId=doc_id).execute()
+    def find_marker_index(self, marker) -> int:
+        """
+        Find the index of a marker in the document.
+
+        The marker is a string that should be present in the document. If the marker is not found, a ValueError is raised.
+
+        Parameters
+        ----------
+        marker : str
+            Marker string to search for in the document.
+
+        Returns
+        -------
+        int
+            Index of the marker in the document.
+
+        """
+        # Fetch the document content.
+        doc = self.drive.docs_service.documents().get(documentId=self.doc_id).execute()
         for element in doc.get("body", {}).get("content", []):
             if "paragraph" in element:
                 for run in element["paragraph"].get("elements", []):
@@ -151,3 +297,51 @@ class GoogleDocHandler:
                     if marker in text_run.get("content", ""):
                         return run["startIndex"]
         raise ValueError(f"Marker '{marker}' not found in document.")
+
+    def insert_image(self, image_url, placeholder, width=350) -> None:
+        """
+        Insert an image into the document at the position of a placeholder text.
+
+        The image will be centered and the placeholder text will be removed.
+
+        Parameters
+        ----------
+        image_url : str
+            URL of the image to be inserted.
+        placeholder : str
+            Placeholder text in the document where the image will be inserted.
+        width : int, optional
+            Width of the image in points.
+
+        """
+        # Get the index of the position where the image should be inserted.
+        insert_index = self.find_marker_index(marker=placeholder)
+
+        edits = [
+            {
+                "insertInlineImage": {
+                    "location": {"index": insert_index},
+                    "uri": image_url,
+                    "objectSize": {
+                        # "height": {
+                        #     "magnitude": 200,
+                        #     "unit": "PT"
+                        # },
+                        "width": {"magnitude": width, "unit": "PT"}
+                    },
+                }
+            },
+            {
+                "updateParagraphStyle": {
+                    "range": {"startIndex": insert_index, "endIndex": insert_index + 1},
+                    "paragraphStyle": {"alignment": "CENTER"},
+                    "fields": "alignment",
+                }
+            },
+        ]
+
+        # Apply both image insert and alignment.
+        self.edit(requests=edits)
+
+        # Remove the original placeholder text.
+        self.replace_text(mapping={placeholder: ""})
