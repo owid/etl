@@ -15,14 +15,14 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collections.common import (
+from etl.collection.common import (
     combine_config_dimensions,
     create_mdim_or_explorer,
     expand_config,
     map_indicator_path_to_id,
 )
-from etl.collections.model import Collection, pruned_json
-from etl.collections.utils import camelize, has_duplicate_table_names
+from etl.collection.model import Collection, pruned_json
+from etl.collection.utils import camelize, has_duplicate_table_names
 from etl.config import OWIDEnv
 
 # Initialize logger.

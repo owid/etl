@@ -14,7 +14,7 @@ from typing import Union
 
 import yaml
 
-from etl.collections.explorer import Explorer
+from etl.collection.explorer import Explorer
 
 
 class ViewEditor:

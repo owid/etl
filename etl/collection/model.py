@@ -21,8 +21,8 @@ from owid.catalog.meta import GrapherConfig, MetaBase
 from structlog import get_logger
 from typing_extensions import Self
 
-from etl.collections.exceptions import DuplicateCollectionViews
-from etl.collections.utils import (
+from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.utils import (
     get_complete_dimensions_filter,
     merge_common_metadata_by_dimension,
     unique_records,
