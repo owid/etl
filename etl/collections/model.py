@@ -574,9 +574,14 @@ class Collection(MDIMBase):
         if owid_env is None:
             owid_env = OWID_ENV
 
-        # Prune non-used dimensions
+        # Prune non-used dimension choices
         if prune_dimensions:
             self.prune_dimension_choices()
+
+        # TODO: Prune dimensions if only one choice is in use
+
+        # Sort views based on dimension order
+        self.sort_views_based_on_dimensions()
 
         # Check that no choice name is repeated
         self.validate_choice_uniqueness()
@@ -689,6 +694,20 @@ class Collection(MDIMBase):
             if dim.slug in slug_order:
                 dim.sort_choices(slug_order[dim.slug])
 
+    def sort_views_based_on_dimensions(self):
+        priority_order = self.dimension_choices
+
+        def sort_key(view):
+            # For each dimension, get the index in the priority list
+            return tuple(
+                priority_order[dim].index(view.dimensions.get(dim, ""))
+                if view.dimensions.get(dim, "") in priority_order[dim]
+                else float("inf")
+                for dim in priority_order
+            )
+
+        self.views = sorted(self.views, key=sort_key)
+
     def validate_choice_uniqueness(self):
         """Validate that all choice names (and slugs) are unique."""
         for dim in self.dimensions:
@@ -743,6 +762,46 @@ class Collection(MDIMBase):
                 all_occurrences[str(key)].add(value)
 
         return dict(all_occurrences)
+
+    def remove_views(
+        self,
+        dimensions: Dict[str, Union[List[str], str]],
+    ):
+        """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
+
+        Args:
+        -----
+        dimensions: Dict[str, Union[List[str], str]]
+            Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
+
+            Example 1: dimensions = {"sex": "female"}
+
+                Drop all views that have "female" in dimension sex.
+
+            Example 2: dimensions = {"age": ["0-4", "5-9"]}
+
+                Drop all views that have "0-4" or "5-9" in dimension age.
+
+            Example 3: dimensions = {"age": ["0-4", "5-9"], "sex": ["female", "male"]}
+
+                Drop all views that have ("0-4" or "5-9" in dimension age) and ("female" or "male" in dimension "sex"). The rest is kept.
+
+        """
+        dimensions_available = self.dimension_choices_in_use()
+        dimensions_drop = {}
+
+        for dim, choices in dimensions_available.items():
+            if dim not in dimensions:
+                dimensions_drop[dim] = choices
+            else:
+                if isinstance(dimensions[dim], str):
+                    assert dimensions[dim] in choices, f"Choice {dimensions[dim]} not found for dimension {dim}!"
+                    dimensions_drop[dim] = [dimensions[dim]]
+                elif isinstance(dimensions[dim], list):
+                    assert all(
+                        choice in choices for choice in dimensions[dim]
+                    ), f"Choices {dimensions[dim]} not found for dimension {dim}!"
+                    dimensions_drop[dim] = dimensions[dim]
 
     def group_views(self, params: List[Dict[str, Any]], drop_dimensions_if_single_choice: bool = True):
         """Group views into new ones.
