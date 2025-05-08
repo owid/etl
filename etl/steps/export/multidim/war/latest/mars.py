@@ -67,16 +67,12 @@ def run() -> None:
                 "config_new": {
                     "chartTypes": ["StackedBar"],
                 },
-                # "replace": True,
+                "replace": True,
             },
             {
                 "dimension": "estimate",
                 "choices": ["low", "high"],
                 "choice_new_slug": "low_high",
-                # "config_new": {
-                #     "chartTypes": ["StackedBar"],
-                # },
-                # "replace": True,
             },
         ]
     )
