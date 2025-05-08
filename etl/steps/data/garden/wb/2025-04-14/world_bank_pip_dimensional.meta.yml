@@ -125,7 +125,7 @@ definitions:
     <%- endif %>
 
   description_key_ppp: |-
-    The data is measured in international-$ at <<<ppp_version>> prices – this adjusts for inflation and for differences in living costs between countries.
+    The data is measured in international-$ at <<ppp_version>> prices – this adjusts for inflation and for differences in living costs between countries.
 
   description_key_per_capita: _Per capita_ means that the income of each household is attributed equally to each member of the household (including children).
 
@@ -318,7 +318,7 @@ tables:
 
       total_shortfall:
         title: Total shortfall ({definitions.poverty_line}, <<ppp_version>> prices)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they would bring about.
         description_key:
@@ -337,7 +337,7 @@ tables:
 
       avg_shortfall:
         title: Average shortfall ($) ({definitions.poverty_line}, <<ppp_version>> prices)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}, averaged across the population in poverty.
         description_key:
@@ -432,7 +432,7 @@ tables:
 
       spl:
         title: Societal poverty line (<<ppp_version>> prices)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The Societal Poverty Line (SPL) is defined to account for national definitions of poverty around the world. The SPL is the International Poverty Line when the national median is sufficiently low and it grows as the median income or consumption grows.
         description_key:
@@ -606,7 +606,7 @@ tables:
       # DISTRIBUTIONAL INDICATORS
       mean:
         title: Mean (<<ppp_version>> prices)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The mean is the average <<welfare_type>> of the population.
         description_key:
@@ -622,7 +622,7 @@ tables:
 
       median:
         title: Median (<<ppp_version>> prices)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The median is the value of <<welfare_type>> below which 50% of the population live.
         description_key:
@@ -639,7 +639,7 @@ tables:
       # NOTE: Edit these indicators once the final data structure is confirmed
       avg:
         title: Average ({definitions.percentiles_avg_share}, <<ppp_version>> prices)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population).
         description_key:
@@ -671,7 +671,7 @@ tables:
 
       thr:
         title: Threshold ({definitions.percentiles_thr}, <<ppp_version>> prices)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The level of <<welfare_type>> per day below which <<decile>>% of the population falls.
         description_key:
@@ -749,7 +749,7 @@ tables:
 
       top1_thr:
         title: Threshold (top 1%)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The level of <<welfare_type>> per day below which 99% of the population falls.
         description_key:
@@ -766,7 +766,7 @@ tables:
 
       top1_avg:
         title: Average (top 1%)
-        unit: international-$ in <<<ppp_version>> prices
+        unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The mean <<welfare_type>> per day within the richest 1% of the population.
         description_key:
