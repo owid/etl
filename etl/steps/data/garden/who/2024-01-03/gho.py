@@ -273,7 +273,7 @@ def set_indicator(tb: Table, short_name: str, meta: dict[str, str]) -> Table:
     markdown_description = ""
     for heading in HEADINGS_TO_USE:
         if heading in meta:
-            markdown_description += f"##### {heading}\n{meta[heading]}\n\n"
+            markdown_description += f"### {heading}\n{meta[heading]}\n\n"
     markdown_description = markdown_description.strip()
 
     # Make sure the value is not the same as dimension
