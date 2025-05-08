@@ -215,12 +215,8 @@ def read_datasette(
                 dfs.append(df_chunk)
                 break
 
-        if len(dfs) == 0:
-            # If no data was fetched, return an empty dataframe.
-            df = pd.DataFrame()
-        else:
-            # Concatenate all chunks of data.
-            df: pd.DataFrame = pd.concat(dfs, ignore_index=True)  # type: ignore
+        # Concatenate all chunks of data.
+        df = _safe_concat(dfs)
 
     return df
 
@@ -573,7 +569,7 @@ def _get_post_references_of_charts_via_narrative_charts(chart_ids: Optional[List
     """Get posts (including articles, topic pages, and data insights) that use narrative chart, and link them to the original (parent) chart."""
     # Prepare query.
     query = """SELECT
-        cv.id AS chart_id,
+        c.id AS chart_id,
         pg.content ->> '$.title' AS post_title,
         pg.slug AS post_slug,
         pg.type AS post_type,
@@ -581,6 +577,7 @@ def _get_post_references_of_charts_via_narrative_charts(chart_ids: Optional[List
         pgl.linkType AS link_type,
         pgl.componentType AS component_type,
         pg.publishedAt AS post_publication_date,
+        cv.id AS narrative_chart_id,
         pgl.target AS narrative_chart_slug
     FROM posts_gdocs pg
     JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
@@ -592,7 +589,7 @@ def _get_post_references_of_charts_via_narrative_charts(chart_ids: Optional[List
     """
     if chart_ids:
         chart_ids_str = ", ".join(str(cid) for cid in chart_ids)
-        query += f" AND cv.id IN ({chart_ids_str})"
+        query += f" AND c.id IN ({chart_ids_str})"
 
     # Execute query and create a dataframe.
     df = OWID_ENV.read_sql(query)
@@ -655,6 +652,20 @@ def get_topic_tags_for_chart_ids(
     return df
 
 
+def _safe_concat(dfs: List[pd.DataFrame]) -> pd.DataFrame:
+    """Concatenate DataFrames, ignoring empty ones."""
+    # Filter out empty DataFrames.
+    dfs_to_concat = [df_ for df_ in dfs if not df_.empty]
+
+    # Concatenate only if there are non-empty DataFrames
+    if dfs_to_concat:
+        df = pd.concat(dfs_to_concat, ignore_index=True)
+    else:
+        df = pd.DataFrame()
+
+    return df
+
+
 def get_post_references_of_charts(
     chart_ids: Optional[List[int]] = None,
     component_types: Optional[List[str]] = None,
@@ -703,8 +714,7 @@ def get_post_references_of_charts(
     if include_parents_of_narrative_charts:
         # If a gdoc uses a narrative chart, we want to identify the parent chart, and, if that parent chart is among the given chart_ids, include those gdocs.
         df_narrative_charts = _get_post_references_of_charts_via_narrative_charts(chart_ids=chart_ids)
-        if not df_narrative_charts.empty:
-            df = pd.concat([df, df_narrative_charts], ignore_index=True)
+        df = _safe_concat([df, df_narrative_charts])
 
     if include_references_of_all_charts_block:
         df_all_charts_block = get_topic_tags_for_chart_ids(
@@ -713,8 +723,7 @@ def get_post_references_of_charts(
         # Add component_type and lint_type, for consistency.
         df_all_charts_block["component_type"] = "all-charts"
         df_all_charts_block["link_type"] = "grapher"
-        if not df_all_charts_block.empty:
-            df = pd.concat([df, df_all_charts_block], ignore_index=True)
+        df = _safe_concat([df, df_all_charts_block])
 
     # Transform slugs of the gdoc posts (articles, topic pages, and data insights) into full urls.
     df["post_url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
@@ -775,9 +784,9 @@ def get_post_views_by_chart_id(
     )
 
     # Combine data.
-    df_views = df_content[["post_url", "post_title", "chart_id", "chart_url"]].merge(
-        df_article_views.rename(columns={"url": "post_url"}), on="post_url", how="left"
-    )
+    df_views = df_content[
+        ["post_url", "post_title", "post_type", "post_publication_date", "chart_id", "chart_url"]
+    ].merge(df_article_views.rename(columns={"url": "post_url"}), on="post_url", how="left")
 
     return df_views
 
