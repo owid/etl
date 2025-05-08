@@ -397,12 +397,12 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - This shows how many students at the end of lower-secondary school have learned basic reading skills.
-          - It is based only on children who are in school and does not include those who never attend.
-          - Students are considered proficient if they can understand main ideas and make simple inferences from written texts.
-          - Data comes from school tests and surveys such as PISA or national exams.
-          - A higher value means more students are reading at a basic level, while a lower value suggests many are falling behind.
-          - Some countries may not test all students, or use different standards, which makes comparison harder.
+          - This indicator shows the percentage of students who reach minimum reading proficiency by the end of lower-secondary school.
+          - Minimum proficiency at this level means students can connect ideas across different types of texts, understand the author’s intent, and draw basic conclusions.
+          - It only includes students who are still in school—not those who dropped out or were never enrolled.
+          - Reading skills are measured through standardized tests, such as PISA or national assessments.
+          - A higher percentage means more students are developing foundational reading skills before finishing lower-secondary education.
+          - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_primary:
         title: Share of students with minimum reading skills by the end of primary school
@@ -410,11 +410,12 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - This shows how many students finish primary school able to read simple stories and understand what they mean.
+          - This indicator shows the percentage of students who complete primary school with basic reading skills.
+          - Proficiency means identifying key ideas in simple texts and linking them to personal experience.
           - It only includes students who are still in school—not those who dropped out or never enrolled.
-          - Reading skills are measured by exams or surveys, often organized nationally or internationally.
-          - A higher percentage means more children are learning to read by the time they leave primary school.
-          - Different countries may test students in different ways, which affects how results can be compared.
+          - Skills are measured through standardized tests, such as PIRLS or national assessments.
+          - A higher percentage indicates more students are developing essential literacy by the end of primary school.
+          - Cross-country comparisons may be affected by differences in test design and standards.
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
         title: Share of children achieving minimum reading proficiency by the end of lower-secondary age
@@ -422,14 +423,13 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - Many children never get the chance to finish school—this indicator shows how many children, in total, are reaching basic reading skills by the time they should complete lower-secondary education.
-          - It combines two elements - how many students reach the end of lower-secondary school, and how many of them meet minimum reading standards.
-          - Minimum reading proficiency means understanding texts, making connections across ideas, and drawing conclusions from what is read.
-          - This provides a more realistic picture than school assessments alone, since it includes children who dropped out or never enrolled.
-          - A high value indicates that most children are not only finishing school but also learning essential reading skills.
-          - The calculation multiplies the share of children who complete lower-secondary school by the share of those who meet reading standards.
-          - Data come from learning assessments (such as PISA, TIMSS, and regional tests) and adjusted completion estimates based on household surveys.
-          - While this approach improves equity and accuracy, it inherits some limitations from both sources—especially where completion and assessment years don’t match exactly.
+          - This indicator shows the share of all children who reach basic reading proficiency by the expected age of completing primary school.
+          - Proficiency means identifying key ideas in simple texts and linking them to familiar knowledge or experience.
+          - It combines the share of children who complete primary school with the share who meet minimum reading standards.
+          - This captures outcomes across the full population—not just students still in school.
+          - A higher percentage suggests that most children are both completing school and acquiring core reading skills.
+          - Data comes from assessments like PIRLS or ERCE and completion estimates from surveys or models.
+          - Comparability may be affected by differences in assessments, definitions, and data timing.
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_1_read:
         title: Share of children achieving minimum reading proficiency by the end of primary age
@@ -437,14 +437,13 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - Many children do not complete primary school—this indicator estimates how many reach basic reading skills by the expected age for finishing primary education.
-          - It adjusts for school completion, showing the share of all children (not just those still enrolled) who meet reading proficiency standards.
-          - Minimum reading proficiency at this level means understanding simple texts, locating key ideas, and linking them to personal knowledge or experience.
-          - A high value reflects both good school access and quality of learning.
-          - The indicator is calculated by multiplying the percentage of children who complete primary school by the percentage of those who meet the reading benchmark.
-          - Data come from large-scale assessments (like PIRLS, TIMSS, ERCE) and completion data from household surveys or modeled estimates.
-          - This combined measure gives a fuller picture of progress toward universal, effective education.
-          - Limitations include possible mismatch in data timing and variations in assessment tools across countries, but it still helps track how well systems serve all children—not only those who stay in school.
+          - This indicator shows the share of all children who reach basic reading proficiency by the expected age of completing primary school.
+          - Proficiency means understanding simple texts, identifying key ideas, and linking them to personal experience.
+          - It combines the share of children who complete primary school with the share who meet reading standards.
+          - This reflects outcomes for all children—not just those still in school.
+          - A higher value suggests strong access to education and effective early learning.
+          - Data comes from assessments like PIRLS or ERCE and completion estimates from surveys or models.
+          - Limitations include differences in assessment tools, definitions, and the timing of data sources.
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_2_math:
         title: Share of children achieving minimum math proficiency by the end of lower-secondary age
@@ -452,14 +451,13 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - Many children drop out before completing lower-secondary school—this indicator estimates how many reach essential math skills by the expected age of completion.
-          - It combines school completion rates with test results to reflect the percentage of all children (not just enrolled students) who meet math proficiency standards.
-          - Minimum math proficiency includes computation, interpreting data, and using algebraic representations in everyday contexts.
-          - A higher percentage indicates that more children are both staying in school and achieving foundational math skills.
-          - The indicator is calculated by multiplying the share of completers by the share of those who meet the minimum math benchmark.
-          - Data sources include international learning assessments and modeled estimates of completion from surveys.
-          - This approach helps capture learning outcomes for an entire age group—not just students in classrooms.
-          - Limitations include gaps in data availability and alignment of assessments and age groups, but it provides a more inclusive view of education system performance.
+          - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing lower-secondary school.
+          - Minimum proficiency means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
+          - It combines the percentage of children who complete lower-secondary school with the percentage who meet the math benchmark.
+          - This provides a fuller picture of learning outcomes—not just for enrolled students, but for the entire age group.
+          - A higher percentage means more children are both staying in school and acquiring core math skills.
+          - Data comes from international assessments such as TIMSS, along with completion estimates based on surveys or models.
+          - Comparability may be affected by gaps in data, different assessment tools, and mismatches in timing between sources.
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_1_math:
         title: Share of children achieving minimum math proficiency by the end of primary age
@@ -467,10 +465,10 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - Many children do not complete primary education—this indicator estimates how many gain essential math skills by the expected completion age.
-          - It reflects both school access and learning outcomes by adjusting test results for primary completion rates.
-          - Minimum math proficiency includes basic operations, spatial understanding, measurement, and interpreting graphs.
-          - High values show effective systems where children both stay in school and acquire core math competencies.
-          - It is calculated by multiplying the percentage who complete primary with the percentage achieving math proficiency.
-          - Data are drawn from assessments and modeled completion rates to cover entire age groups, not just those enrolled.
-          - While subject to some limitations, such as timing mismatches or assessment variation, this combined metric better tracks real progress toward universal foundational learning.
+        - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing primary school.
+        - Minimum proficiency means demonstrating skills in number sense and computation, basic measurement, interpreting graphs, spatial reasoning, and recognizing patterns.
+        - It combines the percentage of children who complete primary school with the percentage who meet the math benchmark.
+        - This reflects outcomes for the full population—not just those still enrolled.
+        - A higher percentage suggests education systems are enabling most children to complete school and build essential math skills.
+        - Data comes from assessments such as TIMSS or ERCE, along with completion estimates based on household surveys or models.
+        - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
