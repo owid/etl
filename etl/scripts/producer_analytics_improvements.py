@@ -1,4 +1,8 @@
-"""Play around with producer analytics."""
+"""Script to generate a quarterly analytics report for a data producer.
+
+TODO: This is work in progress. Clean up code and move to producer analytics (and/or consider creating appropriate tables in analytics or metabase).
+
+"""
 
 from datetime import datetime
 
@@ -9,6 +13,7 @@ from structlog import get_logger
 
 from apps.utils.google import GoogleDoc, GoogleDrive
 from apps.wizard.app_pages.producer_analytics.data_io import get_producers_per_chart
+from etl.analytics import get_chart_views_by_chart_id, get_post_views_by_chart_id
 from etl.data_helpers.misc import round_to_sig_figs
 from etl.db import get_engine
 
@@ -95,7 +100,6 @@ def get_chart_title_from_url(chart_url):
     help="Year.",
 )
 def run(producer, quarter, year):
-    # TODO: This is work in progress. Clean up code and move to producer analytics (and/or consider creating appropriate tables in analytics or metabase).
     quarters = {
         1: {"name": "first", "min_date": "01-01", "max_date": "03-31"},
         2: {"name": "second", "min_date": "04-01", "max_date": "06-30"},
@@ -105,8 +109,8 @@ def run(producer, quarter, year):
     min_date = f"{year}-{quarters[quarter]['min_date']}"
     max_date = f"{year}-{quarters[quarter]['max_date']}"
 
-    from etl.analytics import get_chart_views_by_chart_id, get_post_views_by_chart_id
-
+    # Gather all necessary analytics data.
+    # TODO: Refactor, clean up, and explain code.
     df_producer_charts = get_producers_per_chart(excluded_steps=[])
     df_producer_charts = df_producer_charts[df_producer_charts["producer"] == producer].reset_index(drop=True)
     producer_chart_ids = sorted(set(df_producer_charts["chart_id"]))
@@ -173,6 +177,9 @@ def run(producer, quarter, year):
     # Prepare text for report.
     # TODO: Handle plurals and cases where no DIs are published in the quarter. For now, manually edit the text.
 
+    # Report title.
+    report_title = f"{year}-Q{quarter} Our World in Data analytics report for {producer}"
+
     # Executive summary.
     executive_summary_intro = f"""As of {max_date_humanized}, Our World in Data features your data in"""
     if n_charts == 0:
@@ -193,15 +200,13 @@ def run(producer, quarter, year):
 
     ####################################################################################################################
 
-    # TODO: Make into a function.
-    # def create_report(producer: str, quarter: int, year: int):
-    report_title = f"{year}-Q{quarter} Our World in Data analytics report for {producer}"
     # Initialize a google drive object.
     google_drive = GoogleDrive()
     # google_drive.list_files_in_folder(folder_id=FOLDER_ID)
+
     # Duplicate template report.
-    # NOTE: Unclear why sometimes we need to use "title" and sometimes "name".
     report_id = google_drive.copy(file_id=TEMPLATE_ID, body={"name": report_title})
+
     # Initialize a google doc object.
     google_doc = GoogleDoc(doc_id=report_id)
 
