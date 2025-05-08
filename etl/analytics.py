@@ -383,7 +383,7 @@ def get_chart_views_by_chart_id(
     start_date = published_at.where(published_at > pd.to_datetime(date_min), pd.to_datetime(date_min))
 
     # Add a column with the number of days that the views are referring to.
-    df_views["n_days"] = (pd.Timestamp.today().normalize() - start_date).dt.days
+    df_views["n_days"] = (pd.to_datetime(date_max) - start_date).dt.days
 
     # Add a column for the average number of daily views.
     df_views["views_daily"] = df_views["views"] / df_views["n_days"]
