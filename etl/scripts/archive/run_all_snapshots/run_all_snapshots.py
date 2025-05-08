@@ -113,7 +113,7 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
     existing_prs = github_repo.get_open_prs(branch_name)
 
     if existing_prs:
-        log.info(f"Pull request already exists: {existing_prs[0]['html_url']}")
+        log.info(f"Pull request already exists: {existing_prs[0].html_url}")
     else:
         # Create a pull request
         body = "" if has_changes else "This PR was created without file changes but includes a merge with master."

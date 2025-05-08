@@ -3,45 +3,181 @@ Helpers for working with Git through PyGithub library.
 """
 
 import base64
+import hashlib
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from github import Github, GithubException, InputGitTreeElement
+import jwt
+import requests
+from github import Auth, Github, GithubException, InputGitTreeElement
+from github.ContentFile import ContentFile
+from github.PullRequest import PullRequest
 from github.Repository import Repository
 from structlog import get_logger
 
-from etl.config import GITHUB_TOKEN
+from etl.config import (
+    GITHUB_TOKEN,
+    OWIDBOT_ACCESS_TOKEN,
+    OWIDBOT_APP_CLIENT_ID,
+    OWIDBOT_APP_INSTALLATION_ID,
+    OWIDBOT_APP_PRIVATE_KEY_PATH,
+)
 from etl.paths import BASE_DIR
 
 # Initialize logger.
 log = get_logger()
 
 
-def get_github_instance() -> Github:
-    """Return a PyGithub instance authenticated with the token."""
-    return Github(GITHUB_TOKEN)
+def get_github_instance(access_token: Optional[str] = None) -> Github:
+    """Return a PyGithub instance authenticated with the token.
+
+    Args:
+        access_token: Optional access token. If None, uses GITHUB_TOKEN.
+    """
+    token = access_token or GITHUB_TOKEN
+    if token:
+        auth = Auth.Token(token)
+        return Github(auth=auth)
+    return Github()  # Anonymous access
+
+
+def generate_jwt(client_id: str, private_key_path: str) -> str:
+    """Generate a JWT token for GitHub App authentication.
+
+    Args:
+        client_id: GitHub App client ID
+        private_key_path: Path to the private key file
+
+    Returns:
+        JWT token
+    """
+    now = int(time.time())
+    payload = {
+        "iat": now,
+        "exp": now + (10 * 60),  # JWT expiration time (10 minutes)
+        "iss": client_id,
+    }
+    with open(private_key_path, "r") as key_file:
+        private_key = key_file.read()
+    token = jwt.encode(payload, private_key, algorithm="RS256")
+    return token
+
+
+def github_app_access_token(max_retries=3) -> str:
+    """Get a GitHub App installation access token.
+
+    Args:
+        max_retries: Maximum number of retries if the request fails
+
+    Returns:
+        Access token
+    """
+    assert OWIDBOT_APP_CLIENT_ID, "OWIDBOT_APP_CLIENT_ID is not set"
+    assert OWIDBOT_APP_PRIVATE_KEY_PATH, "OWIDBOT_APP_PRIVATE_KEY_PATH is not set"
+    assert OWIDBOT_APP_INSTALLATION_ID, "OWIDBOT_APP_INSTALLATION_ID is not set"
+
+    jwt_token = generate_jwt(OWIDBOT_APP_CLIENT_ID, OWIDBOT_APP_PRIVATE_KEY_PATH)
+
+    # Use the JWT to get an installation access token
+    headers = {"Authorization": f"Bearer {jwt_token}", "Accept": "application/vnd.github.v3+json"}
+    installation_access_token_url = (
+        f"https://api.github.com/app/installations/{OWIDBOT_APP_INSTALLATION_ID}/access_tokens"
+    )
+
+    backoff = 2
+    for attempt in range(1, max_retries + 1):
+        response = requests.post(installation_access_token_url, headers=headers)
+        if response.status_code not in (500, 504):
+            response.raise_for_status()
+            access_token = response.json()["token"]
+            return access_token
+        else:
+            if attempt == max_retries:
+                response.raise_for_status()
+            else:
+                time.sleep(backoff)
+                backoff *= 2  # Exponential backoff
+
+    raise AssertionError("Failed to get installation access token.")
+
+
+def compute_git_blob_sha1(content: bytes) -> str:
+    """Compute the SHA-1 hash of a file as Git would.
+
+    Args:
+        content: File content as bytes
+
+    Returns:
+        SHA-1 hash
+    """
+    # Calculate the blob header
+    size = len(content)
+    header = f"blob {size}\0".encode("utf-8")
+
+    # Compute the SHA-1 hash of the header + content
+    sha1 = hashlib.sha1()
+    sha1.update(header + content)
+    return sha1.hexdigest()
+
+
+def _github_access_token() -> str:
+    """Get the GitHub access token.
+
+    Returns:
+        GitHub access token
+    """
+    # Use GITHUB_TOKEN if set, otherwise use OWIDBOT_ACCESS_TOKEN
+    if GITHUB_TOKEN:
+        return GITHUB_TOKEN
+    elif OWIDBOT_ACCESS_TOKEN:
+        return OWIDBOT_ACCESS_TOKEN
+    else:
+        raise AssertionError("You need to set GITHUB_TOKEN or OWIDBOT_ACCESS_TOKEN in your .env file to commit.")
 
 
 class GithubApiRepo:
     """Class for interacting with a GitHub repository via the GitHub API."""
 
-    def __init__(self, org: str = "owid", repo_name: str = "etl"):
+    def __init__(
+        self, org: str = "owid", repo_name: str = "etl", access_token: Optional[str] = None, use_app_auth: bool = False
+    ):
         """Initialize with the organization and repository name.
 
         Args:
             org: GitHub organization name
             repo_name: Repository name
+            access_token: Optional access token. If None, uses default token.
+            use_app_auth: If True, uses GitHub App authentication
         """
         self.org = org
         self.repo_name = repo_name
-        self.g = get_github_instance()
+        self.full_repo_name = f"{org}/{repo_name}"
+
+        if use_app_auth:
+            self.access_token = github_app_access_token()
+        elif access_token:
+            self.access_token = access_token
+        else:
+            # Try to get a token from environment variables
+            try:
+                self.access_token = _github_access_token()
+            except AssertionError:
+                self.access_token = None
+
+        self.g = get_github_instance(self.access_token)
         self._repo = None
 
     @property
     def repo(self) -> Repository:
         """Get the PyGithub Repository object (lazily loaded)."""
         if self._repo is None:
-            self._repo = self.g.get_organization(self.org).get_repo(self.repo_name)
+            if self.full_repo_name.count("/") == 1:
+                # Get by org/repo format
+                self._repo = self.g.get_repo(self.full_repo_name)
+            else:
+                # Get by org and repo separately
+                self._repo = self.g.get_organization(self.org).get_repo(self.repo_name)
         return self._repo
 
     def fetch_file_content(self, file_path: str, branch: str) -> str:
@@ -98,7 +234,7 @@ class GithubApiRepo:
             log.error(f"Failed to merge master into {branch_name}: {e}")
             return False
 
-    def get_open_prs(self, branch_name: str) -> List[Dict[str, Any]]:
+    def get_open_prs(self, branch_name: str) -> List[PullRequest]:
         """Get open pull requests for a specific branch.
 
         Args:
@@ -107,10 +243,72 @@ class GithubApiRepo:
         Returns:
             List of pull request data
         """
-        pulls = self.repo.get_pulls(state="open", head=f"{self.org}:{branch_name}")
+        return list(self.repo.get_pulls(state="open", head=f"{self.org}:{branch_name}"))
 
-        # Convert PyGithub objects to dictionaries to maintain compatibility
-        return [{"html_url": pr.html_url, "number": pr.number, "title": pr.title, "state": pr.state} for pr in pulls]
+    def get_pr(self, branch_name: str) -> Optional[PullRequest]:
+        """Get a pull request for a branch.
+
+        Args:
+            branch_name: The name of the branch
+
+        Returns:
+            Pull request object or None if not found
+        """
+        # Find pull requests for the branch (assuming you're looking for open PRs)
+        pulls = self.repo.get_pulls(state="open", sort="created", head=f"{self.org}:{branch_name}")
+        pulls = list(pulls)
+
+        if len(pulls) == 0:
+            return None
+        elif len(pulls) > 1:
+            log.warning(f"More than one open PR found for branch {branch_name}. Taking the most recent one.")
+            return pulls[-1]
+
+        return pulls[0]
+
+    def get_all_prs(self, exclude_dependabot: bool = True) -> list[str]:
+        """Get all open PRs from the repository.
+
+        Args:
+            exclude_dependabot: If True, exclude dependabot PRs
+
+        Returns:
+            List of PR branches
+        """
+        # Get all open PRs using PyGithub's get_pulls method
+        pulls = self.repo.get_pulls(state="open", sort="created")
+
+        active_prs = []
+        for pr in pulls:
+            # Only include PRs from the same org
+            if pr.head.repo and pr.head.repo.owner.login == self.org:
+                active_prs.append(pr.head.ref)
+
+        # Exclude dependabot PRs if requested
+        if exclude_dependabot:
+            active_prs = [pr for pr in active_prs if "dependabot" not in pr]
+
+        return active_prs
+
+    def get_comment_from_pr(self, pr: PullRequest, username: str = "owidbot") -> Optional[Any]:
+        """Get a comment from a PR by username.
+
+        Args:
+            pr: Pull request object
+            username: Username of the commenter
+
+        Returns:
+            Comment object or None
+        """
+        comments = pr.get_issue_comments()
+        matching_comments = [comment for comment in comments if comment.user.login == username]
+
+        if len(matching_comments) == 0:
+            return None
+        elif len(matching_comments) == 1:
+            return matching_comments[0]
+        else:
+            raise AssertionError(f"More than one {username} comment found.")
 
     def get_master_commit_sha(self) -> str:
         """Get the latest commit SHA on master branch.
@@ -149,6 +347,43 @@ class GithubApiRepo:
         # Create a reference (branch)
         self.repo.create_git_ref(f"refs/heads/{branch_name}", base_sha)
         return True
+
+    def create_branch_if_not_exists(self, branch_name: str, dry_run: bool = False) -> bool:
+        """Create a branch if it doesn't exist.
+
+        Args:
+            branch_name: The name of the branch
+            dry_run: If True, don't actually create the branch
+
+        Returns:
+            True if branch exists or was created
+        """
+        try:
+            self.repo.get_branch(branch_name)
+            return True  # Branch already exists
+        except GithubException as e:
+            if e.status == 404:
+                if not dry_run:
+                    try:
+                        # Try main first, then master
+                        try:
+                            master_ref = self.repo.get_branch("main").commit.sha
+                            log.info(f"Using 'main' branch as reference for creating {branch_name}.")
+                        except GithubException:
+                            master_ref = self.repo.get_branch("master").commit.sha
+                            log.info(f"Using 'master' branch as reference for creating {branch_name}.")
+
+                        log.info(f"Creating branch {branch_name} with reference {master_ref}.")
+                        self.create_branch(branch_name, master_ref)
+
+                    except Exception as e:
+                        log.error(f"Failed to create branch {branch_name}: {e}")
+                        return False
+
+                log.info(f"Branch {branch_name} {'would be' if dry_run else 'was'} created in {self.full_repo_name}.")
+                return not dry_run  # True if not dry_run, False otherwise
+            else:
+                raise e
 
     def delete_branch(self, branch_name: str) -> bool:
         """Delete a branch.
@@ -326,3 +561,121 @@ class GithubApiRepo:
         self.update_branch_reference(branch_name, new_commit_sha)
 
         return True, new_commit_sha
+
+    def commit_file(
+        self,
+        content: str,
+        file_path: str,
+        commit_message: str,
+        branch: str,
+        dry_run: bool = True,
+    ) -> bool:
+        """Commit a file to GitHub.
+
+        Args:
+            content: File content
+            file_path: Path to the file in the repository
+            commit_message: Commit message
+            branch: Branch name
+            dry_run: If True, don't actually commit the file
+
+        Returns:
+            True if the file was committed
+        """
+        new_content_checksum = compute_git_blob_sha1(content.encode("utf-8"))
+
+        try:
+            # Check if the file already exists
+            contents = self.repo.get_contents(file_path, ref=branch)
+
+            # Compare the existing content with the new content
+            if contents.sha == new_content_checksum:
+                log.info(
+                    f"File {file_path} is identical to the current version in {self.full_repo_name} on branch {branch}. No commit will be made."
+                )
+                return False
+
+            # Update the file
+            if not dry_run:
+                self.repo.update_file(contents.path, commit_message, content, contents.sha, branch=branch)
+        except Exception as e:
+            # If the file doesn't exist, create a new file
+            if "404" in str(e):
+                if not dry_run:
+                    self.repo.create_file(file_path, commit_message, content, branch=branch)
+            else:
+                raise e
+
+        if dry_run:
+            log.info(f"Would have committed {file_path} to {self.full_repo_name} on branch {branch}.")
+        else:
+            log.info(f"Committed {file_path} to {self.full_repo_name} on branch {branch}.")
+
+        return not dry_run  # True if not dry_run, False otherwise
+
+    def get_git_branch_from_commit_sha(self, commit_sha: str) -> str:
+        """Get the branch name from a merged pull request commit sha.
+
+        This is useful for Buildkite jobs where we only have the commit sha.
+
+        Args:
+            commit_sha: Commit SHA
+
+        Returns:
+            Branch name
+        """
+        # First verify that the commit exists
+        commit = self.repo.get_commit(commit_sha)
+
+        # Use PyGithub's internal requester to make the API call
+        # This endpoint isn't directly exposed in PyGithub's public API
+        endpoint = f"/repos/{self.org}/{self.repo_name}/commits/{commit_sha}/pulls"
+        headers, data = self.repo._requester.requestJsonAndCheck("GET", endpoint)
+
+        # Filter the closed ones
+        closed_pull_requests = [pr for pr in data if pr["state"] == "closed"]
+
+        # Get the branch of the most recent one
+        if closed_pull_requests:
+            return closed_pull_requests[0]["head"]["ref"]
+        else:
+            raise ValueError(f"No closed pull requests found for commit {commit_sha}")
+
+    def create_check_run(
+        self,
+        head_sha: str,
+        name: str,
+        conclusion: str,
+        title: str,
+        summary: str,
+        text: Optional[str] = None,
+    ) -> Any:
+        """Create a check run for a commit.
+
+        Args:
+            head_sha: SHA of the commit
+            name: Name of the check run
+            conclusion: Conclusion of the check run (success, failure, neutral, etc.)
+            title: Title of the check run
+            summary: Summary of the check run
+            text: Additional text for the check run
+
+        Returns:
+            Check run object
+        """
+        output = {
+            "title": title,
+            "summary": summary,
+        }
+        if text:
+            output["text"] = text
+
+        check_run = self.repo.create_check_run(
+            name=name,
+            head_sha=head_sha,
+            status="completed",
+            conclusion=conclusion,
+            output=output,
+        )
+
+        return check_run
