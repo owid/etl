@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List, Optional, Union
 
-from etl.collections.beta import combine_explorers, create_explorer_experimental
+from etl.collection.beta import combine_explorers, create_explorer_experimental
 
 
 class ExplorerCreator:

@@ -1,4 +1,4 @@
-# from etl.collections import multidim
+# from etl.collection import multidim
 
 # from etl.db import get_engine
 from etl.helpers import PathFinder
