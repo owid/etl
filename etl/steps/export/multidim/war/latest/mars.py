@@ -51,21 +51,34 @@ def run() -> None:
             "wars_ongoing_country_rate",
         ],
         dimensions={
-            "conflict_type": ["civil war", "others (non-civil)"],
+            "conflict_type": ["all", "civil war", "others (non-civil)"],
             "estimate": "*",
         },
     )
 
-    # Test
+    # Group certain views together: used to create StackedBar charts
+
     mdim.group_views(
-        dimension="conflict_type",
-        choices=["civil war", "others (non-civil)"],
-        choice_new_slug="combined",
-        config_new={
-            "chartTypes": ["StackedBar"],
-        },
-        replace=True,
-        drop_dimensions_single_choice=True,
+        [
+            {
+                "dimension": "conflict_type",
+                "choices": ["civil war", "others (non-civil)"],
+                "choice_new_slug": "combined",
+                "config_new": {
+                    "chartTypes": ["StackedBar"],
+                },
+                # "replace": True,
+            },
+            {
+                "dimension": "estimate",
+                "choices": ["low", "high"],
+                "choice_new_slug": "low_high",
+                # "config_new": {
+                #     "chartTypes": ["StackedBar"],
+                # },
+                # "replace": True,
+            },
+        ]
     )
 
     # Save & upload

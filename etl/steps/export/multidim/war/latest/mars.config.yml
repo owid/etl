@@ -44,5 +44,7 @@ dimensions:
         name: High estimate
       - slug: na
         name: "-"
+      - slug: low_high
+        name: "Low and high estimates"
 
 views: []

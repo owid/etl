@@ -507,6 +507,8 @@ class Collection(MDIMBase):
     # Internal use. For save() method.
     _collection_type: Optional[str] = field(init=False, default=None)
 
+    _group_operations_done: int = field(init=False, default=0)
+
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> Self:
         """Coerce the dictionary into the expected shape before passing it to the parent class."""
@@ -742,23 +744,103 @@ class Collection(MDIMBase):
 
         return dict(all_occurrences)
 
-    def group_views_in_dimension(self, dimension_slug: str, x: Dict[str, Dict[str, List[str]]]):
-        """
-        1)
-        {
-            choice_slug: [choice_1, choice_2, ...]
-        }
-        """
-        pass
+    def group_views(self, params: List[Dict[str, Any]], drop_dimensions_if_single_choice: bool = True):
+        """Group views into new ones.
 
-    def group_views(
+        Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
+
+        Example:
+        --------
+
+        Suppose you have two dimensions 'sex' and 'age' with the following choices:
+
+            sex: 'female', 'male'
+            age: '0-4', '5-9', '10-14'
+
+        Each view shows a single timeseries. E.g. for sex="female" and age="0-4", you observe a timeseries for the indicator for these specific dimension choices.
+
+        Now, you now want to create a new view, with sex="combined", where the user can observe both timeseries (female and male) in a single view. Hence you'd end up with the following choices:
+
+            sex: 'female', 'male', 'combined'
+            age: '0-4', '5-9', '10-14'
+
+
+        In this example, we have `dimension="sex"`, `choices=["female", "male"]`, and `choice_new_slug="combined"`.
+
+        Args:
+        -----
+        params: List[Dict[str, Any]]
+            List of dictionaries with the following keys:
+                - dimension: str
+                    Slug of the dimension that contains the choices to group.
+                - choices: List[str]
+                    Slugs of the choices to group.
+                - choice_new_slug: str
+                    The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
+                - config_new: Dict[str, Any]
+                    The config for the new choice. E.g. useful to tweak the chart type.
+                - replace: bool
+                    If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
+        """
+        new_views = []
+        for p in params:
+            assert "dimension" in p, "Dimension must be provided!"
+            assert "choices" in p, "Dimension must be provided!"
+            assert "choice_new_slug" in p, "Dimension must be provided!"
+            dimension = p["dimension"]
+            choices = p["choices"]
+            choice_new_slug = p["choice_new_slug"]
+            config_new = p.get("config_new", None)
+
+            # Sanity checks
+            self._sanity_check_view_grouping(
+                dimension,
+                choices,
+                choice_new_slug,
+            )
+
+            # Create new views
+            new_views_ = self.create_new_grouped_views(
+                dimension=dimension,
+                choices=choices,
+                choice_new_slug=choice_new_slug,
+                config_new=config_new,
+            )
+            new_views.extend(new_views_)
+
+            # Add dimensions. TODO: Use combine_dimensions instead?
+            for dim in self.dimensions:
+                if (dim.slug == dimension) and (choice_new_slug not in dim.choice_slugs):
+                    new_choice = DimensionChoice(slug=choice_new_slug, name=choice_new_slug)
+                    # Add new choice to dimension
+                    dim.choices.append(new_choice)
+                    break
+
+        # Extend views
+        self.views.extend(new_views)
+
+        # Remove original choices if asked to
+        for p in params:
+            if p.get("replace", False):
+                dimension = p["dimension"]
+                choices = p["choices"]
+                # Remove views with old choices
+                new_views = [view for view in self.views if view.dimensions[dimension] not in choices]
+                # Remove unused choices
+                self.prune_dimension_choices()
+
+        # Drop dimension if it has only one choice in use
+        if drop_dimensions_if_single_choice:
+            self.prune_dimensions()
+
+    def group_views_single(
         self,
         dimension: str,
         choices: List[str],
         choice_new_slug: str,
         config_new: Optional[GrapherConfig] = None,
         replace: bool = False,
-        drop_dimensions_single_choice: bool = False,
+        drop_dimensions_if_single_choice: bool = True,
     ):
         """Group views in a single view.
 
@@ -796,6 +878,51 @@ class Collection(MDIMBase):
         replace: bool
             If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
         """
+        if self._group_operations_done > 0:
+            log.warning(
+                "If you are doing more than one group operation, consider using `group_views` instead. It is optimized for batch operations, where each grouping is done in parallel."
+            )
+
+        # Sanity checks
+        self._sanity_check_view_grouping(dimension, choices, choice_new_slug)
+
+        # Create new views
+        new_views = self.create_new_grouped_views(
+            dimension=dimension,
+            choices=choices,
+            choice_new_slug=choice_new_slug,
+            config_new=config_new,
+        )
+
+        # Add views to object
+        self.views.extend(new_views)
+
+        for dim in self.dimensions:
+            if (dim.slug == dimension) and (choice_new_slug not in dim.choice_slugs):
+                new_choice = DimensionChoice(slug=choice_new_slug, name=choice_new_slug)
+                # Add new choice to dimension
+                dim.choices.append(new_choice)
+                break
+
+        # Remove original choices if asked to
+        if replace:
+            # Remove views with old choices
+            self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
+            # Remove unused choices
+            self.prune_dimension_choices()
+
+        # Remove dimension if it has only one choice in use
+        if drop_dimensions_if_single_choice:
+            self.prune_dimensions()
+
+        self._group_operations_done += 1
+
+    def _sanity_check_view_grouping(
+        self,
+        dimension: str,
+        choices: List[str],
+        choice_new_slug: str,
+    ):
         # Sanity checks
         dimension_choices = self.dimension_choices
         # Check that the dimension exists
@@ -814,12 +941,25 @@ class Collection(MDIMBase):
                 f"Choice slug {choice_new_slug} in dimension {dimension} already in use by at least one view! Please use another one!"
             )
 
+    def create_new_grouped_views(
+        self,
+        dimension: str,
+        choices: List[str],
+        choice_new_slug: str,
+        config_new: Optional[GrapherConfig] = None,
+    ) -> List[View]:
+        """Create new grouped views."""
+        if self._group_operations_done > 0:
+            log.warning(
+                "If you are doing more than one group operation, consider using `group_views` instead. It is optimized for batch operations, where each grouping is done in parallel."
+            )
         # Prepare groups of views
         grouped = defaultdict(list)
         for view in self.views:
             # Build a key excluding the dimension we're grouping
             key = tuple((k, v) for k, v in view.dimensions.items() if k != dimension)
-            grouped[key].append(view)
+            if view.dimensions[dimension] in choices:
+                grouped[key].append(view)
 
         # Combine views
         new_views = []
@@ -834,27 +974,7 @@ class Collection(MDIMBase):
             )
             new_views.append(new_view)
 
-        # Add views to object
-        self.views.extend(new_views)
-
-        # Adjust dimensions: Add new choice to dimension (if it doesn't exist!)
-        for dim in self.dimensions:
-            if (dim.slug == dimension) and (choice_new_slug not in dim.choice_slugs):
-                new_choice = DimensionChoice(slug=choice_new_slug, name=choice_new_slug)
-                # Add new choice to dimension
-                dim.choices.append(new_choice)
-                break
-
-        # Remove original choices if asked to
-        if replace:
-            # Remove views with old choices
-            self.views = [view for view in self.views if view.dimensions[dimension] not in choices]
-            # Remove unused choices
-            self.prune_dimension_choices()
-
-        # Remove dimension if it has only one choice in use
-        if drop_dimensions_single_choice:
-            self.prune_dimensions()
+        return new_views
 
 
 def _combine_view_indicators(views):
