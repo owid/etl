@@ -6,7 +6,6 @@ I also think that these functions should both work for MDIMs and Explorers!
 
 Relevant functions:
 
-* `create_explorer_experimental`: Create an explorer based on a table and a YAML config. It is a wrapper around `expand_config` and `combine_config_dimensions`. We could consider replacing the existing `paths.create_explorer` with this one. Currently table is optional, and YAML is mandatory.
 * `combine_explorers`: Combine multiple explorers into a single one.
 
 
@@ -21,134 +20,21 @@ combine_explorers: etl/steps/export/multidim/covid/latest/covid.py
 combine_mdims: etl/steps/export/multidim/dummy/latest/dummy.py
 """
 
-import inspect
 from copy import deepcopy
-from typing import Any, Callable, Dict, List, Mapping, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, Union
 
 import pandas as pd
-from owid.catalog import Table
 from structlog import get_logger
 
-from etl.collection.explorer import Explorer, create_explorer, expand_config
+from etl.collection.explorer import Explorer, create_explorer
 from etl.collection.model import Collection
 from etl.collection.model.dimension import Dimension, DimensionChoice
-from etl.collection.multidim import combine_config_dimensions, create_mdim
-from etl.collection.utils import has_duplicate_table_names
-from etl.helpers import PathFinder
+from etl.collection.multidim import create_mdim
 
 log = get_logger()
 
 MDIM_SLUG = "mdim"
 MDIM_TITLE = "MDIM"
-
-
-def create_explorer_experimental(
-    paths: PathFinder,
-    config_yaml: Dict[str, Any],
-    tb: Optional[Table] = None,
-    indicator_names: Optional[Union[str, List[str]]] = None,
-    dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
-    common_view_config: Optional[Dict[str, Any]] = None,
-    indicators_slug: Optional[str] = None,
-    indicator_as_dimension: bool = False,
-    explorer_name: Optional[str] = None,
-    choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
-    catalog_path_full: bool = False,
-) -> Explorer:
-    """Experimental smarter explorer creation.
-
-    Args:
-    -----
-    tb: Table
-        Table object with data. This data will be expanded for the given indicators and dimensions.
-    config_yaml: Dict[str, Any]
-        Configuration YAML for the explorer. This can contain dimension renames, etc. Even views.
-    indicator_names: Optional[Union[str, List[str]]]
-        Name of the indicators to be used. If None, all indicators are used.
-    dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]]
-        Dimensions to be used. If None, all dimensions are used. If a list, all dimensions are used with the given names. If a dict, key represent dimensions to use and values choices to use. Note that if a list or dictionary is given, all dimensions must be present.
-    common_view_config: Optional[Dict[str, Any]]
-        Common view configuration to be used for all views.
-    indicators_slug: Optional[str]
-        Slug to be used for the indicators. A default is used.
-    indicator_as_dimension: bool
-        If True, the indicator is treated as a dimension.
-    explorer_name: Optional[str]
-        Name of the explorer. If None, the table name is used.
-    choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]]
-        Renames for choices. If a dictionary, the key is the dimension slug and the value is a dictionary with the original slug as key and the new name as value. If a callable, the function should return the new name for the given slug. NOTE: If the callable returns None, the name is not changed.
-    catalog_path_full: bool
-        If True, the full path is used for the catalog. If False, a shorter version is used (e.g. table#indicator` or `dataset/table#indicator`).
-
-
-    NOTE: This function is experimental for this step, but could be used in other steps as well. Consider migrating to etl.collection.explorer once we are happy with it.
-    """
-    config = deepcopy(config_yaml)
-
-    # Read from table (programatically expand)
-    config_auto = None
-    if tb is not None:
-        # Check if there are collisions between table names
-        # TODO: We should do this at indicator level. Default to 'table' for all indicators, except when there is a collision, then go to 'dataset', otherwise go to 'full'
-        expand_path_mode = "table"
-        if catalog_path_full:
-            expand_path_mode = "full"
-        elif has_duplicate_table_names(paths.dependencies):
-            expand_path_mode = "dataset"
-
-        # Bake config automatically from table
-        config_auto = expand_config(
-            tb=tb,
-            indicator_names=indicator_names,
-            dimensions=dimensions,
-            common_view_config=common_view_config,
-            indicators_slug=indicators_slug,
-            indicator_as_dimension=indicator_as_dimension,
-            expand_path_mode=expand_path_mode,
-        )
-
-        # Combine & bake dimensions
-        config["dimensions"] = combine_config_dimensions(
-            config_dimensions=config_auto["dimensions"],
-            config_dimensions_yaml=config["dimensions"],
-        )
-
-        # Add views
-        config["views"] += config_auto["views"]
-
-        # Default explorer name is table name
-        if explorer_name is None:
-            explorer_name = tb.m.short_name
-    elif explorer_name is None:
-        explorer_name = "unknown"
-        paths.log.info(f"No table provided. Explorer name is not set. Using '{explorer_name}'.")
-
-    # Create actual explorer
-    explorer = paths.create_explorer(
-        config=config,
-        explorer_name=explorer_name,
-    )
-
-    # Prune unused dimensions
-    explorer.prune_dimension_choices()
-
-    # Rename choice names if given
-    if choice_renames is not None:
-        for dim in explorer.dimensions:
-            if dim.slug in choice_renames:
-                renames = choice_renames[dim.slug]
-                for choice in dim.choices:
-                    if isinstance(renames, dict):
-                        if choice.slug in renames:
-                            choice.name = renames[choice.slug]
-                    elif inspect.isfunction(renames):
-                        rename = renames(choice.slug)
-                        if rename:
-                            choice.name = renames(choice.slug)
-                    else:
-                        raise ValueError("Invalid choice_renames format.")
-
-    return explorer
 
 
 def combine_explorers(
