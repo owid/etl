@@ -491,7 +491,9 @@ def get_post_views_by_url(
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
-    Fetch number of GDoc views per URL from Metabase.
+    Fetch number of posts views (including articles, topic pages, and data insights) for a list of URLs from Metabase.
+
+    URLs corresponding to grapher charts and explorers are excluded from the results.
 
     Parameters
     ----------
@@ -796,7 +798,8 @@ def get_post_references_of_charts(
     # Transform slugs of the gdoc posts (articles, topic pages, and data insights) into full urls.
     df["post_url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
     # In the case of gdocs of type "homepage", the post_slug seems to always be "owid-homepage", which is not a real slug. Fix those cases.
-    df.loc[df["post_type"] == "homepage", "post_url"] = OWID_BASE_URL
+    # NOTE: Ensure the homepage URL does not have a trailing slash (otherwise it will not be found in Metabase).
+    df.loc[df["post_type"] == "homepage", "post_url"] = OWID_BASE_URL.rstrip("/")
 
     # Transform slugs of the target content (usually grapher charts or explorers) into urls.
     df["chart_url"] = df["link_type"].map(POST_LINK_TYPES_TO_URL) + df["chart_slug"]
@@ -867,6 +870,8 @@ def get_post_views_last_n_days(
 ) -> pd.DataFrame:
     """
     Fetch number of post views (including articles, topic pages, and data insights) for the last n_days.
+
+    NOTE: Given that there is a lag in analytics, the number of days considered will be smaller than n_days. For this reason, the returned dataframe will contain a column "n_days" with the number of days for which the views are counted.
 
     Parameters
     ----------
