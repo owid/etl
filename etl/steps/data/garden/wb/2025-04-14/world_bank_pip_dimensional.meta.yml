@@ -230,6 +230,13 @@ definitions:
     The data relates to consumption [per capita](#dod:per-capita).
     <%- endif %>
 
+  note_for_absolute_or_relative_poverty: |-
+    <% if poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    {definitions.note_without_ppp}
+    <%- else %>
+    {definitions.note_ppp}
+    <%- endif %>
+
   hasmaptab: |-
     <% if survey_comparability == "No spells" %>
     true
@@ -251,27 +258,17 @@ definitions:
     OrRd
     <%- endif %>
 
-  map_brackets_headcount_ratio_ipl: &map_brackets_headcount_ratio_ipl [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-
-  map_brackets_headcount_ratio_absolute: &map_brackets_headcount_ratio_absolute [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-
-  map_brackets_headcount_ratio_relative_40: &map_brackets_headcount_ratio_relative_40 [2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
-
-  map_brackets_headcount_ratio_relative_50: &map_brackets_headcount_ratio_relative_50 [3, 6, 9, 12, 15, 18, 21, 24, 1]
-
-  map_brackets_headcount_ratio_relative_60: &map_brackets_headcount_ratio_relative_60 [5, 10, 15, 20, 25, 30, 1]
-
-  map_brackets_headcount_ratio:
+  map_brackets_headcount_ratio: &map_brackets_headcount_ratio
     <% if poverty_line in ["190", "215"] %>
-    *map_brackets_headcount_ratio_ipl
+    [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- elif poverty_line in ["40% of median"] %>
-    *map_brackets_headcount_ratio_relative_40
+    [2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
     <%- elif poverty_line in ["50% of median"] %>
-    *map_brackets_headcount_ratio_relative_50
+    [3, 6, 9, 12, 15, 18, 21, 24, 1]
     <%- elif poverty_line in ["60% of median"] %>
-    *map_brackets_headcount_ratio_relative_60
+    [5, 10, 15, 20, 25, 30, 1]
     <%- else %>
-    *map_brackets_headcount_ratio_absolute
+    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
   entity_names_poverty: &entity_names_poverty
@@ -324,7 +321,7 @@ tables:
           grapher_config:
             title: "{definitions.headcount_ratio_title}"
             subtitle: "{definitions.headcount_ratio_subtitle}"
-            note: "{definitions.note_ppp}"
+            note: "{definitions.note_for_absolute_or_relative_poverty}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
             yAxis:
@@ -333,7 +330,7 @@ tables:
               colorScale:
                 baseColorScheme: "{definitions.headcount_ratio_color_scheme}"
                 binningStrategy: "manual"
-                customNumericValues: "{definitions.map_brackets_headcount_ratio}"
+                customNumericValues: *map_brackets_headcount_ratio
             selectedEntityNames: *entity_names_poverty
 
 
