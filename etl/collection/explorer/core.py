@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from owid.catalog.utils import underscore
 from sqlalchemy.orm import Session
+from typing_extensions import Self
 
 import etl.grapher.model as gm
 from etl.collection.common import (
@@ -16,7 +17,8 @@ from etl.collection.common import (
     expand_config,
 )
 from etl.collection.explorer.legacy import create_explorer_legacy
-from etl.collection.model import CHART_DIMENSIONS, Collection, pruned_json
+from etl.collection.model import Collection
+from etl.collection.utils import CHART_DIMENSIONS, pruned_json
 from etl.config import OWID_ENV, OWIDEnv
 from etl.paths import EXPORT_EXPLORER_DIR
 
@@ -31,7 +33,25 @@ __all__ = [
 class Explorer(Collection):
     """Model for Explorer configuration."""
 
-    config: Dict[str, str]
+    config: Optional[Dict[str, str]] = None
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> Self:
+        """Coerce the dictionary into the expected shape before passing it to the parent class."""
+        # Make a shallow copy so we don't mutate the user's dictionary in-place
+        data = dict(d)
+
+        # If dictionary contains field 'definitions', change it for '_definitions'
+        if "title" not in data:
+            data["title"] = {}
+        if "default_selection" in data:
+            data["default_selection"] = []
+
+        if "config" not in data:
+            raise ValueError("Missing 'config' key in the dictionary.")
+
+        # Now that data is in the expected shape, let the parent class handle the rest
+        return super().from_dict(data)
 
     def __post_init__(self):
         """We set it here because of simplicity.

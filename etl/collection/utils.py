@@ -2,13 +2,15 @@ import re
 from collections import defaultdict
 from copy import deepcopy
 from itertools import product
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, TypeVar
 
 from owid.catalog import Dataset
 
 from etl.db import read_sql
 from etl.files import yaml_dump
 from etl.paths import DATA_DIR
+
+CHART_DIMENSIONS = ["y", "x", "size", "color"]
 
 
 def records_to_dictionary(records, key: str):
@@ -454,3 +456,34 @@ def unique_records(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             seen.add(items)
             unique_records.append(record)
     return unique_records
+
+
+def prune_dict(d: dict) -> dict:
+    """Remove all keys starting with underscore and all empty values from a dictionary.
+
+    NOTE: This method was copied from owid.catalog.utils. It is slightly different in the sense that it does not remove fields with empty lists! This is because there are some fields which are mandatory and can be empty! (TODO: should probably fix the schema / engineering side)
+
+    """
+    out = {}
+    for k, v in d.items():
+        if not k.startswith("_") and v not in [None, {}]:
+            if isinstance(v, dict):
+                out[k] = prune_dict(v)
+            elif isinstance(v, list):
+                out[k] = [prune_dict(x) if isinstance(x, dict) else x for x in v if x not in [None, {}]]
+            else:
+                out[k] = v
+    return out
+
+
+T = TypeVar("T")
+
+
+def pruned_json(cls: T) -> T:
+    orig = cls.to_dict  # type: ignore
+
+    # only keep non-null public variables
+    # calling original to_dict returns dictionaries, not objects
+    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
+
+    return cls

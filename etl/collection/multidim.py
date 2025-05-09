@@ -21,14 +21,12 @@ from etl.collection.common import (
     expand_config,
     map_indicator_path_to_id,
 )
-from etl.collection.model import Collection, pruned_json
-from etl.collection.utils import camelize, has_duplicate_table_names
+from etl.collection.model import Collection
+from etl.collection.utils import camelize, has_duplicate_table_names, pruned_json
 from etl.config import OWIDEnv
 
 # Initialize logger.
 log = get_logger()
-# Dimensions: These are the expected possible dimensions
-CHART_DIMENSIONS = ["y", "x", "size", "color"]
 
 
 __all__ = [
@@ -37,7 +35,6 @@ __all__ = [
 ]
 
 
-# mdim = Multidim.load_yaml("/home/lucas/repos/etl/etl/steps/export/multidim/covid/latest/covid.models.yml")
 @pruned_json
 @dataclass
 class Multidim(Collection):
@@ -211,34 +208,6 @@ def _rename_choices(mdim: Multidim, choice_renames: Optional[Dict[str, Union[Dic
                             choice.name = renames(choice.slug)
                     else:
                         raise ValueError("Invalid choice_renames format.")
-
-
-def build_view_metadata_multi(indicators: List[Dict[str, str]], tables_by_uri: Dict[str, Table]):
-    """TODO: Combine the metadata from the indicators in the view.
-
-    Ideas:
-    -----
-    `indicators` contains the URIs of all indicators used in the view. `tables_by_uri` contains the table objects (and therefore their metadata) easily accessible by their URI. With this information, we can get the metadata of each indicator as:
-
-    ```
-    for indicator in indicators:
-        # Get indicator metadata
-        table_uri, indicator_name = indicator["path"].split("#)
-        metadata = tables_by_uri[table_uri][indicator_name].metadata
-
-        # We also have access on how this indicator was in use (was it for dimension 'y', or 'x'?)
-        dimension = indicator["dimension"] # This can be 'y', 'x', 'size', 'color', etc.
-    ```
-
-    Arguments:
-    ----------
-
-    indicators : List[Dict[str, str]]
-        List of indicators in the view. Each element comes as a record {"path": "...", "dimension": "..."}. The path is the complete URI of the indicator.
-    tables_by_uri : Dict[str, Table]
-        Mapping of table URIs to table objects.
-    """
-    raise NotImplementedError("This function is not yet implemented.")
 
 
 def get_tables_by_uri_mapping(tables_by_name: Dict[str, List[Table]]) -> Dict[str, Table]:

@@ -30,13 +30,10 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from etl.collection.explorer import Explorer, create_explorer, expand_config
-from etl.collection.model import Dimension, DimensionChoice
+from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.multidim import Multidim, combine_config_dimensions, create_mdim
 from etl.collection.utils import has_duplicate_table_names
 from etl.helpers import PathFinder
-
-log = get_logger()
-
 
 log = get_logger()
 
