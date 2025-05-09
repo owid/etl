@@ -1,4 +1,5 @@
 from etl.collection import multidim
+from etl.collection.utils import group_views
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -23,7 +24,7 @@ def run() -> None:
     )
 
     # Group age and metric views under "Side-by-side comparison of causes"
-    grouped_views = multidim.group_views(config_new["views"], by=["age", "metric"])
+    grouped_views = group_views(config_new["views"], by=["age", "metric"])
     for view in grouped_views:
         view["dimensions"]["cause"] = "Side-by-side comparison of causes"
 

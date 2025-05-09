@@ -30,8 +30,9 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from etl.collection.explorer import Explorer, create_explorer, expand_config
+from etl.collection.model import Collection
 from etl.collection.model.dimension import Dimension, DimensionChoice
-from etl.collection.multidim import Multidim, combine_config_dimensions, create_mdim
+from etl.collection.multidim import combine_config_dimensions, create_mdim
 from etl.collection.utils import has_duplicate_table_names
 from etl.helpers import PathFinder
 
@@ -245,14 +246,14 @@ def combine_explorers(
 
 
 def combine_mdims(
-    mdims: List[Multidim],
+    mdims: List[Collection],
     mdim_name: str,
     config: Optional[Dict[str, Any]] = None,
     dependencies: Optional[Set[str]] = None,
     mdim_dimension_name: Optional[str] = None,
     mdim_choices_names: Optional[List[str]] = None,
     force_mdim_dimension: Optional[bool] = False,
-) -> Multidim:
+) -> Collection:
     """Combine multiple MDIMs into a single one.
 
     Notes:
@@ -260,7 +261,7 @@ def combine_mdims(
     - Dimensions can vary across explorers, that's fine. This function consolidates all of them. If there are multiple slugs in use with different names, this function will rename them to preserve uniqueness.
 
     Args:
-        mdims: List[Multidim]
+        mdims: List[Collection]
             List of MDIMs to be combined.
         mdim_name: str
             Name of the combined MDIM.
@@ -416,7 +417,7 @@ def _extract_choice_slug_changes(df_choices) -> Dict[str, Any]:
 
 
 def _combine_dimensions(
-    df_choices: pd.DataFrame, cols_choices: List[str], collection: Union[Explorer, Multidim]
+    df_choices: pd.DataFrame, cols_choices: List[str], collection: Union[Explorer, Collection]
 ) -> List[Dimension]:
     """Combine dimensions from different explorers"""
     # Dimension bucket
@@ -444,7 +445,7 @@ def _combine_dimensions(
     return dimensions
 
 
-def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Union[Multidim, Explorer]]:
+def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapping[str, Union[Collection, Explorer]]:
     """Access each explorer, and update choice slugs in views"""
     for collection_id, change in choice_slug_changes.items():
         # Get collection
@@ -467,7 +468,7 @@ def _update_choice_slugs_in_views(choice_slug_changes, collection_by_id) -> Mapp
     return collection_by_id
 
 
-def _build_df_choices(collections_by_id: Mapping[str, Union[Multidim, Explorer]]) -> Tuple[pd.DataFrame, List[str]]:
+def _build_df_choices(collections_by_id: Mapping[str, Union[Collection, Explorer]]) -> Tuple[pd.DataFrame, List[str]]:
     # Collect all choices in a dataframe: choice_slug, choice_name, ..., collection_id, dimension_slug.
     records = []
     for i, explorer in collections_by_id.items():

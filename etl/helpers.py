@@ -24,8 +24,9 @@ from owid.catalog.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 
 from etl import paths
-from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer, create_explorer_legacy
-from etl.collection.multidim import Multidim, MultidimSet, create_mdim, create_mdim_v2
+from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
+from etl.collection.model import Collection
+from etl.collection.multidim import CollectionSet, create_collection, create_collection_from_config
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -519,7 +520,7 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
         is_private: Optional[bool] = None,
-    ) -> Union[catalog.Dataset, Snapshot, MultidimSet]:
+    ) -> Union[catalog.Dataset, Snapshot, CollectionSet]:
         """Load a (dataset or export) dependency, given its attributes (at least its short name)."""
         dependency_step_name = self.get_dependency_step_name(
             step_type=step_type,
@@ -536,7 +537,7 @@ class PathFinder:
             mdims_path = (
                 paths.EXPORT_MDIMS_DIR / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
             )
-            return MultidimSet(mdims_path)
+            return CollectionSet(mdims_path)
         else:
             dataset_path = (
                 paths.DATA_DIR
@@ -572,12 +573,12 @@ class PathFinder:
         assert isinstance(dataset, catalog.Dataset)
         return dataset
 
-    def load_mdims(
+    def load_collectionset(
         self,
         short_name: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
-    ) -> MultidimSet:
+    ) -> CollectionSet:
         mdims = self.load_dependency(
             step_type="export",
             short_name=short_name or self.short_name,
@@ -585,7 +586,7 @@ class PathFinder:
             namespace=namespace,
             version=version,
         )
-        assert isinstance(mdims, MultidimSet)
+        assert isinstance(mdims, CollectionSet)
         return mdims
 
     def load_etag_url(self) -> str:
@@ -646,8 +647,8 @@ class PathFinder:
             repack=repack,
         )
 
-    def create_mdim(self, config, mdim_name: Optional[str] = None) -> Multidim:
-        """Create a Multidim object.
+    def create_mdim(self, config, mdim_name: Optional[str] = None) -> Collection:
+        """Create a Collection object.
 
         Args:
         -----
@@ -657,72 +658,14 @@ class PathFinder:
         mdim_name: str
             Name of the MDIM page. Default is short_name from mdim catalog path.
         """
-        # Create Multidim
-        mdim = create_mdim(
+        # Create Collection object
+        col = create_collection_from_config(
             config,
             self.dependencies,
             catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}",
         )
 
-        return mdim
-
-    def create_mdim_v2(
-        self,
-        config: Dict[str, Any],
-        mdim_name: Optional[str] = None,
-        tb: Optional[Table] = None,
-        indicator_names: Optional[Union[str, List[str]]] = None,
-        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
-        common_view_config: Optional[Dict[str, Any]] = None,
-        indicators_slug: Optional[str] = None,
-        indicator_as_dimension: bool = False,
-        explorer_name: Optional[str] = None,
-        choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
-        catalog_path_full: bool = False,
-    ) -> Multidim:
-        """Experimental smarter explorer creation.
-
-        Args:
-        -----
-        config: dict
-            Configuration YAML for the explorer.
-        mdim_name: str
-            Name of the MDIM page. Default is short_name from mdim catalog path.
-        catalog_path: str
-            Catalog path for the MDIM. This is used to create the MDIM in the database.
-        tb: Table
-            Table object with data. This data will be expanded for the given indicators and dimensions.
-        indicator_names: Optional[Union[str, List[str]]]
-            Name of the indicators to be used. If None, all indicators are used.
-        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]]
-            Dimensions to be used. If None, all dimensions are used. If a list, all dimensions are used with the given names. If a dict, key represent dimensions to use and values choices to use. Note that if a list or dictionary is given, all dimensions must be present.
-        common_view_config: Optional[Dict[str, Any]]
-            Common view configuration to be used for all views.
-        indicators_slug: Optional[str]
-            Slug to be used for the indicators. A default is used.
-        indicator_as_dimension: bool
-            If True, the indicator is treated as a dimension.
-        explorer_name: Optional[str]
-            Name of the explorer. If None, the table name is used.
-        choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]]
-            Renames for choices. If a dictionary, the key is the dimension slug and the value is a dictionary with the original slug as key and the new name as value. If a callable, the function should return the new name for the given slug. NOTE: If the callable returns None, the name is not changed.
-        catalog_path_full: bool
-            If True, the full path is used for the catalog. If False, a shorter version is used (e.g. table#indicator` or `dataset/table#indicator`).
-        """
-        return create_mdim_v2(
-            config_yaml=config,
-            dependencies=self.dependencies,
-            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}",
-            tb=tb,
-            indicator_names=indicator_names,
-            dimensions=dimensions,
-            common_view_config=common_view_config,
-            indicators_slug=indicators_slug,
-            indicator_as_dimension=indicator_as_dimension,
-            explorer_name=explorer_name,
-            choice_renames=choice_renames,
-            catalog_path_full=catalog_path_full,
-        )
+        return col
 
     def create_explorer(
         self,
@@ -739,13 +682,74 @@ class PathFinder:
             Name of the explorer. If none is provided, it will use the short_name from the explorer catalog path.
         """
         # Create Explorer object
-        explorer = create_explorer(
+        explorer = create_collection_from_config(
             config=config,
             dependencies=self.dependencies,
             catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}",
+            validate_schema=False,
         )
 
+        assert isinstance(explorer, Explorer), "Unexpected type of explorer object. Expected Explorer."
+
         return explorer
+
+    def create_collection(
+        self,
+        config: Dict[str, Any],
+        short_name: Optional[str] = None,
+        tb: Optional[Table] = None,
+        indicator_names: Optional[Union[str, List[str]]] = None,
+        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
+        common_view_config: Optional[Dict[str, Any]] = None,
+        indicators_slug: Optional[str] = None,
+        indicator_as_dimension: bool = False,
+        choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
+        catalog_path_full: bool = False,
+        explorer: bool = False,
+    ) -> Collection:
+        """Experimental smarter explorer creation.
+
+        Args:
+        -----
+        config: dict
+            Configuration YAML for the explorer.
+        short_name: str
+            Name of the MDIM page. Default is short_name from mdim catalog path.
+        catalog_path: str
+            Catalog path for the MDIM. This is used to create the MDIM in the database.
+        tb: Table
+            Table object with data. This data will be expanded for the given indicators and dimensions.
+        indicator_names: Optional[Union[str, List[str]]]
+            Name of the indicators to be used. If None, all indicators are used.
+        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]]
+            Dimensions to be used. If None, all dimensions are used. If a list, all dimensions are used with the given names. If a dict, key represent dimensions to use and values choices to use. Note that if a list or dictionary is given, all dimensions must be present.
+        common_view_config: Optional[Dict[str, Any]]
+            Common view configuration to be used for all views.
+        indicators_slug: Optional[str]
+            Slug to be used for the indicators. A default is used.
+        indicator_as_dimension: bool
+            If True, the indicator is treated as a dimension.
+        choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]]
+            Renames for choices. If a dictionary, the key is the dimension slug and the value is a dictionary with the original slug as key and the new name as value. If a callable, the function should return the new name for the given slug. NOTE: If the callable returns None, the name is not changed.
+        catalog_path_full: bool
+            If True, the full path is used for the catalog. If False, a shorter version is used (e.g. table#indicator` or `dataset/table#indicator`).
+        explorer: bool
+            If True, the collection is created as an explorer. If False, the collection is created as a MDIM.
+        """
+        return create_collection(
+            config_yaml=config,
+            dependencies=self.dependencies,
+            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
+            tb=tb,
+            indicator_names=indicator_names,
+            dimensions=dimensions,
+            common_view_config=common_view_config,
+            indicators_slug=indicators_slug,
+            indicator_as_dimension=indicator_as_dimension,
+            choice_renames=choice_renames,
+            catalog_path_full=catalog_path_full,
+            explorer=explorer,
+        )
 
     def create_explorer_legacy(
         self,

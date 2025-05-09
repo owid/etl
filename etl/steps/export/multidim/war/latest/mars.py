@@ -40,7 +40,7 @@ def run() -> None:
     tb = adjust_dimensions(tb)
 
     # Create MDIM
-    mdim = paths.create_mdim_v2(
+    mdim = paths.create_collection(
         config,
         mdim_name="mars",
         tb=tb,

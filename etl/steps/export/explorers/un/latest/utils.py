@@ -1,8 +1,10 @@
 """The functions below are a bit more specific to this step, so maybe harder to generalize."""
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
 
-from etl.collection.beta import combine_explorers, create_explorer_experimental
+from etl.collection.beta import combine_explorers
+from etl.collection.explorer import Explorer
+from etl.helpers import PathFinder
 
 
 class ExplorerCreator:
@@ -12,7 +14,7 @@ class ExplorerCreator:
     """
 
     def __init__(self, paths, ds, ds_proj):
-        self.paths = paths
+        self.paths: PathFinder = paths
         self.ds = ds
         self.ds_proj = ds_proj
         self.tbs = {"proj": {}, "estimates": {}}
@@ -31,9 +33,13 @@ class ExplorerCreator:
             self.tbs["proj"][table_name] = self.ds_proj.read(table_name, load_data=False)
         return self.tbs["proj"][table_name]
 
-    def create_manual(self, config: Dict[str, Any], **kwargs):
-        explorer = create_explorer_experimental(self.paths, config, indicator_as_dimension=True, **kwargs)
-        return explorer
+    def create_manual(self, config: Dict[str, Any], **kwargs) -> Explorer:
+        explorer = self.paths.create_collection(
+            config=config,
+            indicator_as_dimension=True,
+            **kwargs,
+        )
+        return cast(Explorer, explorer)
 
     def create(
         self,
@@ -50,8 +56,11 @@ class ExplorerCreator:
         tb_proj = self.table_proj(table_name)
 
         # Explorer with estimates
-        explorer = create_explorer_experimental(
-            self.paths, tb=tb, dimensions=dimensions, indicator_as_dimension=True, **kwargs
+        explorer = self.paths.create_collection(
+            tb=tb,
+            dimensions=dimensions,
+            indicator_as_dimension=True,
+            **kwargs,
         )
 
         # Explorer with projections
@@ -60,8 +69,11 @@ class ExplorerCreator:
         else:
             dimensions["variant"] = ["medium", "high", "low"]
 
-        explorer_proj = create_explorer_experimental(
-            self.paths, tb=tb_proj, dimensions=dimensions, indicator_as_dimension=True, **kwargs
+        explorer_proj = self.paths.create_collection(
+            tb=tb_proj,
+            dimensions=dimensions,
+            indicator_as_dimension=True,
+            **kwargs,
         )
 
         explorer = combine_explorers(
