@@ -30,5 +30,5 @@ steps:
     - snapshot://papers/2025-05-08/soo_bae_et_al_2012.csv
     - snapshot://usda_fs/2025-05-07/forest_share.csv
     - data://garden/faostat/2025-03-17/faostat_rl
-  data://grapher/forests/2025-05-08/forest_share:
+  data://grapher/forests/2025-05-09/forest_share:
     - data://garden/forests/2025-05-08/forest_share

@@ -73,13 +73,13 @@ def run() -> None:
     #
 
     # Improve table format.
-    tb = tb.format(["country", "year"])
+    tb_com = tb_com.format(["country", "year"])
 
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb])
+    ds_garden = paths.create_dataset(tables=[tb_com], default_metadata=snap_meadow_defra.metadata)
 
     # Save garden dataset.
     ds_garden.save()
