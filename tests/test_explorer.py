@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from etl.collection.explorer import Explorer, extract_explorers_tables
+from etl.collection.explorer.core import Explorer, extract_explorers_tables
 from etl.collection.model import Dimension
 
 # EXAMPLE explorer. Inspired by Mpox explorer.

@@ -43,23 +43,6 @@ log = get_logger()
 MDIM_SLUG = "mdim"
 MDIM_TITLE = "MDIM"
 
-# def explorer_to_mdim(explorer: Explorer, mdim_name: str):
-#     """TODO: Experimental."""
-#     config = explorer.to_dict()
-#     config_mdim = {
-#         "title": {
-#             "title": "Population",
-#             "title_variant": "by age and age group",
-#         },
-#         "default_selection": ["United States", "India", "China", "Indonesia", "Pakistan"],
-#         "dimensions": config["dimensions"],
-#         "views": config["views"],
-#     }
-#     return paths.create_mdim(
-#         config=config_mdim,
-#         mdim_name=mdim_name,
-#     )
-
 
 def create_explorer_experimental(
     paths: PathFinder,

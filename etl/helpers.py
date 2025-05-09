@@ -24,8 +24,7 @@ from owid.catalog.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 
 from etl import paths
-from etl.collection.explorer import Explorer, create_explorer
-from etl.collection.explorer_legacy import ExplorerLegacy, _create_explorer_legacy
+from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer, create_explorer_legacy
 from etl.collection.multidim import Multidim, MultidimSet, create_mdim, create_mdim_v2
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks
@@ -775,7 +774,7 @@ class PathFinder:
 
         explorer_catalog_path = f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name}"
 
-        explorer = _create_explorer_legacy(
+        explorer = create_explorer_legacy(
             catalog_path=explorer_catalog_path,
             config=config,
             df_graphers=df_graphers,
