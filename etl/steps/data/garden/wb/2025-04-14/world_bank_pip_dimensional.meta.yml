@@ -447,11 +447,11 @@ definitions:
     <%- elif poverty_line in ["100"] %>
     [0.2, 0.4, 0.6, 0.8, 1]
     <%- elif poverty_line in ["190", "215"] %>
-    [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, <<poverty_line|float>>]
+    [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, <<poverty_line|float/100>>]
     <%- elif poverty_line in ["320", "365"] %>
-    [0.5, 1, 1.5, 2, 2.5, 3, <<poverty_line|float>>]
+    [0.5, 1, 1.5, 2, 2.5, 3, <<poverty_line|float/100>>]
     <%- elif poverty_line in ["550", "685"] %>
-    [1, 2, 3, 4, 5, <<poverty_line|float>>]
+    [1, 2, 3, 4, 5, <<poverty_line|float/100>>]
     <%- elif poverty_line in ["1000"] %>
     [2, 4 ,6, 8, 10]
     <%- elif poverty_line in ["2000"] %>
