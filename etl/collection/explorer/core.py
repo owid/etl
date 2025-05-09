@@ -33,7 +33,7 @@ __all__ = [
 class Explorer(Collection):
     """Model for Explorer configuration."""
 
-    config: Optional[Dict[str, str]] = None
+    config: Optional[Dict[str, Any]] = None
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> Self:
