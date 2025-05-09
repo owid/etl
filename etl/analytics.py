@@ -15,7 +15,13 @@ import pandas as pd
 import requests
 from structlog import get_logger
 
-from etl.config import METABASE_API_KEY, METABASE_SEMANTIC_LAYER_DATABASE_ID, METABASE_URL, OWID_ENV
+from etl.config import (
+    DEFAULT_TO_DATASETTE,
+    METABASE_API_KEY,
+    METABASE_SEMANTIC_LAYER_DATABASE_ID,
+    METABASE_URL,
+    OWID_ENV,
+)
 
 # Initialize logger.
 log = get_logger()
@@ -221,7 +227,7 @@ def read_datasette(
     return df
 
 
-def read_metabase(sql: str) -> pd.DataFrame:
+def read_metabase(sql: str, default_to_datasette: bool = DEFAULT_TO_DATASETTE) -> pd.DataFrame:
     """Retrieve data from the Metabase API using an arbitrary sql query.
 
     NOTE: This function has been adapted from this example in the analytics repo:
@@ -231,6 +237,8 @@ def read_metabase(sql: str) -> pd.DataFrame:
     ----------
     sql : str
         SQL query to execute.
+    default_to_datasette : bool, optional
+        If True, use Datasette as a fallback if Metabase API credentials are not available.
 
     Returns
     -------
@@ -261,6 +269,14 @@ def read_metabase(sql: str) -> pd.DataFrame:
     # double quotes b/c the sql query might include single quotes (and DuckDB doesn't allow double quotes). So the line below
     # executes the url encoding without replacing any quotes within the sql query.
     urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
+
+    ####################################################################################################################
+    if default_to_datasette and (not METABASE_API_KEY or not METABASE_SEMANTIC_LAYER_DATABASE_ID):
+        log.warning(
+            "Missing Metabase credentials. Add them to your .env file to avoid this warning. For now, Datasette will be used."
+        )
+        return read_datasette(sql=sql)
+    ####################################################################################################################
 
     # Send request.
     response = requests.post(
