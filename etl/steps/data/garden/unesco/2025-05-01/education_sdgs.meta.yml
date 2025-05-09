@@ -59,11 +59,11 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - This indicator estimates the share of adolescents who complete lower-secondary education, even if they do so later than the expected age.
-          - It refers to the population aged 3 to 5 years above the official age for the last grade of lower-secondary school who are estimated to have completed that level.
-          - The age group is defined based on the standard education path—for example, if lower-secondary begins at age 12 and lasts three years, the completion rate is assessed among 18- to 20-year-olds.
+          - This indicator estimates the share of adolescents who complete lower secondary education, even if they do so later than the expected age.
+          - It refers to the population aged 3 to 5 years above the official age for the last grade of lower secondary school who are estimated to have completed that level.
+          - The age group is defined based on the standard education path—for example, if lower secondary begins at age 12 and lasts three years, the completion rate is assessed among 18- to 20-year-olds.
           - Estimates are modelled using household surveys and administrative records, helping fill data gaps and support trend analysis in countries without recent direct data.
-          - A high completion rate suggests that most adolescents reach the final grade of lower-secondary school, while lower rates may point to issues in access, progression, or retention.
+          - A high completion rate suggests that most adolescents reach the final grade of lower secondary school, while lower rates may point to issues in access, progression, or retention.
           - Modelled rates offer improved cross-country comparability but may differ from national figures due to different definitions or data quality.
           - Changes in school duration, entry age, or national classification over time may also affect how results are interpreted.
         presentation:
@@ -78,11 +78,11 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - This indicator estimates how many young people complete upper-secondary education, even if they do so later than the expected age.
-          - It reflects the percentage of the population aged 3 to 5 years above the official age for the last grade of upper-secondary school who are estimated to have completed that level.
-          - Completion age is based on the standard progression—if upper-secondary starts at age 15 and lasts three years, the indicator is assessed among 21- to 23-year-olds.
+          - This indicator estimates how many young people complete upper secondary education, even if they do so later than the expected age.
+          - It reflects the percentage of the population aged 3 to 5 years above the official age for the last grade of upper secondary school who are estimated to have completed that level.
+          - Completion age is based on the standard progression—if upper secondary starts at age 15 and lasts three years, the indicator is assessed among 21- to 23-year-olds.
           - Modelled estimates combine household survey responses with administrative data to fill gaps and adjust for inconsistencies in reporting.
-          - A high value indicates that most youth eventually complete upper-secondary education, while a low value may highlight challenges related to cost, access, or academic failure.
+          - A high value indicates that most youth eventually complete upper secondary education, while a low value may highlight challenges related to cost, access, or academic failure.
           - These estimates allow for better international comparison but may not match official national data exactly, especially where school structures differ.
           - Limitations include variations in programme length, national classification systems, and the quality or recency of input data used in modelling.
         presentation:
@@ -171,6 +171,10 @@ tables:
           - Data sources include national censuses and household surveys. The UIS and partners may also use modelled estimates when recent or complete data are not available.
           - This indicator measures basic literacy, not functional literacy. It reflects the presence of foundational skills, but not whether they are applied effectively in everyday contexts.
           - Cross-country comparability may be affected by differences in definitions, data collection methods, and the extent to which responses are self-reported or verified.
+        presentation:
+          title_public: Youth literacy rate, adjusted gender parity index
+        display:
+          numDecimalPlaces: 1
 
       educational_attainment_rate__completed_post_secondary_non_tertiary_education_or_higher__population_25plus_years__both_sexes__pct__ea_4t8_ag25t99:
         title: Share of the population with post-secondary education (25+)
@@ -186,7 +190,7 @@ tables:
           - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, and some educational programmes may not be easily classified.
           - In addition, the indicator reflects only the level of education completed—not the quality of education or whether the person uses their qualification in the labour market.
         presentation:
-          title_public: Share of the population with post-secondary education (25+)
+          title_public: Share of the population aged 25+ years with post-secondary education
         display:
           name: Post-secondary education
           numDecimalPlaces: 1
@@ -204,6 +208,10 @@ tables:
           - The data come from national censuses, labour force surveys, or other household surveys, and are usually mapped to the ISCED-11 framework after data collection.
           - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, and some educational programmes may not be easily classified.
           - In addition, the indicator reflects only the level of education completed—not the quality of education or whether the person uses their qualification in the labour market.
+        presentation:
+          title_public: Share of the population aged 25+ years with lower secondary education
+        display:
+          numDecimalPlaces: 1
 
       pupil_qualified_teacher_ratio_in_primary_education__headcount_basis__ptrhc_1_qualified:
         description_short: A qualified teacher is one who has the minimum academic qualifications necessary to teach at a [primary](#dod:primary-education) level of education in a given country.
@@ -269,6 +277,11 @@ tables:
           - A high out-of-school rate highlights the need for improved access and targeted policies to reach excluded groups. When disaggregated, the indicator helps identify gaps by sex, location, or socioeconomic status.
           - The data comes from administrative records and household surveys that collect information on enrolment by single year of age and compare it with population estimates for the same group.
           - As with all estimates, there are limitations. Differences in data sources, enrolment definitions, and the timing of data collection (especially if late in the school year) can affect accuracy.
+        presentation:
+          title_public: Out-of-school rate for children of primary school age
+        display:
+          name: Primary school age
+          numDecimalPlaces: 1
 
       expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf:
         title: Expenditure on education as share of government expenditure
@@ -305,7 +318,7 @@ tables:
 
       completion_rate__upper_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
         title: Completion rate in upper secondary education, adjusted gender parity index (GPIA)
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [upper-secondary](#dod:upper-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [upper secondary](#dod:upper-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
           - Many young people never reach the final grade of upper secondary education—this indicator shows how close girls and boys are to parity in completing this level by a slightly older age than expected.
@@ -319,7 +332,7 @@ tables:
 
       completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
         title: Completion rate in lower secondary education, adjusted gender parity index (GPIA)
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [lower-secondary](#dod:lower-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [lower secondary](#dod:lower-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
           - Many adolescents never reach the end of lower secondary school—this indicator shows how close girls and boys are to parity in completing this level by a slightly older age than expected.
@@ -332,7 +345,7 @@ tables:
 
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__both_sexes__pct__rofst_2_cp:
         title: Out-of-school rate for adolescents of lower secondary school age
-        description_short: Percentage of adolescents in the official age group for [lower-secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
+        description_short: Percentage of adolescents in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -404,16 +417,16 @@ tables:
 
 
       proportion_of_students_at_the_end_of_lower_secondary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_lowersec:
-        title: Share of students at the end of lower-secondary education with minimum reading skills
-        description_short: Percentage of students who meet basic reading skills by the end of [lower-secondary](#dod:lower-secondary-education) school.
+        title: Share of students at the end of lower secondary education with minimum reading skills
+        description_short: Percentage of students who meet basic reading skills by the end of [lower secondary](#dod:lower-secondary-education) school.
         unit: "%"
         short_unit: "%"
         description_key:
-          - This indicator shows the percentage of students who reach minimum reading proficiency by the end of lower-secondary school.
+          - This indicator shows the percentage of students who reach minimum reading proficiency by the end of lower secondary school.
           - Minimum proficiency at this level means students can connect ideas across different types of texts, understand the author’s intent, and draw basic conclusions.
           - It only includes students who are still in school—not those who dropped out or were never enrolled.
           - Reading skills are measured through standardized tests, such as PISA or national assessments.
-          - A higher percentage means more students are developing foundational reading skills before finishing lower-secondary education.
+          - A higher percentage means more students are developing foundational reading skills before finishing lower secondary education.
           - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_primary:
@@ -430,14 +443,14 @@ tables:
           - Cross-country comparisons may be affected by differences in test design and standards.
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
-        title: Share of children achieving minimum reading proficiency by the end of lower-secondary age
-        description_short: Percentage of children at [lower-secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards, including the ability to connect main ideas across different text types, understand the author’s intentions, and draw conclusions from the text, adjusted for national school completion rates.
+        title: Share of children achieving minimum reading proficiency by the end of lower secondary age
+        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards, including the ability to connect main ideas across different text types, understand the author’s intentions, and draw conclusions from the text, adjusted for national school completion rates.
         unit: "%"
         short_unit: "%"
         description_key:
-          - This indicator shows the share of all children who reach minimum reading proficiency by the expected age of completing lower-secondary education.
+          - This indicator shows the share of all children who reach minimum reading proficiency by the expected age of completing lower secondary education.
           - Minimum proficiency at this level means students can connect ideas across different types of texts, understand the author’s intent, and draw basic conclusions.
-          - It combines the share of children who complete lower-secondary education with the share who meet minimum reading standards.
+          - It combines the share of children who complete lower secondary education with the share who meet minimum reading standards.
           - This captures outcomes across the full population—not just students still in school.
           - A higher percentage suggests that most children are both completing school and acquiring core reading skills.
           - Data comes from assessments like PIRLS or ERCE and completion estimates from surveys or models.
@@ -458,14 +471,14 @@ tables:
           - Limitations include differences in assessment tools, definitions, and the timing of data sources.
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_2_math:
-        title: Share of children achieving minimum math proficiency by the end of lower-secondary age
-        description_short: Percentage of children at [lower-secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower-secondary](#dod:lower-secondary-education) education. This means children can apply algebra, interpret graphs, and solve real-world problems.
+        title: Share of children achieving minimum math proficiency by the end of lower secondary age
+        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This means children can apply algebra, interpret graphs, and solve real-world problems.
         unit: "%"
         short_unit: "%"
         description_key:
-          - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing lower-secondary school.
+          - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing lower secondary school.
           - Minimum proficiency means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-          - It combines the percentage of children who complete lower-secondary school with the percentage who meet the math benchmark.
+          - It combines the percentage of children who complete lower secondary school with the percentage who meet the math benchmark.
           - This provides a fuller picture of learning outcomes—not just for enrolled students, but for the entire age group.
           - A higher percentage means more children are both staying in school and acquiring core math skills.
           - Data comes from international assessments such as TIMSS, along with completion estimates based on surveys or models.
