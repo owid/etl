@@ -348,6 +348,42 @@ definitions:
     [10000000000,30000000000,100000000000,300000000000,1000000000000,3000000000000,10000000000000,1]
     <%- endif %>
 
+  map_brackets_avg: &map_brackets_avg
+    <% if decile in [1, 2, 3, 4] %>
+    [1, 2, 5, 10, 20, 1]
+    <%- elif decile in [5, 6, 7, 8] %>
+    [1, 2, 5, 10, 20, 50, 1]
+    <%- elif decile in [9] %>
+    [1, 2, 5, 10, 20, 50, 100, 1]
+    <%- elif decile in [10] %>
+    [1, 2, 5, 10, 20, 50, 100, 200, 1]
+    <%- endif %>
+
+  map_brackets_share: &map_brackets_share
+    <% if decile in [1] %>
+    [1, 2, 3, 4, 1]
+    <%- elif decile in [2] %>
+    [1, 2, 3, 4, 5, 1]
+    <%- elif decile in [3] %>
+    [2, 3, 4, 5, 6, 1]
+    <%- elif decile in [4] %>
+    [2, 3, 4, 5, 6, 7, 1]
+    <%- elif decile in [5] %>
+    [2, 3, 4, 5, 6, 7, 8, 9, 1]
+    <%- elif decile in [6] %>
+    [4, 5, 6, 7, 8, 9, 1]
+    <%- elif decile in [7] %>
+    [6, 7, 8, 9, 10, 11, 1]
+    <%- elif decile in [8] %>
+    [8, 9, 10, 11, 12, 13, 1]
+    <%- elif decile in [9] %>
+    [8, 10, 12, 14, 16, 1]
+    <%- elif decile in [10] %>
+    [20, 25, 30, 35, 40, 45, 50, 1]
+    <%- endif %>
+
+
+
   entity_names_poverty: &entity_names_poverty
     - Bangladesh
     - Bolivia
@@ -363,6 +399,19 @@ definitions:
     - United States
     - France
     - China
+
+  entity_names_incomes_across_distribution: &entity_names_incomes_across_distribution
+    - World
+    - United States
+    - South Korea
+    - Spain
+    - China
+    - Mauritania
+    - Ghana
+    - India
+    - Ethiopia
+    - Madagascar
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -546,8 +595,10 @@ tables:
             note: "{definitions.note_total_shortfall}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
+            hideRelativeToggle: false
             yAxis:
               min: 0
+              canChangeScaleType: true
             map:
               colorScale:
                 baseColorScheme: "{definitions.total_shortfall_color_scheme}"
@@ -871,6 +922,23 @@ tables:
           name: Mean
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: Mean <<welfare_type>> per day
+            subtitle: "{definitions.ppp_adjustment_subtitle}"
+            note: "{definitions.note_ppp}"
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            hideRelativeToggle: false
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: "BuGn"
+                binningStrategy: "manual"
+                customNumericValues: [0, 1, 2, 5, 10, 20, 50, 1]
+            selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
         title: Median (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -887,8 +955,24 @@ tables:
           name: Median
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: Median <<welfare_type>> per day
+            subtitle: "{definitions.ppp_adjustment_subtitle}"
+            note: "{definitions.note_ppp}"
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            hideRelativeToggle: false
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: "Blues"
+                binningStrategy: "manual"
+                customNumericValues: [0, 1, 2, 5, 10, 20, 1]
+            selectedEntityNames: *entity_names_incomes_across_distribution
 
-      # NOTE: Edit these indicators once the final data structure is confirmed
       avg:
         title: Average ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
@@ -905,6 +989,23 @@ tables:
           name: Average ({definitions.percentiles_avg_share})
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: Mean <<welfare_type>> per day within the {definitions.percentiles_avg_share}
+            subtitle: The mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population). {definitions.ppp_adjustment_subtitle}
+            note: "{definitions.note_ppp}"
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            hideRelativeToggle: false
+            yAxis:
+              min: 0
+              canChangeScaleType: true
+            map:
+              colorScale:
+                baseColorScheme: "Greens"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_avg
+            selectedEntityNames: *entity_names_incomes_across_distribution
 
       share:
         title: Share ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -920,7 +1021,21 @@ tables:
           name: Share ({definitions.percentiles_avg_share})
           numDecimalPlaces: 1
           <<: *common_display
-
+        presentation:
+          grapher_config:
+            title: <<welfare_type>> share of the {definitions.percentiles_avg_share}
+            subtitle: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population).
+            note: "{definitions.note_without_ppp}"
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "OrRd"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_share
+            selectedEntityNames: *entity_names_incomes_across_distribution
       thr:
         title: Threshold ({definitions.percentiles_thr}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
