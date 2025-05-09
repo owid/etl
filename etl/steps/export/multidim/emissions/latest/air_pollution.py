@@ -4,7 +4,7 @@ This mdim was created as a proof of concept. It can be deleted if not used.
 
 from owid.catalog.meta import TableDimension
 
-from etl.collections import multidim
+from etl.collection import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.

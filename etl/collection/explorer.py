@@ -7,15 +7,15 @@ import numpy as np
 import pandas as pd
 from owid.catalog.utils import underscore
 
-from etl.collections.common import (
+from etl.collection.common import (
     INDICATORS_SLUG,
     combine_config_dimensions,
     create_mdim_or_explorer,
     expand_config,
     get_mapping_paths_to_id,
 )
-from etl.collections.explorer_legacy import _create_explorer_legacy
-from etl.collections.model import CHART_DIMENSIONS, Collection, pruned_json
+from etl.collection.explorer_legacy import _create_explorer_legacy
+from etl.collection.model import CHART_DIMENSIONS, Collection, pruned_json
 from etl.config import OWIDEnv
 from etl.paths import EXPORT_EXPLORER_DIR
 
@@ -86,7 +86,7 @@ class Explorer(Collection):
         self.sort_choices({"indicator": order})
 
     def upsert_to_db(self, owid_env: OWIDEnv):
-        # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collections.multidim.upsert_mdim_data_page`.
+        # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collection.multidim.upsert_mdim_data_page`.
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
         df_grapher, df_columns = extract_explorers_tables(self)
 
