@@ -933,7 +933,9 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         last_welfare_type.sort()
 
         # Count how many times welfare_type switches from income to consumption and vice versa
-        number_of_welfare_series = (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1)).cumsum().max()
+        number_of_welfare_series = (
+            (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1)).astype(float).cumsum().max()
+        )
 
         # If there are only two welfare series, use both, except for countries where we have to choose one
         if number_of_welfare_series == 2:
