@@ -220,10 +220,6 @@ def run() -> None:
         short_name=paths.short_name,
     )
 
-    # Remove dimensions previously created by pivots
-    for column in tb.columns:
-        tb[column].metadata.dimensions = None
-
     #
     # Save outputs.
     #
@@ -567,7 +563,7 @@ def pivot_table(tb: Table, index: List[str], columns: List[str]) -> Table:
     Pivot the table to calculate indicators more easily
     """
 
-    tb_pivot = tb.pivot(index=index, columns=columns)
+    tb_pivot = tb.pivot(index=index, columns=columns, fill_dimensions=False)
 
     return tb_pivot
 
