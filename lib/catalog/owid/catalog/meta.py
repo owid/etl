@@ -316,7 +316,7 @@ class VariableMeta(MetaBase):
             meta.description_key = [x for x in meta.description_key if x]
 
         # Convert strings to lists when needed
-        gconf = meta.presentation.grapher_config
+        gconf = getattr(meta.presentation, "grapher_config", None)
         if gconf:
             try:
                 color_scale = gconf["map"]["colorScale"]
