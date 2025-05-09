@@ -16,7 +16,7 @@ import requests
 from structlog import get_logger
 
 from etl.config import (
-    DEFAULT_TO_DATASETTE,
+    FORCE_DATASETTE,
     METABASE_API_KEY,
     METABASE_SEMANTIC_LAYER_DATABASE_ID,
     METABASE_URL,
@@ -227,7 +227,7 @@ def read_datasette(
     return df
 
 
-def read_metabase(sql: str, default_to_datasette: bool = DEFAULT_TO_DATASETTE) -> pd.DataFrame:
+def read_metabase(sql: str, force_datasette: bool = FORCE_DATASETTE) -> pd.DataFrame:
     """Retrieve data from the Metabase API using an arbitrary sql query.
 
     NOTE: This function has been adapted from this example in the analytics repo:
@@ -237,8 +237,8 @@ def read_metabase(sql: str, default_to_datasette: bool = DEFAULT_TO_DATASETTE) -
     ----------
     sql : str
         SQL query to execute.
-    default_to_datasette : bool, optional
-        If True, use Datasette as a fallback if Metabase API credentials are not available.
+    force_datasette : bool, optional
+        If True, use Datasette instead of Metabase. This is a fallback if Metabase API credentials are not available.
 
     Returns
     -------
@@ -271,7 +271,7 @@ def read_metabase(sql: str, default_to_datasette: bool = DEFAULT_TO_DATASETTE) -
     urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
 
     ####################################################################################################################
-    if default_to_datasette and (not METABASE_API_KEY or not METABASE_SEMANTIC_LAYER_DATABASE_ID):
+    if force_datasette:
         log.warning(
             "Missing Metabase credentials. Add them to your .env file to avoid this warning. For now, Datasette will be used."
         )
@@ -781,18 +781,7 @@ def get_post_references_of_charts(
     A chart may be used by a gdoc in different ways: it can be embedded, cited as a URL, etc. The argument component_types defines which ways to consider (e.g. 'chart' corresponds to embedded charts).
 
     The main query used in this function was adapted from owid-grapher/db/model/Post.ts (getGdocsPostReferencesByChartId). That is the query that determines the articles and topic pages that reference a given chart id. The resulting list is what appears in the Refs tab of the chart admin.
-
-    That query has some limitations:
-    TODO: Create issue in owid-grapher and suggest a query to handle these limitations.
-    * Redirects are not properly handled.
-      * For example, chart_id 166 used to have slug "incidence-of-child-labour-in-the-uk". This slug was then renamed "incidence-of-child-labor-in-the-uk" (note "labor" instead of "labour"). But there is still one gdoc article citing the old slug, namely the one with slug "child-labor". If you go to the chart admin for chart_id 166, that article is not included as a reference.
-      -> The query in this function solves that (and makes the query significantly faster).
-    * References to narrative charts are (arguably) not properly handled. References to narrative charts are only included if the id of the narrative chart is in the list of chart_ids. But, if a chart in the list of chart_ids is the parent of a narrative chart, references to this narrative chart are not included.
-      * For example, chart_id 6371 has a narrative chart (chartView id 5). This narrative chart is cited by gdoc post "what-is-the-gini-coefficient". You can see the Ref in the admin of the narrative chart, but (arguably) you would also want to know about this reference in the chart admin of the original (parent) chart 6371.
-      -> For this reason, we include an argument include_parents_of_narrative_charts. If True, we check if any of the chart_ids corresponds to a parent of a narrative chart used in a gdoc, and, if so, include the reference of that gdoc.
-    * References to charts in the all-charts block are ignored. If a charts appears in the all-charts block of a topic page, the topic page may not appear in the list of gdoc references. The "all-charts" component in the post_gdocs_links table includes only the top charts (explicitly cited in the [.top] part of the {.all-charts} section of the gdoc).
-      * For example, the energy topic page has an all-charts block. But none of those chart list the energy topic page as a reference.
-      -> For this reason, we include an argument include_references_of_all_charts_block (True by default) which lets you include references of charts in the all-charts block.
+    However, that query had some limitations (see owid-grapher issue https://github.com/owid/owid-grapher/issues/4859).
 
     Parameters
     ----------

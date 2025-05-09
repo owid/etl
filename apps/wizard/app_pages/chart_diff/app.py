@@ -22,7 +22,7 @@ from apps.wizard.app_pages.chart_diff.chart_diff_show import st_show
 from apps.wizard.app_pages.chart_diff.utils import WARN_MSG, get_engines, indicators_in_charts
 from apps.wizard.utils import set_states
 from apps.wizard.utils.components import Pagination, st_horizontal, st_wizard_page_link, url_persist
-from etl.config import DEFAULT_TO_DATASETTE, OWID_ENV
+from etl.config import FORCE_DATASETTE, OWID_ENV
 from etl.grapher import model as gm
 
 log = get_logger()
@@ -39,7 +39,7 @@ st.set_page_config(
 )
 
 ########################################################################################################################
-if DEFAULT_TO_DATASETTE:
+if FORCE_DATASETTE:
     st.warning(
         "Metabase credentials not found (using Datasette as fallback). To stop seeing this warning, set Metabse credentials in your .env file."
     )
