@@ -43,7 +43,8 @@ definitions:
     - Children who are the right age for primary but are already in secondary school are considered enrolled and are not counted as out of school.
     - The indicator is calculated by subtracting the number of primary-age children enrolled in primary or secondary education from the total in that age group.
     - Data sources include enrolment records from school systems and household surveys that help identify children not captured in administrative data.
-    - Estimates may be affected by inconsistencies between sources, late school entry, or surveys conducted at different times of year.    - Children who are enrolled but not attending regularly may not always be captured correctly, depending on how data is collected and defined.
+    - Estimates may be affected by inconsistencies between sources, late school entry, or surveys conducted at different times of year.
+    - Children who are enrolled but not attending regularly may not always be captured correctly, depending on how data is collected and defined.
 
   deck_key_low_out_school: &deck_key_low_out_school
     - This indicator shows the share of adolescents who are the right age for lower secondary school but are not enrolled at that level.
@@ -144,7 +145,7 @@ tables:
       out_of_school_adolescents_of_lower_secondary_school_age__both_sexes__number:
         title: Out-of-school youth of lower secondary school age
         unit: "youth"
-        description_short: Youth in the official lower secondary school age range who are not enrolled in either [lower secondary](#dod:lower-secondary-education) or [upper secondary](#dod:upper-secondary-education) education.
+        description_short: Youth in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
         description_key: *deck_key_low_out_school
         presentation:
           title_public: Out-of-school youth of lower secondary school age
@@ -154,7 +155,7 @@ tables:
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
         title: Out-of-school youth of upper secondary school age
         unit: "youth"
-        description_short: Youth in the official upper secondary school age range who are not enrolled in either [upper secondary](#dod:upper-secondary-education) or [post-secondary non-tertiary](#dod:post-secondary-non-tertiary-education) education.
+        description_short: Youth in the official upper secondary school age range who are not enrolled [upper secondary](#dod:upper-secondary-education) education.
         description_key: *desc_key_up_out_school
         presentation:
           title_public: Out-of-school youth of upper secondary school age
