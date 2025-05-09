@@ -270,6 +270,9 @@ def create_new_indicators_and_format(tb: Table) -> Table:
     # Calculate income gap ratio (according to Ravallion's definition)
     tb["income_gap_ratio"] = (tb["total_shortfall"] / tb["headcount"]) / tb["poverty_line"]
 
+    # Make total_shortfall by year
+    tb["total_shortfall"] *= 365
+
     # Same for relative poverty
     for pct in [40, 50, 60]:
         tb[f"headcount_{pct}_median"] = tb[f"headcount_ratio_{pct}_median"] * tb["reporting_pop"]
@@ -281,6 +284,8 @@ def create_new_indicators_and_format(tb: Table) -> Table:
         tb[f"income_gap_ratio_{pct}_median"] = (tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]) / (
             tb["median"] * pct / 100
         )
+        # Make total_shortfall by year
+        tb[f"total_shortfall_{pct}_median"] *= 365
 
     # Shares to percentages
     # executing the function over list of vars
@@ -1426,8 +1431,8 @@ def make_relative_poverty_long(tb: Table) -> Table:
         r"(.+?)_(\d+_median)", expand=True
     )
 
-    # In poverty_line, replace "_median" with "% of median"
-    tb_relative["poverty_line"] = tb_relative["poverty_line"].str.replace("_median", "% of median")
+    # In poverty_line, replace "_median" with "% of the median"
+    tb_relative["poverty_line"] = tb_relative["poverty_line"].str.replace("_median", "% of the median")
 
     # Make tb_relative wide, by pivoting the indicator column
     tb_relative = tb_relative.pivot(

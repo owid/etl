@@ -107,7 +107,7 @@ definitions:
     A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in upper-middle-income countries."
     <%- elif poverty_line == "3000" %>
     A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in high-income countries."
-    <%- elif poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
     <%- endif %>
 
@@ -153,7 +153,7 @@ definitions:
     For a small number of country-year observations, the World Bank PIP data contains two estimates: one based on income data and one based on consumption data. In these cases we keep only one of the estimates, to strike a balance between maintaining comparability over time and showing as long a time series as possible. This means the indicator is estimating the number of years at least one survey was conducted in the past decade, rather than the number of surveys.
 
   description_processing_relative_poverty: |-
-    <% if poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Measures of relative poverty are not directly available in the World Bank PIP data. To calculate this metric we take the median income or consumption for the country and year, calculate a relative poverty line – in this case <<poverty_line>> – and then run a specific query on the PIP API to return the share of population below that line.
     <%- endif %>
 
@@ -181,35 +181,67 @@ definitions:
   ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at <<ppp_version>> prices.
 
   relative_poverty_percentage: |-
-    <% if poverty_line == "40% of median" %>
+    <% if poverty_line == "40% of the median" %>
     40%
-    <%- elif poverty_line == "50% of median" %>
+    <%- elif poverty_line == "50% of the median" %>
     50%
-    <%- elif poverty_line == "60% of median" %>
+    <%- elif poverty_line == "60% of the median" %>
     60%
     <%- endif %>
 
+  # For Grapher configuration
 
   headcount_ratio_title: |-
     <% if poverty_line in ["190", "215"] %>
     Share of population living in extreme poverty
-    <%- elif poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Share of population below <<poverty_line>>
     <%- else %>
     Poverty: Share of population living below <<poverty_line>>
     <%- endif %>
 
-  headcount_ratio_subtitle: |-
+  headcount_title: |-
+    <% if poverty_line in ["190", "215"] %>
+    Number of people living in extreme poverty
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    Relative poverty: Number of people below <<poverty_line>>
+    <%- else %>
+    Poverty: Number of people living below <<poverty_line>>
+    <%- endif %>
+
+  total_shortfall_title: |-
+    <% if poverty_line in ["190", "215"] %>
+    Total shortfall from extreme poverty
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    Total shortfall from a poverty line of <<poverty_line>> <<welfare_type>>
+    <%- else %>
+    Total shortfall from a poverty line of <<poverty_line>>
+    <%- endif %>
+
+  poverty_line_subtitle: |-
     <% if poverty_line in ["190", "215"] %>
     Extreme poverty is defined as living below the International Poverty Line of {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["320", "365"] %>
     The poverty line of {definitions.poverty_line} is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["550", "685"] %>
     The poverty line of {definitions.poverty_line} is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. {definitions.ppp_adjustment_subtitle}
-    <%- elif poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at {definitions.relative_poverty_percentage} of the median <<welfare_type>>.
     <%- else %>
     {definitions.ppp_adjustment_subtitle}
+    <%- endif %>
+
+  total_shortfall_subtitle: |-
+    <% if poverty_line in ["190", "215"] %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
+    <%- elif poverty_line in ["320", "365"] %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
+    <%- elif poverty_line in ["550", "685"] %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
+    <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to <<poverty_line>> <<welfare_type>>. {definitions.ppp_adjustment_subtitle}
+    <%- else %>
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
     <%- endif %>
 
   note_ppp: |-
@@ -231,11 +263,14 @@ definitions:
     <%- endif %>
 
   note_for_absolute_or_relative_poverty: |-
-    <% if poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     {definitions.note_without_ppp}
     <%- else %>
     {definitions.note_ppp}
     <%- endif %>
+
+  note_total_shortfall: |-
+    {definitions.ppp_adjustment_note} This shortfall does not take into account costs and inefficiencies from making the necessary transfers.
 
   hasmaptab: |-
     <% if survey_comparability == "No spells" %>
@@ -252,23 +287,65 @@ definitions:
     <%- endif %>
 
   headcount_ratio_color_scheme: |-
-    <% if poverty_line in ["40% of median", "50% of median", "60% of median"] %>
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     YlOrBr
     <%- else %>
     OrRd
     <%- endif %>
 
+  headcount_color_scheme: |-
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    YlOrBr
+    <%- else %>
+    Reds
+    <%- endif %>
+
+  total_shortfall_color_scheme: |-
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    YlOrBr
+    <%- else %>
+    Oranges
+    <%- endif %>
+
   map_brackets_headcount_ratio: &map_brackets_headcount_ratio
     <% if poverty_line in ["190", "215"] %>
     [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-    <%- elif poverty_line in ["40% of median"] %>
+    <%- elif poverty_line in ["40% of the median"] %>
     [2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
-    <%- elif poverty_line in ["50% of median"] %>
+    <%- elif poverty_line in ["50% of the median"] %>
     [3, 6, 9, 12, 15, 18, 21, 24, 1]
-    <%- elif poverty_line in ["60% of median"] %>
+    <%- elif poverty_line in ["60% of the median"] %>
     [5, 10, 15, 20, 25, 30, 1]
     <%- else %>
     [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    <%- endif %>
+
+  map_brackets_headcount: &map_brackets_headcount
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    [100000, 300000, 1000000, 3000000, 10000000, 30000000, 1]
+    <%- else %>
+    [100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
+    <%- endif %>
+
+  map_brackets_total_shortfall: &map_brackets_total_shortfall
+    <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
+    [100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1]
+    <%- elif poverty_line in ["100"] %>
+    [1000000,3000000,10000000,30000000,100000000,300000000,1]
+    <%- elif poverty_line in ["190", "215"] %>
+    [1000000,3000000,10000000,30000000,100000000,300000000,1000000000,3000000000,1]
+    <%- elif poverty_line in ["320", "365"] %>
+    [10000000,30000000,100000000,300000000,1000000000,3000000000,10000000000,1]
+    <%- elif poverty_line in ["550", "685"] %>
+    [100000000,300000000,1000000000,3000000000,10000000000,30000000000,100000000000,1]
+    <%- elif poverty_line in ["1000"] %>
+    [1000000000,3000000000,10000000000,30000000000,100000000000,300000000000,1000000000000]
+    <%- elif poverty_line in ["2000"] %>
+    [10000000000,30000000000,100000000000,300000000000,1]
+    <%- elif poverty_line in ["3000"] %>
+    [10000000000,30000000000,100000000000,300000000000,1000000000000,1]
+    <%- elif poverty_line in ["4000"] %>
+    [10000000000,30000000000,100000000000,300000000000,1000000000000,3000000000000,10000000000000,1]
     <%- endif %>
 
   entity_names_poverty: &entity_names_poverty
@@ -320,7 +397,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.headcount_ratio_title}"
-            subtitle: "{definitions.headcount_ratio_subtitle}"
+            subtitle: "{definitions.poverty_line_subtitle}"
             note: "{definitions.note_for_absolute_or_relative_poverty}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -390,6 +467,21 @@ tables:
           name: Number of people in poverty ({definitions.poverty_line})
           numDecimalPlaces: 0
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.headcount_title}"
+            subtitle: "{definitions.poverty_line_subtitle}"
+            note: "{definitions.note_for_absolute_or_relative_poverty}"
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "{definitions.headcount_color_scheme}"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_headcount
+            selectedEntityNames: *entity_names_poverty
 
       headcount_above:
         title: Number of people not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -433,7 +525,7 @@ tables:
         title: Total shortfall ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behaviour they would bring about.
+        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behavior they would bring about.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -447,6 +539,21 @@ tables:
           name: Total shortfall ({definitions.poverty_line})
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "{definitions.total_shortfall_title}"
+            subtitle: "{definitions.total_shortfall_subtitle}"
+            note: "{definitions.note_total_shortfall}"
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "{definitions.total_shortfall_color_scheme}"
+                binningStrategy: "manual"
+                customNumericValues: *map_brackets_total_shortfall
+            selectedEntityNames: *entity_names_poverty
 
       avg_shortfall:
         title: Average shortfall ($) ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -610,6 +717,22 @@ tables:
           name: Gini coefficient
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Gini coefficient"
+            subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.note_without_ppp}
+            note: ""
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "Oranges"
+                binningStrategy: "manual"
+                customNumericMinValue: 1
+                customNumericValues: [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 1]
+            selectedEntityNames: *entity_names_inequality
 
       palma_ratio:
         title: Palma ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -625,6 +748,22 @@ tables:
           name: Palma ratio
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Palma ratio"
+            subtitle: |-
+              The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality. {definitions.note_without_ppp}
+            note: ""
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "YlOrBr"
+                binningStrategy: "manual"
+                customNumericValues: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 1]
+            selectedEntityNames: *entity_names_inequality
 
       s80_s20_ratio:
         title: S80/S20 ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
