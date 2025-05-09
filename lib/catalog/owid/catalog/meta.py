@@ -315,6 +315,12 @@ class VariableMeta(MetaBase):
         if meta.description_key:
             meta.description_key = [x for x in meta.description_key if x]
 
+        # Convert from string to proper type when it comes from YAML
+        grapher_config = getattr(getattr(meta, "presentation", None), "grapher_config", {}) or {}
+        color_scale = grapher_config.get("map", {}).get("colorScale", {})
+        if isinstance(color_scale.get("customNumericMinValue"), str):
+            color_scale["customNumericMinValue"] = float(color_scale["customNumericMinValue"])
+
         # Convert strings to lists when needed
         gconf = getattr(meta.presentation, "grapher_config", None)
         if gconf:
