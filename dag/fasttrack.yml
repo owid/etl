@@ -234,3 +234,5 @@ steps:
     - snapshot://fasttrack/latest/world_bank_pip_filled.csv
   data://grapher/fasttrack/latest/financial_inclusion_table:
     - snapshot://fasttrack/latest/financial_inclusion_table.csv
+  data://grapher/fasttrack/latest/extended_financial_inclusion_table:
+    - snapshot://fasttrack/latest/extended_financial_inclusion_table.csv
