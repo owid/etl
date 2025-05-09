@@ -760,12 +760,13 @@ def _safe_concat(dfs: List[pd.DataFrame]) -> pd.DataFrame:
     """Concatenate DataFrames, ignoring empty ones."""
     # Filter out empty DataFrames.
     dfs_to_concat = [df_ for df_ in dfs if not df_.empty]
+    columns = list(dict.fromkeys(col for df_ in dfs for col in df_.columns))
 
     # Concatenate only if there are non-empty DataFrames
     if dfs_to_concat:
         df = pd.concat(dfs_to_concat, ignore_index=True)
     else:
-        df = pd.DataFrame()
+        df = pd.DataFrame(columns=columns)
 
     return df
 
@@ -775,7 +776,7 @@ def get_post_references_of_charts(
     component_types: Optional[List[str]] = None,
     include_parents_of_narrative_charts: bool = True,
     include_references_of_all_charts_block: bool = True,
-):
+) -> pd.DataFrame:
     """Get posts (including articles, topic pages, and data insights) that use charts, given a list of chart ids.
 
     A chart may be used by a gdoc in different ways: it can be embedded, cited as a URL, etc. The argument component_types defines which ways to consider (e.g. 'chart' corresponds to embedded charts).
@@ -807,7 +808,7 @@ def get_post_references_of_charts(
     if include_parents_of_narrative_charts:
         # If a gdoc uses a narrative chart, we want to identify the parent chart, and, if that parent chart is among the given chart_ids, include those gdocs.
         df_narrative_charts = _get_post_references_of_charts_via_narrative_charts(chart_ids=chart_ids)
-        df = _safe_concat([df, df_narrative_charts])
+        df = _safe_concat(dfs=[df, df_narrative_charts])
 
     if include_references_of_all_charts_block:
         df_all_charts_block = get_topic_tags_for_chart_ids(
@@ -816,7 +817,7 @@ def get_post_references_of_charts(
         # Add component_type and lint_type, for consistency.
         df_all_charts_block["component_type"] = "all-charts"
         df_all_charts_block["link_type"] = "grapher"
-        df = _safe_concat([df, df_all_charts_block])
+        df = _safe_concat(dfs=[df, df_all_charts_block])
 
     # Transform slugs of the gdoc posts (articles, topic pages, and data insights) into full urls.
     df["post_url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
@@ -828,7 +829,7 @@ def get_post_references_of_charts(
     df["chart_url"] = df["link_type"].map(POST_LINK_TYPES_TO_URL) + df["chart_slug"]
 
     # Adapt publication date format.
-    df["post_publication_date"] = df["post_publication_date"].dt.date.astype(str)
+    df["post_publication_date"] = pd.to_datetime(df["post_publication_date"]).dt.date.astype(str)
 
     # Delete rows without a valid post url.
     # This may happen to fragments, since didn't know how to map them into a url.
