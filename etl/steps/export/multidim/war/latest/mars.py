@@ -41,8 +41,8 @@ def run() -> None:
 
     # Create MDIM
     mdim = paths.create_collection(
-        config,
-        mdim_name="mars",
+        config=config,
+        short_name="mars",
         tb=tb,
         indicator_names=[
             "deaths",
