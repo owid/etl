@@ -32,3 +32,11 @@ steps:
     - data://garden/faostat/2025-03-17/faostat_rl
   data://grapher/forests/2025-05-09/forest_share:
     - data://garden/forests/2025-05-08/forest_share
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/fao/2025-05-09/fra_forest_extent:
+    - snapshot://fao/2025-05-09/fra_forest_extent.xlsx
+  data://garden/fao/2025-05-09/fra_forest_extent:
+    - data://meadow/fao/2025-05-09/fra_forest_extent
