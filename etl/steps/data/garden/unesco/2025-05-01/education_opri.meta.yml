@@ -36,7 +36,7 @@ definitions:
     - This indicator is best understood when used together with the *net enrolment rate*, which focuses on age-appropriate participation.
     - One limitation is that the *gross enrolment ratio* can exceed 100%, which may require further data to understand the reasons—such as whether students are repeating grades or starting school late.
 
-  desc_key_prim_out_school: &desc_key_prim_out_schoo
+  desc_key_prim_out_school: &desc_key_prim_out_school
     - This indicator shows the share of children who are the right age for primary school but are not enrolled in primary or secondary education.
     - It focuses on those in the official primary age range—typically 6 to 11 years old—who are not attending any formal level of education.
     - Some may have never entered school, others may have dropped out, or they may not yet have started due to delayed entry.
