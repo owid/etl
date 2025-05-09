@@ -252,7 +252,7 @@ def mock_get_mapping_paths_to_id(paths):
     return {p: i for i, p in enumerate(paths)}
 
 
-@patch("etl.collection.explorer.get_mapping_paths_to_id", side_effect=mock_get_mapping_paths_to_id)
+@patch("etl.collection.explorer.core.get_mapping_paths_to_id", side_effect=mock_get_mapping_paths_to_id)
 def test_explorer_config_legacy(mock_map_func):
     explorer = Explorer.from_dict(EXPLORER_CONFIG)
     assert len(explorer.views) == 7

@@ -6,17 +6,18 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 import numpy as np
 import pandas as pd
 from owid.catalog.utils import underscore
+from sqlalchemy.orm import Session
 
+import etl.grapher.model as gm
 from etl.collection.common import (
     INDICATORS_SLUG,
     combine_config_dimensions,
     create_mdim_or_explorer,
     expand_config,
-    get_mapping_paths_to_id,
 )
 from etl.collection.explorer.legacy import create_explorer_legacy
 from etl.collection.model import CHART_DIMENSIONS, Collection, pruned_json
-from etl.config import OWIDEnv
+from etl.config import OWID_ENV, OWIDEnv
 from etl.paths import EXPORT_EXPLORER_DIR
 
 __all__ = [
@@ -236,6 +237,20 @@ def _extract_explorers_tables(
     df_columns = pd.DataFrame.from_records(records_columns)
 
     return df_grapher, df_columns
+
+
+def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> Dict[str, str]:
+    # Check if given path is actually an ID
+    # Get ID, assuming given path is a catalog path
+    if owid_env is None:
+        engine = OWID_ENV.engine
+    else:
+        engine = owid_env.engine
+    with Session(engine) as session:
+        db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # type: ignore
+        # scores = dict(zip(catalog_paths, range(len(catalog_paths))))
+        # db_indicators.sort(key=lambda x: scores[x.catalogPath], reverse=True)
+        return {indicator.catalogPath: indicator.id for indicator in db_indicators}
 
 
 def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):
