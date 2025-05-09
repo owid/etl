@@ -1,3 +1,5 @@
+autoupdate:
+  name: Epoch
 meta:
   origin:
     # Data product / Snapshot
