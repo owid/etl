@@ -510,22 +510,45 @@ def get_post_views_by_url(
         DataFrame containing the number of GDoc views per URL.
 
     """
+    # Impose a specific list of post views, that excludes grapher charts and explorers.
+    # NOTE: For some reason, the types defined in the metabase pages table do not coincide with the ones in post_gdocs.
+    post_types = [
+        # Articles.
+        "article",
+        # Author pages.
+        "author",
+        # Exclude type 'chart', which is used for grapher charts.
+        # 'chart',
+        # Country pages.
+        "country",
+        # Data insights.
+        "data-insight",
+        # Exclude type 'explorer', which is used for data explorers.
+        # 'explorer',
+        # There is only one page with this type.
+        "teaching",
+        # Topic pages.
+        "topic-page",
+        # The type 'util' is used for a variety of things, including FAQs and latest.
+        # It also includes the homepage, so we need to keep it.
+        "util",
+    ]
+    post_types_str = ", ".join(f"'{post_type}'" for post_type in post_types)
     # Prepare query.
     query = f"""
     SELECT
         url,
         SUM(views) AS views
     FROM views_detailed
+    JOIN pages USING(url)
     WHERE day >= '{date_min}'
     AND day <= '{date_max}'
     """
     if urls:
         url_list = ", ".join(f"'{url}'" for url in urls)
         query += f" AND url IN ({url_list})"
-    query += """
-    AND url NOT LIKE '%/grapher/%'
-    AND url NOT LIKE '%/explorers/%'
-    AND url NOT LIKE '% %'
+    query += f"""
+    AND type in ({post_types_str})
     AND url IS NOT NULL
     GROUP BY url
     ORDER BY views DESC
