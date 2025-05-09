@@ -410,7 +410,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - This indicator shows the percentage of students who complete primary school with basic reading skills.
+          - This indicator shows the percentage of students who reach minimum reading proficiency by the end of primary school.
           - Proficiency means identifying key ideas in simple texts and linking them to personal experience.
           - It only includes students who are still in school—not those who dropped out or never enrolled.
           - Skills are measured through standardized tests, such as PIRLS or national assessments.
@@ -423,9 +423,9 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - This indicator shows the share of all children who reach basic reading proficiency by the expected age of completing primary school.
-          - Proficiency means identifying key ideas in simple texts and linking them to familiar knowledge or experience.
-          - It combines the share of children who complete primary school with the share who meet minimum reading standards.
+          - This indicator shows the share of all children who reach minimum reading proficiency by the expected age of completing lower-secondary education.
+          - Minimum proficiency at this level means students can connect ideas across different types of texts, understand the author’s intent, and draw basic conclusions.
+          - It combines the share of children who complete lower-secondary education with the share who meet minimum reading standards.
           - This captures outcomes across the full population—not just students still in school.
           - A higher percentage suggests that most children are both completing school and acquiring core reading skills.
           - Data comes from assessments like PIRLS or ERCE and completion estimates from surveys or models.
