@@ -8,7 +8,7 @@ from owid.catalog import Table
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
-from etl.collections.utils import (
+from etl.collection.utils import (
     get_tables_by_name_mapping,
     records_to_dictionary,
 )
@@ -208,7 +208,7 @@ def process_views(
 ):
     """Process views in Explorer configuration.
 
-    TODO: See if we can converge to one solution with etl.collections.multidim.process_views.
+    TODO: See if we can converge to one solution with etl.collection.multidim.process_views.
     """
     # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
     tables_by_name = get_tables_by_name_mapping(dependencies)

@@ -1,9 +1,9 @@
 """This is an example on how you can read another MDIM and create a new one based on it.
 
-TODO: Look in etl.collections.beta for more details.
+TODO: Look in etl.collection.beta for more details.
 """
 
-from etl.collections.beta import combine_mdims
+from etl.collection.beta import combine_mdims
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.

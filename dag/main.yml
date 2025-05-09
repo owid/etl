@@ -687,6 +687,17 @@ steps:
   data://grapher/imf/2025-04-25/world_economic_outlook:
     - data://garden/imf/2025-04-25/world_economic_outlook
 
+
+  #
+  # World Airlines Traffic and Capacity
+  #
+  data://meadow/aviation/2025-04-01/air_traffic:
+    - snapshot://aviation/2025-04-01/air_traffic.csv
+  data://garden/aviation/2025-04-01/air_traffic:
+    - data://meadow/aviation/2025-04-01/air_traffic
+  data://grapher/aviation/2025-04-01/air_traffic:
+    - data://garden/aviation/2025-04-01/air_traffic
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

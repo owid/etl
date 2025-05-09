@@ -1,4 +1,4 @@
-from etl.collections.explorer import combine_config_dimensions, expand_config
+from etl.collection.explorer import combine_config_dimensions, expand_config
 
 # from etl.db import get_engine
 from etl.helpers import PathFinder

@@ -3,7 +3,7 @@
 import pandas as pd
 from migration_config_dict import ADDITIONAL_DESCRIPTIONS, CONFIG_DICT, MAP_BRACKETS, SORTER  # type: ignore
 
-from etl.collections.explorer_legacy import ExplorerLegacy
+from etl.collection.explorer_legacy import ExplorerLegacy
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
