@@ -199,7 +199,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Share of population below <<poverty_line>>
     <%- else %>
-    Poverty: Share of population living below <<poverty_line>>
+    Poverty: Share of population living below {definitions.poverty_line}
     <%- endif %>
 
   headcount_title: |-
@@ -208,7 +208,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Number of people below <<poverty_line>>
     <%- else %>
-    Poverty: Number of people living below <<poverty_line>>
+    Poverty: Number of people living below {definitions.poverty_line}
     <%- endif %>
 
   total_shortfall_title: |-
@@ -217,7 +217,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Total shortfall from a poverty line of <<poverty_line>> <<welfare_type>>
     <%- else %>
-    Total shortfall from a poverty line of <<poverty_line>>
+    Total shortfall from a poverty line of {definitions.poverty_line}
     <%- endif %>
 
   avg_shortfall_title: |-
@@ -226,7 +226,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Average shortfall from a poverty line of <<poverty_line>> <<welfare_type>>
     <%- else %>
-    Average shortfall from a poverty line of <<poverty_line>>
+    Average shortfall from a poverty line of {definitions.poverty_line}
     <%- endif %>
 
   income_gap_ratio_title: |-
@@ -235,14 +235,14 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Average shortfall from a poverty line of <<poverty_line>> <<welfare_type>> (as a share of the poverty line)
     <%- else %>
-    Average shortfall from a poverty line of <<poverty_line>> (as a share of the poverty line)
+    Average shortfall from a poverty line of {definitions.poverty_line} (as a share of the poverty line)
     <%- endif %>
 
   poverty_gap_index_title: |-
     <% if poverty_line in ['40% of the median', '50% of the median', '60% of the median'] %>
     Poverty gap index at <<poverty_line>> <<welfare_type>>
     <%- else %>
-    Poverty gap index at <<poverty_line>>
+    Poverty gap index at {definitions.poverty_line}
     <%- endif %>
 
   threshold_title: |-
@@ -586,6 +586,8 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          topic_tags:
+            - Poverty
           grapher_config:
             title: "{definitions.headcount_ratio_title}"
             subtitle: "{definitions.poverty_line_subtitle}"
@@ -659,6 +661,8 @@ tables:
           numDecimalPlaces: 0
           <<: *common_display
         presentation:
+          topic_tags:
+            - Poverty
           grapher_config:
             title: "{definitions.headcount_title}"
             subtitle: "{definitions.poverty_line_subtitle}"
@@ -731,6 +735,8 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          topic_tags:
+            - Poverty
           grapher_config:
             title: "{definitions.total_shortfall_title}"
             subtitle: "{definitions.total_shortfall_subtitle}"
@@ -767,6 +773,8 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          topic_tags:
+            - Poverty
           grapher_config:
             title: "{definitions.avg_shortfall_title}"
             subtitle: "{definitions.avg_shortfall_subtitle}"
@@ -801,6 +809,8 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          topic_tags:
+            - Poverty
           grapher_config:
             title: "{definitions.income_gap_ratio_title}"
             subtitle: "{definitions.income_gap_ratio_subtitle}"
@@ -835,6 +845,8 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          topic_tags:
+            - Poverty
           grapher_config:
             title: "{definitions.poverty_gap_index_title}"
             subtitle: "{definitions.poverty_gap_index_subtitle}"
@@ -868,6 +880,9 @@ tables:
           name: Watts index ({definitions.poverty_line})
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          topic_tags:
+            - Poverty
 
       poverty_severity:
         title: Poverty severity ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -904,6 +919,9 @@ tables:
           name: Societal poverty line
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          topic_tags:
+            - Poverty
 
       spr:
         title: Share of population in societal poverty (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -956,6 +974,8 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          topic_tags:
+            - Economic Inequality
           grapher_config:
             title: "Gini coefficient"
             subtitle: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. {definitions.note_without_ppp}
@@ -987,6 +1007,8 @@ tables:
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
+          topic_tags:
+            - Economic Inequality
           grapher_config:
             title: "Palma ratio"
             subtitle: |-
@@ -1017,6 +1039,9 @@ tables:
           name: S80/S20 ratio
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          topic_tags:
+            - Economic Inequality
 
       p90_p10_ratio:
         title: P90/P10 ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -1047,6 +1072,9 @@ tables:
           name: P90/P50 ratio
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          topic_tags:
+            - Economic Inequality
 
       p50_p10_ratio:
         title: P50/P10 ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -1062,6 +1090,10 @@ tables:
           name: P50/P10 ratio
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          topic_tags:
+            - Economic Inequality
+
 
       mld:
         title: Mean log deviation (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
@@ -1078,6 +1110,8 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
+          topic_tags:
+            - Economic Inequality
           grapher_config:
             title: "Mean log deviation"
             subtitle: |-
@@ -1108,6 +1142,9 @@ tables:
           name: Polarization
           numDecimalPlaces: 2
           <<: *common_display
+        presentation:
+          topic_tags:
+            - Economic Inequality
 
       # DISTRIBUTIONAL INDICATORS
       mean:
