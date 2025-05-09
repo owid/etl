@@ -14,7 +14,7 @@ from etl.collection.common import (
     expand_config,
     get_mapping_paths_to_id,
 )
-from etl.collection.explorer import create_explorer_legacy
+from etl.collection.explorer.legacy import create_explorer_legacy
 from etl.collection.model import CHART_DIMENSIONS, Collection, pruned_json
 from etl.config import OWIDEnv
 from etl.paths import EXPORT_EXPLORER_DIR
