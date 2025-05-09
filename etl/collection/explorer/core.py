@@ -44,7 +44,7 @@ class Explorer(Collection):
         # If dictionary contains field 'definitions', change it for '_definitions'
         if "title" not in data:
             data["title"] = {}
-        if "default_selection" in data:
+        if "default_selection" not in data:
             data["default_selection"] = []
 
         if "config" not in data:
