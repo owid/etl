@@ -227,7 +227,15 @@
           "minimum": 0
         },
         "customNumericMinValue": {
-          "type": "number",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "pattern": "{definitions"
+            }
+          ],
           "description": "The minimum bracket of the first bin"
         }
       },

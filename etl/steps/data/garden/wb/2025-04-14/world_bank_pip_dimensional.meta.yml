@@ -1283,7 +1283,7 @@ tables:
                 baseColorScheme: "OrRd"
                 binningStrategy: "manual"
                 customNumericValues: *map_brackets_share
-                customNumericMinValue: 0
+                customNumericMinValue: "{definitions.custom_numeric_min_value_share}"
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       thr:
