@@ -619,3 +619,7 @@ for env_var in env_vars:
 METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
 METABASE_URL = os.environ.get("METABASE_URL")
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+########################################################################################################################
+# While users don't have Metadata credentials, default to Dataset.
+DEFAULT_TO_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
+########################################################################################################################

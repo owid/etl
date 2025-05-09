@@ -9,13 +9,19 @@ import urllib.error
 import urllib.parse
 from datetime import datetime
 from io import BytesIO
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import pandas as pd
 import requests
 from structlog import get_logger
 
-from etl.config import METABASE_API_KEY, METABASE_SEMANTIC_LAYER_DATABASE_ID, METABASE_URL, OWID_ENV
+from etl.config import (
+    DEFAULT_TO_DATASETTE,
+    METABASE_API_KEY,
+    METABASE_SEMANTIC_LAYER_DATABASE_ID,
+    METABASE_URL,
+    OWID_ENV,
+)
 
 # Initialize logger.
 log = get_logger()
@@ -221,7 +227,7 @@ def read_datasette(
     return df
 
 
-def read_metabase(sql: str) -> pd.DataFrame:
+def read_metabase(sql: str, default_to_datasette: bool = DEFAULT_TO_DATASETTE) -> pd.DataFrame:
     """Retrieve data from the Metabase API using an arbitrary sql query.
 
     NOTE: This function has been adapted from this example in the analytics repo:
@@ -231,6 +237,8 @@ def read_metabase(sql: str) -> pd.DataFrame:
     ----------
     sql : str
         SQL query to execute.
+    default_to_datasette : bool, optional
+        If True, use Datasette as a fallback if Metabase API credentials are not available.
 
     Returns
     -------
@@ -262,6 +270,14 @@ def read_metabase(sql: str) -> pd.DataFrame:
     # executes the url encoding without replacing any quotes within the sql query.
     urlencoded = "&".join([f"{k}={urllib.parse.quote_plus(json.dumps(v))}" for k, v in body.items()])
 
+    ####################################################################################################################
+    if default_to_datasette and (not METABASE_API_KEY or not METABASE_SEMANTIC_LAYER_DATABASE_ID):
+        log.warning(
+            "Missing Metabase credentials. Add them to your .env file to avoid this warning. For now, Datasette will be used."
+        )
+        return read_datasette(sql=sql)
+    ####################################################################################################################
+
     # Send request.
     response = requests.post(
         f"{METABASE_URL}/api/dataset/csv",
@@ -276,6 +292,66 @@ def read_metabase(sql: str) -> pd.DataFrame:
     df = pd.read_csv(BytesIO(response.content))
 
     return df
+
+
+def get_number_of_days(
+    date_min: str,
+    date_max: str,
+    table_name: str,
+    day_column_name: str = "day",
+    published_at: Optional[pd.Series] = None,
+) -> Union[pd.Series, int]:
+    """
+    Calculate the number of days for which the views are counted.
+
+    This will be the range of dates between date_start and date_end, where:
+    * date_start is the maximum between publication date (if given), the start date of analytics data (DATE_MIN), and the given date_min.
+    * date_end is the minimum between the latest date informed in the relevant table (which this function finds out with a query) and the given date_max.
+    If date_start is after date_end, the number of days is set to zero.
+
+    The result is a Series with the number of days for each chart (if publication date is given), or a single integer (if no publication date is given).
+
+    Parameters
+    ----------
+    published_at : pd.Series, optional
+        Series of publication dates (if given).
+    date_min : str
+        Minimum date to consider.
+    date_max : str
+        Maximum date to consider.
+    table_name : str
+        Name of the DB table to query for the maximum informed date.
+    day_column_name : str
+        Name of the column in the DB table that contains the date.
+
+    Returns
+    -------
+    pd.Series or int
+        Number of days for which the views are counted.
+
+    """
+    if published_at is None:
+        # If no publication date is given, we need to find the maximum between the minimum date and the start date of analytics data.
+        date_start = max(pd.to_datetime(date_min), pd.to_datetime(DATE_MIN))
+    else:
+        # If a publication date is given, we need to find the maximum between the publication date, the minimum date, and the start date of analytics data.
+        date_start = (
+            pd.to_datetime(published_at).clip(lower=pd.to_datetime(date_min)).clip(lower=pd.to_datetime(DATE_MIN))
+        )
+
+    # There is always a lag in analytics, so we need to find out the maximum date informed in the analytics data.
+    query = f"SELECT MAX({day_column_name}) AS date_max FROM {table_name}"
+    date_max_informed = read_metabase(sql=query)["date_max"].item()
+    date_end = min(pd.to_datetime(date_max_informed), pd.to_datetime(date_max))
+
+    if isinstance(date_start, pd.Series) or isinstance(date_end, pd.Series):
+        # Add a column with the number of days that the views are referring to.
+        n_days = (date_end - date_start).dt.days.clip(lower=0)
+    else:
+        # If date_start and date_end are not series, simply calculate the number of days.
+        n_days = max(0, (date_end - date_start).days)
+
+    return n_days
 
 
 def get_chart_views_per_day_by_chart_id(
@@ -378,12 +454,13 @@ def get_chart_views_by_chart_id(
     df_views = read_metabase(sql=query)
 
     # To calculate the average daily views, we need to figure out the number of days for which we are counting views.
-    # This will be either the first date since we have analytics (DATE_MIN) or the publication date of the chart (if more recent than that).
-    published_at = pd.to_datetime(df_views["published_at"])
-    start_date = published_at.where(published_at > pd.to_datetime(date_min), pd.to_datetime(date_min))
-
-    # Add a column with the number of days that the views are referring to.
-    df_views["n_days"] = (pd.to_datetime(date_max) - start_date).dt.days
+    df_views["n_days"] = get_number_of_days(
+        published_at=df_views["published_at"],
+        date_min=date_min,
+        date_max=date_max,
+        table_name="grapher_views_detailed",
+        day_column_name="day",
+    )
 
     # Add a column for the average number of daily views.
     df_views["views_daily"] = df_views["views"] / df_views["n_days"]
@@ -430,7 +507,9 @@ def get_post_views_by_url(
     date_max: str = DATE_MAX,
 ) -> pd.DataFrame:
     """
-    Fetch number of GDoc views per URL from Metabase.
+    Fetch number of posts views (including articles, topic pages, and data insights) for a list of URLs from Metabase.
+
+    URLs corresponding to grapher charts and explorers are excluded from the results.
 
     Parameters
     ----------
@@ -447,36 +526,61 @@ def get_post_views_by_url(
         DataFrame containing the number of GDoc views per URL.
 
     """
-    where_clauses = []
-    if date_min:
-        where_clauses.append(f"day >= '{date_min}'")
-    if date_max:
-        where_clauses.append(f"day <= '{date_max}'")
-    if urls:
-        url_list = ", ".join(f"'{url}'" for url in urls)
-        where_clauses.append(f"url IN ({url_list})")
-    # Exclude pages corresponding to grapher charts and explorers.
-    where_clauses.append("url NOT LIKE '%/grapher/%'")
-    where_clauses.append("url NOT LIKE '%/explorers/%'")
-    # Exclude url with spaces or empty.
-    where_clauses.append("url NOT LIKE '% %'")
-    where_clauses.append("url IS NOT NULL")
-    where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
-
+    # Impose a specific list of post views, that excludes grapher charts and explorers.
+    # NOTE: For some reason, the types defined in the metabase pages table do not coincide with the ones in post_gdocs.
+    post_types = [
+        # Articles.
+        "article",
+        # Author pages.
+        "author",
+        # Exclude type 'chart', which is used for grapher charts.
+        # 'chart',
+        # Country pages.
+        "country",
+        # Data insights.
+        "data-insight",
+        # Exclude type 'explorer', which is used for data explorers.
+        # 'explorer',
+        # There is only one page with this type.
+        "teaching",
+        # Topic pages.
+        "topic-page",
+        # The type 'util' is used for a variety of things, including FAQs and latest.
+        # It also includes the homepage, so we need to keep it.
+        "util",
+    ]
+    post_types_str = ", ".join(f"'{post_type}'" for post_type in post_types)
+    # Prepare query.
     query = f"""
     SELECT
         url,
         SUM(views) AS views
     FROM views_detailed
-    {where_sql}
+    JOIN pages USING(url)
+    WHERE day >= '{date_min}'
+    AND day <= '{date_max}'
+    """
+    if urls:
+        url_list = ", ".join(f"'{url}'" for url in urls)
+        query += f" AND url IN ({url_list})"
+    query += f"""
+    AND type in ({post_types_str})
+    AND url IS NOT NULL
     GROUP BY url
     ORDER BY views DESC
     """
     df_views = read_metabase(sql=query)
 
-    n_days = (pd.to_datetime(date_max) - pd.to_datetime(date_min)).days
-    df_views["n_days"] = n_days
-    df_views["views_daily"] = df_views["views"] / n_days
+    # To calculate the average daily views, we need to figure out the number of days for which we are counting views.
+    df_views["n_days"] = get_number_of_days(
+        date_min=date_min,
+        date_max=date_max,
+        table_name="views_detailed",
+        day_column_name="day",
+    )
+
+    # Add a column for the average number of daily views.
+    df_views["views_daily"] = df_views["views"] / df_views["n_days"]
 
     # Fix infs (for charts that were published in the last day).
     df_views.loc[df_views["views_daily"] == float("inf"), "views_daily"] = 0
@@ -728,7 +832,8 @@ def get_post_references_of_charts(
     # Transform slugs of the gdoc posts (articles, topic pages, and data insights) into full urls.
     df["post_url"] = df["post_type"].map(POST_TYPE_TO_URL) + df["post_slug"]
     # In the case of gdocs of type "homepage", the post_slug seems to always be "owid-homepage", which is not a real slug. Fix those cases.
-    df.loc[df["post_type"] == "homepage", "post_url"] = OWID_BASE_URL
+    # NOTE: Ensure the homepage URL does not have a trailing slash (otherwise it will not be found in Metabase).
+    df.loc[df["post_type"] == "homepage", "post_url"] = OWID_BASE_URL.rstrip("/")
 
     # Transform slugs of the target content (usually grapher charts or explorers) into urls.
     df["chart_url"] = df["link_type"].map(POST_LINK_TYPES_TO_URL) + df["chart_slug"]
@@ -788,6 +893,11 @@ def get_post_views_by_chart_id(
         ["post_url", "post_title", "post_type", "post_publication_date", "chart_id", "chart_url"]
     ].merge(df_article_views.rename(columns={"url": "post_url"}), on="post_url", how="left")
 
+    # TODO: Find out why some urls don't have views, e.g. 'https://ourworldindata.org/neurodevelopmental-disorders' (which is now called 'https://ourworldindata.org/mental-health'). Maybe we should account for posts redirects (in the same way we do for charts).
+    # For now, remove rows with no data for views.
+    df_views = df_views.dropna(subset=["views"]).reset_index(drop=True)
+    df_views = df_views.astype({"views": int, "n_days": int})
+
     return df_views
 
 
@@ -799,6 +909,8 @@ def get_post_views_last_n_days(
 ) -> pd.DataFrame:
     """
     Fetch number of post views (including articles, topic pages, and data insights) for the last n_days.
+
+    NOTE: Given that there is a lag in analytics, the number of days considered will be smaller than n_days. For this reason, the returned dataframe will contain a column "n_days" with the number of days for which the views are counted.
 
     Parameters
     ----------
