@@ -35,7 +35,7 @@ def run() -> None:
     # Forest research data for USA
     snap_meadow_usa = paths.load_snapshot("forest_share", namespace="usda_fs")
     # FAO RL
-    ds_meadow_fao_rl = paths.load_dataset("faostat_rl")
+    ds_meadow_fra = paths.load_dataset("fra_forest_extent")
 
     # Read table from meadow dataset.
     tb_defra = snap_meadow_defra.read()
@@ -47,12 +47,8 @@ def run() -> None:
     tb_scotland = snap_meadow_scotland.read()
     tb_south_korea = snap_meadow_south_korea.read()
     tb_usa = snap_meadow_usa.read()
-    tb_fao_rl = ds_meadow_fao_rl["faostat_rl_flat"].reset_index()
-    tb_fao_rl = tb_fao_rl[["country", "year", "forest_land__00006646__share_in_land_area__007209__percent"]]
-    tb_fao_rl = tb_fao_rl.rename(
-        columns={"forest_land__00006646__share_in_land_area__007209__percent": "forest_share"}
-    ).dropna(subset=["forest_share"])
-    tb_fao_rl["source"] = "fao_rl"
+    tb_fra = ds_meadow_fra["fra_forest_extent"].reset_index()
+    tb_fra["source"] = "Forest Resource Assessment (FRA) 2020"
     # Concatenate tables.
     tb = pr.concat(
         [
@@ -68,7 +64,9 @@ def run() -> None:
         ]
     )
 
-    tb_com = combine_datasets(tb_a=tb, tb_b=tb_fao_rl, table_name="forest_share", preferred_source="fao_rl")
+    tb_com = combine_datasets(
+        tb_a=tb, tb_b=tb_fra, table_name="forest_share", preferred_source="Forest Resource Assessment (FRA) 2020"
+    )
     tb_com = tb_com.drop(columns=["source"])
     #
 
