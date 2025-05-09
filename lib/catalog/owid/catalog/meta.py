@@ -10,7 +10,17 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Literal, NewType, Optional, TypedDict, TypeVar, Union
+from typing import (
+    Any,
+    Dict,
+    List,
+    Literal,
+    NewType,
+    Optional,
+    TypedDict,
+    TypeVar,
+    Union,
+)
 
 import mistune
 import pandas as pd
@@ -19,7 +29,7 @@ from typing_extensions import NotRequired, Required, Self
 
 from . import jinja
 from .processing_log import ProcessingLog
-from .utils import dataclass_from_dict, hash_any, pruned_json
+from .utils import dataclass_from_dict, hash_any, parse_numeric_list, pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
@@ -305,6 +315,16 @@ class VariableMeta(MetaBase):
         if meta.description_key:
             meta.description_key = [x for x in meta.description_key if x]
 
+        # Convert strings to lists when needed
+        gconf = getattr(meta.presentation, "grapher_config", None)
+        if gconf:
+            try:
+                color_scale = gconf["map"]["colorScale"]
+                if isinstance(color_scale["customNumericValues"], str):
+                    color_scale["customNumericValues"] = parse_numeric_list(color_scale["customNumericValues"])
+            except KeyError:
+                pass
+
         return meta
 
     def copy(self, deep=True) -> Self:
@@ -505,7 +525,11 @@ def _deepcopy_dataclass(dc) -> Any:
                 lis = type(v)(lis)
             setattr(dc, k, lis)
         elif isinstance(v, dict):
-            setattr(dc, k, {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()})
+            setattr(
+                dc,
+                k,
+                {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()},
+            )
         else:
             pass
     return dc
