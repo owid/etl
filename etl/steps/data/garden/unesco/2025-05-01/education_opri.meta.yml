@@ -116,6 +116,10 @@ tables:
         unit: "children"
         description_short: Children in the official primary school age range who are not enrolled in either [primary](#dod:primary-education) or [secondary](#dod:secondary-education) education.
         description_key: *desc_key_prim_out_school
+        presentation:
+          title_public: Out-of-school children of primary school age
+        display:
+          name: Primary
 
       out_of_school_children_of_primary_school_age__female__number:
         title: Out-of-school girls of primary school age
@@ -142,12 +146,20 @@ tables:
         unit: "youth"
         description_short: Youth in the official lower secondary school age range who are not enrolled in either [lower secondary](#dod:lower-secondary-education) or [upper secondary](#dod:upper-secondary-education) education.
         description_key: *deck_key_low_out_school
+        presentation:
+          title_public: Out-of-school youth of lower secondary school age
+        display:
+          name: Lower secondary
 
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
         title: Out-of-school youth of upper secondary school age
         unit: "youth"
         description_short: Youth in the official upper secondary school age range who are not enrolled in either [upper secondary](#dod:upper-secondary-education) or [post-secondary non-tertiary](#dod:post-secondary-non-tertiary-education) education.
         description_key: *desc_key_up_out_school
+        presentation:
+          title_public: Out-of-school youth of upper secondary school age
+        display:
+          name: Upper secondary
 
       mean_years_of_schooling__isced_1_or_higher__population_25plus_years__female:
         title: Average years of schooling for women
