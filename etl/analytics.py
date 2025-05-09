@@ -510,28 +510,23 @@ def get_post_views_by_url(
         DataFrame containing the number of GDoc views per URL.
 
     """
-    where_clauses = []
-    if date_min:
-        where_clauses.append(f"day >= '{date_min}'")
-    if date_max:
-        where_clauses.append(f"day <= '{date_max}'")
-    if urls:
-        url_list = ", ".join(f"'{url}'" for url in urls)
-        where_clauses.append(f"url IN ({url_list})")
-    # Exclude pages corresponding to grapher charts and explorers.
-    where_clauses.append("url NOT LIKE '%/grapher/%'")
-    where_clauses.append("url NOT LIKE '%/explorers/%'")
-    # Exclude url with spaces or empty.
-    where_clauses.append("url NOT LIKE '% %'")
-    where_clauses.append("url IS NOT NULL")
-    where_sql = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
-
+    # Prepare query.
     query = f"""
     SELECT
         url,
         SUM(views) AS views
     FROM views_detailed
-    {where_sql}
+    WHERE day >= '{date_min}'
+    AND day <= '{date_max}'
+    """
+    if urls:
+        url_list = ", ".join(f"'{url}'" for url in urls)
+        query += f" AND url IN ({url_list})"
+    query += """
+    AND url NOT LIKE '%/grapher/%'
+    AND url NOT LIKE '%/explorers/%'
+    AND url NOT LIKE '% %'
+    AND url IS NOT NULL
     GROUP BY url
     ORDER BY views DESC
     """
