@@ -17,3 +17,16 @@ steps:
     - data://garden/wb/2023-04-30/income_groups
   data://grapher/forests/2024-07-10/tree_cover_loss_by_driver:
     - data://garden/forests/2024-07-10/tree_cover_loss_by_driver
+
+  # Forest Share combined sources
+  data://garden/forests/2025-05-08/forest_share:
+    - snapshot://defra/2025-05-06/forest_share.csv
+    - snapshot://fao/2025-05-07/forest_share.csv
+    - snapshot://forest_research/2025-05-06/forest_share.csv
+    - snapshot://papers/2025-05-07/france_forest_share.csv
+    - snapshot://papers/2025-05-07/japan_forest_share.csv
+    - snapshot://papers/2025-05-07/taiwan_forest_share.csv
+    - snapshot://papers/2025-05-08/mather_2004.csv
+    - snapshot://papers/2025-05-08/soo_bae_et_al_2012.csv
+    - snapshot://usda_fs/2025-05-07/forest_share.csv
+    - data://garden/faostat/2025-03-17/faostat_rl
