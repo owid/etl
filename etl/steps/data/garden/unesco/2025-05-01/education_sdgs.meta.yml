@@ -431,7 +431,7 @@ tables:
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_primary:
         title: Share of students with minimum reading skills by the end of primary school
-        description_short: Percentage of students who meet basic reading skills by the end of [primary](#dod:primary-education) school.
+        description_short: Minimum reading proficiency for the end of [primary](#dod:primary-education) education means students can identify key ideas in texts and connect them to their own experiences.
         unit: "%"
         short_unit: "%"
         description_key:
