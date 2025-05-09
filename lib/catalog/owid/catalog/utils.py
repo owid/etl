@@ -353,7 +353,7 @@ def remove_details_on_demand(text: str) -> str:
     return text
 
 
-def parse_numeric_list(val: list | str) -> list[float | int]:
+def parse_numeric_list(val: Union[list, str]) -> list[Union[float, int]]:
     """
     Parse a string representation of a list of numbers into a Python list.
     Example: "[10, 20, 30]" -> [10, 20, 30]
