@@ -67,6 +67,14 @@ definitions:
     <<poverty_line>>
     <%- endif %>
 
+  table: |-
+    <% if table == "Income or consumption" %>
+    <<table>> (<<welfare_type>>)
+    <%- else %>
+    <<table>>
+    <%- endif %>
+
+
   percentiles_avg_share: |-
     <% if decile == 1 %>
     Poorest decile
@@ -568,7 +576,7 @@ tables:
     # POVERTY
 
       headcount_ratio:
-        title: Share of population in poverty ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share of population in poverty ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: Percentage of population living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line}.
@@ -605,7 +613,7 @@ tables:
 
 
       headcount_ratio_above:
-        title: Share of population not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share of population not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: Percentage of population living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line}.
@@ -624,7 +632,7 @@ tables:
           <<: *common_display
 
       headcount_ratio_between:
-        title: Share of population in poverty (between {definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share of population in poverty (between {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: Percentage of population living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line}.
@@ -643,7 +651,7 @@ tables:
           <<: *common_display
 
       headcount:
-        title: Number of people in poverty ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Number of people in poverty ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "people"
         short_unit: ""
         description_short: Number of people living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line}.
@@ -679,7 +687,7 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       headcount_above:
-        title: Number of people not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Number of people not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "people"
         short_unit: ""
         description_short: Number of people living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line}.
@@ -698,7 +706,7 @@ tables:
           <<: *common_display
 
       headcount_between:
-        title: Number of people in poverty (between {definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Number of people in poverty (between {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "people"
         short_unit: ""
         description_short: Number of people living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line}.
@@ -717,7 +725,7 @@ tables:
           <<: *common_display
 
       total_shortfall:
-        title: Total shortfall ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Total shortfall ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behavior they would bring about.
@@ -755,7 +763,7 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       avg_shortfall:
-        title: Average shortfall ($) ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Average shortfall ($) ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}, averaged across the population in poverty.
@@ -791,7 +799,7 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       income_gap_ratio:
-        title: Average shortfall (%) ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Average shortfall (%) ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_. It captures the depth of poverty of those living on less than {definitions.poverty_line}.
@@ -827,7 +835,7 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       poverty_gap_index:
-        title: Poverty gap index ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Poverty gap index ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).
@@ -863,7 +871,7 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       watts:
-        title: Watts index ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Watts index ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: This is the mean across the population of the proportionate poverty gaps, as measured by the log of the ratio of the poverty line to income, where the mean is formed over the whole population, counting the nonpoor as having a zero poverty gap.
@@ -885,7 +893,7 @@ tables:
             - Poverty
 
       poverty_severity:
-        title: Poverty severity ({definitions.poverty_line}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Poverty severity ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: This is calculated as the square of the income gap ratio, the average shortfall expressed as a share of the poverty line.
@@ -904,7 +912,7 @@ tables:
           <<: *common_display
 
       spl:
-        title: Societal poverty line (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Societal poverty line (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The Societal Poverty Line (SPL) is defined to account for national definitions of poverty around the world. The SPL is the International Poverty Line when the national median is sufficiently low and it grows as the median income or consumption grows.
@@ -924,7 +932,7 @@ tables:
             - Poverty
 
       spr:
-        title: Share of population in societal poverty (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share of population in societal poverty (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: Percentage of population living in households with {definitions.description_short_welfare_type} below the Societal Poverty Line.
@@ -941,7 +949,7 @@ tables:
           <<: *common_display
 
       pg:
-        title: Prosperity gap (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Prosperity gap (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: Average factor by which incomes need to be multiplied to bring everyone to the prosperity standard of {definitions.prosperity_gap_threshold} per person per day.
@@ -960,7 +968,7 @@ tables:
 
       # INEQUALITY
       gini:
-        title: Gini coefficient (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Gini coefficient (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: The [Gini coefficient](#dod:gini) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality.
@@ -993,7 +1001,7 @@ tables:
             selectedEntityNames: *entity_names_inequality
 
       palma_ratio:
-        title: Palma ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Palma ratio (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: The Palma ratio is a measure of inequality that divides the share received by the richest 10% by the share of the poorest 40%. Higher values indicate higher inequality.
@@ -1026,7 +1034,7 @@ tables:
             selectedEntityNames: *entity_names_inequality
 
       s80_s20_ratio:
-        title: S80/S20 ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: S80/S20 ratio (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: The S80/S20 ratio is a measure of inequality that divides the share received by the richest 20% by the share of the poorest 20%. Higher values indicate higher inequality.
@@ -1044,7 +1052,7 @@ tables:
             - Economic Inequality
 
       p90_p10_ratio:
-        title: P90/P10 ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: P90/P10 ratio (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: P90 and P10 are the levels of <<welfare_type>> below which 90% and 10% of the population live, respectively. This variable gives the ratio of the two. It is a measure of inequality that indicates the gap between the richest and poorest tenth of the population.
@@ -1059,7 +1067,7 @@ tables:
           <<: *common_display
 
       p90_p50_ratio:
-        title: P90/P50 ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: P90/P50 ratio (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: The P90/P50 ratio measures the degree of inequality within the richest half of the population. A ratio of 2 means that someone just falling in the richest tenth of the population has twice the median <<welfare_type>>.
@@ -1077,7 +1085,7 @@ tables:
             - Economic Inequality
 
       p50_p10_ratio:
-        title: P50/P10 ratio (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: P50/P10 ratio (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: The P50/P10 ratio measures the degree of inequality within the poorest half of the population. A ratio of 2 means that the median <<welfare_type>> is two times higher than that of someone just falling in the poorest tenth of the population.
@@ -1096,7 +1104,7 @@ tables:
 
 
       mld:
-        title: Mean log deviation (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Mean log deviation (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: The mean log deviation (MLD) is a measure of inequality. An MLD of zero indicates perfect equality and it takes on larger positive values as incomes become more unequal.
@@ -1129,7 +1137,7 @@ tables:
             selectedEntityNames: *entity_names_inequality
 
       polarization:
-        title: Polarization (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Polarization (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: ""
         short_unit: ""
         description_short: The polarization index, also known as the Wolfson polarization index, measures the extent to which the distribution of income or consumption is “spread out” and bi-modal. Like the Gini coefficient, the polarization index ranges from 0 (no polarization) to 1 (complete polarization).
@@ -1148,7 +1156,7 @@ tables:
 
       # DISTRIBUTIONAL INDICATORS
       mean:
-        title: Mean (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Mean (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The mean is the average <<welfare_type>> of the population.
@@ -1181,7 +1189,7 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
-        title: Median (<<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Median (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The median is the value of <<welfare_type>> below which 50% of the population live.
@@ -1214,7 +1222,7 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       avg:
-        title: Average ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Average ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population).
@@ -1248,7 +1256,7 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       share:
-        title: Share ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population)
@@ -1279,7 +1287,7 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       thr:
-        title: Threshold ({definitions.percentiles_thr}, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Threshold ({definitions.percentiles_thr}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The level of <<welfare_type>> per day below which <<decile>>% of the population falls.
@@ -1313,7 +1321,7 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       bottom50_share:
-        title: Share (bottom 50%, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share (bottom 50%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the poorest 50% of the population.
@@ -1328,7 +1336,7 @@ tables:
           <<: *common_display
 
       middle40_share:
-        title: Share (middle 40%, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share (middle 40%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the middle 40% of the population. The middle 40% is the share of the population whose <<welfare_type>> lies between the poorest 50% and the richest 10%.
@@ -1343,7 +1351,7 @@ tables:
           <<: *common_display
 
       top1_share:
-        title: Share (top 1%, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the richest 1% of the population.
@@ -1358,7 +1366,7 @@ tables:
           <<: *common_display
 
       top90_99_share:
-        title: Share (between 90th and 99th percentiles, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Share (between 90th and 99th percentiles, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the population between the 90th and 99th percentiles.
@@ -1374,7 +1382,7 @@ tables:
           <<: *common_display
 
       top1_thr:
-        title: Threshold (top 1%, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Threshold (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The level of <<welfare_type>> per day below which 99% of the population falls.
@@ -1391,7 +1399,7 @@ tables:
           <<: *common_display
 
       top1_avg:
-        title: Average (top 1%, <<ppp_version>> prices) - <<table>> (<<welfare_type>>){definitions.survey_comparability}
+        title: Average (top 1%, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The mean <<welfare_type>> per day within the richest 1% of the population.

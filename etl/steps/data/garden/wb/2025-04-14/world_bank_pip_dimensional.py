@@ -938,7 +938,7 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
     # check_jumps_in_grapher_dataset(tb_no_spells_smooth)
 
     # Add the column table, identifying the type of table to use in Grapher
-    tb_spells["table"] = "Income or consumption with spells"
+    # tb_spells["table"] = "Income or consumption with spells"
     tb_inc_spells["table"] = "Income with spells"
     tb_cons_spells["table"] = "Consumption with spells"
     tb_no_spells["table"] = "Income or consumption"
@@ -952,7 +952,7 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
     # Concatenate all these tables
     tb = pr.concat(
         [
-            tb_spells,
+            # tb_spells,
             tb_inc_spells,
             tb_cons_spells,
             tb_no_spells,
