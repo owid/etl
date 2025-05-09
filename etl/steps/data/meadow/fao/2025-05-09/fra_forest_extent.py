@@ -80,8 +80,10 @@ def run() -> None:
     # Process data.
     #
     # Improve tables format.
-    tb_long = remove_region_duplicates(tb_long)
-    tables = [tb_long.format(["country", "year"])]
+    tb_long = remove_region_duplicates(
+        tb_long,
+    )
+    tables = [tb_long.format(["country", "year"], short_name="fra_forest_area")]
 
     #
     # Save outputs.
