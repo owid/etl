@@ -859,6 +859,11 @@ def get_post_views_by_chart_id(
         ["post_url", "post_title", "post_type", "post_publication_date", "chart_id", "chart_url"]
     ].merge(df_article_views.rename(columns={"url": "post_url"}), on="post_url", how="left")
 
+    # TODO: Find out why some urls don't have views, e.g. 'https://ourworldindata.org/neurodevelopmental-disorders' (which is now called 'https://ourworldindata.org/mental-health'). Maybe we should account for posts redirects (in the same way we do for charts).
+    # For now, remove rows with no data for views.
+    df_views = df_views.dropna(subset=["views"]).reset_index(drop=True)
+    df_views = df_views.astype({"views": int, "n_days": int})
+
     return df_views
 
 
