@@ -351,3 +351,17 @@ def remove_details_on_demand(text: str) -> str:
         text = re.sub(regex, "", text).replace("[", "").replace("]", "")
 
     return text
+
+
+def parse_numeric_list(val: list | str) -> list[float | int]:
+    """
+    Parse a string representation of a list of numbers into a Python list.
+    Example: "[10, 20, 30]" -> [10, 20, 30]
+    """
+    if isinstance(val, list):
+        return val
+    stripped = val.strip()
+    if stripped.startswith("[") and stripped.endswith("]"):
+        stripped = stripped[1:-1]
+
+    return [float(x) if "." in x else int(x) for x in stripped.split(",") if x.strip()]

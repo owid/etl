@@ -162,7 +162,10 @@ def _add_or_update_source(
 
 
 def _update_variables_metadata(table: catalog.Table) -> None:
-    """Update variables metadata."""
+    """Update variables metadata.
+
+    TODO: should this be moved to `.render` method?
+    """
     for col in table.columns:
         meta = table[col].metadata
 
