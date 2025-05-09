@@ -687,6 +687,7 @@ class PathFinder:
             dependencies=self.dependencies,
             catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}",
             validate_schema=False,
+            explorer=True,
         )
 
         assert isinstance(explorer, Explorer), "Unexpected type of explorer object. Expected Explorer."
