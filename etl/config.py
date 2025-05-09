@@ -613,3 +613,13 @@ def no_trailing_slash(url: str | None) -> None:
 env_vars = [ADMIN_HOST, TAILSCALE_ADMIN_HOST, DATA_API_URL, BAKED_VARIABLES_PATH, R2_SNAPSHOTS_PUBLIC_READ]
 for env_var in env_vars:
     no_trailing_slash(env_var)
+
+
+# Get Metabase credentials and parameters (for more information, visit the analytics repos).
+METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
+METABASE_URL = os.environ.get("METABASE_URL")
+METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
+########################################################################################################################
+# While users don't have Metadata credentials, default to Dataset.
+DEFAULT_TO_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
+########################################################################################################################
