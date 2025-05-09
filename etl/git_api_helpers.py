@@ -2,16 +2,14 @@
 Helpers for working with Git through PyGithub library.
 """
 
-import base64
 import hashlib
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional
 
 import jwt
 import requests
 from github import Auth, Github, GithubException, InputGitTreeElement
-from github.ContentFile import ContentFile
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 from structlog import get_logger
@@ -198,7 +196,7 @@ class GithubApiRepo:
 
             # PyGithub's decoded_content is bytes, decode it to a string
             content_bytes = content_file.decoded_content
-            return content_bytes.decode("utf-8") if isinstance(content_bytes, bytes) else content_bytes
+            return str(content_bytes.decode("utf-8") if isinstance(content_bytes, bytes) else content_bytes)
         except GithubException as e:
             if e.status == 404:
                 raise FileNotFoundError(f"File {file_path} not found on branch {branch}")
@@ -587,6 +585,7 @@ class GithubApiRepo:
         try:
             # Check if the file already exists
             contents = self.repo.get_contents(file_path, ref=branch)
+            assert not isinstance(contents, list)
 
             # Compare the existing content with the new content
             if contents.sha == new_content_checksum:
@@ -625,12 +624,12 @@ class GithubApiRepo:
             Branch name
         """
         # First verify that the commit exists
-        commit = self.repo.get_commit(commit_sha)
+        self.repo.get_commit(commit_sha)
 
         # Use PyGithub's internal requester to make the API call
         # This endpoint isn't directly exposed in PyGithub's public API
         endpoint = f"/repos/{self.org}/{self.repo_name}/commits/{commit_sha}/pulls"
-        headers, data = self.repo._requester.requestJsonAndCheck("GET", endpoint)
+        _, data = self.repo._requester.requestJsonAndCheck("GET", endpoint)
 
         # Filter the closed ones
         closed_pull_requests = [pr for pr in data if pr["state"] == "closed"]
@@ -675,7 +674,7 @@ class GithubApiRepo:
             head_sha=head_sha,
             status="completed",
             conclusion=conclusion,
-            output=output,
+            output=output,  # type: ignore
         )
 
         return check_run
