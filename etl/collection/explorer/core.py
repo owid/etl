@@ -1,5 +1,5 @@
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
@@ -33,7 +33,7 @@ __all__ = [
 class Explorer(Collection):
     """Model for Explorer configuration."""
 
-    config: Optional[Dict[str, Any]] = None
+    config: Dict[str, Any] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> Self:
