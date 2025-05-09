@@ -144,13 +144,13 @@ def create_collection(
 
     # Create actual explorer
     if explorer:
-        coll = create_mdim(
+        coll = create_explorer(
             config=config,
             dependencies=dependencies,
             catalog_path=catalog_path,
         )
     else:
-        coll = create_explorer(
+        coll = create_mdim(
             config=config,
             dependencies=dependencies,
             catalog_path=catalog_path,
