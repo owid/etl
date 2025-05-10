@@ -4,12 +4,12 @@ import shutil
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Set, Tuple
+from typing import Set
 
 import click
 import commentjson
 
-from etl.dag_helpers import load_dag
+from etl.dag_helpers import get_active_snapshots, get_active_steps
 from etl.paths import BASE_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
 
 # Time cutoff for recent modifications (1 month)
@@ -27,25 +27,6 @@ def should_exclude(path: Path) -> bool:
         return False
 
     return True
-
-
-def active_steps_and_snapshots() -> Tuple[Set[str], Set[str]]:
-    DAG = load_dag()
-
-    active_snapshots = set()
-    active_steps = set()
-
-    for s in set(DAG.keys()) | {x for v in DAG.values() for x in v}:
-        if s.startswith("snapshot"):
-            active_snapshots.add(s.split("://")[1])
-        else:
-            active_steps.add(s.split("://")[1])
-
-    # Strip dataset name after version
-    active_steps = {s.rsplit("/", 1)[0] for s in active_steps}
-    active_snapshots = {s.rsplit("/", 1)[0] for s in active_snapshots}
-
-    return active_steps, active_snapshots
 
 
 def snapshots_to_exclude(active_snapshots: Set[str]) -> Set[str]:
@@ -92,7 +73,8 @@ def steps_to_exclude(active_steps: Set[str]) -> Set[str]:
     help="Perform a dry run without making any changes.",
 )
 def main(settings_scope, dry_run):
-    active_steps, active_snapshots = active_steps_and_snapshots()
+    active_snapshots = get_active_snapshots()
+    active_steps = get_active_steps()
 
     to_exclude = {s: True for s in sorted(snapshots_to_exclude(active_snapshots) | steps_to_exclude(active_steps))}
 

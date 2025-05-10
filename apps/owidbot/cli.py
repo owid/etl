@@ -10,8 +10,7 @@ from rich_click.rich_command import RichCommand
 
 from apps.owidbot import anomalist, chart_diff, data_diff, grapher
 from etl.config import OWIDBOT_ACCESS_TOKEN, get_container_name
-
-from . import github_utils as gh_utils
+from etl.git_api_helpers import GithubApiRepo
 
 log = structlog.get_logger()
 
@@ -57,8 +56,8 @@ def cli(
     if repo_name not in get_args(REPOS):
         raise AssertionError("Invalid repo")
 
-    repo = gh_utils.get_repo(repo_name, access_token=OWIDBOT_ACCESS_TOKEN)
-    pr = gh_utils.get_pr(repo, branch)
+    repo = GithubApiRepo(repo_name=repo_name, access_token=OWIDBOT_ACCESS_TOKEN)
+    pr = repo.get_pr(branch)
     if pr is None:
         log.warning(f"No open PR found for branch {branch}")
         return
@@ -90,7 +89,7 @@ def cli(
             continue
 
     # get existing comment (do this as late as possible to avoid race conditions)
-    comment = gh_utils.get_comment_from_pr(pr)
+    comment = repo.get_comment_from_pr(pr)
 
     # fill in services from existing comment if not run via --services to avoid deleting them
     if comment:
