@@ -21,7 +21,7 @@ from etl.version_tracker import VersionTracker
 @st.cache_data(show_spinner=False)
 def get_analytics(min_date, max_date, excluded_steps):
     # 1/ Relate charts with producers of their data
-    df = get_producers_per_chart(excluded_steps=excluded_steps)
+    df = get_producers_per_chart(excluded_steps=excluded_steps).drop(columns=["chart_id"])
 
     # 2/ Get chart analytics (chart views)
     df_charts = get_chart_views(min_date=min_date, max_date=max_date)
@@ -166,7 +166,7 @@ AND is_published = true;
     )
 
     # Format as expected by following code
-    df = df[["producer", "chart_slug"]].drop_duplicates()
+    df = df[["producer", "chart_slug", "chart_id"]].drop_duplicates()
 
     # Edit chart slug to match the grapher URL
     df["chart_url"] = GRAPHERS_BASE_URL + df["chart_slug"]
