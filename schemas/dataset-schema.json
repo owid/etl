@@ -63,79 +63,96 @@
           }
         },
         "baseColorScheme": {
-          "type": "string",
           "description": "One of the predefined base color schemes",
           "default": "default",
-          "enum": [
-            "YlGn",
-            "YlGnBu",
-            "GnBu",
-            "BuGn",
-            "PuBuGn",
-            "BuPu",
-            "RdPu",
-            "PuRd",
-            "OrRd",
-            "YlOrRd",
-            "YlOrBr",
-            "Purples",
-            "Blues",
-            "Greens",
-            "Oranges",
-            "Reds",
-            "Greys",
-            "PuOr",
-            "BrBG",
-            "PRGn",
-            "PiYG",
-            "RdBu",
-            "RdGy",
-            "RdYlBu",
-            "Spectral",
-            "RdYlGn",
-            "Accent",
-            "Dark2",
-            "Paired",
-            "Pastel1",
-            "Pastel2",
-            "Set1",
-            "Set2",
-            "Set3",
-            "PuBu",
-            "hsv-RdBu",
-            "hsv-CyMg",
-            "Magma",
-            "Inferno",
-            "Plasma",
-            "Viridis",
-            "continents",
-            "stackedAreaDefault",
-            "owid-distinct",
-            "default",
-            "ContinentsLines",
-            "SingleColorDenim",
-            "SingleColorTeal",
-            "SingleColorPurple",
-            "SingleColorDustyCoral",
-            "SingleColorDarkCopper",
-            "OwidCategoricalA",
-            "OwidCategoricalB",
-            "OwidCategoricalC",
-            "OwidCategoricalD",
-            "OwidCategoricalE",
-            "OwidEnergy",
-            "OwidEnergyLines",
-            "OwidDistinctLines",
-            "BinaryMapPaletteA",
-            "BinaryMapPaletteB",
-            "BinaryMapPaletteC",
-            "BinaryMapPaletteD",
-            "BinaryMapPaletteE",
-            "SingleColorGradientDenim",
-            "SingleColorGradientTeal",
-            "SingleColorGradientPurple",
-            "SingleColorGradientDustyCoral",
-            "SingleColorGradientDarkCopper"
+          "oneOf": [
+            {
+              "enum": [
+                "YlGn",
+                "YlGnBu",
+                "GnBu",
+                "BuGn",
+                "PuBuGn",
+                "BuPu",
+                "RdPu",
+                "PuRd",
+                "OrRd",
+                "YlOrRd",
+                "YlOrBr",
+                "Purples",
+                "Blues",
+                "Greens",
+                "Oranges",
+                "Reds",
+                "Greys",
+                "PuOr",
+                "BrBG",
+                "PRGn",
+                "PiYG",
+                "RdBu",
+                "RdGy",
+                "RdYlBu",
+                "Spectral",
+                "RdYlGn",
+                "Accent",
+                "Dark2",
+                "Paired",
+                "Pastel1",
+                "Pastel2",
+                "Set1",
+                "Set2",
+                "Set3",
+                "PuBu",
+                "hsv-RdBu",
+                "hsv-CyMg",
+                "Magma",
+                "Inferno",
+                "Plasma",
+                "Viridis",
+                "continents",
+                "stackedAreaDefault",
+                "owid-distinct",
+                "default",
+                "ContinentsLines",
+                "SingleColorDenim",
+                "SingleColorTeal",
+                "SingleColorPurple",
+                "SingleColorDustyCoral",
+                "SingleColorDarkCopper",
+                "OwidCategoricalA",
+                "OwidCategoricalB",
+                "OwidCategoricalC",
+                "OwidCategoricalD",
+                "OwidCategoricalE",
+                "OwidEnergy",
+                "OwidEnergyLines",
+                "OwidDistinctLines",
+                "BinaryMapPaletteA",
+                "BinaryMapPaletteB",
+                "BinaryMapPaletteC",
+                "BinaryMapPaletteD",
+                "BinaryMapPaletteE",
+                "SingleColorGradientDenim",
+                "SingleColorGradientTeal",
+                "SingleColorGradientPurple",
+                "SingleColorGradientDustyCoral",
+                "SingleColorGradientDarkCopper"
+              ]
+            },
+            {
+              "type": "string",
+              "pattern": "<%"
+            },
+            {
+              "type": "string",
+              "pattern": "{definitions"
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           ]
         },
         "equalSizeBins": {
@@ -170,11 +187,19 @@
           }
         },
         "customNumericValues": {
-          "type": "array",
-          "description": "Custom maximum brackets for each numeric bin. Only applied when strategy is `manual`",
-          "items": {
-            "type": "number"
-          }
+          "description": "Custom maximum brackets for each numeric bin. Only applied when strategy is `manual` or when using a string matching pattern like `<%`.",
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+          "type": "number"
+              }
+            },
+            {
+              "type": "string",
+              "pattern": "<%"
+            }
+          ]
         },
         "customNumericColorsActive": {
           "type": "boolean",
@@ -202,7 +227,15 @@
           "minimum": 0
         },
         "customNumericMinValue": {
-          "type": "number",
+          "oneOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string",
+              "pattern": "{definitions"
+            }
+          ],
           "description": "The minimum bracket of the first bin"
         }
       },
@@ -1077,10 +1110,17 @@
                           "$ref": "#/$defs/axis"
                         },
                         "tab": {
-                          "type": "string",
+                          "oneOf": [
+                            {
+                              "enum": ["chart", "map", "table"]
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "{definitions"
+                            }
+                          ],
                           "description": "The tab that is shown initially",
-                          "default": "chart",
-                          "enum": ["chart", "map", "table"]
+                          "default": "chart"
                         },
                         "matchingEntitiesOnly": {
                           "type": "boolean",
@@ -1317,7 +1357,15 @@
                           }
                         },
                         "hasMapTab": {
-                          "type": "boolean",
+                          "oneOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "string",
+                              "pattern": "{definitions"
+                            }
+                          ],
                           "default": false,
                           "description": "Whether the default chart for the indicator should include a map tab."
                         },

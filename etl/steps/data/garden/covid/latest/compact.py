@@ -380,6 +380,7 @@ def add_external_indicators(
     tb_hdr = tb_hdr.rename(columns={"hdi": "human_development_index"})
 
     # PIP
+    # TODO: Change when PPP prices are updated: year and poverty line
     tb_pip = ds_pip["income_consumption_2017"].reset_index()
     tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_215"]]
     ## get most recent data
