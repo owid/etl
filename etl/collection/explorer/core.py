@@ -1,22 +1,25 @@
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 import numpy as np
 import pandas as pd
 from owid.catalog.utils import underscore
+from sqlalchemy.orm import Session
+from typing_extensions import Self
 
+import etl.grapher.model as gm
 from etl.collection.common import (
     INDICATORS_SLUG,
     combine_config_dimensions,
     create_mdim_or_explorer,
     expand_config,
-    get_mapping_paths_to_id,
 )
-from etl.collection.explorer_legacy import _create_explorer_legacy
-from etl.collection.model import CHART_DIMENSIONS, Collection, pruned_json
-from etl.config import OWIDEnv
+from etl.collection.explorer.legacy import create_explorer_legacy
+from etl.collection.model import Collection
+from etl.collection.utils import CHART_DIMENSIONS, pruned_json
+from etl.config import OWID_ENV, OWIDEnv
 from etl.paths import EXPORT_EXPLORER_DIR
 
 __all__ = [
@@ -30,7 +33,25 @@ __all__ = [
 class Explorer(Collection):
     """Model for Explorer configuration."""
 
-    config: Dict[str, str]
+    config: Dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> Self:
+        """Coerce the dictionary into the expected shape before passing it to the parent class."""
+        # Make a shallow copy so we don't mutate the user's dictionary in-place
+        data = dict(d)
+
+        # If dictionary contains field 'definitions', change it for '_definitions'
+        if "title" not in data:
+            data["title"] = {}
+        if "default_selection" not in data:
+            data["default_selection"] = []
+
+        if "config" not in data:
+            raise ValueError("Missing 'config' key in the dictionary.")
+
+        # Now that data is in the expected shape, let the parent class handle the rest
+        return super().from_dict(data)
 
     def __post_init__(self):
         """We set it here because of simplicity.
@@ -91,7 +112,7 @@ class Explorer(Collection):
         df_grapher, df_columns = extract_explorers_tables(self)
 
         # Transform to legacy format
-        explorer_legacy = _create_explorer_legacy(
+        explorer_legacy = create_explorer_legacy(
             catalog_path=self.catalog_path,
             explorer_name=self.short_name,
             config=self.config,
@@ -236,6 +257,20 @@ def _extract_explorers_tables(
     df_columns = pd.DataFrame.from_records(records_columns)
 
     return df_grapher, df_columns
+
+
+def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> Dict[str, str]:
+    # Check if given path is actually an ID
+    # Get ID, assuming given path is a catalog path
+    if owid_env is None:
+        engine = OWID_ENV.engine
+    else:
+        engine = owid_env.engine
+    with Session(engine) as session:
+        db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # type: ignore
+        # scores = dict(zip(catalog_paths, range(len(catalog_paths))))
+        # db_indicators.sort(key=lambda x: scores[x.catalogPath], reverse=True)
+        return {indicator.catalogPath: indicator.id for indicator in db_indicators}
 
 
 def _add_indicator_display_settings(df_grapher, df_columns, columns_widgets):

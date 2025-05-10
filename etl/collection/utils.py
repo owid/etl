@@ -2,13 +2,15 @@ import re
 from collections import defaultdict
 from copy import deepcopy
 from itertools import product
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, TypeVar
 
 from owid.catalog import Dataset
 
 from etl.db import read_sql
 from etl.files import yaml_dump
 from etl.paths import DATA_DIR
+
+CHART_DIMENSIONS = ["y", "x", "size", "color"]
 
 
 def records_to_dictionary(records, key: str):
@@ -454,3 +456,67 @@ def unique_records(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
             seen.add(items)
             unique_records.append(record)
     return unique_records
+
+
+def prune_dict(d: dict) -> dict:
+    """Remove all keys starting with underscore and all empty values from a dictionary.
+
+    NOTE: This method was copied from owid.catalog.utils. It is slightly different in the sense that it does not remove fields with empty lists! This is because there are some fields which are mandatory and can be empty! (TODO: should probably fix the schema / engineering side)
+
+    """
+    out = {}
+    for k, v in d.items():
+        if not k.startswith("_") and v not in [None, {}]:
+            if isinstance(v, dict):
+                out[k] = prune_dict(v)
+            elif isinstance(v, list):
+                out[k] = [prune_dict(x) if isinstance(x, dict) else x for x in v if x not in [None, {}]]
+            else:
+                out[k] = v
+    return out
+
+
+T = TypeVar("T")
+
+
+def pruned_json(cls: T) -> T:
+    orig = cls.to_dict  # type: ignore
+
+    # only keep non-null public variables
+    # calling original to_dict returns dictionaries, not objects
+    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
+
+    return cls
+
+
+def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
+    """
+    Group views by the specified dimensions. Concatenate indicators for the same group.
+
+    :param views: List of views dictionaries.
+    :param by: List of dimensions to group by.
+    """
+    views = deepcopy(views)
+
+    grouped_views = {}
+    for view in views:
+        # Group key
+        key = tuple(view["dimensions"][dim] for dim in by)
+
+        if key not in grouped_views:
+            # Ensure 'y' is a single indicator before turning it into a list
+            assert not isinstance(view["indicators"]["y"], list), "Expected 'y' to be a single indicator, not a list"
+
+            if set(view["indicators"].keys()) != {"y"}:
+                raise NotImplementedError(
+                    "Only 'y' indicator is supported in groupby. Adapt the code for other fields."
+                )
+
+            view["indicators"]["y"] = [view["indicators"]["y"]]
+
+            # Add to dictionary
+            grouped_views[key] = view
+        else:
+            grouped_views[key]["indicators"]["y"].append(view["indicators"]["y"])
+
+    return list(grouped_views.values())

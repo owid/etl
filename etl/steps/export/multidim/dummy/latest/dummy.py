@@ -12,17 +12,17 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    mdims = paths.load_mdims("covid")
-    mdims = [
-        mdims.read("covid_cases"),
-        mdims.read("covid_deaths"),
+    cs = paths.load_collectionset("covid")
+    cols = [
+        cs.read("covid_cases"),
+        cs.read("covid_deaths"),
     ]
-    mdim_name = "test_combined"
+    col_name = "test_combined"
 
     # Combine
     mdim = combine_mdims(
-        mdims=mdims,
-        mdim_name=mdim_name,
+        mdims=cols,
+        mdim_name=col_name,
         mdim_dimension_name="Indicator",
         mdim_choices_names=["COVID-19 cases", "COVID-19 deaths"],
         config=paths.load_mdim_config(),

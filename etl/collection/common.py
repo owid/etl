@@ -33,20 +33,6 @@ def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = No
         return db_indicator.id
 
 
-def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> Dict[str, str]:
-    # Check if given path is actually an ID
-    # Get ID, assuming given path is a catalog path
-    if owid_env is None:
-        engine = OWID_ENV.engine
-    else:
-        engine = owid_env.engine
-    with Session(engine) as session:
-        db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # type: ignore
-        # scores = dict(zip(catalog_paths, range(len(catalog_paths))))
-        # db_indicators.sort(key=lambda x: scores[x.catalogPath], reverse=True)
-        return {indicator.catalogPath: indicator.id for indicator in db_indicators}
-
-
 def expand_config(
     tb: Table,
     indicator_names: Optional[Union[str, List[str]]] = None,

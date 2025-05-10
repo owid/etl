@@ -4,7 +4,7 @@ from io import StringIO
 
 import streamlit as st
 
-from etl.collection.explorer_legacy import ExplorerLegacy
+from etl.collection.explorer.legacy import ExplorerLegacy
 
 # PAGE CONFIG
 st.set_page_config(
