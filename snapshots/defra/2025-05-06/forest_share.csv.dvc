@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Department for Environment, Food & Rural Affairs
+    title: DEFRA - Government Forestry and Woodlands Policy Statement
+    citation_full: |-
+      Government Forestry and Woodlands Policy Statement - Incorporating the Government’s Response to the Independent Panel on Forestry's Final Report (2013). Forest Policy Team, Department for Environment, Food & Rural Affairs.
+    attribution_short: DEFRA
+    url_main: |-
+      https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/221023/pb13871-forestry-policy-statement.pdf
+    date_accessed: "2025-05-06"
+    date_published: "2013-01-01"
+    license:
+      name: Open Government Licence
+      url: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
+outs:
+  - md5: 7787a1f1a5bb5ecbb25ddf49f315aa44
+    size: 503
+    path: forest_share.csv

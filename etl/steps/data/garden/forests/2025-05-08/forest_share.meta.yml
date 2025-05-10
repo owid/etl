@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Forests & Deforestation
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Historic forest cover estimates from combined sources
+  description: |
+    This dataset provides estimates of forest cover from various sources, including FAO, USDA Forest Service, DEFRA, Forest Research and others. The data is presented as a percentage of the total land area.
+
+tables:
+  forest_share:
+    variables:
+      forest_share:
+        title: Forest cover
+        description_short: "The share of land area covered by forests."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_key:
+          - "This indicator is a combination of data from multiple sources, including FAO, USDA Forest Service, DEFRA, Forest Research, and others."
+          - "The data is presented as a percentage of the total land area."

@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: United States Department of Agriculture, Forest Service
+    title: U.S. Forest Resource Facts and Historical Trends
+    citation_full: |-
+      U.S. Forest Resource Facts and Historical Trends. U.S. Department of Agriculture, Forest Service, 2014.
+    attribution_short: USDA Forest Service
+    url_main: |-
+      https://www.fs.usda.gov/sites/default/files/legacy_files/media/types/publication/field_pdf/forestfacts-2014aug-fs1035-508complete.pdf
+    date_accessed: "2025-05-07"
+    date_published: "2014-08-01"
+    license:
+      name: Public domain
+      url: https://www.usda.gov/about-usda/policies-and-links/open-government-usda
+outs:
+  - md5: 1c4749483cd7253acaad431279fdc161
+    size: 1751
+    path: forest_share.csv
