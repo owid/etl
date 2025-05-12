@@ -727,6 +727,17 @@ steps:
   data://grapher/corruption/2025-05-12/corruption_barometer:
     - data://garden/corruption/2025-05-12/corruption_barometer
 
+
+  #
+  # World Bank Enterprise Surveys
+  #
+  data://meadow/wb/2025-05-12/enterprise_surveys:
+    - snapshot://wb/2025-05-12/enterprise_surveys.xlsx
+  data://garden/wb/2025-05-12/enterprise_surveys:
+    - data://meadow/wb/2025-05-12/enterprise_surveys
+  data://grapher/wb/2025-05-12/enterprise_surveys:
+    - data://garden/wb/2025-05-12/enterprise_surveys
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
