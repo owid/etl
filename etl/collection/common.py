@@ -186,36 +186,6 @@ def expand_config(
     return config_partial
 
 
-def process_views(
-    mdim_or_explorer,
-    dependencies: Set[str],
-    combine_metadata_when_mult: bool = False,
-):
-    """Process views in Explorer configuration.
-
-    TODO: See if we can converge to one solution with etl.collection.multidim.process_views.
-    """
-    # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
-    tables_by_name = get_tables_by_name_mapping(dependencies)
-
-    for view in mdim_or_explorer.views:
-        # Expand paths
-        view.expand_paths(tables_by_name)
-
-        # Combine metadata/config with definitions.common_views
-        if (mdim_or_explorer.definitions is not None) and (mdim_or_explorer.definitions.common_views is not None):
-            view.combine_with_common(mdim_or_explorer.definitions.common_views)
-
-        # Combine metadata in views which contain multiple indicators
-        if combine_metadata_when_mult and view.metadata_is_needed:  # Check if view "contains multiple indicators"
-            # TODO
-            # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
-            # log.info(
-            #     f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view.dimensions}"
-            # )
-            pass
-
-
 ####################################################################################################
 # Config auto-expander: Expand configuration from a table. This config is partial!
 ####################################################################################################
