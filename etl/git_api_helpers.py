@@ -438,12 +438,13 @@ class GithubApiRepo:
 
         return commit.sha
 
-    def update_branch_reference(self, branch_name: str, commit_sha: str) -> bool:
+    def update_branch_reference(self, branch_name: str, commit_sha: str, force: bool = True) -> bool:
         """Update a branch reference to point to a commit.
 
         Args:
             branch_name: The name of the branch to update
             commit_sha: The SHA of the commit to point to
+            force: If True, allows non-fast-forward updates (default: True)
 
         Returns:
             True if successful
@@ -452,7 +453,7 @@ class GithubApiRepo:
         ref = self.repo.get_git_ref(f"heads/{branch_name}")
 
         # Update it
-        ref.edit(commit_sha, force=False)
+        ref.edit(commit_sha, force=force)
         return True
 
     def create_pull_request(self, title: str, branch_name: str, body: str = "") -> str:
