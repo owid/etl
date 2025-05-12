@@ -32,7 +32,7 @@ tables:
           <% elif category == "Other acts of corruption" %>
           Other acts of corruption includes embezzlement, abuse of functions, trading in influence, illicit enrichment and all other acts of corruption not mentioned above.
           <%- endif -%>
-        unit:
+        unit: |-
           <%- if unit_of_measurement.lower() == "counts" %>
            << indicator.lower() >>
           <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>

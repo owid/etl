@@ -16,6 +16,11 @@ tables:
   justice:
     variables:
       value:
-        title: << indicator >>  << category >> << sex >> << age >> << unit_of_measurement >>
-        unit: << unit_of_measurement.lower() >>
-
+        title: << indicator >>  - << category.lower() >> << age.lower() >> << sex.lower() >> (<< unit_of_measurement.lower() >>)
+        description_short: National figures on persons suspected/arrested/cautioned, persons prosecuted, and persons convicted. They also include data on persons brought before criminal court by type of legal representation.
+        unit: |-
+          <%- if unit_of_measurement.lower() == "counts" %>
+           << indicator.lower() >>
+          <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
+            per 100,000 population
+          <%- endif -%>

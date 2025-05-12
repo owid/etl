@@ -23,10 +23,20 @@ def run() -> None:
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
-    tb = tb[tb["dimension"] == "by selected crime"]
-    tb = tb.drop("dimension", axis=1)
+    tb["sex"] = tb["sex"].replace(
+        {
+            "Total": "all individuals",
+            "Female": "women",
+            "Male": "men",
+        }
+    )
+    tb["age"] = tb["age"].replace(
+        {
+            "Total": "all ages",
+        }
+    )
     # Improve table format.
-    tb = tb.format(["country", "year", "indicator", "category", "sex", "age", "unit_of_measurement"])
+    tb = tb.format(["country", "year", "dimension", "indicator", "category", "sex", "age", "unit_of_measurement"])
 
     #
     # Save outputs.
