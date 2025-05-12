@@ -654,13 +654,6 @@ class PathFinder:
         explorer: bool = False,
     ):
         if explorer:
-            # Create Collection object
-            c = create_collection_from_config(
-                config,
-                self.dependencies,
-                catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
-            )
-        else:
             c = create_collection_from_config(
                 config=config,
                 dependencies=self.dependencies,
@@ -670,6 +663,13 @@ class PathFinder:
             )
 
             assert isinstance(c, Explorer), "Unexpected type of explorer object. Expected Explorer."
+        else:
+            # Create Collection object
+            c = create_collection_from_config(
+                config,
+                self.dependencies,
+                catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
+            )
 
         return c
 
