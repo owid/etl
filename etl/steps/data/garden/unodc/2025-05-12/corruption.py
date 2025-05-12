@@ -12,21 +12,25 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    ds_meadow = paths.load_dataset("justice")
+    ds_meadow = paths.load_dataset("corruption")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("justice")
+    tb = ds_meadow.read("corruption")
 
     #
     # Process data.
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-
-    tb = tb[tb["dimension"] == "by selected crime"]
-    tb = tb.drop("dimension", axis=1)
     # Improve table format.
-    tb = tb.format(["country", "year", "indicator", "category", "sex", "age", "unit_of_measurement"])
+    tb = tb.drop(["dimension", "sex", "age"], axis=1)
+    tb["category"] = tb["category"].replace(
+        {
+            "Corruption: Other acts of corruption": "Other acts of corruption",
+            "Corruption: Bribery": "Bribery",
+        }
+    )
+    tb = tb.format(["country", "year", "indicator", "category", "unit_of_measurement"])
 
     #
     # Save outputs.

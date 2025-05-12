@@ -706,6 +706,14 @@ steps:
   data://grapher/unodc/2025-05-12/justice:
     - data://garden/unodc/2025-05-12/justice
 
+  # UNODC - Corruption & Economic Crime
+  data://meadow/unodc/2025-05-12/corruption:
+    - snapshot://unodc/2025-05-12/corruption.xlsx
+  data://garden/unodc/2025-05-12/corruption:
+    - data://meadow/unodc/2025-05-12/corruption
+  data://grapher/unodc/2025-05-12/corruption:
+    - data://garden/unodc/2025-05-12/corruption
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

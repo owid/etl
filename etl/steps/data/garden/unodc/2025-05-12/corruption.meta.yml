@@ -1,0 +1,40 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Corruption
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  corruption:
+    variables:
+      value:
+        title: << indicator >>  - << category.lower() >>  (<< unit_of_measurement.lower() >>)
+        description_short: |-
+          <%- if category == "Corruption" %>
+          National figures on offences involving corruption, which includes bribery, embezzlement, abuse of functions, trading in influence, illicit enrichment, and any additional corrupt practices not covered under bribery or general corruption categories.
+          <% elif category == "Bribery" %>
+          National figures on offences involving bribery, which includes the promising, offering, giving, soliciting, or accepting of an undue advantage by or from a public official, or a person working in the private sector, directly or indirectly, with the intent to influence the performance or non-performance of their official duties.
+          <% elif category == "Other acts of corruption" %>
+          National figures on other acts of corruption, including embezzlement, abuse of functions, trading in influence, illicit enrichment, and any additional corrupt practices not covered under bribery or general corruption categories.
+          <%- endif -%>
+        description_from_producer: |-
+          <% if category == "Corruption" %>
+          Corruption and other national and international legal instruments against corruption.
+          <% elif category == "Bribery" %>
+          Promising, offering, giving, soliciting, or accepting an undue advantage to or from a public official or a person who directs or works in a private sector entity, directly or indirectly, in order that the person act or refrain from acting in the exercise of his or her official duties.
+          <% elif category == "Other acts of corruption" %>
+          Other acts of corruption includes embezzlement, abuse of functions, trading in influence, illicit enrichment and all other acts of corruption not mentioned above.
+          <%- endif -%>
+        unit:
+          <%- if unit_of_measurement.lower() == "counts" %>
+           << indicator.lower() >>
+          <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
+            per 100,000 population
+          <%- endif -%>
