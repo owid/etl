@@ -10,13 +10,13 @@ paths = PathFinder(__file__)
 
 # Define a mapping for shortening and standardizing corrupt parties
 CORRUPT_PARTIES_MAPPING = {
-    "The (President)/(Prime Minister) and Officials in his office": "President/Prime Minister and officials in their office",
-    "Representatives in the Legislature (i.e. Members of the Parliament or Sentators)": "Legislators (i.e. members of parliament or senators)",
+    "The (President)/(Prime Minister) and Officials in his office": "President/PM and their office",
+    "Representatives in the Legislature (i.e. Members of the Parliament or Sentators)": "Members of parliament or senators",
     "Government officials": "Government officials",
-    "Local government councilors": "Local councilors",
+    "Local government councilors": "Local government councilors",
     "Police": "Police",
     "Tax Officials, like Ministry of Finance officials or Local Government tax collectors": "Tax officials",
-    "Judges and Magistrates": "Judiciary",
+    "Judges and Magistrates": "Judges and magistrates",
     "Religious leaders": "Religious leaders",
     "Business executives": "Business executives",
 }
@@ -56,7 +56,8 @@ def run() -> None:
         # Check if the fifth row, first column is not NaN and matches a valid institution + append to question
         if pd.notna(tb.iloc[4, 0]) and str(tb.iloc[4, 0]).strip() in CORRUPT_PARTIES_MAPPING.keys():
             corrupt_party = CORRUPT_PARTIES_MAPPING[str(tb.iloc[4, 0]).strip()]  # Map to standardized term
-            question = question + " " + corrupt_party  # Append the standardized term to the question
+        else:
+            corrupt_party = "Not applicable"
         country_row_idx = None
         for idx, val in enumerate(tb.iloc[:, 0]):  # Iterate over the first column
             if sheet_name in ["Q3", "Q4"]:
@@ -91,12 +92,13 @@ def run() -> None:
             value_name="value",
         )
         tb["year"] = 2017
+        tb["institution"] = corrupt_party
 
         cleaned_tb.append(tb)
 
     tb = pr.concat(cleaned_tb, ignore_index=True)
     # Improve tables format.
-    tables = [tb.format(["country", "year", "question", "answer"])]
+    tables = [tb.format(["country", "year", "question", "institution", "answer"])]
 
     #
     # Save outputs.

@@ -34,16 +34,15 @@ def run() -> None:
         "NET WELL": "Fairly or very well",
         "None": "None of them",
         "Don't know / Refused": "Don't know or refused",
-        "TOTAL Bribery Rate, Excluding no contact": "in the past 12 months had contact with a public official",
-        "TOTAL Bribery Rate, Total population": "all individuals",
-        "TOTAL Contact Rate": "contact rate",
+        "TOTAL Bribery Rate, Excluding no contact": "Bribery rate among those who had contact with a public official in the past 12 months",
+        "TOTAL Bribery Rate, Total population": "Bribery rate among all respondents irrespective of contact with a public official in the past 12 months",
+        "TOTAL Contact Rate": "Contact rate with a public official in the past 12 months",
     }
 
     tb["answer"] = tb["answer"].replace(answer_mapping).str.lower().str.capitalize()
     tb["value"] = tb["value"] * 100  # Convert to percentage
-
     # Improve table format.
-    tb = tb.format(["country", "year", "question", "answer"])
+    tb = tb.format(["country", "year", "question", "answer", "institution"])
 
     #
     # Save outputs.

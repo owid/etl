@@ -21,14 +21,36 @@ tables:
   corruption_barometer:
     variables:
       value:
-        title: << question >>  -  << answer >>
+        title: |-
+          <%- if institution == "Not applicable" and question != "Bribary rate" %>
+          << question >>   << answer >>
+          <% elif institution == "Not applicable" and question == "Bribary rate" %>
+          << answer >>
+          <% elif institution != "Not applicable" and question != "Bribary rate" %>
+          << institution >>: << question >>  << answer >>
+          <%- endif -%>
+
         description_short: |-
-          <%- if question == "Bribary rate" and answer == "In the past 12 months had contact with a public official" %>
+          <%- if question == "Bribary rate" and answer == "Bribery rate among those who had contact with a public official in the past 12 months" %>
           Percentage of the population who, in the past 12 months, had contact with a public official and were asked for a bribe.
-          <% elif question == "Bribary rate" and answer == "All individuals" %>
+          <% elif question == "Bribary rate" and answer == "Bribery rate among all respondents irrespective of contact with a public official in the past 12 months" %>
           Percentage of the population who were asked for a bribe in the past 12 months.
-          <% elif question == "Bribary rate" and answer == "Contact rate" %>
+          <% elif question == "Bribary rate" and answer == "Contact rate with a public official in the past 12 months" %>
           Percentage of the population who had contact with a public official in the past 12 months.
-          <% elif question != "Bribary rate"%>
+          <% elif question != "Bribary rate" and institution != "Not applicable" %>
+          Percentage of respondents who answered "<< answer >>" to the question "<< question >> << institution >>".
+          <% elif question != "Bribary rate" and institution == "Not applicable" %>
           Percentage of respondents who answered "<< answer >>" to the question "<< question >>".
           <%- endif -%>
+
+        presentation:
+          title_public: |-
+            <%- if question != "Bribary rate" and institution != "Not applicable" %>
+            << institution >>  << question >>  -  << answer >>
+            <%- endif -%>
+        display:
+          name: |-
+            <%- if question != "Bribary rate" and institution != "Not applicable" %>
+            << institution >>
+            <%- endif -%>
+
