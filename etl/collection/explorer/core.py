@@ -13,7 +13,6 @@ import etl.grapher.model as gm
 from etl.collection.common import (
     INDICATORS_SLUG,
     combine_config_dimensions,
-    create_mdim_or_explorer,
     expand_config,
 )
 from etl.collection.explorer.legacy import create_explorer_legacy

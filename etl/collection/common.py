@@ -217,32 +217,6 @@ def process_views(
             pass
 
 
-def create_mdim_or_explorer(
-    obj,
-    config: dict,
-    dependencies: Set[str],
-    catalog_path: str,
-    validate_schema: bool = True,
-):
-    # Read config as structured object
-    mdim_or_explorer = obj.from_dict(dict(**config, catalog_path=catalog_path))
-
-    # Edit views
-    process_views(mdim_or_explorer, dependencies=dependencies)
-
-    # Validate config
-    if validate_schema:
-        mdim_or_explorer.validate_schema()
-
-    # Ensure that all views are in choices
-    mdim_or_explorer.validate_views_with_dimensions()
-
-    # Validate duplicate views
-    mdim_or_explorer.check_duplicate_views()
-
-    return mdim_or_explorer
-
-
 ####################################################################################################
 # Config auto-expander: Expand configuration from a table. This config is partial!
 ####################################################################################################
