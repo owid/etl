@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Optional
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
-from etl.collection.explorer import combine_config_dimensions, expand_config
+from etl.collection.common import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
 
 # Initialize log.

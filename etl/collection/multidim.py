@@ -28,12 +28,6 @@ from etl.collection.utils import (
 log = get_logger()
 
 
-__all__ = [
-    "expand_config",
-    "combine_config_dimensions",
-]
-
-
 class CollectionSet:
     def __init__(self, path: Path):
         self.path = path
