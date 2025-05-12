@@ -43,6 +43,12 @@ class Indicator(MDIMBase):
         complete = bool(pattern.match(self.catalogPath))
         return complete
 
+    def update_display(self, display: Dict[str, Any]):
+        """Update the display dictionary of the indicator."""
+        if self.display is None:
+            self.display = {}
+        self.display.update(display)
+
     @classmethod
     def is_a_valid_path(cls, path: str) -> bool:
         """Valid paths are:
