@@ -504,19 +504,31 @@ def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, An
         key = tuple(view["dimensions"][dim] for dim in by)
 
         if key not in grouped_views:
-            # Ensure 'y' is a single indicator before turning it into a list
-            assert not isinstance(view["indicators"]["y"], list), "Expected 'y' to be a single indicator, not a list"
-
             if set(view["indicators"].keys()) != {"y"}:
                 raise NotImplementedError(
                     "Only 'y' indicator is supported in groupby. Adapt the code for other fields."
                 )
 
-            view["indicators"]["y"] = [view["indicators"]["y"]]
+            if isinstance(view["indicators"]["y"], list):
+                if len(view["indicators"]["y"]) > 1:
+                    raise NotImplementedError(
+                        "Only single indicator is supported in groupby. Adapt the code for multiple indicators."
+                    )
+                view["indicators"]["y"] = view["indicators"]["y"]
+            else:
+                view["indicators"]["y"] = [view["indicators"]["y"]]
 
             # Add to dictionary
             grouped_views[key] = view
         else:
-            grouped_views[key]["indicators"]["y"].append(view["indicators"]["y"])
+            if isinstance(view["indicators"]["y"], list):
+                if len(view["indicators"]["y"]) > 1:
+                    raise NotImplementedError(
+                        "Only single indicator is supported in groupby. Adapt the code for multiple indicators."
+                    )
+                indicator = view["indicators"]["y"][0]
+            else:
+                indicator = view["indicators"]["y"]
+            grouped_views[key]["indicators"]["y"].append(indicator)
 
     return list(grouped_views.values())
