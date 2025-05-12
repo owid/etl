@@ -1,18 +1,4 @@
-"""The code here was developed for population-and-demography explorer.
-
-However, I think there are bits of this that could be migrated into etl.collection so that others can use it. It might need some cleaning, testing, and documenting.
-
-I also think that these functions should both work for MDIMs and Explorers!
-
-Relevant functions:
-
-* `combine_collections`: Combine multiple explorers/mdims into a single one.
-
-
-TODOs:
-
-- Integrate `combine_collections` functions into etl.helpers.PathFinder. That's because we should use create_mdim and create_explorer (they incorporate validation of collection), which is good if has access to PathFinder (needs to access schema, dependencies, etc.).
-"""
+"""Logic and code to combine multiple collections (MDIMs or Explorers) into a single one."""
 
 from copy import deepcopy
 from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, Union

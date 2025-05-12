@@ -16,7 +16,7 @@ NOTE: This pipeline assumes that there is a TSV template in owid-content, this s
 from utils import ExplorerCreator
 from view_edits import ViewEditor
 
-from etl.collection.beta import combine_collections
+from etl.collection.combine import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
