@@ -14,6 +14,7 @@ def run(branch: str) -> str:
 
 <details open>
 <summary><b>Archive:</b> </summary>
+
 - [Archived data page](http://{container_name}:8789/latest/grapher/life-expectancy.html)
 - [Archived grapher page](http://{container_name}:8789/latest/grapher/life-expectancy-vs-healthcare-expenditure.html)
 - [Data page with archive citation](http://{container_name}/grapher/life-expectancy)
