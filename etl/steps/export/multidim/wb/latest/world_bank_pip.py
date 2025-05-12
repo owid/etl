@@ -35,7 +35,14 @@ def run() -> None:
     # Bake config automatically from table
     config_new = multidim.expand_config(
         tb,  # type: ignore
-        indicator_names=["headcount_ratio", "headcount"],
+        indicator_names=[
+            "headcount_ratio",
+            "headcount",
+            "total_shortfall",
+            "avg_shortfall",
+            "income_gap_ratio",
+            "poverty_gap_index",
+        ],
         dimensions=DIMENSIONS_CONFIG,
     )
 

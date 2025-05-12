@@ -17,6 +17,14 @@ dimensions:
         name: Share in poverty
       - slug: headcount
         name: Number in poverty
+      - slug: total_shortfall
+        name: Total shortfall from poverty line
+      - slug: avg_shortfall
+        name: Average shortfall ($ per day)
+      - slug: poverty_gap_ratio
+        name: Average shortfall (% of poverty line)
+      - slug: poverty_gap_index
+        name: Poverty gap index
   - name: Poverty line
     slug: poverty_line
     choices:
