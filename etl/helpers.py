@@ -698,7 +698,7 @@ class PathFinder:
         config: dict
             Configuration YAML for the explorer.
         short_name: str
-            Name of the Collection. Default is short_name from mdim catalog path.
+            Name of the Collection. Default is short_name from collection catalog path.
         catalog_path: str
             Catalog path for the Collection. This is used to create the Collection in the database.
         tb: Table

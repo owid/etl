@@ -1,5 +1,5 @@
 """
-This mdim was created as a proof of concept. It can be deleted if not used.
+This collection was created as a proof of concept. It can be deleted if not used.
 """
 
 from owid.catalog.meta import TableDimension

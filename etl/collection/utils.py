@@ -68,13 +68,13 @@ def load_table_names_from_dependencies(dependencies: Set[str]) -> List[str]:
     return table_names
 
 
-# multidim
+# core.create
 def has_duplicate_table_names(dependencies: Set[str]) -> bool:
     table_names = load_table_names_from_dependencies(dependencies)
     return len(table_names) != len(set(table_names))
 
 
-# multidim
+# core.create
 def get_tables_by_name_mapping(dependencies: Set[str]) -> Dict[str, List[str]]:
     """Dictionary mapping table short name to table object.
 

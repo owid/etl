@@ -34,8 +34,6 @@ def expand_config(
         config_new = expand_config(tb=tb)
         config["views"] = config_new["views"]
         config["dimensions"] = config_new["dimensions"]
-
-        multidim.upsert_multidim_data_page(...)
         ```
 
     HOWEVER, there is a helper function `combine_config_dimensions` that can help you with combining dimensions.

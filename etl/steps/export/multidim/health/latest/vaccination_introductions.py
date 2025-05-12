@@ -1,4 +1,3 @@
-# from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -25,9 +24,7 @@ MULTIDIM_CONFIG = {
 }
 
 
-# etlr multidim
 def run() -> None:
-    # engine = get_engine()
     # Load configuration from adjacent yaml file.
     config = paths.load_collection_config()
 
