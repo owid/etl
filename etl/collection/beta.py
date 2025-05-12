@@ -6,18 +6,12 @@ I also think that these functions should both work for MDIMs and Explorers!
 
 Relevant functions:
 
-* `combine_explorers`: Combine multiple explorers into a single one.
+* `combine_collections`: Combine multiple explorers/mdims into a single one.
 
 
 TODOs:
 
-- Testing
-- Consolidate combine_explorers and combine_mdims into one solution: combine_collection
-- Integrate `combine_*` functions into etl.helpers.PathFinder. That's because we should use create_mdim and create_explorer (they incorporate validation of collection), which is good if has access to PathFinder (needs to access schema, dependencies, etc.).
-
-USE CASES:
-combine_explorers: etl/steps/export/multidim/covid/latest/covid.py
-combine_mdims: etl/steps/export/multidim/dummy/latest/dummy.py
+- Integrate `combine_collections` functions into etl.helpers.PathFinder. That's because we should use create_mdim and create_explorer (they incorporate validation of collection), which is good if has access to PathFinder (needs to access schema, dependencies, etc.).
 """
 
 from copy import deepcopy
@@ -35,102 +29,6 @@ log = get_logger()
 
 COLLECTION_SLUG = "_collection"
 COLLECTION_TITLE = "Collection"
-
-
-def combine_explorers(
-    explorers: List[Explorer],
-    explorer_name: str,
-    config: Dict[str, str],
-    dependencies: Optional[Set[str]] = None,
-):
-    """Combine multiple explorers into a single one.
-
-    Notes:
-    - All explorers should have the same dimensions (slug, name, etc.).
-    - Dimensions can vary across explorers, that's fine. This function consolidates all of them. If there are multiple slugs in use with different names, this function will rename them to preserve uniqueness.
-    - Checkbox dimensions are not supported yet.
-
-    """
-    # Check that there are at least 2 explorers to combine
-    assert len(explorers) > 0, "No explorers to combine."
-    assert len(explorers) > 1, "At least two explorers should be provided."
-
-    # Check that all explorers have the same dimensions (slug, name, etc.)
-    explorer_dims = None
-    for explorer in explorers:
-        dimensions_flatten = [{k: v for k, v in dim.to_dict().items() if k != "choices"} for dim in explorer.dimensions]
-        if explorer_dims is None:
-            explorer_dims = dimensions_flatten
-        else:
-            assert (
-                explorer_dims == dimensions_flatten
-            ), "Dimensions are not the same across explorers. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
-
-    # Check that there are no checkbox dimensions (only first explorer, since all dimensions are the same based on previous check)
-    # TODO: Need to run concrete tests when merging checkboxes: should have the same exact choices, same choice_slug_true
-    for dim in explorers[0].dimensions:
-        if dim.ui_type == "checkbox":
-            raise NotImplementedError("Checkbox dimensions are not supported yet.")
-
-    # 0) Preliminary work #
-    # Create dictionary with explorers, so to have identifiers for them
-    explorers_by_id = {str(i): deepcopy(explorer) for i, explorer in enumerate(explorers)}
-
-    # Build dataframe with all choices. Each row provides details of a choices, and explorer identifier and the dimension slug
-    df_choices, cols_choices = _build_df_choices(explorers_by_id)
-
-    # 1) Combine dimensions (use first explorer as container/reference) #
-    dimensions = _combine_dimensions(
-        df_choices=df_choices,
-        cols_choices=cols_choices,
-        collection=explorers[0].copy(),
-    )
-
-    # 2) Combine views #
-    # Track modifications (useful later for views)
-    choice_slug_changes = _extract_choice_slug_changes(df_choices)
-    # Update explorer views (based on changes on choice slugs)
-    explorers_by_id = _update_choice_slugs_in_views(choice_slug_changes, explorers_by_id)
-    # Collect views
-    views = []
-    for _, explorer in explorers_by_id.items():
-        explorer_views = explorer.views
-        views.extend(explorer_views)
-
-    # 3) Ad-hoc change: update explorer_name #
-    assert isinstance(explorers[0].catalog_path, str), "Catalog path is not set. Please set it before saving."
-    catalog_path = explorers[0].catalog_path.split("#")[0] + "#" + explorer_name
-
-    # 4) Create final explorer #
-    explorer_config = {
-        "config": config,
-        "dimensions": dimensions,
-        "views": views,
-        # "catalog_path": catalog_path,
-    }
-    explorer = create_collection_from_config(
-        config=explorer_config,
-        dependencies=dependencies if dependencies is not None else set(),
-        catalog_path=catalog_path,
-        validate_schema=False,
-        explorer=True,
-    )
-
-    # 5) Announce conflicts
-    df_conflict = df_choices.loc[df_choices["in_conflict"]]
-    if not df_conflict.empty:
-        log.warning("Choice slug conflicts resolved")
-        for (dimension_slug, choice_slug), group in df_conflict.groupby(["dimension_slug", "slug_original"]):
-            # Now group by 'value' to see which col3 values correspond to each unique 'value'
-            log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
-            for _, subgroup in group.groupby("choice_slug_id"):
-                explorer_ids = subgroup["collection_id"].unique().tolist()
-                explorer_names = [explorers_by_id[i].short_name for i in explorer_ids]
-                record = subgroup[cols_choices].drop_duplicates().to_dict("records")
-                assert len(record) == 1, "Unexpected, please report!"
-                log.warning(f" Explorers {explorer_names} map to {record[0]}")
-
-    return explorer
 
 
 def combine_collections(
@@ -269,7 +167,9 @@ def combine_collections(
 
     # Ensure config has minimal required fields
     if config is None:
-        config = {}
+        cconfig = {}
+    else:
+        cconfig = deepcopy(config)
 
     # Make sure there is title and default_selection. If not given, use default values.
     default_title = {
@@ -277,27 +177,27 @@ def combine_collections(
         "title_variant": "Use a YAML to define these attributes",
     }
     if not is_explorer:
-        if "title" not in config:
-            config["title"] = default_title
+        if "title" not in cconfig:
+            cconfig["title"] = default_title
         else:
-            config["title"] = {**default_title, **config["title"]}
-        if "default_selection" not in config:
-            config["default_selection"] = collections[0].default_selection
+            cconfig["title"] = {**default_title, **cconfig["title"]}
+        if "default_selection" not in cconfig:
+            cconfig["default_selection"] = collections[0].default_selection
     else:
-        if "config" not in config:
-            config["config"] = {}
-        if "explorerTitle" not in config["config"]:
-            config["config"]["explorerTitle"] = default_title["title"]
-        if "explorerSubtitle" not in config["config"]:
-            config["config"]["explorerSubtitle"] = default_title["title_variant"]
+        if "config" not in cconfig:
+            cconfig["config"] = {}
+        if "explorerTitle" not in cconfig["config"]:
+            cconfig["config"]["explorerTitle"] = default_title["title"]
+        if "explorerSubtitle" not in cconfig["config"]:
+            cconfig["config"]["explorerSubtitle"] = default_title["title_variant"]
 
     # Set dimensions and views
-    config["dimensions"] = dimensions
-    config["views"] = views
+    cconfig["dimensions"] = dimensions
+    cconfig["views"] = views
 
     # Create the combined collection
     combined = create_collection_from_config(
-        config=config,
+        config=cconfig,
         dependencies=dependencies if dependencies is not None else set(),
         catalog_path=catalog_path,
         validate_schema=True if not is_explorer else False,

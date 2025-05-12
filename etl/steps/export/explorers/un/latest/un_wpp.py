@@ -16,7 +16,7 @@ NOTE: This pipeline assumes that there is a TSV template in owid-content, this s
 from utils import ExplorerCreator
 from view_edits import ViewEditor
 
-from etl.collection.beta import combine_explorers
+from etl.collection.beta import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -236,14 +236,14 @@ def run() -> None:
     ]
 
     # Combine them into single explorer
-    explorer = combine_explorers(
-        explorers=explorers,
-        explorer_name="population-and-demography",
-        config=explorer_pop.config,
+    c = combine_collections(
+        collections=explorers,
+        collection_name="population-and-demography",
+        config=config_default,
     )
 
     # Sort indicator choices
-    explorer.sort_indicators(
+    c.sort_indicators(
         [
             "population",
             "population_broad",
@@ -271,4 +271,4 @@ def run() -> None:
     )
 
     # # Save explorer (upsert to DB)
-    explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)

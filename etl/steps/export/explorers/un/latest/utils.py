@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List, Optional, Union, cast
 
-from etl.collection.beta import combine_explorers
+from etl.collection.beta import combine_collections
 from etl.collection.explorer import Explorer
 from etl.helpers import PathFinder
 
@@ -52,6 +52,9 @@ class ExplorerCreator:
         """Creates an explorer based on `tb` (1950-2023) and `tb_proj` (1950-2100)."""
         self.paths.log.info(f"Creating explorer for {table_name}")
 
+        if "config" not in kwargs:
+            raise ValueError("The config is required to create the explorer. Please provide it in the kwargs.")
+
         # Load tables
         tb = self.table(table_name)
         tb_proj = self.table_proj(table_name)
@@ -82,10 +85,10 @@ class ExplorerCreator:
         assert isinstance(explorer, Explorer)
         assert isinstance(explorer_proj, Explorer)
 
-        explorer = combine_explorers(
-            explorers=[explorer, explorer_proj],
-            explorer_name=explorer.short_name,
-            config=explorer.config,
+        explorer = combine_collections(
+            collections=[explorer, explorer_proj],
+            collection_name=explorer.short_name,
+            config=kwargs["config"],
         )
 
         return explorer
