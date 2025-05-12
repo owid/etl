@@ -1043,7 +1043,11 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
         tb["check_diff_welfare_type"] = tb["welfare_type"] == tb["shift_welfare_type"]
 
         # Check if the difference is too high
-        mask = (abs(tb["check_diff_column"]) > 10) & (tb["check_diff_year"] <= 5) & ~tb["check_diff_welfare_type"]
+        mask = (
+            (abs(tb["check_diff_column"]) > 10)
+            & (tb["check_diff_year"] <= 5)
+            & ~tb["check_diff_welfare_type"].fillna(False)
+        )
         tb_error = tb[mask].reset_index(drop=True).copy()
 
         if not tb_error.empty:
