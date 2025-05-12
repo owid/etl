@@ -192,7 +192,7 @@
             {
               "type": "array",
               "items": {
-          "type": "number"
+                "type": "number"
               }
             },
             {
@@ -975,19 +975,31 @@
                         ]
                       ],
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "gdoc_id": {
-                            "type": "string",
-                            "examples": [
-                              "gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"
-                            ]
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "gdoc_id": {
+                                "type": "string",
+                                "examples": [
+                                  "gdoc_id: 16uGVylqtS-Ipc3OCxqapJ3BEVGjWf648wvZpzio1QFE"
+                                ]
+                              },
+                              "fragment_id": {
+                                "type": "string",
+                                "examples": ["fragment_id: cherries"]
+                              }
+                            }
                           },
-                          "fragment_id": {
+                          {
                             "type": "string",
-                            "examples": ["fragment_id: cherries"]
+                            "pattern": "<%"
+                          },
+                          {
+                            "type": "string",
+                            "pattern": "{definitions"
                           }
-                        }
+                        ]
                       }
                     },
                     "grapher_config": {
