@@ -17,7 +17,7 @@ from etl.collection.utils import records_to_dictionary
 
 log = get_logger()
 
-COLLECTION_SLUG = "_collection"
+COLLECTION_SLUG = "collection__slug"
 COLLECTION_TITLE = "Collection"
 
 # Define type variables to use in overloads
