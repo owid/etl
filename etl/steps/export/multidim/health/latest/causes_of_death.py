@@ -32,7 +32,7 @@ def run() -> None:
     config["views"] += config_new["views"]
     config["views"] += grouped_views
 
-    mdim = paths.create_mdim(config=config)
+    mdim = paths.create_collection_legacy(config=config)
 
     mdim.sort_choices(
         {

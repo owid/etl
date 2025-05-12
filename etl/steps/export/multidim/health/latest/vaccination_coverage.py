@@ -33,8 +33,8 @@ def run() -> None:
     config["views"] = config_new["views"]
 
     # 4: Upsert to DB
-    mdim = paths.create_mdim(
+    mdim = paths.create_collection_legacy(
         config=config,
-        mdim_name="mdd-vaccination-who",
+        short_name="mdd-vaccination-who",
     )
     mdim.save()

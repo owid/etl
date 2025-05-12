@@ -61,9 +61,9 @@ def run() -> None:
     config["views"] = config_new["views"]
 
     # Create mdim
-    mdim = paths.create_mdim(
+    mdim = paths.create_collection_legacy(
         config=config,
-        mdim_name="migration-flows",
+        short_name="migration-flows",
     )
 
     # Edit order of slugs

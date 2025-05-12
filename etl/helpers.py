@@ -647,26 +647,6 @@ class PathFinder:
             repack=repack,
         )
 
-    def create_mdim(self, config, mdim_name: Optional[str] = None) -> Collection:
-        """Create a Collection object.
-
-        Args:
-        -----
-
-        config: dict
-            MDIM configuration.
-        mdim_name: str
-            Name of the MDIM page. Default is short_name from mdim catalog path.
-        """
-        # Create Collection object
-        col = create_collection_from_config(
-            config,
-            self.dependencies,
-            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{mdim_name or self.short_name}",
-        )
-
-        return col
-
     def create_explorer(
         self,
         config,

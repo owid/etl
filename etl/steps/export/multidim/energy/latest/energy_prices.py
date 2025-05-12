@@ -212,5 +212,5 @@ def run() -> None:
     #
     # Save outputs.
     #
-    mdim = paths.create_mdim(config=config)
+    mdim = paths.create_collection_legacy(config=config)
     mdim.save()

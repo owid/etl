@@ -36,7 +36,7 @@ def run() -> None:
         paths.log.info(fname)
         config = paths.load_mdim_config(fname)
 
-        mdim = paths.create_mdim(config, mdim_name=fname_to_mdim_name(fname))
+        mdim = paths.create_collection_legacy(config, short_name=fname_to_short_name(fname))
         mdim.save()
 
     # PART 2: MDIMs hybridly generated (mix of YAML file + data)
@@ -65,14 +65,14 @@ def run() -> None:
     # multidim.adjust_mdim_views(config, paths.dependencies_by_table_name)
 
     # Upsert to DB
-    mdim = paths.create_mdim(
+    mdim = paths.create_collection_legacy(
         config=config,
-        mdim_name=fname_to_mdim_name("covid.mobility.yml"),
+        short_name=fname_to_short_name("covid.mobility.yml"),
     )
 
     mdim.save()
 
 
-def fname_to_mdim_name(fname: str) -> str:
+def fname_to_short_name(fname: str) -> str:
     """Custom MDIM name generator."""
     return f"{fname.replace('.yml', '').replace('.', '_')}"

@@ -36,7 +36,7 @@ def run() -> None:
     config["dimensions"][0]["choices"] = sorted(config["dimensions"][0]["choices"], key=lambda x: x["name"])
 
     # Create MDIM and upsert its config to DB
-    mdim = paths.create_mdim(config=config)
+    mdim = paths.create_collection_legacy(config=config)
     mdim.save()
 
 
