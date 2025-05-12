@@ -12,7 +12,7 @@ from etl.collection.model.core import Collection
 class CollectionSet:
     def __init__(self, path: Path):
         self.path = path
-        self.mdims = self._build_dictionary()
+        self.collections = self._build_dictionary()
 
     def _build_dictionary(self) -> Dict[str, Path]:
         dix = {}
@@ -22,26 +22,26 @@ class CollectionSet:
             dix[name] = p
         return dix
 
-    def read(self, mdim_name: str):
+    def read(self, name: str) -> Collection:
         # Check mdim exists
-        if mdim_name not in self.mdims:
+        if name not in self.collections:
             raise ValueError(
-                f"MDIM name not available. Available options are {self.names}. If this does not make sense to you, try running the necessary steps to re-export files to {self.path}"
+                f"Collection name not available. Available options are {self.names}. If this does not make sense to you, try running the necessary steps to re-export files to {self.path}"
             )
 
         # Read MDIM
-        path = self.mdims[mdim_name]
+        path = self.collections[name]
         try:
-            mdim = Collection.load(str(path))
+            c = Collection.load(str(path))
         except TypeError as e:
             # This is a workaround for the TypeError that occurs when loading the config file.
             raise TypeError(
-                f"Error loading MDIM config file. Please check the file format and ensure it is valid JSON. Suggestion: Re-run export step generating {mdim_name}. Error: {e}"
+                f"Error loading Collection config file. Please check the file format and ensure it is valid JSON. Suggestion: Re-run export step generating {name}. Error: {e}"
             )
 
         # Get and set catalog path
-        return mdim
+        return c
 
     @property
     def names(self):
-        return list(sorted(self.mdims.keys()))
+        return list(sorted(self.collections.keys()))

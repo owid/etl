@@ -534,10 +534,10 @@ class PathFinder:
         if dependency["channel"] == "snapshot":
             dataset = Snapshot(f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}")
         elif (step_type == "export") and (dependency["channel"] in "multidim"):
-            mdims_path = (
+            collection_path = (
                 paths.EXPORT_MDIMS_DIR / f"{dependency['namespace']}/{dependency['version']}/{dependency['short_name']}"
             )
-            return CollectionSet(mdims_path)
+            return CollectionSet(collection_path)
         else:
             dataset_path = (
                 paths.DATA_DIR
@@ -579,15 +579,15 @@ class PathFinder:
         namespace: Optional[str] = None,
         version: Optional[Union[str, int]] = None,
     ) -> CollectionSet:
-        mdims = self.load_dependency(
+        cs = self.load_dependency(
             step_type="export",
             short_name=short_name or self.short_name,
             channel="multidim",
             namespace=namespace,
             version=version,
         )
-        assert isinstance(mdims, CollectionSet)
-        return mdims
+        assert isinstance(cs, CollectionSet)
+        return cs
 
     def load_etag_url(self) -> str:
         """Load etag url dependency and return its URL."""
