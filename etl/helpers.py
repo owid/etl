@@ -25,9 +25,9 @@ from owid.catalog.tables import (
 from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstringWithKwargs
 
 from etl import paths
-from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
+from etl.collection.explorer import ExplorerLegacy, create_explorer_legacy
 from etl.collection.model import Collection
-from etl.collection.multidim import CollectionSet, create_collection, create_collection_from_config
+from etl.collection.multidim import CollectionSet, create_collection
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
