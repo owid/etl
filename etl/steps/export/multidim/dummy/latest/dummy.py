@@ -22,7 +22,7 @@ def run() -> None:
         collection_name=col_name,
         collection_dimension_name="Indicator",
         collection_choices_names=["COVID-19 cases", "COVID-19 deaths"],
-        config=paths.load_mdim_config(),
+        config=paths.load_collection_config(),
     )
 
     # Save & upload

@@ -26,7 +26,7 @@ MULTIDIM_CONFIG = {
 # etlr multidim
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("migration_stock_flows")

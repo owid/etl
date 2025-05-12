@@ -59,7 +59,7 @@ def run() -> None:
     explorer_creator = ExplorerCreator(paths, ds, ds_full)
 
     # Default config: This config contains the default metadata for most explorers. Exceptions are sex_ratio, which needs other names for certain dimension choices, and manual views.
-    config_default = paths.load_explorer_config()
+    config_default = paths.load_collection_config()
 
     # Object used to edit view configs: Some of the views need extra-curation (this includes adding map brackets, renaming titles, etc.)
     view_editor = ViewEditor(map_brackets_yaml=paths.side_file("map_brackets.yml"))
@@ -105,7 +105,7 @@ def run() -> None:
     ########## Sex ratio explorer
     explorer_sr = explorer_creator.create(
         table_name="sex_ratio",
-        config=paths.load_explorer_config("un_wpp.sex_ratio.config.yml"),
+        config=paths.load_collection_config("un_wpp.sex_ratio.config.yml"),
         indicator_names=["sex_ratio"],
         dimensions={
             "age": ["all", "0"] + list(AGES_SR.keys()),
@@ -212,7 +212,7 @@ def run() -> None:
 
     ########## Manual explorer: views with grouped indicators, and others
     explorer_manual = explorer_creator.create_manual(
-        config=paths.load_explorer_config("un_wpp.manual.config.yml"),
+        config=paths.load_collection_config("un_wpp.manual.config.yml"),
     )
     view_editor.edit_views_manual(explorer_manual)
 

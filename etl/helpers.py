@@ -6,7 +6,7 @@ import re
 import time
 from functools import cache
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, List, Literal, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Literal, Optional, Union, overload
 
 import deprecated
 import pandas as pd
@@ -26,7 +26,7 @@ from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstring
 
 from etl import paths
 from etl.collection import Collection, CollectionSet, create_collection
-from etl.collection.explorer import ExplorerLegacy, create_explorer_legacy
+from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks
 from etl.snapshot import Snapshot, SnapshotMeta
@@ -307,7 +307,7 @@ class PathFinder:
         return self.directory / (self.short_name + ".meta.yml")
 
     @property
-    def mdim_path(self) -> Path:
+    def collection_path(self) -> Path:
         """TODO: worth aligning with `metadata_path` (add missing '.meta'), maybe even just deprecate this and use `metadata_path`."""
         assert "multidim" in str(self.directory), "MDIM path is only available for multidim steps!"
         return self.directory / (self.short_name + ".yml")
@@ -606,15 +606,11 @@ class PathFinder:
             raise AttributeError(f"There was a problem loading config from {path}, please review!. Original error: {e}")
         return config
 
-    def load_mdim_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
+    def load_collection_config(
+        self, filename: Optional[str] = None, path: Optional[str | Path] = None
+    ) -> Dict[str, Any]:
         """Replace code to use `self.load_config`."""
         return self.load_config(filename, path)
-
-    def load_explorer_config(self, filename: Optional[str] = None, path: Optional[str | Path] = None) -> Dict[str, Any]:
-        return self.load_config(filename, path)
-        # Check that it can be loaded as an Explorer object.
-        # explorer = Explorer.from_dict(config)
-        # return explorer.to_dict(drop_definitions=False)
 
     def create_dataset(
         self,
@@ -647,6 +643,40 @@ class PathFinder:
             repack=repack,
         )
 
+    @overload
+    def create_collection(
+        self,
+        config: Dict[str, Any],
+        short_name: Optional[str] = None,
+        tb: Optional[Table] = None,
+        indicator_names: Optional[Union[str, List[str]]] = None,
+        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
+        common_view_config: Optional[Dict[str, Any]] = None,
+        indicators_slug: Optional[str] = None,
+        indicator_as_dimension: bool = False,
+        choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
+        catalog_path_full: bool = False,
+        *,  # Force keyword-only arguments after this
+        explorer: Literal[True],
+    ) -> Explorer: ...
+
+    @overload
+    def create_collection(
+        self,
+        config: Dict[str, Any],
+        short_name: Optional[str] = None,
+        tb: Optional[Table] = None,
+        indicator_names: Optional[Union[str, List[str]]] = None,
+        dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
+        common_view_config: Optional[Dict[str, Any]] = None,
+        indicators_slug: Optional[str] = None,
+        indicator_as_dimension: bool = False,
+        choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
+        catalog_path_full: bool = False,
+        *,  # Force keyword-only arguments after this
+        explorer: Literal[False] = False,
+    ) -> Collection: ...
+
     def create_collection(
         self,
         config: Dict[str, Any],
@@ -660,7 +690,7 @@ class PathFinder:
         choice_renames: Optional[Dict[str, Union[Dict[str, str], Callable]]] = None,
         catalog_path_full: bool = False,
         explorer: bool = False,
-    ) -> Collection:
+    ) -> Union[Explorer, Collection]:
         """Experimental smarter explorer creation.
 
         Args:
@@ -668,9 +698,9 @@ class PathFinder:
         config: dict
             Configuration YAML for the explorer.
         short_name: str
-            Name of the MDIM page. Default is short_name from mdim catalog path.
+            Name of the Collection. Default is short_name from mdim catalog path.
         catalog_path: str
-            Catalog path for the MDIM. This is used to create the MDIM in the database.
+            Catalog path for the Collection. This is used to create the Collection in the database.
         tb: Table
             Table object with data. This data will be expanded for the given indicators and dimensions.
         indicator_names: Optional[Union[str, List[str]]]

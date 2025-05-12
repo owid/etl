@@ -62,7 +62,7 @@ def run() -> None:
     tb = ds.read("animals_used_for_food")
 
     # Load grapher config from YAML.
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     #
     # Process data.

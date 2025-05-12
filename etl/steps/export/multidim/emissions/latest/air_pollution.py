@@ -12,7 +12,7 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Load (flattened) table from grapher channel with dimension metadata
     tb = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)

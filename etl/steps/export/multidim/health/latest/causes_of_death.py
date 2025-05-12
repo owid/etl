@@ -12,7 +12,7 @@ def run() -> None:
     table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths", load_data=False)
 
     # Create collection
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
     c = paths.create_collection(
         config=config,
         tb=table,

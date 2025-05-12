@@ -48,7 +48,7 @@ class ExplorerCreator:
         dimensions: Dict[str, Union[List[str], str]],
         dimensions_proj: Optional[Dict[str, Union[List[str], str]]] = None,
         **kwargs,
-    ):
+    ) -> Explorer:
         """Creates an explorer based on `tb` (1950-2023) and `tb_proj` (1950-2100)."""
         self.paths.log.info(f"Creating explorer for {table_name}")
 

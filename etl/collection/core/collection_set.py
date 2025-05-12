@@ -23,7 +23,7 @@ class CollectionSet:
         return dix
 
     def read(self, name: str) -> Collection:
-        # Check mdim exists
+        # Check if collection exists
         if name not in self.collections:
             raise ValueError(
                 f"Collection name not available. Available options are {self.names}. If this does not make sense to you, try running the necessary steps to re-export files to {self.path}"

@@ -30,7 +30,7 @@ def expand_config(
     2) This function generates PARTIAL configuration, you need to then combine it with the config loaded from a YAML file. You can do this combination as you consider. Currently this is mostly manual, but we can look into improving this space:
 
         ```python
-        config = paths.load_mdim_config("filename.yml)
+        config = paths.load_collection_config("filename.yml)
         config_new = expand_config(tb=tb)
         config["views"] = config_new["views"]
         config["dimensions"] = config_new["dimensions"]

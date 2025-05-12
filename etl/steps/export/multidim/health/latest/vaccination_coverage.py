@@ -9,7 +9,7 @@ paths = PathFinder(__file__)
 def run() -> None:
     # engine = get_engine()
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Add views for all dimensions
     # NOTE: using load_data=False which only loads metadata significantly speeds this up

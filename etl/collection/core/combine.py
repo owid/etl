@@ -4,7 +4,7 @@ Additional: combine dimensions (using raw dictionaries)
 """
 
 from copy import deepcopy
-from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, Union
+from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, TypeVar, Union, overload
 
 import pandas as pd
 from structlog import get_logger
@@ -19,6 +19,10 @@ log = get_logger()
 
 COLLECTION_SLUG = "_collection"
 COLLECTION_TITLE = "Collection"
+
+# Define type variables to use in overloads
+T = TypeVar("T", bound=Collection)
+E = TypeVar("E", bound=Explorer)
 
 
 # COMBINE DIMENSIONS
@@ -144,9 +148,35 @@ def _order(config_yaml, config_combined):
     return config_sort + config_others
 
 
+@overload
+def combine_collections(
+    collections: List[E],
+    collection_name: str,
+    config: Optional[Dict[str, Any]] = None,
+    dependencies: Optional[Set[str]] = None,
+    force_collection_dimension: bool = False,
+    collection_dimension_name: Optional[str] = None,
+    collection_choices_names: Optional[List[str]] = None,
+    is_explorer: Optional[bool] = None,
+) -> E: ...
+
+
+@overload
+def combine_collections(
+    collections: List[T],
+    collection_name: str,
+    config: Optional[Dict[str, Any]] = None,
+    dependencies: Optional[Set[str]] = None,
+    force_collection_dimension: bool = False,
+    collection_dimension_name: Optional[str] = None,
+    collection_choices_names: Optional[List[str]] = None,
+    is_explorer: Optional[bool] = None,
+) -> T: ...
+
+
 # COMBINE COLLECTIONS
 def combine_collections(
-    collections: List[Union[Collection, Explorer]],
+    collections: Union[List[Collection], List[Explorer]],
     collection_name: str,
     config: Optional[Dict[str, Any]] = None,
     dependencies: Optional[Set[str]] = None,

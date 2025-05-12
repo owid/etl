@@ -15,7 +15,7 @@ DISPLAY_SETTINGS = {
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Add views for all dimensions
     ds = paths.load_dataset("migration_stock_flows")

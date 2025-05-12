@@ -1,4 +1,4 @@
-from typing import Set
+from typing import Any, Dict, Set, Union, overload
 
 from etl.collection.explorer import Explorer
 from etl.collection.model.core import Collection
@@ -6,7 +6,7 @@ from etl.collection.utils import get_tables_by_name_mapping
 
 
 def process_views(
-    mdim_or_explorer,
+    collection: Union[Collection, Explorer],
     dependencies: Set[str],
     combine_metadata_when_mult: bool = False,
 ):
@@ -14,13 +14,13 @@ def process_views(
     # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
     tables_by_name = get_tables_by_name_mapping(dependencies)
 
-    for view in mdim_or_explorer.views:
+    for view in collection.views:
         # Expand paths
         view.expand_paths(tables_by_name)
 
         # Combine metadata/config with definitions.common_views
-        if (mdim_or_explorer.definitions is not None) and (mdim_or_explorer.definitions.common_views is not None):
-            view.combine_with_common(mdim_or_explorer.definitions.common_views)
+        if (collection.definitions is not None) and (collection.definitions.common_views is not None):
+            view.combine_with_common(collection.definitions.common_views)
 
         # Combine metadata in views which contain multiple indicators
         if combine_metadata_when_mult and view.metadata_is_needed:  # Check if view "contains multiple indicators"
@@ -32,13 +32,36 @@ def process_views(
             pass
 
 
+@overload
 def create_collection_from_config(
-    config: dict,
+    config: Dict[str, Any],
     dependencies: Set[str],
     catalog_path: str,
+    *,  # Force keyword-only arguments after this
+    validate_schema: bool = True,
+    explorer: bool,
+) -> Explorer: ...
+
+
+@overload
+def create_collection_from_config(
+    config: Dict[str, Any],
+    dependencies: Set[str],
+    catalog_path: str,
+    *,  # Force keyword-only arguments after this
     validate_schema: bool = True,
     explorer: bool = False,
-) -> Explorer | Collection:
+) -> Collection: ...
+
+
+def create_collection_from_config(
+    config: Dict[str, Any],
+    dependencies: Set[str],
+    catalog_path: str,
+    *,  # Force keyword-only arguments after this
+    validate_schema: bool = True,
+    explorer: bool = False,
+) -> Union[Explorer, Collection]:
     # Read config as structured object
     if explorer:
         c = Explorer.from_dict(dict(**config, catalog_path=catalog_path))

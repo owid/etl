@@ -33,7 +33,7 @@ def run() -> None:
     for fname in filenames:
         ## Load config
         paths.log.info(fname)
-        config = paths.load_mdim_config(fname)
+        config = paths.load_collection_config(fname)
 
         ## Create and save collection
         c = paths.create_collection(config=config, short_name=fname_to_short_name(fname))
@@ -47,7 +47,7 @@ def run() -> None:
     ## Create and save collection
     fname = "covid.mobility.yml"
     c = paths.create_collection(
-        config=paths.load_mdim_config("covid.mobility.yml"),
+        config=paths.load_collection_config("covid.mobility.yml"),
         short_name=fname_to_short_name("covid.mobility.yml"),
         tb=tb,
         common_view_config=MOBILITY_CONFIG_DEFAULT,

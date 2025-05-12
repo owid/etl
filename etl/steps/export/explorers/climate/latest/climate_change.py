@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load grapher config from YAML
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     # Create explorer
-    ds_explorer = paths.create_collection(
+    c = paths.create_collection(
         config=config,
         short_name="climate-change",
         explorer=True,
@@ -23,4 +23,4 @@ def run() -> None:
     #
     # Save outputs.
     #
-    ds_explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)

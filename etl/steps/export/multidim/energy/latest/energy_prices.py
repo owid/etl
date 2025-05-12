@@ -172,7 +172,7 @@ def run() -> None:
     #
     # Process data.
     #
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Define common view configuration
     common_view_config = {
@@ -212,7 +212,7 @@ def run() -> None:
     c = combine_collections(
         collections=[c1, c2],
         collection_name="energy_prices",
-        config=paths.load_mdim_config(),
+        config=paths.load_collection_config(),
     )
 
     # Add stacked views
