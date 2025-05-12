@@ -36,7 +36,7 @@ tables:
 
       bribery_depth__pct_of_public_transactions_where_a_gift_or_informal_payment_was_requested:
           title: Bribery depth
-          description_short: Percentage of public transactions where a bribe was requested.
+          description_short: Percentage of public transactions where firms faced bribe demands.
           description_from_producer: |-
             The proportion of times firms were asked or expected to provide a gift or informal payment when soliciting six types of public services or licenses: electrical and water connections, construction permits, meetings with tax officials, import licenses, and operating licenses. Refusals are treated as affirmative responses.
           description_key:
