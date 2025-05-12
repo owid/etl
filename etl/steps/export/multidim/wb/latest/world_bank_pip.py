@@ -7,12 +7,12 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 DIMENSIONS_CONFIG = {
-    "ppp_version": ["2017.0"],
     "poverty_line": "*",
     "table": ["Income or consumption consolidated", "Consumption", "Income"],
-    "welfare_type": "*",
-    "decile": "*",
-    "survey_comparability": "*",
+    "ppp_version": ["2017.0"],
+    # "welfare_type": "*",
+    # "decile": "*",
+    # "survey_comparability": "*",
 }
 
 
@@ -24,6 +24,13 @@ def run() -> None:
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("world_bank_pip_dimensional")
     tb = ds.read("world_bank_pip_dimensional", load_data=False)
+
+    # Remove unwanted dimensions.
+    # NOTE: This is a temporary solution until we figure out how to deal with missing dimensions.
+    for column in tb.drop(columns=["country", "year"]).columns:
+        for dimension in ["welfare_type", "decile", "survey_comparability"]:
+            if dimension in tb[column].metadata.dimensions:
+                tb[column].metadata.dimensions.pop(dimension)
 
     # Bake config automatically from table
     config_new = multidim.expand_config(
