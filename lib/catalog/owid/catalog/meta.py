@@ -24,6 +24,7 @@ from typing import (
 
 import mistune
 import pandas as pd
+import yaml
 from dataclasses_json import DataClassJsonMixin
 from typing_extensions import NotRequired, Required, Self
 
@@ -330,6 +331,20 @@ class VariableMeta(MetaBase):
                     color_scale["customNumericValues"] = parse_numeric_list(color_scale["customNumericValues"])
             except KeyError:
                 pass
+
+        # Convert faqs from YAMLs to FaqLink objects
+        if meta.presentation and meta.presentation.faqs:
+            faqs: List[FaqLink] = []
+            for faq in meta.presentation.faqs:
+                if not faq:
+                    continue
+                elif isinstance(faq, str):
+                    # If faq is a YAML string, parse it as a dictionary and create a FaqLink object
+                    faq_dicts = yaml.safe_load(faq)
+                    faqs += [FaqLink(**faq_dict) for faq_dict in faq_dicts]
+                else:
+                    faqs.append(faq)
+            meta.presentation.faqs = faqs
 
         return meta
 

@@ -331,3 +331,33 @@ tables:
             description_short: |-
               The prevalence of << cause >> in << format_sex(sex) >>.
     ```
+
+
+### Using Jinja in presentation.faqs
+
+Below is a more complex example of using FAQs together with Jinja templates. Note that `definitions.my_faqs` is a multi-line string in YAML format. Use `render` method from above to debug the metadata.
+
+```
+definitions:
+  gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+
+  # Note that my_faqs is actually a multi-line string, not a list!
+  my_faqs: |-
+    - fragment_id: a-frag
+      gdoc_id: "{definitions.gdoc_id}"
+    - fragment_id: b-frag
+      gdoc_id: "{definitions.gdoc_id}"
+
+tables:
+  gbd_prevalence:
+    variables:
+      prevalence:
+        presentation:
+          faqs:
+            - fragment_id: unconditional-frag
+              gdoc_id: "{definitions.gdoc_id}"
+            - |-
+              <% if dim_a == "A" %>
+              {definitions.my_faqs}
+              <% endif %>
+```
