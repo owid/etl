@@ -2,7 +2,7 @@
 
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -61,13 +61,13 @@ def prepare_statistical_review_data(tb_review: Table) -> Table:
     return tb_review
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
     ds_review = paths.load_dataset("statistical_review_of_world_energy")
-    tb_review = ds_review["statistical_review_of_world_energy"].reset_index()
+    tb_review = ds_review.read("statistical_review_of_world_energy")
 
     #
     # Process data.
@@ -79,5 +79,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

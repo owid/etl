@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from copy import deepcopy
+from itertools import product
 from typing import Any, Dict, List, Optional, Set
 
 from owid.catalog import Dataset
@@ -408,3 +409,48 @@ def dump_yaml_with_anchors(data):
     dumped = re.sub(r"""(['"])(\*def_[^'"]+)\1""", lambda m: m.group(2), dumped)
 
     return dumped
+
+
+def get_complete_dimensions_filter(
+    dimensions_available: Dict[str, Set[str]], dimensions_filter: Dict[str, Any]
+) -> List[Dict[str, str]]:
+    """Given a dimension filter"""
+    dimensions_filter_complete = {}
+
+    for dim, choices in dimensions_available.items():
+        if dim not in dimensions_filter:
+            dimensions_filter_complete[dim] = choices
+        else:
+            if isinstance(dimensions_filter[dim], str):
+                assert (
+                    dimensions_filter[dim] in choices
+                ), f"Choice {dimensions_filter[dim]} not found for dimension {dim}!"
+                dimensions_filter_complete[dim] = [dimensions_filter[dim]]
+            elif isinstance(dimensions_filter[dim], list):
+                assert all(
+                    choice in choices for choice in dimensions_filter[dim]
+                ), f"Choices {dimensions_filter[dim]} not found for dimension {dim}!"
+                dimensions_filter_complete[dim] = dimensions_filter[dim]
+
+    return expand_combinations(dimensions_filter_complete)
+
+
+def expand_combinations(dim_dict):
+    # Normalize all values to lists (in case they are sets)
+    keys = list(dim_dict)
+    values = [list(dim_dict[k]) for k in keys]
+    return [dict(zip(keys, combo)) for combo in product(*values)]
+
+
+def unique_records(records: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Return a list of unique records based on a specific key."""
+    # Deduplicate by converting to tuples (which are hashable)
+    seen = set()
+    unique_records = []
+    for record in records:
+        # Convert each dictionary to a frozenset of items (key-value pairs)
+        items = frozenset(record.items())
+        if items not in seen:
+            seen.add(items)
+            unique_records.append(record)
+    return unique_records

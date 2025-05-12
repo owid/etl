@@ -9,12 +9,12 @@ from rich_click.rich_command import RichCommand
 from sqlalchemy.orm import Session
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.owidbot import github_utils as gh_utils
 from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiff, ChartDiffsLoader, configs_are_equal
 from apps.wizard.utils import get_staging_creation_time
 from etl import config
 from etl.config import OWIDEnv, get_container_name
 from etl.datadiff import _dict_diff
+from etl.git_api_helpers import GithubApiRepo
 from etl.grapher import model as gm
 from etl.slack_helpers import send_slack_message
 
@@ -95,7 +95,8 @@ def cli(
     ```
     """
     if _is_commit_sha(source):
-        source = gh_utils.get_git_branch_from_commit_sha(source)
+        repo = GithubApiRepo(repo_name="etl")
+        source = repo.get_git_branch_from_commit_sha(source)
         log.info("chart_sync.use_branch", branch=source)
 
     source_engine = OWIDEnv.from_staging_or_env_file(source).get_engine()

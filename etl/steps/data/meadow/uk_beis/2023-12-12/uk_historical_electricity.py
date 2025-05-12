@@ -5,7 +5,7 @@ from typing import Dict
 
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Ignore unnecessary warnings when loading the files.
 warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
@@ -64,7 +64,7 @@ def prepare_data(tb: Table, columns: Dict[str, str], table_name: str) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -172,12 +172,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
-        tables=[tb_fuel_input, tb_supply, tb_efficiency],
-        default_metadata=snap.metadata,
-        check_variables_metadata=True,
-    )
+    ds_meadow = paths.create_dataset(tables=[tb_fuel_input, tb_supply, tb_efficiency], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

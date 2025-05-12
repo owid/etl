@@ -99,7 +99,6 @@ def run() -> None:
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = paths.create_dataset(
         tables=[tb],
-        check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
         yaml_params={"BASE_DOLLAR_YEAR": BASE_DOLLAR_YEAR, "BASE_DOLLAR_YEAR_ORIGINAL": BASE_DOLLAR_YEAR_ORIGINAL},
     )

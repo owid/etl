@@ -1,19 +1,19 @@
 """Grapher step for the Electricity Mix (Energy Institute & Ember) dataset."""
 
 from etl.grapher.helpers import add_columns_for_multiindicator_chart
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("electricity_mix")
-    tb_garden = ds_garden["electricity_mix"]
+    tb_garden = ds_garden.read("electricity_mix", reset_index=False)
 
     #
     # Process data.
@@ -108,5 +108,5 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_grapher = paths.create_dataset(tables=[tb])
     ds_grapher.save()

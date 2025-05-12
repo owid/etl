@@ -35,7 +35,7 @@ SNAPSHOT_FILES = [
     type=bool,
     help="Upload dataset to Snapshot",
 )
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     # Create a new snapshot.
     for snapshot_file in SNAPSHOT_FILES:
         snap = Snapshot(f"energy_institute/{SNAPSHOT_VERSION}/{snapshot_file}")
@@ -45,4 +45,4 @@ def main(upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()

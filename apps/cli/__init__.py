@@ -196,6 +196,12 @@ GROUPS = (
                 "anomalist": "apps.anomalist.cli.cli",
             },
         },
+        {
+            "name": "Autoupdate",
+            "commands": {
+                "autoupdate": "apps.autoupdate.cli.cli",
+            },
+        },
     ]
     # Add subgroups (don't modify)
     + subgroups
