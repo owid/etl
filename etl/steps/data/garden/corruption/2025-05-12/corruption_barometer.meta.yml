@@ -1,0 +1,22 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Corruption
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  corruption_barometer:
+    variables:
+      value:
+        title: <<question.lower() >>  -  (<< answer >>)
+        unit: "%"
+        short_unit: "%"

@@ -714,6 +714,17 @@ steps:
   data://grapher/unodc/2025-05-12/corruption:
     - data://garden/unodc/2025-05-12/corruption
 
+
+  #
+  # Corruption Barometer
+  #
+  data://meadow/corruption/2025-05-12/corruption_barometer:
+    - snapshot://corruption/2025-05-12/corruption_barometer.xlsx
+  data://garden/corruption/2025-05-12/corruption_barometer:
+    - data://meadow/corruption/2025-05-12/corruption_barometer
+  data://grapher/corruption/2025-05-12/corruption_barometer:
+    - data://garden/corruption/2025-05-12/corruption_barometer
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
