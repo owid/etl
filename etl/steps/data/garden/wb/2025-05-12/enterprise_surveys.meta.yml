@@ -32,7 +32,7 @@ tables:
         presentation:
           title_public:  Share of firms experiencing at least one bribe payment request
         display:
-            name: At least one bribe payment request
+            name: At least one bribe request
 
       bribery_depth__pct_of_public_transactions_where_a_gift_or_informal_payment_was_requested:
           title: Bribery depth
@@ -78,7 +78,7 @@ tables:
           presentation:
             title_public: Share of firms expected to bribe secure government contracts
           display:
-            name: Government contracts
+            name: Government contract
 
       percent_of_firms_expected_to_give_gifts_to_get_an_operating_license:
           title: Share of firms expected to give bribes to obtain an operating license
