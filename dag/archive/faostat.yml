@@ -305,8 +305,8 @@ steps:
   #
   # FAOSTAT food explorer step for version 2023-06-12
   #
-  data://explorers/faostat/2023-06-12/food_explorer:
-    - data://garden/faostat/2023-06-12/faostat_food_explorer
+  # data://explorers/faostat/2023-06-12/food_explorer:
+  #   - data://garden/faostat/2023-06-12/faostat_food_explorer
   #
   # FAOSTAT garden step for additional variables for version 2023-06-12
   #
