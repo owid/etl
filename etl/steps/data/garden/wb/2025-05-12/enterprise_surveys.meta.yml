@@ -18,7 +18,7 @@ tables:
   enterprise_surveys:
     variables:
       bribery_incidence__percent_of_firms_experiencing_at_least_one_bribe_payment_request:
-        title: Share of firms experiencing at least one bribe payment request
+        title: Share of firms experiencing at least one bribe payment request when dealing with public services or permits
         description_short: Percent of firms that faced at least one bribe payment request when dealing with public services or permits.
         description_from_producer: |-
           The percentage of firms experiencing at least one bribe payment request across six types of public transactions: electrical and water connections, construction permits, meetings with tax officials, import licenses, and operating licenses. Refusals are treated as affirmative responses.
@@ -29,6 +29,10 @@ tables:
             - Refusal to answer a question is treated as an affirmative response indicating bribery occurred
             - Corruption imposes administrative and financial burdens reduces operational efficiency and increases costs and risks for firms
             - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
+        presentation:
+          title_public:  Share of firms experiencing at least one bribe payment request
+        display:
+            name: At least one bribe payment request
 
       bribery_depth__pct_of_public_transactions_where_a_gift_or_informal_payment_was_requested:
           title: Bribery depth
@@ -43,9 +47,10 @@ tables:
               - Provides insight into how regulatory inefficiencies create opportunities for soliciting bribes
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
 
+
       percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials:
-          title: Share of firms expected to give gifts to tax officials
-          description_short: Percent of firms expected to pay bribes during meetings with tax inspectors.
+          title: Share of firms expected to give bribes to tax officials
+          description_short: Percent of firms expected to give bribes during meetings with tax inspectors.
           description_from_producer: |-
             Percentage of firms reporting that they were expected to give gifts or informal payments to tax officials during inspections or meetings.
           description_key:
@@ -54,10 +59,14 @@ tables:
               - Data are collected through structured interviews with private sector firms using stratified random sampling
               - Corruption in tax inspections increases operational unpredictability and creates unofficial costs
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
+          presentation:
+            title_public: Share of firms expected to bribe tax officials
+          display:
+            name: Tax officials
 
       percent_of_firms_expected_to_give_gifts_to_secure_government_contract:
-          title: Share of firms expected to give gifts to secure government contracts
-          description_short: Percent of firms expected to pay bribes to win government contracts.
+          title: Share of firms expected to give bribes to secure government contracts
+          description_short: Percent of firms expected to give bribes to win government contracts.
           description_from_producer: |-
             Percentage of firms that believe companies like theirs are typically expected to make informal payments to public officials to secure government contracts.
           description_key:
@@ -66,10 +75,13 @@ tables:
               - Data are collected through structured interviews with private sector firms using stratified random sampling
               - Bribery in procurement increases business costs reduces fairness and deters competition from firms unwilling or unable to pay
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
-
+          presentation:
+            title_public: Share of firms expected to bribe secure government contracts
+          display:
+            name: Government contracts
       percent_of_firms_expected_to_give_gifts_to_get_an_operating_license:
-          title: Share of firms expected to give gifts to obtain an operating license
-          description_short: Percent of firms expected to pay bribes to get an operating license.
+          title: Share of firms expected to give bribes to obtain an operating license
+          description_short: Percent of firms expected to give bribes to get an operating license.
           description_from_producer: |-
             Percentage of firms reporting that they were expected to provide gifts or informal payments to obtain an operating license. Refusals are treated as affirmative.
           description_key:
@@ -78,10 +90,14 @@ tables:
               - Data are collected through structured interviews with private sector firms using stratified random sampling
               - Corruption in licensing increases delays costs and risks especially for smaller and newer firms
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
+          presentation:
+            title_public: Share of firms expected to give bribes to obtain an operating license
+          display:
+            name: Operating license
 
       percent_of_firms_expected_to_give_gifts_to_get_an_import_license:
-          title: Share of firms expected to give gifts to obtain an import license
-          description_short: Percent of firms expected to pay bribes to get an import license.
+          title: Share of firms expected tto give bribes to obtain an import license
+          description_short: Percent of firms expected to give bribes to get an import license.
           description_from_producer: |-
             Percentage of firms reporting that they were expected to provide gifts or informal payments to obtain an import license.
           description_key:
@@ -90,10 +106,14 @@ tables:
               - Bribery for import licenses creates additional bureaucratic hurdles and increases the cost of international trade
               - Corruption increases delays and uncertainty for firms attempting to engage in cross-border business
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
+          presentation:
+            title_public: Share of firms expected to give bribes to obtain an import license
+          display:
+            name: Import license
 
       percent_of_firms_expected_to_give_gifts_to_get_a_construction_permit:
-          title: Share of firms expected to give gifts to obtain a construction permit
-          description_short: Percent of firms expected to pay bribes to get a construction permit.
+          title: Share of firms expected to give bribes to obtain a construction permit
+          description_short: Percent of firms expected to give bribes to get a construction permit.
           description_from_producer: |-
             Percentage of firms reporting that they were expected to provide gifts or informal payments to obtain a construction-related permit.
           description_key:
@@ -102,10 +122,14 @@ tables:
               - Bribery to secure permits delays investment drives up project costs and increases business uncertainty
               - Corruption in construction permits can prevent market entry for smaller firms
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
+          presentation:
+            title_public: Share of firms expected to give bribes to obtain a construction permit
+          display:
+            name: Construction permit
 
       percent_of_firms_expected_to_give_gifts_to_get_an_electrical_connection:
-          title: Share of firms expected to give gifts to obtain an electrical connection
-          description_short: Percent of firms expected to pay bribes to get an electrical connection.
+          title: Share of firms expected to give bribes obtain an electrical connection
+          description_short: Percent of firms expected to give bribes to get an electrical connection.
           description_from_producer: |-
             Percentage of firms reporting that they were expected to provide gifts or informal payments to obtain an electrical connection.
           description_key:
@@ -114,10 +138,14 @@ tables:
               - Corruption in utility connections can severely limit firm productivity and raise operational costs
               - Bribery for utility services creates barriers to firm entry and expansion
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
+          presentation:
+            title_public: Share of firms expected to give bribes to obtain an electrical connection
+          display:
+            name: Electrical connection
 
       percent_of_firms_expected_to_give_gifts_to_get_a_water_connection:
-          title: Share of firms expected to give gifts to obtain a water connection
-          description_short: Percent of firms expected to pay bribes to get a water connection.
+          title: Share of firms expected to give bribes to get a water connection
+          description_short: Percent of firms expected to give bribes to get a water connection.
           description_from_producer: |-
             Percentage of firms reporting that they were expected to provide gifts or informal payments to obtain a water connection.
           description_key:
@@ -126,10 +154,14 @@ tables:
               - Corruption in basic services like water access adds to operational burdens and constrains firm growth
               - Bribery for essential services affects firm competitiveness and investment decisions
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
+          presentation:
+            title_public: Share of firms expected to give bribes to get a water connection
+          display:
+            name: Water connection
 
       percent_of_firms_expected_to_give_gifts_to_public_officials_to_get_things_done:
-          title: Share of firms expected to give gifts to public officials to "get things done"
-          description_short: Percent of firms expected to pay bribes to overcome regulatory or administrative obstacles.
+          title: Share of firms expected to bribe public officials to "get things done"
+          description_short: Percent of firms expected to give bribes to overcome regulatory or administrative obstacles.
           description_from_producer: |-
             Percentage of firms reporting that companies like theirs are expected to make informal payments or gifts to public officials to “get things done” regarding customs, taxes, licenses, regulations, and services.
           description_key:
@@ -138,6 +170,10 @@ tables:
               - Data are collected through structured interviews with private sector firms using stratified random sampling
               - Bribery to overcome regulatory or administrative barriers increases unpredictability raises costs and creates competitive disadvantages
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014 following the Enterprise Surveys Global Methodology
+          presentation:
+            title_public: Share of firms expected to bribe public officials to "get things done"
+          display:
+            name: "Get things done"
 
       percent_of_firms_identifying_corruption_as_a_major_or_very_severe_constraint:
           title: Share of firms identifying corruption as a major or very severe constraint
