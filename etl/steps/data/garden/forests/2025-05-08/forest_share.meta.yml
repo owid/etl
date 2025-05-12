@@ -18,11 +18,14 @@ tables:
     variables:
       forest_share:
         title: Forest cover
-        description_short: "The share of land area covered by forests."
+        description_short: "The share of land area covered by forest, including both natural forests and forest plantations."
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
         description_key:
-          - "This indicator is a combination of data from multiple sources, including FAO, USDA Forest Service, DEFRA, Forest Research, and others."
-          - "The data is presented as a percentage of the total land area."
+          - This indicator is a combination of data from multiple sources, including FAO, USDA Forest Service, DEFRA, Forest Research, and others. FAO data is used for 1990 onwards.
+          - "The [FAO definition of forest](https://www.fao.org/4/y1997e/y1997e1m.htm#:~:text=Forest%20and%20related%20land%20use%20classifications,-Forest&text=It%20is%20used%20to%20refer,minimum%20height%20of%205%20m.) is: "Forest includes natural forests and forest plantations. It is used to refer to land with a tree canopy cover of more than 10 percent and area of more than 0.5 ha. Forests are determined both by the presence of trees and the absence of other predominant land uses. The trees should be able to reach a minimum height of 5 m."
+          - The definition of forest differs across sources but we have ensured that it always includes both natural forests and forest plantations.
+          - Measuring forest cover prior to satellite imagery is challenging and the pre-1990 values may use different methods to do this, so this must be taken into account when interpreting the data.
+        description_processing: "This variable is a combination of historical sources of forest cover data from various organizations, including FAO, USDA Forest Service, DEFRA, Forest Research and others; and more recent data from the FAO Global Forest Resources Assessment (FRA) data and the total land area variable from the FAO Land Use data. FAO FRA data is used for the 1990 onwards, while historical data is sourced from various papers and reports."
