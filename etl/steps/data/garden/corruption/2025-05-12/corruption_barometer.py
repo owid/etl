@@ -40,6 +40,8 @@ def run() -> None:
     }
 
     tb["answer"] = tb["answer"].replace(answer_mapping).str.lower().str.capitalize()
+    tb["value"] = tb["value"] * 100  # Convert to percentage
+
     # Improve table format.
     tb = tb.format(["country", "year", "question", "answer"])
 
