@@ -37,22 +37,7 @@ def run() -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    ds_explorer = paths.create_collection_legacy(config=config, explorer=True)
-
-    #
-    # Process data.
-    #
-
-    # Set dtypes -- TODO: is this needed?
-    # if "timelineMinTime" in df_grapher.columns:
-    #     df_grapher = df_grapher.astype(
-    #         {
-    #             "timelineMinTime": "Int64",
-    #         }
-    #     )
-    #
-    # Save outputs.
-    #
+    c = paths.create_collection(config=config, explorer=True)
 
     # Create a new explorers dataset and tsv file.
-    ds_explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)
