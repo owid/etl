@@ -1606,5 +1606,3 @@ tables:
           name: World Bank PIP region
           numDecimalPlaces: 0
           <<: *common_display
-
-
