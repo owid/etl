@@ -3,7 +3,7 @@
 import numpy as np
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -83,12 +83,12 @@ def extract_variable_from_raw_eia_data(
     data["values"] = data["values"].replace("--", np.nan).astype(float)
 
     # Set index and sort appropriately.
-    data = data.set_index(["country", "year"], verify_integrity=True).sort_index()
+    data = data.format(keys=["country", "year"], short_name=paths.short_name)
 
     return data
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -105,12 +105,9 @@ def run(dest_dir: str) -> None:
         data_raw=data_raw, variable_name=VARIABLE_NAME, unit_name=UNIT_NAME, data_time_interval=DATE_TIME_INTERVAL
     )
 
-    # Change the name of the main table.
-    tb.metadata.short_name = paths.short_name
-
     #
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_meadow = paths.create_dataset(tables=[tb])
     ds_meadow.save()
