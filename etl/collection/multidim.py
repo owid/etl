@@ -72,21 +72,6 @@ class CollectionSet:
         return list(sorted(self.mdims.keys()))
 
 
-def create_explorer(
-    config: dict,
-    dependencies: Set[str],
-    catalog_path: str,
-) -> Explorer:
-    coll = create_collection_from_config(
-        config=config,
-        dependencies=dependencies,
-        catalog_path=catalog_path,
-        validate_schema=False,
-        explorer=True,
-    )
-    return cast(Explorer, coll)
-
-
 def create_collection(
     config_yaml: Dict[str, Any],
     dependencies: Set[str],

@@ -126,23 +126,6 @@ class Explorer(Collection):
     # def from_dict(cls, d: Dict[str, Any]) -> T:
 
 
-def create_explorer(
-    config: dict,
-    dependencies: Set[str],
-    catalog_path: str,
-) -> Explorer:
-    """Create an explorer object."""
-    explorer = create_mdim_or_explorer(
-        Explorer,
-        config,
-        dependencies,
-        catalog_path,
-        validate_schema=False,
-    )
-
-    return explorer
-
-
 ###################################################
 # CODE TO EXTRACT TSV EXPLORER TABLES
 # TODO: Maybe we can move this to explorer_legacy?

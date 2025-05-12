@@ -26,7 +26,7 @@ from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, Union
 import pandas as pd
 from structlog import get_logger
 
-from etl.collection.explorer import Explorer, create_explorer
+from etl.collection.explorer import Explorer
 from etl.collection.model import Collection
 from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.multidim import create_collection_from_config
@@ -108,10 +108,12 @@ def combine_explorers(
         "views": views,
         # "catalog_path": catalog_path,
     }
-    explorer = create_explorer(
+    explorer = create_collection_from_config(
         config=explorer_config,
         dependencies=dependencies if dependencies is not None else set(),
         catalog_path=catalog_path,
+        validate_schema=False,
+        explorer=True,
     )
 
     # 5) Announce conflicts
