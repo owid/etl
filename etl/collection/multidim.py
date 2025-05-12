@@ -216,13 +216,3 @@ def _rename_choices(coll: Collection, choice_renames: Optional[Dict[str, Union[D
                             choice.name = renames(choice.slug)
                     else:
                         raise ValueError("Invalid choice_renames format.")
-
-
-def get_tables_by_uri_mapping(tables_by_name: Dict[str, List[Table]]) -> Dict[str, Table]:
-    """Mapping table URIs (complete) to table objects."""
-    mapping = {}
-    for table_name, tables in tables_by_name.items():
-        for table in tables:
-            uri = table.dataset.uri + "/" + table_name
-            mapping[uri] = table
-    return mapping
