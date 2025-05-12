@@ -110,11 +110,11 @@ definitions:
     <% if poverty_line in ["190", "215"] %>
     Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line}.
     <%- elif poverty_line in ["320", "365"] %>
-    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in lower-middle-income countries."
+    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in lower-middle-income countries.
     <%- elif poverty_line in ["550", "685"] %>
-    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in upper-middle-income countries."
+    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in upper-middle-income countries.
     <%- elif poverty_line == "3000" %>
-    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in high-income countries."
+    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in high-income countries.
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
     <%- endif %>
@@ -617,13 +617,18 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Share of population in poverty ({definitions.poverty_line})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Share of population in poverty ({definitions.poverty_line})
+            <%- else %>
+            <<welfare_type.capitalize()>> surveys
+            <%- endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
           topic_tags:
             - Poverty
-          faqs: {"definitions.faqs"}
+          faqs: *faqs_ipl
           grapher_config:
             title: "{definitions.headcount_ratio_title}"
             subtitle: "{definitions.poverty_line_subtitle}"
@@ -655,9 +660,9 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Share of population not in poverty (above {definitions.poverty_line})
-          numDecimalPlaces: 1
-          <<: *common_display
+            name: Share of population not in poverty (above {definitions.poverty_line})
+            numDecimalPlaces: 1
+            <<: *common_display
 
       headcount_ratio_between:
         title: Share of population in poverty (between {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
@@ -693,7 +698,12 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Number of people in poverty ({definitions.poverty_line})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Number of people in poverty ({definitions.poverty_line})
+            <%- else %>
+            <<welfare_type.capitalize()>> surveys
+            <%- endif %>
           numDecimalPlaces: 0
           <<: *common_display
         presentation:
@@ -767,7 +777,12 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Total shortfall ({definitions.poverty_line})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Total shortfall ({definitions.poverty_line})
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -805,7 +820,12 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Average shortfall ($) ({definitions.poverty_line})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Average shortfall ($) ({definitions.poverty_line})
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -841,7 +861,12 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Average shortfall (%) ({definitions.poverty_line})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Average shortfall (%) ({definitions.poverty_line})
+            <%- else %>
+            <<welfare_type.capitalize()>> surveys
+            <%- endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -877,7 +902,12 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Poverty gap index ({definitions.poverty_line})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Poverty gap index ({definitions.poverty_line})
+            <%- else %>
+            <<welfare_type.capitalize()>> surveys
+            <%- endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -913,7 +943,12 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Watts index ({definitions.poverty_line})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Watts index ({definitions.poverty_line})
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -935,7 +970,12 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Poverty severity ({definitions.poverty_line})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Poverty severity ({definitions.poverty_line})
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -952,7 +992,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Societal poverty line
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Societal poverty line
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -972,7 +1017,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Share of population in societal poverty
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Share of population in societal poverty
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -990,7 +1040,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Prosperity gap
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Prosperity gap
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1006,7 +1061,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Gini coefficient
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Gini coefficient
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -1039,7 +1099,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Palma ratio
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Palma ratio
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -1072,7 +1137,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: S80/S20 ratio
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            S80/S20 ratio
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -1090,7 +1160,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: P90/P10 ratio
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            P90/P10 ratio
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1105,7 +1180,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: P90/P50 ratio
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            P90/P50 ratio
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -1123,7 +1203,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: P50/P10 ratio
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            P50/P10 ratio
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -1142,7 +1227,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Mean log deviation
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Mean log deviation
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -1175,7 +1265,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Polarization
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Polarization
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -1195,7 +1290,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Mean
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Mean
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -1228,7 +1328,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Median
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Median
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -1262,7 +1367,12 @@ tables:
           {definitions.description_processing_avg}
           {definitions.description_processing_main}
         display:
-          name: Average ({definitions.percentiles_avg_share})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Average ({definitions.percentiles_avg_share})
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -1294,7 +1404,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Share ({definitions.percentiles_avg_share})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Share ({definitions.percentiles_avg_share})
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
         presentation:
@@ -1327,7 +1442,12 @@ tables:
           {definitions.description_processing_thr}
           {definitions.description_processing_main}
         display:
-          name: Threshold ({definitions.percentiles_thr})
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Threshold ({definitions.percentiles_thr})
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
         presentation:
@@ -1359,7 +1479,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Share (bottom 50%)
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Share (bottom 50%)
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1374,7 +1499,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Share (middle 40%)
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Share (middle 40%)
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1389,7 +1519,12 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         display:
-          name: Share (top 1%)
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Share (top 1%)
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1405,7 +1540,12 @@ tables:
           {definitions.description_processing_share_90_99}
           {definitions.description_processing_main}
         display:
-          name: Share (top 90-99%)
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Share (top 90-99%)
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
 
@@ -1422,7 +1562,12 @@ tables:
           {definitions.description_processing_thr}
           {definitions.description_processing_main}
         display:
-          name: Threshold (top 1%)
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Threshold (top 1%)
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
 
@@ -1439,7 +1584,12 @@ tables:
           {definitions.description_processing_avg}
           {definitions.description_processing_main}
         display:
-          name: Average (top 1%)
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Average (top 1%)
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
           numDecimalPlaces: 2
           <<: *common_display
 
