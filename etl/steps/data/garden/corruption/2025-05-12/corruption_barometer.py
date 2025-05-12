@@ -24,17 +24,22 @@ def run() -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     # Map specific terms in the 'answer' column to desired values
     answer_mapping = {
-        "AGREE": "Net agree",
-        "DISAGREE": "Net disagree",
-        "INCREASED": "Net increased",
-        "DECREASED": "Net decreased",
-        "TOTAL Bribery Rate, Excluding no contact": "Bribery rate, excluding no contact",
-        "TOTAL Bribery Rate, Total population": "Bribery rate, total population",
-        "TOTAL Contact Rate": "Bribery, contact rate",
+        "AGREE": "Agree or strongly agree",
+        "DISAGREE": "Disagree or strongly disagree",
+        "INCREASED": "Increased somewhat or a lot",
+        "DECREASED": "Decreased somewhat or a lot",
+        "NET NONE/ SOME": "Some or none of them",
+        "NET MOST/ALL": "Most or all of them",
+        "NET BADLY": "Fairly or very badly",
+        "NET WELL": "Fairly or very well",
+        "None": "None of them",
+        "Don't know / Refused": "Don't know or refused",
+        "TOTAL Bribery Rate, Excluding no contact": "in the past 12 months had contact with a public official",
+        "TOTAL Bribery Rate, Total population": "all individuals",
+        "TOTAL Contact Rate": "contact rate",
     }
 
-    tb["answer"] = tb["answer"].replace(answer_mapping).str.lower()
-
+    tb["answer"] = tb["answer"].replace(answer_mapping).str.lower().str.capitalize()
     # Improve table format.
     tb = tb.format(["country", "year", "question", "answer"])
 

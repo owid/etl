@@ -7,17 +7,19 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-CORRUPT_PARTIES = [
-    "The (President)/(Prime Minister) and Officials in his office",
-    "Representatives in the Legislature (i.e. Members of the Parliament or Senators)",
-    "Government officials",
-    "Local government councilors",
-    "Police",
-    "Tax Officials, like Ministry of Finance officials or Local Government tax collectors",
-    "Judges and Magistrates",
-    "Religious leaders",
-    "Business executives",
-]
+
+# Define a mapping for shortening and standardizing corrupt parties
+CORRUPT_PARTIES_MAPPING = {
+    "The (President)/(Prime Minister) and Officials in his office": "President/Prime Minister and officials in their office",
+    "Representatives in the Legislature (i.e. Members of the Parliament or Sentators)": "Legislators (i.e. members of parliament or senators)",
+    "Government officials": "Government officials",
+    "Local government councilors": "Local councilors",
+    "Police": "Police",
+    "Tax Officials, like Ministry of Finance officials or Local Government tax collectors": "Tax officials",
+    "Judges and Magistrates": "Judiciary",
+    "Religious leaders": "Religious leaders",
+    "Business executives": "Business executives",
+}
 
 
 def run() -> None:
@@ -42,7 +44,7 @@ def run() -> None:
     for sheet_name in sheets_to_extract:
         tb = snap.read(sheet_name=sheet_name)
         if sheet_name == "Q3":
-            question = "Total bribary rate"
+            question = "Bribary rate"
         else:
             question = (
                 str(tb.iloc[0, 1]) if pd.notna(tb.iloc[0, 1]) else "Unknown question"
@@ -52,8 +54,9 @@ def run() -> None:
         assert question != "Unknown question", f"Question could not be determined for sheet '{sheet_name}'."
 
         # Check if the fifth row, first column is not NaN and matches a valid institution + append to question
-        if pd.notna(tb.iloc[4, 0]) and str(tb.iloc[4, 0]).strip() in CORRUPT_PARTIES:
-            question = question + " " + str(tb.iloc[4, 0]).strip()  # Append the specification to the question
+        if pd.notna(tb.iloc[4, 0]) and str(tb.iloc[4, 0]).strip() in CORRUPT_PARTIES_MAPPING.keys():
+            corrupt_party = CORRUPT_PARTIES_MAPPING[str(tb.iloc[4, 0]).strip()]  # Map to standardized term
+            question = question + " " + corrupt_party  # Append the standardized term to the question
         country_row_idx = None
         for idx, val in enumerate(tb.iloc[:, 0]):  # Iterate over the first column
             if sheet_name in ["Q3", "Q4"]:
@@ -71,7 +74,6 @@ def run() -> None:
         assert country_row_idx is not None, f"No 'Country' row found in sheet '{sheet_name}'."
 
         tb.columns = tb.iloc[country_row_idx]
-
         tb = snap.read(sheet_name=sheet_name, skiprows=country_row_idx + 1)
         tb = tb.dropna(how="all")  # Drop rows where all values are NaN
         tb = tb.dropna(axis=1, how="all")  # Drop columns where all values are NaN

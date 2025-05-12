@@ -2,6 +2,10 @@
 definitions:
   common:
     processing_level: minor
+    unit: "%"
+    short_unit: "%"
+    display:
+     numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Corruption
@@ -17,6 +21,14 @@ tables:
   corruption_barometer:
     variables:
       value:
-        title: <<question.lower() >>  -  (<< answer >>)
-        unit: "%"
-        short_unit: "%"
+        title: << question >>  -  << answer >>
+        description_short: |-
+          <%- if question == "Bribary rate" and answer == "In the past 12 months had contact with a public official" %>
+          Percentage of the population who, in the past 12 months, had contact with a public official and were asked for a bribe.
+          <% elif question == "Bribary rate" and answer == "All individuals" %>
+          Percentage of the population who were asked for a bribe in the past 12 months.
+          <% elif question == "Bribary rate" and answer == "Contact rate" %>
+          Percentage of the population who had contact with a public official in the past 12 months.
+          <% elif question != "Bribary rate"%>
+          Percentage of respondents who answered "<< answer >>" to the question "<< question >>".
+          <%- endif -%>
