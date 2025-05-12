@@ -259,7 +259,7 @@ def combine_collections(
                 break
             seen_dims.add(dims)
 
-    # Add source dimension if needed
+    # Add collection dimension if needed
     if has_duplicate_views or force_collection_dimension:
         for i, collection in enumerate(collections):
             if collection_choices_names is not None:

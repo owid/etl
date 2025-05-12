@@ -14,15 +14,15 @@ def run() -> None:
         cs.read("covid_cases"),
         cs.read("covid_deaths"),
     ]
-    col_name = "test_combined"
 
     # Combine
     c = combine_collections(
         collections=cols,
-        collection_name=col_name,
+        collection_name="test_combined",
         collection_dimension_name="Indicator",
         collection_choices_names=["COVID-19 cases", "COVID-19 deaths"],
         config=paths.load_collection_config(),
+        force_collection_dimension=True,
     )
 
     # Save & upload
