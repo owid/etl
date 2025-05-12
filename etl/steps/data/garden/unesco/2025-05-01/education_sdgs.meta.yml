@@ -271,7 +271,7 @@ tables:
         short_unit: "%"
         description_key:
           - Many children who are old enough for primary school are not attending any kind of school—this indicator shows how many are missing out on education.
-          - It captures the share of children in the official primary school age range who are not enrolled in pre-primary, primary, secondary, or higher education.
+          - It captures the share of children in the official primary school age range who are not enrolled in primary or secondary education.
           - The indicator is calculated by subtracting the number of enrolled primary-age children (regardless of the level of education) from the total number of children in that age group, and expressing the result as a percentage.
           - These children may have never enrolled, may have dropped out, or may be starting late and not yet entered school.
           - A high out-of-school rate highlights the need for improved access and targeted policies to reach excluded groups. When disaggregated, the indicator helps identify gaps by sex, location, or socioeconomic status.
