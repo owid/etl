@@ -1,4 +1,3 @@
-from etl.collection import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.

@@ -3,7 +3,6 @@ from typing import Any, Dict, List
 from owid.catalog.utils import underscore
 from pandas import DataFrame
 
-from etl.collection import multidim
 from etl.collection.beta import combine_mdims
 from etl.collection.model.view import View
 from etl.helpers import PathFinder
