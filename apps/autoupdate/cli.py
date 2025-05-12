@@ -130,8 +130,12 @@ def run_updates(
         # Parse the original YAML content
         original_outs = yaml.safe_load(original_dvc_content)["outs"][0]
 
-        # Try to execute snapshot.
-        subprocess.run(["python", snapshot_script, "--upload"], check=True, capture_output=True, text=True)
+        # Try to execute snapshot and print error output if it fails.
+        try:
+            subprocess.run(["python", snapshot_script, "--upload"], check=True, capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            log.error(f"Snapshot script failed: {snapshot_script}\nstdout:\n{e.stdout}\nstderr:\n{e.stderr}")
+            raise
 
         # Load md5 and size from the (possibly) updated file
         with open(dvc_file, "r") as f:
