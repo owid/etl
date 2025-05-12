@@ -301,7 +301,11 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new explorer.
-    ds_explorer = paths.create_explorer(config=config, explorer_name="animal-welfare")
+    ds_explorer = paths.create_collection_legacy(
+        config=config,
+        short_name="animal-welfare",
+        explorer=True,
+    )
 
     # Save explorer.
     ds_explorer.save(tolerate_extra_indicators=True)

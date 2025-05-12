@@ -14,6 +14,6 @@ def run() -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    explorer = paths.create_explorer(config=config, explorer_name="habitat-loss")
+    explorer = paths.create_collection_legacy(config=config, short_name="habitat-loss", explorer=True)
 
     explorer.save()

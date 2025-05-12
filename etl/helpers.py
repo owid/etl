@@ -647,33 +647,6 @@ class PathFinder:
             repack=repack,
         )
 
-    def create_explorer(
-        self,
-        config,
-        explorer_name: Optional[str] = None,
-    ) -> Explorer:
-        """Create an Explorer object.
-
-        Args:
-        -----
-        config: Dict[str, Any]
-            Configuration of the explorer.
-        explorer_name: str
-            Name of the explorer. If none is provided, it will use the short_name from the explorer catalog path.
-        """
-        # Create Explorer object
-        explorer = create_collection_from_config(
-            config=config,
-            dependencies=self.dependencies,
-            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{explorer_name or self.short_name}",
-            validate_schema=False,
-            explorer=True,
-        )
-
-        assert isinstance(explorer, Explorer), "Unexpected type of explorer object. Expected Explorer."
-
-        return explorer
-
     def create_collection_legacy(
         self,
         config,

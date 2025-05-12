@@ -20,6 +20,10 @@ def run() -> None:
             y["display"]["colorScaleNumericMinValue"] = 0
 
     # Create explorer
-    explorer = paths.create_explorer(config=config, explorer_name="water-and-sanitation")
+    explorer = paths.create_collection_legacy(
+        config=config,
+        short_name="water-and-sanitation",
+        explorer=True,
+    )
 
     explorer.save()

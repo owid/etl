@@ -47,9 +47,10 @@ def run() -> None:
     config["views"] = config_new["views"]
 
     # Create explorer
-    explorer = paths.create_explorer(
+    explorer = paths.create_collection_legacy(
         config=config,
-        explorer_name="migration-flows",
+        short_name="migration-flows",
+        explorer=True,
     )
 
     # Edit order of slugs

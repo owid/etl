@@ -37,7 +37,7 @@ def run() -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    ds_explorer = paths.create_explorer(config=config)
+    ds_explorer = paths.create_collection_legacy(config=config, explorer=True)
 
     #
     # Process data.

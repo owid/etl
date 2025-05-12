@@ -17,8 +17,9 @@ def run() -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    explorer = paths.create_explorer(
+    explorer = paths.create_collection_legacy(
         config=config,
+        explorer=True,
     )
 
     explorer.save(tolerate_extra_indicators=True)
