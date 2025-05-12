@@ -10,7 +10,7 @@ definitions:
 dataset:
   update_period_days: 365
   title: Historic forest cover estimates from combined sources
-  description: |
+  description: |-
     This dataset provides estimates of forest cover from various sources, including FAO, USDA Forest Service, DEFRA, Forest Research and others. The details for the historical estimates are provided below:
 
     - The FAO Global Forest Resources Assessment (FRA) data is used for all countries for the 1990 onwards.
@@ -26,8 +26,6 @@ dataset:
     - United States (1630-1907): [U.S. Department of Agriculture Forest Service (USDA FS) report: U.S. Forest Facts and Historical Trends](https://web.archive.org/web/20220728061823/https://www.fia.fs.fed.us/library/brochures/docs/2000/ForestFactsMetric.pdf)
     - United States (1920-1987): [U.S. Department of Agriculture Forest Service (USDA FS) report (2014): U.S. Forest Resource Facts and Historical Trends](https://www.fs.usda.gov/sites/default/files/legacy_files/media/types/publication/field_pdf/forestfacts-2014aug-fs1035-508complete.pdf)
     - Vietnam (1943-1985): [Forest Science Institute of Vietnam (FSIV) and Food and Agriculture Organization of the United Nations (FAO) report: Vietname Forestry Outlook Study](https://web.archive.org/web/20230715025310/http://www.fao.org/3/am254e/am254e00.pdf)
-
-
 
 tables:
   forest_share:
