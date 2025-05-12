@@ -174,7 +174,7 @@ tables:
           presentation:
             title_public: Share of firms expected to bribe public officials to "get things done"
           display:
-            name: "Get things done"
+            name: To "get things done"
 
       percent_of_firms_identifying_corruption_as_a_major_or_very_severe_constraint:
           title: Share of firms identifying corruption as a major or very severe constraint
