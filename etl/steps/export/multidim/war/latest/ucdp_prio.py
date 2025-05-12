@@ -16,7 +16,7 @@ def run() -> None:
     # tb = ds.read("migrant_stock_dest_origin", load_data=False)
 
     # Create mdim
-    mdim = paths.create_collection_legacy(
+    mdim = paths.create_collection(
         config=config,
         short_name="migration-flows",
     )
