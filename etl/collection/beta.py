@@ -33,8 +33,8 @@ from etl.collection.multidim import create_collection_from_config
 
 log = get_logger()
 
-MDIM_SLUG = "mdim"
-MDIM_TITLE = "MDIM"
+COLLECTION_SLUG = "_collection"
+COLLECTION_TITLE = "Collection"
 
 
 def combine_explorers(
@@ -133,162 +133,191 @@ def combine_explorers(
     return explorer
 
 
-def combine_mdims(
-    mdims: List[Collection],
-    mdim_name: str,
+def combine_collections(
+    collections: List[Union[Collection, Explorer]],
+    collection_name: str,
     config: Optional[Dict[str, Any]] = None,
     dependencies: Optional[Set[str]] = None,
-    mdim_dimension_name: Optional[str] = None,
-    mdim_choices_names: Optional[List[str]] = None,
-    force_mdim_dimension: Optional[bool] = False,
-) -> Collection:
-    """Combine multiple MDIMs into a single one.
+    force_collection_dimension: bool = False,
+    collection_dimension_name: Optional[str] = None,
+    collection_choices_names: Optional[List[str]] = None,
+    is_explorer: Optional[bool] = None,
+) -> Union[Collection, Explorer]:
+    """Combine multiple collections (MDIMs or Explorers) into a single one.
 
-    Notes:
-    - All MDIMs should have the same dimensions (slug, name, etc.).
-    - Dimensions can vary across explorers, that's fine. This function consolidates all of them. If there are multiple slugs in use with different names, this function will rename them to preserve uniqueness.
+    This function serves as a unified interface to combine either Explorers
+    or MDIMs (Collections), abstracting the common logic between the two.
 
     Args:
-        mdims: List[Collection]
-            List of MDIMs to be combined.
-        mdim_name: str
-            Name of the combined MDIM.
-        config: Optional[Dict[str, Any]]
-            Configuration for the combined MDIM. If None, a default configuration is used. We recommend using a config YAML file and calling `paths.load_mdim_config()` to obtain a good default for config.
-        dependencies: Optional[Set[str]]
-            Set of dependencies for the combined MDIM. If None, an empty set is used. TODO: This should probably be required.
-        mdim_dimension_name: Optional[str]
-            Name of the new dimension added if there are duplicate views. This dimension will identify each MDIM and will be shown as the first MDIM dropdown. If None, a default name is used.
-        mdim_choices_names: Optional[List[str]]
-            List of choice names of the MDIM dimension (see `mdim_dimension_name`). Each choice stands for an MDIM in `mdims` (it should be a 1-to-1 correspondence). The length of this list should match that from `mdims`. If None, a default name is used.
-        force_mdim_dimension: Optional[bool]
-            If True, a new dimension to identify each MDIM is added even if there are no duplicate views. Its default value is `False`. This argument will be ignored if there are duplicate views!
+        collections: List of collections (either all MDIMs or all Explorers) to combine
+        collection_name: Name of the resulting combined collection
+        config: Configuration for the combined collection
+        dependencies: Set of dependencies for the combined collection
+        force_collection_dimension: If True, adds a dimension to identify the source collection
+            even if there are no duplicate views
+        collection_dimension_name: Name for the dimension that identifies the source collection
+            (defaults to "MDIM" for Collections or "Explorer" for Explorers)
+        collection_choices_names: Names for the choices in the source dimension
+            (should match the length of collections)
+        is_explorer: Force the result to be an Explorer (True) or MDIM (False).
+            If None (default), inferred from the input collections.
 
-    TODO:
-        - Consolidate with `combine_explorers` function.
-        - Integrate into `PathFinder`.
+    Returns:
+        A combined Collection or Explorer, matching the type of the input collections
+
+    Notes:
+        - All collections must have the same dimensions structure (slug, name, etc.)
+        - Choice conflicts are resolved by renaming conflicting choices
+        - If duplicate views exist, a source dimension is automatically added
     """
+    # Check that there are at least 2 collections to combine
+    assert len(collections) > 0, "No collections to combine."
+    assert len(collections) > 1, "At least two collections should be provided."
 
-    # Check that there are at least 2 MDIMs to combine
-    assert len(mdims) > 0, "No MDIMs to combine."
-    assert len(mdims) > 1, "At least two MDIMs should be provided."
+    # Determine collection type if not specified
+    if is_explorer is None:
+        is_explorer = all(isinstance(c, Explorer) for c in collections)
+        if not (is_explorer or all(not isinstance(c, Explorer) for c in collections)):
+            raise ValueError("All collections must be of the same type (either all Explorers or all Collections)")
 
-    # Check that all MDIMs have the same dimensions (slug, name, etc.)
-    mdims_dims = None
-    for m in mdims:
-        dimensions_flatten = [{k: v for k, v in dim.to_dict().items() if k != "choices"} for dim in m.dimensions]
-        if mdims_dims is None:
-            mdims_dims = dimensions_flatten
+    # Set appropriate default dimension name based on collection type
+    if collection_dimension_name is None:
+        collection_dimension_name = COLLECTION_TITLE
+
+    # Check that all collections have the same dimensions structure
+    collection_dims = None
+    for collection in collections:
+        dimensions_flatten = [
+            {k: v for k, v in dim.to_dict().items() if k != "choices"} for dim in collection.dimensions
+        ]
+        if collection_dims is None:
+            collection_dims = dimensions_flatten
         else:
             assert (
-                mdims_dims == dimensions_flatten
-            ), "Dimensions are not the same across MDIMs. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
+                collection_dims == dimensions_flatten
+            ), "Dimensions are not the same across collections. Please review that dimensions are listed in the same order, have the same slugs, names, description, etc."
 
-    # If there are duplicate views, add dimension to differentiate them!
-    if mdim_dimension_name is None:
-        mdim_dimension_name = MDIM_TITLE
-    if mdim_choices_names is not None:
-        assert len(mdim_choices_names) == len(
-            mdims
-        ), "Length of `mdim_choices_names` should equal the length of `mdimd`."
+    # Check for checkbox dimensions in the first collection
+    # TODO: Implement support for checkboxes when merging
+    for dim in collections[0].dimensions:
+        if dim.ui_type == "checkbox" and is_explorer:
+            raise NotImplementedError("Checkbox dimensions are not supported yet for Explorers.")
 
+    # Detect duplicate views
     seen_dims = set()
     has_duplicate_views = False
-    for mdim in mdims:
-        mdim.check_duplicate_views()
-        for view in mdim.views:
+    for collection in collections:
+        # duplicate views within a collection
+        collection.check_duplicate_views()
+        # duplicate views across collections
+        for view in collection.views:
             dims = tuple(view.dimensions.items())
             if dims in seen_dims:
                 has_duplicate_views = True
                 break
             seen_dims.add(dims)
-    ## Add dimension to differentiate them if applicable
-    if has_duplicate_views or force_mdim_dimension:
-        for i, mdim in enumerate(mdims):
-            if mdim_choices_names is not None:
-                choice = mdim_choices_names[i]
-            else:
-                choice = mdim.title["title"]
 
-            dimension_mdim = Dimension(
-                slug=MDIM_SLUG,
-                name=mdim_dimension_name,
+    # Add source dimension if needed
+    if has_duplicate_views or force_collection_dimension:
+        for i, collection in enumerate(collections):
+            if collection_choices_names is not None:
+                assert len(collection_choices_names) == len(
+                    collections
+                ), "Length of collection_choices_names must match the number of collections"
+                choice_name = collection_choices_names[i]
+            else:
+                choice_name = collection.title.get("title", collection.short_name)
+
+            dimension_collection = Dimension(
+                slug=COLLECTION_SLUG,
+                name=collection_dimension_name,
                 choices=[
-                    DimensionChoice(slug=mdim.short_name, name=choice),
+                    DimensionChoice(slug=collection.short_name, name=choice_name),
                 ],
             )
-            mdim.dimensions = [dimension_mdim] + mdim.dimensions
-            for v in mdim.views:
-                v.dimensions[MDIM_SLUG] = mdim.short_name
+            collection.dimensions = [dimension_collection] + collection.dimensions
+            for v in collection.views:
+                v.dimensions[COLLECTION_SLUG] = collection.short_name
 
-    # 0) Preliminary work #
-    # Create dictionary with MDIMs, so to have identifiers for them
-    mdims_by_id = {str(i): deepcopy(mdim) for i, mdim in enumerate(mdims)}
+    # Create dictionary with collections for tracking
+    collections_by_id = {str(i): deepcopy(collection) for i, collection in enumerate(collections)}
 
-    # Build dataframe with all choices. Each row provides details of a choices, and explorer identifier and the dimension slug
-    df_choices, cols_choices = _build_df_choices(mdims_by_id)
+    # Build dataframe with all choices
+    df_choices, cols_choices = _build_df_choices(collections_by_id)
 
-    # 1) Combine dimensions (use first explorer as container/reference) #
+    # Combine dimensions (use first collection as template)
     dimensions = _combine_dimensions(
         df_choices=df_choices,
         cols_choices=cols_choices,
-        collection=mdims[0].copy(),
+        collection=collections[0].copy(),
     )
 
-    # 2) Combine views #
     # Track modifications (useful later for views)
     choice_slug_changes = _extract_choice_slug_changes(df_choices)
-    # Update explorer views (based on changes on choice slugs)
-    mdims_by_id = _update_choice_slugs_in_views(choice_slug_changes, mdims_by_id)
-    # Collect views
+
+    # Update views based on changes to choice slugs
+    collections_by_id = _update_choice_slugs_in_views(choice_slug_changes, collections_by_id)
+
+    # Collect all views
     views = []
-    for _, explorer in mdims_by_id.items():
-        explorer_views = explorer.views
-        views.extend(explorer_views)
+    for _, collection in collections_by_id.items():
+        views.extend(collection.views)
 
-    # 3) Ad-hoc change: update explorer_name #
-    assert isinstance(mdims[0].catalog_path, str), "Catalog path is not set. Please set it before saving."
-    catalog_path = mdims[0].catalog_path.split("#")[0] + "#" + mdim_name
+    # Create catalog path
+    assert isinstance(collections[0].catalog_path, str), "Catalog path is not set. Please set it before saving."
+    catalog_path = collections[0].catalog_path.split("#")[0] + "#" + collection_name
 
-    # 4) Prepare MDIM config
+    # Ensure config has minimal required fields
     if config is None:
         config = {}
 
     # Make sure there is title and default_selection. If not given, use default values.
-    default_title = {"title": f"Combined MDIM: {mdim_name}", "title_variant": "Use a YAML to define these attributes"}
-    if "title" not in config:
-        config["title"] = default_title
+    default_title = {
+        "title": f"Combined Collection: {collection_name}",
+        "title_variant": "Use a YAML to define these attributes",
+    }
+    if not is_explorer:
+        if "title" not in config:
+            config["title"] = default_title
+        else:
+            config["title"] = {**default_title, **config["title"]}
+        if "default_selection" not in config:
+            config["default_selection"] = collections[0].default_selection
     else:
-        config["title"] = {**default_title, **config["title"]}
-    if "default_selection" not in config:
-        config["default_selection"] = mdims[0].default_selection
+        if "config" not in config:
+            config["config"] = {}
+        if "explorerTitle" not in config["config"]:
+            config["config"]["explorerTitle"] = default_title["title"]
+        if "explorerSubtitle" not in config["config"]:
+            config["config"]["explorerSubtitle"] = default_title["title_variant"]
 
     # Set dimensions and views
     config["dimensions"] = dimensions
     config["views"] = views
 
-    # 4) Create final explorer #
-    mdim = create_collection_from_config(
+    # Create the combined collection
+    combined = create_collection_from_config(
         config=config,
         dependencies=dependencies if dependencies is not None else set(),
         catalog_path=catalog_path,
+        validate_schema=True if not is_explorer else False,
+        explorer=is_explorer,
     )
 
-    # 5) Announce conflicts
+    # Log any conflicts that were resolved
     df_conflict = df_choices.loc[df_choices["in_conflict"]]
     if not df_conflict.empty:
         log.warning("Choice slug conflicts resolved")
         for (dimension_slug, choice_slug), group in df_conflict.groupby(["dimension_slug", "slug_original"]):
-            # Now group by 'value' to see which col3 values correspond to each unique 'value'
             log.warning(f"(dimension={dimension_slug}, choice={choice_slug})")
             for _, subgroup in group.groupby("choice_slug_id"):
                 collection_ids = subgroup["collection_id"].unique().tolist()
-                explorer_names = [mdims_by_id[i].short_name for i in collection_ids]
+                collection_names = [collections_by_id[i].short_name for i in collection_ids]
                 record = subgroup[cols_choices].drop_duplicates().to_dict("records")
                 assert len(record) == 1, "Unexpected, please report!"
-                log.warning(f" MDIMs {explorer_names} map to {record[0]}")
+                log.warning(f" Collections {collection_names} map to {record[0]}")
 
-    return mdim
+    return combined
 
 
 def _extract_choice_slug_changes(df_choices) -> Dict[str, Any]:

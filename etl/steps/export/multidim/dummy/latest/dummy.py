@@ -3,7 +3,7 @@
 TODO: Look in etl.collection.beta for more details.
 """
 
-from etl.collection.beta import combine_mdims
+from etl.collection.beta import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -20,13 +20,13 @@ def run() -> None:
     col_name = "test_combined"
 
     # Combine
-    mdim = combine_mdims(
-        mdims=cols,
-        mdim_name=col_name,
-        mdim_dimension_name="Indicator",
-        mdim_choices_names=["COVID-19 cases", "COVID-19 deaths"],
+    c = combine_collections(
+        collections=cols,
+        collection_name=col_name,
+        collection_dimension_name="Indicator",
+        collection_choices_names=["COVID-19 cases", "COVID-19 deaths"],
         config=paths.load_mdim_config(),
     )
 
     # Save & upload
-    mdim.save()
+    c.save()

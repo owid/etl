@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 from owid.catalog.utils import underscore
 from pandas import DataFrame
 
-from etl.collection.beta import combine_mdims
+from etl.collection.beta import combine_collections
 from etl.collection.model.view import View
 from etl.helpers import PathFinder
 
@@ -209,9 +209,9 @@ def run() -> None:
     )
 
     # Combine MDIMs
-    c = combine_mdims(
-        mdims=[c1, c2],
-        mdim_name="energy_prices",
+    c = combine_collections(
+        collections=[c1, c2],
+        collection_name="energy_prices",
         config=paths.load_mdim_config(),
     )
 
