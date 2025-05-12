@@ -16,11 +16,11 @@ def run() -> None:
     config = paths.load_mdim_config()
 
     # Load (flattened) table from grapher channel with dimension metadata
-    table = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)
+    tb = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)
 
     # Use the updated function with mapping from original_short_name to configuration values.
     add_dimension(
-        table,
+        tb,
         dimension={"name": "Per capita", "slug": "per_capita"},
         mapping={
             "emissions_per_capita": {"new_short_name": "emissions", "value": "True"},
@@ -28,16 +28,17 @@ def run() -> None:
         },
     )
 
-    # Update config with dimensions and views
-    config.update(multidim.expand_config(table))
+    # Create collection
+    c = paths.create_collection(
+        config=config,
+        tb=tb,
+    )
 
-    # Sort pollutants by name
-    # TODO: should sorting be part of dimension metadata in garden channel?
-    config["dimensions"][0]["choices"] = sorted(config["dimensions"][0]["choices"], key=lambda x: x["name"])
+    # Sort choices alphabetically
+    c.sort_choices({"pollutant": lambda x: sorted(x)})
 
-    # Create MDIM and upsert its config to DB
-    mdim = paths.create_collection_legacy(config=config)
-    mdim.save()
+    # Save
+    c.save()
 
 
 def add_dimension(table, dimension: TableDimension, mapping: dict) -> None:
