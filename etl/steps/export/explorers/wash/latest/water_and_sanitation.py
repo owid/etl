@@ -13,17 +13,23 @@ def run() -> None:
     # Load grapher config from YAML
     config = paths.load_explorer_config()
 
-    # Set equal size color bins
-    for view in config["views"]:
-        for y in view["indicators"]["y"]:
-            y["display"]["colorScaleEqualSizeBins"] = True
-            y["display"]["colorScaleNumericMinValue"] = 0
-
-    # Create explorer
-    explorer = paths.create_collection_legacy(
+    # Create collection
+    config = paths.load_explorer_config()
+    c = paths.create_collection(
         config=config,
         short_name="water-and-sanitation",
         explorer=True,
     )
 
-    explorer.save()
+    # Edit display
+    for view in c.views:
+        assert view.indicators.y is not None
+        for y in view.indicators.y:
+            y.update_display(
+                {
+                    "colorScaleEqualSizeBins": True,
+                    "colorScaleNumericMinValue": 0,
+                }
+            )
+
+    c.save()

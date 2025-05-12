@@ -549,7 +549,11 @@ def run():
     # Save outputs.
     #
     # Initialize a new explorer.
-    ds_explorer = paths.create_collection_legacy(config=config, short_name="global-food", explorer=True)
+    c = paths.create_collection(
+        config=config,
+        short_name="global-food",
+        explorer=True,
+    )
 
     # Save explorer.
-    ds_explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)

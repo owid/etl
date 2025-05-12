@@ -1,5 +1,3 @@
-from etl.collection.explorer import combine_config_dimensions, expand_config
-
 # from etl.db import get_engine
 from etl.helpers import PathFinder
 
@@ -31,36 +29,22 @@ def run() -> None:
         "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
     }
 
-    # Bake config automatically from table
-    config_new = expand_config(
-        tb,
+    c = paths.create_collection(
+        config=config,
+        tb=tb,
         indicator_names=["migrants"],
         dimensions=["country_select", "metric", "gender"],
         common_view_config=common_view_config,
-    )
-
-    # Combine both sources (basically dimensions and views)
-    config["dimensions"] = combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config.get("dimensions", {}),
-    )
-    config["views"] = config_new["views"]
-
-    # Create explorer
-    explorer = paths.create_collection_legacy(
-        config=config,
         short_name="migration-flows",
         explorer=True,
     )
-
-    # Edit order of slugs
-    explorer.sort_choices({"country_select": lambda x: sorted(x)})
+    c.sort_choices({"country_select": lambda x: sorted(x)})
 
     # Set display settings
-    add_display_settings(explorer)
+    add_display_settings(c)
 
     # Save explorer to DB
-    explorer.save()
+    c.save()
 
 
 def add_display_settings(explorer):
