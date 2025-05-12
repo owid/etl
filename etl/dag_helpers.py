@@ -332,3 +332,29 @@ def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
     steps = dag["steps"] or {}
 
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
+
+
+def get_active_snapshots() -> Set[str]:
+    DAG = load_dag()
+
+    active_snapshots = set()
+
+    for s in set(DAG.keys()) | {x for v in DAG.values() for x in v}:
+        if s.startswith("snapshot"):
+            active_snapshots.add(s.split("://")[1])
+
+    # Strip extension
+    return {s.split(".")[0] + ".py" for s in active_snapshots}
+
+
+def get_active_steps() -> Set[str]:
+    DAG = load_dag()
+
+    active_steps = set()
+
+    for s in set(DAG.keys()) | {x for v in DAG.values() for x in v}:
+        if not s.startswith("snapshot"):
+            active_steps.add(s.split("://")[1])
+
+    # Strip dataset name after version
+    return {s.rsplit("/", 1)[0] for s in active_steps}
