@@ -47,7 +47,7 @@ def run() -> None:
     tb_scotland = snap_meadow_scotland.read()
     tb_south_korea = snap_meadow_south_korea.read()
     tb_usa = snap_meadow_usa.read()
-    tb_fra = ds_meadow_fra["fra_forest_extent"].reset_index()
+    tb_fra = ds_meadow_fra["fra_forest_area"].reset_index()
     tb_fra["source"] = "Forest Resource Assessment (FRA) 2020"
     # Concatenate tables.
     tb = pr.concat(

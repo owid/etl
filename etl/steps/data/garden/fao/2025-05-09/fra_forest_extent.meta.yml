@@ -11,7 +11,7 @@ dataset:
   update_period_days: 365
 
 tables:
-  fra_forest_extent:
+  fra_forest_area:
     variables:
       forest_share:
         title: Forest cover
