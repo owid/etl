@@ -694,6 +694,32 @@ class PathFinder:
 
         return explorer
 
+    def create_collection_legacy(
+        self,
+        config,
+        short_name: Optional[str] = None,
+        explorer: bool = False,
+    ):
+        if explorer:
+            # Create Collection object
+            c = create_collection_from_config(
+                config,
+                self.dependencies,
+                catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
+            )
+        else:
+            c = create_collection_from_config(
+                config=config,
+                dependencies=self.dependencies,
+                catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
+                validate_schema=False,
+                explorer=True,
+            )
+
+            assert isinstance(c, Explorer), "Unexpected type of explorer object. Expected Explorer."
+
+        return c
+
     def create_collection(
         self,
         config: Dict[str, Any],
