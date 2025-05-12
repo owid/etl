@@ -37,6 +37,7 @@ class ExplorerCreator:
         explorer = self.paths.create_collection(
             config=config,
             indicator_as_dimension=True,
+            explorer=True,
             **kwargs,
         )
         return cast(Explorer, explorer)
@@ -60,6 +61,7 @@ class ExplorerCreator:
             tb=tb,
             dimensions=dimensions,
             indicator_as_dimension=True,
+            explorer=True,
             **kwargs,
         )
 
@@ -73,8 +75,12 @@ class ExplorerCreator:
             tb=tb_proj,
             dimensions=dimensions,
             indicator_as_dimension=True,
+            explorer=True,
             **kwargs,
         )
+
+        assert isinstance(explorer, Explorer)
+        assert isinstance(explorer_proj, Explorer)
 
         explorer = combine_explorers(
             explorers=[explorer, explorer_proj],
