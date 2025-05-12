@@ -1,9 +1,21 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_key:
+      - Crime data can be difficult to compare between countries because of differences in how justice systems work, when the data are collected (for example, when a crime is first reported or after it has been investigated), and how international guidelines are used in each country.
+      - Many crimes are never reported by victims, so the data cannot be used to measure exactly how common crime is. However, the data are still useful for spotting patterns and trends over time.
+      - Most crime data come from records kept by the police or other law enforcement agencies. Countries vary in whether they record a crime when it is first reported, during an investigation, or after the investigation is finished.
+      - In some countries, more than one agency collects crime data, and these different sets of data must be combined before they are published.
+      - The United Nations collects crime data each year through a survey called the United Nations Survey of Crime Trends and Operations of Criminal Justice Systems (UN-CTS). National experts are responsible for gathering data from all relevant agencies and sending it to the UN.
+      - The UN Office on Drugs and Crime (UNODC) checks the submitted data to make sure it matches other known information and is consistent.
+      - Countries that are part of the European Union, the European Free Trade Association, or are candidates to join the EU, first send their data to Eurostat (the EU statistics agency) for checking before it goes to the UN.
+      - Any additional data provided by countries through other methods are reviewed by both the country and the UN before being added to the main dataset.
+      - Population figures used with the crime data come from the World Population Prospect, which is produced by the Population Division of the United Nations.
+
     presentation:
       topic_tags:
         - Corruption
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -18,11 +30,11 @@ tables:
         title: << indicator >>  - << category.lower() >>  (<< unit_of_measurement.lower() >>)
         description_short: |-
           <%- if category == "Corruption" %>
-          National figures on offences involving corruption, which includes bribery, embezzlement, abuse of functions, trading in influence, illicit enrichment, and any additional corrupt practices not covered under bribery or general corruption categories.
+          Reported national figures on offences involving corruption, including bribery, embezzlement, abuse of functions, trading in influence, illicit enrichment, and other corrupt practices not otherwise specified.
           <% elif category == "Bribery" %>
-          National figures on offences involving bribery, which includes the promising, offering, giving, soliciting, or accepting of an undue advantage by or from a public official, or a person working in the private sector, directly or indirectly, with the intent to influence the performance or non-performance of their official duties.
+          Reported national figures on offences involving bribery, including the promising, offering, giving, soliciting, or accepting of an undue advantage by or from a public official or private sector actor, directly or indirectly, to influence the performance or non-performance of official duties.
           <% elif category == "Other acts of corruption" %>
-          National figures on other acts of corruption, including embezzlement, abuse of functions, trading in influence, illicit enrichment, and any additional corrupt practices not covered under bribery or general corruption categories.
+          Reported national figures on other acts of corruption, including embezzlement, abuse of functions, trading in influence, illicit enrichment, and other corrupt practices not covered under bribery or general corruption.
           <%- endif -%>
         description_from_producer: |-
           <% if category == "Corruption" %>

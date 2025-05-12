@@ -1,6 +1,15 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
+    description_key:
+      - Crime and justice data can be affected by many factors, such as how a country’s justice system works, whether the data follow the “principal offence rule” (which means if a person commits more than one crime, it only counts once), how complete the data are, and how closely a country follows international standards for reporting.
+      - Even though these differences exist, the data are still extremely useful for understanding how criminal justice systems work in different countries.
+      - The data are collected from official records kept by different parts of the justice system. The police usually record information about people who are suspected of, arrested for, or cautioned for a crime. Prosecutors collect data about people being charged, and the courts collect information about people who appear before them and those who are convicted.
+      - The United Nations gathers these data each year through a survey called the United Nations Survey of Crime Trends and Operations of Criminal Justice Systems (UN-CTS). Experts in each country, who are appointed by their government, collect and combine the data from all relevant agencies before sending it to the UN.
+      - The UN Office on Drugs and Crime (UNODC) checks the data for accuracy and to make sure it is consistent with other sources.
+      - Countries that are part of the European Union, the European Free Trade Association, or are in the process of joining the EU send their data to Eurostat (the EU statistics agency) for additional checks before the data is passed to the UN.
+      - Data provided in other ways or from other sources are also reviewed by both the country and the UN before being included in the main dataset.
+      - Population figures that are used alongside the crime data come from the World Population Prospect, produced by the United Nations Population Division.
     presentation:
       topic_tags:
         - Corruption
@@ -17,7 +26,18 @@ tables:
     variables:
       value:
         title: << indicator >>  - << category.lower() >> << age.lower() >> << sex.lower() >> (<< unit_of_measurement.lower() >>)
-        description_short: National figures on persons suspected/arrested/cautioned, persons prosecuted, and persons convicted. They also include data on persons brought before criminal court by type of legal representation.
+        description_short: |-
+          <%- if indicator == "Criminal Justice Personnel" %>
+          Nationally reported number of criminal justice personnel, including judges, prosecutors, and public defenders.
+          <% elif indicator == "Persons brought before criminal courts" %>
+          National figures on persons brought before criminal courts, including those with and without legal representation.
+          <% elif indicator == "Persons convicted" %>
+          National figures on persons convicted, including those with and without legal representation.
+          <% elif indicator == "Persons prosecuted" %>
+          National figures on persons prosecuted, including those with and without legal representation.
+          <% elif indicator == "Persons arrested/cautioned/suspected" %>
+          National figures on persons arrested, cautioned, or suspected of a crime, including those with and without legal representation.
+          <%- endif -%>
         unit: |-
           <%- if unit_of_measurement.lower() == "counts" %>
            << indicator.lower() >>
