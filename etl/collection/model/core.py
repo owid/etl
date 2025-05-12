@@ -1,6 +1,7 @@
 """Model for collections."""
 
 import json
+import re
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -16,13 +17,11 @@ from typing_extensions import Self
 from apps.chart_sync.admin_api import AdminAPI
 from etl.collection.common import map_indicator_path_to_id
 from etl.collection.exceptions import DuplicateCollectionViews
-from etl.collection.model.base import MDIMBase
+from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
-    camelize,
     get_complete_dimensions_filter,
-    pruned_json,
     unique_records,
     validate_indicators_in_db,
 )
@@ -631,3 +630,37 @@ def replace_catalog_paths_with_ids(config):
                         )
 
     return config
+
+
+_pattern = re.compile(r"_([a-z])")
+
+
+def snake_to_camel(s: str) -> str:
+    # Use the compiled pattern to substitute underscores with the uppercase letter.
+    return _pattern.sub(lambda match: match.group(1).upper(), s)
+
+
+# model.core
+def camelize(obj: Any, exclude_keys: Optional[Set[str]] = None) -> Any:
+    """
+    Recursively converts dictionary keys from snake_case to camelCase, unless the key is in exclude_keys.
+
+    Parameters:
+        obj: The object (dict, list, or other) to process.
+        exclude_keys: An optional iterable of keys that should not be converted (including nested values).
+    """
+    exclude_keys = exclude_keys or set()
+
+    if isinstance(obj, dict):
+        new_obj: dict[Any, Any] = {}
+        for key, value in obj.items():
+            # Leave the key unchanged if it's in the exclusion list
+            if key in exclude_keys:
+                new_obj[key] = value
+            else:
+                new_obj[snake_to_camel(key)] = camelize(value, exclude_keys)
+        return new_obj
+    elif isinstance(obj, list):
+        return [camelize(item, exclude_keys) for item in obj]
+    else:
+        return obj

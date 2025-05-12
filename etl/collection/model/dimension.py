@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable, ClassVar, List, Optional, TypeGuard, Union
 
-from etl.collection.model.base import MDIMBase
-from etl.collection.utils import pruned_json
+from etl.collection.model.base import MDIMBase, pruned_json
 
 
 @pruned_json
