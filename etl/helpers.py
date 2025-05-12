@@ -706,34 +706,6 @@ class PathFinder:
             explorer=explorer,
         )
 
-    @deprecated.deprecated(reason="Please adapt your code to use `paths.create_collection` instead.")
-    def create_collection_legacy(
-        self,
-        config,
-        short_name: Optional[str] = None,
-        explorer: bool = False,
-    ):
-        """NOTE: Please adapt your code to use `paths.create_collection` instead."""
-        if explorer:
-            c = create_collection_from_config(
-                config=config,
-                dependencies=self.dependencies,
-                catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
-                validate_schema=False,
-                explorer=True,
-            )
-
-            assert isinstance(c, Explorer), "Unexpected type of explorer object. Expected Explorer."
-        else:
-            # Create Collection object
-            c = create_collection_from_config(
-                config,
-                self.dependencies,
-                catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
-            )
-
-        return c
-
     @deprecated.deprecated(
         reason="We should slowly migrate to YAML-based explorers, and use `paths.create_collection` instead."
     )
