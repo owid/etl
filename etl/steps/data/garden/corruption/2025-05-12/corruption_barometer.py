@@ -28,13 +28,9 @@ def run() -> None:
         "DISAGREE": "Net disagree",
         "INCREASED": "Net increased",
         "DECREASED": "Net decreased",
-        "NET NONE/ SOME": "Net none/some",
-        "NET MOST/ALL": "Net most/all",
-        "NET BADLY": "Net badly",
-        "NET WELL": "Net well",
         "TOTAL Bribery Rate, Excluding no contact": "Bribery rate, excluding no contact",
         "TOTAL Bribery Rate, Total population": "Bribery rate, total population",
-        "TOTAL Contact Rate": "contact Rate",
+        "TOTAL Contact Rate": "Bribery, contact rate",
     }
 
     tb["answer"] = tb["answer"].replace(answer_mapping).str.lower()
