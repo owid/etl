@@ -2,6 +2,7 @@ meta:
   origin:
     producer: United Nations Office on Drugs and Crime
     title: United Nations Office on Drugs and Crime - Access and Functioning of Justice
+    description: |-
       The tables on access and functioning of justice include national figures on persons suspected/arrested/cautioned, persons prosecuted, and persons convicted for all crimes and for selected crimes. They also include data on persons brought before criminal court by type of legal representation.
 
       National data are submitted by Member States to UNODC through the United Nations Survey of Crime Trends and Operations of Criminal Justice Systems (UN-CTS) or other means.

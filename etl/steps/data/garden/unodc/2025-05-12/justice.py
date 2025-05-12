@@ -22,9 +22,12 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    print(tb["dimension"].unique())
 
+    tb = tb[tb["dimension"] == "by selected crime"]
+    tb = tb.drop("dimension", axis=1)
     # Improve table format.
-    tb = tb.format(["country", "year", "indicator", "dimension", "category", "sex", "age", "unit_of_measurement"])
+    tb = tb.format(["country", "year", "indicator", "category", "sex", "age", "unit_of_measurement"])
 
     #
     # Save outputs.

@@ -16,6 +16,6 @@ tables:
   justice:
     variables:
       value:
-        title: << indicator >>   << dimension >>  << category >> << sex >> << age >> << unit_of_measurement >>
+        title: << indicator >>  << category >> << sex >> << age >> << unit_of_measurement >>
         unit: << unit_of_measurement.lower() >>
 
