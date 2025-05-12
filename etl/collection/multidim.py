@@ -132,11 +132,6 @@ def create_collection(
 
     # Create actual explorer
     if explorer:
-        coll = create_explorer(
-            config=config,
-            dependencies=dependencies,
-            catalog_path=catalog_path,
-        )
         coll = create_collection_from_config(
             config=config,
             dependencies=dependencies,
@@ -147,9 +142,9 @@ def create_collection(
         return cast(Explorer, coll)
     else:
         coll = create_collection_from_config(
-            config,
-            dependencies,
-            catalog_path,
+            config=config,
+            dependencies=dependencies,
+            catalog_path=catalog_path,
         )
 
     # Rename choice names if given
