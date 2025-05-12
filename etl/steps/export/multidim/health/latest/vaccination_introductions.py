@@ -38,25 +38,14 @@ def run() -> None:
     ds = paths.load_dataset("vaccination_introductions")
     tb = ds.read("vaccination_introductions", load_data=False)
 
-    common_view_config = MULTIDIM_CONFIG
-    # 2: Bake config automatically from table
-    config_new = multidim.expand_config(
-        tb,
+    # Create and save collection
+    c = paths.create_collection(
+        config=config,
+        short_name="mdd-vaccination-introductions-who",
+        tb=tb,
         indicator_names=["intro"],
         dimensions=["description"],
         indicators_slug="vaccine",
-        common_view_config=common_view_config,
+        common_view_config=MULTIDIM_CONFIG,
     )
-    # 3: Combine both sources (basically dimensions and views)
-    config["dimensions"] = multidim.combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config.get("dimensions", {}),
-    )
-    config["views"] = config_new["views"]
-
-    # 4: Upsert to DB
-    mdim = paths.create_collection_legacy(
-        config=config,
-        short_name="mdd-vaccination-introductions-who",
-    )
-    mdim.save()
+    c.save()
