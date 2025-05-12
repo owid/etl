@@ -562,6 +562,33 @@ definitions:
     - Ethiopia
     - Madagascar
 
+  gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
+
+  faqs_ipl: &faqs_ipl
+  - fragment_id: poverty-international-poverty-line
+    gdoc_id: "{definitions.gdoc_id}"
+  - fragment_id: poverty-international-dollars
+    gdoc_id: "{definitions.gdoc_id}"
+  - fragment_id: poverty-comparability
+    gdoc_id: "{definitions.gdoc_id}"
+  - fragment_id: poverty-regional-estimates
+    gdoc_id: "{definitions.gdoc_id}"
+
+  faqs_general: &faqs_general
+  - fragment_id: poverty-international-dollars
+    gdoc_id: "{definitions.gdoc_id}"
+  - fragment_id: poverty-comparability
+    gdoc_id: "{definitions.gdoc_id}"
+  - fragment_id: poverty-regional-estimates
+    gdoc_id: "{definitions.gdoc_id}"
+
+  faqs:
+    <% if poverty_line in ["190", "215"] %>
+    *faqs_ipl
+    <% else %>
+    *faqs_general
+    <% endif %>
+
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -596,6 +623,7 @@ tables:
         presentation:
           topic_tags:
             - Poverty
+          faqs: {"definitions.faqs"}
           grapher_config:
             title: "{definitions.headcount_ratio_title}"
             subtitle: "{definitions.poverty_line_subtitle}"
