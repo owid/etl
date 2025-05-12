@@ -12,7 +12,8 @@ from typing_extensions import Self
 import etl.grapher.model as gm
 from etl.collection.explorer.legacy import create_explorer_legacy
 from etl.collection.model import Collection
-from etl.collection.utils import CHART_DIMENSIONS, INDICATORS_SLUG, pruned_json
+from etl.collection.model.base import pruned_json
+from etl.collection.utils import CHART_DIMENSIONS, INDICATORS_SLUG
 from etl.config import OWID_ENV, OWIDEnv
 from etl.paths import EXPORT_EXPLORER_DIR
 
