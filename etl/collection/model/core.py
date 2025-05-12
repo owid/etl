@@ -263,6 +263,12 @@ class Collection(MDIMBase):
 
     def sort_choices(self, slug_order: Dict[str, Union[List[str], Callable]]):
         """Sort choices based on the given order."""
+        not_expected = set(slug_order).difference(self.dimension_slugs)
+        if not_expected:
+            raise ValueError(
+                f"Dimension slug{'s' if len(not_expected) > 1 else ''} {not_expected} not found in dimensions! Available dimensions are: {self.dimension_slugs}"
+            )
+
         for dim in self.dimensions:
             if dim.slug in slug_order:
                 dim.sort_choices(slug_order[dim.slug])
