@@ -135,6 +135,7 @@ tables:
               - Europe and Northern America (UN)
               - Eastern and South-Eastern Asia (UN)
             $schema: https://files.ourworldindata.org/schemas/grapher-schema.003.json
+
       16_5_1__iu_cor_brib__both_sexes:
          title: Share of people who recently paid a bribe or were asked for one
          short_unit: "%"
