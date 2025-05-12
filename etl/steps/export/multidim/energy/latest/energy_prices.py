@@ -4,6 +4,8 @@ from owid.catalog.utils import underscore
 from pandas import DataFrame
 
 from etl.collection import multidim
+from etl.collection.beta import combine_mdims
+from etl.collection.model.view import View
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -133,7 +135,10 @@ def create_stacked_component_views(tb_annual: DataFrame) -> List[Dict[str, Any]]
                             "unit": unit,
                         },
                         "indicators": {
-                            "y": [f"energy_prices_annual#{indicator}" for indicator in indicators],
+                            "y": [
+                                f"{tb_annual.m.dataset.uri}/energy_prices_annual#{indicator}"
+                                for indicator in indicators
+                            ],
                         },
                         "config": {
                             "chartTypes": ["StackedBar"],
@@ -188,29 +193,33 @@ def run() -> None:
 
     # Create standard line/map views
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
-    annual_config = multidim.expand_config(
-        tb_annual.loc[:, use_cols_annual],
+    c1 = paths.create_collection(
+        config=config,
+        tb=tb_annual.loc[:, use_cols_annual],
         indicator_names=["price"],
         dimensions=dimensions,
         common_view_config=common_view_config,
     )
 
-    monthly_config = multidim.expand_config(
-        tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
+    c2 = paths.create_collection(
+        config=config,
+        tb=tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
         indicator_names=["price"],
         dimensions=dimensions,
         common_view_config=common_view_config,
     )
 
-    # Combine standard views
-    config["views"] = annual_config["views"] + monthly_config["views"]
+    # Combine MDIMs
+    c = combine_mdims(
+        mdims=[c1, c2],
+        mdim_name="energy_prices",
+        config=paths.load_mdim_config(),
+    )
 
-    # Create and add stacked component views
+    # Add stacked views
     component_views = create_stacked_component_views(tb_annual)
-    config["views"].extend(component_views)
+    component_views = [View.from_dict(view) for view in component_views]
+    c.views.extend(component_views)
 
-    #
-    # Save outputs.
-    #
-    mdim = paths.create_collection_legacy(config=config)
-    mdim.save()
+    # Save
+    c.save()
