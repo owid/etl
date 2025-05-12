@@ -21,7 +21,7 @@ dimensions:
         name: Total shortfall from poverty line
       - slug: avg_shortfall
         name: Average shortfall ($ per day)
-      - slug: poverty_gap_ratio
+      - slug: income_gap_ratio
         name: Average shortfall (% of poverty line)
       - slug: poverty_gap_index
         name: Poverty gap index
