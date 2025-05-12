@@ -97,7 +97,7 @@ class Explorer(Collection):
         self.sort_choices({"indicator": order})
 
     def upsert_to_db(self, owid_env: OWIDEnv):
-        # TODO: Below code should be replaced at some point with DB-interaction code, as in `etl.collection.multidim.upsert_mdim_data_page`.
+        # TODO: Below code should be replaced at some point with DB-interaction code.
         # Extract Explorer view rows. NOTE: This is for compatibility with current Explorer config structure.
         df_grapher, df_columns = extract_explorers_tables(self)
 

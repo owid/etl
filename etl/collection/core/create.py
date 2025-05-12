@@ -13,14 +13,12 @@ from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.collection.common import (
-    combine_config_dimensions,
-    expand_config,
-)
+from etl.collection.core.combine import combine_config_dimensions
+from etl.collection.core.expand import expand_config
+from etl.collection.core.utils import create_collection_from_config
 from etl.collection.explorer import Explorer
-from etl.collection.model import Collection
+from etl.collection.model.core import Collection
 from etl.collection.utils import (
-    get_tables_by_name_mapping,
     has_duplicate_table_names,
 )
 
@@ -130,65 +128,6 @@ def create_collection(
     _rename_choices(coll, choice_renames)
 
     return coll
-
-
-def process_views(
-    mdim_or_explorer,
-    dependencies: Set[str],
-    combine_metadata_when_mult: bool = False,
-):
-    """Process views in Explorer configuration.
-
-    TODO: See if we can converge to one solution with etl.collection.multidim.process_views.
-    """
-    # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
-    tables_by_name = get_tables_by_name_mapping(dependencies)
-
-    for view in mdim_or_explorer.views:
-        # Expand paths
-        view.expand_paths(tables_by_name)
-
-        # Combine metadata/config with definitions.common_views
-        if (mdim_or_explorer.definitions is not None) and (mdim_or_explorer.definitions.common_views is not None):
-            view.combine_with_common(mdim_or_explorer.definitions.common_views)
-
-        # Combine metadata in views which contain multiple indicators
-        if combine_metadata_when_mult and view.metadata_is_needed:  # Check if view "contains multiple indicators"
-            # TODO
-            # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
-            # log.info(
-            #     f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view.dimensions}"
-            # )
-            pass
-
-
-def create_collection_from_config(
-    config: dict,
-    dependencies: Set[str],
-    catalog_path: str,
-    validate_schema: bool = True,
-    explorer: bool = False,
-) -> Explorer | Collection:
-    # Read config as structured object
-    if explorer:
-        c = Explorer.from_dict(dict(**config, catalog_path=catalog_path))
-    else:
-        c = Collection.from_dict(dict(**config, catalog_path=catalog_path))
-
-    # Edit views
-    process_views(c, dependencies=dependencies)
-
-    # Validate config
-    if validate_schema:
-        c.validate_schema()
-
-    # Ensure that all views are in choices
-    c.validate_views_with_dimensions()
-
-    # Validate duplicate views
-    c.check_duplicate_views()
-
-    return c
 
 
 def _get_expand_path_mode(dependencies, catalog_path_full):

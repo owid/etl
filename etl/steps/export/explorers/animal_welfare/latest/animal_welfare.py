@@ -2,7 +2,7 @@
 
 from copy import deepcopy
 
-from etl.collection.common import expand_config
+from etl.collection import expand_config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.

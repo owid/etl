@@ -2,16 +2,48 @@ import re
 from collections import defaultdict
 from copy import deepcopy
 from itertools import product
-from typing import Any, Dict, List, Set
+from typing import Any, Dict, List, Optional, Set
 
 from owid.catalog import Dataset
+from sqlalchemy.orm import Session
 
+import etl.grapher.model as gm
+from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.files import yaml_dump
 from etl.paths import DATA_DIR
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
 INDICATORS_SLUG = "indicator"
+
+
+# combine
+def records_to_dictionary(records, key: str):
+    """Transform: [{key: ..., a: ..., b: ...}, ...] -> {key: {a: ..., b: ...}, ...}."""
+
+    dix = {}
+    for record in records:
+        assert key in record, f"`{key}` not found in record: {record}!"
+        dix[record[key]] = {k: v for k, v in record.items() if k != key}
+
+    return dix
+
+
+# common, model.core
+def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = None) -> str | int:
+    # Check if given path is actually an ID
+    if str(catalog_path).isdigit():
+        return catalog_path
+
+    # Get ID, assuming given path is a catalog path
+    if owid_env is None:
+        engine = OWID_ENV.engine
+    else:
+        engine = owid_env.engine
+    with Session(engine) as session:
+        db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
+        assert db_indicator.id is not None
+        return db_indicator.id
 
 
 # .load_table_names_from_dependencies

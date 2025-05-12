@@ -15,13 +15,13 @@ from structlog import get_logger
 from typing_extensions import Self
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collection.common import map_indicator_path_to_id
 from etl.collection.exceptions import DuplicateCollectionViews
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
     get_complete_dimensions_filter,
+    map_indicator_path_to_id,
     unique_records,
     validate_indicators_in_db,
 )
