@@ -14,6 +14,10 @@ def run() -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    explorer = paths.create_collection_legacy(config=config, short_name="habitat-loss", explorer=True)
+    explorer = paths.create_collection(
+        config=config,
+        short_name="habitat-loss",
+        explorer=True,
+    )
 
     explorer.save()

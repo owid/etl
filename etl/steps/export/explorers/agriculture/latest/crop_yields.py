@@ -17,7 +17,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new explorer.
-    ds_explorer = paths.create_collection_legacy(
+    ds_explorer = paths.create_collection(
         config=config,
         short_name="crop-yields",
         explorer=True,

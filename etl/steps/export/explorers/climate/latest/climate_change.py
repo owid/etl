@@ -14,7 +14,11 @@ def run() -> None:
     config = paths.load_explorer_config()
 
     # Create explorer
-    ds_explorer = paths.create_collection_legacy(config=config, short_name="climate-change", explorer=True)
+    ds_explorer = paths.create_collection(
+        config=config,
+        short_name="climate-change",
+        explorer=True,
+    )
 
     #
     # Save outputs.
