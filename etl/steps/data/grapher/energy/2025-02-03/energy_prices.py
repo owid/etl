@@ -13,9 +13,5 @@ def run() -> None:
     tb_monthly = ds_garden.read("energy_prices_monthly", reset_index=False)
 
     # Create a new grapher dataset.
-    dataset = paths.create_dataset(
-        tables=[tb_annual, tb_monthly],
-        check_variables_metadata=True,
-        default_metadata=ds_garden.metadata,
-    )
+    dataset = paths.create_dataset(tables=[tb_annual, tb_monthly], default_metadata=ds_garden.metadata)
     dataset.save()
