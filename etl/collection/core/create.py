@@ -1,13 +1,7 @@
-"""TODO:
-
-- Structure MDIM config and related objects in a more pythonic way (e.g. dataclass).
-- Need to be able to quickly validate the configs against schemas.
-- We should try to keep explorers in mind, and see this tooling as something we may want to use for them, too.
-"""
+"""Methods and tools to create collections of indicators."""
 
 import inspect
 from copy import deepcopy
-from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
 
 from owid.catalog import Table
@@ -18,50 +12,10 @@ from etl.collection.core.expand import expand_config
 from etl.collection.core.utils import create_collection_from_config
 from etl.collection.explorer import Explorer
 from etl.collection.model.core import Collection
-from etl.collection.utils import (
-    has_duplicate_table_names,
-)
+from etl.collection.utils import has_duplicate_table_names
 
 # Initialize logger.
 log = get_logger()
-
-
-class CollectionSet:
-    def __init__(self, path: Path):
-        self.path = path
-        self.mdims = self._build_dictionary()
-
-    def _build_dictionary(self) -> Dict[str, Path]:
-        dix = {}
-        paths = self.path.glob(r"*.config.json")
-        for p in paths:
-            name = p.name.replace(".config.json", "")
-            dix[name] = p
-        return dix
-
-    def read(self, mdim_name: str):
-        # Check mdim exists
-        if mdim_name not in self.mdims:
-            raise ValueError(
-                f"MDIM name not available. Available options are {self.names}. If this does not make sense to you, try running the necessary steps to re-export files to {self.path}"
-            )
-
-        # Read MDIM
-        path = self.mdims[mdim_name]
-        try:
-            mdim = Collection.load(str(path))
-        except TypeError as e:
-            # This is a workaround for the TypeError that occurs when loading the config file.
-            raise TypeError(
-                f"Error loading MDIM config file. Please check the file format and ensure it is valid JSON. Suggestion: Re-run export step generating {mdim_name}. Error: {e}"
-            )
-
-        # Get and set catalog path
-        return mdim
-
-    @property
-    def names(self):
-        return list(sorted(self.mdims.keys()))
 
 
 def create_collection(

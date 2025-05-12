@@ -1,4 +1,7 @@
-"""Logic and code to combine multiple collections (MDIMs or Explorers) into a single one."""
+"""Logic and code to combine multiple collections (MDIMs or Explorers) into a single one.
+
+Additional: combine dimensions (using raw dictionaries)
+"""
 
 from copy import deepcopy
 from typing import Any, Dict, List, Mapping, Optional, Set, Tuple, Union

@@ -1,3 +1,8 @@
+"""Utils
+
+NOTE: Should not import from any other submodule in etl.collection.
+"""
+
 import re
 from collections import defaultdict
 from copy import deepcopy
