@@ -6,7 +6,7 @@ definitions:
         - Global Education
 
   desc_key_ger: &desc_key_ger
-    - Many students are enrolled in school at different ages—this indicator shows how many are participating in a given level of education, regardless of whether they are the “right” age for it.
+    - Not all students enroll in school at the same age. This indicator shows how many students are attending a certain level of education, regardless of whether they are considered to be within the expected age range for that level.
     - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
     - For example, if upper secondary school is designed for ages 15 to 17, the *gross enrolment ratio* compares total enrolment at that level to the population of 15- to 17-year-olds.
     - A high value means many people are accessing education at that level, but it doesn’t necessarily mean that they are in the appropriate grade for their age.
@@ -22,7 +22,7 @@ definitions:
     - The literacy rate is calculated by dividing the number of literate persons by the total number of individuals in the same age group, excluding those with unknown literacy status.
     - A high literacy rate signals that most people have acquired basic reading and writing skills, often through primary education or literacy programs. Low rates may indicate gaps in access, retention, or effectiveness of foundational education.
     - Data typically come from population censuses or household surveys and are often self-reported. In some countries, respondents may be asked to read or write a simple sentence or complete basic tasks to verify literacy.
-    - The UIS and its partners also use statistical models to estimate literacy rates for years or regions where recent data are not available, supporting regional and global comparisons.
+    - The UNESCO Institute for Statistics (UIS) and its partners also use statistical models to estimate literacy rates for years or regions where recent data are not available, supporting regional and global comparisons.
     - For most countries literacy is self-reported but there may be some challenges associated to changes over time in a given country and to differences in definition across countries.
     - Literacy should not be confused with functional literacy. This indicator reflects basic abilities but does not measure whether individuals can apply these skills effectively in daily life, work, or learning.
 # Learn more about the available fields:
@@ -168,7 +168,7 @@ tables:
           - The *adjusted gender parity index (GPIA)* is calculated by dividing the female youth literacy rate by the male youth literacy rate. If the result exceeds 1, it is inverted and subtracted from 2, producing a scale from 0 to 2, with 1 indicating parity.
           - A GPIA value of 1 means young men and women are equally likely to be literate. A value below 1 indicates a gap in favor of males, and a value above 1 suggests a gap in favor of females.
           - Literacy is usually defined as the ability to both read and write a short, simple sentence with understanding. The rate is based on self-reported data or, in some cases, assessed through basic reading or writing tasks.
-          - Data sources include national censuses and household surveys. The UIS and partners may also use modelled estimates when recent or complete data are not available.
+          - Data sources include national censuses and household surveys. The UNESCO Institute for Statistics (UIS) and partners may also use modelled estimates when recent or complete data are not available.
           - This indicator measures basic literacy, not functional literacy. It reflects the presence of foundational skills, but not whether they are applied effectively in everyday contexts.
           - Cross-country comparability may be affected by differences in definitions, data collection methods, and the extent to which responses are self-reported or verified.
         presentation:
@@ -310,7 +310,7 @@ tables:
           - The indicator is calculated by dividing total government expenditure on education by the country's gross domestic product (GDP) and multiplying by 100.
           - A higher value suggests a stronger policy commitment to education and potentially greater availability of funding for schools, teachers, materials, and infrastructure.
           - The Education 2030 Framework for Action recommends allocating at least 4% to 6% of GDP to education as a benchmark for sufficient public investment.
-          - Data on education expenditure are gathered from national finance or education ministries through the annual UIS education survey or the UNESCO-OECD-Eurostat (UOE) collection.
+          - Data on education expenditure are gathered from national finance or education ministries through the annual UNESCO Institute for Statistics (UIS) education survey or the UNESCO-OECD-Eurostat (UOE) collection.
           - GDP data come from the World Bank’s World Development Indicators and are updated quarterly, with the June release typically used for reporting this indicator.
           - Disaggregated values by level of education (e.g. primary, secondary) can reveal how resources are distributed across the system.
           - While useful for comparing education investment across countries, the indicator may underestimate total spending if education budgets from ministries other than the Ministry of Education are not included.
