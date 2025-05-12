@@ -205,6 +205,16 @@ def _get_mdim_views(db_mdim: gm.MultiDimDataPage) -> list[dict]:
     return views
 
 
+@st.fragment
+def display_mdim_comparison(source_mdim):
+    explorer_views = _get_mdim_views(source_mdim)
+    view = _display_view_options(source_mdim.slug, explorer_views)
+
+    # Step 2: Display MDIM comparison
+    st.warning("If you see **Sorry, that page doesn’t exist!**, it means the MDIM has not been published yet.")
+    _display_mdim_comparison(source_mdim.slug, source_mdim.catalogPath, view)
+
+
 def main():
     st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
     st.title(
@@ -233,12 +243,8 @@ def main():
     assert source_mdim.slug, f"MDIM slug does not exist for {mdim_catalog_path}"
     assert source_mdim.catalogPath, f"MDIM catalogPath does not exist for {mdim_catalog_path}"
 
-    explorer_views = _get_mdim_views(source_mdim)
-    view = _display_view_options(source_mdim.slug, explorer_views)
-
     # Step 2: Display MDIM comparison
-    st.warning("If you see **Sorry, that page doesn’t exist!**, it means the MDIM has not been published yet.")
-    _display_mdim_comparison(source_mdim.slug, source_mdim.catalogPath, view)
+    display_mdim_comparison(source_mdim)
 
     # Step 3: Display config diff
     _display_config_diff(source_mdim.config, target_mdim.config)
