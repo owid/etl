@@ -79,6 +79,7 @@ tables:
             title_public: Share of firms expected to bribe secure government contracts
           display:
             name: Government contracts
+
       percent_of_firms_expected_to_give_gifts_to_get_an_operating_license:
           title: Share of firms expected to give bribes to obtain an operating license
           description_short: Percent of firms expected to give bribes to get an operating license.
