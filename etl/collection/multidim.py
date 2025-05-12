@@ -72,19 +72,6 @@ class CollectionSet:
         return list(sorted(self.mdims.keys()))
 
 
-def create_mdim(
-    config: dict,
-    dependencies: Set[str],
-    catalog_path: str,
-) -> Collection:
-    coll = create_collection_from_config(
-        config,
-        dependencies,
-        catalog_path,
-    )
-    return coll
-
-
 def create_explorer(
     config: dict,
     dependencies: Set[str],
@@ -150,12 +137,21 @@ def create_collection(
             dependencies=dependencies,
             catalog_path=catalog_path,
         )
-    else:
-        coll = create_mdim(
+        coll = create_collection_from_config(
             config=config,
             dependencies=dependencies,
             catalog_path=catalog_path,
+            validate_schema=False,
+            explorer=True,
         )
+        return cast(Explorer, coll)
+    else:
+        coll = create_collection_from_config(
+            config,
+            dependencies,
+            catalog_path,
+        )
+
     # Rename choice names if given
     _rename_choices(coll, choice_renames)
 

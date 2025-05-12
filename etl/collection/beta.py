@@ -29,7 +29,7 @@ from structlog import get_logger
 from etl.collection.explorer import Explorer, create_explorer
 from etl.collection.model import Collection
 from etl.collection.model.dimension import Dimension, DimensionChoice
-from etl.collection.multidim import create_mdim
+from etl.collection.multidim import create_collection_from_config
 
 log = get_logger()
 
@@ -266,7 +266,7 @@ def combine_mdims(
     config["views"] = views
 
     # 4) Create final explorer #
-    mdim = create_mdim(
+    mdim = create_collection_from_config(
         config=config,
         dependencies=dependencies if dependencies is not None else set(),
         catalog_path=catalog_path,
