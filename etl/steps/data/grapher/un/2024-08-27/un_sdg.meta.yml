@@ -138,7 +138,7 @@ tables:
 
   _16_5_1__iu_cor_brib__both_sexes:
     variables:
-      16_5_1__iu_cor_brib__both_sexes:
+      _16_5_1__iu_cor_brib__both_sexes:
          title: Share of people who recently paid a bribe or were asked for one
          short_unit: "%"
          unit: "%"
