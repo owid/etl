@@ -1,0 +1,62 @@
+title:
+  title: Poverty indicators
+  title_variant: World Bank
+default_selection:
+  - Bangladesh
+  - Bolivia
+  - Madagascar
+  - India
+  - China
+  - Ethiopia
+
+dimensions:
+  - name: Indicator
+    slug: indicator
+    choices:
+      - slug: headcount_ratio
+        name: Share in poverty
+      - slug: headcount
+        name: Number in poverty
+  - name: Poverty line
+    slug: poverty_line
+    choices:
+      - slug: "100"
+        name: $1 a day
+      - slug: "215"
+        name: $2.15 a day
+        description: International Poverty Line
+      - slug: "365"
+        name: $3.65 a day
+        description: Lower-middle-income poverty line
+      - slug: "685"
+        name: $6.85 a day
+        description: Upper-middle-income poverty line
+      - slug: "1000"
+        name: $10 a day
+      - slug: "2000"
+        name: $20 a day
+      - slug: "3000"
+        name: $30 a day
+        description: High-income poverty line
+      - slug: "4000"
+        name: $40 a day
+      - slug: 40% of the median
+        name: 40% of the median
+        description: Relative poverty
+      - slug: 50% of the median
+        name: 50% of the median
+        description: Relative poverty
+      - slug: 60% of the median
+        name: 60% of the median
+        description: Relative poverty
+
+  - name: Household survey data type
+    slug: table
+    choices:
+      - slug: "Income or consumption consolidated"
+        name: "Show data for both income and consumption"
+      - slug: "Income"
+        name: "Income surveys only"
+      - slug: "Consumption"
+        name: "Consumption surveys only"
+views: []

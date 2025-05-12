@@ -21,6 +21,8 @@ steps:
     - data://meadow/wb/2025-04-08/world_bank_pip
   data://grapher/wb/2025-04-14/world_bank_pip_dimensional:
     - data://garden/wb/2025-04-14/world_bank_pip_dimensional
+  export://multidim/wb/latest/world_bank_pip:
+    - data://grapher/wb/2025-04-14/world_bank_pip_dimensional
 
   # World Inequality Database
   data://meadow/wid/2025-03-14/world_inequality_database:
