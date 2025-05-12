@@ -2,7 +2,7 @@
 
 from typing import Any, Dict, List, Optional, Union, cast
 
-from etl.collection.combine import combine_collections
+from etl.collection import combine_collections
 from etl.collection.explorer import Explorer
 from etl.helpers import PathFinder
 

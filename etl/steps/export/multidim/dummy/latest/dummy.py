@@ -1,6 +1,6 @@
 """This is an example on how you can read another MDIM and create a new one based on it."""
 
-from etl.collection.combine import combine_collections
+from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
