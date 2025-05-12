@@ -698,6 +698,14 @@ steps:
   data://grapher/aviation/2025-04-01/air_traffic:
     - data://garden/aviation/2025-04-01/air_traffic
 
+  # UNODC - Access and Functioning of Justice
+  data://meadow/unodc/2025-05-12/justice:
+    - snapshot://unodc/2025-05-12/justice.xlsx
+  data://garden/unodc/2025-05-12/justice:
+    - data://meadow/unodc/2025-05-12/justice
+  data://grapher/unodc/2025-05-12/justice:
+    - data://garden/unodc/2025-05-12/justice
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
