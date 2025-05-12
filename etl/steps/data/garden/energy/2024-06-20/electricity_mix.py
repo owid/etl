@@ -13,7 +13,7 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.data_helpers.geo import add_population_to_table
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
@@ -402,17 +402,17 @@ def fix_discrepancies_in_aggregate_regions(tb_review: Table, tb_ember: Table, co
     return combined
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load EI's statistical review dataset and read its main table.
     ds_review = paths.load_dataset("statistical_review_of_world_energy")
-    tb_review = ds_review["statistical_review_of_world_energy"]
+    tb_review = ds_review.read("statistical_review_of_world_energy", reset_index=False)
 
     # Load Ember's yearly electricity dataset and read its main table.
     ds_ember = paths.load_dataset("yearly_electricity")
-    tb_ember = ds_ember["yearly_electricity"]
+    tb_ember = ds_ember.read("yearly_electricity", reset_index=False)
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
@@ -487,5 +487,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[combined], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[combined])
     ds_garden.save()

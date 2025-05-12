@@ -1,18 +1,18 @@
 """Grapher step for the primary energy consumption dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("primary_energy_consumption")
-    tb_garden = ds_garden["primary_energy_consumption"].reset_index()
+    tb_garden = ds_garden.read("primary_energy_consumption")
 
     #
     # Process data.
@@ -26,5 +26,5 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    ds_grapher = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_grapher = paths.create_dataset(tables=[tb])
     ds_grapher.save()

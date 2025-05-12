@@ -110,5 +110,5 @@ def run() -> None:
     # Save outputs.
     #
     # Create a new dataset with the same metadata as meadow
-    ds_garden = paths.create_dataset(tables=[tb_annual, tb_monthly], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_annual, tb_monthly])
     ds_garden.save()

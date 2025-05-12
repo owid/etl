@@ -3,7 +3,7 @@ from owid.catalog import Dataset, Table, Variable
 from owid.datautils import dataframes
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -182,13 +182,13 @@ def create_patents_by_sub_technology(tb: Table) -> Table:
     return patents_by_sub_technology
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load meadow dataset and read its main table.
     ds_meadow = paths.load_dataset("renewable_energy_patents")
-    tb_meadow = ds_meadow["renewable_energy_patents"].reset_index()
+    tb_meadow = ds_meadow.read("renewable_energy_patents")
 
     # Load income groups dataset.
     ds_income_groups = paths.load_dataset("income_groups")
@@ -209,7 +209,7 @@ def run(dest_dir: str) -> None:
     tb = add_region_aggregates(tb=tb, ds_regions=ds_regions, ds_income_groups=ds_income_groups)
 
     # Set an appropriate index to main table and sort conveniently.
-    tb = tb.set_index(["country", "year", "sector", "technology", "sub_technology"], verify_integrity=True).sort_index()
+    tb = tb.format(keys=["country", "year", "sector", "technology", "sub_technology"])
 
     # Create a new, simplified table, that shows number of patents by sub-technology.
     patents_by_sub_technology = create_patents_by_sub_technology(tb=tb)
@@ -218,5 +218,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb, patents_by_sub_technology], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb, patents_by_sub_technology])
     ds_garden.save()
