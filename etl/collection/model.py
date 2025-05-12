@@ -488,7 +488,10 @@ class Dimension(MDIMBase):
         """Validate that all choice names are unique."""
         slug = [choice.slug for choice in self.choices]
         if len(slug) != len(set(slug)):
-            raise ValueError(f"Dimension choices for '{self.slug}' must have unique names! Review {self.choice_slugs}")
+            non_unique = set([s for s in slug if slug.count(s) > 1])
+            raise ValueError(
+                f"Dimension choices for '{self.slug}' must have unique slugs! Non-unique slugs: {non_unique}. Review {self.choice_slugs}"
+            )
 
 
 T = TypeVar("T")

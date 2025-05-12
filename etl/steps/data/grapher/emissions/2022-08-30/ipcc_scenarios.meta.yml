@@ -28,7 +28,6 @@ definitions:
         SSP5 - 4.5: Fossil-fueled Development - Taking the Highway
         SSP5 - 6.0: Fossil-fueled Development - Taking the Highway
         SSP5 - Baseline: Fossil-fueled Development - Taking the Highway
-
 tables:
   ipcc_scenarios:
     variables:

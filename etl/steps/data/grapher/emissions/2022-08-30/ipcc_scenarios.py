@@ -72,10 +72,10 @@ def process_region(combined: Table, naming: Table, scenario_naming: Table, annot
         # TODO: unify inconsistent naming
         if col.startswith("secondary_energy_"):
             new_col = col + "_share"
-            tb[new_col] = tb[col] / tb["secondary_energy_elec"]
+            tb[new_col] = tb[col] / tb["secondary_energy_elec"] * 100
         elif col.startswith("primary_energy_"):
             new_col = "primary_energy_share_" + col.replace("primary_energy_", "")
-            tb[new_col] = tb[col] / tb["primary_energy"]
+            tb[new_col] = tb[col] / tb["primary_energy"] * 100
 
     # Rename some columns
     # TODO: this is for backward compatibility, remove in the future
@@ -87,13 +87,14 @@ def process_region(combined: Table, naming: Table, scenario_naming: Table, annot
         }
     )
 
-    # Add kwh columns
-    tb["final_elec_kwh"] = tb["final_energy_elec"] * 1000
-    tb["secondary_energy_elec_kwh"] = tb["secondary_energy_elec"] * 1000
+    # Convert TWh to kWh
+    twh_to_kwh = 1e9
+    tb["final_elec_kwh"] = tb["final_energy_elec"] * twh_to_kwh
+    tb["secondary_energy_elec_kwh"] = tb["secondary_energy_elec"] * twh_to_kwh
     for col in tb.columns:
         if any(col.startswith(prefix) for prefix in ("final_energy", "secondary_energy", "primary_energy")):
             new_col = col + "_kwh"
-            tb[new_col] = tb[col] * 1000
+            tb[new_col] = tb[col] * twh_to_kwh
 
     # Calculate per capita metrics
     tb["gdp_per_capita"] = tb["gdp"] / tb["population"]
@@ -121,8 +122,6 @@ def process(snap):
     # Read input files from archive
     combined = snap.read_from_archive("ipcc.csv", encoding="latin1")
     combined = combined.drop(columns=["MODEL"])
-
-    # Convert units
 
     naming = snap.read_from_archive("variable_naming.csv", encoding="latin1")
     scenario_naming = snap.read_from_archive("scenario_naming.csv", encoding="latin1")

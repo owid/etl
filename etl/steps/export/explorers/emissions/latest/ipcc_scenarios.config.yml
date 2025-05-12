@@ -78,8 +78,6 @@ dimensions:
         name: Forcing from aerosols
       - slug: carbon_dioxide__co2
         name: Carbon dioxide (CO₂)
-      - slug: methane__ch4
-        name: Methane (CH4)
       - slug: nitrous_oxide__n2o
         name: Nitrous oxide (N₂O)
       - slug: methane__ch4
