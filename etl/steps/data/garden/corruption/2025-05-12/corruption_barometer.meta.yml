@@ -1,11 +1,6 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
   common:
-    processing_level: minor
-    unit: "%"
-    short_unit: "%"
-    display:
-     numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Corruption
@@ -53,4 +48,8 @@ tables:
             <%- if question != "Bribary rate" and institution != "Not applicable" %>
             << institution >>
             <%- endif -%>
+          numDecimalPlaces: 1
+        processing_level: minor
+        unit: "%"
+        short_unit: "%"
 
