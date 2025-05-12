@@ -34,40 +34,16 @@ def run() -> None:
     ds = paths.load_dataset("migration_stock_flows")
     tb = ds.read("migrant_stock_dest_origin", load_data=False)
 
-    # add country names and slugs to the config
-    cty_idx = [i for i, d in enumerate(config["dimensions"]) if d["slug"] == "country_select"][0]
-
-    all_countries = [tb[col].dimensions["country_select"] for col in tb.columns if col not in ["year", "country"]]
-    all_countries = sorted(list(set(all_countries)))
-    cty_dict_ls = [{"slug": c.lower(), "name": c} for c in all_countries]
-    config["dimensions"][cty_idx]["choices"] = cty_dict_ls
-
-    # Define common view configuration
-    common_view_config = MULTIDIM_CONFIG
-
-    # Bake config automatically from table
-    config_new = multidim.expand_config(
-        tb,  # type: ignore
+    # Create collection
+    c = paths.create_collection(
+        config=config,
+        tb=tb,
+        short_name="migration-flows",
         indicator_names=["migrants"],
         dimensions=["country_select", "metric", "gender"],
-        common_view_config=common_view_config,
+        common_view_config=MULTIDIM_CONFIG,
     )
-
-    # Combine both sources
-    config["dimensions"] = multidim.combine_config_dimensions(
-        config_dimensions=config_new["dimensions"],
-        config_dimensions_yaml=config.get("dimensions", {}),
-    )
-    config["views"] = config_new["views"]
-
-    # Create mdim
-    mdim = paths.create_collection_legacy(
-        config=config,
-        short_name="migration-flows",
-    )
-
-    # Edit order of slugs
-    mdim.sort_choices({"country_select": lambda x: sorted(x)})
+    c.sort_choices({"country_select": lambda x: sorted(x)})
 
     # Save & upload
-    mdim.save()
+    c.save()
