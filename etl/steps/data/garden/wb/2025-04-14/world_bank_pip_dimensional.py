@@ -210,9 +210,8 @@ def run() -> None:
     tb["survey_comparability"] = tb["survey_comparability"].astype(str)
     tb["survey_comparability"] = tb["survey_comparability"].replace("<NA>", "No spells")
 
-    # TODO: Check if this is working
-    # Drop empty rows in welfare_type. We miss the regional aggregates except for the consolidated table
-    tb = tb.dropna(subset=["welfare_type"], ignore_index=True)
+    # Do the same for poverty_line
+    tb["poverty_line"] = tb["poverty_line"].fillna("No poverty line")
 
     # Improve table format.
     tb = tb.format(
