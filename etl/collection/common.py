@@ -9,12 +9,11 @@ from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
 from etl.collection.utils import (
+    INDICATORS_SLUG,
     get_tables_by_name_mapping,
     records_to_dictionary,
 )
 from etl.config import OWID_ENV, OWIDEnv
-
-INDICATORS_SLUG = "indicator"
 
 
 def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = None) -> str | int:

@@ -10,21 +10,11 @@ from sqlalchemy.orm import Session
 from typing_extensions import Self
 
 import etl.grapher.model as gm
-from etl.collection.common import (
-    INDICATORS_SLUG,
-    combine_config_dimensions,
-    expand_config,
-)
 from etl.collection.explorer.legacy import create_explorer_legacy
 from etl.collection.model import Collection
-from etl.collection.utils import CHART_DIMENSIONS, pruned_json
+from etl.collection.utils import CHART_DIMENSIONS, INDICATORS_SLUG, pruned_json
 from etl.config import OWID_ENV, OWIDEnv
 from etl.paths import EXPORT_EXPLORER_DIR
-
-__all__ = [
-    "expand_config",
-    "combine_config_dimensions",
-]
 
 
 @pruned_json

@@ -11,6 +11,7 @@ from etl.files import yaml_dump
 from etl.paths import DATA_DIR
 
 CHART_DIMENSIONS = ["y", "x", "size", "color"]
+INDICATORS_SLUG = "indicator"
 
 
 def records_to_dictionary(records, key: str):
