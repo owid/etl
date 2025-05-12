@@ -137,6 +137,7 @@ def create_collection(
         config["dimensions"] = combine_config_dimensions(
             config_dimensions=config_auto["dimensions"],
             config_dimensions_yaml=config["dimensions"],
+            # Should be `config_dimensions_yaml=config.get("dimensions", {}),`?
         )
 
         # Add views
