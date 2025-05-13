@@ -8,6 +8,7 @@ TODO: only works for ETL-based datasets.
 from collections import defaultdict
 
 import streamlit as st
+from pygwalker.api.streamlit import StreamlitRenderer
 
 from apps.wizard.app_pages.dataset_preview.dependency_graph import load_dag_cached, show_modal_dependency_graph
 from apps.wizard.app_pages.dataset_preview.utils import (
@@ -21,6 +22,7 @@ from apps.wizard.app_pages.dataset_preview.utils import (
     get_table_charts,
     get_table_explorers,
     get_users,
+    load_dataset_from_etl,
     show_table_charts,
     show_table_explorers,
 )
@@ -129,7 +131,7 @@ def prompt_display_charts():
     """Show charts or not."""
     if "display_charts" in st.session_state:
         st.query_params["displayCharts"] = str(st.session_state["display_charts"])
-    show_charts = st.query_params.get("displayCharts", "True") == "True"
+    show_charts = st.query_params.get("displayCharts", "False") == "True"
     return st.checkbox(
         "Display charts",
         key="display_charts",
@@ -210,9 +212,14 @@ def st_show_indicator(indicator, indicator_charts, display_charts=True):
                 grapher_chart(variable_id=iid, tab="map")  # type: ignore
 
 
+@st.cache_data
+def read_table(ds, name):
+    return ds.read(name)
+
+
 # CONFIG
 st.set_page_config(
-    # page_title="Wizard: Dataset Explorer",
+    page_title="Wizard: Dataset Explorer",
     layout="wide",
     page_icon="🪄",
     # initial_sidebar_state="collapsed",
@@ -289,7 +296,7 @@ if DATASET_ID is not None:
         show_dependency_btn()
 
         # 4/ Tabs
-        tab_indicators, tab_charts = st.tabs(["Indicators", "Charts"])
+        tab_indicators, tab_charts, tb_explore = st.tabs(["Indicators", "Charts", "Explore data"])
 
         with tab_indicators:
             # Apply filters / sorting
@@ -318,3 +325,21 @@ if DATASET_ID is not None:
             st.markdown("#### Most frequent chart editors")
             user_counts = df_charts["User"].value_counts()
             st.dataframe(user_counts, use_container_width=True)
+
+        with tb_explore:
+            # Load dataset
+            uri = f"data://garden/{dataset['catalogPath']}"
+            ds = load_dataset_from_etl(uri)
+
+            if ds is not None:
+                tb_names = ds.table_names
+                if len(tb_names) == 1:
+                    tb_name = tb_names[0]
+                else:
+                    st.warning(f"Need to choose from {tb_names}")
+                    tb_name = tb_names[0]
+
+                tb = read_table(ds, tb_name)
+
+                app = StreamlitRenderer(tb)
+                app.explorer()
