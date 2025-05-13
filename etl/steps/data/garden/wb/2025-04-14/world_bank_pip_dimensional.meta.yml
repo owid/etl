@@ -571,8 +571,14 @@ definitions:
     - Ethiopia
     - Madagascar
 
+  # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
+  # For indicators created exclusively for the consolidated dataset, to avoid long dataset names
+  short_title: |-
+    <% if poverty_line != "No poverty line" %>
+     {definitions.poverty_line}, <<welfare_type>>, <<table>>, <<survey_comparability>>
+    <%- endif %>
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -1578,7 +1584,7 @@ tables:
 
       # ADDITIONAL VARIABLES
       surveys_past_decade:
-        title: Number of surveys in the past decade
+        title: Number of surveys in the past decade{definitions.short_title}
         unit: "surveys"
         short_unit: ""
         description_short: The number of income or consumption surveys available in the past decade. Each decade comprises the current year and the nine years before.
@@ -1593,7 +1599,7 @@ tables:
           <<: *common_display
 
       region_name:
-        title: World Bank PIP region
+        title: World Bank PIP region{definitions.short_title}
         unit: ""
         short_unit: ""
         description_short: Regions of the world as defined by the World Bank Poverty and Inequality Platform (PIP).
