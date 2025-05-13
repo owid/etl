@@ -20,6 +20,9 @@ dimensions:
       - slug: "state-based"
         name: "All"
         description: All conflicts involving states
+      - slug: "state-based-stacked"
+        name: "All (breakdown)"
+        description: Breakdown by conflict type
       - slug: "interstate"
         name: "Interstate conflicts"
         description: Between states
@@ -37,6 +40,8 @@ dimensions:
     choices:
       - slug: best
         name: Best estimate
+      - slug: best-ci
+        name: Best estimate (with CI)
       - slug: low
         name: Low estimate
       - slug: high
