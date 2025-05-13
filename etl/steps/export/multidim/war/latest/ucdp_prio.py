@@ -31,7 +31,7 @@ def run() -> None:
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds_up = paths.load_dataset("ucdp_prio")
-    ds_u = paths.load_dataset("ucdp")
+    # ds_u = paths.load_dataset("ucdp")
     tb_up = ds_up.read("ucdp_prio", load_data=False)
     # tb_u = ds_u.read("ucdp", load_data=False)
 
