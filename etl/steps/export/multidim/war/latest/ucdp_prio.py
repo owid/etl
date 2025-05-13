@@ -1,28 +1,9 @@
 # from etl.db import get_engine
+from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
-
-# INDICATOR dimension (columns starting with this prefix)
-DIMENSION_INDICATOR = {
-    # Deaths
-    "number_deaths_ongoing_conflicts__": "deaths",
-    "number_deaths_ongoing_conflicts_high__": "deaths",
-    "number_deaths_ongoing_conflicts_low__": "deaths",
-    # Death rate
-    "number_deaths_ongoing_conflicts_per_capita": "death_rate",
-    "number_deaths_ongoing_conflicts_high_per_capita": "death_rate",
-    "number_deaths_ongoing_conflicts_low_per_capita": "death_rate",
-    # New wars: number
-    # "number_new_conflicts__": "wars_new",
-    # "number_new_conflicts_per_country": "wars_new_country_rate",
-    # "number_new_conflicts_per_country_pair": "wars_new_country_pair_rate",
-    # # Ongoing wars: number
-    # "number_ongoing_conflicts__": "wars_ongoing",
-    # "number_ongoing_conflicts_per_country": "wars_ongoing_country_rate",
-    # "number_ongoing_conflicts_per_country_pair": "wars_ongoing_country_pair_rate",
-}
 
 
 def run() -> None:
@@ -30,22 +11,29 @@ def run() -> None:
     config = paths.load_collection_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
+    ## UCDP/PRIO
     ds_up = paths.load_dataset("ucdp_prio")
-    # ds_u = paths.load_dataset("ucdp")
     tb_up = ds_up.read("ucdp_prio", load_data=False)
-    # tb_u = ds_u.read("ucdp", load_data=False)
+    ## UCDP
+    ds_u = paths.load_dataset("ucdp")
+    tb_ucdp = ds_u.read("ucdp", load_data=False)
 
-    tb_up = adjust_dimensions(tb_up)
+    # Filter unnecessary columns
+    tb_ucdp = tb_ucdp.filter(regex="^country|^year|^number_ongoing_conflicts")
 
-    # Create collection
-    c = paths.create_collection(
+    # Adjust dimension metadata
+    ## UCDP/PRIO
+    tb_up = adjust_dimensions_ucdp_prio(tb_up)
+    ## UCDP
+    tb_ucdp = adjust_dimensions_ucdp(tb_ucdp)
+
+    # Create collections
+    c = create_collection_multiple_tables(
+        tbs=[tb_up, tb_ucdp],
         config=config,
-        tb=tb_up,
         indicator_names=[
-            "deaths",
-            "death_rate",
-            # "wars_ongoing",
-            # "wars_ongoing_country_rate",
+            ["deaths", "death_rate"],
+            ["wars_ongoing", "wars_ongoing_country_rate"],
         ],
         dimensions={
             "conflict_type": [
@@ -118,12 +106,61 @@ def run() -> None:
     c.save()
 
 
-def adjust_dimensions(tb):
+def create_collection_multiple_tables(tbs, config, indicator_names, dimensions, common_view_config):
+    """This function should be migrated somewhere for everyone to use.
+
+    It is trying to support creation of Collections based on multiple tables.
+
+    Ideas:
+        - tbs: List[Table]
+        - indicator_names:
+            List[List[str]]: Each element contains the indicator names for the corresponding table. Length of indicator_names should match the length of tbs.
+            List[str]: A single list of indicator names. It should be applicable to all tables (i.e. all tables should have these indicator names).
+        - config: ? unclear
+        - dimensions: Similar behavior as indicator_names.
+        - common_view_config: Similar behavior as indicator_names.
+
+        Possibly more arguments needed to match create_collection and combine_collections.
+    """
+    # Create collections
+    collections = []
+    for tb, names in zip(tbs, indicator_names):
+        c_ = paths.create_collection(
+            config=config,
+            tb=tb,
+            indicator_names=names,
+            dimensions=dimensions,
+            common_view_config=common_view_config,
+        )
+        collections.append(c_)
+
+    c = combine_collections(
+        collections=collections,
+        collection_name=paths.short_name,  # Optional: add option to force a certain short_name
+        config=config,
+    )
+
+    return c
+
+
+def adjust_dimensions_ucdp_prio(tb):
     """Add dimensions to table columns.
 
     It adds field `indicator` and `estimate`.
     """
     # 1. Adjust indicators dictionary reference (maps full column name to actual indicator)
+    # INDICATOR dimension (columns starting with this prefix)
+    DIMENSION_INDICATOR = {
+        # Deaths
+        "number_deaths_ongoing_conflicts__": "deaths",
+        "number_deaths_ongoing_conflicts_high__": "deaths",
+        "number_deaths_ongoing_conflicts_low__": "deaths",
+        # Death rate
+        "number_deaths_ongoing_conflicts_per_capita": "death_rate",
+        "number_deaths_ongoing_conflicts_high_per_capita": "death_rate",
+        "number_deaths_ongoing_conflicts_low_per_capita": "death_rate",
+    }
+
     dims = {}
     for prefix, indicator_name in DIMENSION_INDICATOR.items():
         columns = list(tb.filter(regex=prefix).columns)
@@ -146,6 +183,47 @@ def adjust_dimensions(tb):
         # Add 'NA'
         else:
             tb[col].metadata.dimensions["estimate"] = "best"
+
+    # 3. Adjust table-level dimension metadata
+    if isinstance(tb.metadata.dimensions, list):
+        tb.metadata.dimensions.append(
+            {
+                "name": "estimate",
+                "slug": "estimate",
+            }
+        )
+    return tb
+
+
+def adjust_dimensions_ucdp(tb):
+    """Add dimensions to table columns.
+
+    It adds field `indicator` and `estimate`.
+    """
+    # INDICATOR dimension (columns starting with this prefix)
+    DIMENSION_INDICATOR = {
+        # # Ongoing wars: number
+        "number_ongoing_conflicts__": "wars_ongoing",
+        "number_ongoing_conflicts_per_country": "wars_ongoing_country_rate",
+        "number_ongoing_conflicts_per_country_pair": "wars_ongoing_country_pair_rate",
+    }
+
+    # 1. Adjust indicators dictionary reference (maps full column name to actual indicator)
+    dims = {}
+    for prefix, indicator_name in DIMENSION_INDICATOR.items():
+        columns = list(tb.filter(regex=prefix).columns)
+        dims = {**dims, **{c: indicator_name for c in columns}}
+
+    # 2. Iterate over columns and adjust dimensions
+    columns = [col for col in tb.columns if col not in {"year", "country"}]
+    for col in columns:
+        # Overwrite original_short_name to actual indicator name
+        if col not in dims:
+            raise Exception(f"Column {col} not in indicator mapping")
+        tb[col].metadata.original_short_name = dims[col]
+
+        # Add NA as dimension "estimate"
+        tb[col].metadata.dimensions["estimate"] = "na"
 
     # 3. Adjust table-level dimension metadata
     if isinstance(tb.metadata.dimensions, list):
@@ -191,13 +269,13 @@ def edit_view_title(view, conflict_renames):
         view.config = {
             **(view.config or {}),
             "title": f"Number of {conflict_name}",
-            "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+            # "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
         }
     elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
         view.config = {
             **(view.config or {}),
             "title": f"Rate of {conflict_name}",
-            "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+            # "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
         }
 
 
