@@ -575,7 +575,7 @@ class CollectionForm(StepForm):
 
     @property
     def dag(self) -> Dict[str, Any]:
-        dag = {self.step_uri: f"grapher://grapher/{self.base_step_name}"}
+        dag = {self.step_uri: [f"grapher://grapher/{self.base_step_name}"]}
         return dag
 
     @property
