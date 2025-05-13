@@ -10,19 +10,26 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load snapshot and read its data.
-    snap = paths.load_snapshot("yearly_electricity.csv")
-    tb = snap.read(safe_types=False)
+    # Load snapshot of global electricity and read its data.
+    snap_global = paths.load_snapshot("yearly_electricity__global.csv")
+    tb_global = snap_global.read(safe_types=False)
+
+    # Load snapshot of european electricity and read its data.
+    snap_europe = paths.load_snapshot("yearly_electricity__europe.csv")
+    tb_europe = snap_europe.read(safe_types=False)
 
     #
     # Process data.
     #
-    # Format table conveniently.
-    tb = tb.format(keys=["area", "year", "variable", "unit"], sort_columns=True)
+    # Format tables conveniently.
+    tb_global = tb_global.format(keys=["area", "year", "variable", "unit"], sort_columns=True)
+    tb_europe = tb_europe.format(keys=["area", "year", "variable", "unit"], sort_columns=True)
 
     #
     # Save outputs.
     #
-    # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = paths.create_dataset(tables=[tb])
+    # Initialize a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=[tb_global, tb_europe], default_metadata=tb_global.metadata)
+
+    # Save meadow dataset.
     ds_meadow.save()

@@ -330,9 +330,10 @@ steps:
   # Ember - Yearly electricity data.
   #
   data://meadow/ember/2025-05-12/yearly_electricity:
-    - snapshot://ember/2025-05-12/yearly_electricity.csv
+    - snapshot://ember/2025-05-12/yearly_electricity__global.csv
+    - snapshot://ember/2025-05-12/yearly_electricity__europe.csv
   #
-  # Ember - Yearly electricity data.
+  # Ember - Yearly electricity data (Global and Europe).
   #
   data://garden/ember/2025-05-12/yearly_electricity:
     - data://garden/wb/2024-07-29/income_groups

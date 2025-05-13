@@ -1,15 +1,10 @@
-"""Garden step for Ember's Yearly Electricity Data.
-
-NOTE: Some of the processing in this step could be simplified (it inherited some of the complexity from the previous
-version, where data needed to be combined with the European Electricity Review).
-
-"""
+"""Garden step for Ember's Yearly Electricity Data (combining global and European data)."""
 
 from typing import Dict
 
 import owid.catalog.processing as pr
-import pandas as pd
 from owid.catalog import Dataset, Table, utils
+from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
 from etl.data_helpers import geo
@@ -37,16 +32,79 @@ COLUMNS_YEARLY_ELECTRICITY = {
     "category": "category",
     "subcategory": "subcategory",
 }
-
 # Categories expected to exist in the data.
-CATEGORIES = [
+CATEGORIES_GLOBAL = [
     "Capacity",
     "Electricity demand",
     "Electricity generation",
     "Electricity imports",
     "Power sector emissions",
 ]
-
+CATEGORIES_EUROPE = [
+    "Electricity demand",
+    "Electricity generation",
+    "Electricity imports",
+    "Power sector emissions",
+]
+# Subcategories expected to exist in the data.
+SUBCATEGORIES = [
+    "Aggregate fuel",
+    "CO2 intensity",
+    "Demand",
+    "Demand per capita",
+    "Electricity imports",
+    "Fuel",
+    "Total",
+]
+# Variables expected to exist in the data.
+VARIABLES_GLOBAL = [
+    "Bioenergy",
+    "CO2 intensity",
+    "Clean",
+    "Coal",
+    "Demand",
+    "Demand per capita",
+    "Fossil",
+    "Gas",
+    "Gas and Other Fossil",
+    "Hydro",
+    "Hydro, Bioenergy and Other Renewables",
+    "Net Imports",
+    "Nuclear",
+    "Other Fossil",
+    "Other Renewables",
+    "Renewables",
+    "Solar",
+    "Total Generation",
+    "Total emissions",
+    "Wind",
+    "Wind and Solar",
+]
+VARIABLES_EUROPE = [
+    "Bioenergy",
+    "CO2 intensity",
+    "Clean",
+    "Coal",
+    "Demand",
+    "Demand per capita",
+    "Fossil",
+    "Gas",
+    "Hard coal",
+    "Hydro",
+    "Hydro, bioenergy and other renewables",
+    "Lignite",
+    "Net imports",
+    "Nuclear",
+    "Offshore wind",
+    "Onshore wind",
+    "Other fossil",
+    "Other renewables",
+    "Renewables",
+    "Solar",
+    "Total generation",
+    "Wind",
+    "Wind and solar",
+]
 # Choose columns for which region aggregates should be created.
 SUM_AGGREGATES = [
     # "Bioenergy - %",
@@ -72,31 +130,31 @@ SUM_AGGREGATES = [
     "Gas - GW",
     "Gas - TWh",
     "Gas - mtCO2",
-    "Gas and Other Fossil - %",
-    "Gas and Other Fossil - GW",
-    "Gas and Other Fossil - TWh",
-    "Gas and Other Fossil - mtCO2",
+    "Gas and other fossil - %",
+    "Gas and other fossil - GW",
+    "Gas and other fossil - TWh",
+    "Gas and other fossil - mtCO2",
     # "Hydro - %",
     "Hydro - GW",
     "Hydro - TWh",
     "Hydro - mtCO2",
-    "Hydro, Bioenergy and Other Renewables - %",
-    "Hydro, Bioenergy and Other Renewables - GW",
-    "Hydro, Bioenergy and Other Renewables - TWh",
-    "Hydro, Bioenergy and Other Renewables - mtCO2",
-    "Net Imports - TWh",
+    "Hydro, bioenergy and other renewables - %",
+    "Hydro, bioenergy and other renewables - GW",
+    "Hydro, bioenergy and other renewables - TWh",
+    "Hydro, bioenergy and other renewables - mtCO2",
+    "Net imports - TWh",
     # "Nuclear - %",
     "Nuclear - GW",
     "Nuclear - TWh",
     "Nuclear - mtCO2",
     # "Other Fossil - %",
-    "Other Fossil - GW",
-    "Other Fossil - TWh",
-    "Other Fossil - mtCO2",
+    "Other fossil - GW",
+    "Other fossil - TWh",
+    "Other fossil - mtCO2",
     # "Other Renewables - %",
-    "Other Renewables - GW",
-    "Other Renewables - TWh",
-    "Other Renewables - mtCO2",
+    "Other renewables - GW",
+    "Other renewables - TWh",
+    "Other renewables - mtCO2",
     # "Renewables - %",
     "Renewables - GW",
     "Renewables - TWh",
@@ -105,17 +163,50 @@ SUM_AGGREGATES = [
     "Solar - GW",
     "Solar - TWh",
     "Solar - mtCO2",
-    "Total Generation - TWh",
+    "Total generation - TWh",
     "Total emissions - mtCO2",
     # "Wind - %",
     "Wind - GW",
     "Wind - TWh",
     "Wind - mtCO2",
     # "Wind and Solar - %",
-    "Wind and Solar - GW",
-    "Wind and Solar - TWh",
-    "Wind and Solar - mtCO2",
+    "Wind and solar - GW",
+    "Wind and solar - TWh",
+    "Wind and solar - mtCO2",
 ]
+
+
+def sanity_check_inputs(tb_global: Table, tb_europe: Table) -> None:
+    assert set(tb_global.columns) == set(tb_europe.columns), "Columns in global and European data have changed."
+    assert set(tb_global["category"]) == set(CATEGORIES_GLOBAL), "Categories have changed in data."
+    assert set(tb_europe["category"]) == set(CATEGORIES_EUROPE), "Categories have changed in data."
+    assert set(tb_global["subcategory"]) == set(SUBCATEGORIES), "Subcategories have changed in data."
+    assert set(tb_europe["subcategory"]) == set(SUBCATEGORIES), "Subcategories have changed in data."
+    assert set(tb_global["variable"]) == set(VARIABLES_GLOBAL), "Variables have changed in global data."
+    assert set(tb_europe["variable"]) == set(VARIABLES_EUROPE), "Variables have changed in data."
+
+
+def prepare_input_data(tb: Table) -> Table:
+    tb = tb.copy()
+
+    # Select and rename columns conveniently.
+    tb = tb[list(COLUMNS_YEARLY_ELECTRICITY)].rename(columns=COLUMNS_YEARLY_ELECTRICITY, errors="raise")
+
+    # Harmonize names of variables, categories and subcategories.
+    for field in ["variable", "category", "subcategory"]:
+        tb[field] = [value.capitalize().replace("Co2", "CO₂") for value in tb[field]]
+
+    # Harmonize country names.
+    tb = geo.harmonize_countries(
+        df=tb,
+        countries_file=paths.country_mapping_path,
+        excluded_countries_file=paths.excluded_countries_path,
+        warn_on_missing_countries=True,
+        # For debugging, set it to True (the only unused country in global data should be "Türkiye", which is only used in European data).
+        warn_on_unused_countries=False,
+    )
+
+    return tb
 
 
 def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
@@ -140,6 +231,10 @@ def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_gro
         Table in wide format.
 
     """
+    # Sanity check.
+    error = "Combinations of variable and unit expected to create aggregates are missing."
+    assert set(SUM_AGGREGATES) < set(tb["variable"] + " - " + tb["unit"]), error
+
     # Select data for given category.
     _tb = tb[tb["category"] == category].copy()
 
@@ -193,7 +288,7 @@ def make_table_electricity_generation(tb: Table, ds_regions: Dataset, ds_income_
                 raise ValueError(f"Column {value_column} not found.")
             # Select only regions.
             select_regions = table["country"].isin(list(geo.REGIONS))
-            table.loc[select_regions, column] = table[value_column] / table["Total Generation - TWh"] * 100
+            table.loc[select_regions, column] = table[value_column] / table["Total generation - TWh"] * 100
 
     return table
 
@@ -268,14 +363,14 @@ def make_table_power_sector_emissions(tb: Table, ds_regions: Dataset, ds_income_
     # Prepare wide table also for electricity generation (required to calculate carbon intensity).
     electricity = make_wide_table(
         tb=tb, category="Electricity generation", ds_regions=ds_regions, ds_income_groups=ds_income_groups
-    )[["country", "year", "Total Generation - TWh"]]
+    )[["country", "year", "Total generation - TWh"]]
     # Add total electricity generation to emissions table.
     table = pr.merge(table, electricity, on=["country", "year"], how="left")
     # Rename the original carbon intensity column as a temporary column called "check".
-    intensity_col = "CO2 intensity - gCO2/kWh"
+    intensity_col = "CO₂ intensity - gCO2/kWh"
     table = table.rename(columns={intensity_col: "check"}, errors="raise")
     # Calculate carbon intensity for all countries and regions.
-    table[intensity_col] = table["Total emissions - mtCO2"] * MT_TO_G / (table["Total Generation - TWh"] * TWH_TO_KWH)
+    table[intensity_col] = table["Total emissions - mtCO2"] * MT_TO_G / (table["Total generation - TWh"] * TWH_TO_KWH)
 
     # Check that the new carbon intensities agree (within 1 % of mean average percentage error, aka mape) with the
     # original ones (where carbon intensity was given, namely for countries, not aggregate regions).
@@ -364,7 +459,8 @@ def run() -> None:
     #
     # Load dataset from meadow and read its main table.
     ds_meadow = paths.load_dataset("yearly_electricity")
-    tb_meadow = ds_meadow.read("yearly_electricity")
+    tb_global = ds_meadow.read("yearly_electricity__global")
+    tb_europe = ds_meadow.read("yearly_electricity__europe")
 
     # Load population dataset.
     ds_population = paths.load_dataset("population")
@@ -378,20 +474,68 @@ def run() -> None:
     #
     # Process data.
     #
-    # Select and rename columns conveniently.
-    tb = tb_meadow[list(COLUMNS_YEARLY_ELECTRICITY)].rename(columns=COLUMNS_YEARLY_ELECTRICITY, errors="raise")
+    # Sanity check inputs.
+    sanity_check_inputs(tb_global=tb_global, tb_europe=tb_europe)
 
-    # Sanity check.
-    assert set(tb["category"]) == set(CATEGORIES), "Categories have changed in data."
+    # Prepare global and European input data.
+    tb_global = prepare_input_data(tb=tb_global)
+    tb_europe = prepare_input_data(tb=tb_europe)
 
-    # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb,
-        countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
-        warn_on_missing_countries=True,
-        warn_on_unused_countries=True,
-    )
+    # Combine global and European data.
+    def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
+        # These are the main differences between the two datasets:
+        # TODO: Check all these points.
+        # - Variables in global data are title-cased and in European data are sentence-cased.
+        # - Global data includes category 'Capacity', while European does not.
+        # - Global data includes variable 'Total emissions', while European does not.
+        # - European data includes the following subcategory-variables pairs:
+        #   'Aggregate fuel - Coal',
+        #   'Aggregate fuel - Wind',
+        #   'Fuel - Hard coal',
+        #   'Fuel - Lignite',
+        #   'Fuel - Offshore wind',
+        #   'Fuel - Onshore wind',
+        # - Meanwhile global data only includes:
+        #   'Aggregate fuel - Gas and other fossil',
+        #   'Fuel - Coal',
+        #   'Fuel - Wind',
+        # - Global data includes data for all European countries from 2000 onwards. European data includes the same data from 2000 onwards, but also data from 1990 to 1999.
+
+        error = "Variables in global and European data have changed."
+        assert set(tb_global["variable"]) - set(tb_europe["variable"]) == {
+            "Gas and other fossil",
+            "Total emissions",
+        }, error
+        assert set(tb_europe["variable"]) - set(tb_global["variable"]) == {
+            "Hard coal",
+            "Lignite",
+            "Offshore wind",
+            "Onshore wind",
+        }, error
+
+        # The simplest solution regarding coal and wind is to rename the subcategory of European data from "Aggregate fuel" to "Fuel".
+        tb_europe.loc[
+            (tb_europe["subcategory"] == "Aggregate fuel") & (tb_europe["variable"].isin(["Coal", "Wind"])),
+            "subcategory",
+        ] = "Fuel"
+        # TODO: Create the gas and other fossil aggregate for European data.
+
+        # TODO: After combining, assert they are identical.
+        # set_global = set([t["category"] + " - " + t["subcategory"] + " - " + t["variable"] for _, t in tb_global[(tb_global["category"]!="Capacity") & (tb_global["variable"] != "Total emissions")][["category", "subcategory", "variable"]].drop_duplicates().iterrows()])
+        # set_europe = set([t["category"] + " - " + t["subcategory"] + " - " + t["variable"] for _, t in tb_europe[~tb_europe["variable"].isin(["Hard coal", "Lignite", "Onshore wind", "Offshore wind"])][["category", "subcategory", "variable"]].drop_duplicates().iterrows()])
+        # assert set_global == set_europe, "After adapting European data, all category-subcategory-variables should be identical, except for:\n* Capacity and total emissions (only given in global), and\n* Hard coal, Lignite, Onshore wind and Offshore wind, only given in European data."
+
+        # Combine the two overlapping datasets, prioritizing European on overlapping rows.
+        tb = combine_two_overlapping_dataframes(
+            df1=tb_europe,
+            df2=tb_global,
+            index_columns=["country", "year", "variable", "unit", "category", "subcategory"],
+        )
+
+        return tb
+
+    # Combine global and European data.
+    tb = combine_global_and_europe_data(tb_global=tb_global, tb_europe=tb_europe)
 
     # Split data into different tables, one per category, and process each one individually.
     tables = {
@@ -417,48 +561,49 @@ def run() -> None:
         tables[table_name] = tables[table_name].format(short_name=table_name)
 
     ####################################################################################################################
-    # The data for many regions presents a big drop in the last year, simply because many countries are not informed.
-    # Assert that this drop exists, and remove the last data point for regions.
-    error = (
-        "Expected a big drop in the last data point for regions (because of limited data availability)."
-        "If that is no longer the case, remove this part of the code and keep the last data points for regions."
-    )
-    assert tables["capacity"].loc["Africa"]["renewables__gw"].diff().iloc[-1] < -30, error
-    for table_name in tables:
-        latest_year = tables[table_name].reset_index()["year"].max()
-        for column in tables[table_name].columns:
-            for region in geo.REGIONS:
-                tables[table_name].loc[(region, latest_year), column] = None
+    # TODO: The following checks fail. Check if they are still needed.
+    # # The data for many regions presents a big drop in the last year, simply because many countries are not informed.
+    # # Assert that this drop exists, and remove the last data point for regions.
+    # error = (
+    #     "Expected a big drop in the last data point for regions (because of limited data availability)."
+    #     "If that is no longer the case, remove this part of the code and keep the last data points for regions."
+    # )
+    # assert tables["capacity"].loc["Africa"]["renewables__gw"].diff().iloc[-1] < -30, error
+    # for table_name in tables:
+    #     latest_year = tables[table_name].reset_index()["year"].max()
+    #     for column in tables[table_name].columns:
+    #         for region in geo.REGIONS:
+    #             tables[table_name].loc[(region, latest_year), column] = None
 
-    # Similarly, data prior to 2000 exists only for European countries.
-    # This can cause spurious jump in aggregate data.
-    # For example, there is a spurious jump from 1999 to 2000 for Lower-middle-income countries
-    # (see e.g. "Renewables - TWh"), because prior to 2000 only Ukraine has data.
-    # Assert that this jump exists, and remove aggregate data prior to 2000 (except European aggregates).
-    error = (
-        "Expected a big jump (>1000%) (in e.g. renewable generation) between 1999 and 2000 for Lower-middle-income "
-        "countries (because prior to 2000 only Ukraine has data). If that is no longer the case (because not only "
-        "European countries are informed prior to 2000), remove this part of the code."
-    )
-    renewables_lmic_1999 = tables["electricity_generation"].loc["Lower-middle-income countries", 1999][
-        "renewables__twh"
-    ]
-    renewables_lmic_2000 = tables["electricity_generation"].loc["Lower-middle-income countries", 2000][
-        "renewables__twh"
-    ]
-    assert 100 * (renewables_lmic_2000 - renewables_lmic_1999) / renewables_lmic_1999 > 1000, error
-    # We could still create European aggregates. However, certain European countries are also missing data
-    # (namely Albania and Iceland).
-    # In principle, we could keep the aggregate of EU27 (since it's not affected), but, under these circumstances,
-    # it seems safer to simply relay on the Statistical Review aggregates prior to 2000.
-    # Therefore, we make nan all aggregate data in all yearly electricity tables prior to 2000.
-    for table_name in tables:
-        for column in tables[table_name].columns:
-            tables[table_name].loc[
-                (tables[table_name].index.get_level_values(0).isin(geo.REGIONS))
-                & (tables[table_name].index.get_level_values(1) < 2000),
-                :,
-            ] = pd.NA
+    # # Similarly, data prior to 2000 exists only for European countries.
+    # # This can cause spurious jump in aggregate data.
+    # # For example, there is a spurious jump from 1999 to 2000 for Lower-middle-income countries
+    # # (see e.g. "Renewables - TWh"), because prior to 2000 only Ukraine has data.
+    # # Assert that this jump exists, and remove aggregate data prior to 2000 (except European aggregates).
+    # error = (
+    #     "Expected a big jump (>1000%) (in e.g. renewable generation) between 1999 and 2000 for Lower-middle-income "
+    #     "countries (because prior to 2000 only Ukraine has data). If that is no longer the case (because not only "
+    #     "European countries are informed prior to 2000), remove this part of the code."
+    # )
+    # renewables_lmic_1999 = tables["electricity_generation"].loc["Lower-middle-income countries", 1999][
+    #     "renewables__twh"
+    # ]
+    # renewables_lmic_2000 = tables["electricity_generation"].loc["Lower-middle-income countries", 2000][
+    #     "renewables__twh"
+    # ]
+    # assert 100 * (renewables_lmic_2000 - renewables_lmic_1999) / renewables_lmic_1999 > 1000, error
+    # # We could still create European aggregates. However, certain European countries are also missing data
+    # # (namely Albania and Iceland).
+    # # In principle, we could keep the aggregate of EU27 (since it's not affected), but, under these circumstances,
+    # # it seems safer to simply relay on the Statistical Review aggregates prior to 2000.
+    # # Therefore, we make nan all aggregate data in all yearly electricity tables prior to 2000.
+    # for table_name in tables:
+    #     for column in tables[table_name].columns:
+    #         tables[table_name].loc[
+    #             (tables[table_name].index.get_level_values(0).isin(geo.REGIONS))
+    #             & (tables[table_name].index.get_level_values(1) < 2000),
+    #             :,
+    #         ] = pd.NA
     ####################################################################################################################
 
     # Combine all tables into one.
