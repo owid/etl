@@ -5,6 +5,7 @@ import pandas as pd
 import streamlit as st
 
 from apps.wizard.utils import TTL_DEFAULT
+from apps.wizard.utils.components import st_cache_data
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.grapher.model import Dataset
@@ -57,7 +58,7 @@ def get_explorers_views():
     return df.set_index("slug").to_dict(orient="index")
 
 
-@st.cache_data(show_spinner="Getting datasets...", ttl=TTL_DEFAULT)
+@st_cache_data(custom_text="Getting datasets...", ttl=TTL_DEFAULT, show_time=True)
 def get_datasets() -> Dict[int, Dict[str, Any]]:
     """Get list of datasets.
 
