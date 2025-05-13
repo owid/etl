@@ -7,7 +7,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 DIMENSIONS_CONFIG = {
-    "poverty_line": "*",
+    "poverty_line": ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
     "table": ["Income or consumption consolidated", "Consumption", "Income"],
     "ppp_version": ["2017.0"],
     # "welfare_type": "*",
@@ -38,10 +38,10 @@ def run() -> None:
         indicator_names=[
             "headcount_ratio",
             "headcount",
-            "total_shortfall",
-            "avg_shortfall",
-            "income_gap_ratio",
-            "poverty_gap_index",
+            # "total_shortfall",
+            # "avg_shortfall",
+            # "income_gap_ratio",
+            # "poverty_gap_index",
         ],
         dimensions=DIMENSIONS_CONFIG,
     )
@@ -59,23 +59,23 @@ def run() -> None:
         mdim_name="poverty",
     )
 
-    # Group certain views together: used to create StackedBar charts
-    mdim.group_views(
-        params=[
-            {
-                "dimension": "poverty_line",
-                "choices": ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
-                "choice_new_slug": "multiple_lines_absolute",
-                "overwrite_dimension_choice": True,
-            },
-            {
-                "dimension": "poverty_line",
-                "choices": ["40% of the median", "50% of the median", "60% of the median"],
-                "choice_new_slug": "multiple_lines_relative",
-                "overwrite_dimension_choice": True,
-            },
-        ]
-    )
+    # # Group certain views together: used to create StackedBar charts
+    # mdim.group_views(
+    #     params=[
+    #         {
+    #             "dimension": "poverty_line",
+    #             "choices": ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
+    #             "choice_new_slug": "multiple_lines_absolute",
+    #             "overwrite_dimension_choice": True,
+    #         },
+    #         {
+    #             "dimension": "poverty_line",
+    #             "choices": ["40% of the median", "50% of the median", "60% of the median"],
+    #             "choice_new_slug": "multiple_lines_relative",
+    #             "overwrite_dimension_choice": True,
+    #         },
+    #     ]
+    # )
 
     # # Edit order of slugs
     # mdim.sort_choices({"poverty_line": lambda x: sorted(x)})

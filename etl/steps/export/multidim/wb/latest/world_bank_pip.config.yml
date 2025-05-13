@@ -10,21 +10,23 @@ default_selection:
   - Ethiopia
 
 dimensions:
-  - name: Indicator
+  - name: Metric
     slug: indicator
     choices:
       - slug: headcount_ratio
         name: Share in poverty
+        description: The share of the population living below the selected poverty line.
       - slug: headcount
         name: Number in poverty
-      - slug: total_shortfall
-        name: Total shortfall from poverty line
-      - slug: avg_shortfall
-        name: Average shortfall ($ per day)
-      - slug: income_gap_ratio
-        name: Average shortfall (% of poverty line)
-      - slug: poverty_gap_index
-        name: Poverty gap index
+        description: The number of people living below the selected poverty line.
+      # - slug: total_shortfall
+      #   name: Total shortfall from poverty line
+      # - slug: avg_shortfall
+      #   name: Average shortfall ($ per day)
+      # - slug: income_gap_ratio
+      #   name: Average shortfall (% of poverty line)
+      # - slug: poverty_gap_index
+      #   name: Poverty gap index
   - name: Poverty line
     slug: poverty_line
     choices:
@@ -32,24 +34,23 @@ dimensions:
         name: $1 a day
       - slug: "215"
         name: $2.15 a day
-        description: International Poverty Line
+        description: The international poverty line used to measure extreme poverty
       - slug: "365"
         name: $3.65 a day
-        description: Lower-middle-income poverty line
+        description: Set by the World Bank to reflect national definitions in lower-middle income countries
       - slug: "685"
         name: $6.85 a day
-        description: Upper-middle-income poverty line
+        description: Set by the World Bank to reflect national definitions in upper-middle income countries
       - slug: "1000"
         name: $10 a day
       - slug: "2000"
         name: $20 a day
       - slug: "3000"
         name: $30 a day
-        description: High-income poverty line
       - slug: "4000"
         name: $40 a day
-      - slug: multiple_lines_absolute
-        name: Multiple lines
+      # - slug: multiple_lines_absolute
+      #   name: Multiple lines
       - slug: 40% of the median
         name: 40% of the median
         description: Relative poverty
@@ -59,9 +60,9 @@ dimensions:
       - slug: 60% of the median
         name: 60% of the median
         description: Relative poverty
-      - slug: multiple_lines_relative
-        name: Multiple lines
-        description: Relative poverty
+      # - slug: multiple_lines_relative
+      #   name: Multiple lines
+      #   description: Relative poverty
   - name: Household survey data type
     slug: table
     choices:
