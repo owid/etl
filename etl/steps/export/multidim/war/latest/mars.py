@@ -63,7 +63,7 @@ def run() -> None:
             view.indicators.y[0].display = {"name": "Civil wars"}
         elif view.dimensions["conflict_type"] == "others (non-civil)":
             assert view.indicators.y is not None
-            view.indicators.y[0].display = {"name": "Intrastate wars"}
+            view.indicators.y[0].display = {"name": "Interstate wars"}
         elif view.dimensions["conflict_type"] == "all":
             assert view.indicators.y is not None
             view.indicators.y[0].display = {"name": f"{view.dimensions['estimate'].title()} estimate"}
