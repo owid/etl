@@ -29,6 +29,7 @@ dimensions:
       #   name: Poverty gap index
   - name: Poverty line
     slug: poverty_line
+    description: In international dollars
     choices:
       - slug: "100"
         name: $1 a day
@@ -66,10 +67,10 @@ dimensions:
   - name: Household survey data type
     slug: table
     choices:
-      - slug: "Income or consumption consolidated"
-        name: "Show data for both income and consumption"
-      - slug: "Income"
-        name: "Income surveys only"
-      - slug: "Consumption"
-        name: "Consumption surveys only"
+      - slug: Income or consumption consolidated
+        name: Show data for both income and consumption
+      - slug: Income
+        name: Income surveys only
+      - slug: Consumption
+        name: Consumption surveys only
 views: []
