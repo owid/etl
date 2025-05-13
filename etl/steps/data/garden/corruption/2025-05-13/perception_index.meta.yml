@@ -30,7 +30,7 @@ tables:
     variables:
       cpi_score:
         title: Corruption Perceptions Index
-        unit: 0(highest)-100(lowest)
+        unit: ''
         description_short: A country’s score, from 0 (most corrupt) to 100 (least corrupt), reflects the average of expert surveys on public sector corruption, including misuse of office and bribery.
         description_key:
             - The Corruption Perceptions Index (CPI) ranks countries and territories by how much corruption experts and business leaders think exists in the public sector.
@@ -47,7 +47,7 @@ tables:
 
       lower_ci:
         title: Corruption Perceptions Index – Lower bound
-        unit: 0 (highly corrupt) – 100 (very clean)
+        unit: ''
         description_short: Lowest likely value of a country’s Corruption Perceptions Index (CPI) score, based on a 90% confidence interval.
         description_key:
           - The lower bound shows the lowest value a country’s Corruption Perceptions Index (CPI) is likely to have, with only a 5% chance the true score is lower.
@@ -62,7 +62,7 @@ tables:
 
       upper_ci:
         title: Corruption Perceptions Index – Upper bound
-        unit: 0 (highly corrupt) – 100 (very clean)
+        unit: ''
         description_short: Highest likely value of a country’s Corruption Perceptions Index (CPI) score, based on a 90% confidence interval.
         description_key:
           - The upper bound shows the highest value a country’s Corruption Perceptions Index (CPI) score is likely to have, with only a 5% chance the true score is higher.
