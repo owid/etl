@@ -322,7 +322,11 @@ def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_gro
 
     # Pivot table to have a column for each variable.
     table = _tb.pivot(
-        index=["country", "year"], columns=["variable", "unit"], values="value", join_column_levels_with=" - "
+        index=["country", "year"],
+        columns=["variable", "unit"],
+        values="value",
+        join_column_levels_with=" - ",
+        fill_dimensions=False,
     )
 
     # Add region aggregates.
