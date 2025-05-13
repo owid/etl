@@ -30,7 +30,7 @@ DIMENSION_ESTIMATE = {
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("mars")
@@ -40,9 +40,9 @@ def run() -> None:
     tb = adjust_dimensions(tb)
 
     # Create MDIM
-    mdim = paths.create_mdim_v2(
-        config,
-        mdim_name="mars",
+    c = paths.create_collection(
+        config=config,
+        short_name="mars",
         tb=tb,
         indicator_names=[
             "deaths",
@@ -57,7 +57,7 @@ def run() -> None:
     )
 
     # Edit indicator-level display settings
-    for view in mdim.views:
+    for view in c.views:
         if view.dimensions["conflict_type"] == "civil war":
             assert view.indicators.y is not None
             view.indicators.y[0].display = {"name": "Civil wars"}
@@ -69,7 +69,7 @@ def run() -> None:
             view.indicators.y[0].display = {"name": f"{view.dimensions['estimate'].title()} estimate"}
 
     # Group certain views together: used to create StackedBar charts
-    mdim.group_views(
+    c.group_views(
         params=[
             {
                 "dimension": "conflict_type",
@@ -98,7 +98,7 @@ def run() -> None:
     )
 
     # Remove certain views
-    mdim.drop_views(
+    c.drop_views(
         [
             {"conflict_type": ["civil war", "others (non-civil)"]},
             {"estimate": ["high"]},
@@ -106,7 +106,7 @@ def run() -> None:
     )
 
     # Edit FAUST
-    for view in mdim.views:
+    for view in c.views:
         if view.dimensions["indicator"] == "deaths":
             view.config = {
                 **(view.config or {}),
@@ -133,7 +133,7 @@ def run() -> None:
             }
 
     # Save & upload
-    mdim.save()
+    c.save()
 
 
 def adjust_dimensions(tb):
