@@ -33,23 +33,31 @@ dimensions:
     choices:
       - slug: "100"
         name: $1 a day
+        group: Individual poverty lines
       - slug: "215"
         name: $2.15 a day
         description: The international poverty line used to measure extreme poverty
+        group: Individual poverty lines
       - slug: "365"
         name: $3.65 a day
-        description: Set by the World Bank to reflect national definitions in lower-middle income countries
+        description: Set by the World Bank to reflect national definitions in lower-middle income
+        group: Individual poverty lines
       - slug: "685"
         name: $6.85 a day
         description: Set by the World Bank to reflect national definitions in upper-middle income countries
+        group: Individual poverty lines
       - slug: "1000"
         name: $10 a day
+        group: Individual poverty lines
       - slug: "2000"
         name: $20 a day
+        group: Individual poverty lines
       - slug: "3000"
         name: $30 a day
+        group: Individual poverty lines
       - slug: "4000"
         name: $40 a day
+        group: Individual poverty lines
       # - slug: multiple_lines_absolute
       #   name: Multiple lines
       - slug: 40% of the median
