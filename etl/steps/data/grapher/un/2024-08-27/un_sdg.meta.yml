@@ -145,14 +145,18 @@ tables:
          description_short: |-
            Share of people who, in the past 12 months, had contact with a public official and paid or were asked for a bribe.
          description_key:
-          - This indicator shows the share of people who had contact with a public official and paid a bribe or were asked for one in the past 12 months.
-          - It measures everyday bribery between citizens and public officials, often called ‘administrative bribery’.
-          - The indicator is the percentage of people who paid or were asked for a bribe, out of all those who had contact with public officials.
-          - Public officials include people in legislative, executive, administrative, or judicial roles. Surveys use a standard list of officials and civil servants.
-          - Bribery includes giving or being asked for money, gifts, or services in return for special treatment by a public official.
-          - Data comes from household or victimisation surveys, usually carried out by national statistical offices or anti-corruption agencies.
-          - Only the direct experiences of the person surveyed are counted, but bribes paid through intermediaries on their behalf are included.
-          - Some surveys do not count cases where someone was asked for a bribe but refused to pay. This is expected to improve as survey standards are applied.
-          - The indicator does not include other types of corruption, like abuse of power or bribery between businesses and officials.
+          - This measure tracks how common bribery is when citizens interact with public officials. It shows what percentage of people who dealt with officials in the past year either paid a bribe or were asked to pay one. Bribes include extra payments, gifts, or favors given in exchange for special treatment from government workers.
+          - The focus is on everyday administrative bribery—the type most citizens face in routine interactions with government offices. It does not cover high-level political corruption, influence trading, or abuse of power.
+          - Data is collected through national surveys. Respondents report only their own direct experiences, though cases involving middlemen are included. Indirect accounts from other household members are not.
+          - Bribery usually leaves no trace in financial records or documentation. Surveys offer a practical approach for measuring these events.
+          - Many surveys have historically excluded people who were asked for a bribe but refused to pay. This leads to underestimates. More countries are now using standardised methods to address this.
+
+         description_from_producer: |-
+          This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favour) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
+          In the International Classification of Crime for Statistical Purposes (ICCS), bribery is defined as: ‘Promising, offering, giving, soliciting, or accepting an undue advantage to or from a public official or a person who directs or works in a private sector entity, directly or indirectly, in order that the person act or refrain from acting in the exercise of his or her official duties’ (ICCS Category 07031).
+          This definition is based on definitions of bribery of national public officials, bribery of foreign public officials and official of international organisations and bribery in the private sector that are contained in the United Nations Convention against Corruption (articles 15, 16, and 21). While the concept of bribery is broader, as it includes also actions such as promising or offering, and it covers both public and private sector, this indicator focuses on specific forms of bribery that are more measurable (the giving and/or requesting of bribes) and it limits the scope to the public sector.
+          The concept of undue advantage is operationalized by reference to giving of money (in addition to an official fee), gifts or provision of a service requested/offered by/to a public official in exchange for a special treatment. This indicator captures the often called ‘administrative bribery’, which is often intended as the type of bribery affecting citizens in their dealings with public administrations and/or civil servants.
+          For this indicator, public official refers to persons holding a legislative, executive, administrative or judicial office.
+          In the operationalization of the indicator, a list of selected officials and civil servants is used.
          display:
            numDecimalPlaces: 1
