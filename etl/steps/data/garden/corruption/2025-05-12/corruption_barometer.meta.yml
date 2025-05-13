@@ -48,7 +48,7 @@ tables:
             <%- if question != "Bribary rate" and institution != "Not applicable" %>
             << institution >>
             <%- endif -%>
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
         processing_level: minor
         unit: "%"
         short_unit: "%"

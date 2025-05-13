@@ -10,8 +10,8 @@ paths = PathFinder(__file__)
 
 # Define a mapping for shortening and standardizing corrupt parties
 CORRUPT_PARTIES_MAPPING = {
-    "The (President)/(Prime Minister) and Officials in his office": "President/PM and their office",
-    "Representatives in the Legislature (i.e. Members of the Parliament or Sentators)": "Members of parliament or senators",
+    "The (President)/(Prime Minister) and Officials in his office": "Prime Minister / President",
+    "Representatives in the Legislature (i.e. Members of the Parliament or Sentators)": "MPs or senators",
     "Government officials": "Government officials",
     "Local government councilors": "Local government councilors",
     "Police": "Police",
