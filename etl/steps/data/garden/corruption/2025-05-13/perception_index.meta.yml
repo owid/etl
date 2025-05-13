@@ -1,0 +1,70 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    description_from_producer: |-
+          The Corruption Perceptions Index (CPI) aggregates information from several sources that capture how business professionals and country experts perceive corruption in the public sector.
+
+          To build the CPI, eligible data sources are first selected. A source qualifies only if it measures public‑sector corruption perceptions; relies on a sound, comparable scoring method; is produced by a credible institution; shows enough score variation to differentiate countries; covers a substantial number of nations; bases its ratings on the views of country experts or businesspeople; and is updated at least every two years. The current CPI draws on 13 data sets supplied by 12 separate institutions, each reflecting perceptions recorded during the preceding two years (the accompanying source‑description document details them).
+
+          Next, every source is converted to a 0–100 scale, where 0 represents the highest perceived corruption and 100 the lowest. This standardisation subtracts the source’s baseline‑year mean from each country’s raw score and divides the result by that source’s baseline‑year standard deviation. The standardised value is then rescaled by multiplying by the CPI’s 2012 standard deviation (20) and adding the CPI’s 2012 mean (45), ensuring scores remain comparable across years while fitting the CPI’s 0–100 range.
+
+          Finally, a country or territory enters the CPI only when at least three separate sources assess it. The country’s CPI figure is the arithmetic mean of all its available standardised scores, rounded to the nearest whole number.
+    presentation:
+      topic_tags:
+        - Corruption
+    display:
+      numDecimalPlaces: 0
+
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  perception_index:
+    variables:
+      cpi_score:
+        title: Corruption Perceptions Index (CPI) score
+        unit: index (0–100)
+        description_short: Perceptions of public‑sector corruption (0 = most corrupt, 100 = least corrupt).
+        description_key:
+          - The Corruption Perception Index (CPI) combines up to 13 expert‑ and business‑survey datasets on public‑sector corruption and rescales each one to 0 – 100.
+          - A simple average of the available datasets becomes the country’s CPI score for that year.
+          - The methodology has been fixed since 2012, allowing year‑to‑year comparisons.
+          - Higher numbers signal **cleaner** public sectors; lower numbers signal **more corruption**.
+          - A 90 % margin of error is also published because the underlying surveys do not always agree.
+
+
+      lower_ci:
+        title: Lower bound of Corruption Perception Index score
+        unit: index (0–100)
+        description_short: Lower limit of the 90 % confidence interval around the Corruption Perception Index score.
+        description_key:
+          - Shows the lowest score a country is likely to have; there is only about a 5 % (1‑in‑20) chance the true value is below this.
+          - Calculated as the Corruption Perception Index score minus 1.645 × the standard error, where the standard error captures how spread out the source scores are.
+          - Wider bands mean the sources disagree more or there are only a few of them; narrower bands mean the sources agree closely.
+          - If this lower limit overlaps another country’s upper limit, their Corruption Perception Index scores are probably not meaningfully different.
+        presentation:
+          title_public: Lower bound of CPI
+        display:
+          name: Lower bound
+
+      upper_ci:
+        title: Upper bound of Corruption Perception Index
+        unit: index (0–100)
+        description_short: Upper limit of the 90 % confidence interval around the Corruption Perception Index
+        description_key:
+          - Shows the highest score a country is likely to have; there is only about a 5 % (1‑in‑20) chance the true value is above this.
+          - Calculated as the Corruption Perception Index score plus 1.645 × the standard error, using the same measure of spread as for `lower_ci`.
+          - Comparing the upper and lower limits tells you if year‑on‑year changes or gaps between countries are larger than statistical “noise”; non‑overlapping bands point to a real difference.
+          - Bands usually cover 4 – 8 points. The narrow end when 10 + sources agree well, the wide end when only the minimum three sources are available.
+          - Because the number and mix of sources can change over time, the width of the band can grow or shrink, so always check it before interpreting a trend.
+        presentation:
+          title_public: Upper bound of CPI
+        display:
+          name: Upper bound
