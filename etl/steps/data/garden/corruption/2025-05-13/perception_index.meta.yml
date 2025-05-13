@@ -29,42 +29,44 @@ tables:
   perception_index:
     variables:
       cpi_score:
-        title: Corruption Perceptions Index (CPI) score
-        unit: index (0–100)
-        description_short: Perceptions of public‑sector corruption (0 = most corrupt, 100 = least corrupt).
+        title: Corruption Perceptions Index
+        unit: 0(highest)-100(lowest)
+        description_short: A country’s score (0–100) represents an average of expert survey responses on perceived corruption in the public sector, including misuse of public office and bribery. (0 = most corrupt; 100 = least)
         description_key:
-          - The Corruption Perception Index (CPI) combines up to 13 expert‑ and business‑survey datasets on public‑sector corruption and rescales each one to 0 – 100.
-          - A simple average of the available datasets becomes the country’s CPI score for that year.
-          - The methodology has been fixed since 2012, allowing year‑to‑year comparisons.
-          - Higher numbers signal **cleaner** public sectors; lower numbers signal **more corruption**.
-          - A 90 % margin of error is also published because the underlying surveys do not always agree.
-
+          - The Corruption Perceptions Index (CPI) scores and ranks countries and territories based on perceived levels of public-sector corruption, as assessed by experts and business executives.
+          - It combines at least 3 and up to 13 independent data sources, which include expert assessments and business surveys conducted by reputable institutions.
+          - Each source is standardized onto a 0–100 scale, where 0 indicates high perceived corruption and 100 indicates a very clean public sector.
+          - A country’s CPI score is the simple average of the available sources for that year.
+          - The methodology has been stable since 2012, enabling comparable year-to-year results since then.
+          - The CPI applies a 90% confidence interval (margin of error) to account for variation across the data sources and possible inconsistencies in the assessments.
+          - The CPI does not measure actual corruption directly, but rather the perceptions of public-sector corruption, as fully objective nationwide measures do not exist.
 
       lower_ci:
-        title: Lower bound of Corruption Perception Index score
-        unit: index (0–100)
-        description_short: Lower limit of the 90 % confidence interval around the Corruption Perception Index score.
+        title: Corruption Perceptions Index – Lower bound
+        unit: 0 (highly corrupt) – 100 (very clean)
+        description_short: Lowest likely value of a country’s Corruption Perceptions Index (CPI) score, based on a 90% confidence interval.
         description_key:
-          - Shows the lowest score a country is likely to have; there is only about a 5 % (1‑in‑20) chance the true value is below this.
-          - Calculated as the Corruption Perception Index score minus 1.645 × the standard error, where the standard error captures how spread out the source scores are.
-          - Wider bands mean the sources disagree more or there are only a few of them; narrower bands mean the sources agree closely.
-          - If this lower limit overlaps another country’s upper limit, their Corruption Perception Index scores are probably not meaningfully different.
+          - The lower bound shows the lowest value a country’s Corruption Perceptions Index (CPI) is likely to have, with only a 5% chance the true score is lower.
+          - It is calculated by subtracting 1.645 times the standard error from the CPI score. The standard error reflects how much the individual data sources vary.
+          - A wider gap between upper and lower bounds usually means greater disagreement between sources or fewer available data points.
+          - Comparing whether the ranges of two countries overlap can help assess whether differences in scores reflect real differences or normal variation.
+          - The number and mix of sources can change from year to year, which may cause the range to widen or narrow independently of changes in the underlying data on corruption.
         presentation:
-          title_public: Lower bound of CPI
+          title_public: Lower bound – Corruption Perceptions Index
         display:
           name: Lower bound
 
       upper_ci:
-        title: Upper bound of Corruption Perception Index
-        unit: index (0–100)
-        description_short: Upper limit of the 90 % confidence interval around the Corruption Perception Index
+        title: Corruption Perceptions Index – Upper bound
+        unit: 0 (highly corrupt) – 100 (very clean)
+        description_short: Highest likely value of a country’s Corruption Perceptions Index (CPI) score, based on a 90% confidence interval.
         description_key:
-          - Shows the highest score a country is likely to have; there is only about a 5 % (1‑in‑20) chance the true value is above this.
-          - Calculated as the Corruption Perception Index score plus 1.645 × the standard error, using the same measure of spread as for `lower_ci`.
-          - Comparing the upper and lower limits tells you if year‑on‑year changes or gaps between countries are larger than statistical “noise”; non‑overlapping bands point to a real difference.
-          - Bands usually cover 4 – 8 points. The narrow end when 10 + sources agree well, the wide end when only the minimum three sources are available.
-          - Because the number and mix of sources can change over time, the width of the band can grow or shrink, so always check it before interpreting a trend.
+          - The upper bound shows the highest value a country’s Corruption Perceptions Index (CPI) score is likely to have, with only a 5% chance the true score is higher.
+          - It is calculated by adding 1.645 times the standard error to the CPI score. The standard error reflects how much the individual data sources vary.
+          - A wider gap between upper and lower bounds usually means greater disagreement between sources or fewer available data points.
+          - Comparing whether the ranges of two countries overlap can help assess whether differences in scores reflect real differences or normal variation.
+          - The number and mix of sources can change from year to year, which may cause the range to widen or narrow independently of changes in the underlying data on corruption.
         presentation:
-          title_public: Upper bound of CPI
+          title_public: Upper bound – Corruption Perceptions Index
         display:
           name: Upper bound
