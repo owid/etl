@@ -11,11 +11,12 @@ from etl.snapshot import Snapshot
 SNAPSHOT_VERSION = Path(__file__).parent.name
 df = pd.DataFrame(
     {
-        "country": ["Scotland"],
-        "year": [1600],
-        "forest_share": [5],
+        "country": ["Scotland", "Scotland"],
+        "year": [1600, 1750],
+        "forest_share": [5, 5],
         "source": [
-            ["https://www.nature.com/articles/s41598-019-40063-1"],
+            "https://www.nature.com/articles/s41598-019-40063-1",
+            "https://www.nature.com/articles/s41598-019-40063-1",
         ],
     }
 )

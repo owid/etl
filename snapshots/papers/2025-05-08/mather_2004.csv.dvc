@@ -13,6 +13,6 @@ meta:
       name: Copyright © 2023 Royal Scottish Geographical Society
       url: https://www.tandfonline.com/page/terms-and-conditions
 outs:
-  - md5: 158ab12ed64fdab69b40b12613cc3eab
-    size: 104
+  - md5: de14f1a375bdab8625f8dd84cb6ca969
+    size: 167
     path: mather_2004.csv
