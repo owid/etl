@@ -146,11 +146,12 @@ tables:
            Share of people who, in the past 12 months, paid or were asked for a bribe, out of all people who had contact with a public official.
          description_key:
           - This measure tracks how common bribery is when citizens interact with public officials. It shows, out of all people who dealt with a public official in the last year, how many of them either paid a bribe or were asked to pay one. Bribes include extra payments, gifts, or favors given in exchange for special treatment from government workers.
-          - The focus is on everyday administrative bribery—the type most citizens face in routine interactions with government offices. Public officials can hold a legislative, executive, administrative or judicial office, such as customs or police officers, judges, teachers or doctors.
+          - The focus is on everyday administrative bribery—the type most citizens face in routine interactions with public officials.
+          - Public officials can hold a legislative, executive, administrative or judicial office, such as customs or police officers, judges, teachers or doctors.
           - It does not cover high-level political corruption, influence trading, or abuse of power.
           - Data is collected through national surveys. Respondents report only their own direct experiences, though cases involving middlemen are included. Indirect accounts from other household members are not.
           - Bribery usually leaves no trace in financial records or documentation. Surveys offer a practical approach for measuring these events.
-          - Many surveys have historically excluded people who were asked for a bribe but refused to pay. This leads to underestimates and could be one reason for lower reported shares in earlier years. More countries are now using standardised methods to address this.
+          - Many surveys have historically excluded people who were asked for a bribe but refused to pay. This leads to underestimates and could be one reason for lower reported shares in earlier years. More countries are now using standardized methods to address this.
 
          description_from_producer: |-
           This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favour) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
