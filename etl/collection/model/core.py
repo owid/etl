@@ -189,6 +189,21 @@ class Collection(MDIMBase):
             dix = {k: v for k, v in dix.items() if k not in {"_definitions", "definitions"}}
         return dix
 
+    def get_dimension(self, slug: str) -> Dimension:
+        """Get dimension `slug`"""
+        for dim in self.dimensions:
+            if dim.slug == slug:
+                return dim
+        raise ValueError(f"Dimension {slug} not found in dimensions!")
+
+    def get_choice_names(self, dimension_slug: str) -> Dict[str, str]:
+        """Get all choice names in the collection."""
+        dimension = self.get_dimension(dimension_slug)
+        choice_names = {}
+        for choice in dimension.choices:
+            choice_names[choice.slug] = choice.name
+        return choice_names
+
     def validate_views_with_dimensions(self):
         """Validates that dimensions in all views are valid:
 
@@ -348,25 +363,15 @@ class Collection(MDIMBase):
         """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
 
         Args:
-        -----
-        dimensions: Dict[str, Union[List[str], str]]
-            Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
-
-            Example 1: dimensions = {"sex": "female"}
-
-                Drop all views that have "female" in dimension sex.
-
-            Example 2: dimensions = {"age": ["0-4", "5-9"]}
-
-                Drop all views that have "0-4" OR "5-9" in dimension age.
-
-            Example 3: dimensions = {"age": ["0-4", "5-9"], "sex": ["female", "male"]}
-
-                Drop all views that have ("0-4" OR "5-9" in dimension age) AND ("female" OR "male" in dimension "sex"). The rest is kept.
-
-            Example 4: dimensions = [{"sex": "female", "age": "0-4"}, {"sex": "male", "age": "5-9"}]
-
-                Drop all views that have { ("0-4" in dimension "age") AND ("female" in dimension "sex") } OR { ("5-9" in dimension "age") AND ("male" in dimension "sex") }
+            dimensions (Dict[str, Union[List[str], str]]): Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
+                    - Example 1: `dimensions = {"sex": "female"}`.
+                        Drop all views that have "female" in dimension sex.
+                    - Example 2: `dimensions = {"age": ["0-4", "5-9"]}`.
+                        Drop all views that have "0-4" OR "5-9" in dimension age.
+                    - Example 3: `dimensions = {"age": ["0-4", "5-9"], "sex": ["female", "male"]}`.
+                        Drop all views that have ("0-4" OR "5-9" in dimension age) AND ("female" OR "male" in dimension "sex"). The rest is kept.
+                    - Example 4: `dimensions = [{"sex": "female", "age": "0-4"}, {"sex": "male", "age": "5-9"}]`.
+                        Drop all views that have { ("0-4" in dimension "age") AND ("female" in dimension "sex") } OR { ("5-9" in dimension "age") AND ("male" in dimension "sex") }
         """
         # Get dimensions in use, and list of dimension slugs (ordered, used for key-identifying views)
         dimensions_available = self.dimension_choices_in_use()
@@ -404,6 +409,21 @@ class Collection(MDIMBase):
 
         Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
 
+        Args:
+            params (List[Dict[str, Any]]): List of dictionaries with the following keys:
+                    - dimension: str
+                        Slug of the dimension that contains the choices to group.
+                    - choices: List[str]
+                        Slugs of the choices to group.
+                    - choice_new_slug: str
+                        The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
+                    - config_new: Optional[Dict[str, Any]], default=None
+                        The view config for the new choice. E.g. useful to tweak the chart type.
+                    - replace: Optional[bool], default=False
+                        If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
+                    - overwrite_dimension_choice: Optional[bool], default=False
+                        If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
+
         Example:
         --------
 
@@ -422,22 +442,7 @@ class Collection(MDIMBase):
 
         In this example, we have `dimension="sex"`, `choices=["female", "male"]`, and `choice_new_slug="combined"`.
 
-        Args:
-        -----
-        params: List[Dict[str, Any]]
-            List of dictionaries with the following keys:
-                - dimension: str
-                    Slug of the dimension that contains the choices to group.
-                - choices: List[str]
-                    Slugs of the choices to group.
-                - choice_new_slug: str
-                    The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
-                - config_new: Optional[Dict[str, Any]], default=None
-                    The view config for the new choice. E.g. useful to tweak the chart type.
-                - replace: Optional[bool], default=False
-                    If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
-                - overwrite_dimension_choice: Optional[bool], default=False
-                    If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
+
         """
         new_views_all = []
         for p in params:
