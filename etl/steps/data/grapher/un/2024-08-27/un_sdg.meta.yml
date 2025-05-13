@@ -145,7 +145,8 @@ tables:
          description_short: |-
            Share of people who, in the past 12 months, paid or were asked to pay a bribe, out of all people who had contact with a public official.
          description_key:
-          - This measure tracks how common bribery is when citizens interact with public officials. It shows, out of all people who dealt with a public official in the last year, how many of them either paid a bribe or were asked to pay one. Bribes include extra payments, gifts, or favors given in exchange for special treatment from government workers.
+          - This measure tracks how common bribery is when citizens interact with public officials.
+          - It shows, out of all people who dealt with a public official in the last year, how many of them either paid a bribe or were asked to pay one. Bribes include extra payments, gifts, or favors given in exchange for special treatment from government workers.
           - The focus is on everyday administrative bribery—the type most citizens face in routine interactions with public officials.
           - Public officials can hold a legislative, executive, administrative or judicial office, such as customs or police officers, judges, teachers or doctors.
           - It does not cover high-level political corruption, influence trading, or abuse of power.
