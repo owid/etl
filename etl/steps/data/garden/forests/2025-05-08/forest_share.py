@@ -16,20 +16,22 @@ def run() -> None:
     # Load inputs.
     #
     # Load meadow dataset.
-    # Defra data for England and Scotland.
+    # Defra data for England and Scotland
     snap_meadow_defra = paths.load_snapshot("forest_share", namespace="defra")
-    # FAO data for England and Scotland.
+    # FAO data for England and Scotland
     snap_meadow_fao = paths.load_snapshot("forest_share", namespace="fao")
-    # Forest cover data for  Scotland.
+    # Forest cover data for  Scotland
     snap_meadow_forest_research = paths.load_snapshot("forest_share", namespace="forest_research")
     # Forest cover data for France
     snap_meadow_france = paths.load_snapshot("france_forest_share", namespace="papers")
-    # Forest cover data for Japan.
+    # Forest cover data for Japan
     snap_meadow_japan = paths.load_snapshot("japan_forest_share", namespace="papers")
-    # Forest cover data for Taiwan.
+    # Forest cover data for Taiwan
     snap_meadow_taiwan = paths.load_snapshot("taiwan_forest_share", namespace="papers")
     # Forest cover data for the Scotland
     snap_meadow_scotland = paths.load_snapshot("mather_2004", namespace="papers")
+    # Forest cover data for Costa Rica
+    snap_meadow_costa_rica = paths.load_snapshot("kleinn_2000", namespace="papers")
     # Forest research data for South Korea
     snap_meadow_south_korea = paths.load_snapshot("soo_bae_et_al_2012", namespace="papers")
     # Forest research data for USA
@@ -45,6 +47,7 @@ def run() -> None:
     tb_japan = snap_meadow_japan.read()
     tb_taiwan = snap_meadow_taiwan.read()
     tb_scotland = snap_meadow_scotland.read()
+    tb_costa_rica = snap_meadow_costa_rica.read()
     tb_south_korea = snap_meadow_south_korea.read()
     tb_usa = snap_meadow_usa.read()
     tb_fra = ds_meadow_fra["fra_forest_area"].reset_index()
@@ -59,6 +62,7 @@ def run() -> None:
             tb_japan,
             tb_taiwan,
             tb_scotland,
+            tb_costa_rica,
             tb_south_korea,
             tb_usa,
         ]
