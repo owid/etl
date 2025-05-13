@@ -120,10 +120,9 @@ def submit_form() -> None:
 
 # TITLE
 st.title(":material/collections: Collection **:gray[Create step]**")
-st.markdown(
-    ":small[:orange-badge[:material/warning: Use this app to create a collection (previously referred as MDIMs). This app is in development. Please review the generated files.]]"
-)
 
+st.markdown(":small[:orange-badge[:material/warning: This app is in development. Please review the generated files.]]")
+st.markdown("Use this app to create a collection (previously referred as MDIMs).")
 with st.container(border=True):
     render_form()
 
