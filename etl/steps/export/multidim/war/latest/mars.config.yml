@@ -19,7 +19,7 @@ dimensions:
         # description: People moving to country
       - slug: "wars_ongoing_country_rate"
         name: "War rate"
-        # description: People moving to country
+        description: The number of wars divided by the number of countries
   - slug: conflict_type
     name: "Conflict type"
     choices:
