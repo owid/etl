@@ -60,15 +60,15 @@ dimensions:
         group: Individual poverty lines
       # - slug: multiple_lines_absolute
       #   name: Multiple lines
-      - slug: 40% of the median
-        name: 40% of the median
-        description: Relative poverty
-      - slug: 50% of the median
-        name: 50% of the median
-        description: Relative poverty
-      - slug: 60% of the median
-        name: 60% of the median
-        description: Relative poverty
+      # - slug: 40% of the median
+      #   name: 40% of the median
+      #   description: Relative poverty
+      # - slug: 50% of the median
+      #   name: 50% of the median
+      #   description: Relative poverty
+      # - slug: 60% of the median
+      #   name: 60% of the median
+      #   description: Relative poverty
       # - slug: multiple_lines_relative
       #   name: Multiple lines
       #   description: Relative poverty
