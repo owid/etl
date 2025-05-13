@@ -153,10 +153,15 @@ tables:
 
          description_from_producer: |-
           This indicator is defined as the percentage of persons who paid at least one bribe (gave a public official money, a gift or counter favour) to a public official, or were asked for a bribe by these public officials, in the last 12 months, as a percentage of persons who had at least one contact with a public official in the same period.
+
           In the International Classification of Crime for Statistical Purposes (ICCS), bribery is defined as: ‘Promising, offering, giving, soliciting, or accepting an undue advantage to or from a public official or a person who directs or works in a private sector entity, directly or indirectly, in order that the person act or refrain from acting in the exercise of his or her official duties’ (ICCS Category 07031).
+
           This definition is based on definitions of bribery of national public officials, bribery of foreign public officials and official of international organisations and bribery in the private sector that are contained in the United Nations Convention against Corruption (articles 15, 16, and 21). While the concept of bribery is broader, as it includes also actions such as promising or offering, and it covers both public and private sector, this indicator focuses on specific forms of bribery that are more measurable (the giving and/or requesting of bribes) and it limits the scope to the public sector.
+
           The concept of undue advantage is operationalized by reference to giving of money (in addition to an official fee), gifts or provision of a service requested/offered by/to a public official in exchange for a special treatment. This indicator captures the often called ‘administrative bribery’, which is often intended as the type of bribery affecting citizens in their dealings with public administrations and/or civil servants.
+
           For this indicator, public official refers to persons holding a legislative, executive, administrative or judicial office.
+
           In the operationalization of the indicator, a list of selected officials and civil servants is used.
 
           Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-16-05-01.pdf
