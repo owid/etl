@@ -194,7 +194,7 @@ def prepare_input_data(tb: Table) -> Table:
 
     # Harmonize names of variables, categories and subcategories.
     for field in ["variable", "category", "subcategory"]:
-        tb[field] = [value.capitalize().replace("Co2", "CO₂") for value in tb[field]]
+        tb[field] = [value.capitalize().replace("Co2", "CO2") for value in tb[field]]
 
     # Harmonize country names.
     tb = geo.harmonize_countries(
@@ -449,7 +449,7 @@ def make_table_power_sector_emissions(tb: Table, ds_regions: Dataset, ds_income_
     # Add total electricity generation to emissions table.
     table = pr.merge(table, electricity, on=["country", "year"], how="left")
     # Rename the original carbon intensity column as a temporary column called "check".
-    intensity_col = "CO₂ intensity - gCO2/kWh"
+    intensity_col = "CO2 intensity - gCO2/kWh"
     table = table.rename(columns={intensity_col: "check"}, errors="raise")
     # Calculate carbon intensity for all countries and regions.
     table[intensity_col] = table["Total emissions - mtCO2"] * MT_TO_G / (table["Total generation - TWh"] * TWH_TO_KWH)
