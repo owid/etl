@@ -209,6 +209,88 @@ def prepare_input_data(tb: Table) -> Table:
     return tb
 
 
+def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
+    # These are the main differences between the two datasets:
+    # - Variables in global data are title-cased and in European data are sentence-cased.
+    # - Global data includes category 'Capacity', while European does not.
+    # - Global data includes variable 'Total emissions', while European does not.
+    # - European data includes the following subcategory-variables pairs:
+    #   'Aggregate fuel - Coal',
+    #   'Aggregate fuel - Wind',
+    #   'Fuel - Hard coal',
+    #   'Fuel - Lignite',
+    #   'Fuel - Offshore wind',
+    #   'Fuel - Onshore wind',
+    # - Meanwhile global data only includes:
+    #   'Aggregate fuel - Gas and other fossil',
+    #   'Fuel - Coal',
+    #   'Fuel - Wind',
+    # - Global data includes data for all European countries from 2000 onwards. European data includes the same data from 2000 onwards, but also data from 1990 to 1999.
+
+    error = "Variables in global and European data have changed."
+    assert set(tb_global["variable"]) - set(tb_europe["variable"]) == {
+        "Gas and other fossil",
+        "Total emissions",
+    }, error
+    assert set(tb_europe["variable"]) - set(tb_global["variable"]) == {
+        "Hard coal",
+        "Lignite",
+        "Offshore wind",
+        "Onshore wind",
+    }, error
+
+    # The simplest solution regarding coal and wind is to rename the subcategory of European data from "Aggregate fuel" to "Fuel".
+    tb_europe.loc[
+        (tb_europe["subcategory"] == "Aggregate fuel") & (tb_europe["variable"].isin(["Coal", "Wind"])),
+        "subcategory",
+    ] = "Fuel"
+
+    # Create the gas and other fossil aggregate for European data.
+    error = "Expected European data to not include 'Gas and other fossil' variable."
+    assert not (tb_europe["variable"] == "Gas and other fossil").any(), error
+    tb_europe_gas_and_other_fossil = (
+        tb_europe[(tb_europe["variable"].isin(["Gas", "Other fossil"])) & (tb_europe["unit"].isin(["TWh", "MtCO2e"]))]
+        .groupby(["country", "year", "unit", "category"], as_index=False)
+        .agg({"value": "sum"})
+        .assign(**{"variable": "Gas and other fossil", "subcategory": "Aggregate fuel"})
+    )
+    tb_europe = pr.concat([tb_europe, tb_europe_gas_and_other_fossil], ignore_index=True)
+
+    # Check that the category-subcategory-variable groups are now identical for global and European data.
+    set_global = set(
+        [
+            t["category"] + " - " + t["subcategory"] + " - " + t["variable"]
+            for _, t in tb_global[(tb_global["category"] != "Capacity") & (tb_global["variable"] != "Total emissions")][
+                ["category", "subcategory", "variable"]
+            ]
+            .drop_duplicates()
+            .iterrows()
+        ]
+    )
+    set_europe = set(
+        [
+            t["category"] + " - " + t["subcategory"] + " - " + t["variable"]
+            for _, t in tb_europe[
+                ~tb_europe["variable"].isin(["Hard coal", "Lignite", "Onshore wind", "Offshore wind"])
+            ][["category", "subcategory", "variable"]]
+            .drop_duplicates()
+            .iterrows()
+        ]
+    )
+    assert (
+        set_global == set_europe
+    ), "After adapting European data, all category-subcategory-variables should be identical, except for:\n* Capacity and total emissions (only given in global), and\n* Hard coal, Lignite, Onshore wind and Offshore wind, only given in European data."
+
+    # Combine the two overlapping datasets, prioritizing European on overlapping rows.
+    tb = combine_two_overlapping_dataframes(
+        df1=tb_europe,
+        df2=tb_global,
+        index_columns=["country", "year", "variable", "unit", "category", "subcategory"],
+    )
+
+    return tb
+
+
 def make_wide_table(tb: Table, category: str, ds_regions: Dataset, ds_income_groups: Dataset) -> Table:
     """Convert data from long to wide format for a specific category.
 
@@ -480,59 +562,6 @@ def run() -> None:
     # Prepare global and European input data.
     tb_global = prepare_input_data(tb=tb_global)
     tb_europe = prepare_input_data(tb=tb_europe)
-
-    # Combine global and European data.
-    def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
-        # These are the main differences between the two datasets:
-        # TODO: Check all these points.
-        # - Variables in global data are title-cased and in European data are sentence-cased.
-        # - Global data includes category 'Capacity', while European does not.
-        # - Global data includes variable 'Total emissions', while European does not.
-        # - European data includes the following subcategory-variables pairs:
-        #   'Aggregate fuel - Coal',
-        #   'Aggregate fuel - Wind',
-        #   'Fuel - Hard coal',
-        #   'Fuel - Lignite',
-        #   'Fuel - Offshore wind',
-        #   'Fuel - Onshore wind',
-        # - Meanwhile global data only includes:
-        #   'Aggregate fuel - Gas and other fossil',
-        #   'Fuel - Coal',
-        #   'Fuel - Wind',
-        # - Global data includes data for all European countries from 2000 onwards. European data includes the same data from 2000 onwards, but also data from 1990 to 1999.
-
-        error = "Variables in global and European data have changed."
-        assert set(tb_global["variable"]) - set(tb_europe["variable"]) == {
-            "Gas and other fossil",
-            "Total emissions",
-        }, error
-        assert set(tb_europe["variable"]) - set(tb_global["variable"]) == {
-            "Hard coal",
-            "Lignite",
-            "Offshore wind",
-            "Onshore wind",
-        }, error
-
-        # The simplest solution regarding coal and wind is to rename the subcategory of European data from "Aggregate fuel" to "Fuel".
-        tb_europe.loc[
-            (tb_europe["subcategory"] == "Aggregate fuel") & (tb_europe["variable"].isin(["Coal", "Wind"])),
-            "subcategory",
-        ] = "Fuel"
-        # TODO: Create the gas and other fossil aggregate for European data.
-
-        # TODO: After combining, assert they are identical.
-        # set_global = set([t["category"] + " - " + t["subcategory"] + " - " + t["variable"] for _, t in tb_global[(tb_global["category"]!="Capacity") & (tb_global["variable"] != "Total emissions")][["category", "subcategory", "variable"]].drop_duplicates().iterrows()])
-        # set_europe = set([t["category"] + " - " + t["subcategory"] + " - " + t["variable"] for _, t in tb_europe[~tb_europe["variable"].isin(["Hard coal", "Lignite", "Onshore wind", "Offshore wind"])][["category", "subcategory", "variable"]].drop_duplicates().iterrows()])
-        # assert set_global == set_europe, "After adapting European data, all category-subcategory-variables should be identical, except for:\n* Capacity and total emissions (only given in global), and\n* Hard coal, Lignite, Onshore wind and Offshore wind, only given in European data."
-
-        # Combine the two overlapping datasets, prioritizing European on overlapping rows.
-        tb = combine_two_overlapping_dataframes(
-            df1=tb_europe,
-            df2=tb_global,
-            index_columns=["country", "year", "variable", "unit", "category", "subcategory"],
-        )
-
-        return tb
 
     # Combine global and European data.
     tb = combine_global_and_europe_data(tb_global=tb_global, tb_europe=tb_europe)
