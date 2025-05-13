@@ -150,7 +150,7 @@ def combine_beis_and_electricity_mix_data(tb_beis: Table, tb_elec: Table) -> Tab
     )
 
     # Format table conveniently.
-    tb_combined = tb_combined.format(sort_columns=True)
+    tb_combined = tb_combined.format(sort_columns=True, short_name=paths.short_name)
 
     return tb_combined
 
@@ -178,9 +178,6 @@ def run() -> None:
 
     # Combine BEIS and electricity mix data.
     tb_combined = combine_beis_and_electricity_mix_data(tb_beis=tb_beis, tb_elec=tb_elec)
-
-    # Update combined table name.
-    tb_combined.metadata.short_name = paths.short_name
 
     #
     # Save outputs.
