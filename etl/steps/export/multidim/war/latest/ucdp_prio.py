@@ -1,4 +1,5 @@
-# from etl.db import get_engine
+"""I've implemented a simple version of create_collections with support for multiple tables. We should move this somewhere so others can use, or just replace the behavior of paths.create_collection."""
+
 from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
@@ -148,50 +149,32 @@ def adjust_dimensions_ucdp_prio(tb):
 
     It adds field `indicator` and `estimate`.
     """
-    # 1. Adjust indicators dictionary reference (maps full column name to actual indicator)
-    # INDICATOR dimension (columns starting with this prefix)
-    DIMENSION_INDICATOR = {
-        # Deaths
-        "number_deaths_ongoing_conflicts__": "deaths",
-        "number_deaths_ongoing_conflicts_high__": "deaths",
-        "number_deaths_ongoing_conflicts_low__": "deaths",
-        # Death rate
-        "number_deaths_ongoing_conflicts_per_capita": "death_rate",
-        "number_deaths_ongoing_conflicts_high_per_capita": "death_rate",
-        "number_deaths_ongoing_conflicts_low_per_capita": "death_rate",
-    }
 
-    dims = {}
-    for prefix, indicator_name in DIMENSION_INDICATOR.items():
-        columns = list(tb.filter(regex=prefix).columns)
-        dims = {**dims, **{c: indicator_name for c in columns}}
-
-    # 2. Iterate over columns and adjust dimensions
-    columns = [col for col in tb.columns if col not in {"year", "country"}]
-    for col in columns:
-        # Overwrite original_short_name to actual indicator name
-        if col not in dims:
-            raise Exception(f"Column {col} not in indicator mapping")
-        tb[col].metadata.original_short_name = dims[col]
-
+    def fct(tb, col):
         # Add high estimate dimension
         if "_high_" in col:
             tb[col].metadata.dimensions["estimate"] = "high"
         # Add low estimate dimension
         elif "_low_" in col:
             tb[col].metadata.dimensions["estimate"] = "low"
-        # Add 'NA'
+        # Add 'Best'
         else:
             tb[col].metadata.dimensions["estimate"] = "best"
 
-    # 3. Adjust table-level dimension metadata
-    if isinstance(tb.metadata.dimensions, list):
-        tb.metadata.dimensions.append(
-            {
-                "name": "estimate",
-                "slug": "estimate",
-            }
-        )
+    adjust_dimensions(
+        tb,
+        {
+            # Deaths
+            "number_deaths_ongoing_conflicts__": "deaths",
+            "number_deaths_ongoing_conflicts_high__": "deaths",
+            "number_deaths_ongoing_conflicts_low__": "deaths",
+            # Death rate
+            "number_deaths_ongoing_conflicts_per_capita": "death_rate",
+            "number_deaths_ongoing_conflicts_high_per_capita": "death_rate",
+            "number_deaths_ongoing_conflicts_low_per_capita": "death_rate",
+        },
+        fct,
+    )
     return tb
 
 
@@ -200,17 +183,32 @@ def adjust_dimensions_ucdp(tb):
 
     It adds field `indicator` and `estimate`.
     """
-    # INDICATOR dimension (columns starting with this prefix)
-    DIMENSION_INDICATOR = {
-        # # Ongoing wars: number
-        "number_ongoing_conflicts__": "wars_ongoing",
-        "number_ongoing_conflicts_per_country": "wars_ongoing_country_rate",
-        "number_ongoing_conflicts_per_country_pair": "wars_ongoing_country_pair_rate",
-    }
 
+    def fct(tb, col):
+        tb[col].metadata.dimensions["estimate"] = "na"
+
+    adjust_dimensions(
+        tb,
+        {
+            # # Ongoing wars: number
+            "number_ongoing_conflicts__": "wars_ongoing",
+            "number_ongoing_conflicts_per_country": "wars_ongoing_country_rate",
+            "number_ongoing_conflicts_per_country_pair": "wars_ongoing_country_pair_rate",
+        },
+        fct,
+    )
+
+    return tb
+
+
+def adjust_dimensions(tb, indicator_dim, fct_dims):  # -> Any:
+    """Add dimensions to table columns.
+
+    It adds field `indicator` and `estimate`.
+    """
     # 1. Adjust indicators dictionary reference (maps full column name to actual indicator)
     dims = {}
-    for prefix, indicator_name in DIMENSION_INDICATOR.items():
+    for prefix, indicator_name in indicator_dim.items():
         columns = list(tb.filter(regex=prefix).columns)
         dims = {**dims, **{c: indicator_name for c in columns}}
 
@@ -223,7 +221,7 @@ def adjust_dimensions_ucdp(tb):
         tb[col].metadata.original_short_name = dims[col]
 
         # Add NA as dimension "estimate"
-        tb[col].metadata.dimensions["estimate"] = "na"
+        fct_dims(tb, col)
 
     # 3. Adjust table-level dimension metadata
     if isinstance(tb.metadata.dimensions, list):
