@@ -103,12 +103,12 @@ def st_show_home():
     steps = WIZARD_CONFIG["etl"]["steps"]
 
     # We present two channels to create an ETL step chain:
-    # 1. Classic: Snapshot -> Meadow -> Garden + Grapher
-    # 2. Fast Track: Fast Track + Grapher
+    # 1. Classic: Snapshot -> Data
+    # 2. Fast Track
 
     # 1/ CLASSIC: Snapshot + Data
     if steps["fasttrack"]["enable"]:
-        col1, col2 = st.columns([1, 3])
+        col1, col2, col3 = st.columns([1, 2, 1])
         with col1:
             create_card(
                 entrypoint=steps["snapshot"]["entrypoint"],
@@ -123,15 +123,24 @@ def st_show_home():
                 image_url=steps["data"]["image_url"],
                 custom_styles={"height": "100px"},
             )
+        with col3:
+            create_card(
+                entrypoint=steps["collection"]["entrypoint"],
+                title=steps["collection"]["title"],
+                image_url=steps["collection"]["image_url"],
+                custom_styles={"height": "100px"},
+            )
 
     # 2/ FAST TRACK
     if steps["fasttrack"]["enable"]:
-        create_card(
-            entrypoint=steps["fasttrack"]["entrypoint"],
-            title=steps["fasttrack"]["title"],
-            image_url=steps["fasttrack"]["image_url"],
-            custom_styles={"height": "50px"},
-        )
+        col1, _ = st.columns([3, 1])
+        with col1:
+            create_card(
+                entrypoint=steps["fasttrack"]["entrypoint"],
+                title=steps["fasttrack"]["title"],
+                image_url=steps["fasttrack"]["image_url"],
+                custom_styles={"height": "50px"},
+            )
 
     #########################
     # Sections
