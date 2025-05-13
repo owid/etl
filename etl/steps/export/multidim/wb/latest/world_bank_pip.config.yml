@@ -58,6 +58,10 @@ dimensions:
       - slug: "4000"
         name: $40 a day
         group: Individual poverty lines
+      - slug: line_chart
+        name: Line chart
+        description: See how poverty has changed over time using 4 different poverty lines
+        group: Visualize multiple poverty lines
       # - slug: multiple_lines_absolute
       #   name: Multiple lines
       # - slug: 40% of the median
@@ -81,4 +85,19 @@ dimensions:
         name: Income surveys only
       - slug: Consumption
         name: Consumption surveys only
-views: []
+views:
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: line_chart
+      table: Income or consumption consolidated
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+
+    config:
+      title: Share of the population living below a range of poverty lines
+      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      hasMapTab: false
