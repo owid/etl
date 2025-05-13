@@ -433,7 +433,7 @@ class Collection(MDIMBase):
                 - choice_new_slug: str
                     The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
                 - config_new: Optional[Dict[str, Any]], default=None
-                    The config for the new choice. E.g. useful to tweak the chart type.
+                    The view config for the new choice. E.g. useful to tweak the chart type.
                 - replace: Optional[bool], default=False
                     If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
                 - overwrite_dimension_choice: Optional[bool], default=False
@@ -475,7 +475,10 @@ class Collection(MDIMBase):
             # Add dimensions. TODO: Use combine_dimensions instead?
             for dim in self.dimensions:
                 if (dim.slug == dimension) and (choice_new_slug not in dim.choice_slugs):
-                    new_choice = DimensionChoice(slug=choice_new_slug, name=choice_new_slug)
+                    new_choice = DimensionChoice(
+                        slug=choice_new_slug,
+                        name=choice_new_slug,
+                    )
                     # Add new choice to dimension
                     dim.choices.append(new_choice)
                     break

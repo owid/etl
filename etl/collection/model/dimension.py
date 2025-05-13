@@ -10,6 +10,7 @@ class DimensionChoice(MDIMBase):
     slug: str
     name: str
     description: Optional[str] = None
+    group: Optional[str] = None
 
 
 @dataclass(frozen=True)
@@ -115,6 +116,7 @@ class Dimension(MDIMBase):
 
     def validate_unique_names(self):
         """Validate that all choice names are unique."""
+        # TODO: Check if (name, group) is unique instead of just name
         names = [choice.name for choice in self.choices]
         if len(names) != len(set(names)):
             raise ValueError(f"Dimension choices for '{self.slug}' must have unique names!")
