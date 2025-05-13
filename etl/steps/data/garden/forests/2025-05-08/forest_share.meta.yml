@@ -34,7 +34,10 @@ tables:
         description_short: "The share of land area covered by forest, including both natural forests and forest plantations."
         unit: "%"
         short_unit: "%"
+        presentation:
+          title_public: Forest cover
         display:
+          name: Forest cover
           numDecimalPlaces: 1
         description_key:
           - This indicator is a combination of data from multiple sources, including FAO, USDA Forest Service, DEFRA, Forest Research, and others. FAO data is used for 1990 onwards.
