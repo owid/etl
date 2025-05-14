@@ -509,7 +509,7 @@ tables:
           numDecimalPlaces: 1
 
 
-      completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_2_gpia:
+      completion_rate__primary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
         title: Completion rate in primary education, adjusted gender parity index (GPIA)
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal primary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
         unit: ""
@@ -524,4 +524,3 @@ tables:
           - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
         display:
           numDecimalPlaces: 1
-
