@@ -13,7 +13,7 @@ DIMENSIONS_CONFIG = {
     # "ppp_version": ["2017.0"],
     # "welfare_type": "*",
     # "decile": "*",
-    # "survey_comparability": "*",
+    "survey_comparability": ["No spells"],
 }
 
 
@@ -34,8 +34,9 @@ def run() -> None:
         if ("ppp_version" in tb[column].metadata.dimensions) and tb[column].metadata.dimensions["ppp_version"] == 2017:
             columns_to_keep.append(column)
             tb[column].metadata.dimensions.pop("ppp_version")
+
         # Remove dimensions that are not needed.
-        for dimension in ["welfare_type", "decile", "survey_comparability"]:
+        for dimension in ["welfare_type", "decile"]:
             if dimension in tb[column].metadata.dimensions:
                 tb[column].metadata.dimensions.pop(dimension)
     tb = tb[columns_to_keep]

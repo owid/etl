@@ -28,6 +28,15 @@ definitions:
   color_685_to_1000_simplified: &color_685_to_1000_simplified "#ABD9E9"
   color_1000_to_inf_simplified: &color_1000_to_inf_simplified "#2C7BB6"
 
+  extreme_poverty_subtitle: Extreme poverty is defined as living below the International Poverty Line of $2.15 a day.
+  lmic_poverty_line_subtitle: The poverty line of $3.65 a day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries.
+  umic_poverty_line_subtitle: The poverty line of $6.85 a day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries.
+
+  spells_subtitle: The chart shows breaks in the comparability of the underlying household survey data over time within each country individually.
+
+  ppp_adjustment_subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+  ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
+
 dimensions:
   - name: Metric
     slug: indicator
@@ -101,37 +110,25 @@ dimensions:
         name: Bar chart (additional poverty lines)
         description: A more fine-grained comparison of the distribution of incomes in different countries
         group: Visualize multiple poverty lines
-      # - slug: multiple_lines_absolute
-      #   name: Multiple lines
-      # - slug: 40% of the median
-      #   name: 40% of the median
-      #   description: Relative poverty
-      # - slug: 50% of the median
-      #   name: 50% of the median
-      #   description: Relative poverty
-      # - slug: 60% of the median
-      #   name: 60% of the median
-      #   description: Relative poverty
-      # - slug: multiple_lines_relative
-      #   name: Multiple lines
-      #   description: Relative poverty
-  - name: Household survey data type
-    slug: table
+  - name: Breaks in data
+    slug: survey_comparability
+    description: The data provider reports where trends in countries are affected by changes in methodology. These breaks can be shown in the chart.
     choices:
-      - slug: Income or consumption consolidated
-        name: Show data for both income and consumption
-      - slug: Income
-        name: Income surveys only
-      - slug: Consumption
-        name: Consumption surveys only
+      - slug: Spells
+        name: Show
+        description: Better for making broad comparisons across several countries
+      - slug: No spells
+        name: Don't show
+        description: Better for understanding trends within individual countries
 
 views:
   # MULTIPLE LINES SIMPLE
   - dimensions:
       indicator: headcount_ratio
       poverty_line: line_chart
-      # ppp_version: "2017.0"
+      ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -148,7 +145,8 @@ views:
             name: "Share below $30 a day"
     config:
       title: Share of the population living below a range of poverty lines
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -161,6 +159,7 @@ views:
       poverty_line: area_chart
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_above__ppp_version_2017__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -185,7 +184,8 @@ views:
             color: *color_0_to_215_simplified
     config:
       title: Distribution of the population between different poverty thresholds
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
@@ -201,6 +201,7 @@ views:
       poverty_line: bar_chart
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -220,7 +221,8 @@ views:
             name: "Above $10 a day"
     config:
       title: Distribution of the population between different poverty thresholds
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["StackedDiscreteBar"]
       selectedFacetStrategy: entity
@@ -237,6 +239,7 @@ views:
       poverty_line: line_chart_more_lines
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -265,7 +268,8 @@ views:
             name: "Share below $40 a day"
     config:
       title: Share of the population living below a range of poverty lines
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -278,6 +282,7 @@ views:
       poverty_line: area_chart_more_lines
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_above__ppp_version_2017__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -318,7 +323,8 @@ views:
             color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty thresholds
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
@@ -334,6 +340,7 @@ views:
       poverty_line: bar_chart_more_lines
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -365,7 +372,8 @@ views:
             name: "Above $40 a day"
     config:
       title: Distribution of the population between different poverty thresholds
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["StackedDiscreteBar"]
       selectedFacetStrategy: entity
@@ -385,6 +393,7 @@ views:
       poverty_line: line_chart
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -401,7 +410,8 @@ views:
             name: "Share below $30 a day"
     config:
       title: Number of people living below a range of poverty lines
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -412,6 +422,7 @@ views:
       poverty_line: area_chart
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_above__ppp_version_2017__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -436,7 +447,8 @@ views:
             color: *color_0_to_215_simplified
     config:
       title: Distribution of the population between different poverty thresholds
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
@@ -452,6 +464,7 @@ views:
       poverty_line: bar_chart
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -471,7 +484,8 @@ views:
             name: "Above $10 a day"
     config:
       title: Distribution of the population between different poverty thresholds
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["StackedDiscreteBar"]
       selectedFacetStrategy: entity
@@ -487,6 +501,7 @@ views:
       poverty_line: line_chart_more_lines
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -515,7 +530,8 @@ views:
             name: "Share below $40 a day"
     config:
       title: Number of people living below a range of poverty lines
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -526,6 +542,7 @@ views:
       poverty_line: area_chart_more_lines
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_above__ppp_version_2017__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -566,7 +583,8 @@ views:
             color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty thresholds
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
@@ -582,6 +600,7 @@ views:
       poverty_line: bar_chart_more_lines
       ppp_version: "2017.0"
       table: Income or consumption consolidated
+      survey_comparability: No spells
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
@@ -613,7 +632,8 @@ views:
             name: "Above $40 a day"
     config:
       title: Distribution of the population between different poverty thresholds
-      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      subtitle: "{definitions.ppp_adjustment_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
       hasMapTab: false
       chartTypes: ["StackedDiscreteBar"]
       selectedFacetStrategy: entity
@@ -622,3 +642,502 @@ views:
       hideRelativeToggle: false
       stackMode: absolute
       hideTotalValueLabel: false
+
+    ####################################################
+    # SPELL VIEWS
+    ####################################################
+    # HEADCOUNT RATIO
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: "100"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: "215"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.extreme_poverty_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: "365"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.lmic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: "685"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.umic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: "1000"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath:
+            world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: "2000"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath:
+            world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath:
+            world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: "3000"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath:
+            world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath:
+            world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: "4000"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath:
+            world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath:
+            world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  # HEADCOUNT
+  - dimensions:
+      indicator: headcount
+      poverty_line: "100"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount
+      poverty_line: "215"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.extreme_poverty_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount
+      poverty_line: "365"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.lmic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount
+      poverty_line: "685"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.umic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount
+      poverty_line: "1000"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath:
+            world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount
+      poverty_line: "2000"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath:
+            world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath:
+            world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount
+      poverty_line: "3000"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath:
+            world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath:
+            world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount
+      poverty_line: "4000"
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+      survey_comparability: Spells
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_1
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_2
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_0
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_1
+        - catalogPath:
+            world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_2
+        - catalogPath:
+            world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_3
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_4
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_5
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_7
+    config:
+      subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
+      note: "{definitions.ppp_adjustment_note}"
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity

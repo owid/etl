@@ -144,8 +144,10 @@ definitions:
 
   description_key_not_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
 
-  description_key_nowcasts: Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
-
+  description_key_nowcasts: |-
+    <% if survey_comparability == "No spells" %>
+    Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+    <% endif %>
 
   prosperity_gap_threshold: |-
     <% if ppp_version == 2017 %>
