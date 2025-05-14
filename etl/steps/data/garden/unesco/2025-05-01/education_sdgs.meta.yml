@@ -64,8 +64,6 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_literacy
-        presentation:
-          title_public: Youth literacy rate among men
         display:
           numDecimalPlaces: 1
 
@@ -75,8 +73,6 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_literacy
-        presentation:
-          title_public: Youth literacy rate among women
         display:
           numDecimalPlaces: 1
 
@@ -97,8 +93,6 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_literacy
-        presentation:
-          title_public: Youth literacy rate
         display:
           numDecimalPlaces: 1
 
@@ -115,8 +109,6 @@ tables:
           - Data sources include national censuses and household surveys. The UNESCO Institute for Statistics (UIS) and partners may also use modelled estimates when recent or complete data are not available.
           - This indicator measures basic literacy, not functional literacy. It reflects the presence of foundational skills, but not whether they are applied effectively in everyday contexts.
           - Cross-country comparability may be affected by differences in definitions, data collection methods, and the extent to which responses are self-reported or verified.
-        presentation:
-          title_public: Youth literacy rate, adjusted gender parity index
         display:
           numDecimalPlaces: 1
 
@@ -344,8 +336,11 @@ tables:
           - Reading skills are measured through standardized tests, such as PISA or national assessments.
           - A higher percentage means more students are developing foundational reading skills before finishing lower secondary education.
           - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
+        presentation:
+          title_public: Share of students achieving minimum reading proficiency by the end of lower secondary education
         display:
           numDecimalPlaces: 1
+          name: Share achieving reading proficiency by end of lower secondary
 
       proportion_of_students_at_the_end_of_primary_education_achieving_at_least_a_minimum_proficiency_level_in_reading__both_sexes__pct__read_primary:
         title: Share of students with minimum reading skills by the end of primary school
@@ -359,12 +354,15 @@ tables:
           - Skills are measured through standardized tests, such as PIRLS or national assessments.
           - A higher percentage indicates more students are developing essential literacy by the end of primary school.
           - Cross-country comparisons may be affected by differences in test design and standards.
+        presentation:
+          title_public: Share of students achieving minimum reading proficiency by the end of primary education
         display:
           numDecimalPlaces: 1
+          name: Share achieving reading proficiency by end of primary
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_2_read:
         title: Share of children achieving minimum reading proficiency by the end of lower secondary age
-        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards, including the ability to connect main ideas across different text types, understand the author’s intentions, and draw conclusions from the text, adjusted for national school completion rates.
+        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting reading comprehension standards, including the ability to connect main ideas across different text types, understand the author’s intentions, and draw conclusions from the text. This data accounts for school completion rates to estimate reading comprehension skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -375,12 +373,15 @@ tables:
           - A higher percentage suggests that most children are both completing school and acquiring core reading skills.
           - Data comes from assessments like PIRLS or ERCE and completion estimates from surveys or models.
           - Comparability may be affected by differences in assessments, definitions, and data timing.
+        presentation:
+          title_public: Share of children achieving minimum reading proficiency by the end of lower secondary age
         display:
           numDecimalPlaces: 1
+          name: Share achieving reading proficiency by end of lower secondary
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_reading__both_sexes__pct__prepfuture_1_read:
         title: Share of children achieving minimum reading proficiency by the end of primary age
-        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This means children can identify key ideas in texts and connect them to their own experiences. This data omits children who don't attend school.
+        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum reading proficiency by the end of [primary](#dod:primary-education) education. This means children can identify key ideas in texts and connect them to their own experiences. This data accounts for school completion rates to estimate reading comprehension skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -391,12 +392,15 @@ tables:
           - A higher value suggests strong access to education and effective early learning.
           - Data comes from assessments like PIRLS or ERCE and completion estimates from surveys or models.
           - Limitations include differences in assessment tools, definitions, and the timing of data sources.
+        presentation:
+          title_public: Share of children achieving minimum reading proficiency by the end of primary age
         display:
           numDecimalPlaces: 1
+          name: Share achieving reading proficiency by end of primary
 
       proportion_of_children_young_people_at_the_age_of_lower_secondary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_2_math:
         title: Share of children achieving minimum math proficiency by the end of lower secondary age
-        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This means children can apply algebra, interpret graphs, and solve real-world problems.
+        description_short: Percentage of children at [lower secondary](#dod:lower-secondary-education) school age meeting minimum math proficiency for the end of [lower secondary](#dod:lower-secondary-education) education. This means children can apply algebra, interpret graphs, and solve real-world problems. This data accounts for school completion rates to estimate reading comprehension skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -407,12 +411,15 @@ tables:
           - A higher percentage means more children are both staying in school and acquiring core math skills.
           - Data comes from international assessments such as TIMSS, along with completion estimates based on surveys or models.
           - Comparability may be affected by gaps in data, different assessment tools, and mismatches in timing between sources.
+        presentation:
+          title_public: Share of children achieving minimum math proficiency by the end of lower secondary age
         display:
           numDecimalPlaces: 1
+          name: Share achieving math proficiency by end of lower secondary
 
       proportion_of_children_young_people_at_the_age_of_primary_education_prepared_for_the_future_in_mathematics__both_sexes__pct__prepfuture_1_math:
         title: Share of children achieving minimum math proficiency by the end of primary age
-        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This means children can solve basic problems involving number sense, measurement, and interpreting simple data.
+        description_short: Percentage of children at [primary](#dod:primary-education) school age meeting minimum math proficiency for the end of [primary](#dod:primary-education) education. This means children can solve basic problems involving number sense, measurement, and interpreting simple data. This data accounts for school completion rates to estimate reading comprehension skills for all children, not just those in school.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -423,8 +430,11 @@ tables:
         - A higher percentage suggests education systems are enabling most children to complete school and build essential math skills.
         - Data comes from assessments such as TIMSS or ERCE, along with completion estimates based on household surveys or models.
         - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
+        presentation:
+          title_public: Share of children achieving minimum math proficiency by the end of primary age
         display:
           numDecimalPlaces: 1
+          name: Share achieving math proficiency by end of primary
 
       completion_rate__primary_education__both_sexes__pct__modelled_data__cr_mod_1:
         title: Completion rate in primary education

@@ -56,13 +56,13 @@ definitions:
     - Children enrolled in a different level than expected for their age are included in this indicator, even if they are technically still in school.
 
   desc_key_up_out_school: &desc_key_up_out_school
-  - This indicator shows the share of young people who are the right age for upper secondary school but are not enrolled at that level.
-  - It focuses on those within the official upper secondary age range — typically 15 to 17 or 16 to 18 — who are not attending upper secondary education.
-  - These children may still be in lower levels of school, may have left school entirely, or may not have transitioned to upper secondary after completing lower secondary.
-  - The value is calculated by subtracting the number of upper secondary-age students enrolled at the upper secondary level from the total number in that age group.
-  - Data is drawn from school records and household surveys that match enrolment levels to student age.
-  - Inconsistencies in definitions of enrolment, age reporting, or school level classifications may affect the estimates.
-  - Youth who are in school but enrolled below their age-appropriate level are included in this indicator.
+    - This indicator shows the share of young people who are the right age for upper secondary school but are not enrolled at that level.
+    - It focuses on those within the official upper secondary age range — typically 15 to 17 or 16 to 18 — who are not attending upper secondary education.
+    - These children may still be in lower levels of school, may have left school entirely, or may not have transitioned to upper secondary after completing lower secondary.
+    - The value is calculated by subtracting the number of upper secondary-age students enrolled at the upper secondary level from the total number in that age group.
+    - Data is drawn from school records and household surveys that match enrolment levels to student age.
+    - Inconsistencies in definitions of enrolment, age reporting, or school level classifications may affect the estimates.
+    - Children who are in school but enrolled below their age-appropriate level are included in this indicator.
 
   desc_key_private_enrolment: &desc_key_private_enrolment
     - In many countries, education is provided not only by the government but also by private institutions — this indicator shows how much of total enrolment is taking place in privately run schools or educational programmes.
@@ -136,7 +136,7 @@ tables:
       out_of_school_adolescents_of_lower_secondary_school_age__both_sexes__number:
         title: Out-of-school children of lower secondary school age
         unit: "children"
-        description_short: Youth in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
+        description_short: Children in the official lower secondary school age range who are not enrolled in [lower secondary](#dod:lower-secondary-education) education.
         description_key: *deck_key_low_out_school
         presentation:
           title_public: Out-of-school children of lower secondary school age
@@ -147,7 +147,7 @@ tables:
       out_of_school_youth_of_upper_secondary_school_age__both_sexes__number:
         title: Out-of-school children of upper secondary school age
         unit: "children"
-        description_short: Youth in the official upper secondary school age range who are not enrolled [upper secondary](#dod:upper-secondary-education) education.
+        description_short: Children in the official upper secondary school age range who are not enrolled [upper secondary](#dod:upper-secondary-education) education.
         description_key: *desc_key_up_out_school
         presentation:
           title_public: Out-of-school children of upper secondary school age
