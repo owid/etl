@@ -8,9 +8,10 @@ T = TypeVar("T")
 
 
 class MDIMBase(MetaBase):
-    def save_file(self, filename: Union[str, Path]) -> None:
+    def save_file(self, filename: Union[str, Path], force_create: bool = False) -> None:
         path = Path(filename)
-        path.parent.mkdir(parents=True, exist_ok=True)
+        if force_create:
+            path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w") as ostream:
             json.dump(self.to_dict(), ostream, indent=2, default=str)
 

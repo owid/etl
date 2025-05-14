@@ -128,7 +128,7 @@ class Collection(MDIMBase):
 
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")
-        self.save_file(self.local_config_path)
+        self.save_file(self.local_config_path, force_create=False)
 
     def save(  # type: ignore[override]
         self,

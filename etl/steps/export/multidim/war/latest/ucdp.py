@@ -37,7 +37,73 @@ def run() -> None:
             "death_rate",
             "num_conflicts",
         ],
+        common_view_config={
+            "hideAnnotationFieldsInTitle": {
+                "time": True,
+            },
+        },
         # dimensions={},
+    )
+
+    # Aggregate views
+    c.group_views(
+        params=[
+            {
+                "dimension": "conflict_type",
+                "choices": [
+                    "interstate",
+                    "intrastate",
+                    "non-state conflict",
+                    "one-sided violence",
+                ],
+                "choice_new_slug": "all_stacked",
+                "config_new": {
+                    "chartTypes": ["StackedBar"],
+                    "hideAnnotationFieldsInTitle": {
+                        "time": True,
+                    },
+                },
+            },
+            {
+                "dimension": "estimate",
+                "choices": ["low", "high", "best"],
+                "choice_new_slug": "best_ci",
+                "config_new": {
+                    "selectedFacetStrategy": "entity",
+                    "hideAnnotationFieldsInTitle": {
+                        "time": True,
+                    },
+                },
+            },
+            {
+                "dimension": "people",
+                "choices": ["combatants", "civilians", "unknown"],
+                "choice_new_slug": "all_stacked",
+                "config_new": {
+                    "chartTypes": ["StackedBar"],
+                    "selectedFacetStrategy": "entity",
+                    "hideAnnotationFieldsInTitle": {
+                        "time": True,
+                    },
+                },
+            },
+        ]
+    )
+
+    # Drop views
+    c.drop_views(
+        [
+            {
+                "conflict_type": [
+                    "extrasystemic",
+                    "intrastate (internationalized)",
+                    "intrastate (non-internationalized)",
+                    "state-based",
+                ]
+            },
+            {"estimate": ["low", "high"]},
+            {"people": ["combatants", "civilians", "unknown"]},
+        ]
     )
 
     #
