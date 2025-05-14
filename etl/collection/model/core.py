@@ -3,6 +3,7 @@
 import json
 import re
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Union
@@ -586,7 +587,7 @@ def _combine_view_indicators(views: List[View]):
             )
         if view.indicators.y is None:
             raise ValueError("View must have y indicators to be combined.")
-        y_indicators.extend(view.indicators.y)
+        y_indicators.extend(deepcopy(view.indicators.y))
 
     indicators = ViewIndicators(y=y_indicators)
     return indicators
