@@ -164,6 +164,10 @@ views:
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
       baseColorScheme: RdYlBu
+      hideRelativeToggle: false
+      stackMode: absolute
+      yAxis:
+        facetDomain: independent
 
   # BAR CHART
   - dimensions:
@@ -197,6 +201,8 @@ views:
       baseColorScheme: RdYlBu
       sortBy: column
       sortColumnSlug: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      hideRelativeToggle: false
+      stackMode: absolute
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -279,6 +285,10 @@ views:
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
       baseColorScheme: RdYlBu
+      hideRelativeToggle: false
+      stackMode: absolute
+      yAxis:
+        facetDomain: independent
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -325,6 +335,8 @@ views:
       sortBy: column
       sortOrder: asc
       sortColumnSlug: world_bank_pip_dimensional#headcount_ratio_above__ppp_version_2017__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      hideRelativeToggle: false
+      stackMode: absolute
 
 
   # FOR HEADCOUNT
@@ -385,6 +397,10 @@ views:
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
       baseColorScheme: RdYlBu
+      hideRelativeToggle: false
+      stackMode: absolute
+      yAxis:
+        facetDomain: independent
 
   # BAR CHART
   - dimensions:
@@ -418,6 +434,8 @@ views:
       baseColorScheme: RdYlBu
       sortBy: column
       sortColumnSlug: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      hideRelativeToggle: false
+      stackMode: absolute
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -500,6 +518,10 @@ views:
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
       baseColorScheme: RdYlBu
+      hideRelativeToggle: false
+      stackMode: absolute
+      yAxis:
+        facetDomain: independent
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -546,3 +568,5 @@ views:
       sortBy: column
       sortOrder: asc
       sortColumnSlug: world_bank_pip_dimensional#headcount_above__ppp_version_2017__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+      hideRelativeToggle: false
+      stackMode: absolute
