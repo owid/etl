@@ -6,6 +6,7 @@ definitions:
         - Tuberculosis
     description_key:
       - Death rates are standardised using the 2012 population of England and Wales.
+    unit: deaths per 1,000 population
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
