@@ -11,11 +11,11 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("davenport_2021.xls")
+    snap = paths.load_snapshot("davenport_2021.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read()
-
+    tb = snap.read(sheet_name="rates")
+    tb["country"] = "England and Wales"
     #
     # Process data.
     #
