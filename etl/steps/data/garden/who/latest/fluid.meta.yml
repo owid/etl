@@ -4,7 +4,7 @@ dataset:
 
     The platform accommodates both qualitative and quantitative data which facilitates the tracking of global trends, spread, intensity, and impact of influenza. These data are made freely available to health policy makers in order to assist them in making informed decisions regarding the management of influenza.
   licenses:
-  - {}
+    - {}
 tables:
   fluid:
     variables:
@@ -16,5 +16,3 @@ tables:
         title: Reported influenza-like illnesses
       reported_sari_deaths:
         title: Reported severe acute respiratory deaths
-      reported_sari_icu:
-        title: Reported severe acute respiratory ICU hospitalizations

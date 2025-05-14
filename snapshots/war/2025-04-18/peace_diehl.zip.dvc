@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: Diehl et al.
+    title: Peace data
+    description: |-
+      This data article reviews the revised “peace data,” describing the motivations behind them and offering a general description of the different peace scale levels—severe rivalry, lesser rivalry, negative peace, warm peace, and security community respectively. A brief overview of the evolution of peace and rivalry for the 1900-2015 period is presented. Peace in the international system has increased over time, with a decline in rivalries and an increase in security communities being the most notable findings. The article concludes with a discussion of how the peace data might be used to address new questions in international relations research or reconfigure existing ones.
+    citation_full: |-
+      Goertz, G., Diehl, P. and Balas, A. 2016. The Puzzle of Peace: Explaining the Rise of Peace in the International System. Oxford University Press.
+
+      Paul F Diehl & Gary Goertz & Yahve Gallegos, 2021. "Peace data: Concept, measurement, patterns, and research agenda," Conflict Management and Peace Science, Peace Science Society (International), vol. 38(5), pages 605-624, September.
+
+      Available at: https://journals.sagepub.com/doi/abs/10.1177/0738894219870288
+    version_producer: v3.1.1
+    url_main: https://drive.google.com/drive/folders/1HKZ6FQmK09VJ5mzzEzIwkOawf7tb6Z63?usp=sharing
+    date_accessed: "2025-04-18"
+    date_published: "2025-01-02"
+    license:
+      name: CC BY 4.0
+      url: https://creativecommons.org/licenses/by/4.0/
+outs:
+  - md5: 38666572a23ad25eeac84fe4d5aef0c9
+    size: 8629492
+    path: peace_diehl.zip

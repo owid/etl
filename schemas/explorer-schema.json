@@ -464,7 +464,7 @@
                         "type": {
                             "type": "string",
                             "description": "The type of value to display",
-                            "enum": ["Integer", "Decimal", "Percentage", "String", "Ratio"]
+                            "enum": ["Integer", "Decimal", "Percentage", "String", "Ratio", "Numeric"]
                         },
                         "tolerance": {
                             "type": "number",

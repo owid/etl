@@ -61,7 +61,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, ProgrammingError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
     DeclarativeBase,
@@ -1813,14 +1813,21 @@ class ChartDiffConflicts(Base):
 
 class MultiDimDataPage(Base):
     __tablename__ = "multi_dim_data_pages"
-
-    slug: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
-    config: Mapped[dict] = mapped_column(JSON)
-    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"), init=False)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
-    updatedAt: Mapped[datetime] = mapped_column(
-        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    __table_args__ = (
+        Index("idx_multi_dim_data_pages_catalog_path", "catalogPath", unique=True),
+        Index("idx_multi_dim_data_pages_slug", "slug", unique=True),
     )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    config: Mapped[dict] = mapped_column(JSON)
+    configMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(`config`))))", persisted=True))
+    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    )
+    catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767))
+    slug: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
 
     def upsert(self, session: Session) -> "MultiDimDataPage":
         cls = self.__class__
@@ -1831,6 +1838,21 @@ class MultiDimDataPage(Base):
         else:
             session.add(self)
             return self
+
+    @classmethod
+    def load_mdim(
+        cls, session: Session, catalogPath: Optional[str] = None, columns: Optional[List[str]] = None
+    ) -> Optional["MultiDimDataPage"]:
+        cond = cls.catalogPath == catalogPath
+        if columns:
+            return session.execute(_select_columns(cls, columns).where(cond)).one()  # type: ignore
+        else:
+            return session.scalars(select(cls).where(cond)).first()
+
+    @classmethod
+    def load_mdims(cls, session: Session, columns: Optional[List[str]] = None) -> List["MultiDimDataPage"]:
+        execute = session.execute if columns else session.scalars
+        return execute(_select_columns(cls, columns)).all()  # type: ignore
 
 
 class Anomaly(Base):
@@ -1904,7 +1926,14 @@ class Anomaly(Base):
 
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
-        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        try:
+            return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        except ProgrammingError as e:
+            # anomalies table does not exist (error code 1146), it gets created dynamically
+            # when the first anomaly is created
+            if "1146" in str(e):
+                return []
+            raise
 
 
 class Explorer(Base):
@@ -1929,9 +1958,14 @@ class Explorer(Base):
     config: Mapped[dict] = mapped_column(JSON)
 
     @classmethod
-    def load_explorer(cls, session: Session, slug: Optional[str] = None) -> Optional["Explorer"]:
+    def load_explorer(
+        cls, session: Session, slug: Optional[str] = None, columns: Optional[List[str]] = None
+    ) -> Optional["Explorer"]:
         cond = cls.slug == slug
-        return session.scalars(select(cls).where(cond)).first()
+        if columns:
+            return session.execute(_select_columns(cls, columns).where(cond)).one()  # type: ignore
+        else:
+            return session.scalars(select(cls).where(cond)).first()
 
     @classmethod
     def load_explorers(cls, session: Session, columns: Optional[List[str]] = None) -> List["Explorer"]:

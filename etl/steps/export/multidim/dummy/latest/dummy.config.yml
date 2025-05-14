@@ -1,0 +1,11 @@
+title:
+  title: COVID-19
+  title_variant: Explore various indicators
+default_selection:
+  - United States
+  - United Kingdom
+  - China
+  - India
+# Both will be filled programmatically.
+dimensions: []
+views: []

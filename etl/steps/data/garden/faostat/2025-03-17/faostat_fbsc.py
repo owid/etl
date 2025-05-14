@@ -21,12 +21,14 @@ from shared import (
     ADDED_TITLE_TO_WIDE_TABLE,
     CURRENT_DIR,
     ELEMENTS_IN_FBSH_MISSING_IN_FBS,
+    add_modified_variables,
     add_per_capita_variables,
     add_regions,
     clean_data,
     handle_anomalies,
     harmonize_elements,
     harmonize_items,
+    improve_metadata,
     log,
     parse_amendments_table,
     prepare_long_table,
@@ -197,6 +199,9 @@ def run() -> None:
     # Handle detected anomalies in the data.
     tb, anomaly_descriptions = handle_anomalies(dataset_short_name=dataset_short_name, tb=tb)
 
+    # For convenience, create additional indicators in different units.
+    tb = add_modified_variables(tb=tb, dataset_short_name=dataset_short_name)
+
     # Avoid objects as they would explode memory, use categoricals instead.
     # for col in tb.columns:
     # assert tb[col].dtype != object, f"Column {col} should not have object type"
@@ -212,6 +217,9 @@ def run() -> None:
     # Create a wide table (with only country and year as index).
     log.info("faostat_fbsc.prepare_wide_table", shape=tb.shape)
     tb_wide = prepare_wide_table(tb=tb)
+
+    # Improve metadata (of wide table).
+    improve_metadata(tb_wide=tb_wide, dataset_short_name=dataset_short_name)
 
     # Check that column "value" has two origins (other columns are not as important and may not have origins).
     error = f"Column 'value' of the long table of {dataset_short_name} must have two origins."

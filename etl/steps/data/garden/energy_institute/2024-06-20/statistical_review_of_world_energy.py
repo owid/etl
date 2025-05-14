@@ -3,7 +3,7 @@
 from owid.catalog import Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -582,15 +582,15 @@ def fix_missing_nuclear_energy_data(tb: Table) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load meadow dataset and read its tables.
     ds_meadow = paths.load_dataset("statistical_review_of_world_energy")
-    tb_meadow = ds_meadow["statistical_review_of_world_energy"].reset_index()
-    tb_meadow_prices = ds_meadow["statistical_review_of_world_energy_prices"].reset_index()
-    tb_efficiency = ds_meadow["statistical_review_of_world_energy_efficiency_factors"].reset_index()
+    tb_meadow = ds_meadow.read("statistical_review_of_world_energy")
+    tb_meadow_prices = ds_meadow.read("statistical_review_of_world_energy_prices")
+    tb_efficiency = ds_meadow.read("statistical_review_of_world_energy_efficiency_factors")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
@@ -672,10 +672,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=[tb, tb_prices, tb_prices_index],
-        default_metadata=ds_meadow.metadata,
-        check_variables_metadata=True,
-    )
+    ds_garden = paths.create_dataset(tables=[tb, tb_prices, tb_prices_index], default_metadata=ds_meadow.metadata)
     ds_garden.save()

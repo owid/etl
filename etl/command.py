@@ -301,7 +301,7 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
                     continue
 
                 # We want to execute export steps after any grapher://grapher steps,
-                # to ensure that any indicators required by the mdim step are already pushed to DB.
+                # to ensure that any indicators required by the collection step are already pushed to DB.
                 # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
                 dag[step] = {
                     re.sub(r"^(data|data-private)://", "grapher://", dep)
@@ -416,7 +416,16 @@ def run_dag(
 
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
     execution_times = {}
+    failing_steps: List[Step] = []
+    skipped_steps: List[Step] = []
+    exceptions: List[Exception] = []
+
     for i, step in enumerate(steps, 1):
+        if config.CONTINUE_ON_FAILURE and {s.path for s in step.dependencies} & {s.path for s in skipped_steps}:
+            print(f"--- {i}. {step} (skipped)")
+            skipped_steps.append(step)
+            continue
+
         print(f"--- {i}. {step}{_create_expected_time_message(_get_execution_time(step_name=str(step)))}")
 
         # Determine strictness level for the current step
@@ -426,11 +435,18 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
             # Execute the step and measure the time taken
             try:
                 time_taken = timed_run(lambda: step.run())
-            except Exception:
+            except Exception as e:
                 # log which step failed and re-raise the exception, otherwise it gets lost
                 # in logs and we don't know which step failed
                 log.error("step_failed", step=str(step))
-                raise
+                if config.CONTINUE_ON_FAILURE:
+                    failing_steps.append(step)
+                    exceptions.append(e)
+                    skipped_steps.append(step)
+                    click.echo(click.style("FAILED", fg="red"))
+                    continue
+                else:
+                    raise e
             execution_times[str(step)] = time_taken
 
             click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
@@ -438,6 +454,12 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
 
         # Write the recorded execution times to the file after all steps have been executed
         _write_execution_times(execution_times)
+
+    if config.CONTINUE_ON_FAILURE and exceptions:
+        for step, exception in zip(failing_steps, exceptions):
+            log.error("step_exception", step=str(step), exception=str(exception))
+        # Raise the first exception
+        raise exceptions[0]
 
 
 def _steps_sort_key(step: Step) -> int:

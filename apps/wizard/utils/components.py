@@ -176,6 +176,27 @@ def explorer_chart(
     return st.components.v1.html(HTML, height=height)  # type: ignore
 
 
+def mdim_chart(url: str, view: dict, height: int = 600, default_display: Optional[str] = None):
+    params = {
+        "hideControls": "true",
+        **view,
+    }
+    if default_display is not None:
+        dd = default_display.lower()
+        if dd in ["map", "table", "chart"]:
+            params["tab"] = dd
+
+    query_string = "?" + urllib.parse.urlencode(params)
+
+    HTML = f"""
+    <!-- Redirect to the external URL -->
+    <meta http-equiv="refresh" content="0; url={url}{query_string}">
+    """
+
+    # Render the HTML
+    return st.components.v1.html(HTML, height=height)  # type: ignore
+
+
 def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **kwargs):
     """Plot a Grapher chart using the Grapher API.
 
@@ -569,7 +590,7 @@ def _get_params(component, key):
         params = st.query_params.get_all(key)
         # convert to int if digit
         return [int(q) if q.isdigit() else q for q in params]
-    elif component == st.checkbox:
+    elif component == st.checkbox or component == st.toggle:
         params = st.query_params.get(key)
         return params == "True"
     else:

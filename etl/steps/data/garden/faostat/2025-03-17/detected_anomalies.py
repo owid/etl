@@ -26,6 +26,11 @@ INSPECT_ANOMALIES = bool(os.getenv("INSPECT_ANOMALIES", False))
 class DataAnomaly(abc.ABC):
     """Abstract class for a certain type of data anomaly."""
 
+    affected_item_codes = []
+    affected_element_codes = []
+    affected_years = []
+    affected_countries = []
+
     def __init__(self) -> None:
         pass
 
@@ -105,9 +110,21 @@ class DataAnomaly(abc.ABC):
         log.info("Fixing anomalies.")
         tb_fixed = self.fix(tb=tb)
 
+        # Add processing description.
+        mask_affected_rows = (tb_fixed["item_code"].isin(self.affected_item_codes)) & (
+            tb_fixed["element_code"].isin(self.affected_element_codes)
+        )
+        tb_fixed.loc[mask_affected_rows, "description_processing"] = tb_fixed[mask_affected_rows][
+            "description_processing"
+        ].fillna("")
+        tb_fixed.loc[mask_affected_rows, "description_processing"] += self.description
+
         if inspect_anomalies:
+            original_description = self.description
+            self.description = self.description + " *FIXED*"
             log.info("Inspect anomaly after fixing.")
             self.inspect(tb=tb_fixed)
+            self.description = original_description
 
         return tb_fixed
 
@@ -122,12 +139,7 @@ def _split_long_title(text: str) -> str:
 
 
 class SpinachAreaHarvestedAnomaly(DataAnomaly):
-    description = (  # type: ignore
-        "The area harvested of spinach for China (which refers to mainland) in 1984 is zero. "
-        "This causes that other regions that are aggregates which include China mainland have a spurious reduction in "
-        "area harvested of spinach in that year, and a spurious increase in yield. "
-        "Therefore, we remove those spurious aggregate values."
-    )
+    description = "* The area harvested of spinach for China (which refers to mainland) in 1984 was zero. This caused that other aggregate regions that included China mainland had a spurious reduction in area harvested of spinach in that year, and a spurious increase in yield. Therefore, we removed those spurious aggregate values.\n"
 
     affected_item_codes = [
         "00000373",
@@ -205,12 +217,7 @@ class SpinachAreaHarvestedAnomaly(DataAnomaly):
 
 
 class EggYieldNorthernEuropeAnomaly(DataAnomaly):
-    description = (  # type: ignore
-        "The amount of eggs produced per bird for Northern Europe (FAO) is unreasonably high before 1973, with values "
-        "between 857 and 1961, while from 1973 on it has more reasonable values, below 241. "
-        "Note that Lesotho also has a peak, which will be tackled separately. "
-        "Therefore, we remove all values for Northern Europe (FAO) between 1961 and 1972."
-    )
+    description = "* The amount of eggs produced per bird for Northern Europe (FAO) was unreasonably high before 1973, with values between 857 and 1961, while from 1973 on values were more reasonable, below 241. Therefore, we removed all values for Northern Europe (FAO) between 1961 and 1972.\n"
 
     affected_item_codes = [
         "00001062",
@@ -284,11 +291,7 @@ class EggYieldNorthernEuropeAnomaly(DataAnomaly):
 
 
 class EggYieldLesothoAnomaly(DataAnomaly):
-    description = (  # type: ignore
-        "The amount of eggs produced per bird for Lesotho is unreasonably high in 2018, with a value "
-        "of 2094 eggs per hen. "
-        "Therefore, we remove this value for Lesotho in 2018."
-    )
+    description = "* The amount of eggs produced per bird for Lesotho was unreasonably high in 2018, with a value of 2094 eggs per hen. Therefore, we removed this value for Lesotho in 2018.\n"
 
     affected_item_codes = [
         "00001062",
@@ -351,13 +354,7 @@ class EggYieldLesothoAnomaly(DataAnomaly):
 
 
 class TeaProductionAnomaly(DataAnomaly):
-    description = (  # type: ignore
-        "Tea production in FAO data increased dramatically from 1990 to 1991 for many different countries (including "
-        "some of the main producers, like China and India). However, data from 1991 was flagged as 'Estimated value' "
-        "(while data prior to 1991 is flagged as 'Official figure'). This potentially anomalous increase was not "
-        "present in the previous version of the data. Therefore, we removed tea production data (as well as "
-        "per-capita production and yield) from 1991 onwards."
-    )
+    description = "* Tea production in FAO data increased dramatically from 1990 to 1991 for many different countries (including some of the main producers, like China and India). However, data from 1991 was flagged as 'Estimated value' (while data prior to 1991 is flagged as 'Official figure'). Therefore, we removed tea production data (as well as per-capita production and yield) from 1991 onwards.\n"
 
     affected_item_codes = [
         "00000667",
@@ -510,13 +507,7 @@ class HighYieldAnomaly(DataAnomaly):
 
 
 class FruitYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
-        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
-        "For example, the yield of item 'Fruit Primary' in Denmark prior to 1985 is larger than 6000 tonnes/ha. "
-        "Similar issues happen to Antigua and Barbuda and Burkina Faso. "
-        "For Netherlands, a similar anomaly is found but prior to 1984 (which will be considered separately). "
-        "Therefore, we remove these possibly spurious values."
-    )
+    description = "* Yields were unreasonably high (possibly by a factor of 1000) for some items, countries and years. For example, the yield of item 'Fruit Primary' in Denmark prior to 1985 was larger than 6000 tonnes/ha. Similar issues happened to Antigua and Barbuda and Burkina Faso. Therefore, we removed these possibly spurious values.\n"
 
     affected_item_codes = [
         # Item code for "Fruit Primary".
@@ -560,11 +551,7 @@ class FruitYieldAnomaly(HighYieldAnomaly):
 
 
 class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
-        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
-        "This happens to item 'Fruit Primary' in Netherlands prior to 1984. "
-        "Therefore, we remove these possibly spurious values."
-    )
+    description = "* Yields were unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happened to item 'Fruit Primary' in Netherlands prior to 1984. Therefore, we removed these possibly spurious values.\n"
 
     affected_item_codes = [
         # Item code for "Fruit Primary".
@@ -605,12 +592,7 @@ class FruitYieldNetherlandsAnomaly(HighYieldAnomaly):
 
 
 class LocustBeansYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
-        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
-        "This happens to item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)' and "
-        "'Lower-middle-income countries'."
-        "Therefore, we remove these possibly spurious values."
-    )
+    description = "* Yields were unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happened to item 'Locust beans (carobs)' for region 'Net Food Importing Developing Countries (FAO)' and 'Lower-middle-income countries'. Therefore, we removed these possibly spurious values.\n"
 
     affected_item_codes = [
         # Item code for "Locust beans (carobs)".
@@ -653,11 +635,7 @@ class LocustBeansYieldAnomaly(HighYieldAnomaly):
 
 
 class WalnutsYieldAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
-        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
-        "This happens to item 'Walnuts, in shell' for region 'Eastern Asia (FAO)'. "
-        "Therefore, we remove these possibly spurious values."
-    )
+    description = "* Yields were unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happened to item 'Walnuts, in shell' for region 'Eastern Asia (FAO)'. Therefore, we removed these possibly spurious values.\n"
 
     affected_item_codes = [
         # Item code for "Walnuts, in shell".
@@ -699,12 +677,7 @@ class WalnutsYieldAnomaly(HighYieldAnomaly):
 
 
 class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
-        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
-        "This happens to item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. "
-        "A similar anomaly for South America is tackled separately. "
-        "Therefore, we remove these possibly spurious values."
-    )
+    description = "* Yields were unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happened to item 'Other tropical fruits, n.e.c.' for region 'Northern Africa (FAO)'. Therefore, we removed these possibly spurious values.\n"
 
     affected_item_codes = [
         # Item code for "Other tropical fruits, n.e.c.".
@@ -738,11 +711,7 @@ class OtherTropicalFruitYieldNorthernAfricaAnomaly(HighYieldAnomaly):
 
 
 class OtherTropicalFruitYieldSouthAmericaAnomaly(HighYieldAnomaly):
-    description = (  # type: ignore
-        "Yields are unreasonably high (possibly by a factor of 1000) for some items, countries and years. "
-        "This happens to item 'Other tropical fruits, n.e.c.' for South America. "
-        "Therefore, we remove these possibly spurious values."
-    )
+    description = "* Yields were unreasonably high (possibly by a factor of 1000) for some items, countries and years. This happened to item 'Other tropical fruits, n.e.c.' for South America. Therefore, we removed these possibly spurious values.\n"
 
     affected_item_codes = [
         # Item code for "Other tropical fruits, n.e.c.".
@@ -770,26 +739,25 @@ class OtherTropicalFruitYieldSouthAmericaAnomaly(HighYieldAnomaly):
 
 
 class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
-    description = (  # type: ignore
-        "The number of poultry birds in Europe, the EU, and High-income countries, has spurious jumps on recent years. "
-        "The reason is that some European countries (a least Germany, Italy and Spain) lack data on those years. "
-        "However, the original FAO data for Europe and the EU does have data for those years (even though the member countries do not). "
-        "So, we replace the affected years of Europe and the EU by the original FAO data. "
-        "On the other hand, the affected years for High-income countries will be removed (since this aggregate is not included in the original FAO data)."
-    )
+    description = "* The number of poultry birds in Europe, the EU, and High-income countries, had spurious jumps on recent years. The reason was that some European countries (at least Germany, Italy and Spain) lacked data on those years. However, the original FAOSTAT data for Europe and the EU did have data for those years (even though the member countries did not). So, we replaced the affected years of Europe and the EU by the original FAOSTAT data. On the other hand, the affected years for High-income countries were removed (since this aggregate was not included in the original FAOSTAT data).\n"
 
     affected_item_codes = [
-        "00002029",  # Poultry Birds.
+        "00001057",  # Chickens.
+        "00002029",  # Poultry.
+        "00001079",  # Turkeys.
     ]
     affected_element_codes = [
-        "005112",  # Production.
-        # NOTE: There is currently no per capita for this variable.
+        "005112",  # Stocks.
+        "5112pc",  # Stocks per capita.
     ]
     affected_years = [
         2018,
         2019,
+        # NOTE: 2020 is not affected by the issue.
+        # 2020,
         2021,
         2022,
+        2023,
     ]
     # Countries affected by the anomaly.
     affected_countries = [
@@ -804,13 +772,116 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
             (tb["country"].isin(["Germany", "Spain", "Italy"]))
             & (tb["item_code"].isin(self.affected_item_codes))
             & (tb["element_code"].isin(self.affected_element_codes))
-            & (tb["year"].isin(self.affected_years))
+            & (tb["year"].isin([2018, 2019, 2021, 2022]))
+        ].empty
+        assert tb[
+            # NOTE: In 2023, Germany is informed, but not Spain and Italy, which also causes a big dip.
+            (tb["country"].isin(["Spain", "Italy"]))
+            & (tb["item_code"].isin(self.affected_item_codes))
+            & (tb["element_code"].isin(self.affected_element_codes))
+            & (tb["year"].isin([2023]))
         ].empty
 
     def inspect(self, tb):
         log.info(
             "The missing data on the number of poultry birds in European countries causes: "
             f"\n* The number of poultry birds in Europe, EU27 and HEC to jump down on {', '.join(map(str, self.affected_years))}."
+        )
+        for item_code in self.affected_item_codes:
+            for element_code in self.affected_element_codes:
+                selection = (
+                    (tb["item_code"] == item_code)
+                    & (tb["element_code"] == element_code)
+                    & (tb["country"].isin(self.affected_countries))
+                )
+                tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
+                title = _split_long_title(self.description + f" ITEM/ELEMENT: {item_code}/{element_code}")
+                fig = px.line(tb_affected, x="year", y="value", color="country", title=title)
+                fig.show()
+
+    def fix(self, tb):
+        tb_fixed = tb.copy()
+        # We will first remove all those values (for all affected items, elements, countries and years).
+        # Then, where possible, we will add the original values from FAO.
+        # This is only possible for the total number of animals for EU and Europe.
+        # For High-income countries, we don't have data from FAO.
+        # And we don't keep the original per-capita values from FAO.
+        tb_fixed.loc[
+            (
+                (tb_fixed["item_code"].isin(self.affected_item_codes))
+                & (tb_fixed["element_code"].isin(self.affected_element_codes))
+                & (tb_fixed["year"].isin(self.affected_years))
+                & (tb_fixed["country"].isin(self.affected_countries))
+            ),
+            "value",
+        ] = None
+
+        for country in ["Europe", "European Union (27)"]:
+            for item_code in self.affected_item_codes:
+                for element_code in ["005112"]:
+                    for year in self.affected_years:
+                        # First identify the value from FAO.
+                        country_fao = f"{country} (FAO)"
+                        _value_from_fao = tb[
+                            (tb["item_code"] == item_code)
+                            & (tb["element_code"] == element_code)
+                            & (tb["country"] == country_fao)
+                            & (tb["year"] == year)
+                        ]["value"]
+                        assert len(_value_from_fao) == 1, "Unexpected error in 'UnstableNumberOfPoultryBirdsInEurope'."
+                        value_from_fao = _value_from_fao.item()
+
+                        # Now replace the current (non-FAO) value, and replace it with the FAO one.
+                        tb_fixed.loc[
+                            (
+                                (tb_fixed["item_code"] == item_code)
+                                & (tb_fixed["element_code"] == element_code)
+                                & (tb_fixed["country"] == country)
+                                & (tb_fixed["year"] == year)
+                            ),
+                            "value",
+                        ] = value_from_fao
+
+        # Drop rows with no values, if any.
+        tb_fixed = tb_fixed.dropna(subset="value").reset_index(drop=True)
+
+        return tb_fixed
+
+
+class ConstantInsecticidesForAgricultureInAustraliaAnomaly(DataAnomaly):
+    description = "* The use of insecticides for agriculture in Australia became a constant from 2018 onwards. When inspecting the data in the FAOSTAT page (https://www.fao.org/faostat/en/#data/RP) we can see that those values are flagged as 'Imputed value' from 2018 until 2022 (whereas 2017 are flagged as 'Official figure'). So, we removed the imputed values from 2018 onwards.\n"
+
+    affected_item_codes = [
+        "00001309",  # Insecticides.
+    ]
+    affected_element_codes = [
+        "005157",  # Agricultural use.
+    ]
+    affected_years = [
+        2018,
+        2019,
+        2020,
+        2021,
+        2022,
+    ]
+    # Countries affected by the anomaly.
+    affected_countries = ["Australia"]
+
+    def check(self, tb):
+        # Check that the data has only one value from 2018 onwards.
+        assert set(
+            tb[
+                (tb["country"].isin(["Australia"]))
+                & (tb["item_code"].isin(self.affected_item_codes))
+                & (tb["element_code"].isin(self.affected_element_codes))
+                & (tb["year"].isin(self.affected_years))
+            ]["value"].astype(int)
+        ) == {11059}
+
+    def inspect(self, tb):
+        log.info(
+            "The insecticide use for agriculture in Australia causes: "
+            f"\n* The value remains constant for years {', '.join(map(str, self.affected_years))}."
         )
         for element_code in self.affected_element_codes:
             selection = (
@@ -824,39 +895,15 @@ class UnstableNumberOfPoultryBirdsInEurope(DataAnomaly):
             fig.show()
 
     def fix(self, tb):
-        # For High-income countries, we should simply drop those values, since we don't have any way to replace them.
         indexes_to_drop = tb[
             (
                 (tb["item_code"].isin(self.affected_item_codes))
                 & (tb["element_code"].isin(self.affected_element_codes))
                 & (tb["year"].isin(self.affected_years))
-                & (tb["country"] == "High-income countries")
+                & (tb["country"].isin(self.affected_countries))
             )
         ].index
         tb_fixed = tb.drop(indexes_to_drop).reset_index(drop=True)
-
-        # For Europe and European Union (27), we can replace them with their corresponding (FAO) versions.
-        for country in ["Europe", "European Union (27)"]:
-            for year in self.affected_years:
-                # First identify the value from FAO.
-                country_fao = f"{country} (FAO)"
-                _value_from_fao = tb[
-                    (tb["item_code"].isin(self.affected_item_codes))
-                    & (tb["element_code"].isin(self.affected_element_codes))
-                    & (tb["country"] == country_fao)
-                    & (tb["year"] == year)
-                ]["value"]
-                assert len(_value_from_fao) == 1, "Unexpected error in 'UnstableNumberOfPoultryBirdsInEurope'."
-                value_from_fao = _value_from_fao.item()
-
-                # Now replace the current (non-FAO) value, and replace it with the FAO one.
-                current_value_mask = (
-                    (tb["item_code"].isin(self.affected_item_codes))
-                    & (tb["element_code"].isin(self.affected_element_codes))
-                    & (tb["country"] == country)
-                    & (tb["year"] == year)
-                )
-                tb_fixed.loc[current_value_mask, "value"] = value_from_fao
 
         return tb_fixed
 
@@ -876,6 +923,9 @@ detected_anomalies = {
         UnstableNumberOfPoultryBirdsInEurope,
     ],
     "faostat_fbsc": [],
+    "faostat_rp": [
+        ConstantInsecticidesForAgricultureInAustraliaAnomaly,
+    ],
 }
 
 

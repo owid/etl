@@ -27,7 +27,7 @@ from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
 
 from etl import config, download_helpers, paths
-from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump
+from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump, yaml_load
 
 log = structlog.get_logger()
 
@@ -195,10 +195,7 @@ class Snapshot:
         assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
 
-        meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
-
-        with open(self.metadata_path, "w") as f:
-            f.write(ruamel_dump(meta))
+        self.m._update_metadata_file({"outs": [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]})
 
     def create_snapshot(
         self,
@@ -208,14 +205,34 @@ class Snapshot:
     ) -> None:
         """Create a new snapshot from a local file, or from data in memory, or from a download link.
         Then upload it to S3. This is the recommended way to create a snapshot.
+
+        Args:
+            uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
+                `namespace/version/short_name.ext.dvc` must exist!
+            filename (str or None): Path to local data file (if dataframe is not given).
+            data (Table or pd.DataFrame or None): Data to upload (if filename is not given).
+            upload (bool): True to upload data to bucket.
         """
-        if (filename is not None) or (data is not None):
-            # Create snapshot from either a local file or from data in memory.
-            add_snapshot(uri=self.uri, filename=filename, dataframe=data, upload=upload)
+        assert not (filename is not None and data is not None), "Pass either a filename or data, but not both."
+
+        if filename is not None:
+            # Ensure destination folder exists.
+            self.path.parent.mkdir(exist_ok=True, parents=True)
+
+            # Copy local data file to snapshots data folder.
+            self.path.write_bytes(Path(filename).read_bytes())
+        elif data is not None:
+            # Copy dataframe to snapshots data folder.
+            dataframes.to_file(data, file_path=self.path)
         else:
             # Create snapshot by downloading data from a URL.
             self.download_from_source()
-            self.dvc_add(upload=upload)
+
+        # Upload data to R2
+        self.dvc_add(upload=upload)
+
+        # Save metadata to file
+        self.metadata.save()
 
     def to_table_metadata(self) -> TableMeta:
         return self.metadata.to_table_metadata()
@@ -475,33 +492,61 @@ class SnapshotMeta(MetaBase):
 
         return yaml_dump({"meta": d})  # type: ignore
 
-    def save(self) -> None:  # type: ignore
-        self.path.parent.mkdir(exist_ok=True, parents=True)
+    def _update_metadata_file(self, d: dict[str, Any]) -> None:
+        """Update metadata YAML file with given dictionary."""
+        with open(self.path, "r") as f:
+            meta = ruamel_load(f)
+
+        # Update everything from `meta`
+        update_meta = d.pop("meta", {})
+        for k, v in update_meta.items():
+            if k in meta["meta"]:
+                if isinstance(meta["meta"][k], dict):
+                    meta["meta"][k].update(v)
+                else:
+                    meta["meta"][k] = v
+            else:
+                meta["meta"][k] = v
+
+        # Update remaining fields
+        meta.update(d)
+
         with open(self.path, "w") as f:
-            f.write(self.to_yaml())
+            f.write(ruamel_dump(meta))
 
-    # def save(self) -> None:  # type: ignore
-    #     self.path.parent.mkdir(exist_ok=True, parents=True)
+    def save(self) -> None:  # type: ignore
+        """Save metadata to YAML file. This is useful if you're dynamically changing
+        metadata (like dates) from the script and need to save them into YAML. This
+        function doesn't upload the file to S3, use `create_snapshot` instead.
+        """
+        self.path.parent.mkdir(exist_ok=True, parents=True)
 
-    #     # Create new file
-    #     if not self.path.exists():
-    #         with open(self.path, "w") as f:
-    #             f.write(self.to_yaml())
-    #     # Edit existing file, keep outs
-    #     else:
-    #         # Load outs from existing file
-    #         with open(self.path, "r") as f:
-    #             yaml = ruamel_load(f)
-    #             outs = yaml.get("outs", None)
-    #             wdir = yaml.get("wdir", None)
+        # Create new file
+        if not self.path.exists():
+            with open(self.path, "w") as f:
+                f.write(self.to_yaml())
+        # Edit existing file, keep outs
+        else:
+            # Load outs from existing file
+            with open(self.path, "r") as f:
+                yaml = yaml_load(f)
+                outs = yaml.get("outs", None)
+                # wdir is a legacy field, we just ignore it
 
-    #         # Save metadata to file
-    #         meta = self._meta_to_dict()
-    #         with open(self.path, "w") as f:
-    #             d = {"meta": meta, "outs": outs}
-    #             if wdir:
-    #                 d["wdir"] = wdir
-    #             f.write(yaml_dump(d))
+            # Save metadata to file
+            # NOTE: meta does not have `outs` field, it's reset when saving
+            meta = self._meta_to_dict()
+
+            # No change, keep the file as is
+            if yaml["meta"] == meta:
+                return
+
+            # Otherwise update the file
+            # set `outs` back
+            d = {"meta": meta}
+            if outs:
+                d["outs"] = outs
+            self._update_metadata_file(d)
 
     @property
     def uri(self):
@@ -680,38 +725,6 @@ def read_table_from_snapshot(
         tb = cast(Table, to_safe_types(tb))
 
     return tb
-
-
-def add_snapshot(
-    uri: str,
-    filename: Optional[Union[str, Path]] = None,
-    dataframe: Optional[Union[Table, pd.DataFrame]] = None,
-    upload: bool = False,
-) -> None:
-    """Helper function for adding snapshots with metadata, where the data is either
-    a local file, or a dataframe in memory.
-
-    Args:
-        uri (str): URI of the snapshot file, typically `namespace/version/short_name.ext`. Metadata file
-            `namespace/version/short_name.ext.dvc` must exist!
-        filename (str or None): Path to local data file (if dataframe is not given).
-        dataframe (Table or pd.DataFrame or None): Data to upload (if filename is not given).
-        upload (bool): True to upload data to bucket.
-    """
-    snap = Snapshot(uri)
-
-    if (filename is not None) and (dataframe is None):
-        # Ensure destination folder exists.
-        snap.path.parent.mkdir(exist_ok=True, parents=True)
-
-        # Copy local data file to snapshots data folder.
-        snap.path.write_bytes(Path(filename).read_bytes())
-    elif (dataframe is not None) and (filename is None):
-        dataframes.to_file(dataframe, file_path=snap.path)
-    else:
-        raise ValueError("Pass either a filename or data, but not both.")
-
-    snap.dvc_add(upload=upload)
 
 
 def snapshot_catalog(match: str = r".*") -> Iterator[Snapshot]:
