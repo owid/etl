@@ -1,4 +1,4 @@
-from etl.collection import multidim
+from etl.collection import combine_config_dimensions, expand_config
 
 # from etl.db import get_engine
 from etl.helpers import PathFinder
@@ -20,7 +20,7 @@ DIMENSIONS_CONFIG = {
 # etlr multidim
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("world_bank_pip_dimensional")
@@ -34,7 +34,7 @@ def run() -> None:
                 tb[column].metadata.dimensions.pop(dimension)
 
     # Bake config automatically from table
-    config_new = multidim.expand_config(
+    config_new = expand_config(
         tb,  # type: ignore
         indicator_names=[
             "headcount_ratio",
@@ -48,16 +48,16 @@ def run() -> None:
     )
 
     # Combine both sources
-    config["dimensions"] = multidim.combine_config_dimensions(
+    config["dimensions"] = combine_config_dimensions(
         config_dimensions=config_new["dimensions"],
         config_dimensions_yaml=config.get("dimensions", {}),
     )
     config["views"] += config_new["views"]
 
     # Create mdim
-    mdim = paths.create_mdim(
+    mdim = paths.create_collection(
         config=config,
-        mdim_name="poverty",
+        short_name="poverty",
     )
 
     # # Group certain views together: used to create StackedBar charts
