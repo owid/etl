@@ -83,7 +83,7 @@ tables:
         short_unit: "%"
         description_key: *desc_literacy
         presentation:
-          title_public: Elderly literacy rate
+          title_public: Literacy rate among older adults
         display:
           numDecimalPlaces: 1
 
