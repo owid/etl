@@ -1,4 +1,6 @@
-"""Script to create a snapshot of dataset."""
+"""Script to create a snapshot of dataset.
+To download the dataset, go to https://www.enterprisesurveys.org/en/data/exploretopics/corruption. Select All economies, choose Corruption under Topics, and do not select any subgroups.
+"""
 
 from pathlib import Path
 

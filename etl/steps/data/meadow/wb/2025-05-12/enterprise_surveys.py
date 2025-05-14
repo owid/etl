@@ -36,7 +36,9 @@ def run() -> None:
 
     # No year is provided for regions, so we set it to 2024
     # Note that the regional and global averages are actually computed by taking the most recent survey results from each country.
-    tb.loc[tb["country"].isin(regions_to_update), "Year"] = 2024
+    tb.loc[tb["country"].isin(regions_to_update), "Year"] = tb.loc[tb["country"].isin(regions_to_update), "Year"] = tb[
+        "Year"
+    ].max()
 
     # Improve tables format.
     tables = [tb.format(["country", "year"])]
