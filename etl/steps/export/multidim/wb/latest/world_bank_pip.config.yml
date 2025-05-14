@@ -35,7 +35,7 @@ definitions:
   spells_subtitle: The chart shows breaks in the comparability of the underlying household survey data over time within each country individually.
 
   ppp_adjustment_subtitle: This data is adjusted for inflation and for differences in living costs between countries.
-  ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
+  ppp_adjustment_welfare_type_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
 
   description_key_extreme_poverty: Extreme poverty here is defined as living below the International Poverty Line of $2.15 a day.
   description_key_lmic_poverty_line: A poverty line of $3.65 a day represents definitions of national poverty lines in lower-middle-income countries.
@@ -160,7 +160,7 @@ views:
     config:
       title: Share of the population living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -208,7 +208,7 @@ views:
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
@@ -254,7 +254,7 @@ views:
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["StackedDiscreteBar"]
       selectedFacetStrategy: entity
@@ -310,7 +310,7 @@ views:
     config:
       title: Share of the population living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -374,7 +374,7 @@ views:
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
@@ -432,7 +432,7 @@ views:
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["StackedDiscreteBar"]
       selectedFacetStrategy: entity
@@ -479,7 +479,7 @@ views:
     config:
       title: Number of people living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -525,7 +525,7 @@ views:
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
@@ -571,7 +571,7 @@ views:
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["StackedDiscreteBar"]
       selectedFacetStrategy: entity
@@ -626,7 +626,7 @@ views:
     config:
       title: Number of people living below a range of poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -688,7 +688,7 @@ views:
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["StackedArea"]
       selectedFacetStrategy: entity
@@ -746,7 +746,7 @@ views:
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: "{definitions.ppp_adjustment_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["StackedDiscreteBar"]
       selectedFacetStrategy: entity
@@ -794,7 +794,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -829,7 +829,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.extreme_poverty_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -865,7 +865,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.lmic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -901,7 +901,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.umic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -938,7 +938,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -975,7 +975,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1012,7 +1012,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1049,7 +1049,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1085,7 +1085,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1120,7 +1120,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_215__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.extreme_poverty_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1156,7 +1156,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_365__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.lmic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1192,7 +1192,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_685__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.umic_poverty_line_subtitle} {definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1229,7 +1229,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1266,7 +1266,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1303,7 +1303,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
@@ -1340,7 +1340,7 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount__ppp_version_2017__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_7
     config:
       subtitle: "{definitions.ppp_adjustment_subtitle} {definitions.spells_subtitle}"
-      note: "{definitions.ppp_adjustment_note}"
+      note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
