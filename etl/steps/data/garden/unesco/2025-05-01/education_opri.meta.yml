@@ -20,7 +20,7 @@ definitions:
   desc_key_mye: &desc_key_mye
     - Adults around the world have spent different amounts of time in school — this indicator shows the average number of years completed by people aged 25 and older.
     - It reflects the total years of formal education that adults have successfully finished, excluding any years they may have repeated.
-    - The data comes from censuses and household surveys, where adults report the highest level of education they completed. These levels are then matched to standard durations using the ISCED framework.
+    - The data comes from censuses and household surveys, where adults report the highest level of education they completed. These levels are then matched to standard durations using the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) framework.
     - This is a valuable indicator for understanding long-term trends in educational attainment and gender equality.
     - However, it only measures how long people stayed in school — not what they learned or whether they received a quality education.
     - Cross-country comparisons can be challenging. Education systems differ in how long programmes last, and qualifications may not be classified in the same way.
@@ -235,7 +235,7 @@ tables:
           - The adjusted gender parity index (GPIA) is calculated by dividing the average years of schooling for women by that of men. If the result is greater than 1, it is inverted and subtracted from 2. This creates a scale from 0 to 2, centered around 1.
           - A GPIA value of 1 means men and women have the same average number of completed school years. A value below 1 shows a gap in favour of men, and a value above 1 shows a gap in favour of women.
           - This indicator is useful for highlighting long-term trends in gender inequality in education and assessing the lasting effects of policies aimed at closing the gender gap.
-          - The data comes from household surveys or population censuses, where individuals report the highest level of education they have completed. These levels are then converted into years of schooling based on standard durations defined by ISCED.
+          - The data comes from household surveys or population censuses, where individuals report the highest level of education they have completed. These levels are then converted into years of schooling based on standard durations defined by [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced).
           - Because this indicator reflects accumulated schooling over time, it shows how gender disparities have developed across generations.
           - Some limitations include differences in education system structures between countries and challenges in mapping survey responses to ISCED levels. The indicator measures duration of schooling, not its quality or outcomes.
           - Even so, the GPIA for average years of schooling provides a clear measure of gender equality in education over the life course, and is an important complement to indicators focused on current enrolment or access.
@@ -263,16 +263,6 @@ tables:
         description_short: Percentage of a country's [tertiary](#dod:tertiary-education) level students studying abroad as international students. International students are those that move from their home countries for education, identified based on their past education, residence, or distinct immigration regulations.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Many students leave their home country to pursue higher education abroad — this indicator shows what share of a country's tertiary students choose to study in another country.
-          - It captures the percentage of students from a given country who are enrolled in tertiary education abroad, relative to the total number of students enrolled in tertiary education at home.
-          - The outbound mobility ratio is calculated by dividing the number of students from a country who are studying abroad by the total number of students enrolled in tertiary education within that country.
-          - A high outbound mobility ratio means a significant portion of students are going abroad for their studies, which may indicate limited domestic capacity or quality concerns in the home country’s tertiary education system.
-          - The data comes from international education surveys and administrative records, including national higher education management systems and institutional reports.
-          - This indicator can be broken down by sex, ISCED level, and destination region, helping to analyze patterns of international study and gender dynamics in student mobility.
-          - There are some important limitations. Not all countries have a system for tracking outbound students, and some receiving countries may not report enrolment figures by country of origin.
-          - Definitions of what counts as a “mobile student” can vary, affecting comparability between countries and over time.
-          - Despite these challenges, the outbound mobility ratio offers valuable insight into global student flows and highlights international dimensions of access, choice, and demand in tertiary education.
         display:
           numDecimalPlaces: 1
 
@@ -282,15 +272,15 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - Many students cross borders to pursue higher education — this indicator shows how many are choosing a given country as their destination.
-          - It captures the percentage of students from other countries who are enrolled in all levels of tertiary education (ISCED 5 to 8) in a given country, relative to total tertiary enrolment in that same country.
-          - The inbound mobility rate is calculated by dividing the number of internationally mobile students studying in the country by the total number of students enrolled in tertiary education within that country.
-          - A high inbound mobility rate reflects a strong capacity to attract foreign students and signals that the country may be seen as a hub for international higher education.
-          - The data comes from administrative records, such as national higher education information systems and surveys, and includes enrolment disaggregated by country of origin, ISCED level, and sex.
-          - This indicator is useful for assessing the international openness of a country's higher education system and understanding student flow patterns across borders.
-          - There are several limitations to consider. The indicator may not capture students studying at foreign university branches or campuses within the reporting country, which can lead to underestimation.
-          - In addition, how countries define and report “mobile students” can vary, making comparisons between countries less straightforward.
-          - Despite these challenges, the inbound mobility rate provides important insights into a country’s role in global education and its attractiveness as a destination for international students.
+          - Each year, millions of students move abroad to study. This indicator shows how many choose a particular country as their destination.
+          - It measures the percentage of tertiary students in a country who come from outside its borders.
+          - It is calculated by dividing the number of international students by the total number of tertiary students in the country, then multiplying by 100.
+          - International students include those enrolled in full degree programmes, student exchanges, or as visiting students.
+          - Countries with a high share of international students often have well-regarded universities, affordable tuition, or offer courses in widely spoken languages.
+          - The data comes from government records and surveys, which usually include details such as the student’s home country and gender.
+          - This tells us how open a country’s education system is, and how attractive it is as a place to study.
+          - There are some limitations. Students studying at branch campuses of foreign universities may not be included, and countries define “international students” differently.
+          - Even with these gaps, the data gives us a good picture of global student migration and which countries are global education hubs.
         display:
           numDecimalPlaces: 1
 
@@ -304,7 +294,7 @@ tables:
         - The official entrance age is typically determined by national laws or education policies and usually reflects the most common age of entry, though not always.
         - This indicator is essential for understanding how an education system is structured and is used as a reference point when calculating other key indicators like enrolment rates or school-age population estimates.
         - It helps identify the age-specific demand for education services and supports national planning for staffing, infrastructure, and learning materials at each education level.
-        - Data on official entrance age is reported by national ministries of education and compiled by the UNESCO Institute for Statistics, following ISCED classifications to ensure international comparability.
+        - Data on official entrance age is reported by national ministries of education and compiled by the UNESCO Institute for Statistics, following [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) to ensure international comparability.
         - While this provides a standard benchmark, actual school entry may vary due to parental choices, local policies, or flexibility in school admissions.
         - To fully interpret this indicator, it should be considered alongside the theoretical duration of the level of education, which indicates how long students are expected to remain in that level if they follow the system as designed.
         display:
@@ -319,7 +309,7 @@ tables:
           - This indicator helps determine the school-age population by level of education and is a key input for producing education indicators and assessing a country's education supply capacity in relation to demand.
           - The duration is typically calculated based on the official starting and ending ages for compulsory education, assuming students progress through the system without repeating or skipping grades.
           - For example, if compulsory education starts at age 6 and ends at age 15, the theoretical duration would be 9 years.
-          - Data on compulsory education duration are collected from national legislation and formal education standards, and are mapped to the International Standard Classification of Education (ISCED) to ensure international comparability.
+          - Data on compulsory education duration are collected from national legislation and formal education standards, and are mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) to ensure international comparability.
           - It's important to note that while legislation may define the duration of compulsory education, actual implementation and enforcement can vary, and some children may not attend school for the full duration.
           - Changes in national education policies, such as extending or reducing the years of compulsory education, can impact this indicator and should be considered when analyzing trends over time.
           - This indicator is useful for understanding government commitment to education and for planning resource allocation, but it should be interpreted alongside other indicators like enrolment rates and completion rates for a comprehensive view.
@@ -336,7 +326,7 @@ tables:
           - This indicator helps determine the school-age population by level of education and is a key input for producing education indicators and assessing a country's education supply capacity in relation to demand.
           - The duration is typically calculated based on the official starting and ending ages for pre-primary education, assuming students progress through the system without repeating or skipping grades.
           - For example, if pre-primary education starts at age 3 and ends at age 6, the theoretical duration would be 3 years.
-          - Data on pre-primary education duration are collected from national legislation and formal education standards, and are mapped to the International Standard Classification of Education (ISCED) to ensure international comparability.
+          - Data on pre-primary education duration are collected from national legislation and formal education standards, and are mapped to the International Standard Classification of Education ([International Standard Classification of Education(ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced)) to ensure international comparability.
           - It's important to note that while legislation may define the duration of pre-primary education, actual implementation and enforcement can vary, and some children may not attend school for the full duration.
           - Changes in national education policies, such as extending or reducing the years of pre-primary education, can impact this indicator and should be considered when analyzing trends over time.
           - This indicator is useful for understanding government commitment to early childhood education and for planning resource allocation, but it should be interpreted alongside other indicators like enrolment rates and completion rates for a comprehensive view.
@@ -354,7 +344,7 @@ tables:
           - It captures the share of total general government spending on education that goes to primary education, including spending by local, regional, and central government authorities.
           - The indicator is calculated by dividing government spending on primary education by total spending on education across all levels, and multiplying by 100.
           - A higher percentage means that a greater share of education funding is being directed toward primary education, which may reflect a government’s priority for foundational learning.
-          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education (ISCED) to ensure global comparability.
+          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education ([International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced)) to ensure global comparability.
           - This indicator is useful for understanding how governments prioritize different stages of education. It should be interpreted alongside data on enrolment and per-student costs, which can influence how funding is allocated.
           - There are some limitations. In some cases, spending by education level is estimated, and it may be difficult to separate primary from pre-primary or lower from upper secondary education.
           - The reference year usually reflects the end of the school year, which may span two calendar years depending on the country.
@@ -481,7 +471,7 @@ tables:
           - It captures the share of total general government spending on education that goes to pre-primary education, including spending by local, regional, and central government authorities.
           - The indicator is calculated by dividing government spending on pre-primary education by total spending on education across all levels, and multiplying by 100.
           - A higher percentage means that a greater share of education funding is being directed toward pre-primary education, which may reflect a government’s priority for early childhood development and learning.
-          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education (ISCED) to ensure global comparability.
+          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education ([International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced)) to ensure global comparability.
           - This indicator is useful for understanding how governments prioritize different stages of education. It should be interpreted alongside data on enrolment and per-student costs, which can influence how funding is allocated.
           - There are some limitations. In some cases, spending by education level is estimated, and it may be difficult to separate pre-primary from primary or lower from upper secondary education.
           - The reference year usually reflects the end of the school year, which may span two calendar years depending on the country.
@@ -555,7 +545,7 @@ tables:
           - Women are underrepresented in many academic and research fields — this indicator shows what share of the teaching workforce in tertiary education is made up of women.
           - It captures the percentage of teachers in tertiary education who are female, calculated by dividing the number of female teachers by the total number of teachers (male and female) at the tertiary level and multiplying by 100.
           - A value close to 50% reflects gender parity, while lower values highlight gaps in representation that may be shaped by structural, cultural, or institutional barriers to women’s academic careers.
-          - The data come from administrative sources, including higher education institutions and national education databases, which report teaching staff numbers by sex and ISCED level.
+          - The data come from administrative sources, including higher education institutions and national education databases, which report teaching staff numbers by sex and [International Standard Classification of Education )](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) level.
           - This indicator is useful for tracking gender equality in academic employment, particularly in faculty and teaching roles across universities and other post-secondary institutions.
           - It is disaggregated by level of education, and where available, may be further broken down by type of institution, field of study, or academic rank.
           - Full-time equivalent (FTE) adjustments should be made where part-time teachers are present to ensure consistency in comparison across countries and systems.
@@ -574,7 +564,7 @@ tables:
           - It captures the official entrance age for pre-primary education, based on the assumption that children begin schooling at the standard age, attend full-time, and progress through the education system without repeating or skipping any grades.
           - The official entrance age is typically set by national education laws or regulations and often corresponds to the most common age at which children enter pre-primary programmes.
           - This indicator helps estimate the expected demand for early childhood education services and is a key input for producing many other education statistics, including enrolment rates and school-age population estimates.
-          - The data are reported by ministries of education and compiled by the UNESCO Institute for Statistics, using the International Standard Classification of Education (ISCED) to ensure international comparability.
+          - The data are reported by ministries of education and compiled by the UNESCO Institute for Statistics, using the International Standard Classification of Education ([International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced)) to ensure international comparability.
           - While the official age provides a national benchmark, actual entry ages may vary due to cultural preferences, availability of early childhood programmes, or local policy flexibility.
           - Understanding the official entrance age to pre-primary education is essential for education planning and for identifying gaps in access to early learning opportunities that support school readiness and long-term development.
         display:

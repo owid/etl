@@ -126,22 +126,22 @@ tables:
           numDecimalPlaces: 1
 
       educational_attainment_rate__completed_post_secondary_non_tertiary_education_or_higher__population_25plus_years__both_sexes__pct__ea_4t8_ag25t99:
-        title: Share of the population with post-secondary education (25+)
-        description_short: Percentage of adults aged 25 and older who have completed  [post-secondary education](#dod:post-secondary-education), including [tertiary](#dod:tertiary-education) qualifications.
+        title: Share of the population with post-secondary education or higher (25+)
+        description_short: Percentage of adults aged 25 and older who have completed [post-secondary](#dod:post-secondary-education) or [tertiary](#dod:tertiary-education) education.
         unit: "%"
         short_unit: "%"
         description_key:
-          - This indicator shows what portion of the adult population (aged 25 and above) has attained at least a post-secondary level of education, including vocational or university-level qualifications.
-          - It is calculated by dividing the number of adults who have completed at least post-secondary education by the total population in the same age group, and multiplying by 100.
-          - Post-secondary education includes ISCED levels 4 (post-secondary non-tertiary), 5 (short-cycle tertiary), 6 (bachelor's or equivalent), 7 (master's or equivalent), and 8 (doctoral or equivalent).
-          - The 25+ age group is used because most people have completed their formal education by this age, making it a reliable population for tracking educational attainment.
-          - The data come from national censuses, labour force surveys, or other household surveys, and are usually mapped to the ISCED-11 framework after data collection.
-          - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, and some educational programmes may not be easily classified.
-          - In addition, the indicator reflects only the level of education completed — not the quality of education or whether the person uses their qualification in the labour market.
+          - This indicator shows the share of adults (aged 25 and older) who have attained at least a post-secondary level of education, including vocational or university-level qualifications.
+          - It is calculated by dividing the number of adults who have completed post-secondary or tertiary education by the total adult population in the same age group, then multiplying by 100.
+          - This includes vocational training, college diplomas, associate degrees, bachelor's degrees, master's degrees, and doctoral degrees. Examples include nursing diplomas, engineering degrees, business administration degrees, and PhDs.
+          - The 25+ age group is chosen because most people have completed formal education by this stage, making it a stable reference for educational attainment.
+          - Data sources include national censuses, labour force surveys, and household surveys, typically harmonized after collection.
+          - There are limitations to cross-country comparisons due to differences in how qualifications are defined and classified.
+          - The indicator captures only the highest level of education completed. It does not reflect the quality of education or whether qualifications are actively used in the labour market.
         presentation:
-          title_public: Share of the population aged 25+ years with post-secondary education
+          title_public: Share of the population aged 25+ years with post-secondary education or higher
         display:
-          name: Post-secondary education
+          name: At least post-secondary education
           numDecimalPlaces: 1
 
       educational_attainment_rate__completed_lower_secondary_education_or_higher__population_25plus_years__both_sexes__pct__ea_2t8_ag25t99:
@@ -152,9 +152,9 @@ tables:
         description_key:
           - This indicator shows what portion of the adult population (aged 25 and above) has attained at least a lower secondary level of education.
           - It is calculated by dividing the number of adults who have completed at least lower secondary education by the total population in the same age group, and multiplying by 100.
-          - Lower secondary education includes ISCED levels 2 (lower secondary) and above, which typically corresponds to ages 12 to 15 or 16.
+          - Lower secondary education typically corresponds to ages 12 to 15 or 16.
           - The 25+ age group is used because most people have completed their formal education by this age, making it a reliable population for tracking educational attainment.
-          - The data come from national censuses, labour force surveys, or other household surveys, and are usually mapped to the ISCED-11 framework after data collection.
+          - The data come from national censuses, labour force surveys, or other household surveys, and are usually mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) after data collection.
           - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, and some educational programmes may not be easily classified.
           - In addition, the indicator reflects only the level of education completed — not the quality of education or whether the person uses their qualification in the labour market.
         presentation:
@@ -346,7 +346,7 @@ tables:
           - This indicator shows the percentage of students who reach minimum reading proficiency by the end of lower secondary school.
           - Minimum proficiency at this level means students can connect ideas across different types of texts, understand the author’s intent, and draw basic conclusions.
           - It only includes students who are still in school — not those who dropped out or were never enrolled.
-          - Reading skills are measured through standardized tests, such as PISA or national assessments.
+          - Reading skills are measured through standardized tests, such as [PISA](https://www.oecd.org/en/about/programmes/pisa.html) or national assessments.
           - A higher percentage means more students are developing foundational reading skills before finishing lower secondary education.
           - Differences in assessment tools, coverage, and standards can affect how results are compared across countries.
         presentation:
@@ -364,7 +364,7 @@ tables:
           - This indicator shows the percentage of students who reach minimum reading proficiency by the end of primary school.
           - Minimum reading proficiency at the end of primary school means students can identify key ideas in simple texts and link them to personal experience.
           - It only includes students who are still in school — not those who dropped out or never enrolled.
-          - Skills are measured through standardized tests, such as PIRLS or national assessments.
+          - Skills are measured through standardized tests, such as [PIRLS](https://www.iea.nl/studies/iea/pirls) or national assessments.
           - A higher percentage indicates more students are developing essential literacy by the end of primary school.
           - Cross-country comparisons may be affected by differences in test design and standards.
         presentation:
@@ -384,7 +384,7 @@ tables:
           - It combines the share of children who complete lower secondary education with the share who meet minimum reading standards.
           - This captures outcomes across the full population — not just students still in school.
           - A higher percentage suggests that most children are both completing school and acquiring core reading skills.
-          - Data comes from assessments like PIRLS or ERCE and completion estimates from surveys or models.
+          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
           - Comparability may be affected by differences in assessments, definitions, and data timing.
         presentation:
           title_public: Share of children achieving minimum reading proficiency by the end of lower secondary age
@@ -403,7 +403,7 @@ tables:
           - It combines the share of children who complete primary school with the share who meet reading standards.
           - This reflects outcomes for all children — not just those still in school.
           - A higher value suggests strong access to education and effective early learning.
-          - Data comes from assessments like PIRLS or ERCE and completion estimates from surveys or models.
+          - Data comes from assessments like [PIRLS](https://www.iea.nl/studies/iea/pirls) and completion estimates from surveys or models.
           - Limitations include differences in assessment tools, definitions, and the timing of data sources.
         presentation:
           title_public: Share of children achieving minimum reading proficiency by the end of primary age
@@ -422,7 +422,7 @@ tables:
           - It combines the percentage of children who complete lower secondary school with the percentage who meet the math benchmark.
           - This provides a fuller picture of learning outcomes — not just for enrolled students, but for the entire age group.
           - A higher percentage means more children are both staying in school and acquiring core math skills.
-          - Data comes from international assessments such as TIMSS, along with completion estimates based on surveys or models.
+          - Data comes from international assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on surveys or models.
           - Comparability may be affected by gaps in data, different assessment tools, and mismatches in timing between sources.
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of lower secondary age
@@ -441,7 +441,7 @@ tables:
         - It combines the percentage of children who complete primary school with the percentage who meet the math benchmark.
         - This reflects outcomes for the full population — not just those still enrolled.
         - A higher percentage suggests education systems are enabling most children to complete school and build essential math skills.
-        - Data comes from assessments such as TIMSS or ERCE, along with completion estimates based on household surveys or models.
+        - Data comes from assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on household surveys or models.
         - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of primary age
@@ -457,7 +457,8 @@ tables:
         description_key:
           - This indicator estimates how many children complete primary education, even if they do so later than the expected age.
           - It captures the percentage of the population aged 3 to 5 years above the official age for the last grade of primary school who are estimated to have successfully completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating. For example, if primary starts at age 6 and lasts six years, completion is assessed among 14- to 16-year-olds.
+          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating.
+          - For example, if primary starts at age 6 and lasts six years, completion is assessed among 14- to 16-year-olds. For the UK this would be children aged 14-16 years as the age of primary completion is 11.
           - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
           - A high rate means that most children eventually reach the final grade of primary school, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition.
           - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
@@ -476,7 +477,8 @@ tables:
         description_key:
           - This indicator estimates the share of adolescents who complete lower secondary education, even if they do so later than the expected age.
           - It refers to the population aged 3 to 5 years above the official age for the last grade of lower secondary school who are estimated to have completed that level.
-          - The age group is defined based on the standard education path — for example, if lower secondary begins at age 12 and lasts three years, the completion rate is assessed among 18- to 20-year-olds.
+          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating.
+          - For example, if lower secondary begins at age 12 and lasts three years, the completion rate is assessed among 18- to 20-year-olds.
           - Estimates are modelled using household surveys and administrative records, helping fill data gaps and support trend analysis in countries without recent direct data.
           - A high completion rate suggests that most adolescents reach the final grade of lower secondary school, while lower rates may point to issues in access, progression, or retention.
           - Modelled rates offer improved cross-country comparability but may differ from national figures due to different definitions or data quality.
@@ -518,8 +520,8 @@ tables:
           - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
           - A value of 1 means girls and boys complete primary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
           - A high completion rate — close to 100% — means nearly all children complete primary school by the benchmark age, allowing for delays. Lower rates may point to late school entry, dropouts, repetition, or other barriers to completion.
-          - The data comes primarily from household surveys and population censuses that collect information about each individual’s highest completed grade and age. This is combined with official data on school starting ages and duration.
-          - Limitations include inconsistencies in how countries map completed grades to international standards (ISCED), changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
+          - The data comes from national censuses, labour force surveys, or other household surveys, and are usually mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) levels after data collection. This is combined with official data on school starting ages and duration.
+          - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
         display:
           numDecimalPlaces: 1
 
