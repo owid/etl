@@ -1,10 +1,21 @@
 """Load a meadow dataset and create a garden dataset.
 
-This code builds the consolidated Excess Mortality dataset by Our World in Data. To this end, we two datasets: Human Mortality Database (HMD) Short-term Mortality Fluctuations project and the World Mortality Dataset (WMD).
-Both sources are updated weekly.
+NOTE: If checking for issues with data not being up-to-date, please check the HMD dataset (https://mortality.org/Data/STMF), which is the only one that is still being updated since late 2024.
 
-This step merges the two datasets into one single dataset, combining metrics from both sources to obtain excess mortality metrics.
 
+This code builds the consolidated Excess Mortality dataset by Our World in Data. To this end, we three datasets:
+
+    - Human Mortality Database (HMD) Short-term Mortality Fluctuations project: https://mortality.org/Data/STMF
+        UPDATE policy: Currently being updated, check URL above for latest updates.
+
+    - World Mortality Dataset (WMD): https://github.com/akarlinsky/world_mortality/
+        UPDATE policy: No more updates from 2024
+            "We will not provide any excess mortality estimates starting from 2024. Our excess mortality calculations are based on linear extrapolation of 2015--2019 trends, and this becomes more and more tenuous as the years go by. We provide and update data for 2015--2024, but excess mortality estimates will only be avilable up to end of 2023."
+
+
+    - Karlinsky and Kobak (2021) dataset: https://github.com/dkobak/excess-mortality
+        UPDATE policy: No more updates from 2024
+            "We will not provide any excess mortality estimates starting from 2024. Our excess mortality calculations are based on linear extrapolation of 2015--2019 trends, and this becomes more and more tenuous as the years go by. The repository will keep being updated together with the World Mortality Dataset but will only show excess until the end of 2023."
 """
 
 from input import build_df
