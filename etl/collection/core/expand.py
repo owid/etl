@@ -1,50 +1,9 @@
-"""Common tooling for MDIMs/Explorers."""
-
-from copy import deepcopy
-from typing import Any, Dict, List, Literal, Optional, Set, Union
+from typing import Any, Dict, List, Literal, Optional, Union
 
 import pandas as pd
 from owid.catalog import Table
-from sqlalchemy.orm import Session
 
-import etl.grapher.model as gm
-from etl.collection.utils import (
-    get_tables_by_name_mapping,
-    records_to_dictionary,
-)
-from etl.config import OWID_ENV, OWIDEnv
-
-INDICATORS_SLUG = "indicator"
-
-
-def map_indicator_path_to_id(catalog_path: str, owid_env: Optional[OWIDEnv] = None) -> str | int:
-    # Check if given path is actually an ID
-    if str(catalog_path).isdigit():
-        return catalog_path
-
-    # Get ID, assuming given path is a catalog path
-    if owid_env is None:
-        engine = OWID_ENV.engine
-    else:
-        engine = owid_env.engine
-    with Session(engine) as session:
-        db_indicator = gm.Variable.from_id_or_path(session, catalog_path)
-        assert db_indicator.id is not None
-        return db_indicator.id
-
-
-def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> Dict[str, str]:
-    # Check if given path is actually an ID
-    # Get ID, assuming given path is a catalog path
-    if owid_env is None:
-        engine = OWID_ENV.engine
-    else:
-        engine = owid_env.engine
-    with Session(engine) as session:
-        db_indicators = gm.Variable.from_id_or_path(session, catalog_paths)  # type: ignore
-        # scores = dict(zip(catalog_paths, range(len(catalog_paths))))
-        # db_indicators.sort(key=lambda x: scores[x.catalogPath], reverse=True)
-        return {indicator.catalogPath: indicator.id for indicator in db_indicators}
+from etl.collection.utils import INDICATORS_SLUG
 
 
 def expand_config(
@@ -71,12 +30,10 @@ def expand_config(
     2) This function generates PARTIAL configuration, you need to then combine it with the config loaded from a YAML file. You can do this combination as you consider. Currently this is mostly manual, but we can look into improving this space:
 
         ```python
-        config = paths.load_mdim_config("filename.yml)
+        config = paths.load_collection_config("filename.yml)
         config_new = expand_config(tb=tb)
         config["views"] = config_new["views"]
         config["dimensions"] = config_new["dimensions"]
-
-        multidim.upsert_multidim_data_page(...)
         ```
 
     HOWEVER, there is a helper function `combine_config_dimensions` that can help you with combining dimensions.
@@ -201,65 +158,6 @@ def expand_config(
     return config_partial
 
 
-def process_views(
-    mdim_or_explorer,
-    dependencies: Set[str],
-    combine_metadata_when_mult: bool = False,
-):
-    """Process views in Explorer configuration.
-
-    TODO: See if we can converge to one solution with etl.collection.multidim.process_views.
-    """
-    # Get table information (table URI) by (i) table name and (ii) dataset_name/table_name
-    tables_by_name = get_tables_by_name_mapping(dependencies)
-
-    for view in mdim_or_explorer.views:
-        # Expand paths
-        view.expand_paths(tables_by_name)
-
-        # Combine metadata/config with definitions.common_views
-        if (mdim_or_explorer.definitions is not None) and (mdim_or_explorer.definitions.common_views is not None):
-            view.combine_with_common(mdim_or_explorer.definitions.common_views)
-
-        # Combine metadata in views which contain multiple indicators
-        if combine_metadata_when_mult and view.metadata_is_needed:  # Check if view "contains multiple indicators"
-            # TODO
-            # view["metadata"] = build_view_metadata_multi(indicators, tables_by_uri)
-            # log.info(
-            #     f"View with multiple indicators detected. You should edit its `metadata` field to reflect that! This will be done programmatically in the future. Check view with dimensions {view.dimensions}"
-            # )
-            pass
-
-
-def create_mdim_or_explorer(
-    obj,
-    config: dict,
-    dependencies: Set[str],
-    catalog_path: str,
-    validate_schema: bool = True,
-):
-    # Read config as structured object
-    mdim_or_explorer = obj.from_dict(dict(**config, catalog_path=catalog_path))
-
-    # Edit views
-    process_views(mdim_or_explorer, dependencies=dependencies)
-
-    # Validate config
-    if validate_schema:
-        mdim_or_explorer.validate_schema()
-
-    # Ensure that all views are in choices
-    mdim_or_explorer.validate_views_with_dimensions()
-
-    # Validate duplicate views
-    mdim_or_explorer.check_duplicate_views()
-
-    return mdim_or_explorer
-
-
-####################################################################################################
-# Config auto-expander: Expand configuration from a table. This config is partial!
-####################################################################################################
 class CollectionConfigExpander:
     def __init__(
         self,
@@ -562,125 +460,3 @@ def _check_intersection_iters(
         raise ValueError(
             f"Unexpected items: {', '.join([f'`{d}`' for d in items_unexpected])}. Please review `{key_name}`, available are {items_expected}!"
         )
-
-
-def combine_config_dimensions(
-    config_dimensions: List[Dict[str, Any]],
-    config_dimensions_yaml: List[Dict[str, Any]],
-    choices_top: bool = False,
-    dimensions_top: bool = False,
-):
-    """Combine the dimension configuration from the YAML file with the one generated programmatically.
-
-    There are various strategies that we could follow here, but currently:
-
-    - We consider the union of config_dimensions (returned by expander.build_dimensions) nad config_dimensions_yaml.
-    - These are kept as-is, unless they are in the YML config, in which case they are overwritten.
-
-    Other possible strategies:
-
-    - We could do the reverse, and only consider the fields from config_dimensions_yaml. I'm personally unsure when this could be valuable.
-
-
-    Arguments
-    ---------
-    config_dimensions: List[Dict[str, Any]]
-        Generated by expander.build_dimensions.
-    config_dimensions_yaml:  List[Dict[str, Any]]
-        From the YAML file.
-    choices_top: bool
-        Set to True to place the choices from `config_dimensions` first.
-    dimensions_top: bool
-        Set to True to place the dimensions from `config_dimensions` first.
-
-    TODO:
-
-        - I think we need to add more checks to ensure that there is nothing weird being produced here.
-    """
-
-    config_dimensions_combined = deepcopy(config_dimensions)
-    dims_overwrite = records_to_dictionary(config_dimensions_yaml, "slug")
-
-    # Overwrite dimensions
-    for dim in config_dimensions_combined:
-        slug_dim = dim["slug"]
-        if slug_dim in dims_overwrite:
-            # Get dimension data to overwrite, remove it from dictionary
-            dim_overwrite = dims_overwrite.pop(slug_dim)
-
-            # Overwrite dimension name
-            dim["name"] = dim_overwrite.get("name", dim["name"])
-
-            # Overwrite presentation
-            if "presentation" in dim_overwrite:
-                dim["presentation"] = dim_overwrite["presentation"]
-
-            # Overwrite choices
-            if "choices" in dim_overwrite:
-                choices_overwrite = records_to_dictionary(
-                    dim_overwrite["choices"],
-                    "slug",
-                )
-                assert (
-                    "choices" in dim
-                ), f"Choices not found in dimension: {dim}! This is rare, please report this issue!"
-                for choice in dim["choices"]:
-                    slug_choice = choice["slug"]
-                    if slug_choice in choices_overwrite:
-                        # Get dimension data to overwrite, remove it from dictionary
-                        choice_overwrite = choices_overwrite.pop(slug_choice)
-
-                        # Overwrite choice name
-                        choice["name"] = choice_overwrite.get("name", dim["name"])
-                        # Overwrite choice description
-                        choice["description"] = choice_overwrite.get("description", choice["description"])
-
-                # Handle choices from YAML not present in config_dimensions
-                if choices_overwrite:
-                    missing_choices = []
-                    for slug, values in choices_overwrite.items():
-                        choice = {"slug": slug, **values}
-                        missing_choices.append(choice)
-
-                    if choices_top:
-                        dim["choices"] += missing_choices
-                    else:
-                        dim["choices"] = missing_choices + dim["choices"]
-
-                # Sort choices based on how these appear in the YAML file (only if dimensions_top is False)
-                if not choices_top:
-                    dim["choices"] = _order(dim_overwrite["choices"], dim["choices"])
-
-    # Handle dimensions from YAML not present in config_dimensions
-    if dims_overwrite:
-        missing_dims = []
-        for slug, values in dims_overwrite.items():
-            dim = {"slug": slug, **values}
-            missing_dims.append(dim)
-
-        if dimensions_top:
-            config_dimensions_combined += missing_dims
-        else:
-            config_dimensions_combined = missing_dims + config_dimensions_combined
-
-    # Sort dimensions based on how these appear in the YAML file (only if dimensions_top is False)
-    if not dimensions_top:
-        config_dimensions_combined = _order(config_dimensions_yaml, config_dimensions_combined)
-
-    return config_dimensions_combined
-
-
-def _order(config_yaml, config_combined):
-    # Build score
-    score = {record["slug"]: i for i, record in enumerate(config_yaml)}
-    # Split: those that need ordering, those that don't
-    config_sort = [record for record in config_combined if record["slug"] in score]
-    config_others = [record for record in config_combined if record["slug"] not in score]
-
-    # Order if applicable
-    config_sort = sorted(
-        config_sort,
-        key=lambda x: score.get(x["slug"], 100),
-    )
-
-    return config_sort + config_others

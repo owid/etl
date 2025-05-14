@@ -7,7 +7,7 @@ from unittest import mock
 
 import pytest
 
-from etl.collection.explorer_migration import migrate_csv_explorer
+from etl.collection.explorer.migration import migrate_csv_explorer
 from etl.files import yaml_dump
 from etl.helpers import PathFinder
 from etl.paths import STEP_DIR
@@ -200,7 +200,7 @@ views:
 
 
 def test_migrate_csv_explorer():
-    with mock.patch("etl.collection.explorer_migration._get_explorer_config", return_value=influenza_config):
+    with mock.patch("etl.collection.explorer.migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
         out_yaml = yaml_dump(config)
 
@@ -260,7 +260,7 @@ columns
 def test_explorer_legacy_1(tmp_path, monkeypatch):
     """When saving the explorer, the dimension `confirmed_cases_or_symptoms` is dropped because it has only one choice."""
     # Monkeypatch ExplorerLegacy.save() to return its content
-    from etl.collection.explorer_legacy import ExplorerLegacy
+    from etl.collection.explorer.legacy import ExplorerLegacy
 
     d = {}
 
@@ -271,7 +271,7 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
     monkeypatch.setattr(ExplorerLegacy, "save", patch_save)
 
     # Dump config to YAML file
-    with mock.patch("etl.collection.explorer_migration._get_explorer_config", return_value=influenza_config):
+    with mock.patch("etl.collection.explorer.migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
 
     # Make sure explorer can deal with int values
@@ -290,8 +290,9 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
     config = paths.load_config(path=config_path)
 
     # Create explorer
-    explorer = paths.create_explorer(
+    explorer = paths.create_collection(
         config=config,
+        explorer=True,
     )
 
     # Instead of performing the actual save, get the explorer legacy content
@@ -310,7 +311,7 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
 def test_explorer_legacy_2(tmp_path, monkeypatch):
     """When saving the explorer, the dimension `confirmed_cases_or_symptoms` is not dropped because even if it has only one choice because we set prune_dimensions=False."""
     # Monkeypatch ExplorerLegacy.save() to return its content
-    from etl.collection.explorer_legacy import ExplorerLegacy
+    from etl.collection.explorer.legacy import ExplorerLegacy
 
     d = {}
 
@@ -321,7 +322,7 @@ def test_explorer_legacy_2(tmp_path, monkeypatch):
     monkeypatch.setattr(ExplorerLegacy, "save", patch_save)
 
     # Dump config to YAML file
-    with mock.patch("etl.collection.explorer_migration._get_explorer_config", return_value=influenza_config):
+    with mock.patch("etl.collection.explorer.migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
 
     # Make sure explorer can deal with int values
@@ -340,8 +341,9 @@ def test_explorer_legacy_2(tmp_path, monkeypatch):
     config = paths.load_config(path=config_path)
 
     # Create explorer
-    explorer = paths.create_explorer(
+    explorer = paths.create_collection(
         config=config,
+        explorer=True,
     )
 
     # Instead of performing the actual save, get the explorer legacy content
