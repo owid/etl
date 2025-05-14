@@ -37,6 +37,20 @@ definitions:
   ppp_adjustment_subtitle: This data is adjusted for inflation and for differences in living costs between countries.
   ppp_adjustment_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices.
 
+  description_key_extreme_poverty: Extreme poverty here is defined as living below the International Poverty Line of $2.15 a day.
+  description_key_lmic_poverty_line: A poverty line of $3.65 a day represents definitions of national poverty lines in lower-middle-income countries.
+  description_key_umic_poverty_line: A poverty line of $6.85 a day represents definitions of national poverty lines in upper-middle-income countries.
+
+  description_key_ppp: |-
+    The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in living costs between countries.
+
+  description_key_welfare_type: Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. _Per capita_ means that the income of each household is attributed equally to each member of the household (including children).
+
+  description_key_not_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
+
+  description_key_nowcasts: Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
+
+
 dimensions:
   - name: Metric
     slug: indicator
@@ -152,6 +166,15 @@ views:
       selectedFacetStrategy: entity
       yAxis:
         max: 100
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # AREA CHART
   - dimensions:
@@ -194,6 +217,15 @@ views:
       stackMode: absolute
       yAxis:
         facetDomain: independent
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # BAR CHART
   - dimensions:
@@ -232,6 +264,15 @@ views:
       hideRelativeToggle: false
       stackMode: absolute
       hideTotalValueLabel: true
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -275,6 +316,15 @@ views:
       selectedFacetStrategy: entity
       yAxis:
         max: 100
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # AREA CHART MORE LINES
   - dimensions:
@@ -333,6 +383,15 @@ views:
       stackMode: absolute
       yAxis:
         facetDomain: independent
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -384,6 +443,15 @@ views:
       hideRelativeToggle: false
       stackMode: absolute
       hideTotalValueLabel: true
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
 
   # FOR HEADCOUNT
@@ -415,6 +483,15 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # AREA CHART
   - dimensions:
@@ -457,6 +534,15 @@ views:
       stackMode: absolute
       yAxis:
         facetDomain: independent
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # BAR CHART
   - dimensions:
@@ -494,6 +580,15 @@ views:
       hideRelativeToggle: false
       stackMode: absolute
       hideTotalValueLabel: false
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # MULTIPLE LINES MORE LINES
   - dimensions:
@@ -535,6 +630,15 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # AREA CHART MORE LINES
   - dimensions:
@@ -593,6 +697,15 @@ views:
       stackMode: absolute
       yAxis:
         facetDomain: independent
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
   # BAR CHART MORE LINES
   - dimensions:
@@ -642,6 +755,15 @@ views:
       hideRelativeToggle: false
       stackMode: absolute
       hideTotalValueLabel: false
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
+        - "{definitions.description_key_nowcasts}"
 
     ####################################################
     # SPELL VIEWS
@@ -676,6 +798,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -706,6 +833,12 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -736,6 +869,12 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -766,6 +905,12 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -797,6 +942,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -829,6 +979,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -861,6 +1016,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount_ratio
@@ -893,6 +1053,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   # HEADCOUNT
   - dimensions:
@@ -924,6 +1089,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount
@@ -954,6 +1124,12 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_extreme_poverty}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount
@@ -984,6 +1160,12 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_lmic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount
@@ -1014,6 +1196,12 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_umic_poverty_line}"
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount
@@ -1045,6 +1233,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount
@@ -1077,6 +1270,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount
@@ -1109,6 +1307,11 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
 
   - dimensions:
       indicator: headcount
@@ -1141,3 +1344,8 @@ views:
       hasMapTab: false
       chartTypes: ["LineChart"]
       selectedFacetStrategy: entity
+    metadata:
+      description_key:
+        - "{definitions.description_key_ppp}"
+        - "{definitions.description_key_welfare_type}"
+        - "{definitions.description_key_not_market_income}"
