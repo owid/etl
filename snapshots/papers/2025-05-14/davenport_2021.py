@@ -15,7 +15,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--path-to-file", prompt=True, type=str, help="Path to local data file.")
 def run(path_to_file: str, upload: bool) -> None:
     # Initialize a new snapshot.
-    snap = Snapshot(f"papers/{SNAPSHOT_VERSION}/davenport_2021.xls")
+    snap = Snapshot(f"papers/{SNAPSHOT_VERSION}/davenport_2021.xlsx")
 
     # Save snapshot.
     snap.create_snapshot(filename=path_to_file, upload=upload)

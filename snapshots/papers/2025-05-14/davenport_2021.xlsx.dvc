@@ -7,16 +7,14 @@ meta:
     description: |-
       The data for Fig. 1.6 (page 34) was received by personal communication with Dr Romola Davenport, the author of this chapter.
     date_published: "2021"
-
     # Citation
     producer: Romola Davenport
     citation_full: |-
       Davenport R. (2021) Patterns of Death, 1800-2020.  In Stearns, P. (Ed). The Routledge History of Death Since 1800 (pp.21-44). Routledge.
     attribution_short: Davenport
-
     # Files
     url_main: https://www.taylorfrancis.com/reader/download/92acbdcb-b168-48d0-a39c-108b9ba2bc4b/chapter/pdf?context=ubx
-    date_accessed: '2025-05-14'
+    date_accessed: "2025-05-14"
 
     # License
     license:
@@ -25,4 +23,4 @@ meta:
 outs:
   - md5: 75f6a70ab9b216bb0090f089709cdceb
     size: 15184
-    path: davenport_2021.xls
+    path: davenport_2021.xlsx
