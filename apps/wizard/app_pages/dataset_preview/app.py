@@ -212,9 +212,16 @@ def st_show_indicator(indicator, indicator_charts, display_charts=True):
                 grapher_chart(variable_id=iid, tab="map")  # type: ignore
 
 
-@st.cache_data
-def read_table(ds, name):
-    return ds.read(name)
+@st.cache_resource  # heavy work runs only once
+def make_renderer(ds, tb_name):
+    tb = ds.read(tb_name)
+
+    return StreamlitRenderer(tb)
+
+
+@st.fragment
+def walker_fragment(renderer):
+    renderer.explorer()
 
 
 # CONFIG
@@ -329,6 +336,8 @@ if DATASET_ID is not None:
         with tb_explore:
             # Load dataset
             uri = f"data://garden/{dataset['catalogPath']}"
+
+            # Create renderer based on URI
             ds = load_dataset_from_etl(uri)
 
             if ds is not None:
@@ -336,10 +345,14 @@ if DATASET_ID is not None:
                 if len(tb_names) == 1:
                     tb_name = tb_names[0]
                 else:
-                    st.warning(f"Need to choose from {tb_names}")
-                    tb_name = tb_names[0]
+                    tb_name = st.selectbox(
+                        label="Choose table",
+                        options=tb_names,
+                        format_func=lambda x: x,
+                        key="table_select",
+                        placeholder="Select table",
+                    )
 
-                tb = read_table(ds, tb_name)
-
-                app = StreamlitRenderer(tb)
-                app.explorer()
+                # Show exploration dashboard
+                renderer = make_renderer(ds, tb_name)
+                walker_fragment(renderer)
