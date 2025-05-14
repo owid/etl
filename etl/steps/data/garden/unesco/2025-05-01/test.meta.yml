@@ -250,6 +250,37 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      __upper_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_3_gpia:
+        title: Completion rate in upper secondary education, adjusted gender parity index (GPIA)
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [upper secondary](#dod:upper-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        unit: ""
+        description_key:
+          - Many children never reach the final grade of upper secondary education — this indicator shows how close girls and boys are to parity in completing this level by a slightly older age than expected.
+          - It captures the percentage of children, typically aged 3 to 5 years older than the official age for the last grade of upper secondary school, who have successfully completed that level of education, disaggregated by sex.
+          - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2, producing a value between 0 and 2 that is symmetrical around 1.
+          - A GPIA of 1 signals parity. A value below 1 means boys are more likely to complete upper secondary, while a value above 1 means the advantage is with girls.
+          - The completion age group is defined using national data on entry age and duration — e.g. if upper secondary begins at age 15 and lasts 3 years, the indicator is based on young people aged 21 to 23.
+          - The completion rate reflects whether students reach the final grade of the level, regardless of whether they graduated on time, late, or after repeating a year.
+          - The data comes primarily from household surveys and censuses that ask individuals about their highest level of education completed, combined with national data on the structure and duration of schooling.
+          - There are limitations. Survey results may not align neatly with national ISCED mappings, and differences in school structure can make cross-country comparisons challenging.
+        display:
+          numDecimalPlaces: 1
+
+      __lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
+        title: Completion rate in lower secondary education, adjusted gender parity index (GPIA)
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [lower secondary](#dod:lower-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
+        unit: ""
+        description_key:
+          - Many adolescents never reach the end of lower secondary school — this indicator shows how close girls and boys are to parity in completing this level by a slightly older age than expected.
+          - It captures the percentage of children, typically aged 3 to 5 years older than the official age for the last grade of lower secondary education, who have successfully completed that level, disaggregated by sex.
+          - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2, producing a value between 0 and 2 that is symmetrical around 1.
+          - A GPIA of 1 indicates parity. A value below 1 means boys are more likely to complete lower secondary, while a value above 1 signals an advantage for girls.
+          - The age range used reflects the expected age of completion plus a 3–5 year window to account for delayed entry or grade repetition. For example, if lower secondary ends at age 15, the indicator is based on the population aged 18 to 20.
+          - Completion rate data come from household surveys or censuses that collect information on the highest grade completed, together with national education structure data on the official start age and duration of lower secondary.
+          - Interpretation of results should consider potential mismatches between reported educational attainment and national ISCED classifications, as well as any recent changes to school duration or structure.
+        display:
+          numDecimalPlaces: 1
+
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__both_sexes__pct__rofst_2_cp:
         title: Out-of-school rate for adolescents of lower secondary school age
         description_short: Percentage of adolescents in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
@@ -499,4 +530,3 @@ tables:
           - Limitations include inconsistencies in how countries map completed grades to international standards (ISCED), changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
         display:
           numDecimalPlaces: 1
-
