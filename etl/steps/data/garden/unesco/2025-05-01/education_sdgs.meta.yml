@@ -54,9 +54,10 @@ tables:
         short_unit: "%"
         description_key: *desc_literacy
         presentation:
-          title_public: Adult literacy rate
+          title_public: Literacy rate among adults aged 15+
         display:
           numDecimalPlaces: 1
+          name: Literacy rate among adults
 
       youth_literacy_rate__population_15_24_years__male__pct__lr_ag15t24_m:
         title: Literacy rate among young men
@@ -64,8 +65,12 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_literacy
+        presentation:
+          title_public: Literacy rate among young men aged 15–24
         display:
           numDecimalPlaces: 1
+          name: Literacy rate among young men
+
 
       youth_literacy_rate__population_15_24_years__female__pct__lr_ag15t24_f:
         title: Literacy rate among young women
@@ -73,8 +78,12 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_literacy
+        presentation:
+          title_public: Literacy rate among young women aged 15–24
         display:
           numDecimalPlaces: 1
+          name: Literacy rate among young women
+
 
       elderly_literacy_rate__population_65plus_years__both_sexes__pct__lr_ag65t99:
         title: Literacy rate among older adults
@@ -83,9 +92,10 @@ tables:
         short_unit: "%"
         description_key: *desc_literacy
         presentation:
-          title_public: Literacy rate among older adults
+          title_public: Literacy rate among older adults aged 65+
         display:
           numDecimalPlaces: 1
+          name: Literacy rate among older adults
 
       youth_literacy_rate__population_15_24_years__both_sexes__pct__lr_ag15t24:
         title: Literacy rate among young people (15–24 years)
@@ -93,8 +103,11 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key: *desc_literacy
+        presentation:
+          title_public: Literacy rate among young people (15–24 years)
         display:
           numDecimalPlaces: 1
+          name: Literacy rate among young people
 
       youth_literacy_rate__population_15_24_years__adjusted_gender_parity_index__gpia__lr_ag15t24_gpia:
         title: Literacy rate among young people (15–24 years), adjusted gender parity index
