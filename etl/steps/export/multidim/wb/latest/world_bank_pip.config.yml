@@ -9,6 +9,25 @@ default_selection:
   - China
   - Ethiopia
 
+definitions:
+  # Detailed colors:
+  color_0_to_100: &color_0_to_100 "#df4749"
+  color_100_to_215: &color_100_to_215 "#f97b5c"
+  color_215_to_365: &color_215_to_365 "#fdbe81"
+  color_365_to_685: &color_365_to_685 "#ffffcc"
+  color_685_to_1000: &color_685_to_1000 "#bce1ed"
+  color_1000_to_2000: &color_1000_to_2000 "#95cde0"
+  color_2000_to_3000: &color_2000_to_3000 "#6ea9c9"
+  color_3000_to_4000: &color_3000_to_4000 "#4a7ca5"
+  color_4000_to_inf: &color_4000_to_inf "#26456d"
+
+  # Simplified colors:
+  color_0_to_215: &color_0_to_215 "#df4749"
+  # color_215_to_365:
+  # color_365_to_685:
+  # color_685_to_1000:
+  color_1000_to_inf: &color_1000_to_inf "#5695c5"
+
 dimensions:
   - name: Metric
     slug: indicator
@@ -147,18 +166,23 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_above__ppp_version_2017__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "Above $10 a day"
+            color: *color_1000_to_inf
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_685_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$6.85-$10 a day"
+            color: *color_685_to_1000
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_365_and_685__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$3.65-$6.85 a day"
+            color: *color_365_to_685
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_215_and_365__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$2.15-$3.65 a day"
+            color: *color_215_to_365
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "Below $2.15 a day"
+            color: *color_0_to_215
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: This data is adjusted for inflation and for differences in living costs between countries.
@@ -259,30 +283,39 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_above__ppp_version_2017__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "Above $40 a day"
+            color: *color_4000_to_inf
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_3000_and_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$30-$40 a day"
+            color: *color_3000_to_4000
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_2000_and_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$20-$30 a day"
+            color: *color_2000_to_3000
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_1000_and_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$10-$20 a day"
+            color: *color_1000_to_2000
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_685_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$6.85-$10 a day"
+            color: *color_685_to_1000
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_365_and_685__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$3.65-$6.85 a day"
+            color: *color_365_to_685
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_215_and_365__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$2.15-$3.65 a day"
+            color: *color_215_to_365
         - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_100_and_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$1-$2.15 a day"
+            color: *color_100_to_215
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "$Below $1 a day"
+            color: *color_0_to_100
     config:
       title: Distribution of the population between different poverty thresholds
       subtitle: This data is adjusted for inflation and for differences in living costs between countries.
