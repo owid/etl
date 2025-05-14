@@ -45,6 +45,14 @@ def run() -> None:
         # dimensions={},
     )
 
+    # Edit indicator-level display settings
+    choice_names = c.get_choice_names("conflict_type")
+    for view in c.views:
+        for slug, name in choice_names.items():
+            if view.dimensions["conflict_type"] == slug:
+                assert view.indicators.y is not None
+                view.indicators.y[0].display = {"name": name}
+
     # Aggregate views
     c.group_views(
         params=[
@@ -85,6 +93,7 @@ def run() -> None:
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
                     },
+                    "sortBy": "custom",
                 },
             },
         ]
@@ -110,9 +119,11 @@ def run() -> None:
     # (optional) Edit views
     #
     for view in c.views:
-        # if view.dimension["sex"] == "male":
-        #     view.config["title"] = "Something else"
-        pass
+        # Edit title and subtitle in charts
+        edit_view_title(view, choice_names)
+
+        # Edit FAUST in charts with CI (color, display names). Indicator-level.
+        edit_view_display_estimates_ci(view)
 
     #
     # Save garden dataset.
@@ -195,3 +206,72 @@ def adjust_dimensions(tb):
             ]
         )
     return tb
+
+
+def edit_view_title(view, conflict_renames):
+    """Edit FAUST titles and subtitles."""
+    # Get conflict type name
+    conflict_name = "armed conflicts"
+    if view.dimensions["conflict_type"] not in {"all", "all_stacked"}:
+        conflict_name = conflict_renames.get(view.dimensions["conflict_type"]).lower()
+
+    # Add title based on indicator
+    if view.dimensions["indicator"] == "deaths":
+        view.config = {
+            **(view.config or {}),
+            "title": f"Deaths in {conflict_name}",
+        }
+    elif view.dimensions["indicator"] == "death_rate":
+        view.config = {
+            **(view.config or {}),
+            "title": f"Death rate in {conflict_name}",
+        }
+    elif view.dimensions["indicator"] == "num_conflicts":
+        if view.dimensions["conflict_type"] == "one-sided violence":
+            title = f"Number of conflicts with {conflict_name}"
+        else:
+            title = f"Number of {conflict_name}"
+        view.config = {
+            **(view.config or {}),
+            "title": title,
+        }
+
+
+def edit_view_display_estimates_ci(view):
+    """Edit FAUST estimates for confidence intervals."""
+    if view.dimensions["estimate"] == "best_ci":
+        assert view.indicators.y is not None
+        for indicator in view.indicators.y:
+            if "_high_" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "High estimate",
+                    "color": "#C3AEA6",
+                }
+            elif "_low_" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "Low estimate",
+                    "color": "#C3AEA6",
+                }
+            else:
+                indicator.display = {
+                    "name": "Best estimate",
+                    "color": "#B13507",
+                }
+    if view.dimensions["people"] == "all_stacked":
+        assert view.indicators.y is not None
+        for indicator in view.indicators.y:
+            if "_combatants_" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "Combatant deaths",
+                    "color": "#00847E",
+                }
+            elif "_civilians_" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "Civilian deaths",
+                    "color": "#C15065",
+                }
+            else:
+                indicator.display = {
+                    "name": "Unclear deaths",
+                    "color": "#00295B",
+                }
