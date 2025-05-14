@@ -294,6 +294,6 @@ def edit_view_display_estimates_ci(view):
                 }
             else:
                 indicator.display = {
-                    "name": "Beest estimate",
+                    "name": "Best estimate",
                     "color": "#B13507",
                 }
