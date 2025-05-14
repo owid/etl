@@ -67,26 +67,5 @@ def run() -> None:
         short_name="poverty",
     )
 
-    # # Group certain views together: used to create StackedBar charts
-    # mdim.group_views(
-    #     params=[
-    #         {
-    #             "dimension": "poverty_line",
-    #             "choices": ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
-    #             "choice_new_slug": "multiple_lines_absolute",
-    #             "overwrite_dimension_choice": True,
-    #         },
-    #         {
-    #             "dimension": "poverty_line",
-    #             "choices": ["40% of the median", "50% of the median", "60% of the median"],
-    #             "choice_new_slug": "multiple_lines_relative",
-    #             "overwrite_dimension_choice": True,
-    #         },
-    #     ]
-    # )
-
-    # # Edit order of slugs
-    # mdim.sort_choices({"poverty_line": lambda x: sorted(x)})
-
     # Save & upload
     mdim.save()
