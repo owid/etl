@@ -239,7 +239,7 @@ def edit_faust(c):
     choice_names = c.get_choice_names("conflict_type")
     for view in c.views:
         # Edit title and subtitle in charts
-        # edit_view_title(view, choice_names)
+        edit_view_title(view, choice_names)
 
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_view_display_estimates_ci(view)
@@ -279,9 +279,7 @@ def edit_view_title(view, conflict_renames):
 
 def edit_view_display_estimates_ci(view):
     """Edit FAUST estimates for confidence intervals."""
-    print(view.dimensions["estimate"])
     if view.dimensions["estimate"] == "best_ci":
-        print(1)
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
             if "_high_" in indicator.catalogPath:
@@ -299,5 +297,3 @@ def edit_view_display_estimates_ci(view):
                     "name": "Beest estimate",
                     "color": "#B13507",
                 }
-    else:
-        print(0)
