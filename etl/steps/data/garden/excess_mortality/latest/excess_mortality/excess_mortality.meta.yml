@@ -577,7 +577,7 @@ tables:
           - *origin_wmd
           - *origin_kk
         sources:
-          - name: Human Mortality Database (2024)
+          - name: Human Mortality Database (2025)
           - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
         presentation:

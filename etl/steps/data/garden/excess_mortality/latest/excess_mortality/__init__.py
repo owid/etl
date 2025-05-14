@@ -23,7 +23,7 @@ from owid.catalog import Table
 from process import process_df
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.steps.data.garden.covid.latest.shared import add_last12m_to_metric
 
 log = get_logger()
@@ -32,7 +32,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("excess_mortality: start")
 
     #
@@ -70,8 +70,7 @@ def run(dest_dir: str) -> None:
     tb_garden = tb_garden.format(["entity", "date"])
 
     # Create dataset
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_garden],
         formats=["csv", "feather"],
     )
