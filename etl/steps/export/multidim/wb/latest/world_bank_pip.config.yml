@@ -62,6 +62,14 @@ dimensions:
         name: Line chart
         description: See how poverty has changed over time using 4 different poverty lines
         group: Visualize multiple poverty lines
+      - slug: area_chart
+        name: Area chart
+        description: See how the distribution of incomes has changed over time
+        group: Visualize multiple poverty lines
+      - slug: line_chart_more_lines
+        name: Line chart (additional poverty lines)
+        description: See how poverty has changed over time using 8 different poverty lines
+        group: Visualize multiple poverty lines
       # - slug: multiple_lines_absolute
       #   name: Multiple lines
       # - slug: 40% of the median
@@ -85,6 +93,7 @@ dimensions:
         name: Income surveys only
       - slug: Consumption
         name: Consumption surveys only
+
 views:
   - dimensions:
       indicator: headcount_ratio
@@ -102,10 +111,77 @@ views:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "Share below $6.85 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $30 a day"
+    config:
+      title: Share of the population living below a range of poverty lines
+      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: area_chart
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio_above__ppp_version_2017__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Above $10"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_685_and_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$6.85-$10 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_365_and_685__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$3.65-$6.85 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio_between__ppp_version_2017__poverty_line_215_and_365__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$2.15-$3.65 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "$2.15 a day"
+    config:
+      title: Distribution of the population between different poverty thresholds
+      subtitle: This data is adjusted for inflation and for differences in living costs between countries.
+      hasMapTab: false
+      chartTypes: ["StackedArea"]
+      selectedFacetStrategy: entity
+      baseColorScheme: RdYlBu
+
+  - dimensions:
+      indicator: headcount_ratio
+      poverty_line: line_chart_more_lines
+      ppp_version: "2017.0"
+      table: Income or consumption consolidated
+    indicators:
+      y:
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_100__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $1 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $2.15 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $3.65 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $6.85 a day"
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
           display:
             name: "Share below $10 a day"
-
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_2000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $20 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_3000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $30 a day"
+        - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_4000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $40 a day"
     config:
       title: Share of the population living below a range of poverty lines
       subtitle: This data is adjusted for inflation and for differences in living costs between countries.
