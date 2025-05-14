@@ -524,6 +524,7 @@ tables:
           - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
         display:
           numDecimalPlaces: 1
+
       completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_2_gpia:
         title: Completion rate in lower secondary education, adjusted gender parity index (GPIA)
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal lower secondary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
@@ -540,3 +541,18 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      completion_rate__upper_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_3_gpia:
+          title: Completion rate in upper secondary education, adjusted gender parity index (GPIA)
+          description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal upper secondary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
+          unit: ""
+          description_key:
+            - Many young people do not reach the final grade of upper secondary education — this indicator shows how close boys and girls are to completing upper secondary school by a slightly older age than expected.
+            - It captures gender equality in completion rates for [upper secondary education](#dod:upper-secondary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of upper secondary school, who have successfully completed that level.
+            - The completion age group is based on the expected educational pathway — assuming students enter school on time and progress without repeating or skipping grades. For example, if upper secondary starts at age 15 and lasts 3 years, completion is measured among 20–22-year-olds.
+            - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
+            - A value of 1 means girls and boys complete upper secondary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
+            - A high completion rate — close to 100% — indicates that nearly all young people complete upper secondary school by the benchmark age, allowing for delays. Lower rates may reflect late school entry, dropout, repetition, or social and economic barriers to completion.
+            - The data are drawn from national censuses, labour force surveys, or other household surveys, which are generally mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) levels after data collection. These are combined with official information on school starting ages and programme durations.
+            - Important limitations apply. Cross-country comparisons may be affected by differences in ISCED mappings, changes in national education systems over time, and the possibility of underestimating completion when actual programme lengths differ from official definitions.
+          display:
+            numDecimalPlaces: 1
