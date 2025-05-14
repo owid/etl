@@ -335,24 +335,27 @@ if DATASET_ID is not None:
 
         with tb_explore:
             # Load dataset
-            uri = f"data://garden/{dataset['catalogPath']}"
+            if dataset["catalogPath"] is not None:
+                uri = f"data://garden/{dataset['catalogPath']}"
 
-            # Create renderer based on URI
-            ds = load_dataset_from_etl(uri)
+                # Create renderer based on URI
+                ds = load_dataset_from_etl(dataset_uri=uri)
 
-            if ds is not None:
-                tb_names = ds.table_names
-                if len(tb_names) == 1:
-                    tb_name = tb_names[0]
-                else:
-                    tb_name = st.selectbox(
-                        label="Choose table",
-                        options=tb_names,
-                        format_func=lambda x: x,
-                        key="table_select",
-                        placeholder="Select table",
-                    )
+                if ds is not None:
+                    tb_names = ds.table_names
+                    if len(tb_names) == 1:
+                        tb_name = tb_names[0]
+                    else:
+                        tb_name = st.selectbox(
+                            label="Choose table",
+                            options=tb_names,
+                            format_func=lambda x: x,
+                            key="table_select",
+                            placeholder="Select table",
+                        )
 
-                # Show exploration dashboard
-                renderer = make_renderer(ds, tb_name)
-                walker_fragment(renderer)
+                    # Show exploration dashboard
+                    renderer = make_renderer(ds, tb_name)
+                    walker_fragment(renderer)
+            else:
+                st.warning("No catalog path found for this dataset. Might be a pre-ETL dataset?")
