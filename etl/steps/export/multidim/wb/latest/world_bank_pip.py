@@ -10,7 +10,7 @@ DIMENSIONS_CONFIG = {
     "poverty_line": ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
     "table": ["Income or consumption consolidated", "Consumption", "Income"],
     # TODO: It seems that the dimension is float, while the original was probably int. Check if this is a bug.
-    "ppp_version": ["2017.0"],
+    # "ppp_version": ["2017.0"],
     # "welfare_type": "*",
     # "decile": "*",
     # "survey_comparability": "*",
@@ -28,10 +28,17 @@ def run() -> None:
 
     # Remove unwanted dimensions.
     # NOTE: This is a temporary solution until we figure out how to deal with missing dimensions.
+    columns_to_keep = []
     for column in tb.drop(columns=["country", "year"]).columns:
+        # Keep only indicators for a specific PPP year, and then remove that dimension.
+        if ("ppp_version" in tb[column].metadata.dimensions) and tb[column].metadata.dimensions["ppp_version"] == 2017:
+            columns_to_keep.append(column)
+            tb[column].metadata.dimensions.pop("ppp_version")
+        # Remove dimensions that are not needed.
         for dimension in ["welfare_type", "decile", "survey_comparability"]:
             if dimension in tb[column].metadata.dimensions:
                 tb[column].metadata.dimensions.pop(dimension)
+    tb = tb[columns_to_keep]
 
     # Bake config automatically from table
     config_new = expand_config(

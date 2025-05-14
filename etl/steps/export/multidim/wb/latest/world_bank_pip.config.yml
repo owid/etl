@@ -89,7 +89,7 @@ views:
   - dimensions:
       indicator: headcount_ratio
       poverty_line: line_chart
-      ppp_version: "2017.0"
+      # ppp_version: "2017.0"
       table: Income or consumption consolidated
     indicators:
       y:
