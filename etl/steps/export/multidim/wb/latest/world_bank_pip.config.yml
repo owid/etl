@@ -89,15 +89,26 @@ views:
   - dimensions:
       indicator: headcount_ratio
       poverty_line: line_chart
+      ppp_version: "2017.0"
       table: Income or consumption consolidated
     indicators:
       y:
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_215__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $2.15 a day"
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_365__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $3.65 a day"
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_685__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $6.85 a day"
         - catalogPath: world_bank_pip_dimensional#headcount_ratio__ppp_version_2017__poverty_line_1000__welfare_type_income_or_consumption__table_income_or_consumption_consolidated__survey_comparability_no_spells
+          display:
+            name: "Share below $10 a day"
 
     config:
       title: Share of the population living below a range of poverty lines
       subtitle: This data is adjusted for inflation and for differences in living costs between countries.
       hasMapTab: false
+      chartTypes: ["LineChart"]
+      selectedFacetStrategy: entity
