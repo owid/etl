@@ -54,7 +54,7 @@ tables:
           name:  Primary education
           numDecimalPlaces: 1
 
-      completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_1:
+      completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
         title: Completion rate in lower secondary education
         description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
         unit: "%"
@@ -73,7 +73,7 @@ tables:
           name:  Secondary education
           numDecimalPlaces: 1
 
-      completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_1:
+      completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
         title: Completion rate in upper secondary education
         description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
         unit: "%"
@@ -162,7 +162,7 @@ tables:
       youth_literacy_rate__population_15_24_years__adjusted_gender_parity_index__gpia__lr_ag15t24_gpia:
         title: Literacy rate among young people (15–24 years), adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal basic literacy rates among young men and women aged 15–24. Values below 1 favor young men, and above 1 favor young women.
-        unit: "index"
+        unit: ""
         description_key:
           - Literacy unlocks access to education, employment, and civic participation — this indicator shows how equally those opportunities are available to boys and girls in their youth.
           - It captures gender equality in basic literacy by comparing literacy rates between young women and young men aged 15–24.
@@ -251,10 +251,10 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      completion_rate__primary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
+      completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_2_gpia:
         title: Completion rate in primary education, adjusted gender parity index (GPIA)
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal primary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
-        unit: "index"
+        unit: ""
         description_key:
           - Many children never make it to the final grade of their school level — this indicator shows how close boys and girls are to completing primary education by a slightly older age than expected.
           - It captures gender equality in completion rates for [primary education](#dod:primary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of primary school, who have successfully completed that level.
@@ -323,10 +323,10 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      completion_rate__upper_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
+      __upper_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_3_gpia:
         title: Completion rate in upper secondary education, adjusted gender parity index (GPIA)
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [upper secondary](#dod:upper-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
-        unit: "index"
+        unit: ""
         description_key:
           - Many children never reach the final grade of upper secondary education — this indicator shows how close girls and boys are to parity in completing this level by a slightly older age than expected.
           - It captures the percentage of children, typically aged 3 to 5 years older than the official age for the last grade of upper secondary school, who have successfully completed that level of education, disaggregated by sex.
@@ -338,10 +338,11 @@ tables:
           - There are limitations. Survey results may not align neatly with national ISCED mappings, and differences in school structure can make cross-country comparisons challenging.
         display:
           numDecimalPlaces: 1
-      completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
+
+      __lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
         title: Completion rate in lower secondary education, adjusted gender parity index (GPIA)
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal [lower secondary](#dod:lower-secondary-education) school completion rates between boys and girls. Values below 1 favor boys, and above 1 favor girls.
-        unit: "index"
+        unit: ""
         description_key:
           - Many adolescents never reach the end of lower secondary school — this indicator shows how close girls and boys are to parity in completing this level by a slightly older age than expected.
           - It captures the percentage of children, typically aged 3 to 5 years older than the official age for the last grade of lower secondary education, who have successfully completed that level, disaggregated by sex.
