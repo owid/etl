@@ -33,7 +33,7 @@ definitions:
     hmd: &origin_hmd
       title: "Human Mortality Database"
       producer: Human Mortality Database
-      date_published: "2024"
+      date_published: "2025"
       url_main: "https://www.mortality.org"
       license:
         name: Creative Commons BY 4.0
@@ -577,7 +577,7 @@ tables:
           - *origin_wmd
           - *origin_kk
         sources:
-          - name: Human Mortality Database (2025)
+          - name: Human Mortality Database
           - name: World Mortality Dataset (2024)
           - name: Karlinsky and Kobak (2021)
         presentation:
