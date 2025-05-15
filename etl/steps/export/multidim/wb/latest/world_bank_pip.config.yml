@@ -9,6 +9,13 @@ default_selection:
   - China
   - Ethiopia
 
+default_dimensions:
+  indicator: headcount_ratio
+  poverty_line: "215"
+  ppp_version: "2017.0"
+  table: Income or consumption consolidated
+  survey_comparability: No spells
+
 definitions:
   # Detailed colors:
   color_0_to_100: &color_0_to_100 "#D73027"
