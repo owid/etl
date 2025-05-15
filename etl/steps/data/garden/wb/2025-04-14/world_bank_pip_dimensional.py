@@ -179,6 +179,8 @@ def run() -> None:
     # Create stacked variables from headcount and headcount_ratio
     tb = create_stacked_variables(tb=tb)
 
+    # NOTE: In the future, I could modify it to handle issues between PPP versions better
+    # Currently, for some checks, if there is an issue for the old PPP version, it will be deleted for the current one too (it is not a big deal)
     tb = sanity_checks(tb=tb)
 
     tb = make_distributional_indicators_long(tb=tb)
