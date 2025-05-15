@@ -2,6 +2,7 @@
 
 from typing import List
 
+import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
@@ -36,7 +37,7 @@ def run() -> None:
     snap_meadow_south_korea = paths.load_snapshot("soo_bae_et_al_2012", namespace="papers")
     # Forest research data for USA
     snap_meadow_usa = paths.load_snapshot("forest_share", namespace="usda_fs")
-    # FAO RL
+    # FAO Forest Resource Assessment (FRA) 2020 data
     ds_meadow_fra = paths.load_dataset("fra_forest_extent")
 
     # Read table from meadow dataset.
@@ -51,6 +52,8 @@ def run() -> None:
     tb_south_korea = snap_meadow_south_korea.read()
     tb_usa = snap_meadow_usa.read()
     tb_fra = ds_meadow_fra["fra_forest_area"].reset_index()
+    # Interpolate the 5-yearly FRA data to fill in missing years.
+    tb_fra = interpolate_fra(tb_fra)
     tb_fra["source"] = "Forest Resource Assessment (FRA) 2020"
     # Concatenate tables.
     tb = pr.concat(
@@ -85,6 +88,29 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def interpolate_fra(tb_fra: Table) -> Table:
+    """
+    Interpolate FRA data to fill in missing years for countries.
+    The data from FRA is based on annual average changes in forest area, so we can interpolate
+    the forest share for each country across the years.
+    """
+    tb_fra = tb_fra.copy(deep=True)
+
+    years = [tb_fra["year"].min(), tb_fra["year"].max()]
+    range_years = list(range(years[0], years[1] + 1))
+    # Ensure all years are present for each country
+    tb_fra = (
+        tb_fra.set_index(["country", "year"])
+        .reindex(pd.MultiIndex.from_product([tb_fra["country"].unique(), range_years], names=["country", "year"]))
+        .reset_index()
+    )
+    # Interpolate missing values
+    tb_fra["forest_share"] = tb_fra.groupby("country")["forest_share"].transform(
+        lambda x: x.interpolate(method="linear", limit_direction="both")
+    )
+    return tb_fra
 
 
 def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source: str) -> Table:

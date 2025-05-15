@@ -43,6 +43,7 @@ tables:
         description_key:
           - "This indicator shows the share of a country’s land area that is covered by forest. It includes both natural forests and forest plantations, where that distinction is available."
           - "For 1990 onwards, data comes from the Food and Agriculture Organization (FAO), which uses a consistent global definition: forest is land with tree canopy cover greater than 10%, spanning more than 0.5 hectares, with trees that can reach at least 5 metres in height. It includes plantations but excludes land where other uses (such as agriculture or urban development) dominate ([FAO definition](https://www.fao.org/4/y1997e/y1997e1m.htm))."
+          - "We linearly interpolate the data for the years between the FAO FRA data points, which are typically given every 5 years."
           - "For years prior to 1990, the data is drawn from historical estimates published by sources including the USDA Forest Service, DEFRA, Forest Research, and others. These estimates typically rely on older maps, land surveys, and expert reconstructions."
           - "Where possible, pre-1990 estimates include both natural forests and plantations to match the FAO’s definition. However, definitions and methods vary by source and country, and users should interpret older data points with some caution."
           - "The details for the historical estimates are provided below:"
