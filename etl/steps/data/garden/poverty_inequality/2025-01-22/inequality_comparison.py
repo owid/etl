@@ -72,7 +72,7 @@ def run() -> None:
     # NOTE: For now I am keeping the population and regions datasets commented out, because I might use them in the future
     # ds_population = paths.load_dataset("population")
     # ds_regions = paths.load_dataset("regions")
-    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_pip = paths.load_dataset("world_bank_pip_legacy")
     ds_wid = paths.load_dataset("world_inequality_database")
     ds_lis = paths.load_dataset("luxembourg_income_study")
 

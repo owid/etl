@@ -589,7 +589,7 @@ dataset:
 
 
 tables:
-  world_bank_pip_dimensional:
+  world_bank_pip:
     variables:
 
     # POVERTY

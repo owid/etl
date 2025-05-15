@@ -28,7 +28,7 @@ PPP_YEAR_CURRENT = PPP_VERSIONS[1]
 
 def run() -> None:
     # Load garden dataset.
-    ds_garden = paths.load_dataset("world_bank_pip")
+    ds_garden = paths.load_dataset("world_bank_pip_legacy")
 
     # Read table from garden dataset.
     tb_inc_or_cons_current = ds_garden[f"income_consumption_{PPP_YEAR_CURRENT}"]

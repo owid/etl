@@ -21,7 +21,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden datasets
-    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_pip = paths.load_dataset("world_bank_pip_legacy")
     ds_pip_1000 = paths.load_dataset("thousand_bins_distribution")
     ds_lis = paths.load_dataset("luxembourg_income_study")
     ds_wid = paths.load_dataset("world_inequality_database")

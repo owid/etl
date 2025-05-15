@@ -11,10 +11,10 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("world_bank_pip_dimensional")
+    ds_garden = paths.load_dataset("world_bank_pip")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("world_bank_pip_dimensional", reset_index=False)
+    tb = ds_garden.read("world_bank_pip", reset_index=False)
 
     #
     # Save outputs.
