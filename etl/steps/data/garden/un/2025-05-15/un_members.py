@@ -150,14 +150,15 @@ def create_region_members_table(tb: Table, ds_regions: Dataset, ds_population: D
     assert tb_with_regions["missing_pop"].min() == 0, error
 
     # Include missing population in as part of the non members population.
-    tb_with_regions["non_membership_pop"] += tb_with_regions["missing_pop"]
+    # NOTE: We fillna because some of the population data is missing (e.g. between 1945 and 1950).
+    tb_with_regions["non_membership_pop"] += tb_with_regions["missing_pop"].fillna(0)
 
-    # Drop columns
+    # Drop temporary columns.
     tb_with_regions = tb_with_regions.drop(
         columns=["membership_status", "population", "population_region", "missing_pop"]
     )
 
-    # Make variables in var_list integer.
+    # Adjust column types.
     tb_with_regions = tb_with_regions.astype(
         {column: "Int64" for column in tb_with_regions.columns if column != "country"}
     )
