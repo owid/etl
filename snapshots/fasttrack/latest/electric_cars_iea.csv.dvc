@@ -2,7 +2,7 @@ meta:
   origin:
     producer: International Energy Agency. Global EV Outlook 2025.
     title: electric_cars_iea
-    citation_full: 'IEA (2025), Global EV Outlook 2024, IEA, Paris https://www.iea.org/reports/global-ev-outlook-2025, License: CC BY 4.0'
+    citation_full: 'IEA (2025), Global EV Outlook 2025, IEA, Paris https://www.iea.org/reports/global-ev-outlook-2025, License: CC BY 4.0'
     url_main: https://www.iea.org/data-and-statistics/data-product/global-ev-outlook-2025
     url_download: |-
       https://docs.google.com/spreadsheets/d/e/2PACX-1vRDQ1EYuQPZasmbfjaghH9f65Nd2yLkQ0QAnOP5bp0LHWkwnjVcwssk6VFDhmWPOzjw2gCFyOqXBTQU/pub?output=csv
