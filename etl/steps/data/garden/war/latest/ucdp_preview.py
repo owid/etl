@@ -54,15 +54,15 @@ TYPE_OF_VIOLENCE_MAPPING = {
     3: "one-sided violence",
 }
 # Mapping for armed conflicts dataset (inc PRIO/UCDP)
-UNKNOWN_TYPE_ID = 99
-UNKNOWN_TYPE_NAME = "state-based (unknown)"
 TYPE_OF_CONFLICT_MAPPING = {
     1: "extrasystemic",
     2: "interstate",
     3: "intrastate (non-internationalized)",
     4: "intrastate (internationalized)",
-    UNKNOWN_TYPE_ID: UNKNOWN_TYPE_NAME,
 }
+UNKNOWN_TYPE_ID = 99
+UNKNOWN_TYPE_NAME = "state-based (unknown)"
+TYPE_OF_CONFLICT_MAPPING[UNKNOWN_TYPE_ID] = UNKNOWN_TYPE_NAME
 # Regions mapping (for PRIO/UCDP dataset)
 REGIONS_MAPPING = {
     1: "Europe",
@@ -73,11 +73,11 @@ REGIONS_MAPPING = {
 }
 REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 # Last year of data
-LAST_YEAR_STABLE = 2023
-LAST_YEAR_CED = 2024
-LAST_YEAR = 2023
-#
-EXTEND_TO_YEAR = LAST_YEAR_CED  # datetime.now().year
+LAST_YEAR = 2024  # datetime.now().year
+LAST_YEAR_UCDP_GED = 2023
+
+# Number of events with no location assigned (see function estimate_metrics_locations)
+NUM_MISSING_LOCATIONS = 2316
 
 
 def run() -> None:
@@ -110,52 +110,26 @@ def run() -> None:
     _sanity_checks(ds_meadow)
 
     # Load relevant tables
-    tb_ged = ds_meadow.read("ucdp_ged").astype(
-        {
-            "deaths_a": float,
-            "deaths_b": float,
-            "deaths_civilians": float,
-            "deaths_unknown": float,
-            "best": float,
-            "high": float,
-            "low": float,
-        }
-    )
-    tb_ced = ds_ced.read("ucdp_ced").astype(
-        {
-            "deaths_a": float,
-            "deaths_b": float,
-            "deaths_civilians": float,
-            "deaths_unknown": float,
-            "best": float,
-            "high": float,
-            "low": float,
-        }
-    )
-    tb_conflict = ds_meadow.read("ucdp_battle_related_conflict").astype(
-        {
-            "bd_best": float,
-            "bd_low": float,
-            "bd_high": float,
-        }
-    )
+    tb_ged = ds_meadow.read("ucdp_ged")
+    tb_ced = ds_ced.read("ucdp_ced")
+    tb_conflict = ds_meadow.read("ucdp_battle_related_conflict")
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
 
     # Sanity check years
     assert (
-        tb_conflict["year"].max() == LAST_YEAR_STABLE
+        tb_conflict["year"].max() == LAST_YEAR_UCDP_GED
     ), f"Unexpected max year in `ucdp_battle_related_conflict` ({tb_conflict['year'].max()})!"
     assert (
-        tb_prio["year"].max() == LAST_YEAR_STABLE
+        tb_prio["year"].max() == LAST_YEAR_UCDP_GED
     ), f"Unexpected max year in `ucdp_prio_armed_conflict` ({tb_prio['year'].max()})!"
 
     # Extend codes to have data for latest years
-    tb_codes = extend_latest_years(tb_codes)
+    tb_codes = extend_latest_years(tb_codes, LAST_YEAR_UCDP_GED, LAST_YEAR)
 
     # Merge CED into GED
     assert (tb_ced.columns == tb_ged.columns).all(), "Columns are not the same!"
-    assert tb_ged["year"].max() == LAST_YEAR_STABLE, "GED data is not up to date!"
-    assert tb_ced["year"].max() == LAST_YEAR_CED, "CED data is not up to date!"
+    assert tb_ged["year"].max() == LAST_YEAR_UCDP_GED, "GED data is not up to date!"
+    assert tb_ced["year"].max() == LAST_YEAR, "CED data is not up to date!"
     tb_ced = tb_ced[tb_ged.columns]
     tb_ged = pr.concat([tb_ged, tb_ced], ignore_index=True)
 
@@ -183,7 +157,7 @@ def run() -> None:
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
-    _sanity_check_conflict_types(tb)
+    _sanity_check_conflict_types(tb, until_year=LAST_YEAR_UCDP_GED)
     _sanity_check_prio_conflict_types(tb_prio)
 
     # Add number of new conflicts and ongoing conflicts (also adds data for the World)
@@ -378,7 +352,7 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
         how="outer",
     )
 
-    # Assign latest available conflict type to unknown state-based conflicts
+    # Assign conflict type to unknown state-based conflicts
     tb_ged = patch_unknown_conflict_type_ced(tb_ged)
 
     # Assert that `type_of_conflict` was only added for state-based events
@@ -408,7 +382,7 @@ def patch_unknown_conflict_type_ced(tb):
     """Assign conflict types to unknown state-based conflicts (based on latest category appearing in GED)"""
     mask = (tb["type_of_violence"] == 1) & (tb["type_of_conflict"].isna())
     assert (
-        tb.loc[mask, "year"] > LAST_YEAR_STABLE
+        tb.loc[mask, "year"] > LAST_YEAR_UCDP_GED
     ).all(), "Unknown conflict types should only be present in years after GED!"
     ids_unknown = list(tb.loc[mask, "conflict_new_id"].unique())
 
@@ -426,16 +400,17 @@ def patch_unknown_conflict_type_ced(tb):
     return tb
 
 
-def _sanity_check_conflict_types(tb: Table) -> Table:
+def _sanity_check_conflict_types(tb: Table, until_year: Optional[int] = None) -> Table:
     """Check conflict type.
 
     - Only transitions accepted are between intrastate conflicts.
-    - The same conflict is only expceted to have one type in a year.
+    - The same conflict is only expected to have one type in a year.
     """
     # Define expected combinations of conflicT_types for a conflict. Typically, only in the intrastate domain
     TRANSITION_EXPECTED = {"intrastate (internationalized)", "intrastate (non-internationalized)"}
     # Get conflicts with more than one conflict type assigned to them over their lifetime
-    tb_ = tb.loc[tb["year"] < LAST_YEAR_STABLE]
+    if until_year is not None:
+        tb_ = tb.loc[tb["year"] < until_year]
     conflict_type_transitions = tb_.groupby("conflict_new_id")["conflict_type"].apply(set)
     transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
     # Extract unique combinations of conflict_types for a conflict
@@ -620,7 +595,7 @@ def combine_tables(tb: Table, tb_prio: Table) -> Table:
     """
     # Ensure year period for each table is as expected
     assert tb["year"].min() == 1989, "Unexpected start year!"
-    assert tb["year"].max() == LAST_YEAR_CED, "Unexpected start year!"
+    assert tb["year"].max() == LAST_YEAR, "Unexpected start year!"
     assert tb_prio["year"].min() == 1946, "Unexpected start year!"
     assert tb_prio["year"].max() == 1989, "Unexpected start year!"
 
@@ -640,13 +615,13 @@ def combine_tables(tb: Table, tb_prio: Table) -> Table:
     assert tb[tb["number_ongoing_conflicts_prio"].notna()]["year"].max() == 1988
     ## Data from GEO for `number_ongoing_conflicts` goes from 1989 to 2023 (inc)
     assert tb[tb["number_ongoing_conflicts_main"].notna()].year.min() == 1989
-    assert tb[tb["number_ongoing_conflicts_main"].notna()]["year"].max() == LAST_YEAR_CED
+    assert tb[tb["number_ongoing_conflicts_main"].notna()]["year"].max() == LAST_YEAR
     ## Data from PRIO/UCDP for `number_new_conflicts` goes from 1946 to 1989 (inc)
     assert tb[tb["number_new_conflicts_prio"].notna()]["year"].min() == 1946
     assert tb[tb["number_new_conflicts_prio"].notna()]["year"].max() == 1989
     ## Data from GEO for `number_new_conflicts` goes from 1990 to 2022 (inc)
     assert tb[tb["number_new_conflicts_main"].notna()]["year"].min() == 1990
-    assert tb[tb["number_new_conflicts_main"].notna()]["year"].max() == LAST_YEAR_CED
+    assert tb[tb["number_new_conflicts_main"].notna()]["year"].max() == LAST_YEAR
 
     # Actually combine timeseries from UCDP/PRIO and GEO.
     # We prioritise values from PRIO for 1989, therefore the order `PRIO.fillna(MAIN)`
@@ -1137,7 +1112,7 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     assert (
         "Greenland" not in set(tb_locations_country.country)
     ), "Greenland is not expected to be there! That's why we force it to zero. If it appears, just remove the following code line"
-    tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [LAST_YEAR]}))
+    tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [LAST_YEAR_UCDP_GED]}))
     tb_locations_country = pr.concat([tb_locations_country, tb_green], ignore_index=True)
 
     # NaNs of numeric indicators to zero
@@ -1308,12 +1283,11 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
     # Use the overlay function to extract data from the world map that each point sits on top of.
     gdf_match = gpd.overlay(gdf, gdf_maps, how="intersection")
     # Events not assigned to any country
-    # There are 2316 points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
+    # There are some points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
     # I've soften the assertion, otherwise a bit of a pain!
-    diff_expected = 2316
     assert (
-        diff := gdf.shape[0] - gdf_match.shape[0]
-    ) <= diff_expected, f"Unexpected number of events without exact coordinate match! {diff} ({diff-diff_expected} off)"
+        (diff := gdf.shape[0] - gdf_match.shape[0]) <= NUM_MISSING_LOCATIONS
+    ), f"Unexpected number of events without exact coordinate match! {diff} < {NUM_MISSING_LOCATIONS} doesn't hold! ({diff-NUM_MISSING_LOCATIONS} off)"
     # DEBUG: Examine which are these unlabeled conflicts
     # mask = ~tb["relid"].isin(gdf_match["relid"])
     # tb.loc[mask, ["relid", "year", "conflict_name", "side_a", "side_b", "best"]]
@@ -1375,19 +1349,19 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
     return tb
 
 
-def extend_latest_years(tb: Table) -> Table:
+def extend_latest_years(tb: Table, since_year, to_year) -> Table:
     """Create table with each country present in a year."""
 
     index = list(tb.index.names)
     tb = tb.reset_index()
 
     # define mask for last year
-    mask = tb["year"] == LAST_YEAR_STABLE
+    mask = tb["year"] == since_year
 
     # Get year to extend to
-    current_year = EXTEND_TO_YEAR
+    current_year = to_year
 
-    tb_all_years = Table(pd.RangeIndex(LAST_YEAR_STABLE + 1, current_year + 1), columns=["year"])
+    tb_all_years = Table(pd.RangeIndex(since_year + 1, current_year + 1), columns=["year"])
     tb_last = tb[mask].drop(columns="year").merge(tb_all_years, how="cross")
 
     tb = pr.concat([tb, tb_last], ignore_index=True, short_name="gleditsch_countries")
