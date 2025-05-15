@@ -201,7 +201,7 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
     ds_wdi = paths.load_dataset("wdi")
     ds_hdr = paths.load_dataset("undp_hdr")
-    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_pip = paths.load_dataset("world_bank_pip_legacy")
     ds_who = paths.load_dataset("who")
     ds_ghe = paths.load_dataset("ghe")
 
