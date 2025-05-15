@@ -216,7 +216,9 @@ def run() -> None:
     # Improve table format.
     tb = tb.format(
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile", "table", "survey_comparability"],
-        short_name=paths.short_name,
+    )
+    tb_percentiles = tb_percentiles.format(
+        ["country", "year", "ppp_version", "welfare_type", "reporting_level", "percentile"],
     )
 
     #
@@ -224,7 +226,7 @@ def run() -> None:
     #
     # Initialize a new garden dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb],
+        tables=[tb, tb_percentiles],
         default_metadata=ds_meadow.metadata,
     )
 

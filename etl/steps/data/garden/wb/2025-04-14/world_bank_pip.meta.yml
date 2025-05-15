@@ -186,6 +186,9 @@ definitions:
   description_processing_avg: |-
     Income and consumption averages by decile are not directly available in the World Bank PIP API. We calculate the metric by multiplying the share of each decile by the mean income or consumption of the distribution and dividing by the population share of the decile (10%).
 
+  description_processing_thr_percentiles: |-
+    We calculate missing country and regional values of thresholds by running multiple queries on the API to obtain the closest poverty line to each threshold. This data is merged with the percentile files [provided by the World Bank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles).
+
   welfare_type_verb: |-
     <% if welfare_type == "income" %>
     received
@@ -1614,3 +1617,49 @@ tables:
           name: World Bank PIP region
           numDecimalPlaces: 0
           <<: *common_display
+
+  world_bank_pip_percentiles:
+    variables:
+      avg:
+        title: Average (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
+        unit: international-$ in <<ppp_version>> prices
+        short_unit: $
+        description_short: The mean <<welfare_type>> per day within the percentile <<percentile>> of the population.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        display:
+          name: Average (percentile <<percentile>>)
+          numDecimalPlaces: 2
+          <<: *common_display
+
+      share:
+        title: Share (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
+        unit: "%"
+        short_unit: "%"
+        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the percentile <<percentile>> of the population.
+        description_key:
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        display:
+          name: Share (percentile <<percentile>>)
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      thr:
+        title: Threshold (percentile <<percentile>>, <<ppp_version>> prices, <<welfare_type>>, <<reporting_level>>)
+        unit: international-$ in <<ppp_version>> prices
+        short_unit: $
+        description_short: The level of <<welfare_type>> per day below which the <<percentile>>% of the population falls.
+        description_key:
+          - "{definitions.description_key_ppp}"
+          - "{definitions.description_key_welfare_type}"
+          - "{definitions.description_key_not_market_income}"
+        description_processing: |-
+          {definitions.description_processing_thr_percentiles}
+        display:
+          name: Threshold (percentile <<percentile>>)
+          numDecimalPlaces: 2
+          <<: *common_display
+
