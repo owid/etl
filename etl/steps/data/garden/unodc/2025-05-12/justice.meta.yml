@@ -2,14 +2,9 @@
 definitions:
   common:
     description_key:
-      - Crime and justice data can be affected by many factors, such as how a country’s justice system works, whether the data follow the “principal offence rule” (which means if a person commits more than one crime, it only counts once), how complete the data are, and how closely a country follows international standards for reporting.
-      - Even though these differences exist, the data are still extremely useful for understanding how criminal justice systems work in different countries.
-      - The data are collected from official records kept by different parts of the justice system. The police usually record information about people who are suspected of, arrested for, or cautioned for a crime. Prosecutors collect data about people being charged, and the courts collect information about people who appear before them and those who are convicted.
-      - The United Nations gathers these data each year through a survey called the United Nations Survey of Crime Trends and Operations of Criminal Justice Systems (UN-CTS). Experts in each country, who are appointed by their government, collect and combine the data from all relevant agencies before sending it to the UN.
-      - The UN Office on Drugs and Crime (UNODC) checks the data for accuracy and to make sure it is consistent with other sources.
-      - Countries that are part of the European Union, the European Free Trade Association, or are in the process of joining the EU send their data to Eurostat (the EU statistics agency) for additional checks before the data is passed to the UN.
-      - Data provided in other ways or from other sources are also reviewed by both the country and the UN before being included in the main dataset.
-      - Population figures that are used alongside the crime data come from the World Population Prospect, produced by the United Nations Population Division.
+      - Crime and justice data can be affected by many factors, such as how a country’s justice system works, whether the data follow the “principal offence rule” (which means if a person commits more than one crime, it only counts once), how complete the data is, and how closely a country follows international standards for reporting.
+      - Even though these differences exist, the data is still useful for understanding how criminal justice systems work in different countries.
+      - The data is collected from official records kept by different parts of the justice system. The police usually record information about people who are suspected of, arrested for, or cautioned for a crime. Prosecutors collect data about people being charged, and the courts collect information about people who appear before them and those who are convicted.
     presentation:
       topic_tags:
         - Corruption
@@ -40,7 +35,7 @@ tables:
           <%- endif -%>
         unit: |-
           <%- if unit_of_measurement.lower() == "counts" %>
-           << indicator.lower() >>
+            people
           <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
-            per 100,000 population
+            people per 100,000 population
           <%- endif -%>

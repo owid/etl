@@ -2,16 +2,10 @@
 definitions:
   common:
     description_key:
-      - Crime data can be difficult to compare between countries because of differences in how justice systems work, when the data are collected (for example, when a crime is first reported or after it has been investigated), and how international guidelines are used in each country.
-      - Many crimes are never reported by victims, so the data cannot be used to measure exactly how common crime is. However, the data are still useful for spotting patterns and trends over time.
+      - Crime data can be difficult to compare between countries because of differences in how justice systems work, when the data is collected (for example, when a crime is first reported or after it has been investigated), and how international guidelines are used in each country.
+      - Many crimes are never reported by victims, so the data cannot be used to measure exactly how common crime is. However, the data is still useful for spotting patterns and trends over time.
       - Most crime data come from records kept by the police or other law enforcement agencies. Countries vary in whether they record a crime when it is first reported, during an investigation, or after the investigation is finished.
       - In some countries, more than one agency collects crime data, and these different sets of data must be combined before they are published.
-      - The United Nations collects crime data each year through a survey called the United Nations Survey of Crime Trends and Operations of Criminal Justice Systems (UN-CTS). National experts are responsible for gathering data from all relevant agencies and sending it to the UN.
-      - The UN Office on Drugs and Crime (UNODC) checks the submitted data to make sure it matches other known information and is consistent.
-      - Countries that are part of the European Union, the European Free Trade Association, or are candidates to join the EU, first send their data to Eurostat (the EU statistics agency) for checking before it goes to the UN.
-      - Any additional data provided by countries through other methods are reviewed by both the country and the UN before being added to the main dataset.
-      - Population figures used with the crime data come from the World Population Prospect, which is produced by the Population Division of the United Nations.
-
     presentation:
       topic_tags:
         - Corruption
@@ -30,15 +24,15 @@ tables:
         title: << indicator >>  - << category.lower() >>  (<< unit_of_measurement.lower() >>)
         description_short: |-
           <%- if category == "Corruption" %>
-          Reported national figures on offences involving corruption, including bribery, embezzlement, abuse of functions, trading in influence, illicit enrichment, and other corrupt practices not otherwise specified.
+          Reported national figures on corruption offenses, including bribery, embezzlement, abuse of functions, trading in influence, illicit enrichment, and other unspecified corrupt practices.
           <% elif category == "Bribery" %>
-          Reported national figures on offences involving bribery, including the promising, offering, giving, soliciting, or accepting of an undue advantage by or from a public official or private sector actor, directly or indirectly, to influence the performance or non-performance of official duties.
+          Reported national figures on bribery offenses, including the promising, offering, giving, soliciting, or accepting of an undue advantage by or from a public official or private actor to improperly influence the performance of duties.
           <% elif category == "Other acts of corruption" %>
-          Reported national figures on other acts of corruption, including embezzlement, abuse of functions, trading in influence, illicit enrichment, and other corrupt practices not covered under bribery or general corruption.
+          Reported national figures on other corruption offenses, including embezzlement, abuse of functions, trading in influence, illicit enrichment, and corrupt practices not specifically classified as bribery or general corruption.
           <%- endif -%>
         description_from_producer: |-
           <% if category == "Corruption" %>
-          Corruption and other national and international legal instruments against corruption.
+          Corruption includes active bribery, passive bribery, embezzlement, abuse of functions, trading in influence, illicit enrichment, and other acts of corruption.
           <% elif category == "Bribery" %>
           Promising, offering, giving, soliciting, or accepting an undue advantage to or from a public official or a person who directs or works in a private sector entity, directly or indirectly, in order that the person act or refrain from acting in the exercise of his or her official duties.
           <% elif category == "Other acts of corruption" %>
@@ -48,5 +42,5 @@ tables:
           <%- if unit_of_measurement.lower() == "counts" %>
            << indicator.lower() >>
           <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
-            per 100,000 population
+            << indicator.lower() >> per 100,000 population
           <%- endif -%>

@@ -30,6 +30,13 @@ def run() -> None:
             "Corruption: Bribery": "Bribery",
         }
     )
+    # Use american spelling for "offences"
+    tb["indicator"] = tb["indicator"].replace(
+        {
+            "Offences": "offenses",
+        }
+    )
+
     tb = tb.format(["country", "year", "indicator", "category", "unit_of_measurement"])
 
     #
