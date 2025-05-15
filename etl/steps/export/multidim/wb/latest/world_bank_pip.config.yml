@@ -12,7 +12,6 @@ default_selection:
 default_dimensions:
   indicator: headcount_ratio
   poverty_line: "215"
-  ppp_version: "2017.0"
   table: Income or consumption consolidated
   survey_comparability: No spells
 
