@@ -9,8 +9,6 @@ paths = PathFinder(__file__)
 DIMENSIONS_CONFIG = {
     "poverty_line": ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
     "table": ["Income or consumption consolidated"],
-    # TODO: It seems that the dimension is float, while the original was probably int. Check if this is a bug.
-    # "ppp_version": ["2017.0"],
     # "welfare_type": "*",
     # "decile": "*",
     "survey_comparability": ["No spells"],
