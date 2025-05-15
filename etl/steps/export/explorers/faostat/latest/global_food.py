@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Optional
 from owid.catalog.utils import underscore
 from structlog import get_logger
 
-from etl.collections.explorer import combine_config_dimensions, expand_config
+from etl.collection import combine_config_dimensions, expand_config
 from etl.helpers import PathFinder
 
 # Initialize log.
@@ -470,7 +470,7 @@ def run():
     tb_fbsc = ds_fbsc.read("faostat_fbsc_flat", load_data=False)
 
     # Load grapher config from YAML.
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     #
     # Process data.
@@ -549,7 +549,11 @@ def run():
     # Save outputs.
     #
     # Initialize a new explorer.
-    ds_explorer = paths.create_explorer(config=config, explorer_name="global-food")
+    c = paths.create_collection(
+        config=config,
+        short_name="global-food",
+        explorer=True,
+    )
 
     # Save explorer.
-    ds_explorer.save(tolerate_extra_indicators=True)
+    c.save(tolerate_extra_indicators=True)

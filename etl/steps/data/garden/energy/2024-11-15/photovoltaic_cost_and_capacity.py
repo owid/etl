@@ -21,7 +21,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current data step.
 paths = PathFinder(__file__)
@@ -121,25 +121,25 @@ def prepare_cost_data(tb_nemet: Table, tb_irena_cost: Table, tb_farmer_lafond: T
     return combined
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load Nemet (2009) dataset from garden and read its main table.
     ds_nemet = paths.load_dataset("nemet_2009")
-    tb_nemet = ds_nemet["nemet_2009"].reset_index()
+    tb_nemet = ds_nemet.read("nemet_2009")
 
     # Load Farmer & Lafond (2016) dataset from garden and read its main table.
     ds_farmer_lafond = paths.load_dataset("farmer_lafond_2016")
-    tb_farmer_lafond = ds_farmer_lafond["farmer_lafond_2016"].reset_index()
+    tb_farmer_lafond = ds_farmer_lafond.read("farmer_lafond_2016")
 
     # Load IRENA dataset on capacity from garden and read its main table.
     ds_irena_capacity = paths.load_dataset("renewable_capacity_statistics")
-    tb_irena_capacity = ds_irena_capacity["renewable_capacity_statistics"].reset_index()
+    tb_irena_capacity = ds_irena_capacity.read("renewable_capacity_statistics")
 
     # Load IRENA dataset on cost from garden and read its main table.
     ds_irena_cost = paths.load_dataset("renewable_power_generation_costs")
-    tb_irena_cost = ds_irena_cost["solar_photovoltaic_module_prices"].reset_index()
+    tb_irena_cost = ds_irena_cost.read("solar_photovoltaic_module_prices")
 
     #
     # Process data.
@@ -167,5 +167,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new dataset with the same metadata as meadow
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_combined], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_combined])
     ds_garden.save()
