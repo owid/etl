@@ -4,6 +4,8 @@ title:
 default_selection:
   - World
 
+default_dimensions: {}
+
 dimensions:
   - slug: indicator
     name: Measure
