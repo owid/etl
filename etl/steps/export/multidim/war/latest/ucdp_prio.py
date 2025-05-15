@@ -72,7 +72,7 @@ def run() -> None:
                     "intrastate (non-internationalized)",
                     "extrasystemic",
                 ],
-                "choice_new_slug": "state-based-stacked",
+                "choice_new_slug": "state_based_stacked",
                 "config_new": {
                     "chartTypes": ["StackedBar"],
                     "hideAnnotationFieldsInTitle": {
@@ -83,7 +83,7 @@ def run() -> None:
             {
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
-                "choice_new_slug": "best-ci",
+                "choice_new_slug": "best_ci",
                 "config_new": {
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
@@ -249,7 +249,7 @@ def edit_view_title(view, conflict_renames):
     """Edit FAUST titles and subtitles."""
     # Get conflict type name
     conflict_name = "state-based conflicts"
-    if view.dimensions["conflict_type"] not in {"state-based", "state-based-stacked"}:
+    if view.dimensions["conflict_type"] not in {"state-based", "state_based_stacked"}:
         conflict_name = conflict_renames.get(view.dimensions["conflict_type"]).lower()
 
     # Add title based on indicator
@@ -279,7 +279,7 @@ def edit_view_title(view, conflict_renames):
 
 def edit_view_display_estimates_ci(view):
     """Edit FAUST estimates for confidence intervals."""
-    if view.dimensions["estimate"] == "best-ci":
+    if view.dimensions["estimate"] == "best_ci":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
             if "_high_" in indicator.catalogPath:
