@@ -42,7 +42,7 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.data_helpers.misc import expand_time_column
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
@@ -74,7 +74,7 @@ REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 LAST_YEAR = 2023
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("start")
 
     #
@@ -226,14 +226,14 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    ds_garden = paths.create_dataset(
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-    paths.log.info("ucdp.end")
 
 
 def _sanity_checks(ds: Dataset) -> None:
@@ -332,17 +332,20 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
         tb_conflict: Table
             This is a secondary table, that we use to obtain the conflict types of the conflicts.
     """
-    tb_conflict = tb_conflict[["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
+    tb_conflict = tb_conflict.loc[:, ["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
     assert tb_conflict.groupby(["conflict_id", "year"]).size().max() == 1, "Some conflict_id-year pairs are duplicated!"
 
     # Add `type_of_conflict` to `tb_ged`.
     # This column contains the type of state-based conflict (1: inter-state, 2: intra-state, 3: extra-state, 4: internationalized intrastate)
     tb_ged = tb_ged.merge(
-        tb_conflict, left_on=["conflict_new_id", "year"], right_on=["conflict_id", "year"], how="outer"
+        tb_conflict,
+        left_on=["conflict_new_id", "year"],
+        right_on=["conflict_id", "year"],
+        how="outer",
     )
-    # Fill unknown types of violence
-    mask = tb_ged["type_of_violence"] == 1  # these are state-based conflicts
-    tb_ged.loc[mask, "type_of_conflict"] = tb_ged.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
+
+    # Assign "state-based (unknown)" as conflict_type to unknown state-based conflicts
+    tb_ged = patch_unknown_conflict_type_ced(tb_ged)
 
     # Assert that `type_of_conflict` was only added for state-based events
     assert (
@@ -363,7 +366,15 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
 
     # Sanity check
     assert tb_ged["conflict_type"].isna().sum() == 0, "Check NaNs in conflict_type (i.e. conflicts without a type)!"
+
     return tb_ged
+
+
+def patch_unknown_conflict_type_ced(tb):
+    # Fill unknown types of violence
+    mask = tb["type_of_violence"] == 1  # these are state-based conflicts
+    tb.loc[mask, "type_of_conflict"] = tb.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
+    return tb
 
 
 def _sanity_check_conflict_types(tb: Table) -> Table:
@@ -646,7 +657,7 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
 
 def _prepare_prio_table(tb: Table) -> Table:
     # Select relevant columns
-    tb = tb[["conflict_id", "year", "region", "type_of_conflict", "start_date"]]
+    tb = tb.loc[:, ["conflict_id", "year", "region", "type_of_conflict", "start_date"]]
 
     # Flatten (some entries have multiple regions, e.g. `1, 2`). This should be flattened to multiple rows.
     # https://stackoverflow.com/a/42168328/5056599
@@ -803,7 +814,9 @@ def estimate_metrics_participants(tb: Table, tb_prio: Table, tb_codes: Table) ->
 
     # Get table with [year, conflict_type, code]
     codes = ["gwnoa", "gwnob"]
-    tb_country = pr.concat([tb[["year", "conflict_type", code]].rename(columns={code: "id"}).copy() for code in codes])
+    tb_country = pr.concat(
+        [tb.loc[:, ["year", "conflict_type", code]].rename(columns={code: "id"}).copy() for code in codes]
+    )
 
     # Drop rows with code = NaN
     tb_country = tb_country.dropna(subset=["id"])

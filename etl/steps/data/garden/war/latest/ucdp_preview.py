@@ -41,7 +41,7 @@ from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.data_helpers.misc import expand_time_column
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 log = get_logger()
 
@@ -80,7 +80,7 @@ LAST_YEAR = 2023
 EXTEND_TO_YEAR = LAST_YEAR_CED  # datetime.now().year
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("start")
 
     #
@@ -260,14 +260,14 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
+    ds_garden = paths.create_dataset(
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
     )
 
     # Save changes in the new garden dataset.
     ds_garden.save()
-
-    paths.log.info("ucdp.end")
 
 
 def _sanity_checks(ds: Dataset) -> None:
@@ -1106,7 +1106,6 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
             "rename": "is_location_of_conflict",
         },
     }
-    # TODO: continue here
     col_funcs = {k: v["f"] for k, v in column_props.items()}
     col_renames = {k: v["rename"] for k, v in column_props.items()}
     tb_locations_country = (
