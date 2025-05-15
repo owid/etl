@@ -1,12 +1,6 @@
 """Data from UCDP.
 
 
-IMPORTANT NOTE:
-
-    Changes in this script should probably be reflected also in the script for ucdp_preview!
-
-    At some point we should merge the tools from both scripts to avoid duplication.
-
 Notes:
     - Conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
     - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their dashboard, which might not be available yet as bulk download.
@@ -61,6 +55,8 @@ TYPE_OF_CONFLICT_MAPPING = {
     3: "intrastate (non-internationalized)",
     4: "intrastate (internationalized)",
 }
+UNKNOWN_TYPE_ID = 99
+UNKNOWN_TYPE_NAME = "state-based (unknown)"
 # Regions mapping (for PRIO/UCDP dataset)
 REGIONS_MAPPING = {
     1: "Europe",
@@ -83,32 +79,50 @@ def run() -> None:
     #
     # Load inputs.
     #
-    # Load meadow dataset.
-    ds_meadow = paths.load_dataset("ucdp")
+    # Load datasets
+    ds_meadow = paths.load_dataset("ucdp")  # UCDP
+    ds_gw = paths.load_dataset("gleditsch")  # Gleditsch
+    ds_maps = paths.load_dataset("nat_earth_110")  # Nat Earth
+    ds_population = paths.load_dataset("population")  # Population
 
-    # Read table from GW codes
-    ds_gw = paths.load_dataset("gleditsch")
-    tb_regions = ds_gw.read("gleditsch_regions")
-    tb_codes = ds_gw["gleditsch_countries"]
-
-    # Load maps table
-    short_name = "nat_earth_110"
-    ds_maps = paths.load_dataset(short_name)
-    tb_maps = ds_maps.read(short_name)
-
-    # Load population
-    ds_population = paths.load_dataset("population")
-
-    #
-    # Process data.
-    #
+    # Sanity checks (1)
     paths.log.info("sanity checks")
     _sanity_checks(ds_meadow)
 
-    # Load relevant tables
+    # Load tables
     tb_ged = ds_meadow.read("ucdp_ged")
     tb_conflict = ds_meadow.read("ucdp_battle_related_conflict")
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
+    tb_regions = ds_gw.read("gleditsch_regions")
+    tb_codes = ds_gw["gleditsch_countries"]
+    tb_maps = ds_maps.read("nat_earth_110")
+
+    #
+    # Run main code
+    #
+    run_main(
+        tb_ged=tb_ged,
+        tb_conflict=tb_conflict,
+        tb_prio=tb_prio,
+        tb_regions=tb_regions,
+        tb_codes=tb_codes,
+        tb_maps=tb_maps,
+        ds_population=ds_population,
+        default_metadata=ds_meadow.metadata,
+        last_year_actual=LAST_YEAR,
+    )
+
+
+def run_main(
+    tb_ged, tb_conflict, tb_prio, tb_regions, tb_codes, tb_maps, ds_population, default_metadata, last_year_actual
+):
+    # Sanity checks (2)
+    assert (
+        tb_conflict["year"].max() == LAST_YEAR
+    ), f"Unexpected max year in `ucdp_battle_related_conflict` ({tb_conflict['year'].max()})!"
+    assert (
+        tb_prio["year"].max() == LAST_YEAR
+    ), f"Unexpected max year in `ucdp_prio_armed_conflict` ({tb_prio['year'].max()})!"
 
     # Keep only active conflicts
     paths.log.info("keep active conflicts")
@@ -121,10 +135,16 @@ def run() -> None:
     paths.log.info("add field `conflict_type`")
     tb = add_conflict_type(tb_ged, tb_conflict)
 
+    # Sanity-check that the number of 'unknown' types of some conflicts is controlled
+    # NOTE: Export summary of conflicts that have no category assigned
+    tb_summary = get_summary_unknown(tb)
+    assert len(tb_summary) / tb["conflict_new_id"].nunique() < 0.01, "Too many conflicts without a category assigned!"
+    # tb_summary.to_csv("summary.csv")
+
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
     tb_participants = estimate_metrics_participants(tb, tb_prio, tb_codes)
-    tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population)
+    tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population, LAST_YEAR)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -157,7 +177,7 @@ def run() -> None:
     )
     # Combine main dataset with PRIO/UCDP
     paths.log.info("add data from ucdp/prio table")
-    tb = combine_tables(tb, tb_prio)
+    tb = combine_tables(tb, tb_prio, last_year_actual)
 
     # Add extra-systemic after 1989
     paths.log.info("fix extra-systemic nulls")
@@ -172,9 +192,6 @@ def run() -> None:
 
     # Add data for "state-based" conflict types
     tb = add_conflict_all_statebased(tb)
-
-    # Force types
-    # tb = tb.astype({"conflict_type": "category", "region": "category"})
 
     # Add conflict rates
     tb = add_indicators_extra(
@@ -208,7 +225,7 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=tables,
         check_variables_metadata=True,
-        default_metadata=ds_meadow.metadata,
+        default_metadata=default_metadata,
     )
 
     # Save changes in the new garden dataset.
@@ -349,14 +366,6 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
     return tb_ged
 
 
-def patch_unknown_conflict_type_ced(tb):
-    """Assign "state-based (unknown)" as conflict_type to unknown state-based conflicts"""
-    # Fill unknown types of violence
-    mask = tb["type_of_violence"] == 1  # these are state-based conflicts
-    tb.loc[mask, "type_of_conflict"] = tb.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
-    return tb
-
-
 def _sanity_check_conflict_types(tb: Table, until_year: Optional[int] = None) -> Table:
     """Check conflict type.
 
@@ -367,7 +376,9 @@ def _sanity_check_conflict_types(tb: Table, until_year: Optional[int] = None) ->
     TRANSITION_EXPECTED = {"intrastate (internationalized)", "intrastate (non-internationalized)"}
     # Get conflicts with more than one conflict type assigned to them over their lifetime
     if until_year is not None:
-        tb_ = tb.loc[tb["year"] < until_year]
+        tb_ = tb.loc[tb["year"] < until_year].copy()
+    else:
+        tb_ = tb.copy()
     conflict_type_transitions = tb_.groupby("conflict_new_id")["conflict_type"].apply(set)
     transitions = conflict_type_transitions[conflict_type_transitions.apply(len) > 1].drop_duplicates()
     # Extract unique combinations of conflict_types for a conflict
@@ -543,7 +554,7 @@ def prepare_prio_data(tb_prio: Table) -> Table:
     return tb_prio
 
 
-def combine_tables(tb: Table, tb_prio: Table) -> Table:
+def combine_tables(tb: Table, tb_prio: Table, last_year: int) -> Table:
     """Combine main table with data from UCDP/PRIO.
 
     UCDP/PRIO table provides estimates for dates earlier then 1989.
@@ -552,7 +563,7 @@ def combine_tables(tb: Table, tb_prio: Table) -> Table:
     """
     # Ensure year period for each table is as expected
     assert tb["year"].min() == 1989, "Unexpected start year!"
-    assert tb["year"].max() == LAST_YEAR, "Unexpected start year!"
+    assert tb["year"].max() == last_year, "Unexpected start year!"
     assert tb_prio["year"].min() == 1946, "Unexpected start year!"
     assert tb_prio["year"].max() == 1989, "Unexpected start year!"
 
@@ -572,13 +583,13 @@ def combine_tables(tb: Table, tb_prio: Table) -> Table:
     assert tb[tb["number_ongoing_conflicts_prio"].notna()]["year"].max() == 1988
     ## Data from GEO for `number_ongoing_conflicts` goes from 1989 to 2023 (inc)
     assert tb[tb["number_ongoing_conflicts_main"].notna()].year.min() == 1989
-    assert tb[tb["number_ongoing_conflicts_main"].notna()]["year"].max() == LAST_YEAR
+    assert tb[tb["number_ongoing_conflicts_main"].notna()]["year"].max() == last_year
     ## Data from PRIO/UCDP for `number_new_conflicts` goes from 1946 to 1989 (inc)
     assert tb[tb["number_new_conflicts_prio"].notna()]["year"].min() == 1946
     assert tb[tb["number_new_conflicts_prio"].notna()]["year"].max() == 1989
     ## Data from GEO for `number_new_conflicts` goes from 1990 to 2022 (inc)
     assert tb[tb["number_new_conflicts_main"].notna()]["year"].min() == 1990
-    assert tb[tb["number_new_conflicts_main"].notna()]["year"].max() == LAST_YEAR
+    assert tb[tb["number_new_conflicts_main"].notna()]["year"].max() == last_year
 
     # Actually combine timeseries from UCDP/PRIO and GEO.
     # We prioritise values from PRIO for 1989, therefore the order `PRIO.fillna(MAIN)`
@@ -967,7 +978,9 @@ def estimate_metrics_participants_prio(tb_prio: Table, tb_codes: Table) -> Table
     return tb_country
 
 
-def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_population: Dataset) -> Table:
+def estimate_metrics_locations(
+    tb: Table, tb_maps: Table, tb_codes: Table, ds_population: Dataset, last_year: int
+) -> Table:
     """Add participant information at country-level.
 
     reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
@@ -1069,7 +1082,7 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     assert (
         "Greenland" not in set(tb_locations_country.country)
     ), "Greenland is not expected to be there! That's why we force it to zero. If it appears, just remove the following code line"
-    tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [LAST_YEAR]}))
+    tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [last_year]}))
     tb_locations_country = pr.concat([tb_locations_country, tb_green], ignore_index=True)
 
     # NaNs of numeric indicators to zero
@@ -1303,4 +1316,46 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
     assert tb[COLUMN_COUNTRY_NAME].isna().sum() == 4, "4 missing values were expected! Found a different amount!"
     tb = tb.dropna(subset=[COLUMN_COUNTRY_NAME])
 
+    return tb
+
+
+def get_summary_unknown(tb: Table):
+    """Get a table summary of the ongoing conflicts that couldn't be mapped to a specific category.
+
+    We know that these are state-based conflicts, but we don't have more information about them!
+
+    By looking at them, we may be able to map these to a specific category:
+
+        - "extrasystemic",
+        - "interstate"
+        - "intrastate (non-internationalized)"
+        - "intrastate (internationalized)"
+    """
+    tbx = tb.loc[
+        tb["type_of_conflict"] == UNKNOWN_TYPE_ID,
+        ["id", "conflict_new_id", "conflict_name", "date_start", "date_end", "side_a", "side_b"],
+    ]
+    tbx = tbx.groupby(["conflict_new_id", "conflict_name"], as_index=False).agg(
+        {
+            "date_start": "min",
+            "date_end": "max",
+            "side_a": (lambda x: "; ".join(set(x))),
+            "side_b": (lambda x: "; ".join(set(x))),
+            "id": "nunique",
+        }
+    )
+    tbx = tbx.drop_duplicates(subset=["conflict_new_id", "conflict_name"])
+    tbx["date_start"] = pd.to_datetime(tbx["date_start"])
+    tbx["date_end"] = pd.to_datetime(tbx["date_end"])
+    tbx = tbx.rename(columns={"id": "num_events"})
+    tbx = tbx.sort_values(["num_events", "date_start"], ascending=False)
+
+    return tbx
+
+
+def patch_unknown_conflict_type_ced(tb):
+    """Assign "state-based (unknown)" as conflict_type to unknown state-based conflicts"""
+    # Fill unknown types of violence
+    mask = tb["type_of_violence"] == 1  # these are state-based conflicts
+    tb.loc[mask, "type_of_conflict"] = tb.loc[mask, "type_of_conflict"].fillna(UNKNOWN_TYPE_NAME)
     return tb
