@@ -1,0 +1,85 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Transport
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  air_traffic:
+    variables:
+      aircraft_deps:
+        title: Aircraft departures
+        unit: departures
+        description_short: The total number of plane take-offs by passenger and cargo airlines.
+
+      aircraft_kms:
+        title: Aircraft kilometers
+        unit: kilometers
+        short_unit: km
+        description_short: The total distance flown by passenger and cargo airlines.
+
+      asks:
+        title: Available seat kilometers (ASKs)
+        unit: kilometers
+        short_unit: km
+        description_short: Available kilometers measure carrying capacity as the total distance flown by passenger airlines multiplied by the number of available seats.
+
+      cargo_rtks:
+        title: Cargo revenue ton kilometers (RTKs)
+        unit: kilometers
+        short_unit: km
+        description_short: The total distance flown by cargo airlines multiplied by the number of revenue tons.
+
+      freight_rtks:
+        title: Freight revenue ton kilometers (RTKs)
+        unit: kilometers
+        short_unit: km
+        description_short: The total distance flown by freight airlines multiplied by the number of revenue tons.
+
+      freight_tonnes:
+        title: Freight tonnage
+        unit: tonnes
+        short_unit: t
+        description_short: The total weight of freight transported by airlines.
+
+      mail_rtks:
+        title: Mail revenue ton kilometers (RTKs)
+        unit: kilometers
+        short_unit: km
+        description_short: The total distance flown by mail airlines multiplied by the number of revenue tons.
+
+      pax:
+        title: Passengers
+        unit: passengers
+        description_short: This represents total, not unique, passenger activity—so a person taking multiple trips is counted multiple times.
+
+      plf:
+        title: Passenger load factor (PLF)
+        unit: "%"
+        short_unit: "%"
+        description_short: The percentage of available passenger seats that are filled with passengers.
+
+      plf_empty:
+        title: Share of seats not filled with passengers
+        unit: "%"
+        short_unit: "%"
+        description_short:  The percentage of available passenger seats that are not filled with passengers.
+
+      rpks:
+        title: Revenue passenger kilometers (RPKs)
+        unit: kilometers
+        short_unit: km
+        description_short: Passenger-seat kilometers measure the actual number of kilometers flown by paying customers—they are calculated by multiplying the total distance flown by passenger airlines by the number of paying passengers on board.
+        description_key:
+          - A passenger is someone whose travel generates income for the airline.
+          - This includes people traveling under promotional offers, loyalty programs, as compensation for denied boarding, or using corporate and discounted fares such as those for government, military, or students.
+          - It does not include people traveling completely free, airline staff or their families using employee discounts, or infants who do not occupy a seat.

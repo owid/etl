@@ -15,11 +15,11 @@ dimensions:
         name: "Death rate"
         # description: People moving to country
       - slug: "wars_ongoing"
-        name: "Number of ongoing wars"
+        name: "Number of wars"
         # description: People moving to country
       - slug: "wars_ongoing_country_rate"
         name: "War rate"
-        # description: People moving to country
+        description: The number of wars divided by the number of countries
   - slug: conflict_type
     name: "Conflict type"
     choices:
@@ -40,6 +40,9 @@ dimensions:
       - slug: high
         name: High estimate
       - slug: na
-        name: "-"
+        name: "Not applicable"
+        # description: "Not applicable"
+      - slug: low_high
+        name: "Low and high estimates"
 
 views: []

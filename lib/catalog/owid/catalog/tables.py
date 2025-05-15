@@ -757,6 +757,7 @@ class Table(pd.DataFrame):
         values: Optional[Union[str, List[str]]] = None,
         join_column_levels_with: Optional[str] = None,
         short_name: Optional[str] = None,
+        fill_dimensions: bool = True,
         **kwargs,
     ) -> "Table":
         return pivot(
@@ -766,6 +767,7 @@ class Table(pd.DataFrame):
             values=values,
             join_column_levels_with=join_column_levels_with,
             short_name=short_name,
+            fill_dimensions=fill_dimensions,
             **kwargs,
         )
 
@@ -1628,6 +1630,7 @@ def pivot(
     values: Optional[Union[str, List[str]]] = None,
     join_column_levels_with: Optional[str] = None,
     short_name: Optional[str] = None,
+    fill_dimensions: bool = True,
     **kwargs,
 ) -> Table:
     if index is not None:
@@ -1666,9 +1669,10 @@ def pivot(
         # There may be a way to allow for both.
         table[column].metadata = column_metadata
 
-        # Fill dimensions
-        if isinstance(column, tuple) and isinstance(columns, list):
-            table[column].m.dimensions = dict(zip(columns, column))
+        # Optionally fill dimensions metadata
+        if fill_dimensions:
+            if isinstance(column, tuple) and isinstance(columns, list):
+                table[column].m.dimensions = dict(zip(columns, column))
 
     # Transfer also the metadata of the index columns.
     # Note: This metadata will only be accessible if columns are reset and flattened to one level.

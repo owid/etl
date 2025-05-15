@@ -127,7 +127,6 @@ def run() -> None:
     # Create a new garden dataset.
     ds_garden = paths.create_dataset(
         tables=[tb_monthly, tb_annual],
-        check_variables_metadata=True,
         yaml_params={"EUROS_YEAR": PPI_EUROS_YEAR},
     )
 

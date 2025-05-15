@@ -15,12 +15,12 @@ from apps.anomalist.anomalist_api import get_anomalies_for_chart_ids
 from apps.wizard.app_pages.chart_diff.utils import ANALYTICS_NUM_DAYS
 from apps.wizard.utils import get_staging_creation_time
 from apps.wizard.utils.components import st_cache_data
-from apps.wizard.utils.io import get_all_changed_catalog_paths
-from etl.analytics.common import get_article_views_last_n_days, get_chart_views_last_n_days
+from etl.analytics import get_chart_views_last_n_days, get_post_views_last_n_days
 from etl.config import OWID_ENV
 from etl.db import read_sql
 from etl.git_helpers import get_changed_files, log_time
 from etl.grapher import model as gm
+from etl.io import get_all_changed_catalog_paths
 
 log = get_logger()
 
@@ -383,7 +383,10 @@ class ChartDiff:
         article_refs_all = get_chart_in_article_views_cached(chart_ids)
 
         # Get approvals
-        df_approvals_all = OWID_ENV.read_sql(f"SELECT * FROM chart_diff_approvals WHERE chartId in {tuple(chart_ids)}")
+        df_approvals_all = read_sql(
+            "SELECT * FROM chart_diff_approvals WHERE chartId IN %(chart_ids)s",
+            params={"chart_ids": chart_ids},
+        )
 
         # Build chart diffs
         chart_diffs = []
@@ -1020,14 +1023,19 @@ def get_chart_views_cached(chart_ids: List[int]) -> Dict[int, float]:
 @st_cache_data(custom_text="Retrieving anomalies in indicators used in charts to review...", show_time=True)
 def get_chart_anomalies_cached(chart_ids: List[int]) -> Dict[int, float]:
     # Anomalies
-    df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("version_change",))
+    df_anomalies_all = get_anomalies_for_chart_ids(chart_ids, anomaly_types=("upgrade_change",))
     return df_anomalies_all.set_index("chart_id")["score_mean"].to_dict()  # type: ignore
 
 
 @st_cache_data(custom_text="Retrieving analytics on article references...")
 def get_chart_in_article_views_cached(chart_ids: List[int]) -> Dict[int, List[ArticleRef]]:
     # Articles
-    df_articles = get_article_views_last_n_days(chart_ids, 30)
+    df_articles = get_post_views_last_n_days(
+        chart_ids=chart_ids,
+        n_days=30,
+        include_parents_of_narrative_charts=True,
+        include_references_of_all_charts_block=False,
+    ).rename(columns={"post_url": "url", "post_title": "title"})
     return (
         df_articles.groupby("chart_id")[["url", "views_daily", "title"]]
         .apply(lambda x: [ArticleRef(row["url"], row["title"], row["views_daily"]) for _, row in x.iterrows()])
