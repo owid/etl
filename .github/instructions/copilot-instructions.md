@@ -29,7 +29,7 @@ This repository contains the ETL (Extract, Transform, Load) system for Our World
 ## Tools We Use
 - We use `make` for common development tasks
 - Run `make test` to run tests
-- Run `make format` to format code 
+- Run `make format` to format code
 - Run `make etl` to process data
 - We use `pytest` for testing
 
