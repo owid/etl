@@ -1355,7 +1355,7 @@ tables:
               colorScale:
                 baseColorScheme: "Blues"
                 binningStrategy: "manual"
-                customNumericValues: [0, 1, 2, 5, 10, 20, 1]
+                customNumericValues: [0, 1, 2, 5, 10, 20, 50, 1]
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       avg:
