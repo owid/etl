@@ -279,9 +279,9 @@ definitions:
 
   threshold_title: |-
     <% if decile == 5 %>
-    Threshold <<welfare_type>> per day marking the {definitions.percentiles_thr.lower()} (median)
+    Threshold <<welfare_type>> per day marking the {definitions.percentiles_thr}.lower() (median)
     <%- else %>
-    Threshold <<welfare_type>> per day marking the {definitions.percentiles_thr.lower()}
+    Threshold <<welfare_type>> per day marking the {definitions.percentiles_thr}.lower()
     <%- endif %>
 
   poverty_line_subtitle: |-
@@ -1409,7 +1409,7 @@ tables:
           <<: *common_display
         presentation:
           grapher_config:
-            title: Mean <<welfare_type>> per day within the {definitions.percentiles_avg_share.lower()}
+            title: Mean <<welfare_type>> per day within the {definitions.percentiles_avg_share}.lower()
             subtitle: The mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population). {definitions.ppp_adjustment_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
@@ -1446,7 +1446,7 @@ tables:
           <<: *common_display
         presentation:
           grapher_config:
-            title: <<welfare_type.capitalize()>> share of the {definitions.percentiles_avg_share.lower()}
+            title: <<welfare_type.capitalize()>> share of the {definitions.percentiles_avg_share}.lower()
             subtitle: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population).
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
