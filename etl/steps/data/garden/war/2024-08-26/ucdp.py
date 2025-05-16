@@ -111,6 +111,7 @@ def run() -> None:
         tb_maps=tb_maps,
         ds_population=ds_population,
         default_metadata=ds_meadow.metadata,
+        num_missing_location=NUM_MISSING_LOCATIONS,
         last_year=LAST_YEAR,
     )
 
@@ -198,6 +199,7 @@ def run_pipeline(
     tb_maps: Table,
     ds_population: Dataset,
     default_metadata: DatasetMeta,
+    num_missing_location: int,
     last_year: int,
     last_year_preview: Optional[int] = None,
 ):
@@ -229,7 +231,7 @@ def run_pipeline(
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
     tb_participants = estimate_metrics_participants(tb, tb_prio, tb_codes)
-    tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population, last_year)
+    tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population, last_year, num_missing_location)
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -595,7 +597,7 @@ def estimate_metrics_participants_prio(tb_prio: Table, tb_codes: Table) -> Table
 
 # Estimate locations (takes time)
 def estimate_metrics_locations(
-    tb: Table, tb_maps: Table, tb_codes: Table, ds_population: Dataset, last_year: int
+    tb: Table, tb_maps: Table, tb_codes: Table, ds_population: Dataset, last_year: int, num_missing_location: int
 ) -> Table:
     """Add participant information at country-level.
 
@@ -611,7 +613,7 @@ def estimate_metrics_locations(
 
     # Add country name using geometry
     paths.log.info("adding location name of conflict event...")
-    tb_locations = _get_location_of_conflict_in_ucdp_ged(tb, tb_maps).copy()
+    tb_locations = _get_location_of_conflict_in_ucdp_ged(tb, tb_maps, num_missing_location).copy()
 
     # There are some countries not in GW (remove, replace?). We keep Palestine and Western Sahara since
     # these are mappable in OWID maps.
@@ -852,7 +854,7 @@ def estimate_metrics_locations(
     return tb_locations
 
 
-def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
+def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing_location: int) -> Table:
     """Add column with country name of the conflict."""
     # Convert the UCDP data to a GeoDataFrame (so it can be mapped and used in spatial analysis).
     # The 'wkt.loads' function takes the coordinates in the 'geometry' column and ensures geopandas will use it to map the data.
@@ -873,8 +875,8 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table) -> Table:
     # There are some points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
     # I've soften the assertion, otherwise a bit of a pain!
     assert (
-        (diff := gdf.shape[0] - gdf_match.shape[0]) <= NUM_MISSING_LOCATIONS
-    ), f"Unexpected number of events without exact coordinate match! {diff} < {NUM_MISSING_LOCATIONS} doesn't hold! ({diff-NUM_MISSING_LOCATIONS} off)"
+        (diff := gdf.shape[0] - gdf_match.shape[0]) <= num_missing_location
+    ), f"Unexpected number of events without exact coordinate match! {diff} < {num_missing_location} doesn't hold! ({diff-num_missing_location} off)"
     # DEBUG: Examine which are these unlabeled conflicts
     # mask = ~tb["relid"].isin(gdf_match["relid"])
     # tb.loc[mask, ["relid", "year", "conflict_name", "side_a", "side_b", "best"]]

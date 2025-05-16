@@ -19,6 +19,8 @@ Notes:
             5 = Americas (GWNo: 2-199)
 """
 
+import importlib.util
+import sys
 from typing import List, Optional, cast
 
 import geopandas as gpd
@@ -41,10 +43,17 @@ from etl.helpers import PathFinder
 
 log = get_logger()
 
+# Import UCDP (latest) module
+module_path = "/home/lucas/repos/etl/etl/steps/data/garden/war/2024-08-26/ucdp.py"
+spec = importlib.util.spec_from_file_location("ucdp_module", module_path)
+ucdp_module = importlib.util.module_from_spec(spec)
+sys.modules["ucdp_module"] = ucdp_module
+spec.loader.exec_module(ucdp_module)
+
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-# Mapping for Geo-referenced datase
+# Mapping for Geo-referenced database
 TYPE_OF_VIOLENCE_MAPPING = {
     2: "non-state conflict",
     3: "one-sided violence",
@@ -111,7 +120,7 @@ def run() -> None:
     #
     # Run main code
     #
-    run_pipeline(
+    ucdp_module.run_pipeline(
         tb_ged=tb_ged,
         tb_conflict=tb_conflict,
         tb_prio=tb_prio,
@@ -120,6 +129,7 @@ def run() -> None:
         tb_maps=tb_maps,
         ds_population=ds_population,
         default_metadata=ds_meadow.metadata,
+        num_missing_location=NUM_MISSING_LOCATIONS,
         last_year=LAST_YEAR,
         last_year_preview=LAST_YEAR_PREVIEW,
     )
