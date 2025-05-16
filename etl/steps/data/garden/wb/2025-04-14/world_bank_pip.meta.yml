@@ -44,6 +44,10 @@ definitions:
     $3.20 and $5.50 a day
     <%- elif poverty_line == "550 and 1000" %>
     $5.50 and $10 a day
+    <%- elif poverty_line == "190 and 1000" %>
+    $1.90 and $10 a day
+    <%- elif poverty_line == "550 and 1000" %>
+    $5.50 and $10 a day
     <%- elif poverty_line == "215" %>
     $2.15 a day
     <%- elif poverty_line == "365" %>
@@ -56,6 +60,10 @@ definitions:
     $2.15 and $3.65 a day
     <%- elif poverty_line == "365 and 685" %>
     $3.65 and $6.85 a day
+    <%- elif poverty_line == "215 and 1000" %>
+    $2.15 and $10 a day
+    <%- elif poverty_line == "685 and 1000" %>
+    $6.85 and $10 a day
     <%- elif poverty_line == "100" %>
     $1 a day
     <%- elif poverty_line == "1000" %>
@@ -72,6 +80,8 @@ definitions:
     $20 and $30 a day
     <%- elif poverty_line == "3000 and 4000" %>
     $30 and $40 a day
+    <%- elif poverty_line == "1000 and 3000" %>
+    $10 and $30 a day
     <%- else %>
     <<poverty_line>>
     <%- endif %>
