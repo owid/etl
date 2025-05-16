@@ -8,11 +8,16 @@ A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an 
 
 ## Instructions
 
-- Fill just fields in `meta.origin`, ignore the rest of the file
+When filling metadata for snapshots, follow these guidelines:
+
+- Focus only on fields in the `meta.origin` section; other fields are handled elsewhere
 - If `url_main` exists, go to that URL to get the context
+- Use clear, precise language to describe the data source and its content
+- For multiline text, use the `|-` YAML syntax and include linebreaks for readability
+- Avoid using quotes for strings unless they contain special characters
+- **Do not** fill the `date_published` field
+- Always follow capitalization, formatting, and punctuation rules for each field
 - Follow guidelines in the schema below when filling the metadata
-- If the text is long, use `|-` for a multiline string and use linebreaks for better readability
-- Do not fill `date_published` field
 
 
 ## Schema
