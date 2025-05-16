@@ -72,6 +72,7 @@ class Collection(MDIMBase):
     _definitions: Definitions
 
     topic_tags: Optional[List[str]] = None
+    _default_dimensions: Optional[Dict[str, str]] = None
 
     # Internal use. For save() method.
     _collection_type: Optional[str] = field(init=False, default="multidim")
@@ -91,6 +92,11 @@ class Collection(MDIMBase):
         else:
             data["_definitions"] = Definitions()
 
+        # If dictionary contains field 'definitions', change it for '_definitions'
+        if "default_dimensions" in data:
+            data["_default_dimensions"] = data["default_dimensions"]
+            del data["default_dimensions"]
+
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
@@ -101,6 +107,36 @@ class Collection(MDIMBase):
     @property
     def definitions(self) -> Definitions:
         return self._definitions
+
+    @property
+    def default_dimensions(self) -> Optional[Dict[str, str]]:
+        return self._default_dimensions
+
+    @default_dimensions.setter
+    def default_dimensions(self, view_dimensions: Dict[str, str]) -> None:
+        """Set the default view for the collection.
+
+        Args:
+            view_dimensions: Dictionary mapping dimension slugs to their choice values
+                representing the view that should be displayed by default.
+
+        Raises:
+            ValueError: If the view dimensions don't correspond to any existing view
+        """
+        # Validate that this view actually exists
+        if not isinstance(view_dimensions, dict):
+            raise ValueError(f"Cannot set default view to {view_dimensions}: must be of type `dict`")
+
+        found = False
+        for view in self.views:
+            if all(view.dimensions.get(dim) == choice for dim, choice in view_dimensions.items()):
+                found = True
+                break
+
+        if not found:
+            raise ValueError(f"Cannot set default view to {view_dimensions}: no view matches these dimensions")
+
+        self._default_dimensions = view_dimensions
 
     @property
     def v(self):
@@ -146,18 +182,11 @@ class Collection(MDIMBase):
         if prune_choices:
             self.prune_dimension_choices()
 
-        # TODO: Prune dimensions if only one choice is in use
-        if prune_dimensions:
-            self.prune_dimensions()
-
         # Ensure that all views are in choices
         self.validate_views_with_dimensions()
 
         # Validate duplicate views
         self.check_duplicate_views()
-
-        # Sort views based on dimension order
-        self.sort_views_based_on_dimensions()
 
         # Check that no choice name or slug is repeated
         self.validate_choice_uniqueness()
@@ -165,6 +194,16 @@ class Collection(MDIMBase):
         # Check that all indicators in explorer exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Sort views based on dimension order
+        self.sort_views_based_on_dimensions()
+
+        # Pick default view first
+        self.sort_views_with_default_first()
+
+        # TODO: Prune dimensions if only one choice is in use
+        if prune_dimensions:
+            self.prune_dimensions()
 
         # Export config to local directory in addition to uploading it to MySQL for debugging.
         self.save_config_local()
@@ -191,14 +230,14 @@ class Collection(MDIMBase):
         return dix
 
     def get_dimension(self, slug: str) -> Dimension:
-        """Get dimension `slug`"""
+        """Get dimension object with slug `slug`"""
         for dim in self.dimensions:
             if dim.slug == slug:
                 return dim
         raise ValueError(f"Dimension {slug} not found in dimensions!")
 
     def get_choice_names(self, dimension_slug: str) -> Dict[str, str]:
-        """Get all choice names in the collection."""
+        """Get all choice names in a given dimension."""
         dimension = self.get_dimension(dimension_slug)
         choice_names = {}
         for choice in dimension.choices:
@@ -301,6 +340,34 @@ class Collection(MDIMBase):
             )
 
         self.views = sorted(self.views, key=sort_key)
+
+    def sort_views_with_default_first(self):
+        # If default dimensions are specified, move that view to the front
+        if not self.default_dimensions:
+            return
+
+        # Find the default view
+        default_view = None
+        for view in self.views:
+            # Check if this view matches exactly the default dimensions
+            if view.dimensions.keys() == self.default_dimensions.keys() and all(
+                view.dimensions[dim] == choice for dim, choice in self.default_dimensions.items()
+            ):
+                default_view = view
+                break
+
+        # If no matching view was found, show available options and raise error
+        if not default_view:
+            df = pd.DataFrame([v.dimensions for v in self.views])
+            dimensions_str = "\n".join([f"{k}: {v}" for k, v in self.default_dimensions.items()])
+            raise ValueError(
+                f"No view matches dimensions:\n\n{dimensions_str}\n\n"
+                f"Available dimensions in views are:\n\n{df.to_string()}"
+            )
+
+        # Move the default view to the front
+        self.views.remove(default_view)
+        self.views.insert(0, default_view)
 
     def validate_choice_uniqueness(self):
         """Validate that all choice names (and slugs) are unique."""
