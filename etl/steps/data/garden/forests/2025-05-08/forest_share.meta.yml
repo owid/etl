@@ -31,15 +31,18 @@ tables:
   forest_share:
     variables:
       forest_share:
-        title: Forest cover
+        title: Share of land covered by forest
         description_short: "The share of land area covered by forest, including both natural forests and forest plantations."
         unit: "%"
         short_unit: "%"
         presentation:
-          title_public: Forest cover
+          title_public: Share of land covered by forest
         display:
-          name: Forest cover
+          name: Share of land covered by forest
           numDecimalPlaces: 1
+          entityAnnotationsMap: |-
+            Scotland: Pre-1600 cover likely >25%
+            China: Historical cover likely >20%
         description_key:
           - "This indicator shows the share of a country’s land area that is covered by forest. It includes both natural forests and forest plantations, where that distinction is available."
           - "For 1990 onwards, data comes from the Food and Agriculture Organization (FAO), which uses a consistent global definition: forest is land with tree canopy cover greater than 10%, spanning more than 0.5 hectares, with trees that can reach at least 5 metres in height. It includes plantations but excludes land where other uses (such as agriculture or urban development) dominate ([FAO definition](https://www.fao.org/4/y1997e/y1997e1m.htm))."
