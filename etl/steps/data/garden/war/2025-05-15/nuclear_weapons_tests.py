@@ -1,5 +1,8 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import owid.catalog.processing as pr
+from owid.catalog import Table
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -7,15 +10,13 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def extract_year_ranges(years_ranges, year_last):
+def extract_year_ranges(years_ranges):
     # Extract years from a string that contains a list of years and year ranges.
     # Examples: "1964-66,72-75,80-", "1980-", "1953-62,82-87", "1970-2003", "1975-90", "2002-07".
     years = []
     for years_range in years_ranges.split(","):
         if "-" in years_range:
             start, end = years_range.split("-")
-            if end.lower() == "present":
-                end = year_last
             years.extend(list(range(int(start), int(end) + 1)))
         else:
             years.append(int(years_range))
@@ -51,8 +52,18 @@ def run() -> None:
     year_last = int(tb["year"].metadata.origins[0].date_published.split("-")[0]) - 1
 
     # Adapt years column, so that they are integers, and not ranges, e.g. 2018-2019.
-    tb["year"] = tb["year"].astype(str).apply(extract_year_ranges, year_last=year_last)
+    tb["year"] = tb["year"].astype(str).apply(extract_year_ranges)
     tb = tb.explode("year").reset_index(drop=True)
+    # In a private communication with Daryll Kimball, he said that we can safely assume no further tests between the last informed data point and the publication date.
+    tb = pr.concat(
+        [
+            tb,
+            Table(0, index=range(tb["year"].max() + 1, year_last + 1), columns=tb.columns).assign(
+                **{"year": lambda x: x.index}
+            ),
+        ],
+        ignore_index=True,
+    )
 
     # All columns should be integers.
     tb = tb.astype(str).astype(int)
