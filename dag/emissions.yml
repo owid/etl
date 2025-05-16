@@ -172,11 +172,3 @@ steps:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
   export://multidim/emissions/latest/air_pollution:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
-
-  #
-  # IPCC scenarios
-  #
-  data://grapher/emissions/2022-08-30/ipcc_scenarios:
-    - snapshot://emissions/2022-08-30/ipcc_scenarios.zip
-  export://explorers/emissions/latest/ipcc_scenarios:
-    - data://grapher/emissions/2022-08-30/ipcc_scenarios

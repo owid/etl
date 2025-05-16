@@ -11,7 +11,7 @@ def run() -> None:
     # Load inputs.
     #
     # Load grapher config from YAML
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     # Add annotations to all columns
     for view in config["views"]:
@@ -22,7 +22,7 @@ def run() -> None:
             )
 
     # Create explorer
-    explorer = paths.create_explorer(config=config, explorer_name="ipcc-scenarios")
+    explorer = paths.create_collection(config=config, short_name="ipcc-scenarios", explorer=True)
 
     # explorer.save(tolerate_extra_indicators=True)
     explorer.save()

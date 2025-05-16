@@ -2,6 +2,8 @@ meta:
   origin:
     producer: |-
       Riahi et al. (2017). The Shared Socioeconomic Pathways and their energy, land use, and greenhouse gas emissions implications: An overview, Global Environmental Change
+    # NOTE: there's a newer version 3.0 available at https://data.ece.iiasa.ac.at/ssp/#/login?redirect=%2Fdownloads
+    version_producer: 2.0
     title: |-
       IPCC Scenarios
     citation_full: |-

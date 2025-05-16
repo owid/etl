@@ -4,11 +4,13 @@ import owid.catalog.processing as pr
 from owid.catalog import Table
 
 from etl.files import yaml_load
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+TWH_TO_KWH = 1e9
+TON_TO_KG = 1e3
 
 UNITS_CONVERSION = {
     "EJ/yr": 277.778,  # 1 EJ = 277.778 TWh
@@ -60,12 +62,17 @@ def process_region(combined: Table, naming: Table, scenario_naming: Table, annot
     tb = pr.merge(tb, scenario_naming, on="SCENARIO", how="inner")
     tb = tb.drop(columns=["SCENARIO"])
 
+    # Use units to avoid errors
+    tb["emissions_co2_kg"] = tb["emissions_co2"] * TON_TO_KG
+    tb["final_energy_kwh"] = tb["final_energy"] * TWH_TO_KWH
+    tb["primary_energy_kwh"] = tb["primary_energy"] * TWH_TO_KWH
+
     # Calculate derived metrics
-    tb["carbon_intensity_economy"] = tb["emissions_co2"] / tb["gdp"]
-    tb["carbon_intensity_energy"] = tb["emissions_co2"] / tb["primary_energy"]
-    tb["primary_energy_intensity"] = tb["primary_energy"] / tb["gdp"]
-    tb["final_energy_intensity"] = tb["final_energy"] / tb["gdp"]
-    tb["primary_final_efficiency"] = tb["final_energy"] / tb["primary_energy"] * 100
+    tb["carbon_intensity_economy"] = tb["emissions_co2_kg"] / tb["gdp"]
+    tb["carbon_intensity_energy"] = tb["emissions_co2_kg"] / tb["primary_energy_kwh"]
+    tb["primary_energy_intensity"] = tb["primary_energy_kwh"] / tb["gdp"]
+    tb["final_energy_intensity"] = tb["final_energy_kwh"] / tb["gdp"]
+    tb["primary_final_efficiency"] = tb["final_energy_kwh"] / tb["primary_energy_kwh"] * 100
 
     # Calculate share of energy
     for col in tb.columns:
@@ -88,13 +95,12 @@ def process_region(combined: Table, naming: Table, scenario_naming: Table, annot
     )
 
     # Convert TWh to kWh
-    twh_to_kwh = 1e9
-    tb["final_elec_kwh"] = tb["final_energy_elec"] * twh_to_kwh
-    tb["secondary_energy_elec_kwh"] = tb["secondary_energy_elec"] * twh_to_kwh
+    tb["final_elec_kwh"] = tb["final_energy_elec"] * TWH_TO_KWH
+    tb["secondary_energy_elec_kwh"] = tb["secondary_energy_elec"] * TWH_TO_KWH
     for col in tb.columns:
         if any(col.startswith(prefix) for prefix in ("final_energy", "secondary_energy", "primary_energy")):
             new_col = col + "_kwh"
-            tb[new_col] = tb[col] * twh_to_kwh
+            tb[new_col] = tb[col] * TWH_TO_KWH
 
     # Calculate per capita metrics
     tb["gdp_per_capita"] = tb["gdp"] / tb["population"]
@@ -185,7 +191,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset
-    ds_grapher = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
+    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=snap.metadata)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()
