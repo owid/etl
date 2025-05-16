@@ -2,12 +2,12 @@ title:
   title: Poverty indicators
   title_variant: World Bank
 default_selection:
+  - Mozambique
+  - Zambia
+  - Kenya
+  - Nigeria
   - Bangladesh
   - Bolivia
-  - Democratic Republic of Congo
-  - India
-  - China
-  - Ethiopia
 
 default_dimensions:
   indicator: headcount_ratio
