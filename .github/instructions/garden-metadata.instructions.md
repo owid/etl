@@ -4,9 +4,16 @@ applyTo: "**/garden/**/*.meta.yml"
 
 ## Instructions
 
-- Follow guidelines in the JSONSchema below when filling the metadata
-- If the text is long, use `|-` for a multiline string and use linebreaks for better readability
-- Don't use '' or `"` for strings unless the text contains a quote
+When filling metadata for garden datasets, follow these guidelines:
+
+- Each metadata field must adhere to the schema rules defined below
+- Use clear, precise language focused on data meaning rather than technical details
+- For multiline text, use the `|-` YAML syntax and include linebreaks for readability
+- Avoid using quotes (`'` or `"`) for strings unless the text contains quotes or special characters
+- All descriptions should be concise and focused on what users need to know
+- Always follow capitalization, formatting, and punctuation rules for each field
+- Follow guidelines in the Schema below when filling the metadata
+
 
 ## Schema
 
