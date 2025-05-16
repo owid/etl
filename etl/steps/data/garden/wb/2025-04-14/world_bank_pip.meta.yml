@@ -571,14 +571,13 @@ definitions:
     [1, 2, 5, 10, 20, 50, 100, 1]
     <%- endif %>
 
-
   entity_names_poverty: &entity_names_poverty
+    - Mozambique
+    - Zambia
+    - Kenya
+    - Nigeria
     - Bangladesh
     - Bolivia
-    - Democratic Republic of Congo
-    - India
-    - China
-    - Ethiopia
 
   entity_names_inequality: &entity_names_inequality
     - Chile
