@@ -561,7 +561,7 @@ definitions:
   entity_names_poverty: &entity_names_poverty
     - Bangladesh
     - Bolivia
-    - Madagascar
+    - Democratic Republic of Congo
     - India
     - China
     - Ethiopia
@@ -584,7 +584,7 @@ definitions:
     - Ghana
     - India
     - Ethiopia
-    - Madagascar
+    - Democratic Republic of Congo
 
   entity_names_prosperity_gap: &entity_names_prosperity_gap
     - Norway
