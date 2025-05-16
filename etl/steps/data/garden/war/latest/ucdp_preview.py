@@ -1,22 +1,8 @@
-"""Data from UCDP.
+"""This step is almost identical to ucdp. However, it includes the latest data from CED, which is not yet available in the UCDP yearly release dataset.
 
+It is good to keep these separate since CED data is still in preview, and might contain errors.
 
-Notes:
-    - Conflict types for state-based violence is sourced from UCDP/PRIO dataset. non-state and one-sided violence is sourced from GED dataset.
-    - There can be some mismatches with latest official reported data (UCDP's live dashboard). This is because UCDP uses latest data for their dashboard, which might not be available yet as bulk download.
-    - Regions:
-        - Uses `region` column for both GED and UCDP/PRIO datasets.
-        - Incompatibilities in Oceania are encoded in "Asia". We therefore have changed the region name to "Asia and Oceania".
-        - GED: Dataset uses names (not codes!)
-            - You can learn more about the countries included in each region from section "Appendix 5 Main sources consulted during the 2022 update" in page 40,
-            document: https://ucdp.uu.se/downloads/ged/ged231.pdf.
-                - Note that countries from Oceania are included in Asia!
-        - UCDP/PRIO: Dataset uses codes (note we changed "Asia" -> "Asia and Oceania")
-            1 = Europe (GWNo: 200-399)
-            2 = Middle East (GWNo: 630-699)
-            3 = Asia (GWNo: 700-999)  [renamed to 'Asia and Oceania']
-            4 = Africa (GWNo: 400-626)
-            5 = Americas (GWNo: 2-199)
+For more details on the processing pipeline, please refer to garden/war/2024-08-26/ucdp.
 """
 
 import importlib.util
@@ -66,6 +52,9 @@ LAST_YEAR_PREVIEW = 2024
 # Number of events with no location assigned (see function estimate_metrics_locations)
 NUM_MISSING_LOCATIONS = 2316
 
+# Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
+CATALOG_PATH = "garden/war/2024-08-26/ucdp"
+
 
 def run() -> None:
     paths.log.info("start")
@@ -80,7 +69,7 @@ def run() -> None:
     ds_population = paths.load_dataset("population")  # Population
 
     # Import UCDP module
-    ucdp_module = import_ucdp_module()
+    ucdp_module = import_ucdp_module(CATALOG_PATH)
 
     # Sanity checks (1)
     paths.log.info("sanity checks")
@@ -120,12 +109,11 @@ def run() -> None:
     )
 
 
-def import_ucdp_module():
+def import_ucdp_module(catalog_path: str = CATALOG_PATH):
     """To avoid re-implementing the same code as in ucdp.py, we import the module here.
 
     We need to do this unusual import because the module path contains numeric values.
     """
-    catalog_path = "garden/war/2024-08-26/ucdp"
     step_uri = f"data://{catalog_path}"
     assert (
         step_uri in paths.dependencies
