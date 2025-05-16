@@ -9,6 +9,16 @@ Our ETL system includes an automatic update system that runs daily to update sna
 
 It is then up to you to review, optionally edit and merge that PR. Use `chart-diff` and enable **Show all charts** in Options to check all affected charts. `data-diff` can also be helpful. Once you merge the PR, autoupdate will automatically create a new PR when there's new data available.
 
+## Overview
+
+The automatic update process:
+
+1. Runs daily via a scheduled job
+2. Identifies snapshots with `autoupdate` metadata in their `.dvc` files
+3. Executes these snapshots' Python scripts to fetch the latest data
+4. Checks if the data has actually changed (by comparing MD5 hashes and file sizes)
+5. Creates a GitHub pull request when changes are detected for review and merging
+
 ## Enabling Autoupdate for a Snapshot
 
 To enable automatic updates for a snapshot, you need to add the `autoupdate` field to its `.dvc` file:
@@ -23,17 +33,6 @@ outs:
 ```
 
 The `name` field is used to group related snapshots together. Multiple snapshots can share the same update name, which means they will be processed together and included in the same pull request.
-
-
-## Overview
-
-The automatic update process:
-
-1. Runs daily via a scheduled job
-2. Identifies snapshots with `autoupdate` metadata in their `.dvc` files
-3. Executes these snapshots' Python scripts to fetch the latest data
-4. Checks if the data has actually changed (by comparing MD5 hashes and file sizes)
-5. Creates a GitHub pull request when changes are detected for review and merging
 
 
 ## Comparison with Scheduled Script Updates
