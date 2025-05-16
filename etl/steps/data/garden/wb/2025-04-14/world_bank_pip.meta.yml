@@ -575,16 +575,12 @@ definitions:
     - China
 
   entity_names_incomes_across_distribution: &entity_names_incomes_across_distribution
-    - World
+    - Chile
+    - Brazil
+    - South Africa
     - United States
-    - South Korea
-    - Spain
+    - France
     - China
-    - Mauritania
-    - Ghana
-    - India
-    - Ethiopia
-    - Madagascar
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
@@ -1437,7 +1433,7 @@ tables:
         title: Threshold ({definitions.percentiles_thr}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The level of <<welfare_type>> per day below which <<decile>>% of the population falls.
+        description_short: The level of <<welfare_type>> per day below which <<decile>>0% of the population falls.
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1457,7 +1453,7 @@ tables:
         presentation:
           grapher_config:
             title: "{definitions.threshold_title}"
-            subtitle: The level of <<welfare_type>> per person per day below which <<decile>>% of the population falls. {definitions.ppp_adjustment_subtitle}
+            subtitle: The level of <<welfare_type>> per person per day below which <<decile>>0% of the population falls. {definitions.ppp_adjustment_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
