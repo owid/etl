@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Liu, M. & Tian, H.
+    title: "China's land cover and land use change from 1700 to 2005: Estimations from high-resolution satellite data and historical archives"
+    citation_full: |-
+      Liu, M., & Tian, H. (2010). China's land cover and land use change from 1700 to 2005: Estimations from high-resolution satellite data and historical archives. *Global Biogeochemical Cycles*, 24(3), GB3003. https://doi.org/10.1029/2009GB003687
+    attribution_short: Liu & Tian
+    url_main: |-
+      https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2009GB003687
+    date_accessed: "2025-05-16"
+    date_published: "2010-07-16"
+    license:
+      name: © 2025 American Geophysical Union
+      url: https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2009GB003687
+outs:
+  - md5: 0d6af0d4249668928f33e184feec0248
+    size: 549
+    path: liu_2010.csv
