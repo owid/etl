@@ -63,6 +63,7 @@ def process_region(combined: Table, naming: Table, scenario_naming: Table, annot
     tb = tb.drop(columns=["SCENARIO"])
 
     # Use units to avoid errors
+    # NOTE: in the next update, use units explicitly everywhere!
     tb["emissions_co2_kg"] = tb["emissions_co2"] * TON_TO_KG
     tb["final_energy_kwh"] = tb["final_energy"] * TWH_TO_KWH
     tb["primary_energy_kwh"] = tb["primary_energy"] * TWH_TO_KWH
