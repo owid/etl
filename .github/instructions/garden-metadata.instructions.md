@@ -1,7 +1,14 @@
-If asked to "fill metadata" for a YAML file, follow these instructions:
+---
+applyTo: "**/garden/**/*.meta.yml"
+---
+
+## Instructions
+
 - Follow guidelines in the JSONSchema below when filling the metadata
 - If the text is long, use `|-` for a multiline string and use linebreaks for better readability
 - Don't use '' or `"` for strings unless the text contains a quote
+
+## Schema
 
 "title": {
     "title": "Indicator's title",

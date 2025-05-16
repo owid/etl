@@ -1,15 +1,21 @@
+---
+applyTo: "**/snapshots/**/*.dvc"
+---
+
+## Overview
+
 A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data provider at a particular point in time. It is the entrypoint to ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
 
+## Instructions
 
-If asked to "fill metadata" for a snapshot stored in snapshots/**/*.dvc, follow these instructions:
 - Fill just fields in `meta.origin`, ignore the rest of the file
 - If `url_main` exists, go to that URL to get the context
-- Follow guidelines in the JSONSchema below when filling the metadata
+- Follow guidelines in the schema below when filling the metadata
 - If the text is long, use `|-` for a multiline string and use linebreaks for better readability
 - Do not fill `date_published` field
 
 
-Origin JSONSchema
+## Schema
 
 "origin": {
     "type": "object",
