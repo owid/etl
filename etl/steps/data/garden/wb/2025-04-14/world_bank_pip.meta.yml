@@ -575,12 +575,16 @@ definitions:
     - China
 
   entity_names_incomes_across_distribution: &entity_names_incomes_across_distribution
-    - Chile
-    - Brazil
-    - South Africa
+    - World
     - United States
-    - France
+    - South Korea
+    - Spain
     - China
+    - Mauritania
+    - Ghana
+    - India
+    - Ethiopia
+    - Madagascar
 
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
