@@ -19,6 +19,14 @@ The automatic update process:
 4. Checks if the data has actually changed (by comparing MD5 hashes and file sizes)
 5. Creates a GitHub pull request when changes are detected for review and merging
 
+!!! warning "Caution: Overwrites Existing Versions"
+    The autoupdate workflow creates new snapshots in R2, but keeps all ETL versions the same. This means ETL and grapher datasets are overwritten on every update. If your updated steps are dependencies for other steps, those will be updated automatically as well—without a version bump.
+    **Recommendation:** Use autoupdate only for "isolated", regularly updated datasets that use the "latest" version.
+    If an update cascades unexpectedly, you can review all data changes using chart diff.
+
+!!! info "Work in Progress"
+    We are still working on a generalized autoupdate workflow for larger datasets that properly respects versioning. :face_with_monocle:
+
 ## Enabling Autoupdate for a Snapshot
 
 To enable automatic updates for a snapshot, you need to add the `autoupdate` field to its `.dvc` file:
