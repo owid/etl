@@ -231,7 +231,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Share of population below <<poverty_line>>
     <%- else %>
-    Poverty: Share of population living below {definitions.poverty_line}
+    Poverty: Share of population living on less than {definitions.poverty_line}
     <%- endif %>
 
   headcount_title: |-
@@ -240,7 +240,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Number of people below <<poverty_line>>
     <%- else %>
-    Poverty: Number of people living below {definitions.poverty_line}
+    Poverty: Number of people living on less than {definitions.poverty_line}
     <%- endif %>
 
   total_shortfall_title: |-
