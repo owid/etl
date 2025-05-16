@@ -25,17 +25,17 @@ tables:
           <%- if indicator == "Criminal Justice Personnel" %>
           Nationally reported number of criminal justice personnel, including judges, prosecutors, and public defenders.
           <% elif indicator == "Persons brought before criminal courts" %>
-          National figures on persons brought before criminal courts, including those with and without legal representation.
+          Nationally reported number of people brought before criminal courts, including those with and without legal representation.
           <% elif indicator == "Persons convicted" %>
-          National figures on persons convicted, including those with and without legal representation.
+          Nationally reported number of people convicted, including those with and without legal representation.
           <% elif indicator == "Persons prosecuted" %>
-          National figures on persons prosecuted, including those with and without legal representation.
+          Nationally reported number of people prosecuted, including those with and without legal representation.
           <% elif indicator == "Persons arrested/cautioned/suspected" %>
-          National figures on persons arrested, cautioned, or suspected of a crime, including those with and without legal representation.
+          Nationally reported number of people arrested, cautioned, or suspected of a crime, including those with and without legal representation.
           <%- endif -%>
         unit: |-
           <%- if unit_of_measurement.lower() == "counts" %>
-            people
+          people
           <% elif unit_of_measurement.lower() == "rate per 100,000 population" %>
-            people per 100,000 population
+          people per 100,000 population
           <%- endif -%>
