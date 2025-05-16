@@ -34,12 +34,6 @@ POVLINES_DICT = {
     2017: ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
 }
 
-# Define PPP versions from POVLINES_DICT
-PPP_VERSIONS = list(POVLINES_DICT.keys())
-
-PPP_YEAR_OLD = PPP_VERSIONS[0]
-PPP_YEAR_CURRENT = PPP_VERSIONS[1]
-
 # Define international poverty lines as the second value in each list in POVLINES_DICT
 INTERNATIONAL_POVERTY_LINES = {ppp_year: poverty_lines[1] for ppp_year, poverty_lines in POVLINES_DICT.items()}
 

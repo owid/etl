@@ -31,59 +31,73 @@ definitions:
 
   poverty_line: |-
     <% if poverty_line == "190" %>
-    $1.90 a day
+    $1.90
     <%- elif poverty_line == "320" %>
-    $3.20 a day
+    $3.20
     <%- elif poverty_line == "550" %>
-    $5.50 a day
+    $5.50
     <%- elif poverty_line == "100 and 190" %>
-    $1 and $1.90 a day
+    $1 and $1.90
     <%- elif poverty_line == "190 and 320" %>
-    $1.90 and $3.20 a day
+    $1.90 and $3.20
     <%- elif poverty_line == "320 and 550" %>
-    $3.20 and $5.50 a day
+    $3.20 and $5.50
     <%- elif poverty_line == "550 and 1000" %>
-    $5.50 and $10 a day
+    $5.50 and $10
     <%- elif poverty_line == "190 and 1000" %>
-    $1.90 and $10 a day
+    $1.90 and $10
     <%- elif poverty_line == "550 and 1000" %>
-    $5.50 and $10 a day
+    $5.50 and $10
     <%- elif poverty_line == "215" %>
-    $2.15 a day
+    $2.15
     <%- elif poverty_line == "365" %>
-    $3.65 a day
+    $3.65
     <%- elif poverty_line == "685" %>
-    $6.85 a day
+    $6.85
     <%- elif poverty_line == "100 and 215" %>
-    $1 and $2.15 a day
+    $1 and $2.15
     <%- elif poverty_line == "215 and 365" %>
-    $2.15 and $3.65 a day
+    $2.15 and $3.65
     <%- elif poverty_line == "365 and 685" %>
-    $3.65 and $6.85 a day
+    $3.65 and $6.85
     <%- elif poverty_line == "215 and 1000" %>
-    $2.15 and $10 a day
+    $2.15 and $10
     <%- elif poverty_line == "685 and 1000" %>
-    $6.85 and $10 a day
+    $6.85 and $10
     <%- elif poverty_line == "100" %>
-    $1 a day
+    $1
     <%- elif poverty_line == "1000" %>
-    $10 a day
+    $10
     <%- elif poverty_line == "2000" %>
-    $20 a day
+    $20
     <%- elif poverty_line == "3000" %>
-    $30 a day
+    $30
     <%- elif poverty_line == "4000" %>
-    $40 a day
+    $40
     <%- elif poverty_line == "1000 and 2000" %>
-    $10 and $20 a day
+    $10 and $20
     <%- elif poverty_line == "2000 and 3000" %>
-    $20 and $30 a day
+    $20 and $30
     <%- elif poverty_line == "3000 and 4000" %>
-    $30 and $40 a day
+    $30 and $40
     <%- elif poverty_line == "1000 and 3000" %>
-    $10 and $30 a day
+    $10 and $30
     <%- else %>
     <<poverty_line>>
+    <%- endif %>
+
+  poverty_line_a_day: |-
+    <% if poverty_line != ["40% of the median", "50% of the median", "60% of the median"] %>
+    {definitions.poverty_line} a day
+    <%- else %>
+    {definitions.poverty_line}
+    <%- endif %>
+
+  poverty_line_per_day: |-
+    <% if poverty_line != ["40% of the median", "50% of the median", "60% of the median"] %>
+    {definitions.poverty_line} per day
+    <%- else %>
+    {definitions.poverty_line}
     <%- endif %>
 
   table: |-
@@ -127,13 +141,13 @@ definitions:
 
   description_key_poverty_line: |-
     <% if poverty_line in ["190", "215"] %>
-    Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line}.
+    Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
     <%- elif poverty_line in ["320", "365"] %>
-    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in lower-middle-income countries.
+    A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in lower-middle-income countries.
     <%- elif poverty_line in ["550", "685"] %>
-    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in upper-middle-income countries.
+    A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in upper-middle-income countries.
     <%- elif poverty_line == "3000" %>
-    A poverty line of {definitions.poverty_line} represents definitions of national poverty lines in high-income countries.
+    A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in high-income countries.
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     This is a measure of _relative_ poverty – it captures the share of people whose income is low by the standards typical in their own country.
     <%- endif %>
@@ -231,7 +245,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Share of population below <<poverty_line>>
     <%- else %>
-    Poverty: Share of population living on less than {definitions.poverty_line}
+    Poverty: Share of population living on less than {definitions.poverty_line_a_day}
     <%- endif %>
 
   headcount_title: |-
@@ -240,7 +254,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Number of people below <<poverty_line>>
     <%- else %>
-    Poverty: Number of people living on less than {definitions.poverty_line}
+    Poverty: Number of people living on less than {definitions.poverty_line_a_day}
     <%- endif %>
 
   total_shortfall_title: |-
@@ -249,7 +263,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Total shortfall from a poverty line of <<poverty_line>> <<welfare_type>>
     <%- else %>
-    Total shortfall from a poverty line of {definitions.poverty_line}
+    Total shortfall from a poverty line of {definitions.poverty_line_a_day}
     <%- endif %>
 
   avg_shortfall_title: |-
@@ -258,7 +272,7 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Average shortfall from a poverty line of <<poverty_line>> <<welfare_type>>
     <%- else %>
-    Average shortfall from a poverty line of {definitions.poverty_line}
+    Average shortfall from a poverty line of {definitions.poverty_line_a_day}
     <%- endif %>
 
   income_gap_ratio_title: |-
@@ -267,14 +281,14 @@ definitions:
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Average shortfall from a poverty line of <<poverty_line>> <<welfare_type>> (as a share of the poverty line)
     <%- else %>
-    Average shortfall from a poverty line of {definitions.poverty_line} (as a share of the poverty line)
+    Average shortfall from a poverty line of {definitions.poverty_line_a_day} (as a share of the poverty line)
     <%- endif %>
 
   poverty_gap_index_title: |-
     <% if poverty_line in ['40% of the median', '50% of the median', '60% of the median'] %>
     Poverty gap index at <<poverty_line>> <<welfare_type>>
     <%- else %>
-    Poverty gap index at {definitions.poverty_line}
+    Poverty gap index at {definitions.poverty_line_a_day}
     <%- endif %>
 
   threshold_title: |-
@@ -286,11 +300,11 @@ definitions:
 
   poverty_line_subtitle: |-
     <% if poverty_line in ["190", "215"] %>
-    Extreme poverty is defined as living below the International Poverty Line of {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
+    Extreme poverty is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["320", "365"] %>
-    The poverty line of {definitions.poverty_line} is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. {definitions.ppp_adjustment_subtitle}
+    The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["550", "685"] %>
-    The poverty line of {definitions.poverty_line} is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. {definitions.ppp_adjustment_subtitle}
+    The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at {definitions.relative_poverty_percentage} of the median <<welfare_type>>.
     <%- else %>
@@ -299,28 +313,28 @@ definitions:
 
   total_shortfall_subtitle: |-
     <% if poverty_line in ["190", "215"] %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["320", "365"] %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["550", "685"] %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to <<poverty_line>> <<welfare_type>>. {definitions.ppp_adjustment_subtitle}
     <%- else %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {definitions.poverty_line}. {definitions.ppp_adjustment_subtitle}
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- endif %>
 
   avg_shortfall_subtitle: |-
     <% if poverty_line in ["190", "215"] %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line}, averaged across the population in poverty.
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
     <%- elif poverty_line in ["320", "365"] %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line}, averaged across the population in poverty.
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
     <%- elif poverty_line in ["550", "685"] %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line}, averaged across the population in poverty.
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to <<poverty_line>> <<welfare_type>>, averaged across the population in poverty.
     <%- else %>
-    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {definitions.poverty_line}, averaged across the population in poverty.
+    This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to {definitions.poverty_line_per_day}, averaged across the population in poverty.
     <%- endif %>
 
   income_gap_ratio_subtitle_base: |-
@@ -328,15 +342,15 @@ definitions:
 
   income_gap_ratio_subtitle: |-
     <% if poverty_line in ["190", "215"] %>
-    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the International Poverty Line ({definitions.poverty_line}).
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the International Poverty Line ({definitions.poverty_line_per_day}).
     <%- elif poverty_line in ["320", "365"] %>
-    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the lower-middle income poverty line ({definitions.poverty_line}).
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the lower-middle income poverty line ({definitions.poverty_line_per_day}).
     <%- elif poverty_line in ["550", "685"] %>
-    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the upper-middle income poverty line ({definitions.poverty_line}).
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the upper-middle income poverty line ({definitions.poverty_line_per_day}).
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than <<poverty_line>> <<welfare_type>>.
     <%- else %>
-    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than {definitions.poverty_line}.
+    {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than {definitions.poverty_line_per_day}.
     <%- endif %>
 
   poverty_gap_index_subtitle: |-
@@ -605,7 +619,7 @@ definitions:
   # For indicators created exclusively for the consolidated dataset, to avoid long dataset names
   short_title: |-
     <% if poverty_line != "No poverty line" %>
-     {definitions.poverty_line}, <<welfare_type>>, <<table>>, <<survey_comparability>>
+     {definitions.poverty_line_a_day}, <<welfare_type>>, <<table>>, <<survey_comparability>>
     <%- endif %>
 
 # Learn more about the available fields:
@@ -621,10 +635,10 @@ tables:
     # POVERTY
 
       headcount_ratio:
-        title: Share of population in poverty ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Share of population in poverty ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line}.
+        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -637,7 +651,7 @@ tables:
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
-            Share of population in poverty ({definitions.poverty_line})
+            Share of population in poverty ({definitions.poverty_line_a_day})
             <%- else %>
             <<welfare_type.capitalize()>> surveys
             <%- endif %>
@@ -663,10 +677,10 @@ tables:
 
 
       headcount_ratio_above:
-        title: Share of population not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Share of population not in poverty (above {definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line}.
+        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -677,15 +691,15 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-            name: Share of population not in poverty (above {definitions.poverty_line})
+            name: Share of population not in poverty (above {definitions.poverty_line_a_day})
             numDecimalPlaces: 1
             <<: *common_display
 
       headcount_ratio_between:
-        title: Share of population in poverty (between {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Share of population in poverty (between {definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line}.
+        description_short: Percentage of population living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -696,15 +710,15 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Share of population in poverty (between {definitions.poverty_line})
+          name: Share of population in poverty (between {definitions.poverty_line_a_day})
           numDecimalPlaces: 1
           <<: *common_display
 
       headcount:
-        title: Number of people in poverty ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Number of people in poverty ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "people"
         short_unit: ""
-        description_short: Number of people living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line}.
+        description_short: Number of people living in households with {definitions.description_short_welfare_type} below {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -717,7 +731,7 @@ tables:
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
-            Number of people in poverty ({definitions.poverty_line})
+            Number of people in poverty ({definitions.poverty_line_a_day})
             <%- else %>
             <<welfare_type.capitalize()>> surveys
             <%- endif %>
@@ -742,10 +756,10 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       headcount_above:
-        title: Number of people not in poverty (above {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Number of people not in poverty (above {definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "people"
         short_unit: ""
-        description_short: Number of people living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line}.
+        description_short: Number of people living in households with {definitions.description_short_welfare_type} above {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -756,15 +770,15 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Number of people not in poverty (above {definitions.poverty_line})
+          name: Number of people not in poverty (above {definitions.poverty_line_a_day})
           numDecimalPlaces: 0
           <<: *common_display
 
       headcount_between:
-        title: Number of people in poverty (between {definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Number of people in poverty (between {definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "people"
         short_unit: ""
-        description_short: Number of people living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line}.
+        description_short: Number of people living in households with {definitions.description_short_welfare_type} between {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -775,15 +789,15 @@ tables:
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
         display:
-          name: Number of people in poverty (between {definitions.poverty_line})
+          name: Number of people in poverty (between {definitions.poverty_line_a_day})
           numDecimalPlaces: 0
           <<: *common_display
 
       total_shortfall:
-        title: Total shortfall ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Total shortfall ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behavior they would bring about.
+        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line_per_day}. However, this is not a measure of the actual cost of eliminating poverty, since it does not take into account the costs involved in making the necessary transfers nor any changes in behavior they would bring about.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -796,7 +810,7 @@ tables:
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
-            Total shortfall ({definitions.poverty_line})
+            Total shortfall ({definitions.poverty_line_a_day})
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -823,10 +837,10 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       avg_shortfall:
-        title: Average shortfall ($) ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Average shortfall ($) ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line}, averaged across the population in poverty.
+        description_short: This is the amount of money that would be theoretically needed to lift the <<welfare_type>> of all people in poverty up to {definitions.poverty_line_per_day}, averaged across the population in poverty.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -839,7 +853,7 @@ tables:
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
-            Average shortfall ($) ({definitions.poverty_line})
+            Average shortfall ($) ({definitions.poverty_line_a_day})
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -864,10 +878,10 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       income_gap_ratio:
-        title: Average shortfall (%) ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Average shortfall (%) ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_. It captures the depth of poverty of those living on less than {definitions.poverty_line}.
+        description_short: This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_. It captures the depth of poverty of those living on less than {definitions.poverty_line_per_day}.
         description_key:
           - "{definitions.description_key_poverty_line}"
           - "{definitions.description_key_ppp}"
@@ -880,7 +894,7 @@ tables:
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
-            Average shortfall (%) ({definitions.poverty_line})
+            Average shortfall (%) ({definitions.poverty_line_a_day})
             <%- else %>
             <<welfare_type.capitalize()>> surveys
             <%- endif %>
@@ -905,7 +919,7 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       poverty_gap_index:
-        title: Poverty gap index ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Poverty gap index ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: The poverty gap index is a poverty measure that reflects both the prevalence and the depth of poverty. It is calculated as the share of population in poverty multiplied by the average shortfall from the poverty line (expressed as a % of the poverty line).
@@ -921,7 +935,7 @@ tables:
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
-            Poverty gap index ({definitions.poverty_line})
+            Poverty gap index ({definitions.poverty_line_a_day})
             <%- else %>
             <<welfare_type.capitalize()>> surveys
             <%- endif %>
@@ -946,7 +960,7 @@ tables:
             selectedEntityNames: *entity_names_poverty
 
       watts:
-        title: Watts index ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Watts index ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: This is the mean across the population of the proportionate poverty gaps, as measured by the log of the ratio of the poverty line to income, where the mean is formed over the whole population, counting the nonpoor as having a zero poverty gap.
@@ -962,7 +976,7 @@ tables:
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
-            Watts index ({definitions.poverty_line})
+            Watts index ({definitions.poverty_line_a_day})
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -973,7 +987,7 @@ tables:
             - Poverty
 
       poverty_severity:
-        title: Poverty severity ({definitions.poverty_line}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: Poverty severity ({definitions.poverty_line_a_day}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
         description_short: This is calculated as the square of the income gap ratio, the average shortfall expressed as a share of the poverty line.
@@ -989,7 +1003,7 @@ tables:
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
-            Poverty severity ({definitions.poverty_line})
+            Poverty severity ({definitions.poverty_line_a_day})
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
