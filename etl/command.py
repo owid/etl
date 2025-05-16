@@ -301,7 +301,7 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
                     continue
 
                 # We want to execute export steps after any grapher://grapher steps,
-                # to ensure that any indicators required by the mdim step are already pushed to DB.
+                # to ensure that any indicators required by the collection step are already pushed to DB.
                 # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
                 dag[step] = {
                     re.sub(r"^(data|data-private)://", "grapher://", dep)

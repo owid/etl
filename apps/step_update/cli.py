@@ -267,7 +267,7 @@ class StepUpdater:
             log.info(f"Updating {step} to version {step_version_new}.")
         if step_channel == "snapshot":
             return self._update_snapshot_step(step=step, step_version_new=step_version_new, step_header=step_header)
-        elif step_channel in ["meadow", "garden", "grapher", "explorers"]:
+        elif step_channel in ["meadow", "garden", "grapher", "explorers", "external"]:
             return self._update_data_step(step=step, step_version_new=step_version_new, step_header=step_header)
         else:
             log.error(f"Channel {step_channel} not yet supported.")
@@ -362,12 +362,6 @@ class StepUpdater:
                 if success == 1:
                     log.error(f"Stopped because of a failure on step {step}.")
                     break
-
-            # Tell user how to automatically create PR
-            short_name = steps[-1].split("/")[-1].split(".")[0]
-            # cmd = f'etl pro update-{short_name} --title ":bar_chart: Update {short_name}"'
-            cmd = f'etl pr "{short_name}" data'
-            log.info(f"Create the PR automatically with:\n  {cmd}")
 
     def _archive_step(self, step: str) -> None:
         # Move a certain step from its active dag to its corresponding archive dag.

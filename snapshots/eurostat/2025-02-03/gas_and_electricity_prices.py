@@ -65,7 +65,7 @@ URL_SUFFIX = "?format=TSV&compressed=false"
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"eurostat/{SNAPSHOT_VERSION}/gas_and_electricity_prices.zip")
 
@@ -87,4 +87,4 @@ def main(upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()

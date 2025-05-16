@@ -7,7 +7,7 @@ import numpy as np
 from owid.catalog import Table
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -170,7 +170,7 @@ def add_total_consumption_and_percentages(combined: Table) -> Table:
     return combined
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
@@ -201,5 +201,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Save garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[combined], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[combined])
     ds_garden.save()

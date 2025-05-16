@@ -1,0 +1,26 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Patterns of Death (Chapter 1) - The Routledge History of Death Since 1800"
+    description: |-
+      The data for Fig. 1.6 (page 34) was received by personal communication with Dr Romola Davenport, the author of this chapter.
+    date_published: "2007"
+    # Citation
+    producer: Davenport
+    citation_full: |-
+      Davenport, Annual Deaths By Cause, Age and Sex in England and Wales, 1848–1900 [dataset] (2007), Economic and Social Data Services (SN5705).
+    attribution_short: Davenport
+    # Files
+    url_main: https://www.taylorfrancis.com/reader/download/92acbdcb-b168-48d0-a39c-108b9ba2bc4b/chapter/pdf?context=ubx
+    date_accessed: "2025-05-14"
+
+    # License
+    license:
+      name: CC BY-NC-ND 4.0
+      url: https://www.taylorfrancis.com/reader/download/92acbdcb-b168-48d0-a39c-108b9ba2bc4b/chapter/pdf?context=ubx
+outs:
+  - md5: 75f6a70ab9b216bb0090f089709cdceb
+    size: 15184
+    path: davenport_2021.xlsx

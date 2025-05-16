@@ -118,10 +118,9 @@ POST_TYPE_TO_URL = {
 # Dictionary that maps a link type (as defined in the posts_gdocs_links DB table) to the base url; adding the target to this base url gives a full URL to the linked content (e.g. a grapher chart).
 POST_LINK_TYPES_TO_URL = {
     "grapher": OWID_BASE_URL + "grapher/",
-    # Chart views, in theory, refer to narrative charts, which don't have a public URL.
+    # Narrative charts, which don't have a public URL.
     # They are handled separately.
-    # NOTE: there are chart views for non-narrative charts, so there may be other cases I'm not considering.
-    "chart-view": OWID_BASE_URL + "grapher/",
+    "narrative-charts": OWID_BASE_URL + "grapher/",
     "explorer": OWID_BASE_URL + "explorers/",
     "gdoc": "https://docs.google.com/document/d/",
     # A "url" link type links to an arbitrary URL.
@@ -681,15 +680,15 @@ def _get_post_references_of_charts_via_narrative_charts(chart_ids: Optional[List
         pgl.linkType AS link_type,
         pgl.componentType AS component_type,
         pg.publishedAt AS post_publication_date,
-        cv.id AS narrative_chart_id,
+        nc.id AS narrative_chart_id,
         pgl.target AS narrative_chart_slug
     FROM posts_gdocs pg
     JOIN posts_gdocs_links pgl ON pg.id = pgl.sourceId
-    LEFT JOIN chart_views cv ON pgl.target = cv.name
-    LEFT JOIN charts c ON cv.parentChartId = c.id
+    LEFT JOIN narrative_charts nc ON pgl.target = nc.name
+    LEFT JOIN charts c ON nc.parentChartId = c.id
     LEFT JOIN chart_configs cc ON c.configId = cc.id
     WHERE pg.published = 1
-    AND cv.id IS NOT NULL
+    AND nc.id IS NOT NULL
     """
     if chart_ids:
         chart_ids_str = ", ".join(str(cid) for cid in chart_ids)

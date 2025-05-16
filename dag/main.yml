@@ -638,7 +638,7 @@ steps:
     - data://garden/tourism/2024-08-17/unwto
     - data://garden/ggdc/2022-11-28/penn_world_table
     - data://garden/wb/2024-11-04/edstats
-    - data://garden/unesco/2024-06-25/education_sdgs
+    - data://garden/unesco/2025-05-01/education_sdgs
     - data://garden/happiness/2025-03-28/happiness
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
@@ -697,6 +697,22 @@ steps:
     - data://meadow/aviation/2025-04-01/air_traffic
   data://grapher/aviation/2025-04-01/air_traffic:
     - data://garden/aviation/2025-04-01/air_traffic
+
+  # UNODC - Access and Functioning of Justice
+  data://meadow/unodc/2025-05-12/justice:
+    - snapshot://unodc/2025-05-12/justice.xlsx
+  data://garden/unodc/2025-05-12/justice:
+    - data://meadow/unodc/2025-05-12/justice
+  data://grapher/unodc/2025-05-12/justice:
+    - data://garden/unodc/2025-05-12/justice
+
+  # UNODC - Corruption & Economic Crime
+  data://meadow/unodc/2025-05-12/corruption:
+    - snapshot://unodc/2025-05-12/corruption.xlsx
+  data://garden/unodc/2025-05-12/corruption:
+    - data://meadow/unodc/2025-05-12/corruption
+  data://grapher/unodc/2025-05-12/corruption:
+    - data://garden/unodc/2025-05-12/corruption
 
 include:
   - dag/open_numbers.yml

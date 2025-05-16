@@ -664,7 +664,7 @@ class ExplorerLegacy:
             self.df_columns = self.df_columns.drop(columns=["variableId"])
 
 
-def _create_explorer_legacy(
+def create_explorer_legacy(
     catalog_path: str,
     config: Dict[str, Any],
     df_graphers: pd.DataFrame,

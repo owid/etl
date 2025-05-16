@@ -1,19 +1,19 @@
 """Grapher step for the fossil fuel reserves-to-production ratio dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load garden dataset and read its main table.
     ds_garden = paths.load_dataset("fossil_fuel_reserves_production_ratio")
-    tb_garden = ds_garden["fossil_fuel_reserves_production_ratio"]
+    tb_garden = ds_garden.read("fossil_fuel_reserves_production_ratio", reset_index=False)
 
     # Create new grapher dataset.
-    dataset = create_dataset(dest_dir=dest_dir, tables=[tb_garden], check_variables_metadata=True)
+    dataset = paths.create_dataset(tables=[tb_garden])
     dataset.save()

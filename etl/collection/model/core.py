@@ -1,30 +1,28 @@
-"""WIP: Drafting a model for dealing with MDIM/Explorer configuration.
-
-This should be aligned with the MDIM schema.
-
-THINGS TO SOLVE:
-
-    - If an attribute is Optional, MetaBase.from_dict is not correctly loading it as the appropriate class when given.
-"""
+"""Model for collections."""
 
 import json
 import re
 from collections import defaultdict
+from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, ClassVar, Dict, List, Optional, Set, TypeGuard, TypeVar, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
 import fastjsonschema
 import pandas as pd
 import yaml
-from owid.catalog.meta import GrapherConfig, MetaBase
+from owid.catalog.meta import GrapherConfig
 from structlog import get_logger
 from typing_extensions import Self
 
+from apps.chart_sync.admin_api import AdminAPI
 from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.model.base import MDIMBase, pruned_json
+from etl.collection.model.dimension import Dimension, DimensionChoice
+from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
     get_complete_dimensions_filter,
-    merge_common_metadata_by_dimension,
+    map_indicator_path_to_id,
     unique_records,
     validate_indicators_in_db,
 )
@@ -32,201 +30,8 @@ from etl.config import OWID_ENV, OWIDEnv
 from etl.files import yaml_dump
 from etl.paths import EXPORT_DIR, SCHEMAS_DIR
 
-# Initialize logger.
+# Logging
 log = get_logger()
-
-
-CHART_DIMENSIONS = ["y", "x", "size", "color"]
-T = TypeVar("T")
-REGEX_CATALOG_PATH = (
-    r"^grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/[A-Za-z0-9_]+/[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
-)
-REGEX_CATALOG_PATH_OPTIONS = (
-    r"^(?:(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/)?[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
-)
-
-
-def prune_dict(d: dict) -> dict:
-    """Remove all keys starting with underscore and all empty values from a dictionary.
-
-    NOTE: This method was copied from owid.catalog.utils. It is slightly different in the sense that it does not remove fields with empty lists! This is because there are some fields which are mandatory and can be empty! (TODO: should probably fix the schema / engineering side)
-
-    """
-    out = {}
-    for k, v in d.items():
-        if not k.startswith("_") and v not in [None, {}]:
-            if isinstance(v, dict):
-                out[k] = prune_dict(v)
-            elif isinstance(v, list):
-                out[k] = [prune_dict(x) if isinstance(x, dict) else x for x in v if x not in [None, {}]]
-            else:
-                out[k] = v
-    return out
-
-
-def pruned_json(cls: T) -> T:
-    orig = cls.to_dict  # type: ignore
-
-    # only keep non-null public variables
-    # calling original to_dict returns dictionaries, not objects
-    cls.to_dict = lambda self, **kwargs: prune_dict(orig(self, **kwargs))  # type: ignore
-
-    return cls
-
-
-class MDIMBase(MetaBase):
-    def save_file(self, filename: Union[str, Path]) -> None:
-        filename = Path(filename).as_posix()
-        with open(filename, "w") as ostream:
-            json.dump(self.to_dict(), ostream, indent=2, default=str)
-
-
-@pruned_json
-@dataclass
-class Indicator(MDIMBase):
-    catalogPath: str
-    display: Optional[Dict[str, Any]] = None
-
-    def __post_init__(self):
-        # Validate that the catalog path is either (i) complete or (ii) in the format table#indicator.
-        if not self.is_a_valid_path(self.catalogPath):
-            raise ValueError(f"Invalid catalog path: {self.catalogPath}")
-
-    def has_complete_path(self) -> bool:
-        pattern = re.compile(REGEX_CATALOG_PATH)
-        complete = bool(pattern.match(self.catalogPath))
-        return complete
-
-    @classmethod
-    def is_a_valid_path(cls, path: str) -> bool:
-        """Valid paths are:
-        - grapher/namespace/version/dataset/table#indicator.
-        - dataset/table#indicator
-        - table#indicator
-        """
-        pattern = re.compile(REGEX_CATALOG_PATH_OPTIONS)
-        valid = bool(pattern.match(path))
-        return valid
-
-    def __setattr__(self, name, value):
-        """Validate that the catalog path is either (i) complete or (ii) in the format table#indicator."""
-        if hasattr(self, name):
-            if (name == "catalogPath") and (not self.is_a_valid_path(value)):
-                raise ValueError(f"Invalid catalog path: {value}")
-        return super().__setattr__(name, value)
-
-    def expand_path(self, tables_by_name: Dict[str, List[str]]):
-        # Do nothing if path is already complete
-        if self.has_complete_path():
-            return self
-
-        # If path is not complete, we need to expand it!
-        table_name, indicator_name = self.catalogPath.split("#")
-
-        # Check table is in any of the datasets!
-        assert (
-            table_name in tables_by_name
-        ), f"Table name `{table_name}` not found in dependency tables! Available tables are: {', '.join(tables_by_name.keys())}"
-
-        # Check table name to table mapping is unique
-        assert (
-            len(tables_by_name[table_name]) == 1
-        ), f"There are multiple dependencies (datasets) with a table named {table_name}. Please add dataset name (dataset_name/table_name#indicator_name) if you haven't already, or use the complete dataset URI in this case."
-
-        # Check dataset in table metadata is not None
-        tb_uri = tables_by_name[table_name][0]
-        # assert tb.m.dataset is not None, f"Dataset not found for table {table_name}"
-
-        # Build URI
-        self.catalogPath = tb_uri + "#" + indicator_name
-
-        return self
-
-
-@pruned_json
-@dataclass
-class ViewIndicators(MDIMBase):
-    """Indicators in a MDIM/Explorer view."""
-
-    y: Optional[List[Indicator]] = None
-    x: Optional[Indicator] = None
-    size: Optional[Indicator] = None
-    color: Optional[Indicator] = None
-
-    @property
-    def num_indicators(self) -> int:
-        """Get the total number of indicators in the view."""
-        return sum([1 for dim in CHART_DIMENSIONS if getattr(self, dim, None) is not None])
-
-    def has_non_y_indicators(self) -> bool:
-        """Check if the view has non-y indicators."""
-        return any([getattr(self, dim, None) is not None for dim in CHART_DIMENSIONS[1:]])
-
-    @classmethod
-    def from_dict(cls, d: Dict[str, Any]) -> "ViewIndicators":
-        """Coerce the dictionary into the expected shape before passing it to the parent class."""
-        # Make a shallow copy so we don't mutate the user's dictionary in-place
-        data = dict(d)
-
-        # Coerce each dimension field (y, x, size, color) from [str, ...] -> [{'path': str}, ...]
-        for dim in CHART_DIMENSIONS:
-            if dim in data:
-                if isinstance(data[dim], list):
-                    data[dim] = [{"catalogPath": item} if isinstance(item, str) else item for item in data[dim]]
-                else:
-                    if isinstance(data[dim], str):
-                        data[dim] = [{"catalogPath": data[dim]}] if dim == "y" else {"catalogPath": data[dim]}
-                    elif dim == "y":
-                        data[dim] = [data[dim]]
-        # Now that data is in the expected shape, let the parent class handle the rest
-        return super().from_dict(data)
-
-    def to_records(self) -> List[Dict[str, Union[str, Dict[str, Any]]]]:
-        indicators = []
-        for dim in CHART_DIMENSIONS:
-            dimension_val = getattr(self, dim, None)
-            if dimension_val is None:
-                continue
-            if isinstance(dimension_val, list):
-                for d in dimension_val:
-                    display = d.display if d.display is not None else {}
-                    indicator_ = {"path": d.catalogPath, "axis": dim, "display": display}
-                    indicators.append(indicator_)
-            else:
-                display = dimension_val.display if dimension_val.display is not None else {}
-                indicator_ = {
-                    "path": dimension_val.catalogPath,
-                    "axis": dim,
-                    "display": display,
-                }
-                indicators.append(indicator_)
-        return indicators
-
-    def expand_paths(self, tables_by_name: Dict[str, List[str]]):
-        """Expand the catalog paths of all indicators in the view."""
-        for dim in CHART_DIMENSIONS:
-            dimension_val = getattr(self, dim, None)
-            if dimension_val is None:
-                continue
-            if isinstance(dimension_val, list):
-                for indicator in dimension_val:
-                    indicator.expand_path(tables_by_name)
-            else:
-                dimension_val.expand_path(tables_by_name)
-
-        return self
-
-
-@pruned_json
-@dataclass
-class CommonView(MDIMBase):
-    dimensions: Optional[Dict[str, Any]] = None
-    config: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
-
-    @property
-    def num_dimensions(self) -> int:
-        return len(self.dimensions) if self.dimensions is not None else 0
 
 
 @pruned_json
@@ -505,15 +310,16 @@ class Collection(MDIMBase):
     dimensions: List[Dimension]
     views: List[View]
     catalog_path: str
+    title: Dict[str, str]
+    default_selection: List[str]
 
     _definitions: Definitions
 
-    # Private for fast access
-    # _views_hash: Optional[Dict[str, Any]] = None
-    # _dimensions_hash: Optional[Dict[str, Dimension]] = None
+    topic_tags: Optional[List[str]] = None
+    _default_dimensions: Optional[Dict[str, str]] = None
 
     # Internal use. For save() method.
-    _collection_type: Optional[str] = field(init=False, default=None)
+    _collection_type: Optional[str] = field(init=False, default="multidim")
 
     _group_operations_done: int = field(init=False, default=0)
 
@@ -530,6 +336,11 @@ class Collection(MDIMBase):
         else:
             data["_definitions"] = Definitions()
 
+        # If dictionary contains field 'definitions', change it for '_definitions'
+        if "default_dimensions" in data:
+            data["_default_dimensions"] = data["default_dimensions"]
+            del data["default_dimensions"]
+
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
@@ -540,6 +351,36 @@ class Collection(MDIMBase):
     @property
     def definitions(self) -> Definitions:
         return self._definitions
+
+    @property
+    def default_dimensions(self) -> Optional[Dict[str, str]]:
+        return self._default_dimensions
+
+    @default_dimensions.setter
+    def default_dimensions(self, view_dimensions: Dict[str, str]) -> None:
+        """Set the default view for the collection.
+
+        Args:
+            view_dimensions: Dictionary mapping dimension slugs to their choice values
+                representing the view that should be displayed by default.
+
+        Raises:
+            ValueError: If the view dimensions don't correspond to any existing view
+        """
+        # Validate that this view actually exists
+        if not isinstance(view_dimensions, dict):
+            raise ValueError(f"Cannot set default view to {view_dimensions}: must be of type `dict`")
+
+        found = False
+        for view in self.views:
+            if all(view.dimensions.get(dim) == choice for dim, choice in view_dimensions.items()):
+                found = True
+                break
+
+        if not found:
+            raise ValueError(f"Cannot set default view to {view_dimensions}: no view matches these dimensions")
+
+        self._default_dimensions = view_dimensions
 
     @property
     def v(self):
@@ -568,12 +409,7 @@ class Collection(MDIMBase):
 
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")
-        self.save_file(self.local_config_path)
-        # with open(self.local_config_path, "w") as f:
-        #     yaml_dump(config, f)
-
-    # def save(self):  # type: ignore[override]
-    #     pass
+        self.save_file(self.local_config_path, force_create=False)
 
     def save(  # type: ignore[override]
         self,
@@ -590,18 +426,11 @@ class Collection(MDIMBase):
         if prune_choices:
             self.prune_dimension_choices()
 
-        # TODO: Prune dimensions if only one choice is in use
-        if prune_dimensions:
-            self.prune_dimensions()
-
         # Ensure that all views are in choices
         self.validate_views_with_dimensions()
 
         # Validate duplicate views
         self.check_duplicate_views()
-
-        # Sort views based on dimension order
-        self.sort_views_based_on_dimensions()
 
         # Check that no choice name or slug is repeated
         self.validate_choice_uniqueness()
@@ -610,6 +439,16 @@ class Collection(MDIMBase):
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)
 
+        # Sort views based on dimension order
+        self.sort_views_based_on_dimensions()
+
+        # Pick default view first
+        self.sort_views_with_default_first()
+
+        # TODO: Prune dimensions if only one choice is in use
+        if prune_dimensions:
+            self.prune_dimensions()
+
         # Export config to local directory in addition to uploading it to MySQL for debugging.
         self.save_config_local()
 
@@ -617,13 +456,37 @@ class Collection(MDIMBase):
         self.upsert_to_db(owid_env)
 
     def upsert_to_db(self, owid_env: OWIDEnv):
-        raise NotImplementedError("Upser to DB must be implemented in children classes!")
+        # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
+        # TODO: I think we could move this to the Grapher side.
+        config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # Convert config from snake_case to camelCase
+        config = camelize(config, exclude_keys={"dimensions"})
+
+        # Upsert config via Admin API
+        admin_api = AdminAPI(owid_env)
+        admin_api.put_mdim_config(self.catalog_path, config)
 
     def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)
         if drop_definitions:
             dix = {k: v for k, v in dix.items() if k not in {"_definitions", "definitions"}}
         return dix
+
+    def get_dimension(self, slug: str) -> Dimension:
+        """Get dimension object with slug `slug`"""
+        for dim in self.dimensions:
+            if dim.slug == slug:
+                return dim
+        raise ValueError(f"Dimension {slug} not found in dimensions!")
+
+    def get_choice_names(self, dimension_slug: str) -> Dict[str, str]:
+        """Get all choice names in a given dimension."""
+        dimension = self.get_dimension(dimension_slug)
+        choice_names = {}
+        for choice in dimension.choices:
+            choice_names[choice.slug] = choice.name
+        return choice_names
 
     def validate_views_with_dimensions(self):
         """Validates that dimensions in all views are valid:
@@ -698,6 +561,12 @@ class Collection(MDIMBase):
 
     def sort_choices(self, slug_order: Dict[str, Union[List[str], Callable]]):
         """Sort choices based on the given order."""
+        not_expected = set(slug_order).difference(self.dimension_slugs)
+        if not_expected:
+            raise ValueError(
+                f"Dimension slug{'s' if len(not_expected) > 1 else ''} {not_expected} not found in dimensions! Available dimensions are: {self.dimension_slugs}"
+            )
+
         for dim in self.dimensions:
             if dim.slug in slug_order:
                 dim.sort_choices(slug_order[dim.slug])
@@ -715,6 +584,34 @@ class Collection(MDIMBase):
             )
 
         self.views = sorted(self.views, key=sort_key)
+
+    def sort_views_with_default_first(self):
+        # If default dimensions are specified, move that view to the front
+        if not self.default_dimensions:
+            return
+
+        # Find the default view
+        default_view = None
+        for view in self.views:
+            # Check if this view matches exactly the default dimensions
+            if view.dimensions.keys() == self.default_dimensions.keys() and all(
+                view.dimensions[dim] == choice for dim, choice in self.default_dimensions.items()
+            ):
+                default_view = view
+                break
+
+        # If no matching view was found, show available options and raise error
+        if not default_view:
+            df = pd.DataFrame([v.dimensions for v in self.views])
+            dimensions_str = "\n".join([f"{k}: {v}" for k, v in self.default_dimensions.items()])
+            raise ValueError(
+                f"No view matches dimensions:\n\n{dimensions_str}\n\n"
+                f"Available dimensions in views are:\n\n{df.to_string()}"
+            )
+
+        # Move the default view to the front
+        self.views.remove(default_view)
+        self.views.insert(0, default_view)
 
     def validate_choice_uniqueness(self):
         """Validate that all choice names (and slugs) are unique."""
@@ -778,25 +675,15 @@ class Collection(MDIMBase):
         """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
 
         Args:
-        -----
-        dimensions: Dict[str, Union[List[str], str]]
-            Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
-
-            Example 1: dimensions = {"sex": "female"}
-
-                Drop all views that have "female" in dimension sex.
-
-            Example 2: dimensions = {"age": ["0-4", "5-9"]}
-
-                Drop all views that have "0-4" OR "5-9" in dimension age.
-
-            Example 3: dimensions = {"age": ["0-4", "5-9"], "sex": ["female", "male"]}
-
-                Drop all views that have ("0-4" OR "5-9" in dimension age) AND ("female" OR "male" in dimension "sex"). The rest is kept.
-
-            Example 4: dimensions = [{"sex": "female", "age": "0-4"}, {"sex": "male", "age": "5-9"}]
-
-                Drop all views that have { ("0-4" in dimension "age") AND ("female" in dimension "sex") } OR { ("5-9" in dimension "age") AND ("male" in dimension "sex") }
+            dimensions (Dict[str, Union[List[str], str]]): Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
+                    - Example 1: `dimensions = {"sex": "female"}`.
+                        Drop all views that have "female" in dimension sex.
+                    - Example 2: `dimensions = {"age": ["0-4", "5-9"]}`.
+                        Drop all views that have "0-4" OR "5-9" in dimension age.
+                    - Example 3: `dimensions = {"age": ["0-4", "5-9"], "sex": ["female", "male"]}`.
+                        Drop all views that have ("0-4" OR "5-9" in dimension age) AND ("female" OR "male" in dimension "sex"). The rest is kept.
+                    - Example 4: `dimensions = [{"sex": "female", "age": "0-4"}, {"sex": "male", "age": "5-9"}]`.
+                        Drop all views that have { ("0-4" in dimension "age") AND ("female" in dimension "sex") } OR { ("5-9" in dimension "age") AND ("male" in dimension "sex") }
         """
         # Get dimensions in use, and list of dimension slugs (ordered, used for key-identifying views)
         dimensions_available = self.dimension_choices_in_use()
@@ -834,6 +721,21 @@ class Collection(MDIMBase):
 
         Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
 
+        Args:
+            params (List[Dict[str, Any]]): List of dictionaries with the following keys:
+                    - dimension: str
+                        Slug of the dimension that contains the choices to group.
+                    - choices: List[str]
+                        Slugs of the choices to group.
+                    - choice_new_slug: str
+                        The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
+                    - config_new: Optional[Dict[str, Any]], default=None
+                        The view config for the new choice. E.g. useful to tweak the chart type.
+                    - replace: Optional[bool], default=False
+                        If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
+                    - overwrite_dimension_choice: Optional[bool], default=False
+                        If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
+
         Example:
         --------
 
@@ -852,22 +754,7 @@ class Collection(MDIMBase):
 
         In this example, we have `dimension="sex"`, `choices=["female", "male"]`, and `choice_new_slug="combined"`.
 
-        Args:
-        -----
-        params: List[Dict[str, Any]]
-            List of dictionaries with the following keys:
-                - dimension: str
-                    Slug of the dimension that contains the choices to group.
-                - choices: List[str]
-                    Slugs of the choices to group.
-                - choice_new_slug: str
-                    The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
-                - config_new: Optional[Dict[str, Any]], default=None
-                    The config for the new choice. E.g. useful to tweak the chart type.
-                - replace: Optional[bool], default=False
-                    If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
-                - overwrite_dimension_choice: Optional[bool], default=False
-                    If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
+
         """
         new_views_all = []
         for p in params:
@@ -905,7 +792,10 @@ class Collection(MDIMBase):
             # Add dimensions. TODO: Use combine_dimensions instead?
             for dim in self.dimensions:
                 if (dim.slug == dimension) and (choice_new_slug not in dim.choice_slugs):
-                    new_choice = DimensionChoice(slug=choice_new_slug, name=choice_new_slug)
+                    new_choice = DimensionChoice(
+                        slug=choice_new_slug,
+                        name=choice_new_slug,
+                    )
                     # Add new choice to dimension
                     dim.choices.append(new_choice)
                     break
@@ -999,14 +889,16 @@ class Collection(MDIMBase):
         return new_views
 
 
-def _combine_view_indicators(views):
+def _combine_view_indicators(views: List[View]):
     y_indicators = []
     for view in views:
         if view.indicators.has_non_y_indicators():
             raise NotImplementedError(
                 "Merging indicators from views is only implemented for views with *only* y indicators."
             )
-        y_indicators.extend(view.indicators.y)
+        if view.indicators.y is None:
+            raise ValueError("View must have y indicators to be combined.")
+        y_indicators.extend(deepcopy(view.indicators.y))
 
     indicators = ViewIndicators(y=y_indicators)
     return indicators
@@ -1020,3 +912,75 @@ def check_duplicate_views(views: List[View]):
         if dims in seen_dims:
             raise DuplicateCollectionViews(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
         seen_dims.add(dims)
+
+
+def replace_catalog_paths_with_ids(config):
+    """Replace special metadata fields with their corresponding IDs in the database.
+
+    In ETL, we allow certain fields in the config file to reference indicators by their catalog path. However, this is not yet supported in the Grapher API, so we need to replace these fields with the corresponding indicator IDs.
+
+    NOTE: I think this is something that we should discuss changing on the Grapher side. So I see this function as a temporary workaround.
+
+    Currently, affected fields are:
+
+    - views[].config.sortColumnSlug
+
+    These fields above are treated like fields in `dimensions`, and also accessed from:
+    - `expand_catalog_paths`: To expand the indicator URI to be in its complete form.
+    - `validate_multidim_config`: To validate that the indicators exist in the database.
+
+    TODO: There might be other fields which might make references to indicators:
+        - config.map.columnSlug
+        - config.focusedSeriesNames
+    """
+    if "views" in config:
+        views = config["views"]
+        for view in views:
+            if "config" in view:
+                # Update sortColumnSlug
+                if "sortColumnSlug" in view["config"]:
+                    # Check if catalogPath
+                    # Map to variable ID
+                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
+                # Update map.columnSlug
+                if "map" in view["config"]:
+                    if "columnSlug" in view["config"]["map"]:
+                        view["config"]["map"]["columnSlug"] = str(
+                            map_indicator_path_to_id(view["config"]["map"]["columnSlug"])
+                        )
+
+    return config
+
+
+_pattern = re.compile(r"_([a-z])")
+
+
+def snake_to_camel(s: str) -> str:
+    # Use the compiled pattern to substitute underscores with the uppercase letter.
+    return _pattern.sub(lambda match: match.group(1).upper(), s)
+
+
+# model.core
+def camelize(obj: Any, exclude_keys: Optional[Set[str]] = None) -> Any:
+    """
+    Recursively converts dictionary keys from snake_case to camelCase, unless the key is in exclude_keys.
+
+    Parameters:
+        obj: The object (dict, list, or other) to process.
+        exclude_keys: An optional iterable of keys that should not be converted (including nested values).
+    """
+    exclude_keys = exclude_keys or set()
+
+    if isinstance(obj, dict):
+        new_obj: dict[Any, Any] = {}
+        for key, value in obj.items():
+            # Leave the key unchanged if it's in the exclusion list
+            if key in exclude_keys:
+                new_obj[key] = value
+            else:
+                new_obj[snake_to_camel(key)] = camelize(value, exclude_keys)
+        return new_obj
+    elif isinstance(obj, list):
+        return [camelize(item, exclude_keys) for item in obj]
+    else:
+        return obj
