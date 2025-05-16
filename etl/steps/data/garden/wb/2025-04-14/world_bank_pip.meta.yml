@@ -586,6 +586,19 @@ definitions:
     - Ethiopia
     - Madagascar
 
+  entity_names_prosperity_gap: &entity_names_prosperity_gap
+    - Norway
+    - United Kingdom
+    - Russia
+    - China
+    - Brazil
+    - India
+    - Mali
+    - Philippines
+    - Democratic Republic of Congo
+    - Mozambique
+    - United States
+
   # This is the ID of the Google Doc that contains the FAQs
   gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
 
@@ -1052,6 +1065,21 @@ tables:
             <% endif %>
           numDecimalPlaces: 1
           <<: *common_display
+        presentation:
+          grapher_config:
+            title: "Prosperity gap"
+            subtitle: Average factor by which incomes need to be multiplied to bring everyone to the prosperity standard of {definitions.prosperity_gap_threshold} per person per day. {definitions.ppp_adjustment_subtitle}
+            note: "{definitions.note_ppp}"
+            hasMapTab: "{definitions.hasmaptab}"
+            tab: "{definitions.tab}"
+            yAxis:
+              min: 0
+            map:
+              colorScale:
+                baseColorScheme: "RdPu"
+                binningStrategy: "manual"
+                customNumericValues: [1, 2, 5, 10, 20, 1]
+            selectedEntityNames: *entity_names_prosperity_gap
 
       # INEQUALITY
       gini:
