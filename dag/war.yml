@@ -54,6 +54,7 @@ steps:
     - snapshot://war/latest/ucdp_ced_v24_01_24_12.csv
   data://garden/war/latest/ucdp_preview:
     - data://meadow/war/2024-08-26/ucdp
+    - data://garden/war/2024-08-26/ucdp
     - data://garden/geography/2023-11-28/nat_earth_110
     - data://garden/demography/2024-07-15/population
     - data://garden/countries/2024-08-27/gleditsch
