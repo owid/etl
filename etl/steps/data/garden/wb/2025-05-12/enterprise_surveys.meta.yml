@@ -19,7 +19,7 @@ tables:
     variables:
       bribery_incidence__percent_of_firms_experiencing_at_least_one_bribe_payment_request:
         title: Share of businesses asked for bribes
-        description_short: The percentage of businesses that encountered at least one bribe request when dealing with six public services—such as utility connections, construction permits, tax meetings, and license applications.
+        description_short: The percentage of businesses that encountered at least one bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials.
         description_from_producer: |-
           The percentage of firms experiencing at least one bribe payment request across six types of public transactions: electrical and water connections, construction permits, meetings with tax officials, import licenses, and operating licenses. Refusals are treated as affirmative responses.
         description_key:
