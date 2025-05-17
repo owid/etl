@@ -35,10 +35,16 @@ def run() -> None:
     ]
 
     # Note that the regional and global averages are actually computed by taking the most recent survey results from each country.
-    tb.loc[tb["country"].isin(regions_to_update), "Year"] = tb.loc[tb["country"].isin(regions_to_update), "Year"] = tb[
-        "Year"
-    ].max()
+    # Count non-NaN Year values for each country in that subset
+    valid_counts = tb.groupby("country")["Year"].apply(lambda x: x.notna().sum())
 
+    # Identify countries with more than 10 non-NaN values
+    countries_to_update = valid_counts[valid_counts > 10].index
+
+    # Find the max Year across the whole DataFrame
+    most_recent_year = tb["Year"].max()
+    # Update the Year for only the selected countries
+    tb.loc[tb["country"].isin(countries_to_update), "Year"] = most_recent_year
     # Improve tables format.
     tables = [tb.format(["country", "year"])]
 
