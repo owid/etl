@@ -1,0 +1,23 @@
+dataset:
+  update_period_days: 365
+
+tables:
+  nuclear_weapons_tests:
+    title: "Nuclear Weapons Tests"
+    variables:
+      nuclear_weapons_tests:
+        title: Number of nuclear weapons tests
+        unit: tests
+        short_unit: ""
+        description_key:
+          - The number of nuclear tests for the United States does not include the bombings of Hiroshima and Nagasaki.
+          - This data only includes nuclear tests announced or reported by governments and/or intergovernmental organizations.
+          - This data does not include the "Vela Incident" of 1979 because it has not yet officially been declared a nuclear test explosion by any government or intergovernmental organization, although there is strong evidence that suggests it was.
+          - India's three simultaneous nuclear test explosions on May 11 are counted as only one, as are the two explosions on May 13. Likewise, Pakistan's five simultaneous explosions on May 28 are counted as a single test.
+        processing_level: minor
+        presentation:
+          topic_tags:
+            - Nuclear Weapons
+            - War & Peace
+        display:
+          numDecimalPlaces: 0
