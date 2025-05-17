@@ -228,7 +228,7 @@ def edit_view_title(view, conflict_renames):
         }
     elif view.dimensions["indicator"] == "num_conflicts":
         if view.dimensions["conflict_type"] == "one-sided violence":
-            title = f"Number of conflicts with {conflict_name}"
+            title = "Number of episodes of one-sided violence"
         else:
             title = f"Number of {conflict_name}"
         view.config = {
