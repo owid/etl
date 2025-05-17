@@ -19,7 +19,7 @@ tables:
     variables:
       bribery_incidence__percent_of_firms_experiencing_at_least_one_bribe_payment_request:
         title: Share of businesses asked for bribes
-        description_short: The percentage of businesses that faced at least one request for a bribe when dealing with six types of public services, including getting electricity or water connections, obtaining construction permits, meeting with tax officials, and applying for import and operating licenses.
+        description_short: The percentage of businesses that encountered at least one bribe request when dealing with six public services—such as utility connections, construction permits, tax meetings, and license applications.
         description_from_producer: |-
           The percentage of firms experiencing at least one bribe payment request across six types of public transactions: electrical and water connections, construction permits, meetings with tax officials, import licenses, and operating licenses. Refusals are treated as affirmative responses.
         description_key:
@@ -176,7 +176,7 @@ tables:
 
       percent_of_firms_identifying_corruption_as_a_major_or_very_severe_constraint:
           title: Share of firms reporting corruption as a major constraint
-          description_short: The percentage of businesses that say corruption is a major or very serious problem for their operations
+          description_short: The percentage of businesses that say corruption is a major or very serious problem for their operations.
           description_from_producer: |-
             Percentage of firms that identify corruption as either a "major" or "very severe" obstacle to the current operations of their business.
           description_key:
