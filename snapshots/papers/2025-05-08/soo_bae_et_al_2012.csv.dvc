@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Soo Bae J., Won Joo, R. and Kim, Y.S.
+    title: "Forest transition in South Korea: Reality, path and drivers"
+    citation_full: |-
+      Jae Soo Bae, Rin Won Joo, Yeon-Su. Kim, Forest transition in South Korea: Reality, path and drivers, Land Use Policy, Volume 29, Issue 1, 2012, https://doi.org/10.1016/j.landusepol.2011.06.007.
+    attribution_short: Soo Bae et al.
+    url_main: |-
+      https://www.sciencedirect.com/science/article/abs/pii/S0264837711000615
+    date_accessed: "2025-05-08"
+    date_published: "2012-01-01"
+    license:
+      name: Copyright © 2011 Elsevier Ltd. All rights reserved.
+      url: https://www.sciencedirect.com/science/article/abs/pii/S0264837711000615
+outs:
+  - md5: e82f2f2482e155469b7c21fbb4a22cfe
+    size: 393
+    path: soo_bae_et_al_2012.csv

@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Yi-Ying Chen et al.
+    title: Reconstructing Taiwan’s land cover changes between 1904 and 2015 from historical maps and satellite images
+    citation_full: |-
+      Chen YY, Huang W, Wang WH, Juang JY, Hong JS, Kato T, Luyssaert S. Reconstructing Taiwan's land cover changes between 1904 and 2015 from historical maps and satellite images. Sci Rep. 2019 Mar 6;9(1):3643. doi: 10.1038/s41598-019-40063-1. PMID: 30842476; PMCID: PMC6403323.
+    attribution_short: Yi-Ying Chen et al.
+    url_main: |-
+      https://www.nature.com/articles/s41598-019-40063-1
+    date_accessed: "2025-05-07"
+    date_published: "2019-03-06"
+    license:
+      name: CC BY 4.0
+      url: https://www.nature.com/articles/s41598-019-40063-1#rightslink
+outs:
+  - md5: 14e18f1358ea3c36b4a87dcaf0e322ae
+    size: 627
+    path: taiwan_forest_share.csv
