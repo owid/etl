@@ -201,7 +201,7 @@ def run(dest_dir: str) -> None:
     ds_regions = paths.load_dataset("regions")
     ds_wdi = paths.load_dataset("wdi")
     ds_hdr = paths.load_dataset("undp_hdr")
-    ds_pip = paths.load_dataset("world_bank_pip")
+    ds_pip = paths.load_dataset("world_bank_pip_legacy")
     ds_who = paths.load_dataset("who")
     ds_ghe = paths.load_dataset("ghe")
 
@@ -380,6 +380,7 @@ def add_external_indicators(
     tb_hdr = tb_hdr.rename(columns={"hdi": "human_development_index"})
 
     # PIP
+    # TODO: Change when PPP prices are updated: year and poverty line
     tb_pip = ds_pip["income_consumption_2017"].reset_index()
     tb_pip = tb_pip.loc[tb_pip["year"] > 2010, ["country", "year", "headcount_ratio_215"]]
     ## get most recent data
