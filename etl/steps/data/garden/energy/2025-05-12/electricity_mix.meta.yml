@@ -8,11 +8,11 @@ definitions:
     description_processing: |-
       - We rely on Ember as the primary source of electricity data. While the Energy Institute (EI) provides primary energy (not just electricity) consumption data and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990), EI does not provide data for all countries or for all sources of electricity (for example, only Ember provides data on electricity from bioenergy). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
   description_short_twh: &description_short_twh |-
-    Measured in terawatt-hours.
+    Measured in [terawatt-hours](#dod:watt-hours).
   description_short_pct: &description_short_pct |-
     Measured as a percentage of total electricity.
   description_short_per_capita: &description_short_per_capita |-
-    Measured in kilowatt-hours per person.
+    Measured in [kilowatt-hours](#dod:watt-hours) per person.
   description_processing_direct_primary_energy: |-
     - The Statistical Review of World Energy only provides data on input-equivalent primary energy consumption, not on direct primary energy consumption. We estimate the direct primary energy consumption as the sum of the primary energy consumption from coal, oil, gas, and biofuels, plus the electricity generation from low-carbon sources (nuclear, hydro, wind, solar, bioenergy and other renewables). Finally, the share of electricity in direct primary energy consumption is calculated as the ratio of total electricity generation to direct primary energy consumption (multiplied by 100).
   description_short_low_carbon: &description_short_low_carbon |-
@@ -48,7 +48,7 @@ tables:
         short_unit: gCO₂
         unit: grams of CO₂ equivalents per kilowatt-hour
         description_short: |-
-          Greenhouse gases emitted per unit of generated electricity, measured in grams of CO₂ equivalents per kilowatt-hour.
+          Greenhouse gases emitted per unit of generated electricity, measured in grams of [CO₂ equivalents](#dod:carbondioxideequivalents) per [kilowatt-hour](#dod:watt-hours).
         display:
           name: Carbon intensity
         presentation:
@@ -395,7 +395,7 @@ tables:
         title: Primary energy consumption - TWh
         short_unit: TWh
         unit: terawatt-hours
-        description_short: Measured in terawatt-hours, using the substitution method.
+        description_short: Measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod).
         display:
           name: Primary energy consumption
         presentation:
@@ -404,7 +404,7 @@ tables:
         title: Direct primary energy consumption - TWh
         short_unit: TWh
         unit: terawatt-hours
-        description_short: Measured in terawatt-hours.
+        description_short: Measured in [terawatt-hours](#dod:watt-hours).
         description_processing: |-
           {definitions.common.description_processing}
           {definitions.description_processing_direct_primary_energy}
@@ -492,7 +492,7 @@ tables:
         title: Emissions - MtCO2
         short_unit: Mt
         unit: million tonnes CO₂ equivalents
-        description_short: Measured in megatonnes of CO₂ equivalents.
+        description_short: Measured in megatonnes of [CO₂ equivalents](#dod:carbondioxideequivalents).
         display:
           name: Emissions
         presentation:
@@ -511,7 +511,7 @@ tables:
         short_unit: TWh
         unit: terawatt-hours
         description_short: |-
-          Electricity imports minus exports, measured in TWh.
+          Electricity imports minus exports, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Net imports
         presentation:
