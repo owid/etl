@@ -725,7 +725,7 @@ steps:
   data://grapher/corruption/2025-05-12/corruption_barometer:
     - data://garden/corruption/2025-05-12/corruption_barometer
   export://multidim/corruption/latest/corruption_barometer:
-    - data://garden/corruption/2025-05-12/corruption_barometer
+    - data://grapher/corruption/2025-05-12/corruption_barometer
 
 include:
   - dag/open_numbers.yml

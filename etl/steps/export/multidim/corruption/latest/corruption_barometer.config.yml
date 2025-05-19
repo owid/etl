@@ -1,8 +1,8 @@
 title:
-  title: TODO
-  title_variant: TODO
+  title: Perception of corruption
+  title_variant: by institution
 default_selection:
   - World
-
-dimensions: []
+  - Europe
+  - Asia
 views: []
