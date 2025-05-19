@@ -10,7 +10,7 @@ definitions:
   description_short_twh: &description_short_twh |-
     Measured in [terawatt-hours](#dod:watt-hours).
   description_short_pct: &description_short_pct |-
-    Measured as a percentage of total electricity.
+    Measured as a percentage of total electricity produced in the country or region.
   description_short_per_capita: &description_short_per_capita |-
     Measured in [kilowatt-hours](#dod:watt-hours) per person.
   description_processing_direct_primary_energy: |-
@@ -148,7 +148,7 @@ tables:
         short_unit: '%'
         unit: '%'
         description_short: |-
-          Electricity imports minus exports, measured as a percentage of total electricity demand.
+          Electricity imports minus exports, measured as a percentage of total electricity demand in the country or region.
         presentation:
           title_public: Net electricity imports as a share of demand
       nuclear_generation__twh:
@@ -480,7 +480,7 @@ tables:
         title: Electricity generation as share of direct primary energy consumption - %
         short_unit: '%'
         unit: '%'
-        description_short: Measured as a percentage of total, direct primary energy consumption.
+        description_short: Measured as a percentage of total, direct primary energy consumption in the country or region.
         description_processing: |-
           {definitions.common.description_processing}
           {definitions.description_processing_direct_primary_energy}
