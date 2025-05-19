@@ -42,7 +42,8 @@ tables:
           description_key:
             - Measures the percentage of firm interactions—out of six specific types of public service applications—that involved a bribe or informal payment request.
             - These six types include applications for import licenses, operating licenses, construction permits, water connections, electricity connections, and interactions with tax officials.
-            - Captures the depth of bribery by measuring the share of routine regulatory interactions that involve a bribe request.            - A refusal to answer any of the six bribery-related questions is treated as an affirmative response.
+            - Captures the depth of bribery by measuring the share of routine regulatory interactions that involve a bribe request.
+            - A refusal to answer any of the six bribery-related questions is treated as an affirmative response.
             - Highlights how administrative inefficiencies can create opportunities for corruption and informal payments.
             - Regional and global averages are calculated by the World Bank as simple averages of country-level results, using the most recent survey available per country since 2014.
 
