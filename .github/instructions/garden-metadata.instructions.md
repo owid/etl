@@ -1,5 +1,5 @@
 ---
-applyTo: "**/garden/**/*.meta.yml"
+applyTo: "**/etl/steps/data/garden/**/*.meta.yml"
 ---
 
 ## Instructions

@@ -34,6 +34,8 @@ This repository contains the ETL (Extract, Transform, Load) system for Our World
 - We use `pytest` for testing
 
 ## File Structure Conventions
+- Steps for building datasets are in the `etl/steps` directory
+- Core ETL code is in the `etl/` directory
 - Snapshots are stored in `snapshots/<producer>/<date>/` directories
 - Python processing code for snapshots is in `.py` files with the same name
 - DVC files (`.dvc`) track the large data files
