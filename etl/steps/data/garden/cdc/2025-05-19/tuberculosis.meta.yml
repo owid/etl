@@ -43,7 +43,7 @@ tables:
         title: Tuberculosis deaths (pre-1979)
         description_short: Reported deaths from tuberculosis.
         description_key:
-          - Deaths before 1980 included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
+          - Before 1979, this variable had a broader definition and included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
         unit: deaths
       tb_deaths_rate:
         title: Tuberculosis deaths per 100,000 people (pre-1979)
@@ -55,7 +55,7 @@ tables:
         title: Tuberculosis deaths (post-1979)
         description_short: Reported deaths from tuberculosis.
         description_key:
-          - Deaths before 1980 included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
+          - Before 1979, this variable had a broader definition and included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
         unit: deaths
       tb_deaths_rate:
         title: Tuberculosis deaths per 100,000 people (post-1979)
