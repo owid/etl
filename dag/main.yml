@@ -738,6 +738,7 @@ steps:
   data://grapher/corruption/2025-05-12/corruption_barometer:
     - data://garden/corruption/2025-05-12/corruption_barometer
 
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
@@ -777,3 +778,4 @@ include:
   - dag/families.yml
   - dag/technology.yml
   - dag/redistribution.yml
+  - dag/corruption.yml
