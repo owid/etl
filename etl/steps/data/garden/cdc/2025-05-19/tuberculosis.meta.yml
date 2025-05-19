@@ -1,0 +1,67 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  cases_before_1975:
+    variables:
+      tb_cases_no:
+        title: Reported cases of tuberculosis before 1975
+        description_short:
+        description_key:
+        unit: cases
+      tb_cases_rate:
+        title: Reported cases of tuberculosis per 100,000 people before 1975
+        description_short:
+        description_key:
+        unit: cases per 100,000 people
+  cases_after_1975:
+    variables:
+      tb_cases_no:
+        title: Reported cases of tuberculosis after 1975
+        description_short:
+        description_key:
+          - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptome, or if they have laboratory confirmed diagnosis.
+          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than 1 year apart.
+        unit: cases
+      tb_cases_rate:
+        title: Reported cases of tuberculosis per 100,000 people after 1975
+        description_short:
+        description_key:
+          - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptome, or if they have laboratory confirmed diagnosis.
+          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than 1 year apart.
+        unit: cases per 100,000 people
+  deaths_before_1980:
+    variables:
+      tb_deaths_no:
+        title: Deaths from tuberculosis before 1980
+        description_short:
+        description_key:
+          - Deaths before 1980 included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
+        unit: deaths
+      tb_deaths_rate:
+        title: Deaths from tuberculosis per 100,000 people before 1980
+        description_short:
+        description_key:
+        unit: deaths per 100,000 people
+  deaths_after_1980:
+    variables:
+      tb_deaths_no:
+        title:
+        description_short:
+        description_key:
+          - Deaths before 1980 included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
+        unit: deaths
+      tb_deaths_rate:
+        title:
+        description_short:
+        description_key:
+        unit: deaths per 100,000 people
