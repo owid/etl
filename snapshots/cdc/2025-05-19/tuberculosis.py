@@ -59,6 +59,8 @@ def download_data_table() -> pd.DataFrame:
     ]
     # Create DataFrame
     df = pd.DataFrame(data, columns=column_names)
+    # Get the first four digits of the year and convert to int (there are some years with superscripts that are being incorrectly parsed)
+    df["Year"] = df["Year"].str.extract(r"(\d{4})")[0].astype(int)
 
     return df
 

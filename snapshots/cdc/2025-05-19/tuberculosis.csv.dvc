@@ -20,6 +20,6 @@ meta:
     license:
       name: CC BY 4.0
 outs:
-  - md5: 5d97d0c06202a85aae924ec35762018f
-    size: 3692
+  - md5: 0134ef994ed33f1132f05c89fbac5cf6
+    size: 3690
     path: tuberculosis.csv
