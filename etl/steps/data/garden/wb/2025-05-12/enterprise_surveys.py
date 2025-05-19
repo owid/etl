@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import numpy as np
-
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -24,10 +22,6 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
-    for col in tb.columns:
-        if col not in ["country", "year"] and tb[col].dtype == "string":
-            tb[col] = tb[col].replace("n.a.", np.nan)
-            tb[col] = tb[col].astype("float")
 
     # Improve table format.
     tb = tb.format(["country", "year"])
