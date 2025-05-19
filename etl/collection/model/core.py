@@ -21,6 +21,7 @@ from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
+    fill_placeholders,
     get_complete_dimensions_filter,
     map_indicator_path_to_id,
     unique_records,
@@ -472,55 +473,102 @@ class Collection(MDIMBase):
                 new_views.append(view)
         self.views = new_views
 
-    def group_views(self, params: List[Dict[str, Any]], drop_dimensions_if_single_choice: bool = True):
+    def group_views(self, groups: List[Dict[str, Any]], drop_dimensions_if_single_choice: bool = True):
         """Group views into new ones.
 
         Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
 
         Args:
-            params (List[Dict[str, Any]]): List of dictionaries with the following keys:
+            groups (List[Dict[str, Any]]): List of dictionaries with the following keys:
                     - dimension: str
                         Slug of the dimension that contains the choices to group.
                     - choices: List[str]
-                        Slugs of the choices to group.
+                        Slugs of the choices to group. If none, all choices are used!
                     - choice_new_slug: str
                         The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
-                    - config_new: Optional[Dict[str, Any]], default=None
+                    - view_config: Optional[Dict[str, Any]], default=None
                         The view config for the new choice. E.g. useful to tweak the chart type.
                     - replace: Optional[bool], default=False
                         If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
                     - overwrite_dimension_choice: Optional[bool], default=False
                         If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
+                    - view_params: Dict[str, Any]
+                        Define any parameters that might be used in `view_config`. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
 
-        Example:
-        --------
+        Example 1:
+        ----------
 
-        Suppose you have two dimensions 'sex' and 'age' with the following choices:
+        Suppose you have two dimensions
 
-            sex: 'female', 'male'
-            age: '0-4', '5-9', '10-14'
+        - sex: 'female', 'male'
+        - age: '0-4', '5-9', '10-14'
 
-        Each view shows a single timeseries. E.g. for sex="female" and age="0-4", you observe a timeseries for the indicator for these specific dimension choices.
-
-        Now, you now want to create a new view, with sex="combined", where the user can observe both timeseries (female and male) in a single view. Hence you'd end up with the following choices:
+        Each view shows a single timeseries. Now, you now want to create a new view, with sex="combined", where the user can observe both timeseries (female and male) in a single view. Hence you'd end up with the following choices:
 
             sex: 'female', 'male', 'combined'
             age: '0-4', '5-9', '10-14'
 
 
-        In this example, we have `dimension="sex"`, `choices=["female", "male"]`, and `choice_new_slug="combined"`.
+        In this example, you should use method arguments as `dimension="sex"`, `choices=["female", "male"]`, and `choice_new_slug="combined"`.
 
+        Example 2:
+        ----------
+        Sometimes, you may want to define config for the new views. In the example above, you have generated new views for male+female in three different age brackets. Suppose that you want to set the titles each of the three new views: "Population of people aged 0-4", "Population of people aged 5-9", and "Population of people aged 0-4 and 5-9", respectively.
 
+        You can programmatically do this with `view_config` and `view_params` (see code snippets below). Basically, you need to define a title template in `view_config`, and then pass the parameters in `view_params`. The template will be filled with the values in `view_params`.
+
+        ```python
+        c.group_views(
+            groups=[
+                {
+                    "dimension": "sex",
+                    "view_config": {
+                        "title": "Population of people aged {age}",
+                    }
+                    "view_params": {
+                        "age": "0-4",
+                    },
+                }
+            ]
+        )
+        ```
+
+        You can also use a function to dynamically generate a parameter:
+
+        ```python
+        c.group_views(
+            groups=[
+                {
+                    "dimension": "sex",
+                    "view_config": {
+                        "title": "Population of people aged {age}",
+                    }
+                    "view_params": {
+                        "age": lambda view: view.dimensions["age"],
+                    },
+                }
+            ]
+        )
+        ```
         """
         new_views_all = []
-        for p in params:
-            assert "dimension" in p, "Dimension must be provided!"
-            assert "choices" in p, "Dimension must be provided!"
-            assert "choice_new_slug" in p, "Dimension must be provided!"
-            dimension = p["dimension"]
-            choices = p["choices"]
-            choice_new_slug = p["choice_new_slug"]
-            config_new = p.get("config_new")
+        for group in groups:
+            # Get dimension slug
+            assert "dimension" in group, "Dimension must be provided!"
+            dimension = group["dimension"]
+            # Get choice slugs
+            if "choices" not in group:
+                choices = self.get_dimension(dimension).choice_slugs
+            else:
+                choices = group["choices"]
+
+            # Get new choice slug
+            assert "choice_new_slug" in group, "Dimension must be provided!"
+            choice_new_slug = group["choice_new_slug"]
+
+            # Config of new views
+            view_config = group.get("view_config")
+            view_params = group.get("view_params")
 
             # Sanity checks
             self._sanity_check_view_grouping(
@@ -534,11 +582,12 @@ class Collection(MDIMBase):
                 dimension=dimension,
                 choices=choices,
                 choice_new_slug=choice_new_slug,
-                config_new=config_new,
+                view_config=view_config,
+                view_params=view_params,
             )
             new_views_all.append(
                 {
-                    "overwrite": p.get("overwrite_dimension_choice", False),
+                    "overwrite": group.get("overwrite_dimension_choice", False),
                     "views": new_views_,
                     "dimension": dimension,
                     "choice_new": choice_new_slug,
@@ -578,10 +627,10 @@ class Collection(MDIMBase):
         self.views.extend(new_views_list)
 
         # Remove original choices if asked to
-        for p in params:
-            if p.get("replace", False):
-                dimension = p["dimension"]
-                choices = p["choices"]
+        for group in groups:
+            if group.get("replace", False):
+                dimension = group["dimension"]
+                choices = group["choices"]
                 # Remove views with old choices
                 new_views = [view for view in self.views if view.dimensions[dimension] not in choices]
                 # Remove unused choices
@@ -609,14 +658,25 @@ class Collection(MDIMBase):
                 f"Choices {choices} not found in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
             )
 
+        # Check that the new choice slug is not IN USE. Note that it could still be in the dimension choices, but not in use. NOTE: this is tricky. As implemented above it fails for war/latest/mars collection step.
+        # choices_in_use = self.dimension_choices_in_use()
+        # if choice_new_slug in choices_in_use[dimension]:
+        #     raise ValueError(
+        #         f"Choice slug `{choice_new_slug}` already exists in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
+        #     )
+
     def create_new_grouped_views(
         self,
         dimension: str,
         choices: List[str],
         choice_new_slug: str,
-        config_new: Optional[GrapherConfig] = None,
+        view_config: Optional[GrapherConfig] = None,
+        view_params: Optional[Dict[str, Any]] = None,
     ) -> List[View]:
         """Create new grouped views."""
+        if view_params is None:
+            view_params = {}
+
         if self._group_operations_done > 0:
             log.warning(
                 "If you are doing more than one group operation, consider using `group_views` instead. It is optimized for batch operations, where each grouping is done in parallel."
@@ -633,13 +693,24 @@ class Collection(MDIMBase):
         new_views = []
         new_view_groups = list(grouped.values())
         for view_group in new_view_groups:
+            # Create dimensions for new view
             new_dimensions = view_group[0].dimensions.copy()
             new_dimensions[dimension] = choice_new_slug
+            # Create new view
             new_view = View(
                 dimensions=new_dimensions,
                 indicators=_combine_view_indicators(view_group),
-                config=config_new,
             )
+            # Create config for new view
+            params = view_params.copy()
+            for p, k in params.items():
+                if isinstance(k, Callable):
+                    params[p] = k(new_view)
+            new_config = fill_placeholders(view_config, params) if view_config else None
+            # Add config to new view
+            new_view.config = new_config
+
+            # Add new view to list
             new_views.append(new_view)
 
         return new_views
