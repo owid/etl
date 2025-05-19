@@ -658,12 +658,12 @@ class Collection(MDIMBase):
                 f"Choices {choices} not found in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
             )
 
-        # Check that the new choice slug is not IN USE. Note that it could still be in the dimension choices, but not in use.
-        choices_in_use = self.dimension_choices_in_use()
-        if choice_new_slug in choices_in_use[dimension]:
-            raise ValueError(
-                f"Choice slug {choice_new_slug} already exists in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
-            )
+        # Check that the new choice slug is not IN USE. Note that it could still be in the dimension choices, but not in use. NOTE: this is tricky. As implemented above it fails for war/latest/mars collection step.
+        # choices_in_use = self.dimension_choices_in_use()
+        # if choice_new_slug in choices_in_use[dimension]:
+        #     raise ValueError(
+        #         f"Choice slug `{choice_new_slug}` already exists in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
+        #     )
 
     def create_new_grouped_views(
         self,
