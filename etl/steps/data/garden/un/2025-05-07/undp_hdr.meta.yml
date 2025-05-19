@@ -59,8 +59,10 @@ tables:
         description_short: |-
           The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Inequality is measured here in terms of the number of years adults older than 25 participated in formal education.
         description_key: &description_key_ineq
-          - This metric is needed to estimate the Inequality-adjusted Human Development Index.
+          - Measures how unevenly educational attainment is distributed within a country. It is the [Atkinson inequality measure](#dod:atkinson) (ε = 1) applied to years-of-schooling data.
           - This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1 - g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
+          - Data are originally sourced from harmonised datasets, including CEDLAS and World Bank (2024), Eurostat's European Union Statistics on Income and Living Conditions (2024), ICF Macro Demographic and Health Surveys (various years), LIS (2024), United Nations Children's Fund Multiple Indicator Cluster Surveys (various years) and UNESCO Institute for Statistics (2024)
+          - This metric is used to estimate the Inequality-adjusted Human Development Index.
         display:
           numDecimalPlaces: 2
         presentation:
@@ -74,7 +76,13 @@ tables:
         unit: ""
         description_short: |-
           The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
-        description_key: *description_key_ineq
+        description_key:
+          - Measures the share of the income dimension "lost" because disposable household income (or consumption) is unevenly distributed; it applies the [Atkinson inequality measure](#dod:atkinson) (ε = 1) to individual-level income and discounts the average income index accordingly.
+          - This version of the Atkinson index uses an inequality aversion parameter ε equal to 1. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1 - g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
+          - Data is originally sourced from the United Nations University's World Income Inequality Database (UNU-WIDER 2023).
+          - This metric is used to estimate the Inequality-adjusted Human Development Index.
+        # section: Technical note 2 – Inequality-adjusted Human Development Index, Step 1 & Step 2 (pp. 5–6)
+
         display:
           numDecimalPlaces: 2
         presentation:
@@ -85,11 +93,15 @@ tables:
 
       # Inequality in life expectancy
       ineq_le:
-        title: Inequality in Life expectancy
+        title: Inequality in life expectancy
         unit: ""
         description_short: |-
           The [Atkinson index](#dod:atkinson) measures inequality on a scale from 0 to 1. Higher values indicate higher inequality. Inequality is measured here in terms of the number of years a newborn would live if age-specific mortality rates in the current year were to stay the same throughout its life.
-        description_key: *description_key_ineq
+        description_key:
+          - Captures the percentage of the life-expectancy index lost because years of life are not shared equally; it applies the Atkinson inequality measure to age-specific survival data from complete life tables.
+          - This version of the Atkinson index uses an inequality aversion parameter ε equal to 1, which gives greater weight to premature mortality. The parameter defines how sensitive the index is to changes in the lower end of the distribution. In this form, the inequality measure is A = 1 - g/μ, where g is the geometric mean and μ is the arithmetic mean of the distribution.
+          - Data is originally sourced from from complete life tables provided by UNDESA (2024). Mortality rates and other information are available for each age (0, 1, 2, 3, …. 100+).
+          - This metric is used to estimate the Inequality-adjusted Human Development Index.
         display:
           numDecimalPlaces: 2
         presentation:
@@ -104,8 +116,14 @@ tables:
         description_short: |-
           Unweighted average (i.e. arithmetic mean) of inequalities in health, education and income.
         description_key:
+          - An unweighted average of inequalities in health, education and income, expressed as the percentage of human development "lost" due to uneven achievements across these three HDI dimensions.
+          - |-
+            Formula: (A_health + A_education + A_income) / 3, where each A_x is the Atkinson inequality measure (ε = 1) for that dimension.
+          - Provides a single percentage figure summarising overall inequality, expressed as the percentage of human development "lost" due to uneven achievements across these three HDI dimensions.
           - When all inequalities in dimensions are of a similar magnitude, the coefficient of human inequality and the loss in HDI value differ negligibly.
           - When inequalities differ in magnitude, the loss in HDI value tends to be higher than the coefficient of human inequality.
+          - Data is originally sourced from UNDESA life-table data, international household-survey databases (SEDLAC, DHS, MICS, EU-SILC, LIS) and the UNU-WIDER World Income Inequality Database.
+
         display:
           numDecimalPlaces: 2
         presentation:
@@ -120,7 +138,8 @@ tables:
         description_key:
           - The Inequality-adjusted Human Development Index (IHDI) adjusts the Human Development Index (HDI) for inequality in the distribution of each dimension across the population.
           - It is based on a distribution-sensitive class of composite indices proposed by Foster, Lopez-Calva and Szekely (2005), which draws on the Atkinson (1970) family of inequality measures. It is computed as a geometric mean of inequality-adjusted dimensional indices.
-          - The IHDI accounts for inequalities in HDI dimensions by “discounting” each dimension's average value according to its level of inequality. The IHDI value equals the HDI value when there is no inequality across people but falls below the HDI value as inequality rises. In this sense the IHDI measures the level of human development when inequality is accounted for.
+          - The IHDI accounts for inequalities in HDI dimensions by "discounting" each dimension's average value according to its level of inequality. The IHDI value equals the HDI value when there is no inequality across people but falls below the HDI value as inequality rises. In this sense the IHDI measures the level of human development when inequality is accounted for.
+          - Data is originally sourced from UNDESA complete life tables (health), harmonised household-survey micro-datasets (education) and the UNU-WIDER WIID (income).
         display:
           numDecimalPlaces: 3
         presentation:
@@ -137,8 +156,11 @@ tables:
         description_short: |-
           The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living.
         description_key:
+          - Compares female and male achievements in health, education and command over economic resources by taking the ratio of the female HDI to the male HDI; a value of 1 denotes gender parity, while values below (above) 1 indicate disadvantage for women (men).
           - "The Gender Development Index (GDI) measures gender inequalities in achievement in three basic dimensions of human development: health, measured by female and male life expectancy at birth; education, measured by female and male expected years of schooling for children and female and male mean years of schooling for adults ages 25 years and older; and command over economic resources, measured by female and male estimated earned income."
           - Values below 1 indicate higher human development for men than women, while values above 1 indicate the opposite. Values close to 1 therefore indicate higher gender equality.
+          - "Interpretable scale: an absolute deviation of, say, 5% means women's HDI is 95 % of men's (or vice-versa)."
+          - Data is originally sourced from UNDESA life tables, DHS/MICS & UIS education surveys, ILO labour data, IMF & World Bank income statistics and HDRO wage-ratio estimates.
 
         display:
           numDecimalPlaces: 3
@@ -148,14 +170,17 @@ tables:
         title: GDI Group
         unit: ""
         description_short: |-
-          The Gender Development Index (GDI) measures gender inequalities in the achievement of key dimensions of human development: a long and healthy life, a good education, and a decent standard of living. This indicator defines the level of equality in these achievements as the absolute deviation of GDI from gender parity.
+          A categorical indicator that groups countries into five tiers according to how far their Gender Development Index (GDI) deviates from perfect gender parity, facilitating cross-country comparison of gender gaps in human development.
         description_key:
-          - The GDI groups are based on the absolute deviation of GDI from gender parity, 100 ∙ |GDI - 1|.
-          - "Group 1: Countries with absolute deviation from gender parity of 2.5 percent or less are considered countries with high equality in HDI achievements between women and men."
-          - "Group 2: Countries with absolute deviation from gender parity of 2.5-5 percent are considered countries with medium-high equality in HDI achievements between women and men."
-          - "Group 3: Countries with absolute deviation from gender parity of 5-7.5 percent are considered countries with medium equality in HDI achievements between women and men."
-          - "Group 4: Countries with absolute deviation from gender parity of 7.5-10 percent are considered countries with medium-low equality in HDI achievements between women and men."
-          - "Group 5: Countries with absolute deviation from gender parity of more than 10 percent are considered countries with low equality in HDI achievements between women and men."
+          - |-
+            The GDI groups are based on the absolute deviation of GDI from gender parity, 100 × |GDI - 1|.
+            - Group 1: Countries with absolute deviation from gender parity of 2.5 percent or less are considered countries with high equality in HDI achievements between women and men.
+            - Group 2: Countries with absolute deviation from gender parity of 2.5-5 percent are considered countries with medium-high equality in HDI achievements between women and men.
+            - Group 3: Countries with absolute deviation from gender parity of 5-7.5 percent are considered countries with medium equality in HDI achievements between women and men.
+            - Group 4: Countries with absolute deviation from gender parity of 7.5-10 percent are considered countries with medium-low equality in HDI achievements between women and men.
+            - Group 5: Countries with absolute deviation from gender parity of more than 10 percent are considered countries with low equality in HDI achievements between women and men.
+          - Group distributions shift slowly over time, providing a coarse progress tracker towards gender parity in HDI.
+          - Data is originally sourced from the underlying GDI calculations described above.
         display:
           numDecimalPlaces: 0
 
