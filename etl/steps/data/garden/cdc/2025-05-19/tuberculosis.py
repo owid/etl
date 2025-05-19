@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -24,6 +26,7 @@ def run() -> None:
             "tb_deaths_pct_change_rate",
         ]
     )
+    tb = tb.replace("--", pd.NA)  # Replace '--' with NaN for better handling of missing values.
     # Case data after 1974 are not comparable to prior years due to changes in the surveillance case definition that became effective in 1975.
     # So we need to split the table into two parts.
     tb_cases_before_1975 = tb[["country", "year", "tb_cases_no", "tb_cases_rate"]][tb["year"] <= 1974].copy()
