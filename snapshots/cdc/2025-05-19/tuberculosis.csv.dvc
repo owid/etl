@@ -14,10 +14,12 @@ meta:
 
     # Files
     url_main: https://www.cdc.gov/tb-surveillance-report-2023/tables/table-1.html
-    date_accessed: 2025-05-19
+    date_accessed: '2025-05-19'
 
     # License
     license:
       name: CC BY 4.0
-
-  
+outs:
+  - md5: 5d97d0c06202a85aae924ec35762018f
+    size: 3692
+    path: tuberculosis.csv

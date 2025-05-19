@@ -17,14 +17,11 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 def run(upload: bool) -> None:
     # Initialize a new snapshot.
+    data = download_data_table()
     snap = Snapshot(f"cdc/{SNAPSHOT_VERSION}/tuberculosis.csv")
 
     # Save snapshot.
-    snap.create_snapshot(upload=upload)
-
-
-if __name__ == "__main__":
-    run()
+    snap.create_snapshot(upload=upload, data=data)
 
 
 def download_data_table() -> pd.DataFrame:
@@ -64,3 +61,7 @@ def download_data_table() -> pd.DataFrame:
     df = pd.DataFrame(data, columns=column_names)
 
     return df
+
+
+if __name__ == "__main__":
+    run()
