@@ -4,19 +4,19 @@ applyTo: "**/snapshots/**/*.dvc"
 
 ## Overview
 
-A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data provider at a particular point in time. It is the entrypoint to ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
+A Snapshot is a picture of a data product (e.g. a data CSV file) provided by an upstream data provider at a particular point in time. It is the entrypointto ETL and where we define metadata attributes of that picture. This is fundamental to ensure that the data is properly documented and that the metadata is propagated to the rest of the system.
 
 ## Instructions
 
 When filling metadata for snapshots, follow these guidelines:
 
 - Focus only on fields in the `meta.origin` section; other fields are handled elsewhere
-- If `url_main` exists, go to that URL to get the context
 - Use clear, precise language to describe the data source and its content
-- For multiline text, use the `|-` YAML syntax and include linebreaks for readability
+- For multiline text, use the `|-` YAML syntax (not just `|`), split long text into multiple lines, and include linebreaks for readability
 - Avoid using quotes for strings unless they contain special characters
 - **Do not** fill the `date_published` field
 - Always follow capitalization, formatting, and punctuation rules for each field
+- If `url_main` exists, go to that URL to get the context
 - Follow guidelines in the schema below when filling the metadata
 
 
