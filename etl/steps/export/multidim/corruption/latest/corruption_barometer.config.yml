@@ -6,6 +6,18 @@ default_selection:
   - World
   - Europe
   - Asia
-dimensions: []
+  - Oceania
+  - North America
+  - South America
+  - Africa
+dimensions:
+  - slug: institution
+    name: Institution
+    choices:
+      - description: See all institutions side by side
+        name: Side-by-side comparison of institutions
+        slug: Side-by-side comparison of institutions
+  - slug: answer
+    name: Answer
 
 views: []
