@@ -488,12 +488,14 @@ class Collection(MDIMBase):
                         The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
                     - view_config: Optional[Dict[str, Any]], default=None
                         The view config for the new choice. E.g. useful to tweak the chart type.
+                    - view_metadata: Optional[Dict[str, Any]], default=None
+                        The metadata for the new view. Useful to tweak the metadata around the chart in a data page (e.g. description key, etc.)
+                    - view_params: Dict[str, Any]
+                        Define any parameters that might be used in `view_config`. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
                     - replace: Optional[bool], default=False
                         If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
                     - overwrite_dimension_choice: Optional[bool], default=False
                         If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
-                    - view_params: Dict[str, Any]
-                        Define any parameters that might be used in `view_config`. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
 
         Example 1:
         ----------
@@ -568,6 +570,7 @@ class Collection(MDIMBase):
 
             # Config of new views
             view_config = group.get("view_config")
+            view_metadata = group.get("view_metadata")
             view_params = group.get("view_params")
 
             # Sanity checks
@@ -583,6 +586,7 @@ class Collection(MDIMBase):
                 choices=choices,
                 choice_new_slug=choice_new_slug,
                 view_config=view_config,
+                view_metadata=view_metadata,
                 view_params=view_params,
             )
             new_views_all.append(
@@ -671,6 +675,7 @@ class Collection(MDIMBase):
         choices: List[str],
         choice_new_slug: str,
         view_config: Optional[GrapherConfig] = None,
+        view_metadata: Optional[Any] = None,
         view_params: Optional[Dict[str, Any]] = None,
     ) -> List[View]:
         """Create new grouped views."""
@@ -707,8 +712,10 @@ class Collection(MDIMBase):
                 if isinstance(k, Callable):
                     params[p] = k(new_view)
             new_config = fill_placeholders(view_config, params) if view_config else None
+            new_metadata = fill_placeholders(view_metadata, params) if view_metadata else None
             # Add config to new view
             new_view.config = new_config
+            new_view.metadata = new_metadata
 
             # Add new view to list
             new_views.append(new_view)
