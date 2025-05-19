@@ -29,7 +29,6 @@ from sqlalchemy.orm import Session
 from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl import config
 from etl.db import get_engine, production_or_master_engine, read_sql
 from etl.grapher import helpers as gh
@@ -597,6 +596,10 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
     if config.ENV == "staging":
         # It's possible that we merged changes to ETL, but the staging server still uses old charts. In
         # that case, we first check that the charts were really modified on our staging server.
+
+        # Load this dynamically for performance reasons
+        from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
+
         modified_charts = ChartDiffsLoader(config.OWID_ENV.get_engine(), production_or_master_engine()).df
         return bool(set(modified_charts.index) & set(rows.chartId))
     # Only show a warning in production. We can't raise an error because if someone merges changes to ETL
