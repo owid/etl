@@ -14,13 +14,19 @@ def run() -> None:
     ds_garden = paths.load_dataset("tuberculosis")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("tuberculosis", reset_index=False)
+    tb_cases_pre_1975 = ds_garden.read("cases_before_1975", reset_index=False)
+    tb_cases_post_1975 = ds_garden.read("cases_after_1975", reset_index=False)
+    tb_deaths_pre_1980 = ds_garden.read("deaths_before_1980", reset_index=False)
+    tb_deaths_post_1980 = ds_garden.read("deaths_after_1980", reset_index=False)
 
     #
     # Save outputs.
     #
     # Initialize a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(
+        tables=[tb_cases_pre_1975, tb_cases_post_1975, tb_deaths_pre_1980, tb_deaths_post_1980],
+        default_metadata=ds_garden.metadata,
+    )
 
     # Save grapher dataset.
     ds_grapher.save()
