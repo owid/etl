@@ -6,7 +6,7 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
 
 import fastjsonschema
 import pandas as pd
@@ -714,7 +714,7 @@ class Collection(MDIMBase):
             new_config = fill_placeholders(view_config, params) if view_config else None
             new_metadata = fill_placeholders(view_metadata, params) if view_metadata else None
             # Add config to new view
-            new_view.config = new_config
+            new_view.config = cast(GrapherConfig, new_config)
             new_view.metadata = new_metadata
 
             # Add new view to list
