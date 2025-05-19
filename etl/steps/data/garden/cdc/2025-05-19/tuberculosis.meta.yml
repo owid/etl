@@ -17,10 +17,15 @@ tables:
         title: Tuberculosis cases (pre-1975)
         description_short: Reported cases of tuberculosis.
         unit: cases
+        display:
+          numDecimalPlaces: 0
       tb_cases_rate:
         title: Tuberculosis cases per 100,000 people (pre-1975)
         description_short: Reported cases of tuberculosis per 100,000 people.
         unit: cases per 100,000 people
+        display:
+          numDecimalPlaces: 1
+
   cases_after_1975:
     variables:
       tb_cases_no:
@@ -30,6 +35,9 @@ tables:
           - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have symptoms of tuberculosis, or if they have laboratory confirmed diagnosis.
           - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
         unit: cases
+        display:
+          numDecimalPlaces: 0
+
       tb_cases_rate:
         title: Tuberculosis cases per 100,000 people (post-1975)
         description_short: Reported cases of tuberculosis per 100,000 people.
@@ -37,6 +45,9 @@ tables:
           - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptoms, or if they have laboratory confirmed diagnosis.
           - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
         unit: cases per 100,000 people
+        display:
+          numDecimalPlaces: 1
+
   deaths_before_1979:
     variables:
       tb_deaths_no:
@@ -45,10 +56,16 @@ tables:
         description_key:
           - Before 1979, this variable had a broader definition and included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
         unit: deaths
+        display:
+          numDecimalPlaces: 0
+
       tb_deaths_rate:
         title: Tuberculosis deaths per 100,000 people (pre-1979)
         description_short: Reported deaths from tuberculosis per 100,000 people.
         unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1
+
   deaths_after_1979:
     variables:
       tb_deaths_no:
@@ -57,7 +74,12 @@ tables:
         description_key:
           - Before 1979, this variable had a broader definition and included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
         unit: deaths
+        display:
+          numDecimalPlaces: 0
+
       tb_deaths_rate:
         title: Tuberculosis deaths per 100,000 people (post-1979)
         description_short: Reported deaths from tuberculosis per 100,000 people.
         unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1
