@@ -1,0 +1,68 @@
+definitions:
+  common:
+    description_key:
+      - This data primarily focuses on economic instruments targeting carbon dioxide (CO₂) emissions.
+      - In some cases these instruments also cover other greenhouse gases. However, any pricing mechanisms that specifically target non-CO₂ gases (such as methane or nitrous oxide) are not included.
+      - A country is considered to have a carbon tax or emissions trading system if at least one IPCC sector or gas is covered by the instrument. These instruments do not need to cover all sectors within the economy for this to apply.
+  presentation:
+    topic_tags:
+    - CO2 & Greenhouse Gas Emissions
+
+dataset:
+  update_period_days: 365
+
+tables:
+  world_carbon_pricing:
+    title: World carbon pricing
+    variables:
+      ets:
+        title: Covered by emissions trading system
+        unit: ""
+        description_short: A binary value indicating whether the sector(-fuel) is covered by at least one emissions trading system.
+        processing_level: minor
+      ets_price:
+        title: ETS price
+        unit: Current local currency unit per ton of CO₂ equivalent
+        short_unit: current LCU / t CO₂e
+        description_short: Price of an emissions allowance in current local currency unit per ton of CO₂ equivalent.
+        display:
+          numDecimalPlaces: 2
+        processing_level: minor
+      sector_name:
+        title: IPCC sector name.
+        unit: ""
+        processing_level: minor
+      tax:
+        title: Covered by tax instrument
+        unit: ""
+        description_short: A binary value indicating whether the sector(-fuel) is covered by at least one tax instrument.
+        processing_level: minor
+      tax_rate_gross:
+        title: Gross tax rate
+        unit: Current local currency unit per ton of CO₂ equivalent
+        short_unit: current LCU / t CO₂e
+        description_short: Tax rate in current local currency unit (LCU) per ton of CO₂ equivalent
+        display:
+          numDecimalPlaces: 2
+        processing_level: minor
+      tax_rate_net:
+        title: Net tax rate
+        unit: Current local currency unit per ton of CO₂ equivalent
+        short_unit: current LCU / t CO₂e
+        description_short: Net tax rate (accounting for exemption) in current LCU per ton of CO₂ equivalent.
+        display:
+          numDecimalPlaces: 2
+        processing_level: minor
+  world_carbon_pricing_any_sector:
+    title: World carbon pricing for any sector
+    variables:
+      ets:
+        title: Covered by emissions trading system in at least one sector
+        unit: ""
+        description_short: This data indicates whether at least one sector(-fuel) is covered by at least one emissions trading system at the national level, or only at the sub-national level, or whether no sector is covered.
+        processing_level: major
+      tax:
+        title: Covered by tax instrument in at least one sector
+        unit: ""
+        description_short: This data indicates whether at least one sector(-fuel) is covered by at least one carbon tax at the national level, or only at the sub-national level, or whether no sector is covered.
+        processing_level: major
