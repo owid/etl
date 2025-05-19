@@ -72,12 +72,9 @@ def run() -> None:
                 "view_params": {
                     "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
                 },
-                # "view_metadata": {
-                #     "description_key": [
-                #         "Something nice",
-                #         "Something less {answer}",
-                #     ],
-                # },
+                "view_metadata": {
+                    "description_short": 'Percentage of respondents who answered "{answer}" to the question "How many of the following people do you think are involved in corruption?".',
+                },
             },
         ]
     )

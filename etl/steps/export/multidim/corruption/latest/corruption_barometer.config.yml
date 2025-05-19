@@ -14,7 +14,7 @@ dimensions:
     name: Institution
     choices:
       - slug: "side_by_side"
-        name: Side-by-side comparison of institutions
+        name: Comparison of all institutions
         description: See all institutions side by side
   - slug: answer
     name: Answer
