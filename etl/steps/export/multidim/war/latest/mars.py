@@ -35,6 +35,7 @@ def run() -> None:
     # load table using load_data=False which only loads metadata significantly speeds this up
     ds = paths.load_dataset("mars")
     tb = ds.read("mars", load_data=False)
+    print(tb)
 
     # Adjust dimension metadata
     tb = adjust_dimensions(tb)
