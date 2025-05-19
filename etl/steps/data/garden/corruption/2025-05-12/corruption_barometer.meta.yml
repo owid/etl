@@ -4,8 +4,6 @@ definitions:
     processing_level: minor
     unit: "%"
     short_unit: "%"
-    display:
-      numDecimalPlaces: 1
     presentation:
       attribution: Transparency International (2017)
       topic_tags:
@@ -48,6 +46,7 @@ tables:
             << institution >>  << question >>  -  << answer >>
             <%- endif -%>
         display:
+          numDecimalPlaces: 1
           name: |-
             <%- if question != "Bribary rate" and institution != "Not applicable" %>
             << institution >>
