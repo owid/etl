@@ -413,7 +413,7 @@ def add_region_aggregates(
             )
 
     # Sort conveniently.
-    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)
+    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)  # type: ignore
 
     # Convert country to categorical if the original was
     if df[country_col].dtype.name == "category":
