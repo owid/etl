@@ -200,7 +200,6 @@ def prepare_input_data(tb: Table) -> Table:
     tb = geo.harmonize_countries(
         df=tb,
         countries_file=paths.country_mapping_path,
-        excluded_countries_file=paths.excluded_countries_path,
         warn_on_missing_countries=True,
         # For debugging, set it to True (the only unused country in global data should be "Türkiye", which is only used in European data).
         warn_on_unused_countries=False,
