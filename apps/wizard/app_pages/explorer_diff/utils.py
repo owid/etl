@@ -44,7 +44,7 @@ def _display_view_options(slug: str, views: list[dict]) -> dict:
             for dim, val in random_view.items():
                 st.session_state[f"{slug}_{dim}"] = val
             # Rerun to apply the changes
-            st.rerun()
+            st.rerun(scope="fragment")
 
     # Arrange selectboxes horizontally using columns
     cols = st.columns(len(all_dimensions)) if all_dimensions else []
