@@ -6,6 +6,8 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
+
 
 def run() -> None:
     #
@@ -13,6 +15,8 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("corruption_barometer")
+    ds_population = paths.load_dataset("population")
+    ds_regions = paths.load_dataset("regions")
 
     # Read table from meadow dataset.
     tb = ds_meadow.read("corruption_barometer")
@@ -41,6 +45,20 @@ def run() -> None:
 
     tb["answer"] = tb["answer"].replace(answer_mapping).str.lower().str.capitalize()
     tb["value"] = tb["value"] * 100  # Convert to percentage
+
+    # Add regional aggregates by adding population, multiplying the "share" by the population, adding regions and then dividing by the population.
+    tb = geo.add_population_to_table(tb, ds_population)
+    tb["number"] = tb["value"] * tb["population"]
+    tb = geo.add_regions_to_table(
+        tb=tb,
+        index_columns=["country", "year", "question", "answer", "institution"],
+        ds_regions=ds_regions,
+        regions=REGIONS,
+    )
+
+    tb["value"] = tb["number"] / tb["population"]
+    tb = tb.drop(columns=["number", "population"])
+
     # Improve table format.
     tb = tb.format(["country", "year", "question", "answer", "institution"])
 
