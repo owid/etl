@@ -115,7 +115,7 @@ def aggregate_conflict_types(
     if children_names is None:
         tb_agg = tb.copy()
     else:
-        tb_agg = tb[tb[dim_name].isin(children_names)].copy()
+        tb_agg = tb.loc[tb[dim_name].isin(children_names)].copy()
     # Obtain summations
     tb_agg = tb_agg.groupby(columns_to_groupby, as_index=False).agg({col: sum for col in columns_to_aggregate})
     # Threshold to 1 for binary columns
