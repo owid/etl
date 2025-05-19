@@ -24,10 +24,13 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    for col in tb.columns:
+        if col not in ["country", "year"] and tb[col].dtype == "string":
+            tb[col] = tb[col].replace("n.a.", np.nan)
+            tb[col] = tb[col].astype("float")
 
     # Improve table format.
     tb = tb.format(["country", "year"])
-    tb = tb.replace("n.a.", np.nan)
 
     #
     # Save outputs.
