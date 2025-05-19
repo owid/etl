@@ -7,12 +7,15 @@ import re
 from collections import defaultdict
 from copy import deepcopy
 from itertools import product
+from string import Formatter
 from typing import Any, Dict, List, Optional, Set
 
+from deprecated import deprecated
 from owid.catalog import Dataset
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
+from etl.collection.exceptions import PlaceholderError
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.files import yaml_dump
@@ -247,7 +250,48 @@ def extract_definitions(config: dict) -> dict:
     return config
 
 
-# causes_of_death
+def _check_missing_fields(template: str, view_params: dict) -> None:
+    """
+    Scan a single format string and raise PlaceholderError
+    if it references a key that is missing from view_params.
+    """
+    fmt = Formatter()
+    missing = {
+        field_name
+        for literal_text, field_name, *_ in fmt.parse(template)
+        if field_name and field_name not in view_params
+    }
+    if missing:
+        raise PlaceholderError(f"Missing keys for placeholders {missing!r} in template: {template!r}")
+
+
+def fill_placeholders(data, view_params) -> Dict[str, Any]:
+    """
+    Recursively walk *data* (dicts, lists, tuples, sets, primitives) and
+    replace any `{placeholder}` found in strings using values from *view_params*.
+
+    Raises
+    ------
+    PlaceholderError
+        If a placeholder key is referenced that is absent from *view_params*.
+    """
+    if isinstance(data, dict):
+        return {k: fill_placeholders(v, view_params) for k, v in data.items()}
+
+    if isinstance(data, (list, tuple, set)):
+        container_type = type(data)
+        return container_type(fill_placeholders(item, view_params) for item in data)
+
+    if isinstance(data, str):
+        _check_missing_fields(data, view_params)
+        # All placeholders are present – safe to format
+        return data.format(**view_params)
+
+    # Any other type (int, bool, None, etc.) is returned unchanged
+    return data
+
+
+@deprecated("Use class method Collection.group_views instead.")
 def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
     """
     Group views by the specified dimensions. Concatenate indicators for the same group.
