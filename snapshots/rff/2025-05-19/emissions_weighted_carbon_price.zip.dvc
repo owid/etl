@@ -8,7 +8,7 @@ meta:
       Dolphin, G., Merkle, M. Emissions-weighted carbon price: sources and methods. Sci Data 11, 1017 (2024). [https://doi.org/10.1038/s41597-024-03121-6](https://doi.org/10.1038/s41597-024-03121-6).
 
       Supported by Resources for the Future.
-    attribution: Dolphin and Merkle (2022)
+    attribution: Dolphin and Merkle (2024)
     attribution_short: RFF
     url_main: https://github.com/g-dolphin/ECP
     url_download: https://github.com/g-dolphin/ECP/archive/refs/heads/master.zip
