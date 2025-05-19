@@ -1026,6 +1026,7 @@ dependencies = [
 dev = [
     { name = "argh" },
     { name = "pandas-stubs" },
+    { name = "pyrefly" },
     { name = "pyright" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1057,6 +1058,7 @@ requires-dist = [
 dev = [
     { name = "argh", specifier = ">=0.26.2" },
     { name = "pandas-stubs", specifier = "==1.2.0.62" },
+    { name = "pyrefly" },
     { name = "pyright", specifier = "==1.1.373" },
     { name = "pytest", specifier = ">=6.2.5" },
     { name = "pytest-cov", specifier = ">=2.12.1" },
@@ -1576,6 +1578,21 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/a9/e4/bf4aa2305eda1bdf530d8127e07dd324ae923e664db3aa7bf153f1d749ec/pyppmd-1.1.0-pp39-pypy39_pp73-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:435317949a6f35e54cdf08e0af6916ace427351e7664ac1593980114668f0aaa", size = 43625 },
     { url = "https://files.pythonhosted.org/packages/fc/be/33478c13fad90049c35034d9f7de658353f82fc2cd91c57efd904b71ebb7/pyppmd-1.1.0-pp39-pypy39_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4f66b0d0e32b8fb8707f1d2552f13edfc2917e8ed0bdf4d62e2ce190d2c70834", size = 43909 },
     { url = "https://files.pythonhosted.org/packages/60/34/922d8ca6879f08d17f9771e6ef65e9491c2ebbd48934997a3ff01285e55e/pyppmd-1.1.0-pp39-pypy39_pp73-win_amd64.whl", hash = "sha256:650a663a591e06fb8096c213f4070b158981c8c3bf9c166ce7e4c360873f2750", size = 42422 },
+]
+
+[[package]]
+name = "pyrefly"
+version = "0.16.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a6/b7/f5df7529307c0c97a1d6633ed02edae1ec2d9a0e75c07e5110bbc6476c67/pyrefly-0.16.0.tar.gz", hash = "sha256:d4b2f24b7099fe6ed1f778c7ac45019ea59e64949280647dde5309d7c2a20599", size = 955231 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5f/10/f0526d5f4d6044a35d3a50dcdf85cdbce8a1a925f694aa47e39971987538/pyrefly-0.16.0-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:988ba3ac9380bf2ba5aa5d5e01f14695c37125d5e2c5587445a36ccd221a488a", size = 5478620 },
+    { url = "https://files.pythonhosted.org/packages/6d/c9/04fc7c384fa0b0edb5bc6710d177e32c0b7f4f1b03d3f0f8b3cdf2185d89/pyrefly-0.16.0-py3-none-macosx_11_0_arm64.whl", hash = "sha256:06b3f086da18280db10f116294ff42ae84aed6709b1f9a23ab887ac5f18b8118", size = 5076643 },
+    { url = "https://files.pythonhosted.org/packages/c7/73/2a7f3557058992b1242930ea3e2159d6e7a34902d9f730f579bcf99c1d5c/pyrefly-0.16.0-py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:dd028776c40d39000b52e834e21593029ac130447d8aebc707614026de72e92e", size = 5903180 },
+    { url = "https://files.pythonhosted.org/packages/ae/2f/a8705a8e3d68b6d6c3a2654147bd68b7d8561c896a1ad148c4ff1fa3b58a/pyrefly-0.16.0-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:1d1d7a26a8cd9f05891d7acb63510eeb9037fcc36c0e6487507e47eb17b827be", size = 5667445 },
+    { url = "https://files.pythonhosted.org/packages/0b/50/cea0e9c25b960a41e2d4a523aa63211af2172c31f57c62e254cc2a569deb/pyrefly-0.16.0-py3-none-win32.whl", hash = "sha256:ce0532155f57276538859f8dbe0b715981b0c727dfc3b8fcb07cf95e126edcae", size = 5118828 },
+    { url = "https://files.pythonhosted.org/packages/60/49/b5180055fca34c64afd3d47a9680f24e68691d5deb3fba46a35e5a7ac473/pyrefly-0.16.0-py3-none-win_amd64.whl", hash = "sha256:332ffc6496079411564067e7e4d8c27af9df0d6445e00e6585dbf43f162053cd", size = 5506965 },
+    { url = "https://files.pythonhosted.org/packages/03/39/550d6a9cdc4e2bce4903203408fcb0e2cb4f79cab8c1318870f6b6837f28/pyrefly-0.16.0-py3-none-win_arm64.whl", hash = "sha256:1bcb8ac7a0253218feb001bc1b0bd9776c4857824e7d3943a685acbb8207556d", size = 5165671 },
 ]
 
 [[package]]
