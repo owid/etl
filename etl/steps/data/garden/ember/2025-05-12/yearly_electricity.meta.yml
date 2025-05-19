@@ -6,9 +6,9 @@ definitions:
       topic_tags:
         - "Energy"
   description_short_gw: &description_short_gw |-
-    Measured in gigawatts.
+    Measured in [gigawatts](#dod:watt-hours).
   description_short_twh: &description_short_twh |-
-    Measured in terawatt-hours.
+    Measured in [terawatt-hours](#dod:watt-hours).
   description_short_pct: &description_short_pct |-
     Measured as a percentage of total electricity.
   description_short_mtco2: &description_short_mtco2 |-
@@ -176,7 +176,7 @@ tables:
         display:
           name: Demand per capita
         description_short: |-
-          Sum of power production and net imports divided by the population, measured in kWh.
+          Sum of power production and net imports divided by the population, measured in [kilowatt-hours](#dod:watt-hours).
         presentation:
           title_public: Total electricity demand per person
       generation__clean__pct:
