@@ -59,6 +59,7 @@ if SUBSET:
     ]
     SUBSET += "," + ",".join(subset_list)
 
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -81,11 +82,11 @@ def run(dest_dir: str) -> None:
             ind_meta = indicators[indicators.label == label].iloc[0]
 
             if SUBSET:
-                if ((
+                if (
                     "smoking" in ind_meta["display"].lower()
                     or "tobacco" in ind_meta["display"].lower()
                     or "tax" in ind_meta["display"].lower()
-                )) and 'estimate' in ind_meta["display"].lower():
+                ) and "estimate" in ind_meta["display"].lower():
                     pass
                 elif underscore(label) in underscore(SUBSET):
                     pass
