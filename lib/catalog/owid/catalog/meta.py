@@ -331,6 +331,16 @@ class VariableMeta(MetaBase):
             except KeyError:
                 pass
 
+        # Prune faqs with empty fragment_id
+        if meta.presentation and meta.presentation.faqs:
+            faqs: List[FaqLink] = []
+            for faq in meta.presentation.faqs:
+                if not faq.fragment_id.strip():
+                    continue
+                else:
+                    faqs.append(faq)
+            meta.presentation.faqs = faqs
+
         return meta
 
     def copy(self, deep=True) -> Self:
