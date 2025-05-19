@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -25,6 +27,7 @@ def run() -> None:
 
     # Improve table format.
     tb = tb.format(["country", "year"])
+    tb = tb.replace("n.a.", np.nan)
 
     #
     # Save outputs.
