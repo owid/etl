@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection.model.view import View
-from etl.collection.utils import group_views
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -53,24 +51,36 @@ def run() -> None:
         },
         common_view_config=MULTIDIM_CONFIG,
     )
-    grouped_views = group_views(c.to_dict()["views"], by=["answer"])
-    grouped_views = [View.from_dict(view) for view in grouped_views]
-    for view in grouped_views:
-        view.dimensions["institution"] = "Side-by-side comparison of institutions"
-        choice_names = c.get_choice_names("answer")
-        answer = choice_names.get(view.dimensions["answer"])
-        view.config = {
-            **(view.config or {}),
-            "hasMapTab": False,
-            "chartTypes": ["DiscreteBar"],
-            "tab": "chart",
-            "facettingLabelByYVariables": "institution",
-            "selectedFacetStrategy": "metric",
-            "title": f"How many of the following people do you think are involved in corruption? {answer}",
-            "subtitle": f'Percentage of respondents who answered "{answer}" to the question "How many of the following people do you think are involved in corruption?".',
-        }
 
-    c.views.extend(grouped_views)
+    CHOICE_NAMES = c.get_choice_names("answer")
+
+    # Add grouped view
+    c.group_views(
+        groups=[
+            {
+                "dimension": "institution",
+                "choice_new_slug": "side_by_side",
+                "view_config": {
+                    "hasMapTab": False,
+                    "chartTypes": ["DiscreteBar"],
+                    "tab": "chart",
+                    "facettingLabelByYVariables": "institution",
+                    "selectedFacetStrategy": "metric",
+                    "title": "How many of the following people do you think are involved in corruption? {answer}",
+                    "subtitle": 'Percentage of respondents who answered {answer} to the question "How many of the following people do you think are involved in corruption?".',
+                },
+                "view_params": {
+                    "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
+                },
+                # "view_metadata": {
+                #     "description_key": [
+                #         "Something nice",
+                #         "Something less {answer}",
+                #     ],
+                # },
+            },
+        ]
+    )
 
     #
     # Save garden dataset.
