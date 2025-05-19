@@ -1,22 +1,33 @@
 definitions:
-  common:
-    processing_level: major
-    presentation:
-      attribution_short: Ember and Energy Institute
-      topic_tags:
-        - "Energy"
-    description_processing: |-
-      - We rely on Ember as the primary source of electricity data. While the Energy Institute (EI) provides primary energy (not just electricity) consumption data and it provides a longer time-series (dating back to 1965) than Ember (which only dates back to 1990), EI does not provide data for all countries or for all sources of electricity (for example, only Ember provides data on electricity from bioenergy). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
   description_short_twh: &description_short_twh |-
     Measured in [terawatt-hours](#dod:watt-hours).
   description_short_pct: &description_short_pct |-
     Measured as a percentage of total electricity produced in the country or region.
   description_short_per_capita: &description_short_per_capita |-
     Measured in [kilowatt-hours](#dod:watt-hours) per person.
-  description_processing_direct_primary_energy: |-
-    - The Statistical Review of World Energy only provides data on input-equivalent primary energy consumption, not on direct primary energy consumption. We estimate the direct primary energy consumption as the sum of the primary energy consumption from coal, oil, gas, and biofuels, plus the electricity generation from low-carbon sources (nuclear, hydro, wind, solar, bioenergy and other renewables). Finally, the share of electricity in direct primary energy consumption is calculated as the ratio of total electricity generation to direct primary energy consumption (multiplied by 100).
+  # Processing description for indicators that combine Ember and EI data, proritizing Ember (most indicators).
+  description_processing_electricity_generation_origins: |-
+    - We rely on Ember as the main source of electricity data. While the Energy Institute (EI) provides a longer time-series (dating back to 1965) than Ember (dating back only to 1990 for European countries and 2000 for other countries), EI does not provide data for all countries or for all sources of electricity (bioenergy is not provided). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
+  # Processing description for indicators that only use Ember data.
+  description_procesing_only_ember_origins: ""
+  # Processing description for direct primary energy consumption indicators.
+  description_processing_direct_primary_energy_origins: |-
+    - The Statistical Review of World Energy only provides data on input-equivalent primary energy consumption, not on direct primary energy consumption. We estimate the direct primary energy consumption as the sum of the primary energy consumption from coal, oil, gas, and biofuels, plus the electricity generation from low-carbon sources (nuclear, solar, wind, hydro, bioenergy, and other renewables).
+  # Processing description for primary energy consumption indicators.
+  description_processing_primary_energy_origins: ""
+  # Processing description for population indicator.
+  description_processing_population: ""
   description_short_low_carbon: &description_short_low_carbon |-
     Low-carbon sources correspond to renewables and nuclear power, that produce significantly less greenhouse-gas emissions than fossil fuels.
+  common:
+    processing_level: major
+    presentation:
+      attribution_short: Ember and Energy Institute
+      topic_tags:
+        - "Energy"
+    # Use the following common processing description for all variables in this dataset (which is almost all of them), and then rewrite the ones that have a different processing description.
+    description_processing: |-
+      {definitions.description_processing_electricity_generation_origins}
 
 dataset:
   update_period_days: 365
@@ -30,6 +41,8 @@ tables:
         short_unit: TWh
         unit: terawatt-hours
         description_short: *description_short_twh
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         display:
           name: Bioenergy
         presentation:
@@ -149,6 +162,8 @@ tables:
         unit: '%'
         description_short: |-
           Electricity imports minus exports, measured as a percentage of total electricity demand in the country or region.
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         presentation:
           title_public: Net electricity imports as a share of demand
       nuclear_generation__twh:
@@ -192,6 +207,8 @@ tables:
         short_unit: TWh
         unit: terawatt-hours
         description_short: *description_short_twh
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         display:
           name: Other renewables excluding bioenergy
         presentation:
@@ -228,6 +245,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         display:
           name: Bioenergy
           numDecimalPlaces: 0
@@ -308,6 +327,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         display:
           name: Other renewables excluding bioenergy
           numDecimalPlaces: 0
@@ -368,6 +389,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         display:
           name: Total electricity
           numDecimalPlaces: 0
@@ -389,6 +412,8 @@ tables:
         unit: people
         display:
           name: Population
+        description_processing: |-
+          {definitions.description_processing_population}
         presentation:
           title_public: Population
       primary_energy_consumption__twh:
@@ -396,6 +421,8 @@ tables:
         short_unit: TWh
         unit: terawatt-hours
         description_short: Measured in [terawatt-hours](#dod:watt-hours), using the [substitution method](#dod:substitutionmethod).
+        description_processing: |-
+          {definitions.description_processing_primary_energy_origins}
         display:
           name: Primary energy consumption
         presentation:
@@ -406,8 +433,7 @@ tables:
         unit: terawatt-hours
         description_short: Measured in [terawatt-hours](#dod:watt-hours).
         description_processing: |-
-          {definitions.common.description_processing}
-          {definitions.description_processing_direct_primary_energy}
+          {definitions.description_processing_direct_primary_energy_origins}
         display:
           name: Direct primary energy consumption
         presentation:
@@ -472,6 +498,8 @@ tables:
         short_unit: TWh
         unit: terawatt-hours
         description_short: *description_short_twh
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         display:
           name: Electricity demand
         presentation:
@@ -483,7 +511,7 @@ tables:
         description_short: Measured as a percentage of total, direct primary energy consumption in the country or region.
         description_processing: |-
           {definitions.common.description_processing}
-          {definitions.description_processing_direct_primary_energy}
+          {definitions.description_processing_direct_primary_energy_origins}
         display:
           name: Electricity
         presentation:
@@ -493,6 +521,8 @@ tables:
         short_unit: Mt
         unit: million tonnes CO₂ equivalents
         description_short: Measured in megatonnes of [CO₂ equivalents](#dod:carbondioxideequivalents).
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         display:
           name: Emissions
         presentation:
@@ -512,6 +542,8 @@ tables:
         unit: terawatt-hours
         description_short: |-
           Electricity imports minus exports, measured in [terawatt-hours](#dod:watt-hours).
+        description_processing: |-
+          {definitions.description_procesing_only_ember_origins}
         display:
           name: Net imports
         presentation:
