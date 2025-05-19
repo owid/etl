@@ -10,6 +10,7 @@ definitions:
         - Corruption
 
 
+
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -42,9 +43,16 @@ tables:
           <%- endif -%>
         presentation:
           title_public: |-
-            <%- if question != "Bribary rate" and institution != "Not applicable" %>
-            << institution >>  << question >>  -  << answer >>
+            <%- if question == "How many of the following people do you think are involved in corruption, or haven’t you heard enough about them to say? " and institution != "Not applicable" %>
+            How many of the following people do you think are involved in corruption? << institution >> - "<< answer >>"
             <%- endif -%>
+          grapher_config:
+            hasMapTab: true
+            map:
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0,10,20,30,40,50,60,70]
+                baseColorScheme: RdPu
         display:
           numDecimalPlaces: 1
           name: |-

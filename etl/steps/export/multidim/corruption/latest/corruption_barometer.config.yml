@@ -1,3 +1,4 @@
+
 title:
   title: Perception of corruption
   title_variant: by institution
@@ -5,4 +6,6 @@ default_selection:
   - World
   - Europe
   - Asia
+dimensions: []
+
 views: []

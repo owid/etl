@@ -1,10 +1,14 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection import create_collection, expand_config
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+MULTIDIM_CONFIG = {
+    "hasMapTab": True,
+    "chartTypes": [],
+    "tab": "map",
+}
 
 
 def run() -> None:
@@ -18,10 +22,9 @@ def run() -> None:
 
     ds = paths.load_dataset("corruption_barometer")
     tb = ds.read("corruption_barometer")
-
-    # Create views.
-    config_new = expand_config(
-        tb,
+    c = paths.create_collection(
+        config=config,
+        tb=tb,
         dimensions={
             "question": [
                 "How many of the following people do you think are involved in corruption, or haven’t you heard enough about them to say? "
@@ -38,23 +41,12 @@ def run() -> None:
                 "Tax officials",
             ],
             "answer": [
-                "All of them",
-                "Don't know / haven't heard",
-                "Most of them",
                 "Most or all of them",
-                "None of them",
-                "Some of them",
                 "Some or none of them",
+                "Don't know / haven't heard",
             ],
         },
-    )
-
-    config["dimensions"] = config_new["dimensions"]
-    config["views"] = config_new["views"]
-
-    c = paths.create_collection(
-        config=config,
-        tb=tb,
+        common_view_config=MULTIDIM_CONFIG,
     )
 
     #
