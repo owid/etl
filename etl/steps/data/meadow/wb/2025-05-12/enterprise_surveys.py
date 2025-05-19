@@ -43,9 +43,7 @@ def run() -> None:
     most_recent_year = recent_with_more_than_10.max()
     # Update the Year for only the selected countries
     tb.loc[tb["country"].isin(regions_to_update), "Year"] = most_recent_year
-    tb = tb.replace("n.a.", np.nan)
 
-    # Improve tables format.
     tables = [tb.format(["country", "year"])]
 
     #
