@@ -27,15 +27,15 @@ tables:
         title: Tuberculosis cases (post-1975)
         description_short: Reported cases of tuberculosis.
         description_key:
-          - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptome, or if they have laboratory confirmed diagnosis.
-          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than 1 year apart.
+          - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have symptoms of tuberculosis, or if they have laboratory confirmed diagnosis.
+          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
         unit: cases
       tb_cases_rate:
         title: Tuberculosis cases per 100,000 people (post-1975)
         description_short: Reported cases of tuberculosis per 100,000 people.
         description_key:
-          - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptome, or if they have laboratory confirmed diagnosis.
-          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than 1 year apart.
+          - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptoms, or if they have laboratory confirmed diagnosis.
+          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
         unit: cases per 100,000 people
   deaths_before_1980:
     variables:
