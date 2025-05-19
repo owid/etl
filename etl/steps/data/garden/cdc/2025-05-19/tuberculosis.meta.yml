@@ -37,27 +37,27 @@ tables:
           - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptoms, or if they have laboratory confirmed diagnosis.
           - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
         unit: cases per 100,000 people
-  deaths_before_1980:
+  deaths_before_1979:
     variables:
       tb_deaths_no:
-        title: Tuberculosis deaths (pre-1980)
+        title: Tuberculosis deaths (pre-1979)
         description_short: Reported deaths from tuberculosis.
         description_key:
           - Deaths before 1980 included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
         unit: deaths
       tb_deaths_rate:
-        title: Tuberculosis deaths per 100,000 people (pre-1980)
+        title: Tuberculosis deaths per 100,000 people (pre-1979)
         description_short: Reported deaths from tuberculosis per 100,000 people.
         unit: deaths per 100,000 people
-  deaths_after_1980:
+  deaths_after_1979:
     variables:
       tb_deaths_no:
-        title: Tuberculosis deaths (post-1980)
+        title: Tuberculosis deaths (post-1979)
         description_short: Reported deaths from tuberculosis.
         description_key:
           - Deaths before 1980 included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
         unit: deaths
       tb_deaths_rate:
-        title: Tuberculosis deaths per 100,000 people (post-1980)
+        title: Tuberculosis deaths per 100,000 people (post-1979)
         description_short: Reported deaths from tuberculosis per 100,000 people.
         unit: deaths per 100,000 people

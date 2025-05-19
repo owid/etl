@@ -35,14 +35,14 @@ def run() -> None:
     # The large decrease in death rate in 1979 occurred because late effects of tuberculosis (e.g., bronchiectasis or fibrosis) and pleurisy with effusion
     # (without mention of cause) are no longer included in tuberculosis deaths.
     # So we need to split the table into two parts.
-    tb_deaths_before_1980 = tb[["country", "year", "tb_deaths_no", "tb_deaths_rate"]][tb["year"] <= 1979].copy()
-    tb_deaths_after_1980 = tb[["country", "year", "tb_deaths_no", "tb_deaths_rate"]][tb["year"] > 1979].copy()
+    tb_deaths_before_1979 = tb[["country", "year", "tb_deaths_no", "tb_deaths_rate"]][tb["year"] <= 1978].copy()
+    tb_deaths_after_1979 = tb[["country", "year", "tb_deaths_no", "tb_deaths_rate"]][tb["year"] > 1978].copy()
 
     # Improve table format.
     tb_cases_before_1975 = tb_cases_before_1975.format(["country", "year"], short_name="cases_before_1975")
     tb_cases_after_1975 = tb_cases_after_1975.format(["country", "year"], short_name="cases_after_1975")
-    tb_deaths_before_1980 = tb_deaths_before_1980.format(["country", "year"], short_name="deaths_before_1980")
-    tb_deaths_after_1980 = tb_deaths_after_1980.format(["country", "year"], short_name="deaths_after_1980")
+    tb_deaths_before_1980 = tb_deaths_before_1979.format(["country", "year"], short_name="deaths_before_1979")
+    tb_deaths_after_1980 = tb_deaths_after_1979.format(["country", "year"], short_name="deaths_after_1979")
     #
     # Save outputs.
     #
