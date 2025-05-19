@@ -8,7 +8,7 @@ from collections import defaultdict
 from copy import deepcopy
 from itertools import product
 from string import Formatter
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 from deprecated import deprecated
 from owid.catalog import Dataset
@@ -265,7 +265,7 @@ def _check_missing_fields(template: str, view_params: dict) -> None:
         raise PlaceholderError(f"Missing keys for placeholders {missing!r} in template: {template!r}")
 
 
-def fill_placeholders(data, view_params) -> Dict[str, Any]:
+def fill_placeholders(data, view_params) -> Union[Dict[str, Any], List[Any], Set[Any], Tuple[Any], str]:
     """
     Recursively walk *data* (dicts, lists, tuples, sets, primitives) and
     replace any `{placeholder}` found in strings using values from *view_params*.
