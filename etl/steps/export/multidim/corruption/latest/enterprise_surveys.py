@@ -81,7 +81,6 @@ def adjust_dimensions_corruption(tb):
     And updates `original_short_name` to 'bribery_prevalence' for all.
     """
 
-        "percent_of_firms_expected_to_give_gifts_to_get_a_water_connection": "water_connection",
     service_mapping = {
         "bribery_incidence__percent_of_firms_experiencing_at_least_one_bribe_payment_request": "At least one bribe request",
         "percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials": "Tax official",
