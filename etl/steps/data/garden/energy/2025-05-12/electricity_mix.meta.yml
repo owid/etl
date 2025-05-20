@@ -565,7 +565,8 @@ tables:
         title: Electricity generation - TWh
         short_unit: TWh
         unit: terawatt-hours
-        description_short: *description_short_twh
+        description_short: |-
+          Total electricity generated in each country or region, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Total electricity
         presentation:
