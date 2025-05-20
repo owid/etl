@@ -45,14 +45,14 @@ def run() -> None:
     # Improve table format.
     tb_cases_before_1975 = tb_cases_before_1975.format(["country", "year"], short_name="cases_before_1975")
     tb_cases_after_1975 = tb_cases_after_1975.format(["country", "year"], short_name="cases_after_1975")
-    tb_deaths_before_1980 = tb_deaths_before_1979.format(["country", "year"], short_name="deaths_before_1979")
-    tb_deaths_after_1980 = tb_deaths_after_1979.format(["country", "year"], short_name="deaths_after_1979")
+    tb_deaths_before_1979 = tb_deaths_before_1979.format(["country", "year"], short_name="deaths_before_1979")
+    tb_deaths_after_1979 = tb_deaths_after_1979.format(["country", "year"], short_name="deaths_after_1979")
     #
     # Save outputs.
     #
     # Initialize a new garden dataset.
     ds_garden = paths.create_dataset(
-        tables=[tb_cases_before_1975, tb_cases_after_1975, tb_deaths_before_1980, tb_deaths_after_1980],
+        tables=[tb_cases_before_1975, tb_cases_after_1975, tb_deaths_before_1979, tb_deaths_after_1979],
         default_metadata=ds_meadow.metadata,
     )
 
