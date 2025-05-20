@@ -1,11 +1,19 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog.meta import TableDimension
+from owid.catalog.utils import underscore
 
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+MULTIDIM_CONFIG = {
+    "hasMapTab": True,
+    "chartTypes": ["DiscreteBar"],
+    "tab": "map",
+    "originUrl": "ourworldindata.org/corruption",
+    "maxTime": "latest",
+}
 
 
 def run() -> None:
@@ -31,15 +39,30 @@ def run() -> None:
     c = paths.create_collection(
         config=config,
         tb=tb,
+        common_view_config=MULTIDIM_CONFIG,
     )
 
-    #
-    # (optional) Edit views
-    #
-    for view in c.views:
-        # if view.dimension["sex"] == "male":
-        #     view.config["title"] = "Something else"
-        pass
+    # Add grouped view
+    c.group_views(
+        groups=[
+            {
+                "dimension": "service",
+                "choice_new_slug": "side_by_side",
+                "view_config": {
+                    "hasMapTab": False,
+                    "chartTypes": ["DiscreteBar"],
+                    "tab": "chart",
+                    "facettingLabelByYVariables": "service",
+                    "selectedFacetStrategy": "metric",
+                    "title": "Share of businesses asked for bribes, by type of transaction",
+                    "subtitle": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials.",
+                },
+                "view_metadata": {
+                    "description_short": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials."
+                },
+            },
+        ]
+    )
 
     #
     # Save garden dataset.
@@ -52,22 +75,23 @@ def adjust_dimensions_corruption(tb):
     Add dimensions to corruption-related table columns.
 
     It adds fields:
-    - `stage` (what the bribe was for)
+    - `sector` (what the bribe was for)
 
 
     And updates `original_short_name` to 'bribery_prevalence' for all.
     """
 
-    sector_mapping = {
-        "bribery_incidence__percent_of_firms_experiencing_at_least_one_bribe_payment_request": "any",
-        "percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials": "tax",
-        "percent_of_firms_expected_to_give_gifts_to_secure_government_contract": "government_contract",
-        "percent_of_firms_expected_to_give_gifts_to_get_an_operating_license": "operating_license",
-        "percent_of_firms_expected_to_give_gifts_to_get_an_import_license": "import_license",
-        "percent_of_firms_expected_to_give_gifts_to_get_a_construction_permit": "construction_permit",
-        "percent_of_firms_expected_to_give_gifts_to_get_an_electrical_connection": "electrical_connection",
         "percent_of_firms_expected_to_give_gifts_to_get_a_water_connection": "water_connection",
-        "percent_of_firms_expected_to_give_gifts_to_public_officials_to_get_things_done": "general",
+    service_mapping = {
+        "bribery_incidence__percent_of_firms_experiencing_at_least_one_bribe_payment_request": "At least one bribe request",
+        "percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials": "Tax official",
+        "percent_of_firms_expected_to_give_gifts_to_secure_government_contract": "Government contract",
+        "percent_of_firms_expected_to_give_gifts_to_get_an_operating_license": "Operating_license",
+        "percent_of_firms_expected_to_give_gifts_to_get_an_import_license": "Import license",
+        "percent_of_firms_expected_to_give_gifts_to_get_a_construction_permit": "Construction permit",
+        "percent_of_firms_expected_to_give_gifts_to_get_an_electrical_connection": "Electrical connection",
+        "percent_of_firms_expected_to_give_gifts_to_get_a_water_connection": "Water connection",
+        "percent_of_firms_expected_to_give_gifts_to_public_officials_to_get_things_done": "To get things done",
     }
 
     indicator_name = "bribery_prevalence"
@@ -76,21 +100,21 @@ def adjust_dimensions_corruption(tb):
         if col in ["country", "year"]:
             continue
 
-        if col not in sector_mapping:
-            raise Exception(f"Column '{col}' not recognized in sector mapping")
+        if col not in service_mapping:
+            raise Exception(f"Column '{col}' not recognized in service mapping")
 
         # Set short name
         tb[col].metadata.original_short_name = indicator_name
         tb[col].metadata.dimensions = {}
 
         # Set dimensions
-        tb[col].metadata.dimensions["sector"] = sector_mapping[col]
+        tb[col].metadata.dimensions["service"] = service_mapping[col]
 
     # Add dimension definitions at table level
     if isinstance(tb.metadata.dimensions, list):
         tb.metadata.dimensions.extend(
             [
-                {"name": "sector", "slug": "sector"},
+                {"name": "Service", "slug": "service"},
             ]
         )
 
