@@ -7,7 +7,7 @@ definitions:
     Measured in [kilowatt-hours](#dod:watt-hours) per person.
   # Processing description for indicators that combine Ember and EI data, proritizing Ember (most indicators).
   description_processing_electricity_generation_origins: |-
-    - We rely on Ember as the main source of electricity data. While the Energy Institute (EI) provides a longer time-series (dating back to 1965) than Ember (dating back only to 1990 for European countries and 2000 for other countries), EI does not provide data for all countries or for all sources of electricity (bioenergy is not provided). So, where data from Ember is available for a given country and year, we rely on it as the primary source. We then supplement this with data from EI where data from Ember is not available.
+    - While the Energy Institute (EI) provides a longer time series (dating back to 1965) than Ember (dating back only to 1990 for European countries and 2000 for other countries), EI does not cover all countries or all sources of electricity (for example, generation from bioenergy is missing). Therefore, when data from Ember is available for a given country and year, we use it as the primary data source. Where Ember data is unavailable, we supplement it with data from EI.
   # Processing description for indicators that only use Ember data.
   description_procesing_only_ember_origins: ""
   # Processing description for direct primary energy consumption indicators.
