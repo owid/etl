@@ -292,7 +292,7 @@ def fill_placeholders(data, view_params) -> Union[Dict[str, Any], List[Any], Set
 
 
 @deprecated("Use class method Collection.group_views instead.")
-def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
+def group_views_legacy(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
     """
     Group views by the specified dimensions. Concatenate indicators for the same group.
 
