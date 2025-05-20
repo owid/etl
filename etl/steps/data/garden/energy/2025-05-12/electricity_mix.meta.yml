@@ -88,7 +88,8 @@ tables:
         title: Electricity from fossil fuels - TWh
         short_unit: TWh
         unit: terawatt-hours
-        description_short: *description_short_twh
+        description_short: |-
+          Electricity generation from coal, oil, and gas, measured in [terawatt-hours](#dod:watt-hours).
         display:
           name: Fossil fuels
         presentation:
@@ -97,7 +98,8 @@ tables:
         title: Fossil fuels - % electricity
         short_unit: '%'
         unit: '%'
-        description_short: *description_short_pct
+        description_short: |-
+          Electricity generation from coal, oil, and gas, measured as a percentage of total electricity produced in the country or region.
         display:
           name: Fossil fuels
         presentation:
@@ -272,7 +274,8 @@ tables:
         title: Fossil fuel electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
-        description_short: *description_short_per_capita
+        description_short: |-
+          Electricity generation from coal, oil, and gas, measured in [kilowatt-hours](#dod:watt-hours) per person.
         description_key:
           - *description_key_per_capita
         display:
