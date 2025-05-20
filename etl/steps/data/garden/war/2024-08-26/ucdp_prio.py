@@ -83,7 +83,7 @@ def run(dest_dir: str) -> None:
     tb = add_indicators_extra(
         tb,
         tb_regions,
-        columns_conflict_mortality=[
+        columns_conflict_deaths=[
             "number_deaths_ongoing_conflicts",
             "number_deaths_ongoing_conflicts_high",
             "number_deaths_ongoing_conflicts_low",

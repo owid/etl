@@ -230,7 +230,11 @@ def run_pipeline(
 
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
-    tb_participants = estimate_metrics_participants(tb, tb_prio, tb_codes)
+    tb_participants = estimate_metrics_participants(
+        tb,
+        tb_prio,
+        tb_codes,
+    )
     tb_locations = estimate_metrics_locations(
         tb,
         tb_maps,
@@ -291,8 +295,8 @@ def run_pipeline(
     tb = add_indicators_extra(
         tb,
         tb_regions,
-        columns_conflict_rate=["number_ongoing_conflicts", "number_new_conflicts"],
-        columns_conflict_mortality=[
+        columns_conflict_count=["number_ongoing_conflicts", "number_new_conflicts"],
+        columns_conflict_deaths=[
             "number_deaths_ongoing_conflicts",
             "number_deaths_ongoing_conflicts_high",
             "number_deaths_ongoing_conflicts_low",
@@ -328,7 +332,7 @@ def run_pipeline(
 
 # Add conflict type
 def add_conflict_type(tb_ged: Table, tb_conflict: Table, last_year: int) -> Table:
-    """Add `conflict_type` to georeferenced dataset table.
+    """Add `conflict_type` to geo-referenced dataset table.
 
     Values for conflict_type are:
     - non-state conflict
@@ -338,16 +342,14 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table, last_year: int) -> Tabl
     - intrastate
     - internationalized intrastate
 
-    The thing is that the original table `tb_ged` only contains a very high level categorisation. In particular,
-    it labels all state-based conflicts as 'state-based'. Instead, we want to use a more fine grained definition:
-    extrasystemic, intrastate, interstate.
+    Context: The original table `tb_ged` only contains a very high-level categorization. In particular, it labels all state-based conflicts as 'state-based'. Instead, we want to use a more fine grained definition which distinguishes between extrasystemic, intrastate, interstate.
 
     Parameters
     ----------
         tb_ged: Table
-            This is the main table with the relevant data
+            This is the main table with the relevant data.
         tb_conflict: Table
-            This is a secondary table, that we use to obtain the conflict types of the conflicts.
+            This is a secondary table, that we use to obtain the conflict types of the state-based conflicts.
     """
     tb_conflict = tb_conflict.loc[:, ["conflict_id", "year", "type_of_conflict"]].drop_duplicates()
     assert tb_conflict.groupby(["conflict_id", "year"]).size().max() == 1, "Some conflict_id-year pairs are duplicated!"
@@ -610,10 +612,34 @@ def estimate_metrics_locations(
 
     reference: https://github.com/owid/notebooks/blob/main/JoeHasell/UCDP%20and%20PRIO/UCDP_georeferenced/ucdp_country_extract.ipynb
 
-    tb: actual data
-    tb_maps: map data (borders and stuff)
-    tb_codes: from gw codes. so that all countries have either a 1 or 0 (instead of missing data).
-    ds_population: population data (for rates)
+    Args:
+        tb: actual data
+        tb_maps: map data (borders and stuff)
+        tb_codes: from gw codes. so that all countries have either a 1 or 0 (instead of missing data).
+        ds_population: population data (for rates)
+
+    NOTES:
+
+    This function estimates country-level data for all columns. The only exception is `number_locations` which does exactly the opposite: only regional data is estimated.
+
+    Example:
+
+        >>> tb_locations[tb_locations["country"]=="Europe"].notna().sum()
+        year                        280
+        country                     280
+        conflict_type               280
+        number_deaths                 0
+        number_deaths_high            0
+        number_deaths_low             0
+        number_deaths_civilians       0
+        number_deaths_unknown         0
+        number_deaths_combatants      0
+        is_location_of_conflict       0
+        death_rate                    0
+        death_rate_high               0
+        death_rate_low                0
+        number_locations            280
+
     """
     tb_codes_ = tb_codes.reset_index().drop(columns=["id"]).copy()
     tb_codes_ = tb_codes_.loc[tb_codes_["year"] >= 1989]
