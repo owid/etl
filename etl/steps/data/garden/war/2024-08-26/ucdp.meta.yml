@@ -418,8 +418,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
         description_processing: |-
           {definitions.all.location_conflicts_method}
 
@@ -432,8 +430,6 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
-        presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
         description_processing: |-
           {definitions.all.location_conflicts_method}
 
@@ -446,8 +442,6 @@ tables:
         description_key: *description_key_deaths_type
         display:
           numDecimalPlaces: 1
-        presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
         description_processing: |-
           {definitions.all.location_conflicts_method}
 

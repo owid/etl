@@ -1348,9 +1348,10 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     Basically means setting to zero null entries after 1989.
     """
     # Sanity check
-    assert (
-        tb.loc[tb["conflict_type"] == "extrasystemic", "year"].max() == 1989
-    ), "There are years beyond 1989 for extrasystemic conflicts by default!"
+    if "extrasystemic" in tb["conflict_type"].unique():
+        assert (
+            tb.loc[tb["conflict_type"] == "extrasystemic", "year"].max() == 1989
+        ), "There are years beyond 1989 for extrasystemic conflicts by default!"
 
     # Get only extra-systemic stuff
     mask = tb.conflict_type == "extrasystemic"
@@ -1359,7 +1360,7 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     # add all combinations
     years = np.arange(tb["year"].min(), tb["year"].max() + 1)
     regions = set(tb["region"])
-    new_idx = pd.MultiIndex.from_product([years, regions], names=["year", "region"])
+    new_idx = pd.MultiIndex.from_product(iterables=[years, regions], names=["year", "region"])
     tb_extra = tb_extra.set_index(["year", "region"]).reindex(new_idx).reset_index()
     tb_extra["conflict_type"] = "extrasystemic"
 
@@ -1368,22 +1369,31 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
         "number_ongoing_conflicts",
         "number_new_conflicts",
     ]
-    tb_extra[columns] = tb_extra[columns].fillna(0)
+    cols = list(set(columns).intersection(tb_extra.columns))
+    if cols:
+        tb_extra[columns] = tb_extra[columns].fillna(0)
 
     # Replace nulls with zeroes (only post 1989 time series)
     columns = [
+        # Deaths
         "number_deaths_ongoing_conflicts",
         "number_deaths_ongoing_conflicts_high",
         "number_deaths_ongoing_conflicts_low",
         "number_deaths_ongoing_conflicts_civilians",
         "number_deaths_ongoing_conflicts_unknown",
         "number_deaths_ongoing_conflicts_combatants",
+        # Death rate
+        "number_deaths_ongoing_conflicts_per_capita",
+        "number_deaths_ongoing_conflicts_high_per_capita",
+        "number_deaths_ongoing_conflicts_low_per_capita",
     ]
-    mask_1989 = tb_extra["year"] >= 1989
-    tb_extra.loc[mask_1989, columns] = tb_extra.loc[mask_1989, columns].fillna(0)
+    cols = list(set(columns).intersection(tb_extra.columns))
+    if cols:
+        mask_1989 = tb_extra["year"] >= 1989
+        tb_extra.loc[mask_1989, cols] = tb_extra.loc[mask_1989, cols].fillna(0)
 
     # Add to main table
-    tb = pr.concat([tb[-mask], tb_extra])
+    tb = pr.concat([tb[~mask], tb_extra])
     return tb
 
 
@@ -1477,6 +1487,8 @@ def merge_country_and_region_data(tb: Table, tb_locations: Table) -> Table:
     cols_index = ["year", "region", "conflict_type"]
     col_indicators = [col for col in tb_locations_.columns if col not in cols_index]
     tb_locations_ = tb_locations_.dropna(how="all", subset=col_indicators)
+    ## Add extrasystemic entries
+    tb_locations_ = fix_extrasystemic_entries(tb_locations_)
 
     ## 2) Sanity checks
     ## Check that there is no redundant rows (regional data in only-country-data and viceversa)!
