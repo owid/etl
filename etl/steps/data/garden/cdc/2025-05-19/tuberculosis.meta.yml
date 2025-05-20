@@ -18,6 +18,7 @@ tables:
         description_short: Reported cases of tuberculosis.
         description_key:
           - The data is split at 1975 for cases due to changes in surveillance methods implemented by the CDC during those years.
+          - Prior to 1975, only new cases of tuberculosis were counted in the data and relapses were not included.
           - Pre-1975 data may not be directly comparable with post-1975 data due to these methodological differences.
         unit: cases
         display:
@@ -27,6 +28,7 @@ tables:
         description_short: Reported cases of tuberculosis per 100,000 people.
         description_key:
           - The data is split at 1975 for cases due to changes in surveillance methods implemented by the CDC during those years.
+          - Prior to 1975, only new cases of tuberculosis were counted in the data and relapses were not included.
           - Pre-1975 data may not be directly comparable with post-1975 data due to these methodological differences.
         unit: cases per 100,000 people
         display:
@@ -39,9 +41,10 @@ tables:
         description_short: Reported cases of tuberculosis.
         description_key:
           - The data is split at 1975 for cases due to changes in surveillance methods implemented by the CDC during those years.
+          - After 1975, the data includes all cases of tuberculosis, including relapses.
+          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
           - Pre-1975 data may not be directly comparable with post-1975 data due to these methodological differences.
           - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have symptoms of tuberculosis, or if they have laboratory confirmed diagnosis.
-          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
         unit: cases
         display:
           numDecimalPlaces: 0
@@ -51,9 +54,10 @@ tables:
         description_short: Reported cases of tuberculosis per 100,000 people.
         description_key:
           - The data is split at 1975 for cases due to changes in surveillance methods implemented by the CDC during those years.
+          - After 1975, the data includes all cases of tuberculosis, including relapses.
+          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
           - Pre-1975 data may not be directly comparable with post-1975 data due to these methodological differences.
           - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptoms, or if they have laboratory confirmed diagnosis.
-          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
         unit: cases per 100,000 people
         display:
           numDecimalPlaces: 1
@@ -72,6 +76,8 @@ tables:
       tb_deaths_rate:
         title: Tuberculosis deaths per 100,000 people (pre-1979)
         description_short: Reported deaths from tuberculosis per 100,000 people.
+        description_key:
+          - Before 1979, this variable had a broader definition and included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
         unit: deaths per 100,000 people
         display:
           numDecimalPlaces: 1
