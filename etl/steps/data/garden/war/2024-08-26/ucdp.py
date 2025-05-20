@@ -309,6 +309,10 @@ def run_pipeline(
     # Adapt region names
     tb = adapt_region_names(tb)
 
+    # Combine regional & country data
+    ## For legacy reasons, we have generated two tables: `tb_locations` for country-data and `tb` for regional data. However, we want to combine them into one table.
+    tb = merge_country_and_region_data(tb, tb_locations)
+
     # Tables
     tables = [
         tb.format(["year", "region", "conflict_type"], short_name=paths.short_name),
@@ -1435,6 +1439,7 @@ def add_conflict_all_statebased(tb: Table) -> Table:
 
 # Region names
 def adapt_region_names(tb: Table) -> Table:
+    """Add suffix (UCDP) to region names."""
     assert not tb["region"].isna().any(), "There were some NaN values found for field `region`. This is not expected!"
     # Get regions in table
     regions = set(tb["region"])
@@ -1446,6 +1451,50 @@ def adapt_region_names(tb: Table) -> Table:
     msk = tb["region"] != "World"
     tb.loc[msk, "region"] = tb.loc[msk, "region"] + " (UCDP)"
     return tb
+
+
+def merge_country_and_region_data(tb: Table, tb_locations: Table) -> Table:
+    ## 1) Prepare locations table: Select relevant columns, rename them according to main table
+    cols_rename = {
+        "year": "year",
+        "country": "region",
+        "conflict_type": "conflict_type",
+        # Deaths
+        "number_deaths": "number_deaths_ongoing_conflicts",
+        "number_deaths_high": "number_deaths_ongoing_conflicts_high",
+        "number_deaths_low": "number_deaths_ongoing_conflicts_low",
+        "number_deaths_civilians": "number_deaths_ongoing_conflicts_civilians",
+        "number_deaths_unknown": "number_deaths_ongoing_conflicts_unknown",
+        "number_deaths_combatants": "number_deaths_ongoing_conflicts_combatants",
+        # Death rate
+        "death_rate": "number_deaths_ongoing_conflicts_per_capita",
+        "death_rate_high": "number_deaths_ongoing_conflicts_high_per_capita",
+        "death_rate_low": "number_deaths_ongoing_conflicts_low_per_capita",
+    }
+    col_names = list((cols_rename.keys()))
+    tb_locations_ = tb_locations.copy().loc[:, col_names].rename(columns=cols_rename)
+    ## Remove all-NA rows
+    cols_index = ["year", "region", "conflict_type"]
+    col_indicators = [col for col in tb_locations_.columns if col not in cols_index]
+    tb_locations_ = tb_locations_.dropna(how="all", subset=col_indicators)
+
+    ## 2) Sanity checks
+    ## Check that there is no redundant rows (regional data in only-country-data and viceversa)!
+    regions = set(tb["region"].unique())
+    countries = set(tb_locations_["region"].unique())
+    assert tb["region"].isin(countries).sum() == 0, "There are some regions in tb that are not in tb_locations_!"
+    assert (
+        tb_locations_["region"].isin(regions).sum() == 0
+    ), "There are some countries in tb_locations_ that are not in tb!"
+    ## Check that all columns in tb_locations_ are in tb
+    assert tb_locations_.columns.difference(
+        tb.columns
+    ).empty, f"Some columns in `tb_locations_` are not in `tb`: {tb_locations_.columns} vs {tb.columns}"
+
+    ## 3) Combine
+    tb_new = pr.concat([tb, tb_locations_])
+
+    return tb_new
 
 
 # Aux
