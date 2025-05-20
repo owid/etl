@@ -236,6 +236,7 @@ def test_long_to_wide():
     table = Table(df.set_index(["country", "year", "age"]))
     table.deaths.metadata.unit = "people"
     table.deaths.metadata.title = "Deaths"
+    # table.deaths.metadata.presentation = {"grapher_config": {"colorScale": {"customNumericValues": "[1, 2, 3]"}}}
 
     wide = gh.long_to_wide(table)
 
