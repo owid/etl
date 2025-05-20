@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from owid.catalog.meta import TableDimension
-
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
