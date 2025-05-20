@@ -647,6 +647,8 @@ tables:
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
+        description_from_producer: |-
+          % of population living in households with consumption or income per person below the poverty line at <<ppp_version>> international prices. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -689,6 +691,8 @@ tables:
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
+        description_from_producer: |-
+          Number of people living on less than a day at <<ppp_version>> PPP is calculated by multiplying the poverty rate and the population. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
             name: Share of population not in poverty (above {definitions.poverty_line_a_day})
             numDecimalPlaces: 1
@@ -931,6 +935,8 @@ tables:
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
+        description_from_producer: |-
+          Poverty gap at a day (<<ppp_version>> PPP) is the mean shortfall in income or consumption from the poverty line a day (counting the nonpoor as having zero shortfall), expressed as a percentage of the poverty line. This measure reflects the depth of poverty as well as its incidence. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -972,6 +978,8 @@ tables:
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
+        description_from_producer: |-
+          This is the mean across the population of the proportionate poverty gaps, as measured by the log of the ratio of the poverty line to income, where the mean is formed over the whole population, counting the nonpoor as having a zero poverty gap.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -999,6 +1007,8 @@ tables:
         description_processing: |-
           {definitions.description_processing_relative_poverty}
           {definitions.description_processing_main}
+        description_from_producer: |-
+          The square of Poverty gap. Poverty gap at a day (<<ppp_version>> PPP) is the mean shortfall in income or consumption from the poverty line a day (counting the nonpoor as having zero shortfall), expressed as a percentage of the poverty line. This measure reflects the depth of poverty as well as its incidence. As a result of revisions in PPP exchange rates, poverty rates for individual countries cannot be compared with poverty rates reported in earlier editions.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1046,6 +1056,8 @@ tables:
           - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_main}
+        description_from_producer: |-
+          The poverty headcount ratio at societal poverty line is the percentage of a population living in poverty according to the World Bank's Societal Poverty Line. The Societal Poverty Line is expressed in purchasing power adjusted <<ppp_version>> U.S. dollars and defined as max({definitions.poverty_line}, $1.15 + 0.5*Median). This means that when the national median is sufficiently low, the Societal Poverty line is equivalent to the extreme poverty line, {definitions.poverty_line}. For countries with a sufficiently high national median, the Societal Poverty Line grows as countries’ median income grows.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1069,6 +1081,8 @@ tables:
           - "{definitions.description_key_nowcasts}"
         description_processing: |-
           {definitions.description_processing_main}
+        description_from_producer: |-
+          The average shortfall from a prosperity standard of {definitions.prosperity_gap_threshold} per day (adjusted for differences in purchasing power parity across countries). It is measured as the average factor by which incomes fall short of {definitions.prosperity_gap_threshold}.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1105,6 +1119,8 @@ tables:
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
+        description_from_producer: |-
+          The Gini index measures the extent to which the distribution of income (or, in some cases, consumption expenditure) among individuals or households within an economy deviates from a perfectly equal distribution. A Lorenz curve plots the cumulative percentages of total income received against the cumulative number of recipients, starting with the poorest individual or household. The Gini index measures the area between the Lorenz curve and a hypothetical line of absolute equality, expressed as a percentage of the maximum area under the line. Thus, a Gini index of 0 represents perfect equality, while an index of 100 implies perfect inequality.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1271,6 +1287,8 @@ tables:
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
+        description_from_producer: |-
+          The mean log deviation. This is an index of inequality, given by the mean across the population of the log of the overall mean divided by individual income.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1334,6 +1352,8 @@ tables:
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
+        description_from_producer: |-
+          The mean is the average monthly household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1372,6 +1392,8 @@ tables:
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
+        description_from_producer: |-
+          The median of monthly household per capita income or consumption expenditure from the survey in <<ppp_version>> PPP.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1448,6 +1470,8 @@ tables:
           - "{definitions.description_key_not_market_income}"
         description_processing: |-
           {definitions.description_processing_main}
+        description_from_producer: |-
+          Percentage share of income or consumption is the share that accrues to subgroups of population indicated by deciles. Percentage shares by deciles may not sum to 100 because of rounding.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
