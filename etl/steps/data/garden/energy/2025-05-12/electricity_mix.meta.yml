@@ -17,8 +17,6 @@ definitions:
   description_processing_primary_energy_origins: ""
   # Processing description for population indicator.
   description_processing_population: ""
-  description_short_low_carbon: &description_short_low_carbon |-
-    Low-carbon sources correspond to renewables and nuclear power, that produce significantly less greenhouse-gas emissions than fossil fuels.
   description_key_per_capita: &description_key_per_capita |-
     Per capita figures are calculated by dividing total values by the population of the country or region. Population data is constructed by Our World in Data, based on [various sources](https://ourworldindata.org/grapher/population).
   common:
@@ -63,7 +61,7 @@ tables:
         short_unit: gCO₂
         unit: grams of CO₂ equivalents per kilowatt-hour
         description_short: |-
-          Greenhouse gases emitted per unit of generated electricity, measured in grams of [CO₂ equivalents](#dod:carbondioxideequivalents) per [kilowatt-hour](#dod:watt-hours).
+          [Greenhouse gases](#dod:ghgemissions) emitted per unit of generated electricity, measured in grams of [CO₂ equivalents](#dod:carbondioxideequivalents) per [kilowatt-hour](#dod:watt-hours).
         display:
           name: Carbon intensity
         presentation:
@@ -144,7 +142,8 @@ tables:
         title: Low-carbon electricity - TWh
         short_unit: TWh
         unit: terawatt-hours
-        description_short: *description_short_low_carbon
+        description_short: |-
+          Measured in [terawatt-hours](#dod:watt-hours). Low-carbon sources correspond to renewables and nuclear power, that produce significantly less [greenhouse-gas emissions](#dod:ghgemissions) than fossil fuels. Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.
         display:
           name: Low-carbon
         presentation:
@@ -153,7 +152,8 @@ tables:
         title: Low-carbon electricity - % electricity
         short_unit: '%'
         unit: '%'
-        description_short: *description_short_low_carbon
+        description_short: |-
+          Measured as a percentage of total electricity produced in the country or region. Low-carbon sources correspond to renewables and nuclear power, that produce significantly less [greenhouse-gas emissions](#dod:ghgemissions) than fossil fuels. Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.
         display:
           name: Low-carbon
         presentation:
@@ -308,7 +308,8 @@ tables:
         title: Low-carbon electricity per capita - kWh
         short_unit: kWh
         unit: kilowatt-hours
-        description_short: *description_short_low_carbon
+        description_short: |-
+          Measured in [kilowatt-hours](#dod:watt-hours) per person. Low-carbon sources correspond to renewables and nuclear power, that produce significantly less [greenhouse-gas emissions](#dod:ghgemissions) than fossil fuels. Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.
         description_key:
           - *description_key_per_capita
         display:
