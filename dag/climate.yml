@@ -237,3 +237,11 @@ steps:
   export://explorers/climate/latest/climate_change:
     - data://grapher/climate/2025-03-17/climate_change_impacts_monthly
     - data://grapher/climate/2025-03-17/climate_change_impacts_annual
+
+  #
+  # IPCC scenarios
+  #
+  data://grapher/emissions/2022-08-30/ipcc_scenarios:
+    - snapshot://emissions/2022-08-30/ipcc_scenarios.zip
+  export://explorers/emissions/latest/ipcc_scenarios:
+    - data://grapher/emissions/2022-08-30/ipcc_scenarios

@@ -33,6 +33,7 @@ MAPPABLE_COUNTRIES = [
     "ARE",
     "ARG",
     "ARM",
+    "ATA",
     "ATF",
     "ATG",
     "AUS",
@@ -234,6 +235,7 @@ MAPPABLE_COUNTRIES = [
 NO_COUNTRY_PAGE = [
     "ALA",
     "ANT",
+    "ATA",
     "ATF",
     "BES",
     "BVT",

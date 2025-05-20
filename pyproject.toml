@@ -127,6 +127,7 @@ wizard = [
     "streamlit-ace>=0.1.1",
     "streamlit-extras>=0.3.6",
     "streamlit-agraph>=0.0.45",
+    "pygwalker>=0.4.9",
     "plotly>=5.23.0",
     "geographiclib>=2.0",
     "pyproj>=3.6.1",

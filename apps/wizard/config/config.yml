@@ -68,6 +68,15 @@ etl:
       disable:
         "production": True
         "staging": True
+    collection:
+      title: "Collection"
+      entrypoint: etl_steps/collection.py
+      icon: ":material/collections:"
+      image_url: "https://cdn12.picryl.com/photo/2016/12/31/stamps-collection-philately-backgrounds-textures-0097d9-1024.jpg"
+      description: "MDIMs, Explorers."
+      disable:
+        "production": True
+        "staging": True
     fasttrack:
       title: "Fast Track"
       alias: fasttrack

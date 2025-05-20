@@ -1,0 +1,820 @@
+"""Model for collections."""
+
+import json
+import re
+from collections import defaultdict
+from copy import deepcopy
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
+
+import fastjsonschema
+import pandas as pd
+import yaml
+from owid.catalog.meta import GrapherConfig
+from structlog import get_logger
+from typing_extensions import Self
+
+from apps.chart_sync.admin_api import AdminAPI
+from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.model.base import MDIMBase, pruned_json
+from etl.collection.model.dimension import Dimension, DimensionChoice
+from etl.collection.model.view import CommonView, View, ViewIndicators
+from etl.collection.utils import (
+    fill_placeholders,
+    get_complete_dimensions_filter,
+    map_indicator_path_to_id,
+    unique_records,
+    validate_indicators_in_db,
+)
+from etl.config import OWID_ENV, OWIDEnv
+from etl.files import yaml_dump
+from etl.paths import EXPORT_DIR, SCHEMAS_DIR
+
+# Logging
+log = get_logger()
+
+
+@pruned_json
+@dataclass
+class Definitions(MDIMBase):
+    common_views: Optional[List[CommonView]] = None
+
+    def __post_init__(self):
+        # Validate that there is no duplicate common view (based on dimensions)
+        if self.common_views is not None:
+            if not (
+                isinstance(self.common_views, list) and all(isinstance(view, CommonView) for view in self.common_views)
+            ):
+                raise TypeError("`common_views` must be a list!")
+
+            records = []
+            for view in self.common_views:
+                records.append(view.dimensions)
+
+            df = pd.DataFrame.from_records([r if r else {} for r in records])
+
+            if df.duplicated().any():
+                info = df[df.duplicated()].to_dict(orient="records")
+                raise ValueError(f"Duplicate common views found! {info}")
+
+
+@pruned_json
+@dataclass
+class Collection(MDIMBase):
+    """Overall MDIM/Explorer config"""
+
+    dimensions: List[Dimension]
+    views: List[View]
+    catalog_path: str
+    title: Dict[str, str]
+    default_selection: List[str]
+
+    _definitions: Definitions
+
+    topic_tags: Optional[List[str]] = None
+    _default_dimensions: Optional[Dict[str, str]] = None
+
+    # Internal use. For save() method.
+    _collection_type: Optional[str] = field(init=False, default="multidim")
+
+    _group_operations_done: int = field(init=False, default=0)
+
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> Self:
+        """Coerce the dictionary into the expected shape before passing it to the parent class."""
+        # Make a shallow copy so we don't mutate the user's dictionary in-place
+        data = dict(d)
+
+        # If dictionary contains field 'definitions', change it for '_definitions'
+        if "definitions" in data:
+            data["_definitions"] = data["definitions"]
+            del data["definitions"]
+        else:
+            data["_definitions"] = Definitions()
+
+        # If dictionary contains field 'definitions', change it for '_definitions'
+        if "default_dimensions" in data:
+            data["_default_dimensions"] = data["default_dimensions"]
+            del data["default_dimensions"]
+
+        # Now that data is in the expected shape, let the parent class handle the rest
+        return super().from_dict(data)
+
+    def __post_init__(self):
+        # Sanity check
+        assert "#" in self.catalog_path, "Catalog path should be in the format `path#name`."
+
+    @property
+    def definitions(self) -> Definitions:
+        return self._definitions
+
+    @property
+    def default_dimensions(self) -> Optional[Dict[str, str]]:
+        return self._default_dimensions
+
+    @default_dimensions.setter
+    def default_dimensions(self, view_dimensions: Dict[str, str]) -> None:
+        """Set the default view for the collection.
+
+        Args:
+            view_dimensions: Dictionary mapping dimension slugs to their choice values
+                representing the view that should be displayed by default.
+
+        Raises:
+            ValueError: If the view dimensions don't correspond to any existing view
+        """
+        # Validate that this view actually exists
+        if not isinstance(view_dimensions, dict):
+            raise ValueError(f"Cannot set default view to {view_dimensions}: must be of type `dict`")
+
+        found = False
+        for view in self.views:
+            if all(view.dimensions.get(dim) == choice for dim, choice in view_dimensions.items()):
+                found = True
+                break
+
+        if not found:
+            raise ValueError(f"Cannot set default view to {view_dimensions}: no view matches these dimensions")
+
+        self._default_dimensions = view_dimensions
+
+    @property
+    def v(self):
+        return self.views
+
+    @property
+    def d(self):
+        return self.dimensions
+
+    @property
+    def local_config_path(self) -> Path:
+        # energy/latest/energy_prices#energy_prices -> export/multidim/energy/latest/energy_prices/config.yml
+        if self._collection_type is None:
+            raise ValueError("_collection_type must have a value!")
+        collection_dir = "explorers" if self._collection_type == "explorer" else self._collection_type
+        return EXPORT_DIR / collection_dir / (self.catalog_path.replace("#", "/") + ".config.json")
+
+    @property
+    def short_name(self):
+        _, name = self.catalog_path.split("#")
+        return name
+
+    @property
+    def schema_path(self) -> Path:
+        return SCHEMAS_DIR / f"{self._collection_type}-schema.json"
+
+    def save_config_local(self) -> None:
+        log.info(f"Exporting config to {self.local_config_path}")
+        self.save_file(self.local_config_path, force_create=False)
+
+    def save(  # type: ignore[override]
+        self,
+        owid_env: Optional[OWIDEnv] = None,
+        tolerate_extra_indicators: bool = False,
+        prune_choices: bool = True,
+        prune_dimensions: bool = True,
+    ):
+        # Ensure we have an environment set
+        if owid_env is None:
+            owid_env = OWID_ENV
+
+        # Prune non-used dimension choices
+        if prune_choices:
+            self.prune_dimension_choices()
+
+        # Ensure that all views are in choices
+        self.validate_views_with_dimensions()
+
+        # Validate duplicate views
+        self.check_duplicate_views()
+
+        # Check that no choice name or slug is repeated
+        self.validate_choice_uniqueness()
+
+        # Check that all indicators in explorer exist
+        indicators = self.indicators_in_use(tolerate_extra_indicators)
+        validate_indicators_in_db(indicators, owid_env.engine)
+
+        # Sort views based on dimension order
+        self.sort_views_based_on_dimensions()
+
+        # Pick default view first
+        self.sort_views_with_default_first()
+
+        # TODO: Prune dimensions if only one choice is in use
+        if prune_dimensions:
+            self.prune_dimensions()
+
+        # Export config to local directory in addition to uploading it to MySQL for debugging.
+        self.save_config_local()
+
+        # Upsert to DB
+        self.upsert_to_db(owid_env)
+
+    def upsert_to_db(self, owid_env: OWIDEnv):
+        # Replace especial fields URIs with IDs (e.g. sortColumnSlug).
+        # TODO: I think we could move this to the Grapher side.
+        config = replace_catalog_paths_with_ids(self.to_dict())
+
+        # Convert config from snake_case to camelCase
+        config = camelize(config, exclude_keys={"dimensions"})
+
+        # Upsert config via Admin API
+        admin_api = AdminAPI(owid_env)
+        admin_api.put_mdim_config(self.catalog_path, config)
+
+    def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
+        dix = super().to_dict(encode_json=encode_json)
+        if drop_definitions:
+            dix = {k: v for k, v in dix.items() if k not in {"_definitions", "definitions"}}
+        return dix
+
+    def get_dimension(self, slug: str) -> Dimension:
+        """Get dimension object with slug `slug`"""
+        for dim in self.dimensions:
+            if dim.slug == slug:
+                return dim
+        raise ValueError(f"Dimension {slug} not found in dimensions!")
+
+    def get_choice_names(self, dimension_slug: str) -> Dict[str, str]:
+        """Get all choice names in a given dimension."""
+        dimension = self.get_dimension(dimension_slug)
+        choice_names = {}
+        for choice in dimension.choices:
+            choice_names[choice.slug] = choice.name
+        return choice_names
+
+    def validate_views_with_dimensions(self):
+        """Validates that dimensions in all views are valid:
+
+        - TODO: The dimension slugs in all views are defined.
+        - The dimension choices in all views are defined.
+        """
+        # Get all dimension and choice slugs
+        dix = {dim.slug: dim.choice_slugs for dim in self.dimensions}
+
+        # Iterate over all views and validate dimensions and choices
+        for view in self.views:
+            for dim_slug, choice_slugs in dix.items():
+                # Check that dimension is defined in the view!
+                assert (
+                    dim_slug in view.dimensions
+                ), f"Dimension {dim_slug} not found in dimensions! View:\n{yaml_dump(view.to_dict())}"
+                # Check that choices defined in the view are valid!
+                assert (
+                    view.dimensions[dim_slug] in choice_slugs
+                ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
+
+    def validate_schema(self, schema_path: Optional[Union[str, Path]] = None):
+        """Validate class against schema."""
+        if schema_path is None:
+            schema_path = self.schema_path
+        with open(schema_path) as f:
+            s = f.read()
+
+            # Add "file://" prefix to "dataset-schema.json#"
+            # This is needed to activate file handler below. Unfortunately, fastjsonschema does not
+            # support file references out of the box
+            s = s.replace("dataset-schema.json#", "file://dataset-schema.json#")
+
+            schema = json.loads(s)
+
+        # file handler for file:// URIs
+        def file_handler(uri):
+            # Remove 'file://' prefix and build local path relative to the schema file
+            local_file = SCHEMAS_DIR / Path(uri.replace("file://", "")).name
+            with local_file.open() as f:
+                return json.load(f)
+
+        # Pass custom format for date validation
+        # NOTE: we use fastjsonschema because schema uses multiple $ref to an external schema.
+        #   python-jsonschema doesn't cache external resources and is extremely slow. It should be
+        #   possible to speed it up by pre-loading schema and inserting it dynamically if
+        #   fastjsonschema becomes hard to maintain.
+        validator = fastjsonschema.compile(
+            schema, handlers={"file": file_handler}, formats={"date": r"^\d{4}-\d{2}-\d{2}$"}
+        )
+
+        try:
+            validator(self.to_dict())  # type: ignore
+        except fastjsonschema.JsonSchemaException as e:
+            raise ValueError(f"Config validation error: {e.message}")  # type: ignore
+
+    def indicators_in_use(self, tolerate_extra_indicators: bool = False):
+        # Get all indicators used in all views
+        indicators = []
+        for view in self.views:
+            indicators.extend(view.indicators_used(tolerate_extra_indicators))
+
+        # Make sure indicators are unique
+        indicators = list(set(indicators))
+
+        return indicators
+
+    def check_duplicate_views(self):
+        """Check for duplicate views in the collection."""
+        check_duplicate_views(self.views)
+
+    def sort_choices(self, slug_order: Dict[str, Union[List[str], Callable]]):
+        """Sort choices based on the given order."""
+        not_expected = set(slug_order).difference(self.dimension_slugs)
+        if not_expected:
+            raise ValueError(
+                f"Dimension slug{'s' if len(not_expected) > 1 else ''} {not_expected} not found in dimensions! Available dimensions are: {self.dimension_slugs}"
+            )
+
+        for dim in self.dimensions:
+            if dim.slug in slug_order:
+                dim.sort_choices(slug_order[dim.slug])
+
+    def sort_views_based_on_dimensions(self):
+        priority_order = self.dimension_choices
+
+        def sort_key(view):
+            # For each dimension, get the index in the priority list
+            return tuple(
+                priority_order[dim].index(view.dimensions.get(dim, ""))
+                if view.dimensions.get(dim, "") in priority_order[dim]
+                else float("inf")
+                for dim in priority_order
+            )
+
+        self.views = sorted(self.views, key=sort_key)
+
+    def sort_views_with_default_first(self):
+        # If default dimensions are specified, move that view to the front
+        if not self.default_dimensions:
+            return
+
+        # Find the default view
+        default_view = None
+        for view in self.views:
+            # Check if this view matches exactly the default dimensions
+            if view.dimensions.keys() == self.default_dimensions.keys() and all(
+                view.dimensions[dim] == choice for dim, choice in self.default_dimensions.items()
+            ):
+                default_view = view
+                break
+
+        # If no matching view was found, show available options and raise error
+        if not default_view:
+            df = pd.DataFrame([v.dimensions for v in self.views])
+            dimensions_str = "\n".join([f"{k}: {v}" for k, v in self.default_dimensions.items()])
+            raise ValueError(
+                f"No view matches dimensions:\n\n{dimensions_str}\n\n"
+                f"Available dimensions in views are:\n\n{df.to_string()}"
+            )
+
+        # Move the default view to the front
+        self.views.remove(default_view)
+        self.views.insert(0, default_view)
+
+    def validate_choice_uniqueness(self):
+        """Validate that all choice names (and slugs) are unique."""
+        for dim in self.dimensions:
+            dim.validate_unique_names()
+            dim.validate_unique_slugs()
+
+    def validate_choice_names(self):
+        """Validate that all choice names are unique."""
+        for dim in self.dimensions:
+            dim.validate_unique_names()
+
+    def prune_dimensions(self):
+        """Remove dimension if only one of its choice is in use."""
+        # Get all dimension choices in use
+        all_occurrences = self.dimension_choices_in_use()
+
+        # Remove those not in use
+        for dim in self.dimensions:
+            if len(all_occurrences[dim.slug]) == 1:
+                # Remove from dimensions
+                self.dimensions.remove(dim)
+                # Remove from views
+                for view in self.views:
+                    if dim.slug in view.dimensions:
+                        del view.dimensions[dim.slug]
+
+    def prune_dimension_choices(self):
+        """Remove all dimension choices that are not used in any view."""
+        all_occurrences = self.dimension_choices_in_use()
+
+        # Remove those not in use
+        for dim in self.dimensions:
+            dim.choices = [choice for choice in dim.choices if choice.slug in all_occurrences[dim.slug]]
+
+    @property
+    def dimension_slugs(self):
+        return [dim.slug for dim in self.dimensions]
+
+    @property
+    def dimension_choices(self) -> Dict[str, List[str]]:
+        """Get all dimension choices in the collection."""
+        return {dim.slug: [choice.slug for choice in dim.choices] for dim in self.dimensions}
+
+    def dimension_choices_in_use(self) -> Dict[str, Set[str]]:
+        from collections import defaultdict
+
+        # Get all dimension choices in use
+        all_occurrences = defaultdict(set)
+
+        for view in self.views:
+            for key, value in view.dimensions.items():
+                all_occurrences[str(key)].add(value)
+
+        return dict(all_occurrences)
+
+    def drop_views(
+        self,
+        dimensions: Union[Dict[str, Union[List[str], str]], List[Dict[str, Union[List[str], str]]]],
+    ):
+        """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
+
+        Args:
+            dimensions (Dict[str, Union[List[str], str]]): Dictionary with the dimensions to drop. The keys are the dimension slugs, and the values are either a list of choices or a single choice.
+                    - Example 1: `dimensions = {"sex": "female"}`.
+                        Drop all views that have "female" in dimension sex.
+                    - Example 2: `dimensions = {"age": ["0-4", "5-9"]}`.
+                        Drop all views that have "0-4" OR "5-9" in dimension age.
+                    - Example 3: `dimensions = {"age": ["0-4", "5-9"], "sex": ["female", "male"]}`.
+                        Drop all views that have ("0-4" OR "5-9" in dimension age) AND ("female" OR "male" in dimension "sex"). The rest is kept.
+                    - Example 4: `dimensions = [{"sex": "female", "age": "0-4"}, {"sex": "male", "age": "5-9"}]`.
+                        Drop all views that have { ("0-4" in dimension "age") AND ("female" in dimension "sex") } OR { ("5-9" in dimension "age") AND ("male" in dimension "sex") }
+        """
+        # Get dimensions in use, and list of dimension slugs (ordered, used for key-identifying views)
+        dimensions_available = self.dimension_choices_in_use()
+
+        # Make sure we are dealing with a list
+        if isinstance(dimensions, dict):
+            dimensions = [dimensions]
+
+        # Get list of dimension arrangements to drop: Iterate over each dimension filter, and obtain explicit filter.
+        dimensions_drop = []
+        for dimensions_ in dimensions:
+            dimensions_drop_ = get_complete_dimensions_filter(dimensions_available, dimensions_)
+            dimensions_drop.extend(dimensions_drop_)
+        dimensions_drop = unique_records(dimensions_drop)
+
+        # Function to get key for each view
+        dimensions_order = list(dimensions_available.keys())
+
+        def _get_view_key(dimension_choices: Dict[str, str]):
+            return tuple(dimension_choices[dim] for dim in dimensions_order)
+
+        # Convert the list to set of IDs. Each element in the set identifies a dimension arrangement by a tuple with the choices.
+        drop_keys = {_get_view_key(dimension_drop) for dimension_drop in dimensions_drop}
+
+        # Iterate over all views and drop those that match the given dimensions
+        new_views = []
+        for view in self.views:
+            key = _get_view_key(view.dimensions)
+            if key not in drop_keys:
+                new_views.append(view)
+        self.views = new_views
+
+    def group_views(self, groups: List[Dict[str, Any]], drop_dimensions_if_single_choice: bool = True):
+        """Group views into new ones.
+
+        Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
+
+        Args:
+            groups (List[Dict[str, Any]]): List of dictionaries with the following keys:
+                    - dimension: str
+                        Slug of the dimension that contains the choices to group.
+                    - choices: List[str]
+                        Slugs of the choices to group. If none, all choices are used!
+                    - choice_new_slug: str
+                        The slug for the newly created choice. If the MDIM config file doesn't specify a name, it will be the same as the slug.
+                    - view_config: Optional[Dict[str, Any]], default=None
+                        The view config for the new choice. E.g. useful to tweak the chart type.
+                    - view_metadata: Optional[Dict[str, Any]], default=None
+                        The metadata for the new view. Useful to tweak the metadata around the chart in a data page (e.g. description key, etc.)
+                    - view_params: Dict[str, Any]
+                        Define any parameters that might be used in `view_config`. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
+                    - replace: Optional[bool], default=False
+                        If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
+                    - overwrite_dimension_choice: Optional[bool], default=False
+                        If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
+
+        Example 1:
+        ----------
+
+        Suppose you have two dimensions
+
+        - sex: 'female', 'male'
+        - age: '0-4', '5-9', '10-14'
+
+        Each view shows a single timeseries. Now, you now want to create a new view, with sex="combined", where the user can observe both timeseries (female and male) in a single view. Hence you'd end up with the following choices:
+
+            sex: 'female', 'male', 'combined'
+            age: '0-4', '5-9', '10-14'
+
+
+        In this example, you should use method arguments as `dimension="sex"`, `choices=["female", "male"]`, and `choice_new_slug="combined"`.
+
+        Example 2:
+        ----------
+        Sometimes, you may want to define config for the new views. In the example above, you have generated new views for male+female in three different age brackets. Suppose that you want to set the titles each of the three new views: "Population of people aged 0-4", "Population of people aged 5-9", and "Population of people aged 0-4 and 5-9", respectively.
+
+        You can programmatically do this with `view_config` and `view_params` (see code snippets below). Basically, you need to define a title template in `view_config`, and then pass the parameters in `view_params`. The template will be filled with the values in `view_params`.
+
+        ```python
+        c.group_views(
+            groups=[
+                {
+                    "dimension": "sex",
+                    "view_config": {
+                        "title": "Population of people aged {age}",
+                    }
+                    "view_params": {
+                        "age": "0-4",
+                    },
+                }
+            ]
+        )
+        ```
+
+        You can also use a function to dynamically generate a parameter:
+
+        ```python
+        c.group_views(
+            groups=[
+                {
+                    "dimension": "sex",
+                    "view_config": {
+                        "title": "Population of people aged {age}",
+                    }
+                    "view_params": {
+                        "age": lambda view: view.dimensions["age"],
+                    },
+                }
+            ]
+        )
+        ```
+        """
+        new_views_all = []
+        for group in groups:
+            # Get dimension slug
+            assert "dimension" in group, "Dimension must be provided!"
+            dimension = group["dimension"]
+            # Get choice slugs
+            if "choices" not in group:
+                choices = self.get_dimension(dimension).choice_slugs
+            else:
+                choices = group["choices"]
+
+            # Get new choice slug
+            assert "choice_new_slug" in group, "Dimension must be provided!"
+            choice_new_slug = group["choice_new_slug"]
+
+            # Config of new views
+            view_config = group.get("view_config")
+            view_metadata = group.get("view_metadata")
+            view_params = group.get("view_params")
+
+            # Sanity checks
+            self._sanity_check_view_grouping(
+                dimension=dimension,
+                choices=choices,
+                choice_new_slug=choice_new_slug,
+            )
+
+            # Create new views
+            new_views_ = self.create_new_grouped_views(
+                dimension=dimension,
+                choices=choices,
+                choice_new_slug=choice_new_slug,
+                view_config=view_config,
+                view_metadata=view_metadata,
+                view_params=view_params,
+            )
+            new_views_all.append(
+                {
+                    "overwrite": group.get("overwrite_dimension_choice", False),
+                    "views": new_views_,
+                    "dimension": dimension,
+                    "choice_new": choice_new_slug,
+                }
+            )
+
+            # Add dimensions. TODO: Use combine_dimensions instead?
+            for dim in self.dimensions:
+                if (dim.slug == dimension) and (choice_new_slug not in dim.choice_slugs):
+                    new_choice = DimensionChoice(
+                        slug=choice_new_slug,
+                        name=choice_new_slug,
+                    )
+                    # Add new choice to dimension
+                    dim.choices.append(new_choice)
+                    break
+
+        # Get list of new views from dictionary. Also, drop views in existing MDIM if needed (e.g. if there are collisions and overwrite_dimension_choice=True)
+        new_views_list = []
+        for new_views in new_views_all:
+            if new_views["overwrite"]:
+                # 1) TODO: Get list of dimensions to drop
+                dimensions_drop = [v.dimensions for v in new_views["views"]]
+                # 2) Drop dimensions
+                self.drop_views(dimensions_drop)
+            else:
+                try:
+                    check_duplicate_views(new_views["views"] + self.views)
+                except DuplicateCollectionViews:
+                    raise DuplicateCollectionViews(
+                        f"Duplicate views found (dimension `{new_views['dimension']}`, new choice `{new_views['choice_new']}`)! If you want to overwrite the existing views, set `overwrite_dimension_choice=True` in the parameters."
+                    )
+            # Add views to list
+            new_views_list.extend(new_views["views"])
+
+        # Extend views
+        self.views.extend(new_views_list)
+
+        # Remove original choices if asked to
+        for group in groups:
+            if group.get("replace", False):
+                dimension = group["dimension"]
+                choices = group["choices"]
+                # Remove views with old choices
+                new_views = [view for view in self.views if view.dimensions[dimension] not in choices]
+                # Remove unused choices
+                self.prune_dimension_choices()
+
+        # Drop dimension if it has only one choice in use
+        if drop_dimensions_if_single_choice:
+            self.prune_dimensions()
+
+    def _sanity_check_view_grouping(
+        self,
+        dimension: str,
+        choices: List[str],
+        choice_new_slug: str,
+    ):
+        # Sanity checks
+        dimension_choices = self.dimension_choices
+        # Check that the dimension exists
+        if dimension not in set(dimension_choices):
+            raise ValueError(f"Dimension {dimension} not found in dimensions!")
+
+        # Check that the choices exist
+        if not all([choice in dimension_choices[dimension] for choice in choices]):
+            raise ValueError(
+                f"Choices {choices} not found in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
+            )
+
+        # Check that the new choice slug is not IN USE. Note that it could still be in the dimension choices, but not in use. NOTE: this is tricky. As implemented above it fails for war/latest/mars collection step.
+        # choices_in_use = self.dimension_choices_in_use()
+        # if choice_new_slug in choices_in_use[dimension]:
+        #     raise ValueError(
+        #         f"Choice slug `{choice_new_slug}` already exists in dimension {dimension}! Available choices are: {dimension_choices[dimension]}"
+        #     )
+
+    def create_new_grouped_views(
+        self,
+        dimension: str,
+        choices: List[str],
+        choice_new_slug: str,
+        view_config: Optional[GrapherConfig] = None,
+        view_metadata: Optional[Any] = None,
+        view_params: Optional[Dict[str, Any]] = None,
+    ) -> List[View]:
+        """Create new grouped views."""
+        if view_params is None:
+            view_params = {}
+
+        if self._group_operations_done > 0:
+            log.warning(
+                "If you are doing more than one group operation, consider using `group_views` instead. It is optimized for batch operations, where each grouping is done in parallel."
+            )
+        # Prepare groups of views
+        grouped = defaultdict(list)
+        for view in self.views:
+            # Build a key excluding the dimension we're grouping
+            key = tuple((k, v) for k, v in view.dimensions.items() if k != dimension)
+            if view.dimensions[dimension] in choices:
+                grouped[key].append(view)
+
+        # Combine views
+        new_views = []
+        new_view_groups = list(grouped.values())
+        for view_group in new_view_groups:
+            # Create dimensions for new view
+            new_dimensions = view_group[0].dimensions.copy()
+            new_dimensions[dimension] = choice_new_slug
+            # Create new view
+            new_view = View(
+                dimensions=new_dimensions,
+                indicators=_combine_view_indicators(view_group),
+            )
+            # Create config for new view
+            params = view_params.copy()
+            for p, k in params.items():
+                if isinstance(k, Callable):
+                    params[p] = k(new_view)
+            new_config = fill_placeholders(view_config, params) if view_config else None
+            new_metadata = fill_placeholders(view_metadata, params) if view_metadata else None
+            # Add config to new view
+            new_view.config = cast(GrapherConfig, new_config)
+            new_view.metadata = new_metadata
+
+            # Add new view to list
+            new_views.append(new_view)
+
+        return new_views
+
+
+def _combine_view_indicators(views: List[View]):
+    y_indicators = []
+    for view in views:
+        if view.indicators.has_non_y_indicators():
+            raise NotImplementedError(
+                "Merging indicators from views is only implemented for views with *only* y indicators."
+            )
+        if view.indicators.y is None:
+            raise ValueError("View must have y indicators to be combined.")
+        y_indicators.extend(deepcopy(view.indicators.y))
+
+    indicators = ViewIndicators(y=y_indicators)
+    return indicators
+
+
+def check_duplicate_views(views: List[View]):
+    """Check for duplicate views in the collection."""
+    seen_dims = set()
+    for view in views:
+        dims = tuple(view.dimensions.items())
+        if dims in seen_dims:
+            raise DuplicateCollectionViews(f"Duplicate view:\n\n{yaml.dump(view.dimensions)}")
+        seen_dims.add(dims)
+
+
+def replace_catalog_paths_with_ids(config):
+    """Replace special metadata fields with their corresponding IDs in the database.
+
+    In ETL, we allow certain fields in the config file to reference indicators by their catalog path. However, this is not yet supported in the Grapher API, so we need to replace these fields with the corresponding indicator IDs.
+
+    NOTE: I think this is something that we should discuss changing on the Grapher side. So I see this function as a temporary workaround.
+
+    Currently, affected fields are:
+
+    - views[].config.sortColumnSlug
+
+    These fields above are treated like fields in `dimensions`, and also accessed from:
+    - `expand_catalog_paths`: To expand the indicator URI to be in its complete form.
+    - `validate_multidim_config`: To validate that the indicators exist in the database.
+
+    TODO: There might be other fields which might make references to indicators:
+        - config.map.columnSlug
+        - config.focusedSeriesNames
+    """
+    if "views" in config:
+        views = config["views"]
+        for view in views:
+            if "config" in view:
+                # Update sortColumnSlug
+                if "sortColumnSlug" in view["config"]:
+                    # Check if catalogPath
+                    # Map to variable ID
+                    view["config"]["sortColumnSlug"] = str(map_indicator_path_to_id(view["config"]["sortColumnSlug"]))
+                # Update map.columnSlug
+                if "map" in view["config"]:
+                    if "columnSlug" in view["config"]["map"]:
+                        view["config"]["map"]["columnSlug"] = str(
+                            map_indicator_path_to_id(view["config"]["map"]["columnSlug"])
+                        )
+
+    return config
+
+
+_pattern = re.compile(r"_([a-z])")
+
+
+def snake_to_camel(s: str) -> str:
+    # Use the compiled pattern to substitute underscores with the uppercase letter.
+    return _pattern.sub(lambda match: match.group(1).upper(), s)
+
+
+# model.core
+def camelize(obj: Any, exclude_keys: Optional[Set[str]] = None) -> Any:
+    """
+    Recursively converts dictionary keys from snake_case to camelCase, unless the key is in exclude_keys.
+
+    Parameters:
+        obj: The object (dict, list, or other) to process.
+        exclude_keys: An optional iterable of keys that should not be converted (including nested values).
+    """
+    exclude_keys = exclude_keys or set()
+
+    if isinstance(obj, dict):
+        new_obj: dict[Any, Any] = {}
+        for key, value in obj.items():
+            # Leave the key unchanged if it's in the exclusion list
+            if key in exclude_keys:
+                new_obj[key] = value
+            else:
+                new_obj[snake_to_camel(key)] = camelize(value, exclude_keys)
+        return new_obj
+    elif isinstance(obj, list):
+        return [camelize(item, exclude_keys) for item in obj]
+    else:
+        return obj

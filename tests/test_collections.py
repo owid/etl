@@ -1,7 +1,7 @@
 import pytest
 
-from etl.collection.model import CommonView, Definitions
-from etl.collection.utils import merge_common_metadata_by_dimension
+from etl.collection.model.core import Definitions
+from etl.collection.model.view import CommonView, merge_common_metadata_by_dimension
 
 
 def test_merge_common_metadata_1():
