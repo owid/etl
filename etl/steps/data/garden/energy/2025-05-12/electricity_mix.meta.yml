@@ -19,6 +19,8 @@ definitions:
   description_processing_population: ""
   description_short_low_carbon: &description_short_low_carbon |-
     Low-carbon sources correspond to renewables and nuclear power, that produce significantly less greenhouse-gas emissions than fossil fuels.
+  description_key_per_capita: &description_key_per_capita |-
+    Per capita figures are calculated by dividing total values by the population of the country or region. Population data is constructed by Our World in Data, based on [various sources](https://ourworldindata.org/grapher/population).
   common:
     processing_level: major
     presentation:
@@ -245,6 +247,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         description_processing: |-
           {definitions.description_procesing_only_ember_origins}
         display:
@@ -257,6 +261,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Coal
           numDecimalPlaces: 0
@@ -267,6 +273,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Fossil fuels
           numDecimalPlaces: 0
@@ -277,6 +285,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Gas
           numDecimalPlaces: 0
@@ -287,6 +297,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Hydro
           numDecimalPlaces: 0
@@ -297,6 +309,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_low_carbon
+        description_key:
+          - *description_key_per_capita
         display:
           name: Low-carbon
           numDecimalPlaces: 0
@@ -307,6 +321,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Nuclear
           numDecimalPlaces: 0
@@ -317,6 +333,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Oil
           numDecimalPlaces: 0
@@ -327,6 +345,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         description_processing: |-
           {definitions.description_procesing_only_ember_origins}
         display:
@@ -339,6 +359,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Other renewables including bioenergy
           numDecimalPlaces: 0
@@ -349,6 +371,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Renewables
           numDecimalPlaces: 0
@@ -359,6 +383,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Solar
           numDecimalPlaces: 0
@@ -369,6 +395,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Solar and wind
           numDecimalPlaces: 0
@@ -379,6 +407,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Total electricity
           numDecimalPlaces: 0
@@ -389,6 +419,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         description_processing: |-
           {definitions.description_procesing_only_ember_origins}
         display:
@@ -401,6 +433,8 @@ tables:
         short_unit: kWh
         unit: kilowatt-hours
         description_short: *description_short_per_capita
+        description_key:
+          - *description_key_per_capita
         display:
           name: Wind
           numDecimalPlaces: 0
