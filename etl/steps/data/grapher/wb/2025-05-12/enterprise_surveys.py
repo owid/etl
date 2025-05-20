@@ -1,5 +1,7 @@
 """Load a garden dataset and create a grapher dataset."""
 
+import owid.catalog.processing as pr
+
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -15,6 +17,15 @@ def run() -> None:
 
     # Read table from garden dataset.
     tb = ds_garden.read("enterprise_surveys", reset_index=False)
+    print(tb.columns)
+
+    # Assuming your DataFrame is named df
+    df_long = pr.melt(
+        df,
+        id_vars=["year", "country"],  # Keep these as identifier variables
+        var_name="indicator_name",  # Name of the new column for indicators
+        value_name="value",  # Name of the new column for the corresponding values
+    )
 
     #
     # Save outputs.
