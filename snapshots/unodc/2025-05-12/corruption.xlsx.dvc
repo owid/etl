@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: United Nations Office on Drugs and Crime
+    title: Corruption and Economic Crime
+    description: |-
+      The tables on corruption and economic crime include national figures on offenses for selected economic and environmental crimes recorded by the police or other law enforcement agencies.
+
+      These data is submitted by Member States to UNODC through the United Nations Survey of Crime Trends and Operations of Criminal Justice Systems (UN-CTS) or other means.
+    citation_full: UNODC (2024), UNODC Research - Data Portal – Corruption and Economic Crime. https://dataunodc.un.org/dp-crime-corruption-offences (Accessed on 09 May 2025).
+    attribution_short: UNODC
+
+    url_main: https://dataunodc.un.org/dp-crime-corruption-offences
+    url_download: https://dataunodc.un.org/sites/dataunodc.un.org/files/data_cts_corruption_and_economic_crime.xlsx
+    date_accessed: '2025-05-12'
+    date_published: '2024-05-16'
+
+    license:
+      name: CC BY 3.0 IGO
+      url: https://dataunodc.un.org/termsofuse#:~:text=Neither%20the%20United%20Nations%20nor,or%20for%20its%20timeliness%20or
+outs:
+  - md5: 154daaf5dd688ef0d8791f738ba49b87
+    size: 1135483
+    path: corruption.xlsx

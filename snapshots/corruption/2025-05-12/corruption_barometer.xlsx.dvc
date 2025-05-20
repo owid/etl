@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Global Corruption Barometer"
+    description: |-
+      The Global Corruption Barometer is a public opinion survey on individual experiences and perceptions of corruption, based on responses from 162,136 people across 119 countries and territories. The dataset covers views on national corruption trends, levels of corruption in specific institutions, personal encounters with bribery, and citizens’ attitudes toward reporting corruption. Data were collected between March 2014 and January 2017 through face-to-face and telephone interviews, with sampling designed to be nationally representative. 
+    date_published: "2017"
+
+    # Citation
+    producer: Transparency International
+    citation_full: |-
+      Global Corruption Barometer. Transparency International, 2017,https://www.transparency.org/en/gcb/global/global-corruption-barometer-2017/press-and-downloads.
+
+    # Files
+    url_main: https://www.transparency.org/en/gcb/global/global-corruption-barometer-2017/press-and-downloads
+    url_download: https://files.transparencycdn.org/images/GCB-2017_Global-Results.xlsx
+    date_accessed: '2025-05-12'
+
+    # License
+    license:
+      name: CC BY-ND 4.0
+      url: https://www.transparency.org/en/terms
+outs:
+  - md5: 0cccf0ee200afdad5d1718d3c0d4f5f6
+    size: 128392
+    path: corruption_barometer.xlsx

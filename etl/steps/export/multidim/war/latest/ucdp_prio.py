@@ -63,7 +63,7 @@ def run() -> None:
 
     # Aggregate views
     c.group_views(
-        params=[
+        groups=[
             {
                 "dimension": "conflict_type",
                 "choices": [

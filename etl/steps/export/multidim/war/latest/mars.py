@@ -70,7 +70,7 @@ def run() -> None:
 
     # Group certain views together: used to create StackedBar charts
     c.group_views(
-        params=[
+        groups=[
             {
                 "dimension": "conflict_type",
                 "choices": ["civil war", "others (non-civil)"],
