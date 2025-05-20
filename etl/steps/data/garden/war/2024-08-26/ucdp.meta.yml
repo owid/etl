@@ -354,6 +354,8 @@ tables:
           <% set estimate = "best" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -362,6 +364,8 @@ tables:
           <% set estimate = "high" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_low:
         title: Deaths in ongoing conflicts (low estimate)
@@ -370,6 +374,8 @@ tables:
           <% set estimate = "low" %>
           {definitions.number_deaths.description_short}
         description_key: *description_key_deaths
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       ## Deaths by type
       number_deaths_ongoing_conflicts_civilians:
@@ -379,6 +385,8 @@ tables:
           <% set people_type = "civilians" %>
           {definitions.number_deaths_type.description_short}
         description_key: *description_key_deaths_type
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_combatants:
         title: Deaths of combatants in ongoing conflicts
@@ -387,6 +395,8 @@ tables:
           <% set people_type = "combatants" %>
           {definitions.number_deaths_type.description_short}
         description_key: *description_key_deaths_type
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_unknown:
         title: Deaths of unknown type in ongoing conflicts
@@ -395,6 +405,8 @@ tables:
           <% set people_type = "unknown type" %>
           {definitions.number_deaths_type.description_short}
         description_key: *description_key_deaths_type
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       ## Deaths per capita
       number_deaths_ongoing_conflicts_per_capita:
@@ -408,6 +420,8 @@ tables:
           numDecimalPlaces: 1
         presentation:
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Death rate in ongoing conflicts (high estimate)
@@ -418,6 +432,10 @@ tables:
         description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       number_deaths_ongoing_conflicts_low_per_capita:
         title: Death rate in ongoing conflicts (low estimate)
@@ -428,36 +446,10 @@ tables:
         description_key: *description_key_deaths_type
         display:
           numDecimalPlaces: 1
-
-      # number_deaths_ongoing_conflicts_civilians_per_capita:
-      #   title: Death rate from civilians in ongoing conflicts
-      #   unit: deaths
-      #   description_short: |-
-      #     <% set people_type = "civilians" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-      #   description_key: *description_key_deaths_type
-      #   display:
-      #     numDecimalPlaces: 1
-
-      # number_deaths_ongoing_conflicts_combatants_per_capita:
-      #   title: Death rate from combatants ongoing conflicts
-      #   unit: deaths
-      #   description_short: |-
-      #     <% set people_type = "combatants" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-      #   description_key: *description_key_deaths_type
-      #   display:
-      #     numDecimalPlaces: 1
-
-      # number_deaths_ongoing_conflicts_unknown_per_capita:
-      #   title: Death rate from unknown type in ongoing conflicts
-      #   unit: deaths
-      #   description_short: |-
-      #     <% set people_type = "unknown type" %>
-      #     {definitions.number_deaths_type.description_short_per_capita}
-      #   description_key: *description_key_deaths
-      #   display:
-      #     numDecimalPlaces: 1
+        presentation:
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+        description_processing: |-
+          {definitions.all.location_conflicts_method}
 
       #####################
       # Ongoing conflicts #
