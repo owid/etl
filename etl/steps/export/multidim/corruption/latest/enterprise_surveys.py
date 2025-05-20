@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 from owid.catalog.meta import TableDimension
-from owid.catalog.utils import underscore
 
 from etl.helpers import PathFinder
 
@@ -12,7 +11,7 @@ MULTIDIM_CONFIG = {
     "chartTypes": ["DiscreteBar"],
     "tab": "map",
     "originUrl": "ourworldindata.org/corruption",
-    "maxTime": "latest",
+    "maxTime": "2024",
 }
 
 
