@@ -224,9 +224,12 @@ class Snapshot:
         elif data is not None:
             # Copy dataframe to snapshots data folder.
             dataframes.to_file(data, file_path=self.path)
-        else:
+        elif self.metadata.origin and self.metadata.origin.url_download:
             # Create snapshot by downloading data from a URL.
             self.download_from_source()
+        else:
+            # Maybe file is already there
+            assert self.path.exists(), "File not found. Provide a filename, data or add url_download to metadata."
 
         # Upload data to R2
         self.dvc_add(upload=upload)

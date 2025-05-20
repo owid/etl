@@ -37,6 +37,15 @@
                 "type": "string"
             }
         },
+        "default_dimensions": {
+            "type": "object",
+            "description": "The dimensions of the default view in the collection (shown by default on the site).",
+            "patternProperties": {
+                ".*": {
+                    "type": "string"
+                }
+            }
+        },
         "topic_tags": {
             "type": "array",
             "items": {
