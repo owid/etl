@@ -1295,7 +1295,7 @@ steps:
     - data://garden/who/2025-04-07/gho_smoking
 
   #
-  # TODO: add step name (just something recognizable)
+  # Rinderpest
   #
   data://meadow/health/2025-04-22/rinderpest:
     - snapshot://health/2025-04-22/rinderpest.csv
@@ -1303,9 +1303,9 @@ steps:
     - data://meadow/health/2025-04-22/rinderpest
   data://grapher/health/2025-04-22/rinderpest:
     - data://garden/health/2025-04-22/rinderpest
-  
+
   #
-  # TODO: add step name (just something recognizable)
+  # Tuberculosis - CDC
   #
   data://meadow/cdc/2025-05-19/tuberculosis:
     - snapshot://cdc/2025-05-19/tuberculosis.csv
