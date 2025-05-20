@@ -68,14 +68,14 @@ steps:
     - data://garden/technology/2024-12-23/internet
 
   # UNDP
-  data://meadow/un/2024-04-09/undp_hdr:
-    - snapshot://un/2024-04-09/undp_hdr.csv
-  data://garden/un/2024-04-09/undp_hdr:
-    - data://meadow/un/2024-04-09/undp_hdr
+  data://meadow/un/2025-05-07/undp_hdr:
+    - snapshot://un/2025-05-07/undp_hdr.csv
+  data://garden/un/2025-05-07/undp_hdr:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-07-29/income_groups
-  data://grapher/un/2024-04-09/undp_hdr:
-    - data://garden/un/2024-04-09/undp_hdr
+    - data://meadow/un/2025-05-07/undp_hdr
+  data://grapher/un/2025-05-07/undp_hdr:
+    - data://garden/un/2025-05-07/undp_hdr
 
   # Maddison Database 2010
   data://meadow/ggdc/2022-12-23/maddison_database:
@@ -687,7 +687,6 @@ steps:
   data://grapher/imf/2025-04-25/world_economic_outlook:
     - data://garden/imf/2025-04-25/world_economic_outlook
 
-
   #
   # World Airlines Traffic and Capacity
   #
@@ -734,8 +733,12 @@ steps:
     - snapshot://corruption/2025-05-12/corruption_barometer.xlsx
   data://garden/corruption/2025-05-12/corruption_barometer:
     - data://meadow/corruption/2025-05-12/corruption_barometer
+    - data://garden/demography/2024-07-15/population
+    - data://garden/regions/2023-01-01/regions
   data://grapher/corruption/2025-05-12/corruption_barometer:
     - data://garden/corruption/2025-05-12/corruption_barometer
+  export://multidim/corruption/latest/corruption_barometer:
+    - data://grapher/corruption/2025-05-12/corruption_barometer
 
 include:
   - dag/open_numbers.yml
@@ -776,3 +779,4 @@ include:
   - dag/families.yml
   - dag/technology.yml
   - dag/redistribution.yml
+  - dag/corruption.yml

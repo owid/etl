@@ -70,7 +70,6 @@ def create_collection(
             validate_schema=False,
             explorer=True,
         )
-        return cast(Explorer, coll)
     else:
         coll = create_collection_from_config(
             config=config,
@@ -80,6 +79,10 @@ def create_collection(
 
     # Rename choice names if given
     _rename_choices(coll, choice_renames)
+
+    # Cast if required
+    if explorer:
+        return cast(Explorer, coll)
 
     return coll
 
