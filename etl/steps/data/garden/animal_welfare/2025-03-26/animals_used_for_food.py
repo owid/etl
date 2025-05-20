@@ -76,7 +76,7 @@ STOCK_ITEM_CODES = {
     "00001107": "donkeys",  # Asses
     "00001110": "mules",  # Mules and hinnies
     "00001140": "rabbits",  # Rabbits
-    "00001181": "bees",  # Bees
+    # "00001181": "bees",  # Bees
     "00001126": "camels",  # Camels
     "00001072": "geese",  # Geese
     "00001150": "other rodents",  # Other rodents
