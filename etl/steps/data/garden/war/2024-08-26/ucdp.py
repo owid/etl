@@ -231,7 +231,14 @@ def run_pipeline(
     # Get country-level stuff
     paths.log.info("getting country-level indicators")
     tb_participants = estimate_metrics_participants(tb, tb_prio, tb_codes)
-    tb_locations = estimate_metrics_locations(tb, tb_maps, tb_codes, ds_population, last_year, num_missing_location)
+    tb_locations = estimate_metrics_locations(
+        tb,
+        tb_maps,
+        tb_codes,
+        ds_population,
+        last_year,
+        num_missing_location,
+    )
 
     # Sanity check conflict_type transitions
     ## Only consider transitions between intrastate and intl intrastate. If other transitions are detected, raise error.
@@ -613,7 +620,11 @@ def estimate_metrics_locations(
 
     # Add country name using geometry
     paths.log.info("adding location name of conflict event...")
-    tb_locations = _get_location_of_conflict_in_ucdp_ged(tb, tb_maps, num_missing_location).copy()
+    tb_locations = _get_location_of_conflict_in_ucdp_ged(
+        tb,
+        tb_maps,
+        num_missing_location,
+    ).copy()
 
     # There are some countries not in GW (remove, replace?). We keep Palestine and Western Sahara since
     # these are mappable in OWID maps.
@@ -858,7 +869,7 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     """Add column with country name of the conflict."""
     # Convert the UCDP data to a GeoDataFrame (so it can be mapped and used in spatial analysis).
     # The 'wkt.loads' function takes the coordinates in the 'geometry' column and ensures geopandas will use it to map the data.
-    gdf = tb[["relid", "geom_wkt"]]
+    gdf = tb[["relid", "geom_wkt"]].copy()
     gdf.rename(columns={"geom_wkt": "geometry"}, inplace=True)
     gdf["geometry"] = gdf["geometry"].apply(wkt.loads)
     gdf = gpd.GeoDataFrame(gdf, crs="epsg:4326")
@@ -869,42 +880,35 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     gdf_maps = gdf_maps.set_geometry("geometry")
     gdf_maps.crs = "epsg:4326"
 
-    # Use the overlay function to extract data from the world map that each point sits on top of.
-    gdf_match = gpd.overlay(gdf, gdf_maps, how="intersection")
+    # ALTERNATIVE: Use the overlay function to extract data from the world map that each point sits on top of. NOTE: This takes ~1 minute (M1 MAX). We used this method for some years, but it is very slow. We then switched to using the sjoin method.
+    # gdf_match = gpd.overlay(gdf, gdf_maps, how="intersection")
+
+    # Use spatial join instead of overlay - much faster for points
+    # The 'within' predicate is faster than intersection for point-in-polygon
+    gdf_match = gpd.sjoin(gdf, gdf_maps, how="inner", predicate="within")
+
+    # TODO: below code might be equivalent to how we estimate location for missing points!
+    # if gdf_match2["name"].isna().any():
+    #     missing_points = gdf[~gdf["relid"].isin(gdf_match2.dropna(subset=["name"])["relid"])]
+    #     if not missing_points.empty:
+    #         # Create spatial index for faster nearest computation
+    #         nearest_idx = gdf_maps.sindex.nearest(missing_points.geometry)
+    #         assert nearest_idx.shape == (2, len(missing_points)), "Expected result to be of shape (2, 1)!"
+
+    #         names = gdf_maps.iloc[nearest_idx[1, :]]["name"]
+    #         gdf_match2.loc[nearest_idx[0, :], "name"] = gdf_maps.iloc[nearest_idx]["name"]
+
+    ###
     # Events not assigned to any country
-    # There are some points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
-    # I've soften the assertion, otherwise a bit of a pain!
-    assert (
-        (diff := gdf.shape[0] - gdf_match.shape[0]) <= num_missing_location
-    ), f"Unexpected number of events without exact coordinate match! {diff} < {num_missing_location} doesn't hold! ({diff-num_missing_location} off)"
-    # DEBUG: Examine which are these unlabeled conflicts
-    # mask = ~tb["relid"].isin(gdf_match["relid"])
-    # tb.loc[mask, ["relid", "year", "conflict_name", "side_a", "side_b", "best"]]
-
-    # Get missing entries
-    ids_missing = set(gdf["relid"]) - set(gdf_match["relid"])
-    gdf_missing = gdf.loc[gdf["relid"].isin(ids_missing)]
-
-    # Reprojecting the points and the world into the World Equidistant Cylindrical Sphere projection.
-    wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
-    gdf_missing_wec = gdf_missing.to_crs(wec_crs)
-    gdf_maps_wec = gdf_maps.to_crs(wec_crs)
-    # For these points we can find the nearest country using the distance function
-    polygon_near = []
-    for _, row in gdf_missing_wec.iterrows():
-        polygon_index = gdf_maps_wec.distance(row["geometry"]).sort_values().index[0]
-        ne_country_name = gdf_maps_wec["name"][polygon_index]
-        polygon_near.append(ne_country_name)
-    # Assign
-    gdf_missing["name"] = polygon_near
-
-    # Combining and adding name to original table
     COLUMN_COUNTRY_NAME = "country_name_location"
-    gdf_country_names = pr.concat([Table(gdf_match[["relid", "name"]]), Table(gdf_missing[["relid", "name"]])])
-    tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
-        columns={"name": COLUMN_COUNTRY_NAME}
+    tb = _add_missing_values(
+        tb,
+        gdf,
+        gdf_match,
+        gdf_maps,
+        num_missing_location,
+        COLUMN_COUNTRY_NAME,
     )
-    assert tb[COLUMN_COUNTRY_NAME].notna().all(), "Some missing values found in `COLUMN_COUNTRY_NAME`"
 
     # SOME CORRECTIONS #
     # To align with OWID borders we will rename the conflicts in Somaliland to Somalia and the conflicts in Morocco that were below 27.66727 latitude to Western Sahara.
@@ -935,6 +939,49 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     assert tb[COLUMN_COUNTRY_NAME].isna().sum() == 4, "4 missing values were expected! Found a different amount!"
     tb = tb.dropna(subset=[COLUMN_COUNTRY_NAME])
 
+    return tb
+
+
+def _add_missing_values(
+    tb,
+    gdf,
+    gdf_match,
+    gdf_maps,
+    num_missing_location,
+    column_country_name: str,
+):
+    # There are some points that are missed - likely because they are in the sea perhaps due to the conflict either happening at sea or at the coast and the coordinates are slightly inaccurate.
+    # I've soften the assertion, otherwise a bit of a pain!
+    assert (
+        (diff := gdf.shape[0] - gdf_match.shape[0]) <= num_missing_location
+    ), f"Unexpected number of events without exact coordinate match! {diff} < {num_missing_location} doesn't hold! ({diff-num_missing_location} off)"
+    # DEBUG: Examine which are these unlabeled conflicts
+    # mask = ~tb["relid"].isin(gdf_match["relid"])
+    # tb.loc[mask, ["relid", "year", "conflict_name", "side_a", "side_b", "best"]]
+
+    # Get missing entries
+    ids_missing = set(gdf["relid"]) - set(gdf_match["relid"])
+    gdf_missing = gdf.loc[gdf["relid"].isin(ids_missing)]
+
+    # Reprojecting the points and the world into the World Equidistant Cylindrical Sphere projection.
+    wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
+    gdf_missing_wec = gdf_missing.to_crs(wec_crs)
+    gdf_maps_wec = gdf_maps.to_crs(wec_crs)
+    # For these points we can find the nearest country using the distance function
+    polygon_near = []
+    for _, row in gdf_missing_wec.iterrows():
+        polygon_index = gdf_maps_wec.distance(row["geometry"]).sort_values().index[0]
+        ne_country_name = gdf_maps_wec["name"][polygon_index]
+        polygon_near.append(ne_country_name)
+    # Assign
+    gdf_missing["name"] = polygon_near
+
+    # Combining and adding name to original table
+    gdf_country_names = pr.concat([Table(gdf_match[["relid", "name"]]), Table(gdf_missing[["relid", "name"]])])
+    tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
+        columns={"name": column_country_name}
+    )
+    # assert tb[column_country_name].notna().all(), "Some missing values found in `column_country_name`"
     return tb
 
 
