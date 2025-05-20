@@ -234,3 +234,7 @@ steps:
     - snapshot://fasttrack/latest/financial_inclusion_table.csv
   data://grapher/fasttrack/latest/extended_financial_inclusion_table:
     - snapshot://fasttrack/latest/extended_financial_inclusion_table.csv
+  data://grapher/fasttrack/latest/global_findex_2021:
+    - snapshot://fasttrack/latest/global_findex_2021.csv
+  data://grapher/fasttrack/latest/bank_account_selected_countries_global_findex_2021:
+    - snapshot://fasttrack/latest/bank_account_selected_countries_global_findex_2021.csv
