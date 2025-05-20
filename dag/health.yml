@@ -1303,3 +1303,13 @@ steps:
     - data://meadow/health/2025-04-22/rinderpest
   data://grapher/health/2025-04-22/rinderpest:
     - data://garden/health/2025-04-22/rinderpest
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/cdc/2025-05-19/tuberculosis:
+    - snapshot://cdc/2025-05-19/tuberculosis.csv
+  data://garden/cdc/2025-05-19/tuberculosis:
+    - data://meadow/cdc/2025-05-19/tuberculosis
+  data://grapher/cdc/2025-05-19/tuberculosis:
+    - data://garden/cdc/2025-05-19/tuberculosis
