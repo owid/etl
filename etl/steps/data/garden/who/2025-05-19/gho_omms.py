@@ -80,7 +80,6 @@ def add_population_without_clean_cooking_fuels(tables_dict: dict[str, Table], ds
     new_col = "population_without_primary_reliance_on_clean_fuels_and_technologies_for_cooking__in_millions"
 
     tb = tables_dict[indicator_name]
-    tb[col].m.unit = "persons"
 
     # Add population
     tb = geo.add_population_to_table(tb=tb.reset_index(), ds_population=ds_population, warn_on_missing_countries=False)
@@ -93,6 +92,10 @@ def add_population_without_clean_cooking_fuels(tables_dict: dict[str, Table], ds
 
     # Drop rows that aren't Total from the new column
     tb.loc[tb.residence_area_type != "Total", new_col] = np.nan
+
+    # Add units
+    tb[col].m.unit = "persons"
+    tb[new_col].m.unit = "persons"
 
     tables_dict[indicator_name] = tb.drop(columns=["population"]).set_index(["year", "country", "residence_area_type"])
 
