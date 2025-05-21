@@ -73,7 +73,7 @@ def run() -> None:
                     "extrasystemic",
                 ],
                 "choice_new_slug": "state_based_stacked",
-                "config_new": {
+                "view_config": {
                     "chartTypes": ["StackedBar"],
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -84,7 +84,7 @@ def run() -> None:
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "config_new": {
+                "view_config": {
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
