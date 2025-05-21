@@ -7,6 +7,7 @@ paths = PathFinder(__file__)
 MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
+    "chartTypes": ["DiscreteBar"],
     "originUrl": "ourworldindata.org/corruption",
 }
 
@@ -48,7 +49,7 @@ def run() -> None:
                     "chartTypes": ["DiscreteBar"],
                     "tab": "chart",
                     "facettingLabelByYVariables": "service",
-                    "selectedFacetStrategy": "metric",
+                    "selectedFacetStrategy": "entity",
                     "title": "Share of businesses asked for bribes, by type of transaction",
                     "subtitle": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials.",
                 },
@@ -80,14 +81,14 @@ def adjust_dimensions_corruption(tb):
 
     service_mapping = {
         "bribery_incidence__percent_of_firms_experiencing_at_least_one_bribe_payment_request": "At least one bribe request",
-        "percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials": "Tax official",
-        "percent_of_firms_expected_to_give_gifts_to_secure_government_contract": "Government contract",
-        "percent_of_firms_expected_to_give_gifts_to_get_an_operating_license": "Operating_license",
-        "percent_of_firms_expected_to_give_gifts_to_get_an_import_license": "Import license",
         "percent_of_firms_expected_to_give_gifts_to_get_a_construction_permit": "Construction permit",
         "percent_of_firms_expected_to_give_gifts_to_get_an_electrical_connection": "Electrical connection",
-        "percent_of_firms_expected_to_give_gifts_to_get_a_water_connection": "Water connection",
+        "percent_of_firms_expected_to_give_gifts_to_secure_government_contract": "Government contract",
+        "percent_of_firms_expected_to_give_gifts_to_get_an_import_license": "Import license",
+        "percent_of_firms_expected_to_give_gifts_to_get_an_operating_license": "Operating_license",
+        "percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials": "Tax official",
         "percent_of_firms_expected_to_give_gifts_to_public_officials_to_get_things_done": "To get things done",
+        "percent_of_firms_expected_to_give_gifts_to_get_a_water_connection": "Water connection",
     }
 
     indicator_name = "bribery_prevalence"
