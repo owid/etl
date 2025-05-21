@@ -5,13 +5,11 @@ It is good to keep these separate since CED data is still in preview, and might 
 For more details on the processing pipeline, please refer to garden/war/2024-08-26/ucdp.
 """
 
-import importlib.util
 import re
 import sys
 import types
 from importlib import util
 from pathlib import Path
-from typing import Union
 
 import pandas as pd
 from owid.catalog import Table
