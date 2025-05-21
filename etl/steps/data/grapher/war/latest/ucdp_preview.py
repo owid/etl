@@ -14,7 +14,7 @@ def run() -> None:
     ds_garden = paths.load_dataset("ucdp_preview")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("ucdp")
+    tb = ds_garden.read("ucdp_preview")
 
     # Process data.
     #
