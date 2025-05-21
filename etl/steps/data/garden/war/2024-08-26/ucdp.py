@@ -102,7 +102,7 @@ def run() -> None:
     #
     # Run main code
     #
-    run_pipeline(
+    tables = run_pipeline(
         tb_ged=tb_ged,
         tb_conflict=tb_conflict,
         tb_prio=tb_prio,
@@ -110,10 +110,22 @@ def run() -> None:
         tb_codes=tb_codes,
         tb_maps=tb_maps,
         ds_population=ds_population,
-        default_metadata=ds_meadow.metadata,
         num_missing_location=NUM_MISSING_LOCATIONS,
         last_year=LAST_YEAR,
     )
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = paths.create_dataset(
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
 
 
 def _sanity_checks(ds: Dataset) -> None:
@@ -198,11 +210,10 @@ def run_pipeline(
     tb_codes: Table,
     tb_maps: Table,
     ds_population: Dataset,
-    default_metadata: DatasetMeta,
     num_missing_location: int,
     last_year: int,
     last_year_preview: Optional[int] = None,
-):
+) -> List[Table]:
     # Sanity checks (2)
     assert (
         tb_conflict["year"].max() == last_year
@@ -320,18 +331,7 @@ def run_pipeline(
         tb_locations.format(["year", "country", "conflict_type"]),
     ]
 
-    #
-    # Save outputs.
-    #
-    # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = paths.create_dataset(
-        tables=tables,
-        check_variables_metadata=True,
-        default_metadata=default_metadata,
-    )
-
-    # Save changes in the new garden dataset.
-    ds_garden.save()
+    return tables
 
 
 # Add conflict type

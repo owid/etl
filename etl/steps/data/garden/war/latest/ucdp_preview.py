@@ -6,7 +6,12 @@ For more details on the processing pipeline, please refer to garden/war/2024-08-
 """
 
 import importlib.util
+import re
 import sys
+import types
+from importlib import util
+from pathlib import Path
+from typing import Union
 
 import pandas as pd
 from owid.catalog import Table
@@ -69,11 +74,11 @@ def run() -> None:
     ds_population = paths.load_dataset("population")  # Population
 
     # Import UCDP module
-    ucdp_module = import_ucdp_module(CATALOG_PATH)
+    module_ucdp = import_ucdp_module(CATALOG_PATH)
 
     # Sanity checks (1)
     paths.log.info("sanity checks")
-    ucdp_module._sanity_checks(ds_meadow)
+    module_ucdp._sanity_checks(ds_meadow)
 
     # Load tables
     tb_ged = ds_meadow.read("ucdp_ged")
@@ -94,7 +99,7 @@ def run() -> None:
     #
     # Run main code
     #
-    ucdp_module.run_pipeline(
+    tables = module_ucdp.run_pipeline(
         tb_ged=tb_ged,
         tb_conflict=tb_conflict,
         tb_prio=tb_prio,
@@ -102,11 +107,23 @@ def run() -> None:
         tb_codes=tb_codes,
         tb_maps=tb_maps,
         ds_population=ds_population,
-        default_metadata=ds_meadow.metadata,
         num_missing_location=NUM_MISSING_LOCATIONS,
         last_year=LAST_YEAR,
         last_year_preview=LAST_YEAR_PREVIEW,
     )
+
+    #
+    # Save outputs.
+    #
+    # Create a new garden dataset with the same metadata as the meadow dataset.
+    ds_garden = paths.create_dataset(
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_meadow.metadata,
+    )
+
+    # Save changes in the new garden dataset.
+    ds_garden.save()
 
 
 def import_ucdp_module(catalog_path: str = CATALOG_PATH):
@@ -119,16 +136,61 @@ def import_ucdp_module(catalog_path: str = CATALOG_PATH):
         step_uri in paths.dependencies
     ), f"ucdp_preview module relies on the code of step {step_uri}. The dag should list this step as a dependency!"
 
-    # Import UCDP (latest) module
-    module_path = ETL_DIR / f"steps/data/{catalog_path}.py"
-    spec = importlib.util.spec_from_file_location("ucdp_module", module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Could not load module from {module_path}")
-    ucdp_module = importlib.util.module_from_spec(spec)
-    sys.modules["ucdp_module"] = ucdp_module
-    spec.loader.exec_module(ucdp_module)
+    submodule_path = Path(f"steps/data/{catalog_path}.py")
+    submodule_dir = submodule_path.parent
+    module_name = submodule_path.stem
+    module_path = ETL_DIR / submodule_dir
+    pkg_module_path = module_path / f"{module_name}.py"
 
-    return ucdp_module
+    # Extract folder path and convert to a valid Python module name
+    pkg_name = str(submodule_dir).replace("/", ".").replace("-", "_")
+    pkg_name = re.sub(r"\.(\d)", r"._\1", pkg_name)
+    pkg_name = f"etl.{pkg_name}"  # legal surrogate
+    pkg_module_name = f"{pkg_name}.{module_name}"  # the actual file
+
+    # ------------------------------------------------------------
+    # 1.  Put the dated folder on sys.path   <<<<<<<<<<
+    #     Now   `import shared`   will succeed if  shared.py
+    #     lives right next to ucdp.py.
+    # ------------------------------------------------------------
+    # sys.path.insert(0, str(ver_dir))
+    sys.path.append(str(module_path))
+
+    # ------------------------------------------------------------
+    # 2.  Ensure the normal parent packages exist
+    # ------------------------------------------------------------
+    def ensure_pkg(name, path):
+        if name not in sys.modules:
+            pkg = types.ModuleType(name)
+            pkg.__path__ = [str(path)]
+            sys.modules[name] = pkg
+
+    parts = pkg_module_name.split(".")
+    for i in range(len(parts) - 1):
+        pkg_name = ".".join(parts[: i + 1])
+        pkg_path = Path("/".join(parts[: i + 1]))
+        ensure_pkg(pkg_name, pkg_path)
+
+    # ------------------------------------------------------------
+    # 3.  Create a virtual package that points at the dated folder
+    # ------------------------------------------------------------
+    pkg = types.ModuleType(pkg_name)
+    pkg.__path__ = [str(module_path)]
+    sys.modules[pkg_name] = pkg
+
+    # ------------------------------------------------------------
+    # 4.  Load module
+    # ------------------------------------------------------------
+    spec = util.spec_from_file_location(pkg_module_name, pkg_module_path)
+
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load module from {pkg_module_name}")
+
+    module = util.module_from_spec(spec)
+    sys.modules[pkg_module_name] = module
+    spec.loader.exec_module(module)
+
+    return module
 
 
 # CED-specific
