@@ -239,6 +239,13 @@ tables:
             '1' indicates that there was a conflict event in the given country. '0' indicates that there was no conflict event in the given country.
           - "{definitions.all.conflict_type}"
 
+      number_ongoing_conflicts:
+        title: Number of ongoing conflicts (country)
+        unit: conflicts
+        description_short: |-
+          {definitions.number_ongoing_conflicts.description_short}
+        description_key: *description_key_ongoing
+
       number_locations:
         title: Number of countries where conflict took place
         unit: "countries"
@@ -458,7 +465,7 @@ tables:
           grapher_config:
             selectedEntityNames:
               - World
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024); Natural Earth (2022)
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per state
