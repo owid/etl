@@ -92,6 +92,13 @@ def adjust_dimensions_corruption(tb):
     }
 
     indicator_name = "bribery_prevalence"
+    # Ensure your DataFrame is called df (or update accordingly)
+    desired_order = list(service_mapping.keys())
+
+    # Reorder columns: keep only those in the mapping, and preserve others if needed
+    tb = tb[
+        [col for col in desired_order if col in tb.columns] + [col for col in tb.columns if col not in desired_order]
+    ]
 
     for col in tb.columns:
         if col in ["country", "year"]:
