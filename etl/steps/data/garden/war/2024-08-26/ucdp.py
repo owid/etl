@@ -212,6 +212,7 @@ def run_pipeline(
     num_missing_location: int,
     last_year: int,
     last_year_preview: Optional[int] = None,
+    short_name: Optional[str] = None,
 ) -> List[Table]:
     # Sanity checks (2)
     assert (
@@ -220,6 +221,10 @@ def run_pipeline(
     assert (
         tb_prio["year"].max() == last_year
     ), f"Unexpected max year in `ucdp_prio_armed_conflict` ({tb_prio['year'].max()})!"
+
+    # Get short_name to use
+    if short_name is None:
+        short_name = paths.short_name
 
     # Keep only active conflicts
     paths.log.info("keep active conflicts")
@@ -325,9 +330,9 @@ def run_pipeline(
 
     # Tables
     tables = [
-        tb.format(["year", "region", "conflict_type"], short_name=paths.short_name),
-        tb_participants.format(["year", "country", "conflict_type"]),
-        tb_locations.format(["year", "country", "conflict_type"]),
+        tb.format(["year", "region", "conflict_type"], short_name=short_name),
+        tb_participants.format(["year", "country", "conflict_type"], short_name=f"{short_name}_country"),
+        tb_locations.format(["year", "country", "conflict_type"], short_name=f"{short_name}_locations"),
     ]
 
     return tables
@@ -504,7 +509,7 @@ def estimate_metrics_participants(tb: Table, tb_prio: Table, tb_codes: Table) ->
     ############
     tb_country_prio = estimate_metrics_participants_prio(tb_prio, tb_codes)
 
-    tb_country = pr.concat([tb_country, tb_country_prio], ignore_index=True, short_name=f"{paths.short_name}_country")
+    tb_country = pr.concat([tb_country, tb_country_prio], ignore_index=True)
 
     return tb_country
 
@@ -888,9 +893,7 @@ def estimate_metrics_locations(
     # COMBINE: Country flag + Regional counts
     ###################
     paths.log.info("combining country flag and regional counts...")
-    tb_locations = pr.concat(
-        [tb_locations_country, tb_locations_regions], short_name=f"{paths.short_name}_locations", ignore_index=True
-    )
+    tb_locations = pr.concat([tb_locations_country, tb_locations_regions], ignore_index=True)
     return tb_locations
 
 
