@@ -644,7 +644,7 @@ class Collection(MDIMBase):
         if drop_dimensions_if_single_choice:
             self.prune_dimensions()
 
-    def edit_view_text(
+    def edit_view_display(
         self,
         edits: List[Dict[str, Any]],
         params: Optional[Dict[str, Any]] = None,
@@ -652,7 +652,7 @@ class Collection(MDIMBase):
         # config: Optional[Dict[str, Any]] = None,
         # metadata: Optional[Dict[str, Any]] = None,
     ):
-        """Edit the text of a view. Text can come from `config` (Grapher config) or `metadata` (Grapher metadata, i.e. text in the data page).
+        """Edit the display of a view. Text can come from `config` (Grapher config) or `metadata` (Grapher metadata, i.e. text in the data page).
 
         Args:
             edits (List[Dict[str, Any]]): List of dictionaries with the following keys

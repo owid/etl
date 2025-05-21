@@ -126,7 +126,7 @@ def run() -> None:
         edit_view_display_estimates_ci(view)
 
     # Edit view configs
-    c.edit_view_text(
+    c.edit_view_display(
         [
             {
                 "config": {
