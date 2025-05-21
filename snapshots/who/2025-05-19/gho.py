@@ -284,7 +284,8 @@ def _fetch_and_repack_data(ind_code: str) -> pd.DataFrame:
     data = pd.DataFrame(resp.json()["value"])
 
     # make it smaller
-    data = repack.repack_frame(data)
+    if not data.empty:
+        data = repack.repack_frame(data)
 
     return data
 
@@ -316,6 +317,11 @@ def fetch_data(ind_code: str) -> pd.DataFrame:
 def fetch_and_process_data(ind_code: str) -> pd.DataFrame:
     # Fetch raw data
     df = fetch_data(ind_code)
+
+    if df.empty:
+        # Skip empty indicators
+        log.warning("Empty indicator", ind_code=ind_code)
+        return df
 
     # Remove unnecessary columns
     drop_cols = [
@@ -386,7 +392,7 @@ def add_df_to_zip(zipf: zipfile.ZipFile, fname: str, df: pd.DataFrame) -> None:
 )
 @click.option(
     "--max-workers",
-    default=5,
+    default=1,
     show_default=True,
     type=int,
     help="Number of parallel workers for downloads.",

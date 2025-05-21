@@ -15,6 +15,6 @@ meta:
       name: CC BY-NC-SA 4.0
       url: https://www.who.int/about/policies/publishing/copyright
 outs:
-  - md5: 1d5244e39e4aa15a649d35410145bb78
-    size: 2674540
+  - md5: ca0e2aa46f35032f76f2b03b7619ea78
+    size: 135989753
     path: gho.zip
