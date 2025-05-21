@@ -173,6 +173,7 @@ tables:
   _17_1_1__gr_g14_gdp:
     variables:
       _17_1_1__gr_g14_gdp:
+        title: 17.1.1 - Total government revenue as a proportion of GDP (%) - GR_G14_GDP
         description_short: Taxes, social contributions, and other revenues such as fines, fees, rent, and income from property or sales included.
         presentation:
           grapher_config:
