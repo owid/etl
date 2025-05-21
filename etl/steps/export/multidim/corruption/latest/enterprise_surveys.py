@@ -49,7 +49,7 @@ def run() -> None:
                     "chartTypes": ["DiscreteBar"],
                     "tab": "chart",
                     "facettingLabelByYVariables": "service",
-                    "selectedFacetStrategy": "entity",
+                    "selectedFacetStrategy": "metric",
                     "title": "Share of businesses asked for bribes, by type of transaction",
                     "subtitle": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials.",
                 },
