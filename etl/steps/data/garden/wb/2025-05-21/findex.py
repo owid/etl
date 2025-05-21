@@ -24,7 +24,8 @@ def run() -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-
+    # Convert to %
+    tb["value"] = tb["value"] * 100
     # Improve table format.
     tb = tb.format(["country", "year", "indicator_name", "short_definition", "long_definition"])
 
