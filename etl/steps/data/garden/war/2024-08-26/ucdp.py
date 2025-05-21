@@ -711,7 +711,7 @@ def estimate_metrics_locations(
         # Number of conflicts
         "conflict_new_id": {
             "f": "nunique",
-            "rename": "is_location_of_conflict",
+            "rename": "number_ongoing_conflicts",
         },
     }
     col_funcs = {k: v["f"] for k, v in column_props.items()}
@@ -726,12 +726,14 @@ def estimate_metrics_locations(
             | col_renames
         )
     )
-    assert tb_locations_country["is_location_of_conflict"].notna().all(), "Missing values in `is_location_of_conflict`!"
-    cols_num_deaths = [v for v in col_renames.values() if v != "is_location_of_conflict"]
+    assert (
+        tb_locations_country["number_ongoing_conflicts"].notna().all()
+    ), "Missing values in `number_ongoing_conflicts`!"
+    cols_num_deaths = [v for v in col_renames.values() if v != "number_ongoing_conflicts"]
     for col in cols_num_deaths:
         assert tb_locations_country[col].notna().all(), f"Missing values in `{col}`!"
     # Convert into a binary indicator: 1 (if more than one conflict), 0 (otherwise)
-    tb_locations_country["is_location_of_conflict"] = tb_locations_country["is_location_of_conflict"].apply(
+    tb_locations_country["is_location_of_conflict"] = tb_locations_country["number_ongoing_conflicts"].apply(
         lambda x: 1 if x > 0 else 0
     )
 
@@ -749,7 +751,7 @@ def estimate_metrics_locations(
     tb_locations_country = pr.concat([tb_locations_country, tb_green], ignore_index=True)
 
     # NaNs of numeric indicators to zero
-    cols_indicators = ["is_location_of_conflict"] + cols_num_deaths
+    cols_indicators = ["is_location_of_conflict", "number_ongoing_conflicts"] + cols_num_deaths
     tb_locations_country[cols_indicators] = tb_locations_country[cols_indicators].fillna(0)
     # NaN in conflict_type to arbitrary (since missing ones are filled from the next operation with fill_gaps_with_zeroes)
     mask = tb_locations_country["conflict_type"].isna()
@@ -768,8 +770,8 @@ def estimate_metrics_locations(
     )
 
     # Add origins from Natural Earth
-    cols = ["is_location_of_conflict"] + cols_num_deaths
-    for col in cols:
+    # cols = ["is_location_of_conflict"] + cols_num_deaths
+    for col in cols_indicators:
         tb_locations_country[col].origins += tb_maps["name"].m.origins
 
     ###################
@@ -784,13 +786,14 @@ def estimate_metrics_locations(
         "all": list(TYPE_OF_VIOLENCE_MAPPING.values()) + list(TYPE_OF_CONFLICT_MAPPING.values()),
     }
 
+    tb_locations_country2 = tb_locations_country.copy()
     for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
-        tb_locations_country = aggregate_conflict_types(
-            tb=tb_locations_country,
+        tb_locations_country2 = aggregate_conflict_types(
+            tb=tb_locations_country2,
             parent_name=ctype_agg,
             children_names=ctypes,
-            columns_to_aggregate=["is_location_of_conflict"] + cols_num_deaths,
-            columns_to_aggregate_absolute=cols_num_deaths,
+            columns_to_aggregate=cols_indicators,
+            columns_to_aggregate_absolute=["number_ongoing_conflicts"] + cols_num_deaths,
             columns_to_groupby=["country", "year"],
         )
 
@@ -859,7 +862,6 @@ def estimate_metrics_locations(
     ]
 
     ## Extra conflict types (aggregates)
-    cols = ["region", "year"]
     for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
         # Keep only children for this ctype aggregate
         tb_locations_ = tb_locations.loc[tb_locations["conflict_type"].isin(ctypes)]
@@ -1373,7 +1375,7 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     ]
     cols = list(set(columns).intersection(tb_extra.columns))
     if cols:
-        tb_extra[columns] = tb_extra[columns].fillna(0)
+        tb_extra[cols] = tb_extra[cols].fillna(0)
 
     # Replace nulls with zeroes (only post 1989 time series)
     columns = [
@@ -1482,6 +1484,8 @@ def merge_country_and_region_data(tb: Table, tb_locations: Table) -> Table:
         "death_rate": "number_deaths_ongoing_conflicts_per_capita",
         "death_rate_high": "number_deaths_ongoing_conflicts_high_per_capita",
         "death_rate_low": "number_deaths_ongoing_conflicts_low_per_capita",
+        # Number of ongoing conflicts
+        "number_ongoing_conflicts": "number_ongoing_conflicts",
     }
     col_names = list((cols_rename.keys()))
     tb_locations_ = tb_locations.copy().loc[:, col_names].rename(columns=cols_rename)
