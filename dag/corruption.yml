@@ -43,3 +43,14 @@ steps:
     - data://garden/corruption/2025-05-12/corruption_barometer
   export://multidim/corruption/latest/corruption_barometer:
     - data://grapher/corruption/2025-05-12/corruption_barometer
+
+
+  #
+  # Corruption Perceptions Index - Transparency International
+  #
+  data://meadow/corruption/2025-05-13/perception_index:
+    - snapshot://corruption/2025-05-13/perception_index.csv
+  data://garden/corruption/2025-05-13/perception_index:
+    - data://meadow/corruption/2025-05-13/perception_index
+  data://grapher/corruption/2025-05-13/perception_index:
+    - data://garden/corruption/2025-05-13/perception_index
