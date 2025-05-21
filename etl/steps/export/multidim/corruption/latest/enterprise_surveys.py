@@ -6,7 +6,6 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 MULTIDIM_CONFIG = {
     "hasMapTab": True,
-    "chartTypes": ["DiscreteBar"],
     "tab": "map",
     "originUrl": "ourworldindata.org/corruption",
 }
