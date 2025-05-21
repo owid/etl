@@ -32,7 +32,6 @@ def run(dest_dir: str) -> None:
     tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years"], "< 5 years")
     tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years", "5-9 years"], "< 10 years")
     tb = tb.drop(columns=["estimated_population"])
-    print(tb.columns)
 
     tb = tb.format(["country", "year", "sex", "age_group", "cause", "icd10_codes"])
     ds_garden = create_dataset(
