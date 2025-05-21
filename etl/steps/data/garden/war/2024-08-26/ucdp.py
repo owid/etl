@@ -26,7 +26,6 @@ import numpy as np
 import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
-from owid.catalog.meta import DatasetMeta
 from shapely import wkt
 from shared import (
     add_indicators_extra,
