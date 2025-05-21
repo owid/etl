@@ -11,7 +11,7 @@ import time
 import pytest
 
 from etl import command as cmd
-from etl.steps import compile_steps
+from etl.steps import compile_steps, DataStep, GrapherStep
 
 
 def test_timed_run():
@@ -61,3 +61,39 @@ def test_exec_graph_parallel():
 
     # Assert that all tasks have been completed
     assert all(task in done for task in exec_graph.keys())
+
+
+class DummyStep:
+    """Minimal step used for dependency testing."""
+
+    def __init__(self, name: str) -> None:
+        self.path = name
+        self.is_dirty = lambda: True
+
+
+def test_set_dependencies_to_nondirty_data_step():
+    dep1 = DummyStep("dep1")
+    dep2 = DummyStep("dep2")
+    step = DataStep("garden/ns/2020/test", [dep1, dep2])
+
+    # both dependencies initially report dirty
+    assert dep1.is_dirty() is True
+    assert dep2.is_dirty() is True
+
+    cmd._set_dependencies_to_nondirty(step)
+
+    assert dep1.is_dirty() is False
+    assert dep2.is_dirty() is False
+
+
+def test_set_dependencies_to_nondirty_grapher_step():
+    sub_dep = DummyStep("subdep")
+    data_step = DataStep("garden/ns/2020/test", [sub_dep])
+    data_step.is_dirty = lambda: True
+    step = GrapherStep(data_step.path, [data_step])
+
+    assert data_step.is_dirty() is True
+
+    cmd._set_dependencies_to_nondirty(step)
+
+    assert data_step.is_dirty() is False
