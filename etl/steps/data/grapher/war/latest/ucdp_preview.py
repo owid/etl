@@ -14,20 +14,20 @@ def run() -> None:
     ds_garden = paths.load_dataset("ucdp_preview")
 
     # Read table from garden dataset.
-    tb = ds_garden["ucdp"]
+    tb = ds_garden.read("ucdp")
 
     # Process data.
     #
     # Rename index column `region` to `country`.
-    tb = tb.reset_index().rename(columns={"region": "country"})
+    tb = tb.rename(columns={"region": "country"})
     # Remove suffixes in region names
     tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
     # Set index
     tb = tb.format(["year", "country", "conflict_type"])
 
     # Get country-level data
-    tb_participants = ds_garden["ucdp_country"]
-    tb_locations = ds_garden["ucdp_locations"]
+    tb_participants = ds_garden["ucdp_preview_country"]
+    tb_locations = ds_garden["ucdp_preview_locations"]
 
     tables = [
         tb,

@@ -108,6 +108,7 @@ def run() -> None:
         num_missing_location=NUM_MISSING_LOCATIONS,
         last_year=LAST_YEAR,
         last_year_preview=LAST_YEAR_PREVIEW,
+        short_name=paths.short_name,
     )
 
     #
