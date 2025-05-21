@@ -9,7 +9,6 @@ MULTIDIM_CONFIG = {
     "chartTypes": ["DiscreteBar"],
     "tab": "map",
     "originUrl": "ourworldindata.org/corruption",
-    "maxTime": "2024",
 }
 
 
