@@ -24,15 +24,29 @@ def run() -> None:
     #
     # Harmonize country names.
     tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+        tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
     # Convert to %
     tb["value"] = tb["value"] * 100
 
     # Add metadata to the table.
     tb = add_metadata(tb)
+
     # Improve table format.
     tb = tb.format(["country", "year"])
+
+    # Calculate the percentage of adults who have both accounts
+    tb["both_accounts"] = (
+        tb["mobile_money_account__pct_age_15plus"]
+        + tb["financial_institution_account__pct_age_15plus"]
+        - tb["account__pct_age_15plus"]
+    )
+
+    # % only mobile money account
+    tb["only_mobile_money_account"] = tb["mobile_money_account__pct_age_15plus"] - tb["both_accounts"]
+
+    # % only financial institution account
+    tb["only_financial_institution_account"] = tb["financial_institution_account__pct_age_15plus"] - tb["both_accounts"]
 
     #
     # Save outputs.
@@ -53,7 +67,6 @@ def add_metadata(tb: Table) -> Table:
 
     for column in tb_pivoted.columns:
         meta = tb_pivoted[column].metadata
-        meta.display = {}
         long_definition = tb["long_definition"].loc[tb["indicator_name"] == column]
         short_definition = tb["short_definition"].loc[tb["indicator_name"] == column]
         meta.description_from_producer = long_definition.iloc[0]

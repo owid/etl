@@ -17,3 +17,18 @@ dataset:
   update_period_days: 365
 
 
+tables:
+  findex:
+    variables:
+      both_accounts:
+        title: Both accounts
+        description_short: Percentage of adults with both a mobile money account and a bank account.
+
+      only_mobile_money_account:
+        title: Only mobile money account
+        description_short: Percentage of adults with only a mobile money account.
+
+      only_financial_institution_account:
+        title: Only financial institution account
+        description_short: Percentage of adults with only a financial institution account.
+
