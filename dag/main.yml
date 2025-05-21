@@ -713,6 +713,19 @@ steps:
   data://grapher/unodc/2025-05-12/corruption:
     - data://garden/unodc/2025-05-12/corruption
 
+  # United Nations members
+  data://meadow/un/2025-05-15/un_members:
+    - snapshot://un/2025-05-15/un_members.csv
+  # United Nations members
+  data://garden/un/2025-05-15/un_members:
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/un/2025-05-15/un_members
+    - data://garden/regions/2023-01-01/regions
+  # United Nations members
+  data://grapher/un/2025-05-15/un_members:
+    - data://garden/un/2025-05-15/un_members
+
   #
   # Corruption Barometer
   #
