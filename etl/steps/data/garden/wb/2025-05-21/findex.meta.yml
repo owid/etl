@@ -2,6 +2,10 @@
 definitions:
   common:
     processing_level: minor
+    unit: "%"
+    short_unit: "%"
+    display:
+      numDecimalPlaces: 1
     presentation:
       topic_tags:
         - Economic Growth
@@ -11,16 +15,5 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
-
-tables:
-  findex:
-    variables:
-      value:
-        title: << indicator_name >>
-        unit: "%"
-        short_unit: "%"
-        display:
-          numDecimalPlaces: 1
 
 
