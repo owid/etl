@@ -174,5 +174,10 @@
   "South Asia": "South Asia (WB)",
   "Sub-Saharan Africa": "Sub-Saharan Africa (WB)",
   "Taiwan, China": "Taiwan",
-  "Upper middle income": "Upper-middle-income countries"
+  "Upper middle income": "Upper-middle-income countries",
+  "Sub-Saharan Africa (excluding high income)": "Sub-Saharan Africa (excluding high income) (WB)",
+  "Europe & Central Asia (excluding high income)": "Europe and Central Asia (excluding high income) (WB)",
+  "Middle East & North Africa (excluding high income)": "Middle East and North Africa (excluding high income) (WB)",
+  "East Asia & Pacific (excluding high income)": "East Asia and Pacific (excluding high income) (WB)",
+  "Latin America & Caribbean (excluding high income)":  "Latin America and Caribbean (excluding high income) (WB)"
 }
