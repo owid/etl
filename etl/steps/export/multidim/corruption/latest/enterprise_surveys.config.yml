@@ -3,8 +3,12 @@ title:
   title_variant: by type of transaction
 default_selection:
   - World
-
-
+  - Europe
+  - Asia
+  - Oceania
+  - North America
+  - South America
+  - Africa
 dimensions:
   - slug: service
     name: Type of transaction

@@ -59,7 +59,6 @@ def run() -> None:
             },
         ]
     )
-
     #
     # Save garden dataset.
     #
