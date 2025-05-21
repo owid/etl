@@ -17,10 +17,10 @@ def run() -> None:
     # Load inputs.
     #
 
-    # Load grapher dataset.
     # Load configuration from adjacent yaml file.
     config = paths.load_config()
 
+    # Load grapher dataset.
     ds = paths.load_dataset("corruption_barometer")
     tb = ds.read("corruption_barometer")
 
@@ -78,6 +78,8 @@ def run() -> None:
             },
         ]
     )
+    # Sort choices alphabetically
+    c.sort_choices({"answer": lambda x: sorted(x)})
 
     #
     # Save garden dataset.
