@@ -786,10 +786,10 @@ def estimate_metrics_locations(
         "all": list(TYPE_OF_VIOLENCE_MAPPING.values()) + list(TYPE_OF_CONFLICT_MAPPING.values()),
     }
 
-    tb_locations_country2 = tb_locations_country.copy()
+    tb_locations_country = tb_locations_country.copy()
     for ctype_agg, ctypes in CTYPES_AGGREGATES.items():
-        tb_locations_country2 = aggregate_conflict_types(
-            tb=tb_locations_country2,
+        tb_locations_country = aggregate_conflict_types(
+            tb=tb_locations_country,
             parent_name=ctype_agg,
             children_names=ctypes,
             columns_to_aggregate=cols_indicators,
