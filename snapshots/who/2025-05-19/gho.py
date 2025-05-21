@@ -55,17 +55,46 @@ memory = Memory(CACHE_DIR, verbose=0)
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
-# Parallelize downloads
-MAX_WORKERS = 5
-
 # Only include specified indicators, useful for debugging
 SUBSET = os.environ.get("SUBSET")
+if SUBSET:
+    subset_list = [
+        "WHS3_45",
+        "PHE_HHAIR_POP_CLEAN_FUELS",
+        "WHS3_56",
+        "PHE_HHAIR_PROP_POP_CLEAN_FUELS",
+        "NTD_YAWSNUM",
+        "carep",
+        "NTD_7",
+        "NTD_8",
+        "NTD_TRA5",
+        "NTD_ONCHEMO",
+        "NTD_ONCTREAT",
+        "NCD_BMI_25A",
+        "MDG_0000000026",
+        "MDG_0000000032",
+        "MORT_MATERNALNUM",
+        "NUTSTUNTINGPREV",
+        "R_Total_tax",
+        "O_Group",
+        "E_Group",
+        "P_count_places_sf",
+        "R_afford_gdp",
+        "SDGNTDTREATMENT",
+    ]
+    SUBSET += "," + ",".join(subset_list)
 
 # Labels of indicators that cannot be empty even if GHO API returns empty response
 NON_EMPTY_LABELS = [
     "LIFE_0000000030",
     "NTD_YAWSNUM",
 ]
+
+# Currently not used, because Athena API returns richer response with DEFINITION_XML that
+#   contains the ID of the indicator.
+# def fetch_indicators():
+#     df = pd.DataFrame(requests.get("https://ghoapi.azureedge.net/api/Indicator").json()["value"])
+#     return df[["IndicatorCode", "IndicatorName"]]
 
 
 @memory.cache()
@@ -232,13 +261,27 @@ def _metadata_url_is_valid(url: str) -> bool:
 
 
 @memory.cache()
-def _fetch_and_repack_data(label: str) -> pd.DataFrame:
-    log.info("fetch_data", label=label)
-    url = f"https://apps.who.int/gho/athena/api/GHO/{label}?format=csv&profile=text"
+def fetch_dimensions():
+    df = pd.DataFrame(requests.get("https://ghoapi.azureedge.net/api/Dimension").json()["value"])
+    return df[["Code", "Title"]]
+
+
+@memory.cache()
+def fetch_dimension_values(dim_code: str):
+    df = pd.DataFrame(
+        requests.get(f"https://ghoapi.azureedge.net/api/DIMENSION/{dim_code}/DimensionValues").json()["value"]
+    )
+    return df[["Code", "Title"]].set_index("Code")["Title"].to_dict()
+
+
+@memory.cache()
+def _fetch_and_repack_data(ind_code: str) -> pd.DataFrame:
+    log.info("fetch_data", ind_code=ind_code)
+    url = f"https://ghoapi.azureedge.net/api/{ind_code}?$format=json"
     resp = fetch_url_with_retry(url, retry_empty=True)
     resp.raise_for_status()
 
-    data = pd.read_csv(io.StringIO(resp.text))
+    data = pd.DataFrame(resp.json()["value"])
 
     # make it smaller
     data = repack.repack_frame(data)
@@ -246,7 +289,7 @@ def _fetch_and_repack_data(label: str) -> pd.DataFrame:
     return data
 
 
-def fetch_data(label: str) -> pd.DataFrame:
+def fetch_data(ind_code: str) -> pd.DataFrame:
     """Fetch data from GHO API. It's possible that the API returns an empty response even though it has the data (
     and there's no way to know if the empty data is real or not). In that case we'll retry a few times or infinite
     times if the label is in NON_EMPTY_LABELS.
@@ -254,20 +297,76 @@ def fetch_data(label: str) -> pd.DataFrame:
     some of the empty datasets.
     """
     try:
-        return _fetch_and_repack_data(label)
+        return _fetch_and_repack_data(ind_code)
     except tenacity.RetryError as e:
         # just try again... maybe it'll succeed one day
-        if label in NON_EMPTY_LABELS:
-            log.warning("Required label is empty, trying again", label=label)
-            return fetch_data(label)
+        if ind_code in NON_EMPTY_LABELS:
+            log.warning("Required indicator is empty, trying again", ind_code=ind_code)
+            return fetch_data(ind_code)
 
         if isinstance(e.last_attempt.exception(), EmptyResponseError):
-            log.warning("Empty response after retrying", label=label)
+            log.warning("Empty response after retrying", ind_code=ind_code)
             return pd.DataFrame()
         else:
             # Not working, raise an error and return empty
-            log.warning("Error after retrying", label=label, e=e.last_attempt.exception())
+            log.warning("Error after retrying", ind_code=ind_code, e=e.last_attempt.exception())
             return pd.DataFrame()
+
+
+def fetch_and_process_data(ind_code: str) -> pd.DataFrame:
+    # Fetch raw data
+    df = fetch_data(ind_code)
+
+    # Remove unnecessary columns
+    drop_cols = [
+        "TimeDimensionBegin",
+        "TimeDimensionEnd",
+        "Date",
+        "ParentLocationCode",
+        "Id",
+        "IndicatorCode",
+        "DataSourceDimType",
+        "DataSourceDim",
+    ]
+    df = df.drop(columns=drop_cols)
+
+    dimensions = fetch_dimensions()
+
+    # Turn dimensions into columns
+    for k in (1, 2, 3):
+        dim_type = f"Dim{k}Type"
+        dim_col = f"Dim{k}"
+
+        for dim_code in set(df[dim_type]):
+            # Add dimension
+            if not pd.isnull(dim_code):
+                dim_title = dimensions[dimensions.Code == dim_code].Title.iloc[0]
+                dim_values = fetch_dimension_values(dim_code)
+
+                # Map codes to values
+                df[dim_title] = df[dim_col].map(dim_values)
+
+        # Drop dimension columns
+        df = df.drop(columns=[dim_col, dim_type])
+
+    # Turn spatial dimension into country
+    mapping = {}
+    for spatial_dim_code in set(df["SpatialDimType"]):
+        mapping.update(fetch_dimension_values(spatial_dim_code))
+    df["Country"] = df["SpatialDim"].map(mapping)
+
+    # Turn time dimension into year
+    mapping = {}
+    for spatial_dim_code in set(df["TimeDimType"]):
+        mapping.update(fetch_dimension_values(spatial_dim_code))
+    df["Year"] = df["TimeDim"].astype("string").map(mapping)
+
+    df = df.drop(columns=["SpatialDim", "TimeDim"])
+
+    # make it smaller
+    df = repack.repack_frame(df)
+
+    return df
 
 
 def add_df_to_zip(zipf: zipfile.ZipFile, fname: str, df: pd.DataFrame) -> None:
@@ -285,7 +384,14 @@ def add_df_to_zip(zipf: zipfile.ZipFile, fname: str, df: pd.DataFrame) -> None:
     type=bool,
     help="Use cache. Useful for debugging. Don't use for the final snapshot.",
 )
-def main(upload: bool, cache: bool) -> None:
+@click.option(
+    "--max-workers",
+    default=5,
+    show_default=True,
+    type=int,
+    help="Number of parallel workers for downloads.",
+)
+def main(upload: bool, cache: bool, max_workers: int) -> None:
     # Clear cache.
     if not cache:
         memory.clear()
@@ -304,7 +410,7 @@ def main(upload: bool, cache: bool) -> None:
         df_indicators = df_indicators[df_indicators.label.isin(SUBSET.split(","))]
 
     # Download metadata for each of them and add it a JSON.
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         df_indicators["metadata"] = list(
             executor.map(
                 lambda row: get_metadata_for_row(row, name_to_metadata_url),
@@ -320,25 +426,21 @@ def main(upload: bool, cache: bool) -> None:
         # Add indicators metadata.
         add_df_to_zip(zipf, "indicators.feather", df_indicators)
 
-        if MAX_WORKERS == 1:
+        if max_workers == 1:
             # Download individual CSV files.
             for label in df_indicators.label:
-                data = fetch_data(label)
+                data = fetch_and_process_data(label)
+
                 # skip empty indicators
                 if data.empty:
                     continue
                 add_df_to_zip(zipf, f"{label}.feather", data)
         else:
             # Download individual CSV files.
-            with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-                futures = []
-
-                # Fetch all data async
-                for label in df_indicators.label:
-                    future = executor.submit(fetch_data, label)
-                    futures.append(future)
-
-                future_to_label = {executor.submit(fetch_data, label): label for label in df_indicators.label}
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                future_to_label = {
+                    executor.submit(fetch_and_process_data, label): label for label in df_indicators.label
+                }
 
                 # Add data to ZIP
                 for future in concurrent.futures.as_completed(future_to_label):

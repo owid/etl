@@ -153,6 +153,11 @@ def add_percentage_without_clean_cooking_fuels(tables_dict: dict[str, Table]) ->
 
 def _add_global_total(tb: Table, ds_regions: Dataset) -> Table:
     """Add global total. Table shouldn't contain regional data."""
+
+    # If the table already contains a global total, return it
+    if "World" in tb.index.get_level_values("country"):
+        return tb
+
     # Exclude regions from the sum
     country_names = ds_regions["regions"].query('region_type == "country"').name
     total = tb[tb.index.get_level_values("country").isin(country_names)]
