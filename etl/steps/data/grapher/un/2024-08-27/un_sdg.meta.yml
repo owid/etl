@@ -203,6 +203,7 @@ tables:
   _17_1_2__gc_gob_taxd:
     variables:
       _17_1_2__gc_gob_taxd:
+        title: 17.1.2 - Proportion of budgetary central government funded by domestic taxes (%) - GC_GOB_TAXD
         description_short: Expenditures refer to the budgetary central government which includes the core institutions of the national government. Funds only include taxes; Fines, penalties, and most social security contributions are excluded.
         description_key:
           - This indicator measures the share of government revenue that comes from domestic taxes.
