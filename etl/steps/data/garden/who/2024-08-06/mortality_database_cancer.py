@@ -53,21 +53,23 @@ def add_age_group_aggregate(tb: Table, age_groups: list[str], label: str) -> Tab
     - Table: Aggregated rows with updated death rate and age group label merged into the original table.
     """
     # Filter relevant age groups
-    tb_filtered = tb[tb["age_group"].isin(age_groups)]
+    tb_filtered = tb[tb["age_group"].isin(age_groups)].copy()
 
     # Group by relevant dimensions and sum values
-    tb_grouped = tb_filtered.groupby(["country", "year", "sex", "cause", "icd10_codes"], as_index=False).agg(
+    tb_filtered = tb_filtered.groupby(["country", "year", "sex", "cause", "icd10_codes"], as_index=False).agg(
         {"number": "sum", "estimated_population": "sum"}
     )
 
     # Recalculate the death rate for the new age group
-    tb_grouped["death_rate_per_100_000_population"] = tb_grouped["number"] / tb_grouped["estimated_population"] * 100000
+    tb_filtered["death_rate_per_100_000_population"] = (
+        tb_filtered["number"] / tb_filtered["estimated_population"] * 100000
+    )
 
     # Assign new age group label
-    tb_grouped["age_group"] = label
+    tb_filtered["age_group"] = label
 
     # Drop the helper column
-    tb = pr.concat([tb, tb_grouped])
+    tb = pr.concat([tb, tb_filtered])
     return tb
 
 
