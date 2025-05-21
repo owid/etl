@@ -701,7 +701,7 @@ def _set_dependencies_to_nondirty(step: Step) -> None:
             step_dep.is_dirty = lambda: False
     if isinstance(step, GrapherStep):
         for step_dep in step.data_step.dependencies:
-            step.data_step.is_dirty = lambda: False
+            step_dep.is_dirty = lambda: False
 
 
 def _check_public_private_steps(dag: DAG) -> None:
