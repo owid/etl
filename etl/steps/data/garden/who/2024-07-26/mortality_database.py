@@ -31,6 +31,8 @@ def run(dest_dir: str) -> None:
     tb["estimated_population"] = tb["number"] / tb["death_rate_per_100_000_population"] * 100000
     tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years"], "< 5 years")
     tb = add_age_group_aggregate(tb, ["less than 1 year", "1-4 years", "5-9 years"], "< 10 years")
+    tb = tb.drop(columns=["estimated_population"])
+    print(tb.columns)
 
     tb = tb.format(["country", "year", "sex", "age_group", "cause", "icd10_codes"])
     ds_garden = create_dataset(
@@ -67,7 +69,6 @@ def add_age_group_aggregate(tb: Table, age_groups: list[str], label: str) -> Tab
     tb_grouped["age_group"] = label
 
     # Drop the helper column
-    tb_grouped = tb_grouped.drop(columns=["estimated_population"])
     tb = pr.concat([tb, tb_grouped])
     return tb
 
