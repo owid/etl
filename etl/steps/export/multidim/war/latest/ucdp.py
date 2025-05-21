@@ -125,6 +125,21 @@ def run() -> None:
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_view_display_estimates_ci(view)
 
+    # Edit view configs
+    c.edit_view_text(
+        [
+            {
+                "config": {
+                    "timelineMinTime": 1989,
+                    "selectedFacetStrategy": "entity",
+                    "yAxis": {
+                        "facetDomain": True,
+                    },
+                },
+            }
+        ]
+    )
+
     #
     # Save garden dataset.
     #

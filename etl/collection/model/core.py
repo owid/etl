@@ -644,6 +644,42 @@ class Collection(MDIMBase):
         if drop_dimensions_if_single_choice:
             self.prune_dimensions()
 
+    def edit_view_text(
+        self,
+        edits: List[Dict[str, Any]],
+        params: Optional[Dict[str, Any]] = None,
+        # dimensions: Optional[Dict[str, str]] = None,
+        # config: Optional[Dict[str, Any]] = None,
+        # metadata: Optional[Dict[str, Any]] = None,
+    ):
+        """Edit the text of a view. Text can come from `config` (Grapher config) or `metadata` (Grapher metadata, i.e. text in the data page).
+
+        Args:
+            edits (List[Dict[str, Any]]): List of dictionaries with the following keys
+                - dimensions: Dict[str, str]
+                    Slugs of the dimensions to edit. The keys are the dimension slugs, and the values are the new choice slugs.
+                - config: Dict[str, Any]
+                    The config for the new choice. E.g. useful to tweak the chart type.
+                - metadata: Dict[str, Any]
+                    The metadata for the new choice. E.g. useful to tweak the metadata around the chart in a data page (e.g. description key, etc.)
+            params (Dict[str, Any]): Optional parameters to pass to the config and metadata. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
+        """
+        # Check edits is a list of dicts
+        if not isinstance(edits, list):
+            raise TypeError("Edits must be a list of dictionaries!")
+        if not all(isinstance(edit, dict) for edit in edits):
+            raise TypeError("Edits must be a list of dictionaries!")
+
+        # Create CommonView objects
+        common_views = []
+        for edit in edits:
+            cv = CommonView(**edit)
+            common_views.append(cv)
+
+        # Apply common views (with priority over view-specific config)
+        for view in self.views:
+            view.combine_with_common(common_views, common_has_priority=True)
+
     def _sanity_check_view_grouping(
         self,
         dimension: str,
