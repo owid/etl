@@ -4,6 +4,11 @@ title:
 default_selection:
   - World
 
+default_dimensions:
+  indicator: deaths
+  conflict_type: state_based_stacked
+  estimate: best
+
 dimensions:
   - slug: indicator
     name: Measure
