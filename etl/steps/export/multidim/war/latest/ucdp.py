@@ -42,7 +42,6 @@ def run() -> None:
                 "time": True,
             },
         },
-        # dimensions={},
     )
 
     # Edit indicator-level display settings
@@ -123,40 +122,17 @@ def run() -> None:
         edit_indicator_displays(view)
 
     # Edit view configs
-    c.edit_views(
-        [
-            # General
-            {
-                "config": {
-                    "timelineMinTime": 1989,
-                    "selectedFacetStrategy": "entity",
-                    "yAxis": {
-                        "facetDomain": True,
-                    },
-                },
+    c.set_global_config(
+        {
+            "timelineMinTime": 1989,
+            "selectedFacetStrategy": "entity",
+            "yAxis": {
+                "facetDomain": True,
             },
-            # Specific
-            {
-                "dimensions": {"indicator": "deaths"},
-                "config": {
-                    "title": "Deaths in {conflict_name}",
-                },
-            },
-            {
-                "dimensions": {"indicator": "death_rate"},
-                "config": {
-                    "title": "Death rate in {conflict_name}",
-                },
-            },
-            {
-                "dimensions": {"indicator": "num_conflicts"},
-                "config": {
-                    "title": "Number of {conflict_name}",
-                },
-            },
-        ],
+            "title": "{title}",
+        },
         params={
-            "conflict_name": lambda view: _get_conflict_name(view, choice_names),
+            "title": lambda view: _set_title(view, choice_names),
         },
     )
 
@@ -241,6 +217,16 @@ def adjust_dimensions(tb):
             ]
         )
     return tb
+
+
+def _set_title(view, choice_names):
+    conflict_name = _get_conflict_name(view, choice_names)
+    if view.dimensions["indicator"] == "deaths":
+        return f"Deaths in {conflict_name}"
+    elif view.dimensions["indicator"] == "death_rate":
+        return f"Death rate in {conflict_name}"
+    else:
+        return f"Number of {conflict_name}"
 
 
 def _get_conflict_name(view, choice_names):
