@@ -193,7 +193,7 @@ tables:
           - This indicator aims to measure revenue of the general government sector, which includes all levels of government (central, state, and local) and social security funds. Where this data is not available, it falls back on onto consolidated or budgetary central government level data, which might not include all levels of government.
 
         description_from_producer: |-
-          Total government revenue as a proportion of GDP
+          Total government revenue as a proportion of GDP (%)
 
           #### Definition:
 
@@ -219,7 +219,7 @@ tables:
           - Government expenditures refer to the budgetary central government. These are all institutions that are directly financed through the main central government budget, such as the core ministries, departments and agencies.
           - This indicator does not include other sources of government revenue, such as grants, loans, fines, penalties, and most social security contributions.
         description_from_producer: |-
-          Proportion of domestic budgetary central government expenditure funded by taxe (%)
+          Proportion of domestic budgetary central government expenditure funded by taxes (%)
 
           #### Definition:
           Budgetary central government is an institutional unit of the general government sector particularly important in terms of size and power, particularly the power to exercise control over many other units and entities.
