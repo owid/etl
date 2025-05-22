@@ -23,13 +23,13 @@ tables:
       ets_price:
         title: ETS price
         unit: Current local currency unit per ton of CO₂ equivalent
-        short_unit: current LCU / t CO₂e
+        short_unit: current LCU/t CO₂e
         description_short: Price of an emissions allowance in current local currency unit per ton of CO₂ equivalent.
         display:
           numDecimalPlaces: 2
         processing_level: minor
       sector_name:
-        title: IPCC sector name.
+        title: IPCC sector name
         unit: ""
         processing_level: minor
       tax:
@@ -40,7 +40,7 @@ tables:
       tax_rate_gross:
         title: Gross tax rate
         unit: Current local currency unit per ton of CO₂ equivalent
-        short_unit: current LCU / t CO₂e
+        short_unit: current LCU/t CO₂e
         description_short: Tax rate in current local currency unit (LCU) per ton of CO₂ equivalent
         display:
           numDecimalPlaces: 2
@@ -48,7 +48,7 @@ tables:
       tax_rate_net:
         title: Net tax rate
         unit: Current local currency unit per ton of CO₂ equivalent
-        short_unit: current LCU / t CO₂e
+        short_unit: current LCU/t CO₂e
         description_short: Net tax rate (accounting for exemption) in current LCU per ton of CO₂ equivalent.
         display:
           numDecimalPlaces: 2
