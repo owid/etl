@@ -12,6 +12,7 @@ import fastjsonschema
 import pandas as pd
 import yaml
 from owid.catalog.meta import GrapherConfig
+from owid.catalog.utils import underscore
 from structlog import get_logger
 from typing_extensions import Self
 
@@ -206,6 +207,9 @@ class Collection(MDIMBase):
         if prune_dimensions:
             self.prune_dimensions()
 
+        # Snake case all slugs (in dimensions and views)
+        self.snake_case_slugs()
+
         # Export config to local directory in addition to uploading it to MySQL for debugging.
         self.save_config_local()
 
@@ -223,6 +227,62 @@ class Collection(MDIMBase):
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
         admin_api.put_mdim_config(self.catalog_path, config)
+
+    def snake_case_slugs(self):
+        """
+        Convert all slugs in dimensions and views to snake_case format.
+
+        This method ensures that all slugs in `self.dimensions` and `self.views` are in snake_case.
+        It validates the format of slugs and raises errors if they do not meet the required criteria.
+
+        Input expectations:
+        - `self.dimensions` is a list of `Dimension` objects, each with slugs to be converted.
+        - `self.views` is a list of `View` objects, each containing dimension and choice slugs.
+
+        Error conditions:
+        - Raises `ValueError` if a slug does not match the snake_case format.
+        - Raises `ValueError` if a dimension or choice slug is not found in the mappings.
+        """
+
+        def _validated_underscore(text):
+            text = underscore(text)
+            # Validate that the text contains only lowercase letters and underscores
+            if not re.match(r"^[a-z][a-z0-9_]*$|^_[a-z0-9][a-z0-9_]*$", text):
+                raise ValueError(
+                    f"Text '{text}' must start with a lowercase letter or underscore followed by at least one alphanumeric character, and contain only lowercase letters, digits, and underscores."
+                )
+            return text
+
+        # 1) Build mappings
+        dimension_choices = self.dimension_choices_in_use()
+        dimension_mapping = {slug: _validated_underscore(slug) for slug in dimension_choices.keys()}
+        choice_mapping = {
+            dim_slug: {choice_slug: _validated_underscore(choice_slug) for choice_slug in choice_slugs}
+            for dim_slug, choice_slugs in dimension_choices.items()
+        }
+
+        # 1) Snake case all slugs in dimensions+choices
+        for dim in self.dimensions:
+            ## Choice slug
+            for choice in dim.choices:
+                assert choice.slug in choice_mapping[dim.slug], "Choice slug not found in mapping!"
+                choice.slug = choice_mapping[dim.slug][choice.slug]
+            ## Dimension slug
+            assert dim.slug in dimension_mapping, "Dimension slug not found in mapping!"
+            dim.slug = dimension_mapping[dim.slug]
+
+        # 2) Snake case all slugs in views based on the mapping from 1. Raise error if any slug is not found in the mapping.
+        for view in self.views:
+            view_dimensions = {}
+            for dim_slug, choice_slug in view.dimensions.items():
+                if dim_slug not in dimension_mapping:
+                    raise ValueError(f"Dimension slug {dim_slug} not found in mapping!")
+                if choice_slug not in choice_mapping[dim_slug]:
+                    raise ValueError(f"Choice slug {choice_slug} not found in mapping for dimension {dim_slug}!")
+                # Set the new slugs
+                view_dimensions[dimension_mapping[dim_slug]] = choice_mapping[dim_slug][choice_slug]
+            # Update dimensions
+            view.dimensions = view_dimensions
 
     def to_dict(self, encode_json: bool = False, drop_definitions: bool = True) -> Dict[str, Any]:  # type: ignore
         dix = super().to_dict(encode_json=encode_json)
