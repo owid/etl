@@ -188,10 +188,10 @@ tables:
           title_public: Government revenues as a share of GDP
           grapher_config:
             note: |-
-              Coverage varies by country. Data for general government (including central, state, and local governments, and social security funds) is used when available. Otherwise, it reflects consolidated or budgetary central government, as reported by each country.
+              Coverage varies by country. Data for [general government](#dod:general-government) (including central, state, and local governments, and social security funds) is used when available. Otherwise, it reflects [consolidated or budgetary central government](#dod:central-government), as reported by each country.
         description_key:
           - Government revenue in this indicator includes all types of revenue, such as taxes, social contributions, grants, and other income. The total revenue is expressed as a percentage of gross domestic product (GDP).
-          - This indicator refers to revenues of the general government, which includes all levels of government (central, state, and local) and social security funds. Where general government data is not available, it relies on consolidated or budgetary central government data, which may not include all levels of government.
+          - This indicator refers to revenues of the [general government](#dod:general-government), which includes all levels of government (central, state, and local) and social security funds. Where general government data is not available, it relies on [consolidated or budgetary central government](#dod:central-government) data, which may not include all levels of government.
 
 
         description_from_producer: |-
@@ -217,9 +217,9 @@ tables:
         title: 17.1.2 - Proportion of budgetary central government funded by domestic taxes (%) - GC_GOB_TAXD
         presentation:
           title_public: Share of central government spending funded by taxes
-        description_short: Expenditures refer to the budgetary central government which includes the core institutions of the national government. Funds only include taxes; Fines, penalties, and most social security contributions are excluded.
+        description_short: Spending refers to the [budgetary central government](#dod:central-government) which includes the core institutions of the national government. Funds only include taxes; Fines, penalties, and most social security contributions are excluded.
         description_key:
-          - This indicator measures the share of central government spending that is covered by domestic tax revenue.
+          - This indicator measures the share of [central government](#dod:central-government) spending that is covered by domestic tax revenue.
           - Government expenditures refer to the budgetary central government. These are all institutions that are directly financed through the main central government budget, such as the core ministries, departments and agencies.
           - This indicator does not include other sources of government revenue, such as grants, loans, fines, penalties, and most social security contributions.
         description_from_producer: |-
