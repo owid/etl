@@ -64,7 +64,7 @@ tables:
           - Short-term or occasional childcare (such as babysitting) and nanny services are excluded.
           - Camp, kindergarten, and any programs for grade school students (including extended before- and after-school care) are also excluded.
           - In families with more than three children, only the costs for up to three children are included; additional children are excluded from pricing.
-        - *cpi_base_1982_84
+          - *cpi_base_1982_84
         unit: ""
         presentation:
           title_public: Tuition, school fees, childcare (US consumer price index)
