@@ -8,13 +8,14 @@ import click
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+from structlog import get_logger
 
 from etl.snapshot import Snapshot
 
 # Version for current snapshot dataset.
 SNAPSHOT_VERSION = Path(__file__).parent.name
 
-
+logging = get_logger()
 WHO_REGIONS = ["EURO", "AMRO", "WPRO", "EMRO", "AFRO", "SEARO"]
 
 
@@ -42,9 +43,9 @@ def get_shiny_data():
         if section:
             button = section.find("button")
             if not button:
-                print("No button found in section.")
+                logging.warning("No button found in section.")
         else:
-            print("Section not found.")
+            logging.warning("Section not found.")
         # Step 2: Find the button with base64 CSV data
 
         if button and "onclick" in button.attrs:
