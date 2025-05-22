@@ -650,7 +650,11 @@ class Collection(MDIMBase):
         if drop_dimensions_if_single_choice:
             self.prune_dimensions()
 
-    def set_global_config(self, config):
+    def set_global_config(
+        self,
+        config,
+        params: Optional[Dict[str, Any]] = None,
+    ):
         self.edit_views(
             [
                 # General
@@ -658,9 +662,14 @@ class Collection(MDIMBase):
                     "config": config,
                 }
             ],
+            params=params,
         )
 
-    def set_global_metadata(self, metadata):
+    def set_global_metadata(
+        self,
+        metadata,
+        params: Optional[Dict[str, Any]] = None,
+    ):
         self.edit_views(
             [
                 # General
@@ -668,6 +677,7 @@ class Collection(MDIMBase):
                     "metadata": metadata,
                 }
             ],
+            params=params,
         )
 
     def edit_views(
