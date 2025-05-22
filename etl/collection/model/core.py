@@ -473,7 +473,12 @@ class Collection(MDIMBase):
                 new_views.append(view)
         self.views = new_views
 
-    def group_views(self, groups: List[Dict[str, Any]], drop_dimensions_if_single_choice: bool = True):
+    def group_views(
+        self,
+        groups: List[Dict[str, Any]],
+        drop_dimensions_if_single_choice: bool = True,
+        params: Optional[Dict[str, Any]] = None,
+    ):
         """Group views into new ones.
 
         Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
@@ -490,12 +495,14 @@ class Collection(MDIMBase):
                         The view config for the new choice. E.g. useful to tweak the chart type.
                     - view_metadata: Optional[Dict[str, Any]], default=None
                         The metadata for the new view. Useful to tweak the metadata around the chart in a data page (e.g. description key, etc.)
-                    - view_params: Dict[str, Any]
-                        Define any parameters that might be used in `view_config`. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
                     - replace: Optional[bool], default=False
                         If True, the original choices will be removed and replaced with the new choice. If False, the original choices will be kept and the new choice will be added.
                     - overwrite_dimension_choice: Optional[bool], default=False
                         If True and `choice_new_slug` already exists as a `choice` in `dimension`, views created here will overwrite those already existing if there is any collision.
+            drop_Dimensions_if_single_choice (bool):
+                If True, drop dimensions that have only one choice in use. Default: True. To keep the dropdown, even if just with one option, set this to False.
+            params (Dict[str, Any]):
+                Optional parameters to pass to the config and metadata. Keys of the dictionary are the parameter names, and values can either be strings or callables. NOTE: Callables must have one argument, which should be the grouped view. See Example 2 below for more details.
 
         Example 1:
         ----------
@@ -517,7 +524,7 @@ class Collection(MDIMBase):
         ----------
         Sometimes, you may want to define config for the new views. In the example above, you have generated new views for male+female in three different age brackets. Suppose that you want to set the titles each of the three new views: "Population of people aged 0-4", "Population of people aged 5-9", and "Population of people aged 0-4 and 5-9", respectively.
 
-        You can programmatically do this with `view_config` and `view_params` (see code snippets below). Basically, you need to define a title template in `view_config`, and then pass the parameters in `view_params`. The template will be filled with the values in `view_params`.
+        You can programmatically do this with `view_config` and `params` (see code snippets below). Basically, you need to define a title template in `view_config`, and then pass the parameters in `params`. The template will be filled with the values in `params`.
 
         ```python
         c.group_views(
@@ -527,11 +534,11 @@ class Collection(MDIMBase):
                     "view_config": {
                         "title": "Population of people aged {age}",
                     }
-                    "view_params": {
-                        "age": "0-4",
-                    },
                 }
-            ]
+            ],
+            params={
+                "age": "0-4",
+            }
         )
         ```
 
@@ -544,12 +551,12 @@ class Collection(MDIMBase):
                     "dimension": "sex",
                     "view_config": {
                         "title": "Population of people aged {age}",
-                    }
-                    "view_params": {
-                        "age": lambda view: view.dimensions["age"],
                     },
                 }
-            ]
+            ],
+            "params": {
+                "age": lambda view: view.dimensions["age"],
+            },
         )
         ```
         """
@@ -571,7 +578,6 @@ class Collection(MDIMBase):
             # Config of new views
             view_config = group.get("view_config")
             view_metadata = group.get("view_metadata")
-            view_params = group.get("view_params")
 
             # Sanity checks
             self._sanity_check_view_grouping(
@@ -587,7 +593,7 @@ class Collection(MDIMBase):
                 choice_new_slug=choice_new_slug,
                 view_config=view_config,
                 view_metadata=view_metadata,
-                view_params=view_params,
+                params=params,
             )
             new_views_all.append(
                 {
@@ -644,13 +650,30 @@ class Collection(MDIMBase):
         if drop_dimensions_if_single_choice:
             self.prune_dimensions()
 
-    def edit_view_display(
+    def set_global_config(self, config):
+        self.edit_views(
+            [
+                # General
+                {
+                    "config": config,
+                }
+            ],
+        )
+
+    def set_global_metadata(self, metadata):
+        self.edit_views(
+            [
+                # General
+                {
+                    "metadata": metadata,
+                }
+            ],
+        )
+
+    def edit_views(
         self,
         edits: List[Dict[str, Any]],
         params: Optional[Dict[str, Any]] = None,
-        # dimensions: Optional[Dict[str, str]] = None,
-        # config: Optional[Dict[str, Any]] = None,
-        # metadata: Optional[Dict[str, Any]] = None,
     ):
         """Edit the display of a view. Text can come from `config` (Grapher config) or `metadata` (Grapher metadata, i.e. text in the data page).
 
@@ -673,12 +696,17 @@ class Collection(MDIMBase):
         # Create CommonView objects
         common_views = []
         for edit in edits:
+            ## Create common view
             cv = CommonView(**edit)
             common_views.append(cv)
 
         # Apply common views (with priority over view-specific config)
+        ## NOTE: we allow to fill in a view with a parametrized config and metadata. We then make sure to fill in the parameters. We do it this way to avoid touching `combine_with_common` method.
         for view in self.views:
+            ## Combine with common views
             view.combine_with_common(common_views, common_has_priority=True)
+            ## TODO: Fill in possible params
+            view = _set_config_metadata_with_params(view, view.config, view.metadata, params)
 
     def _sanity_check_view_grouping(
         self,
@@ -712,11 +740,11 @@ class Collection(MDIMBase):
         choice_new_slug: str,
         view_config: Optional[GrapherConfig] = None,
         view_metadata: Optional[Any] = None,
-        view_params: Optional[Dict[str, Any]] = None,
+        params: Optional[Dict[str, Any]] = None,
     ) -> List[View]:
         """Create new grouped views."""
-        if view_params is None:
-            view_params = {}
+        if params is None:
+            params = {}
 
         if self._group_operations_done > 0:
             log.warning(
@@ -743,20 +771,50 @@ class Collection(MDIMBase):
                 indicators=_combine_view_indicators(view_group),
             )
             # Create config for new view
-            params = view_params.copy()
-            for p, k in params.items():
-                if isinstance(k, Callable):
-                    params[p] = k(new_view)
-            new_config = fill_placeholders(view_config, params) if view_config else None
-            new_metadata = fill_placeholders(view_metadata, params) if view_metadata else None
-            # Add config to new view
-            new_view.config = cast(GrapherConfig, new_config)
-            new_view.metadata = new_metadata
+            new_view = _set_config_metadata_with_params(new_view, view_config, view_metadata, params)
 
             # Add new view to list
             new_views.append(new_view)
 
         return new_views
+
+
+def _expand_params(params: Dict[str, Any], view: View) -> Dict[str, Any]:
+    """Expand parameters in the config and metadata."""
+    # Create config for new view
+    params_view = params.copy()
+    for p, k in params_view.items():
+        if isinstance(k, Callable):
+            params_view[p] = k(view)
+    return params_view
+
+
+def _set_config_metadata_with_params(
+    view,
+    view_config: Optional[GrapherConfig] = None,
+    view_metadata: Optional[Any] = None,
+    params: Optional[Dict[str, Any]] = None,
+) -> View:
+    # Set params to dict if None
+    if params is None:
+        params = {}
+
+    # Sanity check
+    if (view_config is None) and (view_metadata is None):
+        raise ValueError("Either view_config or view_metadata must be provided!")
+
+    # Execute callables in params to get a proper Dict[str, str]
+    params_view = _expand_params(params, view)
+
+    # Get config and metadata filled with params
+    new_config = fill_placeholders(view_config, params_view) if view_config else None
+    new_metadata = fill_placeholders(view_metadata, params_view) if view_metadata else None
+
+    # Add config and metadata to new view
+    view.config = cast(GrapherConfig, new_config)
+    view.metadata = new_metadata
+
+    return view
 
 
 def _combine_view_indicators(views: List[View]):

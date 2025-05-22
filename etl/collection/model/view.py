@@ -289,9 +289,9 @@ class View(MDIMBase):
 
 
 def merge_common_metadata_by_dimension(
-    common_params,
+    common_config,
     view_dimensions: Dict[str, Any],
-    view_params,
+    view_config,
     field_name: str,
     common_has_priority: bool = False,
 ):
@@ -300,7 +300,7 @@ def merge_common_metadata_by_dimension(
     Resolves conflicts by specificity and raises an error for any unresolved conflicts.
 
     common_has_priority: bool
-        Set to True if the parameters the parameters from common_params should override the parameters from view_params.
+        Set to True if the parameters the parameters from common_config should override the parameters from view_config.
     """
 
     # Helper to check if an entry's dimensions match the active dimensions
@@ -313,7 +313,7 @@ def merge_common_metadata_by_dimension(
         return True
 
     # Filter entries applicable to the current dimensions and sort by specificity (num of dimension conditions)
-    applicable_entries = [entry for entry in common_params if entry_matches(entry.dimensions, view_dimensions)]
+    applicable_entries = [entry for entry in common_config if entry_matches(entry.dimensions, view_dimensions)]
     applicable_entries = sorted(applicable_entries, key=lambda e: e.num_dimensions)
 
     # Placeholder for result
@@ -409,7 +409,7 @@ def merge_common_metadata_by_dimension(
                 record_source_for_dict(new_val, parent_path + (sub_key,), source_new)
         # (Sub-keys present only in existing_dict remain intact with their original source)
 
-    # Process each entry in order, and build the config/metadata PRIOR to merging it to view_params
+    # Process each entry in order, and build the config/metadata PRIOR to merging it to view_config
     for entry in applicable_entries:
         # TODO: temporary conversion
         entry = entry.to_dict()
@@ -488,14 +488,14 @@ def merge_common_metadata_by_dimension(
                 value_source_map[(key,)] = entry_source
                 record_source_for_dict(new_val, (key,), entry_source)
 
-    # Combine `final_result` and `view_params`
+    # Combine `final_result` and `view_config`
     # - final_result: At this point it contains the combined parameters (config or metadata) from `common_params`.
-    # - view_params: It contains the parameters for a given specific view.
+    # - view_config: It contains the parameters for a given specific view.
     #
-    # By default (`common_has_priority=False``), content of `view_params` takes preference.
-    if view_params:
-        for key, val in view_params.items():
-            # Default behavior: `view_params` takes priority over `common_params`
+    # By default (`common_has_priority=False``), content of `view_config` takes preference.
+    if view_config:
+        for key, val in view_config.items():
+            # Default behavior: `view_config` takes priority over `common_params`
             if not common_has_priority:
                 # Remove any conflict associated with this key (custom override resolves it)
                 for path in list(unresolved_conflicts.keys()):
