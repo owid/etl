@@ -55,7 +55,7 @@ def run() -> None:
 
     # Aggregate views
     c.group_views(
-        params=[
+        groups=[
             {
                 "dimension": "conflict_type",
                 "choices": [
@@ -65,7 +65,7 @@ def run() -> None:
                     "one-sided violence",
                 ],
                 "choice_new_slug": "all_stacked",
-                "config_new": {
+                "view_config": {
                     "chartTypes": ["StackedBar"],
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -76,7 +76,7 @@ def run() -> None:
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "config_new": {
+                "view_config": {
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -87,7 +87,7 @@ def run() -> None:
                 "dimension": "people",
                 "choices": ["combatants", "civilians", "unknown"],
                 "choice_new_slug": "all_stacked",
-                "config_new": {
+                "view_config": {
                     "chartTypes": ["StackedBar"],
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
@@ -228,7 +228,7 @@ def edit_view_title(view, conflict_renames):
         }
     elif view.dimensions["indicator"] == "num_conflicts":
         if view.dimensions["conflict_type"] == "one-sided violence":
-            title = f"Number of conflicts with {conflict_name}"
+            title = "Number of episodes of one-sided violence"
         else:
             title = f"Number of {conflict_name}"
         view.config = {

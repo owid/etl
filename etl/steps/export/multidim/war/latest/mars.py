@@ -70,12 +70,12 @@ def run() -> None:
 
     # Group certain views together: used to create StackedBar charts
     c.group_views(
-        params=[
+        groups=[
             {
                 "dimension": "conflict_type",
                 "choices": ["civil war", "others (non-civil)"],
                 "choice_new_slug": "all",
-                "config_new": {
+                "view_config": {
                     "chartTypes": ["StackedBar"],
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -87,7 +87,7 @@ def run() -> None:
                 "dimension": "estimate",
                 "choices": ["low", "high"],
                 "choice_new_slug": "low_high",
-                "config_new": {
+                "view_config": {
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
                         "time": True,

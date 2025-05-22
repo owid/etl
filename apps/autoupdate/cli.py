@@ -1,3 +1,19 @@
+"""Automatically update data snapshots and optionally create a pull request with the changes.
+
+**Main use case**: Run all autoupdate-enabled snapshots, update their data if needed, and create a PR if there are changes.
+
+Examples:
+
+# Run all autoupdate snapshots, update data, and create PRs if needed
+etl autoupdate --create-pr
+
+# Run in dry-run mode (no changes will be made)
+etl autoupdate --dry-run
+
+# Only process snapshots matching a filter
+etl autoupdate --filter "population"
+"""
+
 import datetime as dt
 import subprocess
 from collections import defaultdict
@@ -7,6 +23,7 @@ from pathlib import Path
 import click
 import yaml
 from owid.catalog.utils import underscore
+from rich_click import RichCommand
 from structlog import get_logger
 from tqdm.auto import tqdm
 
@@ -167,10 +184,26 @@ def run_updates(
         create_autoupdate_pr(update_name=update.name, files=files_to_update)  # type: ignore
 
 
-@click.command()
-@click.option("--dry-run", is_flag=True, help="Run the script in dry-run mode.")
-@click.option("--create-pr", is_flag=True, help="If there's an update, create a PR.")
-@click.option("--filter", type=str, help="Process only snapshots that include the given substring.")
+@click.command(
+    name="autoupdate",
+    cls=RichCommand,
+    help=__doc__,
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Run in dry-run mode. No snapshot scripts will be executed and no files will be changed.",
+)
+@click.option(
+    "--create-pr",
+    is_flag=True,
+    help="If there is an update, create a pull request with the changes.",
+)
+@click.option(
+    "--filter",
+    type=str,
+    help="Process only snapshots whose name includes the given substring.",
+)
 def cli(
     dry_run: bool,
     create_pr: bool,
