@@ -119,15 +119,13 @@ def run() -> None:
     # (optional) Edit views
     #
     for view in c.views:
-        # Edit title and subtitle in charts
-        edit_view_title(view, choice_names)
-
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
-        edit_view_display_estimates_ci(view)
+        edit_indicator_displays(view)
 
     # Edit view configs
-    c.edit_view_display(
+    c.edit_views(
         [
+            # General
             {
                 "config": {
                     "timelineMinTime": 1989,
@@ -136,8 +134,30 @@ def run() -> None:
                         "facetDomain": True,
                     },
                 },
-            }
-        ]
+            },
+            # Specific
+            {
+                "dimensions": {"indicator": "deaths"},
+                "config": {
+                    "title": "Deaths in {conflict_name}",
+                },
+            },
+            {
+                "dimensions": {"indicator": "death_rate"},
+                "config": {
+                    "title": "Death rate in {conflict_name}",
+                },
+            },
+            {
+                "dimensions": {"indicator": "num_conflicts"},
+                "config": {
+                    "title": "Number of {conflict_name}",
+                },
+            },
+        ],
+        params={
+            "conflict_name": lambda view: _get_conflict_name(view, choice_names),
+        },
     )
 
     #
@@ -223,36 +243,17 @@ def adjust_dimensions(tb):
     return tb
 
 
-def edit_view_title(view, conflict_renames):
-    """Edit FAUST titles and subtitles."""
-    # Get conflict type name
+def _get_conflict_name(view, choice_names):
+    """Get conflict name based on view dimensions."""
     conflict_name = "armed conflicts"
-    if view.dimensions["conflict_type"] not in {"all", "all_stacked"}:
-        conflict_name = conflict_renames.get(view.dimensions["conflict_type"]).lower()
-
-    # Add title based on indicator
-    if view.dimensions["indicator"] == "deaths":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Deaths in {conflict_name}",
-        }
-    elif view.dimensions["indicator"] == "death_rate":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Death rate in {conflict_name}",
-        }
-    elif view.dimensions["indicator"] == "num_conflicts":
-        if view.dimensions["conflict_type"] == "one-sided violence":
-            title = "Number of episodes of one-sided violence"
-        else:
-            title = f"Number of {conflict_name}"
-        view.config = {
-            **(view.config or {}),
-            "title": title,
-        }
+    if view.dimensions["conflict_type"] == "one-sided violence":
+        conflict_name = "episodes of one-sided violence"
+    elif view.dimensions["conflict_type"] not in {"all", "all_stacked"}:
+        conflict_name = choice_names[view.dimensions["conflict_type"]].lower()
+    return conflict_name
 
 
-def edit_view_display_estimates_ci(view):
+def edit_indicator_displays(view):
     """Edit FAUST estimates for confidence intervals."""
     if view.dimensions["estimate"] == "best_ci":
         assert view.indicators.y is not None

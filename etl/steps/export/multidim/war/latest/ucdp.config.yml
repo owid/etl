@@ -1,3 +1,13 @@
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        originUrl: ourworldindata.org/ucdp
+        map:
+          colorScale:
+            baseColorScheme: "OrRd"
+        # tab: "map"
+
 title:
   title: Data on conflict since 1989
   title_variant: "from UCDP"
