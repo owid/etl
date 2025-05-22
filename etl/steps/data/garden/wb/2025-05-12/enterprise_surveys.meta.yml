@@ -4,7 +4,18 @@ definitions:
     unit: "%"
     short_unit: "%"
     processing_level: minor
+    display:
+      tolerance: 5
     presentation:
+      grapher_config:
+        hasMapTab: true
+        maxTime: 2024
+        map:
+          timeTolerance: 5
+          colorScale:
+            binningStrategy: manual
+            customNumericValues: [10,20,30,40,50,60]
+            baseColorScheme: OrRd
       topic_tags:
         - Corruption
 

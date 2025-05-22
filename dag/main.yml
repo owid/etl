@@ -697,33 +697,20 @@ steps:
   data://grapher/aviation/2025-04-01/air_traffic:
     - data://garden/aviation/2025-04-01/air_traffic
 
-  # UNODC - Access and Functioning of Justice
-  data://meadow/unodc/2025-05-12/justice:
-    - snapshot://unodc/2025-05-12/justice.xlsx
-  data://garden/unodc/2025-05-12/justice:
-    - data://meadow/unodc/2025-05-12/justice
-  data://grapher/unodc/2025-05-12/justice:
-    - data://garden/unodc/2025-05-12/justice
 
-  # UNODC - Corruption & Economic Crime
-  data://meadow/unodc/2025-05-12/corruption:
-    - snapshot://unodc/2025-05-12/corruption.xlsx
-  data://garden/unodc/2025-05-12/corruption:
-    - data://meadow/unodc/2025-05-12/corruption
-  data://grapher/unodc/2025-05-12/corruption:
-    - data://garden/unodc/2025-05-12/corruption
-
-  #
-  # Corruption Barometer
-  #
-  data://meadow/corruption/2025-05-12/corruption_barometer:
-    - snapshot://corruption/2025-05-12/corruption_barometer.xlsx
-  data://garden/corruption/2025-05-12/corruption_barometer:
-    - data://meadow/corruption/2025-05-12/corruption_barometer
+  # United Nations members
+  data://meadow/un/2025-05-15/un_members:
+    - snapshot://un/2025-05-15/un_members.csv
+  # United Nations members
+  data://garden/un/2025-05-15/un_members:
+    - data://garden/wb/2021-07-01/wb_income
     - data://garden/demography/2024-07-15/population
+    - data://meadow/un/2025-05-15/un_members
     - data://garden/regions/2023-01-01/regions
-  data://grapher/corruption/2025-05-12/corruption_barometer:
-    - data://garden/corruption/2025-05-12/corruption_barometer
+  # United Nations members
+  data://grapher/un/2025-05-15/un_members:
+    - data://garden/un/2025-05-15/un_members
+
 
 include:
   - dag/open_numbers.yml

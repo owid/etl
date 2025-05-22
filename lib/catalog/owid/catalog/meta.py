@@ -19,7 +19,7 @@ from typing_extensions import NotRequired, Required, Self
 
 from . import jinja
 from .processing_log import ProcessingLog
-from .utils import dataclass_from_dict, hash_any, pruned_json
+from .utils import dataclass_from_dict, hash_any, parse_numeric_list, pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
@@ -301,9 +301,7 @@ class VariableMeta(MetaBase):
         """
         meta = jinja._expand_jinja(self.copy(), dim_dict, remove_dods=remove_dods)
 
-        # Prune empty description keys
-        if meta.description_key:
-            meta.description_key = [x for x in meta.description_key if x]
+        meta = update_variable_metadata(meta)
 
         return meta
 
@@ -509,3 +507,55 @@ def _deepcopy_dataclass(dc) -> Any:
         else:
             pass
     return dc
+
+
+def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
+    """Post-process variable metadata and fix issues before rendering or exporting to grapher.
+    Things like converting strings to numbers, removing empty fields, post-processing jinja
+    rendering, etc.
+    """
+    # Grapher uses units from field `display` instead of fields `unit` and `short_unit`
+    # before we fix grapher data model, copy them to `display`.
+    meta.display = meta.display or {}
+
+    # Copy unit and short_unit to display if they exist
+    if meta.short_unit:
+        meta.display.setdefault("shortUnit", meta.short_unit)
+    if meta.unit:
+        meta.display.setdefault("unit", meta.unit)
+
+    # Convert numDecimalPlaces from string to int if needed
+    if meta.display and isinstance(meta.display.get("numDecimalPlaces"), str):
+        meta.display["numDecimalPlaces"] = int(meta.display["numDecimalPlaces"])
+
+    # Prune empty fields from description_key
+    if meta.description_key:
+        meta.description_key = [x for x in meta.description_key if x.strip()]
+
+    # Convert from string to proper type when it comes from YAML
+    grapher_config = getattr(getattr(meta, "presentation", None), "grapher_config", {}) or {}
+    color_scale = grapher_config.get("map", {}).get("colorScale", {})
+    if isinstance(color_scale.get("customNumericMinValue"), str):
+        color_scale["customNumericMinValue"] = float(color_scale["customNumericMinValue"])
+
+    # Convert strings to lists when needed
+    gconf = getattr(meta.presentation, "grapher_config", None)
+    if gconf:
+        try:
+            color_scale = gconf["map"]["colorScale"]
+            if isinstance(color_scale["customNumericValues"], str):
+                color_scale["customNumericValues"] = parse_numeric_list(color_scale["customNumericValues"])
+        except KeyError:
+            pass
+
+    # Prune faqs with empty fragment_id
+    if meta.presentation and meta.presentation.faqs:
+        faqs: List[FaqLink] = []
+        for faq in meta.presentation.faqs:
+            if not faq.fragment_id.strip():
+                continue
+            else:
+                faqs.append(faq)
+        meta.presentation.faqs = faqs
+
+    return meta

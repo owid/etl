@@ -1,0 +1,29 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Corruption Perceptions Index"
+    description: |-
+      The Corruption Perceptions Index (CPI), produced by Transparency International, ranks countries and territories based on the perceived level of corruption in their public sectors, as evaluated by experts and business executives. It is a composite index that combines data from at least three and up to thirteen independent sources specializing in governance and business climate analysis. These sources provide perception-based assessments, which are necessary since corruption is largely clandestine and cannot be directly measured at a national level. The CPI uses a scale from 0 (highly corrupt) to 100 (very clean) and has been consistently comparable year-to-year since a methodological revision in 2012.
+      The CPI captures perceptions of public sector corruption in areas such as bribery, diversion of public funds, abuse of office, red tape, meritocracy in public appointments, and protections for whistleblowers. It does not measure private sector corruption, tax fraud, money laundering, or citizens’ personal experiences of corruption. Countries are included only if sufficient data is available, and changes of one or two points in the index are generally not considered statistically significant. The methodology has undergone independent audits, confirming its validity and reliability.
+    date_published: "2024"
+
+    # Citation
+    producer: Transparency International
+    citation_full: |-
+      Corruption Perceptions Index (2024) by Transparency International, https://www.transparency.org/en/cpi/2024.
+
+    # Files
+    url_main: https://www.transparency.org/en/cpi/2024
+    url_download: https://images.transparencycdn.org/images/CPI2024-Results-and-trends.xlsx
+    date_accessed: '2025-05-13'
+
+    # License
+    license:
+      name: CC BY-ND 4.0
+      url: https://images.transparencycdn.org/images/CPI-2024-Methodology.zip
+outs:
+  - md5: ddcbe4e17b3c58e7e698a91c67e2d18b
+    size: 99899
+    path: perception_index.csv
