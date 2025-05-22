@@ -243,6 +243,7 @@ class Collection(MDIMBase):
         - Raises `ValueError` if a slug does not match the snake_case format.
         - Raises `ValueError` if a dimension or choice slug is not found in the mappings.
         """
+
         def _validated_underscore(text):
             text = underscore(text)
             # Validate that the text contains only lowercase letters and underscores
