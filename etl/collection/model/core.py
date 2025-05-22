@@ -229,6 +229,20 @@ class Collection(MDIMBase):
         admin_api.put_mdim_config(self.catalog_path, config)
 
     def snake_case_slugs(self):
+        """
+        Convert all slugs in dimensions and views to snake_case format.
+
+        This method ensures that all slugs in `self.dimensions` and `self.views` are in snake_case.
+        It validates the format of slugs and raises errors if they do not meet the required criteria.
+
+        Input expectations:
+        - `self.dimensions` is a list of `Dimension` objects, each with slugs to be converted.
+        - `self.views` is a list of `View` objects, each containing dimension and choice slugs.
+
+        Error conditions:
+        - Raises `ValueError` if a slug does not match the snake_case format.
+        - Raises `ValueError` if a dimension or choice slug is not found in the mappings.
+        """
         def _validated_underscore(text):
             text = underscore(text)
             # Validate that the text contains only lowercase letters and underscores
