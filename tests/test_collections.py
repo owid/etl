@@ -293,7 +293,7 @@ def test_definitions():
 def test_merge_common_metadata_4():
     """Now we test when we give priority to the common params.
 
-    That is, common_params should override the view_params."""
+    That is, common_params should override the view_config."""
     common_params = [
         # Top-level params
         {
@@ -378,9 +378,9 @@ def test_merge_common_metadata_4():
 
     common_params = [CommonView.from_dict(r) for r in common_params]
     config = merge_common_metadata_by_dimension(
-        common_params=common_params,
+        common_config=common_params,
         view_dimensions=active_dimensions,
-        view_params=custom_config,
+        view_config=custom_config,
         field_name="config",
         common_has_priority=True,
     )
@@ -411,9 +411,9 @@ def test_merge_common_metadata_4():
 def test_merge_common_metadata_5():
     """Now we test when we give priority to the common params.
 
-    That is, common_params should override the view_params.
+    That is, common_params should override the view_config.
 
-    In this case, the code should fail. That's because there is a conflict in others1.description_aux1. Both sex=female and age=10 are trying to set it and they have the same priority. Since view_params has no priority, the conflict is not resolved!"""
+    In this case, the code should fail. That's because there is a conflict in others1.description_aux1. Both sex=female and age=10 are trying to set it and they have the same priority. Since view_config has no priority, the conflict is not resolved!"""
     common_params = [
         # Top-level params
         {
@@ -500,9 +500,9 @@ def test_merge_common_metadata_5():
     common_params = [CommonView.from_dict(r) for r in common_params]
     with pytest.raises(ValueError):
         _ = merge_common_metadata_by_dimension(
-            common_params=common_params,
+            common_config=common_params,
             view_dimensions=active_dimensions,
-            view_params=custom_config,
+            view_config=custom_config,
             field_name="config",
             common_has_priority=True,
         )
