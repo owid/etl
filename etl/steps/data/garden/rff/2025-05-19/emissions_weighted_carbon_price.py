@@ -212,6 +212,22 @@ def run() -> None:
     expected_countries_dropping_taxes = set()
     sanity_check_outputs(tb_combined, expected_countries_dropping_taxes=expected_countries_dropping_taxes)
 
+    ####################################################################################################################
+    # There is an issue with Malta (confirmed with the data provider).
+    # For now, I will remove the affected data point.
+    error = "Expected issue with Malta in 2024 (prices increasing by more than 600%). This issue may have been fixed."
+    for column in tb_combined.drop(columns=["country", "year"]).columns:
+        tb_malta = tb_combined[(tb_combined["country"] == "Malta")]
+        pct_change = 100 * (
+            tb_malta[(tb_malta["year"] == 2024)][column].item()
+            / (tb_malta[(tb_malta["year"] == 2023)][column].item() + 1e-7)
+        )
+        assert (pct_change > 600) or (pct_change == 0), error
+    tb_combined = tb_combined[~((tb_combined["country"] == "Malta") & (tb_combined["year"] == 2024))].reset_index(
+        drop=True
+    )
+    ####################################################################################################################
+
     # Improve table format.
     tb_combined = tb_combined.format(keys=["country", "year"], sort_columns=True)
 
