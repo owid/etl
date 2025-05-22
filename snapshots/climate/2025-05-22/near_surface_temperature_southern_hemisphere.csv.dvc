@@ -19,3 +19,7 @@ meta:
     license:
       name: Open Government License v3
       url: https://www.metoffice.gov.uk/hadobs/hadcrut5/terms_and_conditions.html
+outs:
+  - md5: 14adf4cbac8c1eb7987db79594e59bf7
+    size: 7012
+    path: near_surface_temperature_southern_hemisphere.csv

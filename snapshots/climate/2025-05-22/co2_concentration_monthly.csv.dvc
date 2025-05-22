@@ -17,3 +17,7 @@ meta:
     license:
       name: CC BY 4.0
       url: https://gml.noaa.gov/about/disclaimer.html
+outs:
+  - md5: 532f6baa462dc6e4763e089fd62aaadd
+    size: 24080
+    path: co2_concentration_monthly.csv
