@@ -67,9 +67,9 @@ tables:
           - *cpi_base_1982_84
         unit: ""
         presentation:
-          title_public: Tuition, school fees, childcare (US consumer price index)
+          title_public: Day care and preschool fees (US consumer price index)
         display:
-          name: Tuition, other school fees, and childcare
+          name: Day care and preschool
 
       medical_care:
         title: US consumer price index for medical care
