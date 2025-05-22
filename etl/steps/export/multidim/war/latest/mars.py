@@ -66,7 +66,13 @@ def run() -> None:
             view.indicators.y[0].display = {"name": "Interstate wars"}
         elif view.dimensions["conflict_type"] == "all":
             assert view.indicators.y is not None
-            view.indicators.y[0].display = {"name": f"{view.dimensions['estimate'].title()} estimate"}
+            view.indicators.y[0].display = {
+                "name": f"{view.dimensions['estimate'].title()} estimate",
+            }
+            if view.dimensions["estimate"] == "high":
+                view.indicators.y[0].display["color"] = "#561802"
+            elif view.dimensions["estimate"] == "low":
+                view.indicators.y[0].display["color"] = "#B13507"
 
     # Group certain views together: used to create StackedBar charts
     c.group_views(

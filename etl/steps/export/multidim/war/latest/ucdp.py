@@ -241,6 +241,14 @@ def _get_conflict_name(view, choice_names):
 
 def edit_indicator_displays(view):
     """Edit FAUST estimates for confidence intervals."""
+    # Set color to red if there is only one line in the chart
+    if (view.indicators.y is not None) and (len(view.indicators.y) == 1):
+        if view.indicators.y[0].display is None:
+            view.indicators.y[0].display = {"color": "#B13507"}
+        else:
+            view.indicators.y[0].display["color"] = "#B13507"
+
+    # Set colors for stacked bar charts
     if view.dimensions["estimate"] == "best_ci":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
