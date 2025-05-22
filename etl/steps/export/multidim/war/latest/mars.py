@@ -106,31 +106,39 @@ def run() -> None:
     )
 
     # Edit FAUST
-    for view in c.views:
-        if view.dimensions["indicator"] == "deaths":
-            view.config = {
-                **(view.config or {}),
-                "title": "Deaths in wars",
-                "subtitle": "Included are deaths of combatants due to fighting in [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-            }
-        elif view.dimensions["indicator"] == "death_rate":
-            view.config = {
-                **(view.config or {}),
-                "title": "Death rate in wars",
-                "subtitle": "Deaths of combatants due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-            }
-        elif view.dimensions["indicator"] == "wars_ongoing":
-            view.config = {
-                **(view.config or {}),
-                "title": "Number of wars",
-                "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-            }
-        elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
-            view.config = {
-                **(view.config or {}),
-                "title": "Rate of wars",
-                "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-            }
+    c.edit_views(
+        [
+            {"config": {"timelineMinTime": 1800}},
+            {
+                "dimensions": {"indicator": "deaths"},
+                "config": {
+                    "title": "Deaths in wars",
+                    "subtitle": "Included are deaths of combatants due to fighting in [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+                },
+            },
+            {
+                "dimensions": {"indicator": "death_rate"},
+                "config": {
+                    "title": "Death rate in wars",
+                    "subtitle": "Deaths of combatants due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+                },
+            },
+            {
+                "dimensions": {"indicator": "wars_ongoing"},
+                "config": {
+                    "title": "Number of wars",
+                    "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+                },
+            },
+            {
+                "dimensions": {"indicator": "wars_ongoing_country_rate"},
+                "config": {
+                    "title": "Rate of wars",
+                    "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+                },
+            },
+        ]
+    )
 
     # Save & upload
     c.save()
