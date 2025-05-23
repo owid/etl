@@ -26,7 +26,8 @@ dependencies = [
     "click>=8.1.7",
     "py7zr>=1.0.0rc3",
     "pyppmd>=1.2.0",
-    "pybcj>=1.0.6"
+    "pybcj>=1.0.6",
+    "inflate64>=1.0.1"
 ]
 
 [tool.uv]
