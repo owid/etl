@@ -43,20 +43,20 @@ def render_prop_doc(prop: Dict[str, Any], prop_name: str, level: int = 1, top_le
     guidelines = ""
     if "guidelines" in prop and prop.get("guidelines"):
         guidelines = f"""=== ":fontawesome-solid-list:  Guidelines"
-        {guidelines_to_markdown(prop["guidelines"], extra_tab=1)}
+        {guidelines_to_markdown(prop['guidelines'], extra_tab=1)}
     """
     # Prepare examples
     examples = ""
     if "examples" in prop and prop.get("examples"):
         examples = f"""=== ":material-note-edit: Examples"
-        {examples_to_markdown(prop["examples"], prop["examples_bad"], extra_tab=1)}
+        {examples_to_markdown(prop['examples'], prop['examples_bad'], extra_tab=1)}
     """
 
     # Prepare FAQs
     faqs = ""
     if "faqs" in prop and prop.get("examples"):
         faqs = f"""=== ":material-chat-question: FAQs"
-        {faqs_to_markdown(prop["faqs"], extra_tab=1)}
+        {faqs_to_markdown(prop['faqs'], extra_tab=1)}
     """
 
     # Bake documentation for property
