@@ -37,6 +37,8 @@ def run() -> None:
     snap_meadow_south_korea = paths.load_snapshot("soo_bae_et_al_2012", namespace="papers")
     # Forest research data for USA
     snap_meadow_usa = paths.load_snapshot("forest_share", namespace="usda_fs")
+    # Forest data for China
+    snap_meadow_china = paths.load_snapshot("forest_share", namespace="he_2025")
     # FAO Forest Resource Assessment (FRA) 2020 data
     ds_meadow_fra = paths.load_dataset("fra_forest_extent")
 
@@ -51,6 +53,7 @@ def run() -> None:
     tb_costa_rica = snap_meadow_costa_rica.read()
     tb_south_korea = snap_meadow_south_korea.read()
     tb_usa = snap_meadow_usa.read()
+    tb_china = snap_meadow_china.read()
     tb_fra = ds_meadow_fra["fra_forest_area"].reset_index()
     # Interpolate the 5-yearly FRA data to fill in missing years.
     tb_fra = interpolate_fra(tb_fra)
@@ -68,6 +71,7 @@ def run() -> None:
             tb_costa_rica,
             tb_south_korea,
             tb_usa,
+            tb_china,
         ]
     )
 

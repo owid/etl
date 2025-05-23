@@ -42,7 +42,6 @@ tables:
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
             Scotland: Pre-1600 cover likely >25%
-            China: Historic cover likely >20%
         description_key:
           - "This indicator shows the share of a country’s land area that is covered by forest. It includes both natural forests and forest plantations, where that distinction is available."
           - "For 1990 onwards, data comes from the Food and Agriculture Organization (FAO), which uses a consistent global definition: forest is land with tree canopy cover greater than 10%, spanning more than 0.5 hectares, with trees that can reach at least 5 metres in height. It includes plantations but excludes land where other uses (such as agriculture or urban development) dominate ([FAO definition](https://www.fao.org/4/y1997e/y1997e1m.htm))."
@@ -51,6 +50,7 @@ tables:
           - "Where possible, pre-1990 estimates include both natural forests and plantations to match the FAO’s definition. However, definitions and methods vary by source and country, and users should interpret older data points with some caution."
           - |-
             The details for the historical estimates are provided below:
+            - China (1000-1960): [He et al. (2025): Reconstructing forest and grassland cover changes in China over the past millennium](https://link.springer.com/article/10.1007/s11430-024-1454-4)
             - Costa Rica (1940-1969): [Kleinn et al. (2002): Forest area in Costa Rica: A comparative study of tropical forest cover estimates over time](https://link.springer.com/article/10.1023/A:1012659129083)
             - England (1086-1650): [Department for Environment, Food and Rural Affairs (DEFRA) report: Government Forestry and Woodlands Policy Statement](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/221023/pb13871-forestry-policy-statement.pdf)
             - England (1870-1980): [Forest Research report: National inventory of woodland and trees](https://www.forestresearch.gov.uk/tools-and-resources/national-forest-inventory/national-inventory-of-woodland-and-trees/national-inventory-of-woodland-and-trees-england/)
