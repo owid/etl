@@ -11,7 +11,7 @@ dependencies = [
     "numpy>=1.24.0",
     "pandas>=2.2.3",
     # there are problems with installing 18.0.0, but we should undo this once it's fixed
-    "pyarrow>=10.0.1,<18.0.0",
+    "pyarrow>=18.0.0",
 ]
 
 [tool.uv]
