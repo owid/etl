@@ -40,7 +40,8 @@ def main():
             dataset_name = catalog.Dataset(DATA_DIR / f"garden/faostat/{VERSION}/{domain}").metadata.title
         except FileNotFoundError:
             log.error(
-                f"ETL grapher step for {domain} could not be loaded. Run `etl run {domain} --grapher` and try again."
+                f"ETL grapher step for {domain} could not be loaded. "
+                f"Run `etl run {domain} --grapher` and try again."
             )
             continue
         try:
