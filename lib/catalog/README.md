@@ -1,6 +1,6 @@
 [![Build status](https://badge.buildkite.com/66cc67fc572120ca97b9ffff288d5d73cb33e019dd70323053.svg)](https://buildkite.com/our-world-in-data/owid-catalog-unit-tests)
 [![PyPI version](https://badge.fury.io/py/owid-catalog.svg)](https://badge.fury.io/py/owid-catalog)
-![](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)
+![](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue.svg)
 
 # owid-catalog
 
@@ -75,7 +75,7 @@ df = rc[path]
 
 ## Development
 
-You need Python 3.11+, `uv` and `make` installed. Clone the repo, then you can simply run:
+You need Python 3.10+, `uv` and `make` installed. Clone the repo, then you can simply run:
 
 ```
 # run all unit tests and CI checks
@@ -89,8 +89,8 @@ make watch
 
 - `v0.4.0`
   - **Highlights**
-    - Drop support for Python 3.9 and 3.10 (breaking change)
-    - support for Python 3.13
+    - Support for Python 3.10-3.13 (was 3.11-3.13)
+    - Drop support for Python 3.9 (breaking change)
   - **Others**
     - Deprecate Walden.
     - Dependencies: Change `rdata` for `pyreadr`.

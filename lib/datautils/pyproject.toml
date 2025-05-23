@@ -12,7 +12,7 @@ keywords = [
     "data utils",
 ]
 license = "MIT"
-requires-python = ">=3.11, <4.0"
+requires-python = ">=3.10, <4.0"
 dependencies = [
     "pandas>=2.2.3",
     "boto3>=1.21.16",

@@ -1,12 +1,12 @@
 [project]
 name = "owid-repack"
-version = "0.1.4"
+version = "0.1.5"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24.0",
     "pandas>=2.2.3",

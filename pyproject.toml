@@ -5,7 +5,7 @@ description = ""
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
-requires-python = ">=3.11, <3.14"
+requires-python = ">=3.10, <3.14"
 dependencies = [
     "click>=8.0.1",
     "PyYAML>=6.0.1",
@@ -109,7 +109,7 @@ dev-dependencies = [
     # unpinning those would introduce tons of type errors
     "pyright==1.1.373",
     "pandas-stubs==1.2.0.62",
-    "ruff>=0.8.2",
+    "ruff==0.8.6",
     "ipdb>=0.13.13",
     "commentjson>=0.9.0",
 ]

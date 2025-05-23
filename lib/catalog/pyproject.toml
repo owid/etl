@@ -6,7 +6,7 @@ authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
 license = "MIT"
-requires-python = ">=3.11, <4.0"
+requires-python = ">=3.10, <4.0"
 dependencies = [
     "pandas>=2.2.3",
     "jsonschema>=3.2.0",
@@ -24,6 +24,7 @@ dependencies = [
     "owid-datautils",
     "owid-repack",
     "jinja2>=3.1.6",
+    "typing-extensions>=4.7.1",
 ]
 
 [tool.uv]
