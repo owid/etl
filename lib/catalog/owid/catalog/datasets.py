@@ -7,7 +7,6 @@ import hashlib
 import json
 import shutil
 import warnings
-from _hashlib import HASH
 from collections.abc import Iterator
 from dataclasses import dataclass
 from glob import glob
@@ -383,7 +382,7 @@ for k in DatasetMeta.__dataclass_fields__:
     setattr(Dataset, k, metadata_property(k))
 
 
-def checksum_file(filename: str) -> HASH:
+def checksum_file(filename: str) -> Any:
     "Return the MD5 checksum of a given file."
     chunk_size = 2**20  # 1MB
     checksum = hashlib.md5()
