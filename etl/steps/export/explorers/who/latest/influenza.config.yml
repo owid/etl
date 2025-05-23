@@ -116,7 +116,7 @@ definitions:
     def_2114940264292507114: &def_2114940264292507114 FluID by the World Health Organization (2023)
   common_views:
     - config:
-        timelineMinTime: '-4043'
+        timelineMinTime: "-4043"
 config:
   explorerTitle: Influenza
   explorerSubtitle: Explore global data produced by the World Health Organization on influenza symptoms and cases.
@@ -202,8 +202,8 @@ dimensions:
         name: Sentinel surveillance
       - slug: non_sentinel_surveillance
         name: Non-sentinel surveillance
-      - slug: ''
-        name: ''
+      - slug: na
+        name: ""
     presentation:
       type: dropdown
 views:
@@ -373,7 +373,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah1combined_zfilled
@@ -383,7 +383,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#CC4C02'
+            color: "#CC4C02"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3combined_zfilled
@@ -393,7 +393,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah5combined_zfilled
@@ -403,7 +403,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#FE9929'
+            color: "#FE9929"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah7n9combined_zfilled
@@ -413,7 +413,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#FEC44F'
+            color: "#FEC44F"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypecombined_zfilled
@@ -423,7 +423,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bviccombined_zfilled
@@ -433,7 +433,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamcombined_zfilled
@@ -443,7 +443,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminedcombined_zfilled
@@ -453,7 +453,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
             colorScaleNumericMinValue: 0
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -477,7 +477,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah1combined_zfilled
@@ -486,7 +486,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#CC4C02'
+            color: "#CC4C02"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3combined_zfilled
@@ -495,7 +495,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah5combined_zfilled
@@ -504,7 +504,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#FE9929'
+            color: "#FE9929"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah7n9combined_zfilled
@@ -513,7 +513,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#FEC44F'
+            color: "#FEC44F"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypecombined_zfilled
@@ -522,7 +522,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bviccombined_zfilled
@@ -531,7 +531,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamcombined_zfilled
@@ -540,7 +540,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminedcombined_zfilled
@@ -549,7 +549,7 @@ views:
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
             colorScaleNumericMinValue: 0
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -573,7 +573,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3sentinel_zfilled
@@ -582,7 +582,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypesentinel_zfilled
@@ -591,7 +591,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bvicsentinel_zfilled
@@ -600,7 +600,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamsentinel_zfilled
@@ -609,7 +609,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminedsentinel_zfilled
@@ -618,7 +618,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -641,7 +641,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3sentinel_zfilled
@@ -649,7 +649,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypesentinel_zfilled
@@ -657,7 +657,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bvicsentinel_zfilled
@@ -665,7 +665,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamsentinel_zfilled
@@ -673,7 +673,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminedsentinel_zfilled
@@ -681,7 +681,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -705,7 +705,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#ah3nonsentinel_zfilled
@@ -714,7 +714,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#a_no_subtypenonsentinel_zfilled
@@ -723,7 +723,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bvicnonsentinel_zfilled
@@ -732,7 +732,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#byamnonsentinel_zfilled
@@ -741,7 +741,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu#bnotdeterminednonsentinel_zfilled
@@ -750,7 +750,7 @@ views:
             tolerance: 0
             sourceName: *def_9196648065525151193
             additionalInfo: *def_7743772186090429532
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -773,7 +773,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#8C2D04'
+            color: "#8C2D04"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#ah3nonsentinel_zfilled
@@ -781,7 +781,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#EC7014'
+            color: "#EC7014"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#a_no_subtypenonsentinel_zfilled
@@ -789,7 +789,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#FEE391'
+            color: "#FEE391"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bvicnonsentinel_zfilled
@@ -797,7 +797,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#02818A'
+            color: "#02818A"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#byamnonsentinel_zfilled
@@ -805,7 +805,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#67A9CF'
+            color: "#67A9CF"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
         - catalogPath: flu_monthly#bnotdeterminednonsentinel_zfilled
@@ -813,7 +813,7 @@ views:
             type: Integer
             sourceName: *def_9196648065525151193
             additionalInfo: *def_995503154005330455
-            color: '#BDC9E1'
+            color: "#BDC9E1"
             sourceLink: *def_4019404533801586313
             dataPublishedBy: *def_7616543856230231790
     config:
@@ -828,7 +828,7 @@ views:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: confirmed_cases__by_surveillance_type
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#inf_allcombined
@@ -878,7 +878,7 @@ views:
       confirmed_cases_or_symptoms: confirmed_cases
       metric: confirmed_cases__by_surveillance_type
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#inf_allcombined
@@ -1064,7 +1064,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: comparison_of_data_on_respiratory_infections
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#reported_ari_cases
@@ -1111,7 +1111,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: comparison_of_data_on_respiratory_infections
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#reported_ari_cases
@@ -1158,7 +1158,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: influenza_like_illnesses
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#reported_ili_cases
@@ -1180,7 +1180,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: influenza_like_illnesses
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#reported_ili_cases
@@ -1202,7 +1202,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: acute_respiratory_infections
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#reported_ari_cases
@@ -1224,7 +1224,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: acute_respiratory_infections
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#reported_ari_cases
@@ -1246,7 +1246,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: severe_acute_respiratory_infections
       interval: weekly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu#reported_sari_cases
@@ -1268,7 +1268,7 @@ views:
       confirmed_cases_or_symptoms: symptoms
       metric: severe_acute_respiratory_infections
       interval: monthly
-      surveillance_type: ''
+      surveillance_type: na
     indicators:
       y:
         - catalogPath: flu_monthly#reported_sari_cases

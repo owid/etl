@@ -225,14 +225,26 @@ class View(MDIMBase):
 
         return self
 
-    def combine_with_common(self, common_views: List[CommonView]):
+    def combine_with_common(self, common_views: List[CommonView], common_has_priority: bool = False):
         """Combine config and metadata fields in view with those specified by definitions.common_views."""
         # Update config
-        new_config = merge_common_metadata_by_dimension(common_views, self.dimensions, self.config, "config")
+        new_config = merge_common_metadata_by_dimension(
+            common_views,
+            self.dimensions,
+            self.config,
+            "config",
+            common_has_priority=common_has_priority,
+        )
         if new_config:
             self.config = new_config
         # Update metadata
-        new_metadata = merge_common_metadata_by_dimension(common_views, self.dimensions, self.metadata, "metadata")
+        new_metadata = merge_common_metadata_by_dimension(
+            common_views,
+            self.dimensions,
+            self.metadata,
+            "metadata",
+            common_has_priority=common_has_priority,
+        )
         if new_metadata:
             self.metadata = new_metadata
 
@@ -276,10 +288,19 @@ class View(MDIMBase):
         return indicators
 
 
-def merge_common_metadata_by_dimension(common_params, view_dimensions: Dict[str, Any], view_params, field_name: str):
+def merge_common_metadata_by_dimension(
+    common_config,
+    view_dimensions: Dict[str, Any],
+    view_config,
+    field_name: str,
+    common_has_priority: bool = False,
+):
     """
     Merge metadata entries with dimension-based inheritance and deep merging.
     Resolves conflicts by specificity and raises an error for any unresolved conflicts.
+
+    common_has_priority: bool
+        Set to True if the parameters the parameters from common_config should override the parameters from view_config.
     """
 
     # Helper to check if an entry's dimensions match the active dimensions
@@ -292,7 +313,7 @@ def merge_common_metadata_by_dimension(common_params, view_dimensions: Dict[str,
         return True
 
     # Filter entries applicable to the current dimensions and sort by specificity (num of dimension conditions)
-    applicable_entries = [entry for entry in common_params if entry_matches(entry.dimensions, view_dimensions)]
+    applicable_entries = [entry for entry in common_config if entry_matches(entry.dimensions, view_dimensions)]
     applicable_entries = sorted(applicable_entries, key=lambda e: e.num_dimensions)
 
     # Placeholder for result
@@ -388,7 +409,7 @@ def merge_common_metadata_by_dimension(common_params, view_dimensions: Dict[str,
                 record_source_for_dict(new_val, parent_path + (sub_key,), source_new)
         # (Sub-keys present only in existing_dict remain intact with their original source)
 
-    # Process each entry in order
+    # Process each entry in order, and build the config/metadata PRIOR to merging it to view_config
     for entry in applicable_entries:
         # TODO: temporary conversion
         entry = entry.to_dict()
@@ -467,17 +488,31 @@ def merge_common_metadata_by_dimension(common_params, view_dimensions: Dict[str,
                 value_source_map[(key,)] = entry_source
                 record_source_for_dict(new_val, (key,), entry_source)
 
-    # Apply view_params (highest priority overrides)
-    if view_params:
-        for key, val in view_params.items():
-            # Remove any conflict associated with this key (custom override resolves it)
-            for path in list(unresolved_conflicts.keys()):
-                if path[0] == key:
-                    unresolved_conflicts.pop(path, None)
-            if key in final_result and isinstance(final_result[key], dict) and isinstance(val, dict):
-                final_result[key] = deep_merge(final_result[key], val)
+    # Combine `final_result` and `view_config`
+    # - final_result: At this point it contains the combined parameters (config or metadata) from `common_params`.
+    # - view_config: It contains the parameters for a given specific view.
+    #
+    # By default (`common_has_priority=False``), content of `view_config` takes preference.
+    if view_config:
+        for key, val in view_config.items():
+            # Default behavior: `view_config` takes priority over `common_params`
+            if not common_has_priority:
+                # Remove any conflict associated with this key (custom override resolves it)
+                for path in list(unresolved_conflicts.keys()):
+                    if path[0] == key:
+                        unresolved_conflicts.pop(path, None)
+                # If the key is already in final_result, merge or override as needed (with deep merge if required)
+                if key in final_result and isinstance(final_result[key], dict) and isinstance(val, dict):
+                    final_result[key] = deep_merge(final_result[key], val)
+                else:
+                    final_result[key] = deepcopy(val)
+            # Common has priority
             else:
-                final_result[key] = deepcopy(val)
+                if key in final_result and isinstance(final_result[key], dict) and isinstance(val, dict):
+                    final_result[key] = deep_merge(val, final_result[key])
+                elif key not in final_result:
+                    final_result[key] = deepcopy(val)
+
             key_priority[key] = float("inf")
             key_source[key] = "custom"
             value_source_map[(key,)] = "custom"

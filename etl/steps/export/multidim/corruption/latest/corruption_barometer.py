@@ -69,14 +69,14 @@ def run() -> None:
                     "title": "How many of the following people do you think are involved in corruption? {answer}",
                     "subtitle": 'Percentage of respondents who answered {answer} to the question "How many of the following people do you think are involved in corruption?".',
                 },
-                "view_params": {
-                    "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
-                },
                 "view_metadata": {
                     "description_short": 'Percentage of respondents who answered "{answer}" to the question "How many of the following people do you think are involved in corruption?".',
                 },
             },
-        ]
+        ],
+        params={
+            "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
+        },
     )
     # Sort choices alphabetically
     c.sort_choices({"answer": lambda x: sorted(x)})

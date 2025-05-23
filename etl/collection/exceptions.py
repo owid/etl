@@ -5,7 +5,7 @@ class DuplicateCollectionViews(Exception):
     pass
 
 
-class PlaceholderError(KeyError):
-    """Raised when a placeholder is not found in view_params."""
+class ParamKeyError(KeyError):
+    """Raised when a placeholder is not found in `params`."""
 
     pass
