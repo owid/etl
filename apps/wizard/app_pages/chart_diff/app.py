@@ -484,7 +484,7 @@ def _show_summary_top(chart_diffs):
 
     # Signal filtering (if any)
     if num_charts_listed != num_charts_total:
-        text_warning = f"{num_charts_total - num_charts_listed} charts are hidden (already reviewed, or filtered)."
+        text_warning = f"{num_charts_total-num_charts_listed} charts are hidden (already reviewed, or filtered)."
         text += f" :orange-badge[:small[{text_warning}]]"
         st.markdown(
             text,

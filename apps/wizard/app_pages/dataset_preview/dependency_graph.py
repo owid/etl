@@ -59,8 +59,8 @@ def generate_graph(
 
     def _friendly_title(attributes: Dict[str, str], children: List[str]) -> str:
         deps = "\n- ".join(children)
-        title = f"""{attributes["identifier"].upper()}
-        version {attributes["version"]} ({attributes["kind"]})
+        title = f"""{attributes['identifier'].upper()}
+        version {attributes['version']} ({attributes['kind']})
         """
         title = attributes["step"].upper()
         if deps:

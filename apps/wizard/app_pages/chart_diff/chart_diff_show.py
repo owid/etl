@@ -311,7 +311,7 @@ class ChartDiffShow:
                 )
 
         if len(self.diff.article_refs) > 0:
-            articles_md = "| Article Title | Daily Views |\n| --- | --- |\n" + "\n".join(
+            articles_md = "| Article Title | Daily Views |\n" "| --- | --- |\n" + "\n".join(
                 [f"| [{art.title}]({art.url}) | {art.views_daily_pretty} |" for art in self.diff.article_refs]
             )
             articles_md = f"\n\n{articles_md}"

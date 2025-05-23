@@ -198,7 +198,7 @@ def ask_llm_for_summary(df: pd.DataFrame):
     # Get metadata summary
     metadata_summary = ""
     for m in metadata:
-        _summary = f"- {m.name}\n- {m.descriptionShort}\n- {m.unit}"
+        _summary = f"- {m.name}\n" f"- {m.descriptionShort}\n" f"- {m.unit}"
         metadata_summary += f"{_summary}\n-------------\n"
 
     # df = st.session_state.anomalist_df
