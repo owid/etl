@@ -38,7 +38,7 @@ def run() -> None:
     # Forest research data for USA
     snap_meadow_usa = paths.load_snapshot("forest_share", namespace="usda_fs")
     # Forest data for China
-    snap_meadow_china = paths.load_snapshot("forest_share", namespace="he_2025")
+    snap_meadow_china = paths.load_snapshot("he_2025", namespace="papers")
     # FAO Forest Resource Assessment (FRA) 2020 data
     ds_meadow_fra = paths.load_dataset("fra_forest_extent")
 
