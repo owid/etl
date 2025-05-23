@@ -88,13 +88,16 @@ make watch
 ## Changelog
 
 - `v0.4.0`
-  - **BREAKING CHANGE**: Drop support for Python 3.9 and 3.10
-  - Deprecate Walden.
-  - Add support for Python 3.13
-  - Add support for indicator dimensions.
-  - Add support for MDIMs.
-  - Switched from Poetry to UV package manager.
-  - New decorator `@keep_metadata` to propagate metadata in pandas functions.
+  - **Highlights**
+    - Drop support for Python 3.9 and 3.10 (breaking change)
+    - support for Python 3.13
+  - **Others**
+    - Deprecate Walden.
+    - Dependencies: Change `rdata` for `pyreadr`.
+    - Support: indicator dimensions.
+    - Support: MDIMs.
+    - Switched from Poetry to UV package manager.
+    - New decorator `@keep_metadata` to propagate metadata in pandas functions.
   - Fixes: `Table.apply`, `groupby.apply`, metadata propagation, type hinting, etc.
 - `v0.3.11`
   - Add support for Python 3.12 in `pypackage.toml`
