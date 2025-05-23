@@ -1,12 +1,14 @@
 #
 #  variables.py
 #
+from __future__ import annotations
 
 import copy
 import json
 import os
 from collections import defaultdict
-from typing import Any, Callable, Dict, List, Literal, Optional, Union, cast, overload
+from collections.abc import Callable
+from typing import Any, Literal, cast, overload
 
 import pandas as pd
 import structlog
@@ -69,16 +71,16 @@ UNNAMED_VARIABLE = "**TEMPORARY UNNAMED VARIABLE**"
 
 
 class Variable(pd.Series):
-    _name: Optional[str] = None
-    _fields: Dict[str, VariableMeta]
+    _name: str | None = None
+    _fields: dict[str, VariableMeta]
 
     def __init__(
         self,
         data: Any = None,
         index: Any = None,
-        name: Optional[str] = None,
-        _fields: Optional[Dict[str, VariableMeta]] = None,
-        metadata: Optional[VariableMeta] = None,
+        name: str | None = None,
+        _fields: dict[str, VariableMeta] | None = None,
+        metadata: VariableMeta | None = None,
         **kwargs: Any,
     ) -> None:
         if metadata:
@@ -102,7 +104,7 @@ class Variable(pd.Series):
         return self.metadata
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         return self._name
 
     @name.setter
@@ -153,7 +155,7 @@ class Variable(pd.Series):
     def metadata(self, meta: VariableMeta) -> None:
         self._fields[self.checked_name] = meta
 
-    def astype(self, *args: Any, **kwargs: Any) -> "Variable":
+    def astype(self, *args: Any, **kwargs: Any) -> Variable:
         # To fix: https://github.com/owid/owid-catalog-py/issues/12
         v = super().astype(*args, **kwargs)
         v.name = self.name
@@ -167,34 +169,34 @@ class Variable(pd.Series):
              <pre>{}</pre>
         """.format(self.name, html)
 
-    def __add__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __add__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__add__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="+", name=variable_name)
         return variable
 
-    def __iadd__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __iadd__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__add__(other)
 
-    def __sub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __sub__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__sub__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="-", name=variable_name)
         return variable
 
-    def __isub__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __isub__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__sub__(other)
 
-    def __mul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __mul__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__mul__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="*", name=variable_name)
         return variable
 
-    def __imul__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __imul__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__mul__(other)
 
-    def __truediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __truediv__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         if is_nullable_series(self) or is_nullable_series(other):
             # 0/0 should return pd.NA, not np.nan
             zero_div_zero = (other == 0) & (self == 0)
@@ -206,37 +208,37 @@ class Variable(pd.Series):
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="/", name=variable_name)
         return variable
 
-    def __itruediv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __itruediv__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __floordiv__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__floordiv__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="//", name=variable_name)
         return variable
 
-    def __ifloordiv__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __ifloordiv__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __mod__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__mod__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="%", name=variable_name)
         return variable
 
-    def __imod__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __imod__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__mod__(other)
 
-    def __pow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __pow__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__pow__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="**", name=variable_name)
         return variable
 
-    def __ipow__(self, other: Union[Scalar, Series, "Variable"]) -> "Variable":  # type: ignore
+    def __ipow__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__pow__(other)
 
-    def fillna(self, value=None, *args, **kwargs) -> "Variable":
+    def fillna(self, value=None, *args, **kwargs) -> Variable:
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
@@ -251,7 +253,7 @@ class Variable(pd.Series):
         )
         return variable
 
-    def dropna(self, *args, **kwargs) -> "Variable":
+    def dropna(self, *args, **kwargs) -> Variable:
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
@@ -266,30 +268,30 @@ class Variable(pd.Series):
         )
         return variable
 
-    def add(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
+    def add(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__add__(other=other)
 
-    def sub(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
+    def sub(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__sub__(other=other)
 
-    def mul(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
+    def mul(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__mul__(other=other)
 
-    def truediv(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
+    def truediv(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__truediv__(other=other)
 
-    def div(self, other: Union[Scalar, Series, "Variable"], *args, **kwargs) -> "Variable":  # type: ignore
+    def div(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         return self.truediv(other=other, *args, **kwargs)
 
-    def pct_change(self, *args, **kwargs) -> "Variable":
+    def pct_change(self, *args, **kwargs) -> Variable:
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().pct_change(*args, **kwargs), name=variable_name)
         variable._fields[variable_name] = combine_variables_metadata(
@@ -297,16 +299,16 @@ class Variable(pd.Series):
         )
         return variable
 
-    def set_categories(self, *args, **kwargs) -> "Variable":
+    def set_categories(self, *args, **kwargs) -> Variable:
         return Variable(self.cat.set_categories(*args, **kwargs), name=self.name, metadata=self.metadata.copy())
 
     def update_log(
         self,
         operation: str,
-        parents: Optional[List[Any]] = None,
-        variable: Optional[str] = None,
-        comment: Optional[str] = None,
-    ) -> "Variable":
+        parents: list[Any] | None = None,
+        variable: str | None = None,
+        comment: str | None = None,
+    ) -> Variable:
         if variable is None:
             # If a variable name is not specified, take it from the variable, or otherwise use UNNAMED_VARIABLE.
             variable = self.name or UNNAMED_VARIABLE
@@ -324,14 +326,14 @@ class Variable(pd.Series):
         )
         return self
 
-    def rolling(self, *args, **kwargs) -> "VariableRolling":
+    def rolling(self, *args, **kwargs) -> VariableRolling:
         """Rolling operation that preserves metadata."""
         return VariableRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # type: ignore
 
-    def copy_metadata(self, from_variable: "Variable", inplace: bool = False) -> Optional["Variable"]:
+    def copy_metadata(self, from_variable: Variable, inplace: bool = False) -> Variable | None:
         return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # type: ignore
 
-    def copy(self, deep: bool = True) -> "Variable":
+    def copy(self, deep: bool = True) -> Variable:
         new_var = super().copy(deep=deep)
         if deep:
             field_names = [n for n in self.index.names + [self.name] if n is not None]
@@ -351,18 +353,18 @@ class VariableRolling:
     # fixes type hints
     __annotations__ = {}
 
-    def __init__(self, rolling: pd.core.window.rolling.Rolling, metadata: VariableMeta, name: Optional[str] = None):
+    def __init__(self, rolling: pd.core.window.rolling.Rolling, metadata: VariableMeta, name: str | None = None):
         self.rolling = rolling
         self.metadata = metadata
         self.name = name
 
-    def __getattr__(self, name: str) -> Callable[..., "Variable"]:
+    def __getattr__(self, name: str) -> Callable[..., Variable]:
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
             x = getattr(self.rolling, name)(*args, **kwargs)
             return Variable(x, name=self.name, metadata=self.metadata)
 
-        self.__annotations__[name] = Callable[..., "Variable"]
+        self.__annotations__[name] = Callable[..., Variable]
         return func
 
 
@@ -371,11 +373,11 @@ def _hash_dict(d):
 
 
 def _get_metadata_value_from_variables_if_all_identical(
-    variables: List[Variable],
+    variables: list[Variable],
     field: str,
     warn_if_different: bool = False,
-    operation: Optional[OPERATION] = None,
-) -> Optional[Any]:
+    operation: OPERATION | None = None,
+) -> Any | None:
     if (operation == "/") and (getattr(variables[0].metadata, field) is None):
         # When dividing a variable by another, it only makes sense to keep the metadata values of the first variable.
         # For example, if we have energy (without description) and population (with a description), when calculating
@@ -413,7 +415,7 @@ def _get_metadata_value_from_variables_if_all_identical(
     return combined_value
 
 
-def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]:
+def get_unique_sources_from_variables(variables: list[Variable]) -> list[Source]:
     # Make a list of all sources of all variables.
     sources = []
     for variable in variables:
@@ -421,7 +423,7 @@ def get_unique_sources_from_variables(variables: List[Variable]) -> List[Source]
     return sources
 
 
-def get_unique_origins_from_variables(variables: List[Variable]) -> List[Origin]:
+def get_unique_origins_from_variables(variables: list[Variable]) -> list[Origin]:
     # Make a list of all origins of all variables.
     origins = []
     for variable in variables:
@@ -430,7 +432,7 @@ def get_unique_origins_from_variables(variables: List[Variable]) -> List[Origin]
     return origins
 
 
-def get_unique_licenses_from_variables(variables: List[Variable]) -> List[License]:
+def get_unique_licenses_from_variables(variables: list[Variable]) -> list[License]:
     # Make a list of all licenses of all variables.
     licenses = []
     for variable in variables:
@@ -438,7 +440,7 @@ def get_unique_licenses_from_variables(variables: List[Variable]) -> List[Licens
     return licenses
 
 
-def get_unique_description_key_points_from_variables(variables: List[Variable]) -> List[str]:
+def get_unique_description_key_points_from_variables(variables: list[Variable]) -> list[str]:
     # Make a list of all description key points of all variables.
     description_key_points = []
     for variable in variables:
@@ -446,7 +448,7 @@ def get_unique_description_key_points_from_variables(variables: List[Variable]) 
     return description_key_points
 
 
-def combine_variables_processing_logs(variables: List[Variable]) -> ProcessingLog:
+def combine_variables_processing_logs(variables: list[Variable]) -> ProcessingLog:
     # Make a list with all entries in the processing log of all variables.
     processing_log = sum(
         [
@@ -459,7 +461,7 @@ def combine_variables_processing_logs(variables: List[Variable]) -> ProcessingLo
     return ProcessingLog(processing_log)
 
 
-def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str, Any]]]) -> Optional[Dict[str, Any]]:
+def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
     # The argument list_of_objects can contain dictionaries or None, or be empty.
     # If a list contains one dictionary (possibly repeated multiple times with identical content), return that
     # dictionary. Otherwise, if not all dictionaries are identical, return None.
@@ -479,8 +481,8 @@ def _get_dict_from_list_if_all_identical(list_of_objects: List[Optional[Dict[str
 
 
 def combine_variables_display(
-    variables: List[Variable], operation: OPERATION, _field_name="display"
-) -> Optional[Dict[str, Any]]:
+    variables: list[Variable], operation: OPERATION, _field_name="display"
+) -> dict[str, Any] | None:
     # Gather displays from all variables that are defined.
     list_of_displays = [getattr(variable.metadata, _field_name) for variable in variables]
     if operation == "/" and list_of_displays[0] is None:
@@ -491,14 +493,12 @@ def combine_variables_display(
         return _get_dict_from_list_if_all_identical(list_of_objects=list_of_displays)
 
 
-def combine_variables_presentation(
-    variables: List[Variable], operation: OPERATION
-) -> Optional[VariablePresentationMeta]:
+def combine_variables_presentation(variables: list[Variable], operation: OPERATION) -> VariablePresentationMeta | None:
     # Apply the same logic as for displays.
     return combine_variables_display(variables=variables, operation=operation, _field_name="presentation")  # type: ignore
 
 
-def combine_variables_processing_level(variables: List[Variable]) -> Optional[PROCESSING_LEVELS]:
+def combine_variables_processing_level(variables: list[Variable]) -> PROCESSING_LEVELS | None:
     # Gather processing levels from all variables that are defined.
     processing_levels = [
         variable.metadata.processing_level for variable in variables if variable.metadata.processing_level is not None
@@ -509,7 +509,7 @@ def combine_variables_processing_level(variables: List[Variable]) -> Optional[PR
         return None
 
     # Ensure that all processing levels are known.
-    unknown_processing_levels = set([level for level in processing_levels]) - set(PROCESSING_LEVELS_ORDER)
+    unknown_processing_levels = {level for level in processing_levels} - set(PROCESSING_LEVELS_ORDER)
     assert len(unknown_processing_levels) == 0, f"Unknown processing levels: {unknown_processing_levels}"
 
     # If any of the variables has a processing level, take the highest level.
@@ -521,7 +521,7 @@ def combine_variables_processing_level(variables: List[Variable]) -> Optional[PR
     return cast(PROCESSING_LEVELS, combined_processing_level)
 
 
-def combine_variables_sort(variables: List[Variable]) -> List[str]:
+def combine_variables_sort(variables: list[Variable]) -> list[str]:
     # Return sort if all variables have the same sort, otherwise return empty list.
     sorts = [variable.metadata.sort for variable in variables if variable.metadata.sort]
     if not sorts:
@@ -531,7 +531,7 @@ def combine_variables_sort(variables: List[Variable]) -> List[str]:
 
 
 def combine_variables_metadata(
-    variables: List[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
+    variables: list[Any], operation: OPERATION, name: str = UNNAMED_VARIABLE
 ) -> VariableMeta:
     # Initialise an empty metadata.
     metadata = VariableMeta()
@@ -599,7 +599,7 @@ def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Liter
 def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: Literal[True] = True) -> None: ...
 
 
-def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Optional[Variable]:
+def copy_metadata(from_variable: Variable, to_variable: Variable, inplace: bool = False) -> Variable | None:
     if inplace:
         to_variable.metadata = from_variable.metadata.copy()
     else:
