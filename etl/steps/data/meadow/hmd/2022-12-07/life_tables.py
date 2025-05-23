@@ -375,8 +375,8 @@ def _clean_correct_missing_data(df: pd.DataFrame, folder_path: str) -> pd.DataFr
     countries_missing_data = sorted(set(rows_missing.country))
     # Run checks
     assert perc_rows_missing < perc_rows_missing_expected, (
-        f"More missing data than expected was found! {round(perc_rows_missing * 100, 2)} rows missing, but"
-        f" {round(perc_rows_missing_expected * 100, 2)} were expected."
+        f"More missing data than expected was found! {round(perc_rows_missing*100, 2)} rows missing, but"
+        f" {round(perc_rows_missing_expected*100,2)} were expected."
     )
     fname = folder_path.split("/")[-1]
     assert countries_missing_data == MISSING_DATA_COUNTRIES[fname], (

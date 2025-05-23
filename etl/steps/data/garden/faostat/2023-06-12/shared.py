@@ -288,7 +288,7 @@ FLAGS_RANKING = (
 
 # Additional explanation to append to element description for variables that were originally given per capita.
 WAS_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
-    "Originally given per-capita, and converted into total figures by multiplying by population (given by FAO)."
+    "Originally given per-capita, and converted into total figures by " "multiplying by population (given by FAO)."
 )
 # Additional explanation to append to element description for created per-capita variables.
 NEW_PER_CAPITA_ADDED_ELEMENT_DESCRIPTION = (
@@ -592,7 +592,7 @@ def remove_rows_with_nan_value(data: pd.DataFrame, verbose: bool = False) -> pd.
     if n_rows_with_nan_value > 0:
         frac_nan_rows = n_rows_with_nan_value / len(data)
         if verbose:
-            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) with nan in column 'value'.")
+            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) " f"with nan in column 'value'.")
         if frac_nan_rows > 0.15:
             log.warning(f"{frac_nan_rows: .0%} rows of nan values removed.")
         data = data.dropna(subset="value").reset_index(drop=True)

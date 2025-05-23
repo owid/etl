@@ -138,7 +138,7 @@ def _clean_raw_dataframe(df_raw: pd.DataFrame) -> pd.DataFrame:
             df_issues = df_issues[df_issues["Category"] == "Production"]
             if len(df_issues) > 0:
                 log.warning(
-                    f"Duplicated entries with different values on Category {set(df_issues['Category'])}, {len(df_issues['Country'].unique())} countries, Commodity {set(df_issues['Commodity'])}, and Sub-commodities: {set(df_issues['Sub-commodity'])}."
+                    f'Duplicated entries with different values on Category {set(df_issues["Category"])}, {len(df_issues["Country"].unique())} countries, Commodity {set(df_issues["Commodity"])}, and Sub-commodities: {set(df_issues["Sub-commodity"])}.'
                 )
         # Drop duplicates.
         df = df.drop_duplicates(

@@ -296,8 +296,8 @@ def proces_missing_data_lt(tb: Table) -> Table:
     countries_missing_data = rows_missing["country"].unique()
     # Run checks
     assert num_rows_missing < FRAC_ROWS_MISSING_EXPECTED_LT, (
-        f"More missing data than expected was found! {round(num_rows_missing * 100, 2)} rows missing, but"
-        f" {round(FRAC_ROWS_MISSING_EXPECTED_LT * 100, 2)}% were expected."
+        f"More missing data than expected was found! {round(num_rows_missing*100, 2)} rows missing, but"
+        f" {round(FRAC_ROWS_MISSING_EXPECTED_LT*100, 2)}% were expected."
     )
     assert len(countries_missing_data) <= COUNTRIES_MISSING_DATA_EXPECTED_LT, (
         f"More missing data than expected was found! Found {len(countries_missing_data)} countries, expected is"
@@ -319,8 +319,8 @@ def proces_missing_data_de(tb: Table) -> Table:
     countries_missing_data = rows_missing["country"].unique()
     # Run checks
     assert num_rows_missing < FRAC_ROWS_MISSING_EXPECTED_DE, (
-        f"More missing data than expected was found! {round(num_rows_missing * 100, 2)} rows missing, but"
-        f" {round(FRAC_ROWS_MISSING_EXPECTED_DE * 100, 2)}% were expected."
+        f"More missing data than expected was found! {round(num_rows_missing*100, 2)} rows missing, but"
+        f" {round(FRAC_ROWS_MISSING_EXPECTED_DE*100,2)}% were expected."
     )
     assert len(countries_missing_data) <= COUNTRIES_MISSING_DATA_EXPECTED_DE, (
         f"More missing data than expected was found! Found {len(countries_missing_data)} countries, expected is"
@@ -342,8 +342,8 @@ def proces_missing_data_exp(tb: Table) -> Table:
     countries_missing_data = rows_missing["country"].unique()
     # Run checks
     assert num_rows_missing < FRAC_ROWS_MISSING_EXPECTED_EXP, (
-        f"More missing data than expected was found! {round(num_rows_missing * 100, 2)} rows missing, but"
-        f" {round(FRAC_ROWS_MISSING_EXPECTED_EXP * 100, 2)}% were expected."
+        f"More missing data than expected was found! {round(num_rows_missing*100, 2)} rows missing, but"
+        f" {round(FRAC_ROWS_MISSING_EXPECTED_EXP*100,2)}% were expected."
     )
     assert len(countries_missing_data) <= COUNTRIES_MISSING_DATA_EXPECTED_EXP, (
         f"More missing data than expected was found! Found {len(countries_missing_data)} countries, expected is"

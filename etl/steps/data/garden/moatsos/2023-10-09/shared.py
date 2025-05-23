@@ -132,7 +132,7 @@ def add_metadata_vars(tb_garden: Table):
             for i in range(len(povline_list)):
                 if i != 0:
                     # For variables between poverty lines
-                    col_name = f"{var}_between_{povline_list[i - 1]}_{povline_list[i]}{smooth}"
+                    col_name = f"{var}_between_{povline_list[i-1]}_{povline_list[i]}{smooth}"
 
                     if col_name in cols:
                         # Get the origins of the variable
@@ -148,7 +148,7 @@ def add_metadata_vars(tb_garden: Table):
                             col_name
                         ].metadata.description_short.replace(
                             "{povline}",
-                            f"living between {povline_dict[povline_list[i - 1]]['title_between']} and {povline_dict[povline_list[i]]['title_between']} a day",
+                            f"living between {povline_dict[povline_list[i-1]]['title_between']} and {povline_dict[povline_list[i]]['title_between']} a day",
                         )
 
             for cbn in cbn_dict:
@@ -209,7 +209,7 @@ def var_metadata_absolute(var, povline, origins, smooth) -> VariableMeta:
         description_key=[ppp_description, dod_description],
         description_processing=f"""
         {processing_description}
-{smooth_dict[smooth]["description"]}""",
+{smooth_dict[smooth]['description']}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -237,7 +237,7 @@ def var_metadata_between(var, povline1, povline2, origins, smooth) -> VariableMe
         description_key=[ppp_description, dod_description],
         description_processing=f"""
         {processing_description}
-{smooth_dict[smooth]["description"]}""",
+{smooth_dict[smooth]['description']}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
         origins=origins,
@@ -265,7 +265,7 @@ def var_metadata_cbn(var, cbn, origins, smooth) -> VariableMeta:
         description_key=[cbd_description_1, cbd_description_2],
         description_processing=f"""
         {processing_description}
-{smooth_dict[smooth]["description"]}""",
+{smooth_dict[smooth]['description']}""",
         unit=var_dict[var]["unit"],
         short_unit=var_dict[var]["short_unit"],
         origins=origins,

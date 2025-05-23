@@ -149,7 +149,7 @@ def clean_global_dataset_descriptions_dataframe(
         log.warning(f"{len(changed_titles)} domains have changed titles, consider updating custom_datasets.csv.")
     if len(changed_descriptions) > 0:
         log.warning(
-            f"{len(changed_descriptions)} domains have changed descriptions. Consider updating custom_datasets.csv."
+            f"{len(changed_descriptions)} domains have changed descriptions. " f"Consider updating custom_datasets.csv."
         )
     datasets_df = datasets_df.drop(columns=["fao_dataset_title_old", "fao_dataset_description_old"]).rename(
         columns={
@@ -342,7 +342,8 @@ def clean_global_items_dataframe(items_df: pd.DataFrame, custom_items: pd.DataFr
     ]
     if len(changed_descriptions) > 0:
         log.warning(
-            f"{len(changed_descriptions)} domains have changed item descriptions. Consider updating custom_items.csv."
+            f"{len(changed_descriptions)} domains have changed item descriptions. "
+            f"Consider updating custom_items.csv."
         )
 
     items_df = items_df.drop(columns="fao_item_description_old").rename(

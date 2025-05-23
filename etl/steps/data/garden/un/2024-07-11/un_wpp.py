@@ -322,7 +322,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     age_group_mapping = {
         key: value
         for i in range(0, 100, 10)
-        for key, value in {f"{i}-{i + 4}": f"{i}-{i + 9}", f"{i + 5}-{i + 9}": f"{i}-{i + 9}"}.items()
+        for key, value in {f"{i}-{i+4}": f"{i}-{i+9}", f"{i+5}-{i+9}": f"{i}-{i+9}"}.items()
     }
     tb_10 = tb.copy()
     tb_10["age"] = tb_10["age"].map(age_group_mapping)
@@ -527,7 +527,7 @@ def estimate_age_groups(tb: Table) -> Table:
 
     # 1/ Basic age groups
     age_map = {
-        **{str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)},
+        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
         **{"100+": "100+"},
     }
     tb_basic = tb_.assign(age=tb_.age.map(age_map))

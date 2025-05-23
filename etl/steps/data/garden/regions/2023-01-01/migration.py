@@ -686,7 +686,7 @@ def _create_yaml_content_from_df(df_main: pd.DataFrame) -> str:
 #
 # Additionally, each region can contain the following fields:
 # short_name: Short version of the region name. If not given, 'name' will be used.
-# region_type: Region type ({", ".join(REGION_TYPES)}). If not given, 'country' will be used.
+# region_type: Region type ({', '.join(REGION_TYPES)}). If not given, 'country' will be used.
 # defined_by: Institution that used the region in a dataset. If not given, 'owid' will be used.
 # is_historical: True if region does not exist anymore. If not given, False will be used.
 # end_year: Last year when a historical region existed. If not given, pd.NA will be used.

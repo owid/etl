@@ -491,7 +491,7 @@ def check_sum_100(tb: Table, questions: List[str], answers: List[str], margin: f
         if not tb_error.empty:
             log.fatal(
                 f"""{len(tb_error)} answers for {q} are not adding up to 100%:
-                {tabulate(tb_error[["country", "year"] + answers_by_question + ["sum_check"]], headers="keys", tablefmt=TABLEFMT, floatfmt=".1f")}"""
+                {tabulate(tb_error[['country', 'year'] + answers_by_question + ['sum_check']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
             )
 
     # Remove sum_check

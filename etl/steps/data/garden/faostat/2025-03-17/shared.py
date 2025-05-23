@@ -664,7 +664,7 @@ def remove_rows_with_nan_value(tb: Table, verbose: bool = False) -> Table:
     if n_rows_with_nan_value > 0:
         frac_nan_rows = n_rows_with_nan_value / len(tb)
         if verbose:
-            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) with nan in column 'value'.")
+            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) " f"with nan in column 'value'.")
         if frac_nan_rows > 0.15:
             log.warning(f"{frac_nan_rows: .0%} rows of nan values removed.")
         tb = tb.dropna(subset="value").reset_index(drop=True)

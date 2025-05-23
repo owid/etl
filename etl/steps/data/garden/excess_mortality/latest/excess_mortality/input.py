@@ -70,7 +70,7 @@ def _build_estimates_df(ds_hmd: Dataset, ds_wmd: Dataset) -> pd.DataFrame:
     df_estimates = pd.concat([df_hmd, df_wmd], ignore_index=True)
     # Run checks
     if (ds := df_estimates[COLUMNS_IDX].value_counts()).max() > 1:
-        raise ValueError(f"Unexpected duplicates {ds[ds > 1]}")
+        raise ValueError(f"Unexpected duplicates {ds[ds>1]}")
     return pd.DataFrame(df_estimates)
 
 
@@ -79,7 +79,7 @@ def _build_projections_df(ds_kobak: Dataset) -> pd.DataFrame:
     df_kobak_age = ds_kobak.read("xm_karlinsky_kobak_by_age", reset_index=True)
     df_proj = pd.concat([df_kobak, df_kobak_age], ignore_index=True)
     if (ds := df_proj[COLUMNS_IDX].value_counts()).max() > 1:
-        raise ValueError(f"Unexpected duplicates {ds[ds > 1]}")
+        raise ValueError(f"Unexpected duplicates {ds[ds>1]}")
     return pd.DataFrame(df_proj)
 
 

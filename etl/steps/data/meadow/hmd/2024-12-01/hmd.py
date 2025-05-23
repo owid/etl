@@ -277,7 +277,7 @@ def _check_nas(tb, missing_row_max, missing_countries_max):
     row_nans = tb.isna().any(axis=1)
     assert (
         row_nans.sum() / len(tb) < missing_row_max
-    ), f"Too many missing values in life tables: {row_nans.sum() / len(tb)}"
+    ), f"Too many missing values in life tables: {row_nans.sum()/len(tb)}"
 
     # Countries missing
     countries_missing_data = tb.loc[row_nans, "country"].unique()

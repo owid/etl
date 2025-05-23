@@ -212,7 +212,7 @@ def format_wpp(tb: Table) -> Table:
     ), f"Unexpected start year for WPP estimates. Should be {YEAR_START_WPP}!"
     assert (
         tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_START_WPP_PROJ - 1
-    ), f"Unexpected end year for WPP estimates. Should be {YEAR_START_WPP_PROJ - 1}!"
+    ), f"Unexpected end year for WPP estimates. Should be {YEAR_START_WPP_PROJ-1}!"
     assert (
         tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_START_WPP_PROJ
     ), f"Unexpected start year for WPP projections. Should be {YEAR_START_WPP_PROJ}!"
