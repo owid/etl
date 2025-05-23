@@ -126,6 +126,7 @@ def cli(
             log.info("chart_sync.start", n=len(chart_diffs), chart_ids=chart_ids)
 
             charts_synced = 0
+            dods_synced = 0
 
             # Iterate over all chart diffs
             for diff in chart_diffs:
@@ -232,10 +233,15 @@ def cli(
                     else:
                         raise ValueError("Invalid chart diff state")
 
+            # Sync DODs
+            dods_synced = _sync_dods(source_session, target_session, target_api, dry_run)
+
     if charts_synced > 0:
         print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
-    else:
-        print("\n[bold green]No charts synced[/bold green]")
+    if dods_synced > 0:
+        print(f"[bold green]DODs synced: {dods_synced}[/bold green]")
+    if charts_synced == 0 and dods_synced == 0:
+        print("\n[bold green]No charts or DODs synced[/bold green]")
 
 
 def _is_commit_sha(source: str) -> bool:
@@ -309,6 +315,47 @@ def _chart_config_diff(
     return _dict_diff(
         _prune_chart_config(source_config), _prune_chart_config(target_config), tabs=tabs, color=color, width=500
     )
+
+
+def _sync_dods(
+    source_session: Session,
+    target_session: Session,
+    target_api: Optional[AdminAPI],
+    dry_run: bool,
+) -> int:
+    """Sync DODs from source to target."""
+    dods_synced = 0
+
+    # Get DODs from source
+    source_dods = source_session.query(gm.Dod).all()
+
+    log.info("dod_sync.start", n=len(source_dods), dod_ids=[dod.id for dod in source_dods])
+
+    for source_dod in source_dods:
+        # Check if DOD exists in target
+        target_dod = target_session.query(gm.Dod).filter(gm.Dod.name == source_dod.name).first()
+
+        if target_dod:
+            # DOD exists, check if it needs updating
+            if source_dod.content != target_dod.content or source_dod.updatedAt > target_dod.updatedAt:
+                log.info("dod_sync.update", name=source_dod.name, dod_id=source_dod.id)
+                dods_synced += 1
+
+                if not dry_run and target_api:
+                    target_api.update_dod(
+                        target_dod.id, source_dod.name, source_dod.content, source_dod.lastUpdatedUserId
+                    )
+            else:
+                log.info("dod_sync.skip", name=source_dod.name, reason="no changes detected")
+        else:
+            # DOD doesn't exist, create it
+            log.info("dod_sync.create", name=source_dod.name, dod_id=source_dod.id)
+            dods_synced += 1
+
+            if not dry_run and target_api:
+                target_api.create_dod(source_dod.name, source_dod.content, source_dod.lastUpdatedUserId)
+
+    return dods_synced
 
 
 if __name__ == "__main__":

@@ -148,6 +148,38 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "slug": slug, "tsv": tsv[:1000]})
         return js
 
+    def create_dod(self, name: str, content: str, user_id: int) -> Dict[str, Any]:
+        """Create a new DOD (Details on Demand)."""
+        data = {
+            "name": name,
+            "content": content,
+        }
+        resp = requests.post(
+            f"{self.owid_env.admin_api}/api/dods",
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json=data,
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "dod_data": data})
+        return js
+
+    def update_dod(self, dod_id: int, name: str, content: str, user_id: int) -> Dict[str, Any]:
+        """Update an existing DOD."""
+        data = {
+            "name": name,
+            "content": content,
+        }
+        resp = requests.patch(
+            f"{self.owid_env.admin_api}/api/dods/{dod_id}",
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json=data,
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "dod_data": data})
+        return js
+
 
 @cache
 def create_session_id(owid_env: OWIDEnv, grapher_user_id: int) -> str:

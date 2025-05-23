@@ -292,6 +292,24 @@ class Tag(Base):
         return tags
 
 
+class Dod(Base):
+    __tablename__ = 'dods'
+    __table_args__ = (
+        ForeignKeyConstraint(['lastUpdatedUserId'], ['users.id'], ondelete='SET NULL', name='dods_ibfk_1'),
+        Index('lastUpdatedUserId', 'lastUpdatedUserId'),
+        Index('name', 'name', unique=True)
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(512))
+    content: Mapped[str] = mapped_column(VARCHAR(4096))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
+    lastUpdatedUserId: Mapped[Optional[int]] = mapped_column(Integer)
+
+    user: Mapped['User'] = relationship('User', back_populates='dodss')
+
+
 class User(Base):
     __tablename__ = "users"
     __table_args__ = (Index("email", "email", unique=True),)
@@ -2120,3 +2138,4 @@ def _select_columns(cls, columns: Optional[list[str]] = None) -> Select:
         return select(*columns_to_select)
     else:
         return select(cls)
+```
