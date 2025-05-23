@@ -216,8 +216,22 @@ def sanity_checks(tb: Table) -> None:
 
     # NEGATIVE VALUES
     # Define mask
-    for column in [col for col in tb.columns if col not in INDEX]:
-        mask = tb[column] < 0
+    for column in [
+        col
+        for col in tb.columns
+        if col
+        not in INDEX
+        + [
+            "Government fiscal balance",
+            "Government gross debt per capita",
+            "Government net interest spending",
+            "Government primary balance",
+            "Government revenues per capita",
+            "Government structural balance",
+            "Government structural primary balance",
+        ]
+    ]:
+        mask = (tb[column] < 0) & (tb["unit"] != "growth_rate")
 
         tb_error = tb[mask].reset_index(drop=True)
 
@@ -229,24 +243,27 @@ def sanity_checks(tb: Table) -> None:
 
     # SPENDING BY FUNCTION ADDING UP TO 100%
     # Exclude rows with function == "Total"
-    tb = tb[tb["function"] != "Total"].reset_index(drop=True)
+    tb_function = tb[tb["function"] != "Total"].reset_index(drop=True)
 
     # Keep only the rows with function_subcategory == "Total"
-    tb = tb[tb["function_subcategory"] == "Total"].reset_index(drop=True)
+    tb_function = tb_function[tb_function["function_subcategory"] == "Total"].reset_index(drop=True)
 
-    # Calculate the sum of the values for each "country", "year", "unit"
-    tb_sum = tb.groupby(["country", "year", "unit"]).sum().reset_index()
+    # Keep only the unit share_gov_exp
+    tb_function = tb_function[tb_function["unit"] == "share_gov_exp"].reset_index(drop=True)
+
+    # Calculate the sum of the values for each "country", "year"
+    tb_sum = tb_function.groupby(["country", "year"]).sum().reset_index()
 
     # Create a mask
-    mask = (tb_sum["Government expenditure by function"] > 100 - TOLERANCE_CHECK) & (
-        tb_sum["Government expenditure by function"] < 100 + TOLERANCE_CHECK
+    mask = (tb_sum["Government expenditure by function"] < 100 + TOLERANCE_CHECK) & (
+        tb_sum["Government expenditure by function"] > 100 - TOLERANCE_CHECK
     )
 
     tb_error = tb_sum[~mask].reset_index(drop=True)
     if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of Government expenditure by function do not add up to 100%::
-                {_tabulate(tb_error[["country", "year", "unit", "Government expenditure by function"]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f", long_format=LONG_FORMAT)}"""
+                {_tabulate(tb_error[["country", "year", "Government expenditure by function"]], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f", long_format=LONG_FORMAT)}"""
         )
 
     return None
