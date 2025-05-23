@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from functools import wraps
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Literal
 
 from dataclasses_json import dataclass_json
 
@@ -47,13 +47,13 @@ class LogEntry:
     variable: str
     operation: str
     target: str
-    parents: Tuple[str, ...] = field(default_factory=tuple)
-    comment: Optional[str] = None
+    parents: tuple[str, ...] = field(default_factory=tuple)
+    comment: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]: ...
+    def to_dict(self) -> dict[str, Any]: ...
 
     @staticmethod
-    def from_dict(d: Dict[str, Any]) -> "LogEntry": ...
+    def from_dict(d: dict[str, Any]) -> "LogEntry": ...
 
     def clone(self, **kwargs):
         """Clone the log entry, optionally overriding some attributes."""
@@ -62,18 +62,18 @@ class LogEntry:
         return LogEntry.from_dict(d)
 
 
-class ProcessingLog(List[LogEntry]):
+class ProcessingLog(list[LogEntry]):
     # hack for dataclasses_json
     __args__ = (LogEntry,)
 
-    def __init__(self, entries: List[Union[LogEntry, Dict[str, Any]]] = []):
+    def __init__(self, entries: list[LogEntry | dict[str, Any]] = []):
         # Accept both LogEntry and dict when initializing, i.e. ProcessingLog([{"variable": "foo", ...}]) returns a list
         # of LogEntry objects.
         super().__init__([entry if isinstance(entry, LogEntry) else LogEntry.from_dict(entry) for entry in entries])
 
     # NOTE: calling this method `as_dict` is intentional, otherwise it gets called
     # by dataclass_json
-    def as_dict(self) -> List[Dict[str, Any]]:
+    def as_dict(self) -> list[dict[str, Any]]:
         return [r.to_dict() for r in self]
 
     def clear(self) -> "ProcessingLog":  # type: ignore
@@ -81,7 +81,7 @@ class ProcessingLog(List[LogEntry]):
             super().clear()
         return self
 
-    def _parse_parents(self, parents: List[Any]) -> List[str]:
+    def _parse_parents(self, parents: list[Any]) -> list[str]:
         """Parents currently can be Variable, VariableMeta or str. Here we should ensure that they
         are strings. For example, we could extract the name of the parent if it is a variable."""
         new_parents = []
@@ -118,10 +118,10 @@ class ProcessingLog(List[LogEntry]):
     def add_entry(
         self,
         variable: str,
-        parents: List[Any],
+        parents: list[Any],
         operation: str,
-        target: Optional[str] = None,
-        comment: Optional[str] = None,
+        target: str | None = None,
+        comment: str | None = None,
     ) -> None:
         if not enabled():
             # Avoid any processing
@@ -150,8 +150,8 @@ class ProcessingLog(List[LogEntry]):
 
     def amend_entry(
         self,
-        operation: Optional[str] = None,
-        comment: Optional[str] = None,
+        operation: str | None = None,
+        comment: str | None = None,
     ) -> None:
         """Amend last entry in the log."""
         if not enabled():
@@ -171,7 +171,7 @@ class ProcessingLog(List[LogEntry]):
 
     def display(
         self,
-        data_dir: Optional[Path] = None,
+        data_dir: Path | None = None,
         output: Literal["text", "html"] = "html",
         show_upstream=True,
         auto_open=True,
@@ -234,7 +234,7 @@ class ProcessingLog(List[LogEntry]):
             webbrowser.open("file://" + os.path.realpath(temp.name))
 
 
-def wrap(operation: str, parents: List[str] = []):
+def wrap(operation: str, parents: list[str] = []):
     """Decorator that wraps function returning Table object. It disables
     processing log during the execution of the function and adds a clean new entry.
     """
@@ -287,7 +287,7 @@ def _sanitize_mermaid(s: str) -> str:
     return s.replace(" ", "_").replace(">", "").replace("<", "")
 
 
-def _mermaid_diagram(pl: List[LogEntry]):
+def _mermaid_diagram(pl: list[LogEntry]):
     yield "graph TB;"
 
     for r in pl:

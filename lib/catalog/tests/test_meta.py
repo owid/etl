@@ -3,7 +3,7 @@
 #
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pytest
 import yaml
@@ -17,10 +17,10 @@ def test_dict_mixin():
     @dataclass_json
     @dataclass
     class Dog:
-        name: Optional[str] = None
-        age: Optional[int] = None
+        name: str | None = None
+        age: int | None = None
 
-        def to_dict(self) -> Dict[str, Any]: ...
+        def to_dict(self) -> dict[str, Any]: ...
 
     assert Dog(name="fred").to_dict() == {"name": "fred"}
     assert Dog(age=10).to_dict() == {"age": 10}
@@ -31,18 +31,18 @@ def test_dict_mixin_nested():
     @dataclass_json
     @dataclass
     class Cat:
-        name: Optional[str] = None
-        age: Optional[int] = None
+        name: str | None = None
+        age: int | None = None
 
     @meta.pruned_json
     @dataclass_json
     @dataclass
     class Dog:
-        name: Optional[str] = None
-        age: Optional[int] = None
-        cat: Optional[Cat] = None
+        name: str | None = None
+        age: int | None = None
+        cat: Cat | None = None
 
-        def to_dict(self) -> Dict[str, Any]: ...
+        def to_dict(self) -> dict[str, Any]: ...
 
     assert Dog(name="fred", cat=Cat(name="cred")).to_dict() == {"name": "fred", "cat": {"name": "cred"}}
 
@@ -113,7 +113,7 @@ def test_hash():
     origin_c = meta.Origin("a", "c")
     assert origin_a == origin_b
     assert origin_a != origin_c
-    assert set([origin_a, origin_b, origin_c]) == {origin_a, origin_c}
+    assert {origin_a, origin_b, origin_c} == {origin_a, origin_c}
 
     # test hashing of nested dictionary
     var_a = meta.VariableMeta(display={"d": {"a": 1, "b": 2}})
@@ -130,7 +130,7 @@ def test_from_dict():
 
     @dataclass
     class Y(meta.MetaBase):
-        x_list: Optional[List[X]] = None
+        x_list: list[X] | None = None
 
     # list of objects should be correctly loaded as that object
     y = Y.from_dict({"x_list": [{"a": 1}]})
