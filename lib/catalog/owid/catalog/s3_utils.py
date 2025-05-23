@@ -5,6 +5,7 @@ import threading
 from functools import lru_cache
 from os import environ as env
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 # import botocore.client.S3 as BaseClient
@@ -17,7 +18,7 @@ log = structlog.get_logger()
 BOTO3_CLIENT_LOCK = threading.Lock()
 
 
-def s3_bucket_key(url: str) -> tuple[str, str]:
+def s3_bucket_key(url: str) -> Tuple[str, str]:
     """Get bucket and key from either s3:// URL or https:// URL."""
     parsed = urlparse(url)
     bucket = parsed.netloc
@@ -30,7 +31,7 @@ def s3_bucket_key(url: str) -> tuple[str, str]:
     return bucket, key
 
 
-def list_s3_objects(s3_folder: str, client: BaseClient | None = None) -> list[str]:
+def list_s3_objects(s3_folder: str, client: Optional[BaseClient] = None) -> List[str]:
     client = client or connect_r2()
 
     bucket, key = s3_bucket_key(s3_folder)
@@ -54,7 +55,7 @@ def list_s3_objects(s3_folder: str, client: BaseClient | None = None) -> list[st
     return keys
 
 
-def download(s3_url: str, filename: str, quiet: bool = False, client: BaseClient | None = None) -> None:
+def download(s3_url: str, filename: str, quiet: bool = False, client: Optional[BaseClient] = None) -> None:
     """Download the file at the S3 URL to the given local filename."""
     client = client or connect_r2()
 
@@ -73,9 +74,9 @@ def download(s3_url: str, filename: str, quiet: bool = False, client: BaseClient
 def download_s3_folder(
     s3_folder: str,
     local_dir: Path,
-    exclude: list[str] = [],
-    include: list[str] = [],
-    client: BaseClient | None = None,
+    exclude: List[str] = [],
+    include: List[str] = [],
+    client: Optional[BaseClient] = None,
     max_workers: int = 20,
     delete: bool = False,
 ) -> None:
@@ -115,7 +116,7 @@ def download_s3_folder(
 
     if delete:
         local_files = set(local_dir.glob("*"))
-        downloaded_files = {local_dir / Path(s3_key).name for s3_key in s3_keys}
+        downloaded_files = set(local_dir / Path(s3_key).name for s3_key in s3_keys)
         files_to_delete = local_files - downloaded_files
         for file in files_to_delete:
             file.unlink()
@@ -137,7 +138,7 @@ def upload(s3_url: str, filename: str, public: bool = False, quiet: bool = False
 
 
 # if R2_ACCESS_KEY and R2_SECRET_KEY are null, try using credentials from rclone config
-def _read_owid_rclone_config() -> dict[str, str]:
+def _read_owid_rclone_config() -> Dict[str, str]:
     # Create a ConfigParser object
     config = configparser.ConfigParser()
 

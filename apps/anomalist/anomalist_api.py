@@ -124,11 +124,11 @@ def pretty_print_number(number):
     if pd.isna(number):
         return "?"
     elif int(number) >= 1e9:
-        return f"{number / 1e9:.1f}B"
+        return f"{number/1e9:.1f}B"
     elif number >= 1e6:
-        return f"{number / 1e6:.1f}M"
+        return f"{number/1e6:.1f}M"
     elif number >= 1e3:
-        return f"{number / 1e3:.1f}k"
+        return f"{number/1e3:.1f}k"
     else:
         return f"{int(number)}"
 

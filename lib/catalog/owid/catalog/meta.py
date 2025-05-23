@@ -10,11 +10,12 @@ import json
 import re
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import Any, Literal, NewType, NotRequired, Required, Self, TypedDict, TypeVar
+from typing import Any, Dict, List, Literal, NewType, Optional, TypedDict, TypeVar, Union
 
 import mistune
 import pandas as pd
 from dataclasses_json import DataClassJsonMixin
+from typing_extensions import NotRequired, Required, Self
 
 from . import jinja
 from .processing_log import ProcessingLog
@@ -40,15 +41,15 @@ class MetaBase(DataClassJsonMixin):
             return False
         return self.__hash__() == other.__hash__()
 
-    def to_dict(self, encode_json: bool = False) -> dict[str, Any]:  # type: ignore
+    def to_dict(self, encode_json: bool = False) -> Dict[str, Any]:  # type: ignore
         return super().to_dict(encode_json=encode_json)
 
     @classmethod
-    def from_dict(cls, d: dict[str, Any]) -> T:  # type: ignore
+    def from_dict(cls, d: Dict[str, Any]) -> T:  # type: ignore
         # NOTE: this is much faster than using dataclasses_json
         return dataclass_from_dict(cls, d)  # type: ignore
 
-    def update(self, **kwargs: dict[str, Any]) -> None:
+    def update(self, **kwargs: Dict[str, Any]) -> None:
         """Update object with new values."""
         for key, value in kwargs.items():
             if value is not None:
@@ -61,7 +62,7 @@ class MetaBase(DataClassJsonMixin):
         else:
             return _deepcopy_dataclass(self)
 
-    def save(self, filename: str | Path) -> None:
+    def save(self, filename: Union[str, Path]) -> None:
         filename = Path(filename).as_posix()
         with open(filename, "w") as ostream:
             json.dump(self.to_dict(), ostream, indent=2, default=str)
@@ -75,8 +76,8 @@ class MetaBase(DataClassJsonMixin):
 @pruned_json
 @dataclass(eq=False)
 class License(MetaBase):
-    name: str | None = None
-    url: str | None = None
+    name: Optional[str] = None
+    url: Optional[str] = None
 
     def __bool__(self):
         return bool(self.name or self.url)
@@ -93,18 +94,18 @@ class Source(MetaBase):
         can be edited. The other ones are not visible.
     """
 
-    name: str | None = None
-    description: str | None = None
-    url: str | None = None
-    source_data_url: str | None = None
-    owid_data_url: str | None = None
-    date_accessed: str | None = None
-    publication_date: str | None = None
-    publication_year: int | None = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    url: Optional[str] = None
+    source_data_url: Optional[str] = None
+    owid_data_url: Optional[str] = None
+    date_accessed: Optional[str] = None
+    publication_date: Optional[str] = None
+    publication_year: Optional[int] = None
     # specific fields for grapher
     # NOTE: it's not clear how to map description & name to fields in grapher, so
     # we're keeping both for the time being. We might consolidate them in the future
-    published_by: str | None = None
+    published_by: Optional[str] = None
 
 
 @pruned_json
@@ -116,32 +117,32 @@ class Origin(MetaBase):
     # Title of the original data product
     title: str
     # Description of the data product
-    description: str | None = None
+    description: Optional[str] = None
     # Title of the snapshot
     # Subset of data that we extract from the data product. Only fill if it does not coincide with the title of the data product.
-    title_snapshot: str | None = None
+    title_snapshot: Optional[str] = None
     # Description of the snapshot
     # Subset of data that we extract from the data product). Only when the data product and the snapshot do not coincide, the description_snapshot
     # will contain additional information to the description of the data product.
-    description_snapshot: str | None = None
+    description_snapshot: Optional[str] = None
     # The full citation
-    citation_full: str | None = None
+    citation_full: Optional[str] = None
     # These will be often empty and then producer is used instead, but for the (relatively common) cases
     # where the data product is more famous than the authors we would use this (e.g. VDEM instead of the first authors)
-    attribution: str | None = None
-    attribution_short: str | None = None
+    attribution: Optional[str] = None
+    attribution_short: Optional[str] = None
     # This is also often empty but if not then it will be part of the short citation (e.g. for VDEM)
-    version_producer: str | None = None
+    version_producer: Optional[str] = None
     # The authorative URL of the dataset
-    url_main: str | None = None
+    url_main: Optional[str] = None
     # Direct URL to download the dataset
-    url_download: str | None = None
+    url_download: Optional[str] = None
     # Date when the dataset was accessed
-    date_accessed: str | None = None
+    date_accessed: Optional[str] = None
     # Publication date or, if the exact date is not known, publication year
-    date_published: YearDateLatest | None = None
+    date_published: Optional[YearDateLatest] = None
     # License of the dataset
-    license: License | None = None
+    license: Optional[License] = None
 
     def __post_init__(self):
         if self.date_published:
@@ -171,29 +172,29 @@ class FaqLink(MetaBase):
     fragment_id: str
 
 
-GrapherConfig = dict[str, Any]
+GrapherConfig = Dict[str, Any]
 
 
 @pruned_json
 @dataclass(eq=False)
 class VariablePresentationMeta(MetaBase):
     # Any fields of grapher config can be set here - title and subtitle *should* be set whenever possible
-    grapher_config: GrapherConfig | None = None
+    grapher_config: Optional[GrapherConfig] = None
     # The text for the header of the data page
-    title_public: str | None = None
+    title_public: Optional[str] = None
     # Shown next to title to differentiate similar indicators e.g. "future projections" or "historical values"
-    title_variant: str | None = None
+    title_variant: Optional[str] = None
     # Shown next to title to differentiate similar indicators e.g. "WHO" or "IHME"
-    attribution_short: str | None = None
+    attribution_short: Optional[str] = None
     # A short text to use to credit the source e.g. at the bottom of charts. Autofilled from the list of origins (see below). Semicolon separated if there are multiple.
-    attribution: str | None = None
+    attribution: Optional[str] = None
     # List of topic tags
-    topic_tags: list[str] = field(default_factory=list)
+    topic_tags: List[str] = field(default_factory=list)
 
     # Fields that are more work to add but of high value
 
     # List of google doc ids + fragment id
-    faqs: list[FaqLink] = field(default_factory=list)
+    faqs: List[FaqLink] = field(default_factory=list)
 
 
 @pruned_json
@@ -214,55 +215,55 @@ class VariableMeta(MetaBase):
     underscoring fields and converting them back to camelCase before inserting to grapher
     """
 
-    title: str | None = None
+    title: Optional[str] = None
     # This shouldn't be used for data pages, use `description_short`, `description_key` or `description_processing` instead
-    description: str | None = None
+    description: Optional[str] = None
     # A 1-2 sentence description - used internally or as fallback for description_key
-    description_short: str | None = None
+    description_short: Optional[str] = None
     # How did the origin describe this variable?
-    description_from_producer: str | None = None
+    description_from_producer: Optional[str] = None
     # List of bullet points for the description key (can use markdown formatting)
-    description_key: list[str] = field(default_factory=list)
-    origins: list[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
+    description_key: List[str] = field(default_factory=list)
+    origins: List[Origin] = field(default_factory=list)  # Origins is the new replacement for sources
     # Use of `licenses` is discouraged, they should be captured in origins.
-    licenses: list[License] = field(default_factory=list)
-    unit: str | None = None
-    short_unit: str | None = None
+    licenses: List[License] = field(default_factory=list)
+    unit: Optional[str] = None
+    short_unit: Optional[str] = None
     # We keep display for the time being as the "less powerful sibling" of grapherConfig below
-    display: dict[str, Any] | None = None
-    additional_info: dict[str, Any] | None = None  # Only used for internal bookkeeping
+    display: Optional[Dict[str, Any]] = None
+    additional_info: Optional[Dict[str, Any]] = None  # Only used for internal bookkeeping
 
     # How much processing did we do to this data?
-    processing_level: PROCESSING_LEVELS | None = None
+    processing_level: Optional[PROCESSING_LEVELS] = None
     # List of processing steps, in the future autogenerated
     processing_log: ProcessingLog = field(default_factory=ProcessingLog)
 
-    presentation: VariablePresentationMeta | None = None
+    presentation: Optional[VariablePresentationMeta] = None
 
     # A short summary of what was done to process this indicator
-    description_processing: str | None = None
+    description_processing: Optional[str] = None
 
     # This one is the license that we give the data. Normally it will be empty and then it will
     # be our usual license (CC-BY) but in cases where special restriction apply this is where
     # we would capture this.
-    license: License | None = None
+    license: Optional[License] = None
 
     # This is the old sources that we keep for compatibility. Use is strongly discouraged going forward
-    sources: list[Source] = field(default_factory=list)
+    sources: List[Source] = field(default_factory=list)
 
     # The type of the variable, automatically inferred from the data if empty
-    type: VARIABLE_TYPE | None = None
+    type: Optional[VARIABLE_TYPE] = None
 
     # List of categories for ordinal type indicators
-    sort: list[str] = field(default_factory=list)
+    sort: List[str] = field(default_factory=list)
 
     # Dimensions
     # Dictionary of dimensions
-    dimensions: dict[str, Any] | None = None
+    dimensions: Optional[Dict[str, Any]] = None
     # Original short name and title of the indicator before flattening
-    original_short_name: str | None = None
+    original_short_name: Optional[str] = None
     # TODO: it's possible that we might not need `original_title` at all
-    original_title: str | None = None
+    original_title: Optional[str] = None
 
     @property
     def schema_version(self) -> int:
@@ -284,7 +285,7 @@ class VariableMeta(MetaBase):
              {}
         """.format(getattr(self, "_name", None), to_html(record))
 
-    def render(self, dim_dict: dict[str, Any], remove_dods: bool = False) -> "VariableMeta":
+    def render(self, dim_dict: Dict[str, Any], remove_dods: bool = False) -> "VariableMeta":
         """Render Jinja in all fields of VariableMeta. Return a new VariableMeta object.
 
         :param dim_dict: dictionary of dimensions to render
@@ -321,26 +322,26 @@ class DatasetMeta(MetaBase):
     the variable level.
     """
 
-    channel: str | None = None
-    namespace: str | None = None
+    channel: Optional[str] = None
+    namespace: Optional[str] = None
     # NOTE: short_name should be underscore and validate in setter, however this
     # is nontrivial to do with `dataclass_json` (see https://github.com/lidatong/dataclasses-json/issues/176)
-    short_name: str | None = None
-    title: str | None = None
-    description: str | None = None
+    short_name: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
     # sources is deprecated, use origins on indicator level instead
-    sources: list[Source] = field(default_factory=list)
-    licenses: list[License] = field(default_factory=list)
+    sources: List[Source] = field(default_factory=list)
+    licenses: List[License] = field(default_factory=list)
     is_public: bool = True
-    additional_info: dict[str, Any] | None = None
-    version: str | None = None
+    additional_info: Optional[Dict[str, Any]] = None
+    version: Optional[str] = None
     # update period in days
-    update_period_days: int | None = None
+    update_period_days: Optional[int] = None
     # prohibit redistribution (disable chart download)
     non_redistributable: bool = False
 
     # an md5 checksum of the ingredients used to make this dataset
-    source_checksum: str | None = None
+    source_checksum: Optional[str] = None
 
     def __post_init__(self) -> None:
         """Imply version from publication_date or publication_year if not given
@@ -364,7 +365,7 @@ class DatasetMeta(MetaBase):
 
     def update_from_yaml(
         self,
-        path: Path | str,
+        path: Union[Path, str],
         if_source_exists: SOURCE_EXISTS_OPTIONS = "fail",
     ) -> None:
         """The main reason for wanting to do this is to manually override what goes into Grapher before an export."""
@@ -414,23 +415,23 @@ class DatasetMeta(MetaBase):
 class TableDimension(TypedDict):
     name: Required[str]
     slug: Required[str]
-    description: NotRequired[str | None]
+    description: NotRequired[Optional[str]]
 
 
 @pruned_json
 @dataclass(eq=False)
 class TableMeta(MetaBase):
     # data about this table
-    short_name: str | None = None
-    title: str | None = None
-    description: str | None = None
+    short_name: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
 
     # a reference back to the dataset
-    dataset: DatasetMeta | None = field(compare=False, default=None)
-    primary_key: list[str] = field(default_factory=list)
+    dataset: Optional[DatasetMeta] = field(compare=False, default=None)
+    primary_key: List[str] = field(default_factory=list)
 
     # table dimensions
-    dimensions: list[TableDimension] | None = None
+    dimensions: Optional[List[TableDimension]] = None
 
     @property
     def checked_name(self) -> str:
@@ -450,7 +451,7 @@ class TableMeta(MetaBase):
         """.format(short_name, to_html(record))
 
 
-def to_html(record: Any) -> str | None:
+def to_html(record: Any) -> Optional[str]:
     if isinstance(record, dict):
         rows = []
         for k, v in record.items():
@@ -471,7 +472,7 @@ def to_html(record: Any) -> str | None:
 
         rows = []
         for item in record:
-            rows.append(f"<li>{to_html(item)}</li>")
+            rows.append("<li>{}</li>".format(to_html(item)))
         return '<ul style="text-align: left; margin-top: 0em; margin-bottom: 0em">{}</ul>'.format("".join(rows))
 
     else:
@@ -549,7 +550,7 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
 
     # Prune faqs with empty fragment_id
     if meta.presentation and meta.presentation.faqs:
-        faqs: list[FaqLink] = []
+        faqs: List[FaqLink] = []
         for faq in meta.presentation.faqs:
             if not faq.fragment_id.strip():
                 continue
