@@ -14,7 +14,8 @@ dataset:
     This dataset provides estimates of forest cover from various sources, including FAO, USDA Forest Service, DEFRA, Forest Research and others. The details for the historical estimates are provided below:
 
     - The FAO Global Forest Resources Assessment (FRA) data is used for all countries for the 1990 onwards.
-    - "Costa Rica (1940-1969): [Kleinn et al. (2002): Forest area in Costa Rica: A comparative study of tropical forest cover estimates over time](https://link.springer.com/article/10.1023/A:1012659129083)"
+    - China (1000-1960): [He et al. (2025): Reconstructing forest and grassland cover changes in China over the past millennium](https://link.springer.com/article/10.1007/s11430-024-1454-4)
+    - Costa Rica (1940-1969): [Kleinn et al. (2002): Forest area in Costa Rica: A comparative study of tropical forest cover estimates over time](https://link.springer.com/article/10.1023/A:1012659129083)
     - England (1086-1650): [Department for Environment, Food and Rural Affairs (DEFRA) report: Government Forestry and Woodlands Policy Statement](https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/221023/pb13871-forestry-policy-statement.pdf)
     - England (1870-1980): [Forest Research report: National inventory of woodland and trees](https://www.forestresearch.gov.uk/tools-and-resources/national-forest-inventory/national-inventory-of-woodland-and-trees/national-inventory-of-woodland-and-trees-england/)
     - France (1000-1976): [Mather et al. (1999): The course and drivers of the forest transition in France](https://www.sciencedirect.com/science/article/abs/pii/S0743016798000230)"
