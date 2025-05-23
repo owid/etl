@@ -116,7 +116,7 @@
                 "type": "object",
                 "properties": {
                     "slug": {
-                        "$ref": "definitions.json#/slug"
+                        "$ref": "definitions.json#/slug_relaxed"
                     },
                     "name": {
                         "type": "string"
@@ -130,7 +130,7 @@
                             "type": "object",
                             "properties": {
                                 "slug": {
-                                    "$ref": "definitions.json#/slug"
+                                    "$ref": "definitions.json#/slug_relaxed"
                                 },
                                 "name": {
                                     "type": "string"
