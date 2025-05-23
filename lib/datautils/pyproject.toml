@@ -25,7 +25,8 @@ dependencies = [
     "urllib3<2",
     "click>=8.1.7",
     "py7zr>=1.0.0rc3",
-    "pyppmd>=1.2.0"
+    "pyppmd>=1.2.0",
+    "pybcj>=1.0.6"
 ]
 
 [tool.uv]
