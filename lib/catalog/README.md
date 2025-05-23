@@ -1,6 +1,6 @@
 [![Build status](https://badge.buildkite.com/66cc67fc572120ca97b9ffff288d5d73cb33e019dd70323053.svg)](https://buildkite.com/our-world-in-data/owid-catalog-unit-tests)
 [![PyPI version](https://badge.fury.io/py/owid-catalog.svg)](https://badge.fury.io/py/owid-catalog)
-![](https://img.shields.io/badge/python-3.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue.svg)
+![](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)
 
 # owid-catalog
 
@@ -75,7 +75,7 @@ df = rc[path]
 
 ## Development
 
-You need Python 3.9+, `uv` and `make` installed. Clone the repo, then you can simply run:
+You need Python 3.11+, `uv` and `make` installed. Clone the repo, then you can simply run:
 
 ```
 # run all unit tests and CI checks
@@ -87,6 +87,15 @@ make watch
 
 ## Changelog
 
+- `v0.4.0`
+  - **BREAKING CHANGE**: Drop support for Python 3.9 and 3.10
+  - Deprecate Walden.
+  - Add support for Python 3.13
+  - Add support for indicator dimensions.
+  - Add support for MDIMs.
+  - Switched from Poetry to UV package manager.
+  - New decorator `@keep_metadata` to propagate metadata in pandas functions.
+  - Fixes: `Table.apply`, `groupby.apply`, metadata propagation, type hinting, etc.
 - `v0.3.11`
   - Add support for Python 3.12 in `pypackage.toml`
 - `v0.3.10`
