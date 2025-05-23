@@ -51,7 +51,7 @@ def test_fetch_chart_with_dates():
 
 def test_fetch_chart_by_url():
     df = charts.get_data("https://ourworldindata.org/grapher/life-expectancy")
-    assert set(df.columns) == set(["entities", "years", "life_expectancy"])
+    assert set(df.columns) == {"entities", "years", "life_expectancy"}
     assert len(df) > 0
 
 
