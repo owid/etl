@@ -42,7 +42,7 @@ tables:
           name: Share of land covered by forest
           numDecimalPlaces: 1
           entityAnnotationsMap: |-
-            Scotland: Pre-1600 cover likely >25%
+            Scotland: Pre-1600 likely 25-50% but estimates uncertain
         description_key:
           - This indicator shows the share of a country’s land area that is covered by forest. It includes both natural forests and forest plantations, where that distinction is available.
           - "For 1990 onwards, data comes from the Food and Agriculture Organization (FAO), which uses a consistent global definition: forest is land with tree canopy cover greater than 10%, spanning more than 0.5 hectares, with trees that can reach at least 5 metres in height. It includes plantations but excludes land where other uses (such as agriculture or urban development) dominate ([FAO definition](https://www.fao.org/4/y1997e/y1997e1m.htm))."
