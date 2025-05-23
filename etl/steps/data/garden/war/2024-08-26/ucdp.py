@@ -335,7 +335,7 @@ def run_pipeline(
 
     # Tables
     tables = [
-        tb.format(["year", "region", "conflict_type"], short_name=short_name),
+        tb.format(column_index, short_name=short_name),
         tb_participants.format(column_index, short_name=f"{short_name}_country"),
         tb_locations.format(column_index, short_name=f"{short_name}_locations"),
     ]
@@ -1516,6 +1516,9 @@ def merge_country_and_region_data(tb: Table, tb_locations: Table) -> Table:
 
     ## 3) Combine
     tb_new = pr.concat([tb, tb_locations_])
+
+    # 4) Final touch
+    tb_new = tb_new.rename(columns={"region": "country"})
 
     return tb_new
 

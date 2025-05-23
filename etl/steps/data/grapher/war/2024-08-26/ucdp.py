@@ -18,8 +18,6 @@ def run() -> None:
 
     # Process data.
     #
-    # Rename index column `region` to `country`.
-    tb = tb.rename(columns={"region": "country"})
     # Remove suffixes in region names
     tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
     # Set index
