@@ -1,6 +1,7 @@
 #
 #  datasets.py
 #
+from __future__ import annotations
 
 import hashlib
 import json
@@ -13,7 +14,7 @@ from glob import glob
 from os import environ
 from os.path import join
 from pathlib import Path
-from typing import Any, Literal, Self, cast
+from typing import Any, Literal, cast
 
 import numpy as np
 import pandas as pd
@@ -84,7 +85,7 @@ class Dataset:
         return self.metadata
 
     @classmethod
-    def create_empty(cls, path: str | Path, metadata: Self | None = None) -> Self:
+    def create_empty(cls, path: str | Path, metadata: DatasetMeta | None = None) -> Dataset:
         path = Path(path)
 
         if path.is_dir():

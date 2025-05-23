@@ -1,13 +1,14 @@
 #
 #  variables.py
 #
+from __future__ import annotations
 
 import copy
 import json
 import os
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, Literal, Self, cast, overload
+from typing import Any, Literal, cast, overload
 
 import pandas as pd
 import structlog
@@ -154,7 +155,7 @@ class Variable(pd.Series):
     def metadata(self, meta: VariableMeta) -> None:
         self._fields[self.checked_name] = meta
 
-    def astype(self, *args: Any, **kwargs: Any) -> Self:
+    def astype(self, *args: Any, **kwargs: Any) -> Variable:
         # To fix: https://github.com/owid/owid-catalog-py/issues/12
         v = super().astype(*args, **kwargs)
         v.name = self.name
@@ -168,34 +169,34 @@ class Variable(pd.Series):
              <pre>{}</pre>
         """.format(self.name, html)
 
-    def __add__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __add__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__add__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="+", name=variable_name)
         return variable
 
-    def __iadd__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __iadd__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__add__(other)
 
-    def __sub__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __sub__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__sub__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="-", name=variable_name)
         return variable
 
-    def __isub__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __isub__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__sub__(other)
 
-    def __mul__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __mul__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__mul__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="*", name=variable_name)
         return variable
 
-    def __imul__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __imul__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__mul__(other)
 
-    def __truediv__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __truediv__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         if is_nullable_series(self) or is_nullable_series(other):
             # 0/0 should return pd.NA, not np.nan
             zero_div_zero = (other == 0) & (self == 0)
@@ -207,37 +208,37 @@ class Variable(pd.Series):
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="/", name=variable_name)
         return variable
 
-    def __itruediv__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __itruediv__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__truediv__(other)
 
-    def __floordiv__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __floordiv__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__floordiv__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="//", name=variable_name)
         return variable
 
-    def __ifloordiv__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __ifloordiv__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__floordiv__(other)
 
-    def __mod__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __mod__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__mod__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="%", name=variable_name)
         return variable
 
-    def __imod__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __imod__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__mod__(other)
 
-    def __pow__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __pow__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().__pow__(other), name=variable_name)
         variable.metadata = combine_variables_metadata(variables=[self, other], operation="**", name=variable_name)
         return variable
 
-    def __ipow__(self, other: Scalar | Series | Self) -> Self:  # type: ignore
+    def __ipow__(self, other: Scalar | Series | Variable) -> Variable:  # type: ignore
         return self.__pow__(other)
 
-    def fillna(self, value=None, *args, **kwargs) -> Self:
+    def fillna(self, value=None, *args, **kwargs) -> Variable:
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
@@ -252,7 +253,7 @@ class Variable(pd.Series):
         )
         return variable
 
-    def dropna(self, *args, **kwargs) -> Self:
+    def dropna(self, *args, **kwargs) -> Variable:
         # NOTE: Argument "inplace" will modify the original variable's data, but not its metadata.
         #  But we should not use "inplace" anyway.
         if "inplace" in kwargs and kwargs["inplace"] is True:
@@ -267,30 +268,30 @@ class Variable(pd.Series):
         )
         return variable
 
-    def add(self, other: Scalar | Series | Self, *args, **kwargs) -> Self:  # type: ignore
+    def add(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__add__(other=other)
 
-    def sub(self, other: Scalar | Series | Self, *args, **kwargs) -> Self:  # type: ignore
+    def sub(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__sub__(other=other)
 
-    def mul(self, other: Scalar | Series | Self, *args, **kwargs) -> Self:  # type: ignore
+    def mul(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__mul__(other=other)
 
-    def truediv(self, other: Scalar | Series | Self, *args, **kwargs) -> Self:  # type: ignore
+    def truediv(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         if args or kwargs:
             raise NotImplementedError("This feature may exist in pandas, but not in owid.catalog.")
         return self.__truediv__(other=other)
 
-    def div(self, other: Scalar | Series | Self, *args, **kwargs) -> Self:  # type: ignore
+    def div(self, other: Scalar | Series | Variable, *args, **kwargs) -> Variable:  # type: ignore
         return self.truediv(other=other, *args, **kwargs)
 
-    def pct_change(self, *args, **kwargs) -> Self:
+    def pct_change(self, *args, **kwargs) -> Variable:
         variable_name = self.name or UNNAMED_VARIABLE
         variable = Variable(super().pct_change(*args, **kwargs), name=variable_name)
         variable._fields[variable_name] = combine_variables_metadata(
@@ -298,7 +299,7 @@ class Variable(pd.Series):
         )
         return variable
 
-    def set_categories(self, *args, **kwargs) -> Self:
+    def set_categories(self, *args, **kwargs) -> Variable:
         return Variable(self.cat.set_categories(*args, **kwargs), name=self.name, metadata=self.metadata.copy())
 
     def update_log(
@@ -307,7 +308,7 @@ class Variable(pd.Series):
         parents: list[Any] | None = None,
         variable: str | None = None,
         comment: str | None = None,
-    ) -> Self:
+    ) -> Variable:
         if variable is None:
             # If a variable name is not specified, take it from the variable, or otherwise use UNNAMED_VARIABLE.
             variable = self.name or UNNAMED_VARIABLE
@@ -325,14 +326,14 @@ class Variable(pd.Series):
         )
         return self
 
-    def rolling(self, *args, **kwargs) -> "VariableRolling":
+    def rolling(self, *args, **kwargs) -> VariableRolling:
         """Rolling operation that preserves metadata."""
         return VariableRolling(super().rolling(*args, **kwargs), self.metadata.copy(), self.name)  # type: ignore
 
-    def copy_metadata(self, from_variable: Self, inplace: bool = False) -> Self | None:
+    def copy_metadata(self, from_variable: Variable, inplace: bool = False) -> Variable | None:
         return copy_metadata(to_variable=self, from_variable=from_variable, inplace=inplace)  # type: ignore
 
-    def copy(self, deep: bool = True) -> Self:
+    def copy(self, deep: bool = True) -> Variable:
         new_var = super().copy(deep=deep)
         if deep:
             field_names = [n for n in self.index.names + [self.name] if n is not None]
@@ -357,13 +358,13 @@ class VariableRolling:
         self.metadata = metadata
         self.name = name
 
-    def __getattr__(self, name: str) -> Callable[..., Self]:
+    def __getattr__(self, name: str) -> Callable[..., Variable]:
         def func(*args, **kwargs):
             """Apply function and return variable with proper metadata."""
             x = getattr(self.rolling, name)(*args, **kwargs)
             return Variable(x, name=self.name, metadata=self.metadata)
 
-        self.__annotations__[name] = Callable[..., Self]
+        self.__annotations__[name] = Callable[..., Variable]
         return func
 
 
