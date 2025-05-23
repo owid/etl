@@ -336,7 +336,8 @@ class Collection(MDIMBase):
             # Add "file://" prefix to "dataset-schema.json#"
             # This is needed to activate file handler below. Unfortunately, fastjsonschema does not
             # support file references out of the box
-            s = s.replace("dataset-schema.json#", "file://dataset-schema.json#")
+            # Add "file://" prefix to any JSON schema references
+            s = re.sub(r'(?<!")([a-zA-Z0-9_-]+\.json#)', r"file://\1", s)
 
             schema = json.loads(s)
 
