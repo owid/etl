@@ -428,9 +428,9 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
         indicator_category_callback=lambda x: "low" if "_low" in x else "high" if "_high" in x else "best",
         column_dimension_name="estimate",
     )
-    assert set(tb_population_avg) == set(tb_countries_avg), (
-        "Columns in tb_population_avg and tb_countries_avg do not match!"
-    )
+    assert set(tb_population_avg) == set(
+        tb_countries_avg
+    ), "Columns in tb_population_avg and tb_countries_avg do not match!"
 
     # Get uni- and multi-dimensional indicator tables
     tb_uni, tb_multi = _split_into_uni_and_multi(tb)
@@ -683,9 +683,9 @@ def make_table_with_dummies(tb: Table) -> Table:
             # Assert that there are actually NaNs
             assert tb_[indicator["name"]].isna().any(), "No NA found!"
             # If NA, we should not have category '-1', otherwise these would get merged!
-            assert "-1" not in set(tb_[indicator["name"]].unique()), (
-                f"Error for indicator `{indicator['name']}`. Found -1, which is not allowed when `has_na=True`!"
-            )
+            assert "-1" not in set(
+                tb_[indicator["name"]].unique()
+            ), f"Error for indicator `{indicator['name']}`. Found -1, which is not allowed when `has_na=True`!"
             tb_[indicator["name"]] = tb_[indicator["name"]].fillna("-1")
             # Add '-1' as a possible category
             if isinstance(values_expected, dict):
@@ -696,9 +696,9 @@ def make_table_with_dummies(tb: Table) -> Table:
             assert not tb_[indicator["name"]].isna().any(), "NA found!"
 
         values_found = set(tb_[indicator["name"]].unique())
-        assert values_found == set(values_expected), (
-            f"Error for indicator `{indicator['name']}`. Expected {set(values_expected)} but found {values_found}"
-        )
+        assert values_found == set(
+            values_expected
+        ), f"Error for indicator `{indicator['name']}`. Expected {set(values_expected)} but found {values_found}"
 
         # Rename dimension values
         if isinstance(values_expected, dict):

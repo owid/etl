@@ -67,9 +67,9 @@ def run(dest_dir: str) -> None:
     # Sanity checks
     assert set(tb_ucdp["region"]) == set(tb_prio["region"]), "Missmatch in regions between UCDP and PRIO"
     expected_missmatch = {"non-state conflict", "one-sided violence", "all"}
-    assert set(tb_ucdp["conflict_type"]) - set(tb_prio["conflict_type"]) == expected_missmatch, (
-        "Missmatch in conflict_type between UCDP and PRIO not as expected!"
-    )
+    assert (
+        set(tb_ucdp["conflict_type"]) - set(tb_prio["conflict_type"]) == expected_missmatch
+    ), "Missmatch in conflict_type between UCDP and PRIO not as expected!"
 
     # Rename columns, keep relevant indicators
     tb_ucdp = tb_ucdp.rename(columns=COLUMNS_RENAME["ucdp"])[COLUMNS_INDEX + COLUMNS_INDICATORS]
@@ -126,9 +126,9 @@ def make_tb_country(tb_ucdp_countries: Table, tb_prio_countries: Table) -> Table
     assert set(tb_ucdp_countries["conflict_type"]) - set(tb_prio_countries["conflict_type"]) == {
         "one-sided violence"
     }, "Missmatch in conflict_type between UCDP and PRIO (country) not as expected!"
-    assert set(tb_prio_countries["conflict_type"]) - set(tb_ucdp_countries["conflict_type"]) == {"extrasystemic"}, (
-        "Missmatch in conflict_type between UCDP and PRIO (country) not as expected!"
-    )
+    assert set(tb_prio_countries["conflict_type"]) - set(tb_ucdp_countries["conflict_type"]) == {
+        "extrasystemic"
+    }, "Missmatch in conflict_type between UCDP and PRIO (country) not as expected!"
 
     # Preserve only pre-UCDP-time data in PRIO
     assert tb_ucdp_countries["year"].min() == YEAR_UCDP_MIN, "UCDP year min is not as expected!"

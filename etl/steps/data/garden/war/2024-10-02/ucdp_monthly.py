@@ -296,9 +296,9 @@ def _sanity_checks(ds: Dataset) -> None:
         # Remove accepted errors
         if conflict_ids_errors is not None:
             res = res.loc[~res["conflict_new_id"].isin(conflict_ids_errors)]
-        assert len(res) == 0, (
-            f"Dicrepancy between number of deaths in conflict ({tb_ged.m.short_name} vs. {tb_type.m.short_name}). \n {res})"
-        )
+        assert (
+            len(res) == 0
+        ), f"Dicrepancy between number of deaths in conflict ({tb_ged.m.short_name} vs. {tb_type.m.short_name}). \n {res})"
 
     # Read tables
     tb_ged = ds["ucdp_ged"].reset_index()
@@ -369,13 +369,13 @@ def add_conflict_type(tb_ged: Table, tb_conflict: Table) -> Table:
     tb_ged.loc[mask, "type_of_conflict"] = tb_ged.loc[mask, "type_of_conflict"].fillna("state-based (unknown)")
 
     # Assert that `type_of_conflict` was only added for state-based events
-    assert tb_ged[tb_ged["type_of_violence"] != 1]["type_of_conflict"].isna().all(), (
-        "There are some actual values for non-state based conflicts! These should only be NaN, since `tb_conflict` should only contain data for state-based conflicts."
-    )
+    assert (
+        tb_ged[tb_ged["type_of_violence"] != 1]["type_of_conflict"].isna().all()
+    ), "There are some actual values for non-state based conflicts! These should only be NaN, since `tb_conflict` should only contain data for state-based conflicts."
     # Check that `type_of_conflict` is not NaN for state-based events
-    assert not tb_ged[tb_ged["type_of_violence"] == 1]["type_of_conflict"].isna().any(), (
-        "Could not find the type of conflict for some state-based conflicts!"
-    )
+    assert (
+        not tb_ged[tb_ged["type_of_violence"] == 1]["type_of_conflict"].isna().any()
+    ), "Could not find the type of conflict for some state-based conflicts!"
 
     # Create `conflict_type` column as a combination of `type_of_violence` and `type_of_conflict`.
     tb_ged["conflict_type"] = (
@@ -406,9 +406,9 @@ def _sanity_check_conflict_types(tb: Table) -> Table:
     assert (len(transitions) == 1) & (transitions.iloc[0] == TRANSITION_EXPECTED), "Error"
 
     # Check if different regions categorise the conflict differently in the same year
-    assert not (tb_.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1).any(), (
-        "Seems like the conflict has multiple types for a single year! Is it categorised differently depending on the region? This case has not been taken into account -- please review the code!"
-    )
+    assert not (
+        tb_.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1
+    ).any(), "Seems like the conflict has multiple types for a single year! Is it categorised differently depending on the region? This case has not been taken into account -- please review the code!"
 
 
 def _sanity_check_prio_conflict_types(tb: Table) -> Table:
@@ -427,9 +427,9 @@ def _sanity_check_prio_conflict_types(tb: Table) -> Table:
     transitions_unk = transitions - TRANSITIONS_EXPECTED
 
     # Check if different regions categorise the conflict differently in the same year
-    assert not (tb.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1).any(), (
-        "Seems like the conflict hast multiple types for a single year! Is it categorised differently depending on the region?"
-    )
+    assert not (
+        tb.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1
+    ).any(), "Seems like the conflict hast multiple types for a single year! Is it categorised differently depending on the region?"
 
     assert not transitions_unk, f"Unknown transitions found: {transitions_unk}"
 
@@ -630,9 +630,9 @@ def fix_extrasystemic_entries(tb: Table) -> Table:
     Basically means setting to zero null entries after 1989.
     """
     # Sanity check
-    assert tb.loc[tb["conflict_type"] == "extrasystemic", "year"].max() == 1989, (
-        "There are years beyond 1989 for extrasystemic conflicts by default!"
-    )
+    assert (
+        tb.loc[tb["conflict_type"] == "extrasystemic", "year"].max() == 1989
+    ), "There are years beyond 1989 for extrasystemic conflicts by default!"
 
     # Get only extra-systemic stuff
     mask = tb.conflict_type == "extrasystemic"
@@ -1099,9 +1099,9 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
         how="outer",
     )
     # Add Greenland
-    assert "Greenland" not in set(tb_locations_country.country), (
-        "Greenland is not expected to be there! That's why we force it to zero. If it appears, just remove the following code line"
-    )
+    assert (
+        "Greenland" not in set(tb_locations_country.country)
+    ), "Greenland is not expected to be there! That's why we force it to zero. If it appears, just remove the following code line"
     tb_green = Table(pd.DataFrame({"country": ["Greenland"], "year": [LAST_YEAR]}))
     tb_locations_country = pr.concat([tb_locations_country, tb_green], ignore_index=True)
 
@@ -1110,9 +1110,9 @@ def estimate_metrics_locations(tb: Table, tb_maps: Table, tb_codes: Table, ds_po
     tb_locations_country[cols_indicators] = tb_locations_country[cols_indicators].fillna(0)
     # NaN in conflict_type to arbitrary (since missing ones are filled from the next operation with fill_gaps_with_zeroes)
     mask = tb_locations_country["conflict_type"].isna()
-    assert tb_locations_country.loc[mask, cols_indicators].sum().sum() == 0, (
-        "There are some non-NaNs for NaN-valued conflict types!"
-    )
+    assert (
+        tb_locations_country.loc[mask, cols_indicators].sum().sum() == 0
+    ), "There are some non-NaNs for NaN-valued conflict types!"
     tb_locations_country["conflict_type"] = tb_locations_country["conflict_type"].fillna("one-sided violence")
 
     # Fill with zeroes

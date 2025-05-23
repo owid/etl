@@ -165,9 +165,9 @@ def test_expand_time_column_full_range_dimension():
         .agg(["min", "max"])
         .equals(dfx.groupby(dimension_col)[time_col].agg(["min", "max"]))
     ), "Min max years for some entities may have changed!"
-    assert (dfx.groupby(dimension_col)[time_col].diff().dropna() == 1).all(), (
-        "Time difference is sometimes greater than one unit"
-    )
+    assert (
+        dfx.groupby(dimension_col)[time_col].diff().dropna() == 1
+    ).all(), "Time difference is sometimes greater than one unit"
     assert df.sort_values(index_col, ignore_index=True).equals(
         dfx.dropna().sort_values(index_col, ignore_index=True).astype(df.dtypes)
     ), "Original values should have been preserved"
@@ -209,9 +209,9 @@ def test_expand_time_column_full_range():
     time_range = dfx.groupby(dimension_col)[time_col].agg(["min", "max"])
     assert (time_range["min"] == df[time_col].min()).all(), "Minimum time is not as expected!"
     assert (time_range["max"] == df[time_col].max()).all(), "Maximum time is not as expected!"
-    assert (dfx.groupby(dimension_col)[time_col].diff().dropna() == 1).all(), (
-        "Time difference is sometimes greater than one unit"
-    )
+    assert (
+        dfx.groupby(dimension_col)[time_col].diff().dropna() == 1
+    ).all(), "Time difference is sometimes greater than one unit"
     assert df.sort_values(index_col, ignore_index=True).equals(
         dfx.dropna().sort_values(index_col, ignore_index=True).astype(df.dtypes)
     ), "Original values should have been preserved"

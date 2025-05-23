@@ -359,17 +359,17 @@ def prepare_prices_index_table(tb_prices: Table) -> Table:
         )
 
     # Sanity check.
-    assert PRICE_INDEX_REFERENCE_YEAR in years, (
-        f"The chosen reference year {PRICE_INDEX_REFERENCE_YEAR} does not have data for all variables; either change this year, or remove this assertion (and some prices will be dropped)."
-    )
+    assert (
+        PRICE_INDEX_REFERENCE_YEAR in years
+    ), f"The chosen reference year {PRICE_INDEX_REFERENCE_YEAR} does not have data for all variables; either change this year, or remove this assertion (and some prices will be dropped)."
 
     # Remove empty rows and columns.
     tb_prices_index = tb_prices_index.dropna(axis=1, how="all").dropna(how="all")
 
     # Sanity check.
-    assert tb_prices_index.loc[PRICE_INDEX_REFERENCE_YEAR].round(2).unique().tolist() == [100], (
-        "Price index is not well constructed."
-    )
+    assert tb_prices_index.loc[PRICE_INDEX_REFERENCE_YEAR].round(2).unique().tolist() == [
+        100
+    ], "Price index is not well constructed."
 
     # Update table metadata.
     tb_prices_index.metadata.short_name = "statistical_review_of_world_energy_fossil_fuel_price_index"

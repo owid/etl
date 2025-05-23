@@ -68,9 +68,9 @@ def run(dest_dir: str) -> None:
 
     # Check that countries without classification for the latest year are as expected.
     missing_countries = set(tb_latest.loc[tb_latest["year"] != tb_latest["year"].max(), "country"])
-    assert missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE, (
-        f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
-    )
+    assert (
+        missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE
+    ), f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
 
     # Extract data only for latest release (and remove column year).
     tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])

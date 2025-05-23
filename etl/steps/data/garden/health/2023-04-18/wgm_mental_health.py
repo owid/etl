@@ -158,9 +158,9 @@ def _build_df_with_incomes(df: pd.DataFrame) -> pd.DataFrame:
     # Sanity check
     unc_countries_expected = {"Venezuela"}  # WB unclassified Venezuela in 2021, bc of lacking data
     unc_countries = set(df_income.country).difference(incomes)
-    assert unc_countries == unc_countries_expected, (
-        f"Only Venezuela is expected to be unclassified, but found {unc_countries} to be unclassified!"
-    )
+    assert (
+        unc_countries == unc_countries_expected
+    ), f"Only Venezuela is expected to be unclassified, but found {unc_countries} to be unclassified!"
     # Remove Venezuela
     df_income = df_income[~df_income["country"].isin(unc_countries_expected)]
     return df_income
@@ -182,9 +182,9 @@ def _make_df_with_share_answers(df: pd.DataFrame, weight_column: str = "weight_i
     df_combined = pd.concat([df_nb, df_gender, df_age, df_gender_age], ignore_index=True)
     # Sanity check
     x = df_combined.groupby(["country", "year", "question", "gender", "age_group"], observed=True)[["share"]].sum()
-    assert x[abs(x.share - 100) > 0.1].empty, (
-        "The share was not correctly estimated! Sum of shares does not sum up to 100% (we allow for 0.1% error)"
-    )
+    assert x[
+        abs(x.share - 100) > 0.1
+    ].empty, "The share was not correctly estimated! Sum of shares does not sum up to 100% (we allow for 0.1% error)"
     return df_combined
 
 

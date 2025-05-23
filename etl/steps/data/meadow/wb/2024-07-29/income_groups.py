@@ -53,22 +53,22 @@ def run(dest_dir: str) -> None:
 
 def run_sanity_checks_on_inputs(tb: Table) -> None:
     # Sanity checks on input data.
-    assert (num_rows := tb.shape[0]) == (num_rows_expected := 239), (
-        f"Invalid number of rows. Expected was {num_rows_expected}, but found {num_rows}"
-    )
-    assert (num_cols := tb.shape[1]) >= (num_cols_expected := 38), (
-        f"Invalid number of columns. Expected was >{num_cols_expected}, but found {num_cols}"
-    )
-    assert tb.loc[10, "World Bank Analytical Classifications"] == "Afghanistan", (
-        "Row 10, column 'World Bank Analytical Classifications' expected to have value 'Afghanistan'"
-    )
+    assert (num_rows := tb.shape[0]) == (
+        num_rows_expected := 239
+    ), f"Invalid number of rows. Expected was {num_rows_expected}, but found {num_rows}"
+    assert (num_cols := tb.shape[1]) >= (
+        num_cols_expected := 38
+    ), f"Invalid number of columns. Expected was >{num_cols_expected}, but found {num_cols}"
+    assert (
+        tb.loc[10, "World Bank Analytical Classifications"] == "Afghanistan"
+    ), "Row 10, column 'World Bank Analytical Classifications' expected to have value 'Afghanistan'"
 
     # Sanity check on years.
     years = list(tb.loc[ROW_YEARS])
     assert np.isnan(years[0]), f"The first column in row {ROW_YEARS} is expected to be NaN. Instead found {years[0]}"
-    assert years[1] == "Data for calendar year :", (
-        f"The second column in row {ROW_YEARS} is expected to be 'Data for calendar year :'. Instead found {years[1]}"
-    )
-    assert all(isinstance(year, int) for year in years[2:]), (
-        f"Columns 3 to the end in row {ROW_YEARS} should be numbers. Check: {years[2:]}"
-    )
+    assert (
+        years[1] == "Data for calendar year :"
+    ), f"The second column in row {ROW_YEARS} is expected to be 'Data for calendar year :'. Instead found {years[1]}"
+    assert all(
+        isinstance(year, int) for year in years[2:]
+    ), f"Columns 3 to the end in row {ROW_YEARS} should be numbers. Check: {years[2:]}"

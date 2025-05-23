@@ -160,9 +160,9 @@ def run() -> None:
     for tb in tables:
         for col in tb.columns:
             if col in INDICATORS_NO_ORIGINS:
-                assert len(tb[col].metadata.origins) == 0, (
-                    f"No origins expected for indicator {col} in table {tb.m.short_name}"
-                )
+                assert (
+                    len(tb[col].metadata.origins) == 0
+                ), f"No origins expected for indicator {col} in table {tb.m.short_name}"
                 tb[col].metadata.origins = origins
             if len(tb[col].metadata.origins) == 0:
                 raise ValueError(f"No source for indicator {col} in table {tb.m.short_name}")

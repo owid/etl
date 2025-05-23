@@ -167,9 +167,9 @@ def extract_explorers_tables(
     if "slug" in df_columns:
         mask = df_columns["catalogPath"].isna()
         assert df_columns.loc[mask, "slug"].notna().all(), "`slug` must be set whenever `catalogPath` is missing."
-        assert df_columns.loc[mask, "transform"].notna().all(), (
-            "`transform` must be set whenever `catalogPath` is missing."
-        )
+        assert (
+            df_columns.loc[mask, "transform"].notna().all()
+        ), "`transform` must be set whenever `catalogPath` is missing."
 
     return df_grapher, df_columns
 

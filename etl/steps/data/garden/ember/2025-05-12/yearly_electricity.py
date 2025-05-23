@@ -276,9 +276,9 @@ def combine_global_and_europe_data(tb_global: Table, tb_europe: Table) -> Table:
             .iterrows()
         ]
     )
-    assert set_global == set_europe, (
-        "After adapting European data, all category-subcategory-variables should be identical, except for:\n* Capacity and total emissions (only given in global), and\n* Hard coal, Lignite, Onshore wind and Offshore wind, only given in European data."
-    )
+    assert (
+        set_global == set_europe
+    ), "After adapting European data, all category-subcategory-variables should be identical, except for:\n* Capacity and total emissions (only given in global), and\n* Hard coal, Lignite, Onshore wind and Offshore wind, only given in European data."
 
     # Combine the two overlapping datasets, prioritizing European on overlapping rows.
     tb = combine_two_overlapping_dataframes(

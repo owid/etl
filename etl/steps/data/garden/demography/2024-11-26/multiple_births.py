@@ -184,18 +184,18 @@ def check_stillbirths(tb):
 
         flags_actual = set(tb.loc[tb["country"].isin(countries_expected), "stillbirths"].unique())
 
-        assert flags_actual == flags_expected, (
-            f"Expected flags {flags_expected} for countries {countries_expected} are not as expected! Found: {flags_actual}"
-        )
+        assert (
+            flags_actual == flags_expected
+        ), f"Expected flags {flags_expected} for countries {countries_expected} are not as expected! Found: {flags_actual}"
 
     # Check Overlaps
     ## There are overlaps in New Zealand and Sweden
     x = tb.groupby(["country", "year"], as_index=False).stillbirths.nunique()
     countries_overlap_expected = {"New Zealand", "Sweden"}
     countries_overlap_actually = set(x.loc[x["stillbirths"] != 1, "country"].unique())
-    assert countries_overlap_actually == countries_overlap_expected, (
-        f"Expected countries with overlaps {countries_overlap_expected} are not as expected! Found: {countries_overlap_actually}"
-    )
+    assert (
+        countries_overlap_actually == countries_overlap_expected
+    ), f"Expected countries with overlaps {countries_overlap_expected} are not as expected! Found: {countries_overlap_actually}"
 
 
 def adapt_stillbirths_flags(tb):
@@ -207,9 +207,9 @@ def adapt_stillbirths_flags(tb):
 
     # If there is 1 and 0, keep 1.
     flag = tb.sort_values("stillbirths").duplicated(subset=["country", "year"], keep="last")
-    assert set(tb.loc[flag, "stillbirths"].unique()) == {0}, (
-        "Removed rows because of duplicate country-year values should only be stillbirths=0!"
-    )
+    assert set(tb.loc[flag, "stillbirths"].unique()) == {
+        0
+    }, "Removed rows because of duplicate country-year values should only be stillbirths=0!"
     tb = tb.loc[~flag]
 
     # Sweden: Remove, ensure there is actually redundancy. Keep 1.
@@ -234,14 +234,14 @@ def get_summary_methodology_sb(tb):
 
 def remove_outliers(tb):
     flag = (tb["country"] == "England and Wales") & (tb["year"] == 1938)
-    assert (tb.loc[flag, "children_multiple_delivery_ratio"] >= 4000).all(), (
-        "Unexpected outlier for England and Wales in 1938"
-    )
+    assert (
+        tb.loc[flag, "children_multiple_delivery_ratio"] >= 4000
+    ).all(), "Unexpected outlier for England and Wales in 1938"
     tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio", "children_delivery_ratio"]] = pd.NA
     flag = (tb["country"] == "England and Wales") & (tb["year"] == 1939)
-    assert (tb.loc[flag, "children_multiple_delivery_ratio"] <= 1500).all(), (
-        "Unexpected outlier for England and Wales in 1938"
-    )
+    assert (
+        tb.loc[flag, "children_multiple_delivery_ratio"] <= 1500
+    ).all(), "Unexpected outlier for England and Wales in 1938"
     tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio", "children_delivery_ratio"]] = pd.NA
 
     return tb

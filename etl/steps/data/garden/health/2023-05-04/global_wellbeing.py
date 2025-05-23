@@ -65,9 +65,9 @@ def run(dest_dir: str) -> None:
     # Sanity check on questions
     log.info("global_wellbeing: check questions are as expected")
     questions = set(df["question"])
-    assert not (questions_unknown := questions.difference(QUESTIONS_EXPECTED)), (
-        f"Unknown questions! {questions_unknown}"
-    )
+    assert not (
+        questions_unknown := questions.difference(QUESTIONS_EXPECTED)
+    ), f"Unknown questions! {questions_unknown}"
 
     # Pivot to have questions as columnns
     log.info("global_wellbeing: harmonize_countries")

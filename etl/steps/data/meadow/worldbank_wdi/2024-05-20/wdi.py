@@ -43,12 +43,12 @@ def run(dest_dir: str) -> None:
     assert df[years].apply(lambda s: is_numeric_dtype(s), axis=0).all(), "One or more {year} columns is non-numeric"
 
     # variable code <-> variable name should be a 1:1 mapping
-    assert (df.groupby("indicator_code", observed=True)["indicator_name"].apply(lambda gp: gp.nunique()) == 1).all(), (
-        "A variable code in `WDIData.csv` has multiple variable names."
-    )
-    assert (df.groupby("indicator_name", observed=True)["indicator_code"].apply(lambda gp: gp.nunique()) == 1).all(), (
-        "A variable name in `WDIData.csv` has multiple variable codes."
-    )
+    assert (
+        df.groupby("indicator_code", observed=True)["indicator_name"].apply(lambda gp: gp.nunique()) == 1
+    ).all(), "A variable code in `WDIData.csv` has multiple variable names."
+    assert (
+        df.groupby("indicator_name", observed=True)["indicator_code"].apply(lambda gp: gp.nunique()) == 1
+    ).all(), "A variable name in `WDIData.csv` has multiple variable codes."
 
     # reshapes data from `country indicator 1960 1961 ...` format to long format `country indicator_code year value`
     df_long = (

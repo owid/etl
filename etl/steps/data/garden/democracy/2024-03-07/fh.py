@@ -93,9 +93,9 @@ def run(dest_dir: str) -> None:
 
     # Impute values
     col_flag_imputed = "values_imputed"
-    assert tb["year"].min() == YEAR_MIN, (
-        f"Minimum year is not as expected (should be {YEAR_MIN}! Imputing might behave unexpectedly."
-    )
+    assert (
+        tb["year"].min() == YEAR_MIN
+    ), f"Minimum year is not as expected (should be {YEAR_MIN}! Imputing might behave unexpectedly."
     tb = add_imputes(tb=tb, path=PATH_IMPUTE, col_flag_imputed=col_flag_imputed)
 
     # Get region data

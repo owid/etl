@@ -81,7 +81,7 @@ def load_dataframe(path: Union[Path, str], column_names: List[str]) -> pd.DataFr
     """Load the data from the latest version of the dataset."""
     df = pd.read_csv(path, names=column_names)
     # Check columns
-    assert df.reset_index().shape[1] == len(column_names) + 1, (
-        "Check columns in source! There seems to be more (or less) columns."
-    )
+    assert (
+        df.reset_index().shape[1] == len(column_names) + 1
+    ), "Check columns in source! There seems to be more (or less) columns."
     return df

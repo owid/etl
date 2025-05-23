@@ -28,9 +28,9 @@ def run(dest_dir: str) -> None:
     #    - Reporting country ("ReporterDesc")
     #    - Partner country ("PartnerDesc")
     #    - Mode of transport ("MotDesc")
-    assert tb.groupby(["RefYear", "FlowDesc", "ReporterDesc", "PartnerDesc", "MotDesc"]).size().max() == 1, (
-        "There should be, at most, one entry per year, export type, origin country, destination country and mode of transport combination"
-    )
+    assert (
+        tb.groupby(["RefYear", "FlowDesc", "ReporterDesc", "PartnerDesc", "MotDesc"]).size().max() == 1
+    ), "There should be, at most, one entry per year, export type, origin country, destination country and mode of transport combination"
     #
     # Process data.
     #

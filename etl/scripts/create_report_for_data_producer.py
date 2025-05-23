@@ -115,9 +115,9 @@ def run(producer, quarter, year):
     df_producer_charts = df_producer_charts[df_producer_charts["producer"] == producer].reset_index(drop=True)
     producer_chart_ids = sorted(set(df_producer_charts["chart_id"]))
     df_producer = get_chart_views_by_chart_id(chart_ids=producer_chart_ids, date_min=min_date, date_max=max_date)
-    assert df_producer[df_producer.duplicated(subset=["chart_id"])].empty, (
-        "Expected no duplicates in df_producer. If there are, drop duplicates (and check if that's expected)."
-    )
+    assert df_producer[
+        df_producer.duplicated(subset=["chart_id"])
+    ].empty, "Expected no duplicates in df_producer. If there are, drop duplicates (and check if that's expected)."
     df_top_charts = df_producer.sort_values("views", ascending=False)[["url", "views"]].reset_index(drop=True).head(10)
     # Fetch titles from chart API.
     df_top_charts["title"] = df_top_charts["url"].apply(get_chart_title_from_url)
@@ -132,16 +132,16 @@ def run(producer, quarter, year):
     df_articles = df_content[df_content["post_type"].isin(["article", "topic-page", "linear-topic-page"])].reset_index(
         drop=True
     )
-    assert df_articles[df_articles.duplicated(subset=["url"])].empty, (
-        "Expected no duplicates in df_articles. If there are, drop duplicates (and check if that's expected)."
-    )
+    assert df_articles[
+        df_articles.duplicated(subset=["url"])
+    ].empty, "Expected no duplicates in df_articles. If there are, drop duplicates (and check if that's expected)."
     df_articles = df_articles.sort_values(["views"], ascending=False).reset_index(drop=True)
     df_top_articles = df_articles.head(10)
 
     df_insights = df_content[df_content["post_type"].isin(["data-insight"])].reset_index(drop=True)
-    assert df_insights[df_insights.duplicated(subset=["url"])].empty, (
-        "Expected no duplicates in df_insights. If there are, drop duplicates (and check if that's expected)."
-    )
+    assert df_insights[
+        df_insights.duplicated(subset=["url"])
+    ].empty, "Expected no duplicates in df_insights. If there are, drop duplicates (and check if that's expected)."
     # TODO: Check if insights should be only the ones published in the quarter.
     df_insights = (
         df_insights[

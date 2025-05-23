@@ -374,9 +374,9 @@ if st.session_state["show_form"]:
 
         # 2) Show fields for metadata fields
         categories_in_schema = {v["category"] for k, v in SCHEMA_ORIGIN.items()}
-        assert categories_in_schema == set(ACCEPTED_CATEGORIES), (
-            f"Unknown categories in schema: {categories_in_schema - set(ACCEPTED_CATEGORIES)}"
-        )
+        assert categories_in_schema == set(
+            ACCEPTED_CATEGORIES
+        ), f"Unknown categories in schema: {categories_in_schema - set(ACCEPTED_CATEGORIES)}"
 
         render_fields_from_schema(SCHEMA_ORIGIN, "origin", categories=ACCEPTED_CATEGORIES)
 

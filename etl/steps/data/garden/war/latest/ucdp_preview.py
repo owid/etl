@@ -131,9 +131,9 @@ def import_ucdp_module(catalog_path: str = CATALOG_PATH):
     We need to do this unusual import because the module path contains numeric values.
     """
     step_uri = f"data://{catalog_path}"
-    assert step_uri in paths.dependencies, (
-        f"ucdp_preview module relies on the code of step {step_uri}. The dag should list this step as a dependency!"
-    )
+    assert (
+        step_uri in paths.dependencies
+    ), f"ucdp_preview module relies on the code of step {step_uri}. The dag should list this step as a dependency!"
 
     submodule_path = Path(f"steps/data/{catalog_path}.py")
     submodule_dir = submodule_path.parent

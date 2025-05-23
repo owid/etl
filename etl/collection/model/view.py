@@ -77,14 +77,14 @@ class Indicator(MDIMBase):
         table_name, indicator_name = self.catalogPath.split("#")
 
         # Check table is in any of the datasets!
-        assert table_name in tables_by_name, (
-            f"Table name `{table_name}` not found in dependency tables! Available tables are: {', '.join(tables_by_name.keys())}"
-        )
+        assert (
+            table_name in tables_by_name
+        ), f"Table name `{table_name}` not found in dependency tables! Available tables are: {', '.join(tables_by_name.keys())}"
 
         # Check table name to table mapping is unique
-        assert len(tables_by_name[table_name]) == 1, (
-            f"There are multiple dependencies (datasets) with a table named {table_name}. Please add dataset name (dataset_name/table_name#indicator_name) if you haven't already, or use the complete dataset URI in this case."
-        )
+        assert (
+            len(tables_by_name[table_name]) == 1
+        ), f"There are multiple dependencies (datasets) with a table named {table_name}. Please add dataset name (dataset_name/table_name#indicator_name) if you haven't already, or use the complete dataset URI in this case."
 
         # Check dataset in table metadata is not None
         tb_uri = tables_by_name[table_name][0]

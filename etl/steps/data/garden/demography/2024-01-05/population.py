@@ -162,18 +162,18 @@ def format_wpp(tb: Table) -> Table:
     ]
 
     # Sanity checks IN
-    assert tb.loc[tb["variant"] == "estimates", "year"].min() == YEAR_WPP_START, (
-        f"Unexpected start year for WPP estimates. Should be {YEAR_WPP_START}!"
-    )
-    assert tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_WPP_PROJECTIONS_START - 1, (
-        f"Unexpected end year for WPP estimates. Should be {YEAR_WPP_PROJECTIONS_START - 1}!"
-    )
-    assert tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_WPP_PROJECTIONS_START, (
-        f"Unexpected start year for WPP projections. Should be {YEAR_WPP_PROJECTIONS_START}!"
-    )
-    assert tb.loc[tb["variant"] == "medium", "year"].max() == YEAR_WPP_END, (
-        f"Unexpected end year for WPP projections. Should be {YEAR_WPP_END}!"
-    )
+    assert (
+        tb.loc[tb["variant"] == "estimates", "year"].min() == YEAR_WPP_START
+    ), f"Unexpected start year for WPP estimates. Should be {YEAR_WPP_START}!"
+    assert (
+        tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_WPP_PROJECTIONS_START - 1
+    ), f"Unexpected end year for WPP estimates. Should be {YEAR_WPP_PROJECTIONS_START - 1}!"
+    assert (
+        tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_WPP_PROJECTIONS_START
+    ), f"Unexpected start year for WPP projections. Should be {YEAR_WPP_PROJECTIONS_START}!"
+    assert (
+        tb.loc[tb["variant"] == "medium", "year"].max() == YEAR_WPP_END
+    ), f"Unexpected end year for WPP projections. Should be {YEAR_WPP_END}!"
 
     # Rename columns, sort rows
     columns_rename = {
@@ -442,9 +442,9 @@ def add_historical_regions(tb: Table, tb_gm: Table, tb_regions: Table) -> Table:
         former_country_name = tb_regions.loc[code, "name"]
         end_year = tb_regions.loc[code, "end_year"]
         # Sanity check: former country not already in table! remember that we are creating it now
-        assert former_country_name not in set(tb["country"]), (
-            f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
-        )
+        assert former_country_name not in set(
+            tb["country"]
+        ), f"{former_country_name} already in table (either import it via Systema Globalis or manual aggregation)!"
         # Get list of country successors (equivalent of former state with nowadays' countries) and end year (dissolution of former state)
         codes_successors = json.loads(tb_regions.loc[code, "successors"])
         countries_successors = tb_regions.loc[codes_successors, "name"].tolist()

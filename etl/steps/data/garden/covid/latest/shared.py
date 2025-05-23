@@ -147,9 +147,9 @@ def add_population_2022(tb: Table, ds_population: Dataset, missing_countries: Op
     # Check countries that went missing
     if missing_countries is not None:
         countries_missing = countries_start - countries_end
-        assert countries_missing == missing_countries, (
-            f"Missing countries don't match the expected! {countries_missing}; expected {missing_countries}"
-        )
+        assert (
+            countries_missing == missing_countries
+        ), f"Missing countries don't match the expected! {countries_missing}; expected {missing_countries}"
 
     return tb
 
@@ -169,9 +169,9 @@ def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: O
     # Check countries that went missing
     if missing_countries is not None:
         countries_missing = countries_start - countries_end
-        assert countries_missing == missing_countries, (
-            f"Missing countries don't match the expected! {countries_missing}"
-        )
+        assert (
+            countries_missing == missing_countries
+        ), f"Missing countries don't match the expected! {countries_missing}"
 
     return tb
 

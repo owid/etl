@@ -98,9 +98,9 @@ def combine_statistical_review_and_eia_data(tb_review: Table, tb_eia: Table) -> 
 
     """
     # Check that there are no duplicated rows in any of the two datasets.
-    assert tb_review[tb_review.duplicated(subset=["country", "year"])].empty, (
-        "Duplicated rows in Statistical Review data."
-    )
+    assert tb_review[
+        tb_review.duplicated(subset=["country", "year"])
+    ].empty, "Duplicated rows in Statistical Review data."
     assert tb_eia[tb_eia.duplicated(subset=["country", "year"])].empty, "Duplicated rows in EIA data."
 
     tb_review["source"] = "ei"

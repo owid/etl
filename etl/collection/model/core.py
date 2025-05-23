@@ -318,13 +318,13 @@ class Collection(MDIMBase):
         for view in self.views:
             for dim_slug, choice_slugs in dix.items():
                 # Check that dimension is defined in the view!
-                assert dim_slug in view.dimensions, (
-                    f"Dimension {dim_slug} not found in dimensions! View:\n{yaml_dump(view.to_dict())}"
-                )
+                assert (
+                    dim_slug in view.dimensions
+                ), f"Dimension {dim_slug} not found in dimensions! View:\n{yaml_dump(view.to_dict())}"
                 # Check that choices defined in the view are valid!
-                assert view.dimensions[dim_slug] in choice_slugs, (
-                    f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
-                )
+                assert (
+                    view.dimensions[dim_slug] in choice_slugs
+                ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
 
     def validate_schema(self, schema_path: Optional[Union[str, Path]] = None):
         """Validate class against schema."""

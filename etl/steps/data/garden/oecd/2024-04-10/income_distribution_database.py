@@ -89,9 +89,9 @@ def rename_and_create_columns(tb: Table) -> Table:
     """
     # Assert if all keys of dictionary are in the columns.
     assert set(INDICATOR_NAMES.keys()) == set(tb["measure"]), "Not all expected categories are in the measure column"
-    assert set(POVERTY_LINES.keys()) == set(tb["poverty_line"]), (
-        "Not all expected categories are in the poverty_line column"
-    )
+    assert set(POVERTY_LINES.keys()) == set(
+        tb["poverty_line"]
+    ), "Not all expected categories are in the poverty_line column"
     assert set(AGE_GROUPS.keys()) == set(tb["age"]), "Not all expected categories are in the age column"
 
     # Rename categories in measure, poverty_line and age columns.

@@ -111,9 +111,9 @@ def process_sheet(excel_object: pd.ExcelFile, sheet_name: str, year_range: tuple
     # Set the index to 'country', 'year', and 'indicator'
     df.set_index(["country", "year", "indicator"], inplace=True)
 
-    assert df.index.is_unique, (
-        f"Index is not unique in sheet '{sheet_name}'."
-    )  # Added assert statement to check index is unique
+    assert (
+        df.index.is_unique
+    ), f"Index is not unique in sheet '{sheet_name}'."  # Added assert statement to check index is unique
     return df
 
 

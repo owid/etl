@@ -112,12 +112,12 @@ def set_years_in_table(tb: Table) -> Table:
     Each entry in the table describes a period of time and the relationship of a country pair. The period of time is defined by fields `time_start` and `time_end`, which are in the format of YYYYMMDD. This function maps these to a year.
     """
     # Small assertions
-    assert set(tb[tb["time_start"].str.contains("99$")]["time_start"]) == {"19009999"}, (
-        "Unexpected time_start ending with 99, other than 19009999"
-    )
-    assert set(tb[tb["time_end"].str.contains("99$")]["time_end"]) == {"20209999"}, (
-        "Unexpected time_end ending with 99, other than 20209999"
-    )
+    assert set(tb[tb["time_start"].str.contains("99$")]["time_start"]) == {
+        "19009999"
+    }, "Unexpected time_start ending with 99, other than 19009999"
+    assert set(tb[tb["time_end"].str.contains("99$")]["time_end"]) == {
+        "20209999"
+    }, "Unexpected time_end ending with 99, other than 20209999"
 
     # Known bugs, fix
     tb["time_start"] = tb["time_start"].replace(START_YEAR_FIXES)
@@ -272,17 +272,17 @@ def build_tb_regions(tb: Table, ds_cow_ssm: Dataset) -> Table:
     tb_regions_cow = tb_regions_cow[tb_regions_cow["year"] >= 1900]
 
     missing_codes = set(tb_regions_cow["ccode"]) - (set(tb["code_2"]) | set(tb["code_1"]))
-    assert missing_codes == {260}, (
-        "Country codes missing in Diehl, when comparing with COW. Only code expected to miss is 260."
-    )
+    assert missing_codes == {
+        260
+    }, "Country codes missing in Diehl, when comparing with COW. Only code expected to miss is 260."
 
     # Sanity check
-    assert tb_regions["year"].max() == tb["year"].max(), (
-        "Maximum year does not match between DIEHL and DIEHL-based country in region table."
-    )
-    assert tb_regions["year"].min() == tb["year"].min(), (
-        "Minimum year does not match between DIEHL and DIEHL-based country in region table."
-    )
+    assert (
+        tb_regions["year"].max() == tb["year"].max()
+    ), "Maximum year does not match between DIEHL and DIEHL-based country in region table."
+    assert (
+        tb_regions["year"].min() == tb["year"].min()
+    ), "Minimum year does not match between DIEHL and DIEHL-based country in region table."
     return tb_regions
 
 

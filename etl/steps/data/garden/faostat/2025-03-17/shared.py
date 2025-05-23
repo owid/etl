@@ -1213,9 +1213,9 @@ def add_fao_population_if_given(tb: Table) -> Table:
         fao_population = tb[population_rows_mask].reset_index(drop=True)
 
         # Check that population is given in "1000 persons" and convert to persons.
-        assert list(fao_population["unit"].unique()) == [fao_population_unit_name], (
-            "FAO population may have changed units."
-        )
+        assert list(fao_population["unit"].unique()) == [
+            fao_population_unit_name
+        ], "FAO population may have changed units."
         fao_population["value"] *= 1000
 
         # Note: Here we will dismiss the flags related to population. But they are only relevant for those columns

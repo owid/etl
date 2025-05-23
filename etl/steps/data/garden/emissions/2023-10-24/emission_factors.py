@@ -41,9 +41,9 @@ def run(dest_dir: str) -> None:
 
     # Sanity checks.
     error = "Unexpected sources, units, or gas in selected rows."
-    assert tb["source_of_data"].str.startswith("2006 IPCC Guidelines for National Greenhouse Gas Inventories").all(), (
-        error
-    )
+    assert (
+        tb["source_of_data"].str.startswith("2006 IPCC Guidelines for National Greenhouse Gas Inventories").all()
+    ), error
     assert tb["gas"].str.startswith("CARBON DIOXIDE").all(), error
     assert (tb["unit"] == "kg/TJ").all(), error
 

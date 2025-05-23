@@ -40,9 +40,9 @@ def run(dest_dir: str) -> None:
         summary = tb.groupby(["country", "year", "sex", "type", "age"], as_index=False).size().sort_values("size")
         row_dups = summary.loc[summary["size"] != 1]
         assert row_dups.shape[0] <= 19, "Found duplicated rows in life tables!"
-        assert (row_dups["country"].unique() == "Switzerland").all() & (row_dups["year"] <= 1931).all(), (
-            "Unexpected duplicates in life tables!"
-        )
+        assert (row_dups["country"].unique() == "Switzerland").all() & (
+            row_dups["year"] <= 1931
+        ).all(), "Unexpected duplicates in life tables!"
 
         flag = (
             (tb_lt["country"] == "Switzerland")

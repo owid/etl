@@ -223,17 +223,17 @@ def create_and_add_tables_to_dataset(local_file: Path, ds: Dataset) -> Dataset:
 
 def _sanity_check_relevant_folders(path: str) -> None:
     folders = os.listdir(path)
-    assert all(folder in folders for folder in FOLDERS_EXPECTED), (
-        f"Some of the life table ({FOLDERS_EXPECTED}) folders are not present!"
-    )
+    assert all(
+        folder in folders for folder in FOLDERS_EXPECTED
+    ), f"Some of the life table ({FOLDERS_EXPECTED}) folders are not present!"
 
 
 def _sanity_check_files(path: str, files_expected: List[str]) -> None:
     """Checks that all required files are present once zip is uncompressed."""
     files_found = sorted(os.listdir(path))
-    assert files_found == files_expected, (
-        f"Files found are not the ones expected! Check that {files_expected} are actually there!"
-    )
+    assert (
+        files_found == files_expected
+    ), f"Files found are not the ones expected! Check that {files_expected} are actually there!"
 
 
 def make_table(input_folder: str, folder: dict) -> catalog.Table:

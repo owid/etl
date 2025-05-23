@@ -83,12 +83,12 @@ def run(dest_dir: str) -> None:
     tb.columns = [f"{col[0]}_{col[1]}" if col[0] not in ["year", "country"] else col[0] for col in tb.columns]
     # Check that there is no intersection between former and current countries
     paths.log.info("un.comtrade: handle former countries West Germany and Sudan (former)")
-    assert tb[tb["country"].str.contains("Germany")].groupby("year").size().max() == 1, (
-        "There are some years with data for both Germany and West Germany"
-    )
-    assert tb[tb["country"].str.contains("Sudan")].groupby("year").size().max() == 1, (
-        "There are some years with data for both Sudan and Sudan (former)"
-    )
+    assert (
+        tb[tb["country"].str.contains("Germany")].groupby("year").size().max() == 1
+    ), "There are some years with data for both Germany and West Germany"
+    assert (
+        tb[tb["country"].str.contains("Sudan")].groupby("year").size().max() == 1
+    ), "There are some years with data for both Sudan and Sudan (former)"
     # West Germany and Sudan (former) are both mapped to current countries (Germany and Sudan).
     # This is to ease the region aggregate estimations.
     # However, later, we undo this for the specific regions. That's why we need the year range.

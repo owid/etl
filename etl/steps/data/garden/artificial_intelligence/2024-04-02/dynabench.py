@@ -45,9 +45,9 @@ def run(dest_dir: str) -> None:
     }
     tb["assessment_domain"] = tb["benchmark"].map(mapping)
 
-    assert not tb["assessment_domain"].isnull().any(), (
-        "There are NaN values in the 'assessment_domain' column. Make sure you've mapped all benchmarks to their respective assessment domains."
-    )
+    assert (
+        not tb["assessment_domain"].isnull().any()
+    ), "There are NaN values in the 'assessment_domain' column. Make sure you've mapped all benchmarks to their respective assessment domains."
 
     tb = tb.format(["benchmark", "year"])
 

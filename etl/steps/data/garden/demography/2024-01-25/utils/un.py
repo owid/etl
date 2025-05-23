@@ -27,18 +27,18 @@ def format_un(tb: Table) -> Table:
     ]
 
     # Sanity checks IN
-    assert tb.loc[tb["variant"] == "estimates", "year"].min() == YEAR_WPP_START, (
-        f"Unexpected start year for WPP estimates. Should be {YEAR_WPP_START}!"
-    )
-    assert tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_WPP_PROJECTIONS_START - 1, (
-        f"Unexpected end year for WPP estimates. Should be {YEAR_WPP_PROJECTIONS_START - 1}!"
-    )
-    assert tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_WPP_PROJECTIONS_START, (
-        f"Unexpected start year for WPP projections. Should be {YEAR_WPP_PROJECTIONS_START}!"
-    )
-    assert tb.loc[tb["variant"] == "medium", "year"].max() == YEAR_WPP_END, (
-        f"Unexpected end year for WPP projections. Should be {YEAR_WPP_END}!"
-    )
+    assert (
+        tb.loc[tb["variant"] == "estimates", "year"].min() == YEAR_WPP_START
+    ), f"Unexpected start year for WPP estimates. Should be {YEAR_WPP_START}!"
+    assert (
+        tb.loc[tb["variant"] == "estimates", "year"].max() == YEAR_WPP_PROJECTIONS_START - 1
+    ), f"Unexpected end year for WPP estimates. Should be {YEAR_WPP_PROJECTIONS_START - 1}!"
+    assert (
+        tb.loc[tb["variant"] == "medium", "year"].min() == YEAR_WPP_PROJECTIONS_START
+    ), f"Unexpected start year for WPP projections. Should be {YEAR_WPP_PROJECTIONS_START}!"
+    assert (
+        tb.loc[tb["variant"] == "medium", "year"].max() == YEAR_WPP_END
+    ), f"Unexpected end year for WPP projections. Should be {YEAR_WPP_END}!"
 
     # Rename columns, sort rows
     columns_rename = {

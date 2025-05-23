@@ -99,9 +99,9 @@ def run(dest_dir: str) -> None:
 
 def sanity_checks(tb_proj, tb_hist):
     # Short name sanity check
-    assert tb_proj.m.short_name == tb_hist.m.short_name, (
-        f"Mismatch in short_name of historical ({tb_hist.m.short_name}) and projection ({tb_proj.m.short_name})"
-    )
+    assert (
+        tb_proj.m.short_name == tb_hist.m.short_name
+    ), f"Mismatch in short_name of historical ({tb_hist.m.short_name}) and projection ({tb_proj.m.short_name})"
     key = tb_proj.m.short_name
 
     # Look for differences

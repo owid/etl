@@ -86,6 +86,6 @@ def _sanity_checks(tb: Table, ds_pop) -> None:
     # Actual sanity check: Ensure absolute values make sense (positive, lower than population)
     for col in columns_absolute:
         x = tb_.dropna(subset=[col])
-        assert all(x[col] < 0.2 * x["population"]), (
-            f"{col} contains values that might be too large (compared to population values)!"
-        )
+        assert all(
+            x[col] < 0.2 * x["population"]
+        ), f"{col} contains values that might be too large (compared to population values)!"

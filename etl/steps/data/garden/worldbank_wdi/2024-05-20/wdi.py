@@ -466,9 +466,7 @@ def add_variable_metadata(table: Table) -> Table:
 
         # load metadata created from raw source name
         clean_source = clean_source_mapping.get(source_raw_name)
-        assert clean_source, (
-            f'`rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
-        )
+        assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
 
         # create an origin with WDI source name as producer
         table[var_code].m.origins[0].producer = clean_source["name"]

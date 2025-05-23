@@ -32,12 +32,12 @@ def prepare_number_of_eggs(tb: Table) -> Table:
     tb = tb.loc[tb.groupby("year", as_index=True)["product"].transform("count") == 4 * 12, :].reset_index(drop=True)
 
     # Sanity checks.
-    assert tb.groupby(["month"], as_index=False).count()["product"].unique().tolist() == [4], (
-        "Expected 4 rows per month."
-    )
-    assert tb.groupby(["year"], as_index=False).count()["product"].unique().tolist() == [12 * 4], (
-        "Expected 12 months with 4 rows each per year."
-    )
+    assert tb.groupby(["month"], as_index=False).count()["product"].unique().tolist() == [
+        4
+    ], "Expected 4 rows per month."
+    assert tb.groupby(["year"], as_index=False).count()["product"].unique().tolist() == [
+        12 * 4
+    ], "Expected 12 months with 4 rows each per year."
 
     # Add data for hatching and table eggs for all months, to get the total number of hens and eggs per year.
     tb_total = (

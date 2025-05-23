@@ -96,9 +96,9 @@ def parse_oil_reserves(data: pr.ExcelFile) -> Table:
     tb = data.parse(sheet_name, skiprows=2)
 
     # Check that units are the expected ones.
-    assert tb.columns[0] == "Thousand million barrels", (
-        f"Units (or sheet format) may have changed in sheet {sheet_name}"
-    )
+    assert (
+        tb.columns[0] == "Thousand million barrels"
+    ), f"Units (or sheet format) may have changed in sheet {sheet_name}"
     # Check that zeroth column should correspond to countries.
     assert "Total World" in tb[tb.columns[0]].tolist()
 
@@ -367,9 +367,9 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, source: Source, lice
     # Find the row where that table starts.
     table_start_row = tb[tb.iloc[:, 0].astype(str).str.startswith("Year")].index
 
-    assert len(table_start_row) == 1, (
-        "Table of thermal equivalent efficiency factors not found, format may have changed."
-    )
+    assert (
+        len(table_start_row) == 1
+    ), "Table of thermal equivalent efficiency factors not found, format may have changed."
 
     # Select relevant rows and drop empty columns.
     tb = tb.iloc[table_start_row[0] :].dropna(axis=1, how="all").reset_index(drop=True)
@@ -397,15 +397,15 @@ def parse_thermal_equivalent_efficiency(data: pr.ExcelFile, source: Source, lice
     efficiency = pr.concat([older_efficiency, efficiency], ignore_index=True)
 
     # Sanity checks.
-    assert efficiency["year"].diff().dropna().unique().tolist() == [1], (
-        "Year columns for efficiency factors was not well extracted."
-    )
-    assert (efficiency["efficiency_factor"].diff().dropna() >= 0).all(), (
-        "Efficiency is expected to be monotonically increasing."
-    )
-    assert (efficiency["efficiency_factor"] > 0.35).all() & (efficiency["efficiency_factor"] < 0.5).all(), (
-        "Efficiency out of expected range."
-    )
+    assert efficiency["year"].diff().dropna().unique().tolist() == [
+        1
+    ], "Year columns for efficiency factors was not well extracted."
+    assert (
+        efficiency["efficiency_factor"].diff().dropna() >= 0
+    ).all(), "Efficiency is expected to be monotonically increasing."
+    assert (efficiency["efficiency_factor"] > 0.35).all() & (
+        efficiency["efficiency_factor"] < 0.5
+    ).all(), "Efficiency out of expected range."
 
     # Set an appropriate index and sort conveniently.
     efficiency = efficiency.set_index(["year"], verify_integrity=True).sort_index()

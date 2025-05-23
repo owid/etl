@@ -113,9 +113,9 @@ def run(dest_dir: str) -> None:
     if tb["country"].dtype.name != "category":
         tb["country"] = tb["country"].astype("category")
 
-    assert tb["country"].dtype.name == "category", (
-        "The 'country' column must be of type 'category for subsequent aggregations to be correct'"
-    )
+    assert (
+        tb["country"].dtype.name == "category"
+    ), "The 'country' column must be of type 'category for subsequent aggregations to be correct'"
 
     total_df["total_killed"] = tb.groupby(["country", "year"], observed=False)["nkill"].sum()
     total_df["total_wounded"] = tb.groupby(["country", "year"], observed=False)["nwound"].sum()

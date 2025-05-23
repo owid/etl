@@ -64,6 +64,6 @@ PR_CATEGORIES_CHOICES = [
     for k, v in PR_CATEGORIES.items()
 ]
 PR_CATEGORIES_CHOICES = sorted(PR_CATEGORIES_CHOICES, key=lambda x: x["shortcut_key"])
-assert len(set([x["shortcut_key"].lower() for x in PR_CATEGORIES_CHOICES])) == len(PR_CATEGORIES_CHOICES), (
-    "Shortcut keys must be unique"
-)
+assert len(set([x["shortcut_key"].lower() for x in PR_CATEGORIES_CHOICES])) == len(
+    PR_CATEGORIES_CHOICES
+), "Shortcut keys must be unique"

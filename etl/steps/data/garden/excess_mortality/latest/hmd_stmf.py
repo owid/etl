@@ -140,9 +140,9 @@ def add_uk(df: pd.DataFrame):
     # NOTE: this used to be
     #     df_uk[[col for col in column_years if col != THIS_YEAR]].isna().sum() < 20
     # but it started failing in 2024
-    assert (df_uk[[col for col in column_years if col <= 2023]].isna().sum() < 20).all(), (
-        "Too many missing values. Check values in year columns!"
-    )
+    assert (
+        df_uk[[col for col in column_years if col <= 2023]].isna().sum() < 20
+    ).all(), "Too many missing values. Check values in year columns!"
     # Group by and get sum
     df_uk = df_uk.groupby(["week", "age"], as_index=False)[column_years].sum(min_count=3)
     # Assign Entity name

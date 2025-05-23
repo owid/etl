@@ -54,9 +54,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Sanity check
-    assert (tb["agegrpspan"].isin([1, -1])).all() and (tb.loc[tb["agegrpspan"] == -1, "agegrpstart"] == 100).all(), (
-        "Age group span should always be of 1, except for 100+ (-1)"
-    )
+    assert (tb["agegrpspan"].isin([1, -1])).all() and (
+        tb.loc[tb["agegrpspan"] == -1, "agegrpstart"] == 100
+    ).all(), "Age group span should always be of 1, except for 100+ (-1)"
 
     # Rename columns, select columns
     tb = tb.rename(columns=COLUMNS_RENAME)
