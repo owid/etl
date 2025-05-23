@@ -207,9 +207,9 @@ class CollectionConfigExpander:
             # If table defines dimensions, use them instead!
             if self.tb_dims:
                 dimensions_tb = [str(d["slug"]) for d in self.tb_dims]
-                assert (
-                    set(dimensions) == set(dimensions_tb)
-                ), f"Dimensions in given table are not complete! Expected: {dimensions}, found: {dimensions_tb}. This might be due to some manual adjustments done to the metadata."
+                assert set(dimensions) == set(dimensions_tb), (
+                    f"Dimensions in given table are not complete! Expected: {dimensions}, found: {dimensions_tb}. This might be due to some manual adjustments done to the metadata."
+                )
                 dimensions = dimensions_tb
             else:
                 # If dimensions is None, use a list with all dimension names (in no particular order)
@@ -366,9 +366,9 @@ class CollectionConfigExpander:
             self.df_dims = self.df_dims.drop(columns=[self.indicators_slug])
 
         # Final checks
-        assert all(
-            isinstance(indicator_name, str) for indicator_name in self.indicator_names
-        ), "Class attribute indicator_names should be a list of string!"
+        assert all(isinstance(indicator_name, str) for indicator_name in self.indicator_names), (
+            "Class attribute indicator_names should be a list of string!"
+        )
         assert not self.df_dims.empty, "df_dims can't be empty!"
 
     def _build_df_dims(self, tb):

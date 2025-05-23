@@ -337,12 +337,12 @@ def match_ref_years(
     for y in [0, 1]:
         excluded_years_list = reference_years[reference_years_list[y]]["excluded_years"]
         if not excluded_years_list:
-            tb_match[f"excluded_years_{y+1}"] = "No"
+            tb_match[f"excluded_years_{y + 1}"] = "No"
         else:
-            tb_match[f"excluded_years_{y+1}"] = "Yes"
+            tb_match[f"excluded_years_{y + 1}"] = "Yes"
 
         maximum_distance = reference_years[reference_years_list[y]]["maximum_distance"]
-        tb_match[f"maximum_distance_{y+1}"] = maximum_distance
+        tb_match[f"maximum_distance_{y + 1}"] = maximum_distance
 
     # Replace only_all_series with a more descriptive name
     tb_match["only_all_series"] = tb_match["only_all_series"].replace({True: "Only countries in all sources"})

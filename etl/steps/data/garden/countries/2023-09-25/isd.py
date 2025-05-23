@@ -178,9 +178,9 @@ def create_table_countries_in_region(tb: Table) -> Table:
         .groupby("year")["number_countries"]
         .sum()
     )
-    assert (
-        sum_1 == sum_2
-    ).all(), f"The following equation should hold: ME + AFR = NAME + SSA, but {sum_1[sum_1 != sum_2]}"
+    assert (sum_1 == sum_2).all(), (
+        f"The following equation should hold: ME + AFR = NAME + SSA, but {sum_1[sum_1 != sum_2]}"
+    )
 
     # Get numbers for World
     tb_world = (

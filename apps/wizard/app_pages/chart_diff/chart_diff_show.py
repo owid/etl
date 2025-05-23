@@ -311,7 +311,7 @@ class ChartDiffShow:
                 )
 
         if len(self.diff.article_refs) > 0:
-            articles_md = "| Article Title | Daily Views |\n" "| --- | --- |\n" + "\n".join(
+            articles_md = "| Article Title | Daily Views |\n| --- | --- |\n" + "\n".join(
                 [f"| [{art.title}]({art.url}) | {art.views_daily_pretty} |" for art in self.diff.article_refs]
             )
             articles_md = f"\n\n{articles_md}"
@@ -373,9 +373,9 @@ class ChartDiffShow:
     def _show_metadata_diff_modal(self) -> None:
         """Show metadata diff in a modal page."""
         # Sanity checks
-        assert (
-            self.diff.is_modified
-        ), "Metadata diff should only be shown for modified charts! Please report this issue."
+        assert self.diff.is_modified, (
+            "Metadata diff should only be shown for modified charts! Please report this issue."
+        )
         assert self.diff.target_chart is not None, "Chart detected as modified but target_chart is None!"
 
         # Get indicator IDs from source & target
@@ -545,9 +545,9 @@ class ChartDiffShow:
         return config_ref, is_prod
 
     def _show_config_diff(self, config_ref, fromfile: str = "production") -> None:
-        assert (
-            self.diff.target_chart is not None
-        ), "We detected this diff to be a chart modification, but couldn't find target chart!"
+        assert self.diff.target_chart is not None, (
+            "We detected this diff to be a chart modification, but couldn't find target chart!"
+        )
 
         # config_1 = self.diff.target_chart.config
         config_2 = self.diff.source_chart.config

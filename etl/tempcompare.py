@@ -16,7 +16,7 @@ def get_list_description_with_max_length(items: List[Any], max_items: int = 20) 
     if len(items) > max_items:
         return (
             f"[{len(items)} items] "
-            + f'{", ".join(str(item) for item in items[:int(max_items/2)])} ... {", ".join(str(item) for item in items[-int(max_items/2):])}'
+            + f"{', '.join(str(item) for item in items[: int(max_items / 2)])} ... {', '.join(str(item) for item in items[-int(max_items / 2) :])}"
         )
     else:
         return ", ".join(str(item) for item in items)

@@ -204,9 +204,9 @@ def process_midb_table(tb: Table) -> Table:
     - Add regions
     """
     # Sanity checks
-    assert (
-        tb.groupby(["dispnum", "ccode", "styear", "endyear"]).size().max() == 1
-    ), "Multiple entries for a conflict-country-start_year-end_year"
+    assert tb.groupby(["dispnum", "ccode", "styear", "endyear"]).size().max() == 1, (
+        "Multiple entries for a conflict-country-start_year-end_year"
+    )
     assert tb["styear"].notna().all() and (tb["styear"] >= 0).all(), "NA values (or negative) found in `styear`"
     assert tb["endyear"].notna().all() and (tb["endyear"] >= 0).all(), "NA values (or negative) found in `endyear`"
 
@@ -256,9 +256,9 @@ def combine_tables(tb_a: Table, tb_b: Table) -> Table:
     dispnum_nans_unexpected = dispnum_nans_found - dispnum_nans_expected
     assert dispnum_nans_unexpected, f"Unexpected dispnum with NaN regions: {dispnum_nans_unexpected}"
     ## Sanity check (2)
-    assert (
-        tb_b[tb_b["dispnum"].isin(dispnum_nans_expected)].groupby("dispnum")["region"].nunique().max() == 1
-    ), f"More than one region for some dispnum in {dispnum_nans_expected}"
+    assert tb_b[tb_b["dispnum"].isin(dispnum_nans_expected)].groupby("dispnum")["region"].nunique().max() == 1, (
+        f"More than one region for some dispnum in {dispnum_nans_expected}"
+    )
     ## Actually fill NaNs
     tb.loc[tb["dispnum"] == 2044, "region"] = "Americas"
     tb.loc[tb["dispnum"] == 2328, "region"] = "Europe"
@@ -325,9 +325,9 @@ def _estimate_metrics_fatality(tb: Table) -> Table:
 
     We assign hostility="all".
     """
-    assert (
-        tb.groupby(["dispnum"])["fatality"].nunique().max() == 1
-    ), "The same conflict appears with multiple fatality levels!"
+    assert tb.groupby(["dispnum"])["fatality"].nunique().max() == 1, (
+        "The same conflict appears with multiple fatality levels!"
+    )
 
     # Operations to apply
     ops = {"dispnum": "nunique"}
@@ -374,9 +374,9 @@ def _estimate_metrics_hostility(tb: Table) -> Table:
 
 
 def _estimate_metrics_hostility_ongoing(tb: Table) -> Table:
-    assert (
-        tb.groupby(["dispnum"])["hostlev"].nunique().max() == 1
-    ), "The same conflict appears with multiple hostlev levels!"
+    assert tb.groupby(["dispnum"])["hostlev"].nunique().max() == 1, (
+        "The same conflict appears with multiple hostlev levels!"
+    )
 
     # Operations to apply
     ops = {"dispnum": "nunique"}
@@ -412,9 +412,9 @@ def _estimate_metrics_hostility_ongoing(tb: Table) -> Table:
 
 
 def _estimate_metrics_hostility_new(tb: Table) -> Table:
-    assert (
-        tb.groupby(["dispnum"])["hostlev"].nunique().max() == 1
-    ), "The same conflict appears with multiple hostlev levels!"
+    assert tb.groupby(["dispnum"])["hostlev"].nunique().max() == 1, (
+        "The same conflict appears with multiple hostlev levels!"
+    )
     # Operations to apply
     ops = {"dispnum": "nunique"}
 

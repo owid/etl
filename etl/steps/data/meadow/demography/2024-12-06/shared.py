@@ -101,9 +101,9 @@ def make_tables_from_scenario(tbs, scenario_num, tables_combine_edu, tables_conc
         # Check columns are in tables
         assert ("country" in tb.columns) and ("country_code" in tb.columns), "Missing country or country_code!"
         # Check there is a one-to-one correspondence
-        assert (
-            tb.groupby("country")["country_code"].nunique().max() == 1
-        ), "Multiple country codes for a single country!"
+        assert tb.groupby("country")["country_code"].nunique().max() == 1, (
+            "Multiple country codes for a single country!"
+        )
         # Drop country_code
         tb = tb.drop(columns="country_code")
         tables.append(tb)

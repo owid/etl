@@ -210,9 +210,9 @@ def convert_to_percentage(tb: Table) -> Table:
     # Dividing values of selected rows by 10
 
     selected_rows = tb["unit_of_measure"].isin(rate_conversions.keys())
-    assert all(
-        key in tb["unit_of_measure"].values for key in rate_conversions.keys()
-    ), "Not all keys are in tb['unit_of_measure']"
+    assert all(key in tb["unit_of_measure"].values for key in rate_conversions.keys()), (
+        "Not all keys are in tb['unit_of_measure']"
+    )
     tb.loc[selected_rows, ["observation_value", "lower_bound", "upper_bound"]] = tb.loc[
         selected_rows, ["observation_value", "lower_bound", "upper_bound"]
     ].div(10)

@@ -34,7 +34,7 @@ from etl.paths import DATA_DIR
 
 VariableMatcher = getattr(
     import_module(
-        f'etl.steps.data.garden.{Path(__file__).parent.as_posix().split("/grapher/")[1].replace("/", ".")}.wdi'
+        f"etl.steps.data.garden.{Path(__file__).parent.as_posix().split('/grapher/')[1].replace('/', '.')}.wdi"
     ),
     "VariableMatcher",
 )

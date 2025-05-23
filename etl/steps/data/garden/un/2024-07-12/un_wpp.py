@@ -339,14 +339,14 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb_total = tb_total.assign(age="all")
 
     # Get 5-year age groups from 0 to 100
-    age_group_mapping = {str(i): f"{i//5 * 5}-{i//5 * 5 + 4}" for i in range(0, 100, 1)}
+    age_group_mapping = {str(i): f"{i // 5 * 5}-{i // 5 * 5 + 4}" for i in range(0, 100, 1)}
     tb_5 = tb.copy()
     tb_5["age"] = tb_5["age"].map(age_group_mapping)
     tb_5 = cast(Table, tb_5.dropna(subset=["age"]))
     tb_5 = tb_5.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
 
     # Get 10-year age groups from 0 to 100
-    age_group_mapping = {str(i): f"{i//10 * 10}-{i//10 * 10 + 9}" for i in range(0, 100, 1)}
+    age_group_mapping = {str(i): f"{i // 10 * 10}-{i // 10 * 10 + 9}" for i in range(0, 100, 1)}
     tb_10 = tb.copy()
     tb_10["age"] = tb_10["age"].map(age_group_mapping)
     tb_10 = cast(Table, tb_10.dropna(subset=["age"]))
@@ -468,9 +468,9 @@ def process_fertility(tb: Table) -> Table:
     )
 
     # Drop 55-59 age group in fertility (is all zero!)
-    assert (
-        tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0
-    ).all(), "Unexpected non-zero fertility rate values for age group 55-59."
+    assert (tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0).all(), (
+        "Unexpected non-zero fertility rate values for age group 55-59."
+    )
     tb = tb.loc[tb["age"] != "55-59"]
 
     # Age as string
@@ -540,12 +540,12 @@ def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -
     # Sanity check
     if allowed_nans:
         for colname, num_nans in allowed_nans.items():
-            assert (
-                num_nans_real := tb[colname].isna().sum()
-            ) == num_nans, f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
-        assert (
-            tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None)
-        ), "Some NaNs detected"
+            assert (num_nans_real := tb[colname].isna().sum()) == num_nans, (
+                f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
+            )
+        assert tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None), (
+            "Some NaNs detected"
+        )
     else:
         assert tb.notna().all(axis=None), "Some NaNs detected"
 
@@ -613,7 +613,7 @@ def estimate_age_groups(tb: Table) -> Table:
 
     # 1/ Basic age groups
     age_map = {
-        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+        **{str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)},
         **{"100+": "100+"},
     }
     tb_basic = tb_.assign(age=tb_.age.map(age_map))
@@ -721,9 +721,9 @@ def add_population_change(tb: Table) -> Table:
     tb = tb.drop(columns=["population_2023"])
 
     # Sanity check
-    assert (years := set(tb.loc[tb[column_pop_change].isna()]["year"])) == {
-        1950
-    }, f"Other than year 1950 detected: {years}"
+    assert (years := set(tb.loc[tb[column_pop_change].isna()]["year"])) == {1950}, (
+        f"Other than year 1950 detected: {years}"
+    )
 
     return tb
 

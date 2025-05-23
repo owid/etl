@@ -280,9 +280,9 @@ def get_similarity_score(
             score["rel_error"] = round(df.loc[:, COLUMN_ABS_RELATIVE_ERROR].dropna().mean(), N_ROUND_DEC)
     if (COLUMN_LOG_ERROR not in df.columns) and (COLUMN_RELATIVE_ERROR not in df.columns):
         # Categorical values
-        assert (column_old is not None) and (
-            column_new is not None
-        ), "Need to provide column names for categorical values."
+        assert (column_old is not None) and (column_new is not None), (
+            "Need to provide column names for categorical values."
+        )
         score["rel_diff_error"] = (100 * ((df.loc[:, column_old] != df.loc[:, column_new]).astype(int).mean())).round(2)
         # num_diff = (df.loc[:, column_old] != df.loc[:, column_new]).sum()
         # score["num_diff"] = num_diff

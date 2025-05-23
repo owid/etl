@@ -88,9 +88,9 @@ def rename_and_create_columns(tb: Table) -> Table:
     """
     # Assert if all keys of dictionary are in the columns.
     assert set(INDICATOR_NAMES.keys()) == set(tb["measure"]), "Not all expected categories are in the measure column"
-    assert set(POVERTY_LINES.keys()) == set(
-        tb["poverty_line"]
-    ), "Not all expected categories are in the poverty_line column"
+    assert set(POVERTY_LINES.keys()) == set(tb["poverty_line"]), (
+        "Not all expected categories are in the poverty_line column"
+    )
     assert set(AGE_GROUPS.keys()) == set(tb["age"]), "Not all expected categories are in the age column"
 
     # Rename categories in measure, poverty_line and age columns.
@@ -183,7 +183,7 @@ def check_between_0_and_1(tb: Table, variables: List[str]) -> None:
         if not tb_error.empty:
             log.fatal(
                 f"""Values for {v} are not between 0 and 1:
-                {tabulate(tb_error[['country', 'year', 'poverty_line', 'age', v]], headers = 'keys', tablefmt = TABLEFMT)}"""
+                {tabulate(tb_error[["country", "year", "poverty_line", "age", v]], headers="keys", tablefmt=TABLEFMT)}"""
             )
 
     return None
@@ -207,7 +207,7 @@ def check_negative_values(tb: Table) -> None:
         if not tb_error.empty:
             log.fatal(
                 f"""{len(tb_error)} observations for {v} are negative:
-                {tabulate(tb_error[['country', 'year', 'poverty_line', 'age', v]], headers = 'keys', tablefmt = TABLEFMT)}"""
+                {tabulate(tb_error[["country", "year", "poverty_line", "age", v]], headers="keys", tablefmt=TABLEFMT)}"""
             )
 
     return None

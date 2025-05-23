@@ -412,7 +412,7 @@ def cli(
 
         # Add those files to `include` regex (use positive look-aheads to match on both)
         if include:
-            include = rf'(?=.*{include})(?=.*{"|".join(catalog_paths)})'
+            include = rf"(?=.*{include})(?=.*{'|'.join(catalog_paths)})"
         else:
             include = "|".join(catalog_paths)
 

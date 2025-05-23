@@ -55,9 +55,9 @@ def run(dest_dir: str) -> None:
     origins = tb["number"].metadata.origins
     tb = tb[(tb["cause"].isin(CAUSE_MAPPING.keys())) & (tb["age_group"] == "all ages") & (tb["sex"] == "Both sexes")]
     # Assert all the causes are included
-    assert len(tb["cause"].unique()) == len(
-        set(CAUSE_MAPPING.keys())
-    ), "Not all causes are included in the table, check spelling."
+    assert len(tb["cause"].unique()) == len(set(CAUSE_MAPPING.keys())), (
+        "Not all causes are included in the table, check spelling."
+    )
 
     tb = tb[["country", "year", "cause", "percentage_of_cause_specific_deaths_out_of_total_deaths"]]
 

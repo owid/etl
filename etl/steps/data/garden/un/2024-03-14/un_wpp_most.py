@@ -52,7 +52,7 @@ def create_ten_year_age_groups(tb: Table, origins: Any) -> Table:
     age_bands = []
     # Loop through a range with a step of 5, stopping before 100
     for i in range(20, 100, 10):
-        age_bands.append(f"{i}-{i+9}")
+        age_bands.append(f"{i}-{i + 9}")
     # Add the "100+" group at the end and 0-4 and 5-9 as 0-9 is not a group in the dataset
     age_bands = age_bands + ["100+", "0-4", "5-9", "10-14", "15-19"]
     # Filter the table to only include the age bands we want
@@ -83,7 +83,7 @@ def create_five_year_age_groups(tb: Table, origins: Any) -> Table:
     age_bands = []
     # Loop through a range with a step of 5, stopping before 100
     for i in range(0, 100, 5):
-        age_bands.append(f"{i}-{i+4}")
+        age_bands.append(f"{i}-{i + 4}")
     # Add the "100+" group at the end
     age_bands.append("100+")
     # Filter the table to only include the age bands we want
