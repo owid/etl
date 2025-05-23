@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import pyarrow
 import pyarrow.parquet as pq
-import rdata
+import pyreadr
 import structlog
 from pandas._typing import FilePath, ReadCsvBuffer, Scalar  # type: ignore
 from pandas.core.series import Series
@@ -1829,8 +1829,7 @@ def read_rda(
     origin: Origin | None = None,
     underscore: bool = False,
 ) -> Table:
-    parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
-    converted = rdata.conversion.convert(parsed)
+    converted = pyreadr.read_r(filepath_or_buffer)
 
     if table_name not in converted:
         raise ValueError(f"Table {table_name} not found in RDA file.")
@@ -1847,8 +1846,7 @@ def read_rda_multiple(
     underscore: bool = False,
 ) -> dict[str, Table]:
     # Read RData
-    parsed = rdata.parser.parse_file(filepath_or_buffer)  # type: ignore
-    converted = rdata.conversion.convert(parsed)
+    converted = pyreadr.read_r(filepath_or_buffer)
 
     # Init output dictionary
     tables = {}
@@ -1862,7 +1860,7 @@ def read_rda_multiple(
             # Load object
             table = converted[tname]
             # Check that object is a DataFrame (otherwise raise error!). NOTE: here we raise an error, bc user explicitly asked us to load this table.
-            if isinstance(table, pd.DataFrame):
+            if not isinstance(table, pd.DataFrame):
                 raise ValueError(f"Table {tname} is not a DataFrame.")
             # Parse object to Table, and add metadata
             table = Table(converted[tname], underscore=underscore)
@@ -1890,10 +1888,11 @@ def read_rds(
     origin: Origin | None = None,
     underscore: bool = False,
 ) -> Table:
-    parsed = rdata.parser.parse_file(filepath_or_buffer, extension="rds")  # type: ignore
-    converted = rdata.conversion.convert(parsed)
+    converted = pyreadr.read_r(filepath_or_buffer)
+    # For RDS files, pyreadr returns a dict with None as key
+    data = list(converted.values())[0]
 
-    table = Table(converted, underscore=underscore)
+    table = Table(data, underscore=underscore)
     table = _add_table_and_variables_metadata_to_table(table=table, metadata=metadata, origin=origin)
     return cast(Table, table)
 
