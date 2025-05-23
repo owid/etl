@@ -62,11 +62,17 @@
                     "description": "URL to the explorer thumbnail"
                 },
                 "subNavId": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "description": "ID of the subnav"
                 },
                 "subNavCurrentId": {
-                    "type": ["string", "null"],
+                    "type": [
+                        "string",
+                        "null"
+                    ],
                     "description": "Current ID in the subnav"
                 },
                 "hasMapTab": {
@@ -81,7 +87,9 @@
                     "oneOf": [
                         {
                             "type": "array",
-                            "items": { "type": "string" }
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     ],
                     "description": "Column slugs for the entity picker"
@@ -108,7 +116,7 @@
                 "type": "object",
                 "properties": {
                     "slug": {
-                        "type": "string"
+                        "$ref": "definitions.json#/slug"
                     },
                     "name": {
                         "type": "string"
@@ -122,7 +130,7 @@
                             "type": "object",
                             "properties": {
                                 "slug": {
-                                    "type": "string"
+                                    "$ref": "definitions.json#/slug"
                                 },
                                 "name": {
                                     "type": "string"
@@ -409,25 +417,52 @@
                             },
                             "yAxisMin": {
                                 "oneOf": [
-                                    { "type": "number" },
-                                    { "type": "string", "enum": ["auto"] }
+                                    {
+                                        "type": "number"
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "auto"
+                                        ]
+                                    }
                                 ],
                                 "description": "Minimum value for the Y axis, or 'auto' for automatic scaling"
                             },
                             "type": {
                                 "type": "string",
                                 "description": "Chart type (e.g., LineChart, ScatterPlot, etc.)",
-                                "enum": ["LineChart", "ScatterPlot", "StackedArea", "StackedBar", "DiscreteBar", "SlopeChart", "StackedDiscreteBar", "Marimekko"]
+                                "enum": [
+                                    "LineChart",
+                                    "ScatterPlot",
+                                    "StackedArea",
+                                    "StackedBar",
+                                    "DiscreteBar",
+                                    "SlopeChart",
+                                    "StackedDiscreteBar",
+                                    "Marimekko"
+                                ]
                             },
                             "facetYDomain": {
                                 "type": "string",
                                 "description": "How to handle y-axis domains in facets",
-                                "enum": ["independent", "shared"]
+                                "enum": [
+                                    "independent",
+                                    "shared"
+                                ]
                             },
                             "defaultView": {
                                 "oneOf": [
-                                    { "type": "boolean" },
-                                    { "type": "string", "enum": ["true", "false"] }
+                                    {
+                                        "type": "boolean"
+                                    },
+                                    {
+                                        "type": "string",
+                                        "enum": [
+                                            "true",
+                                            "false"
+                                        ]
+                                    }
                                 ],
                                 "description": "Whether this view should be the default"
                             }
@@ -464,18 +499,33 @@
                         "type": {
                             "type": "string",
                             "description": "The type of value to display",
-                            "enum": ["Integer", "Decimal", "Percentage", "String", "Ratio", "Numeric", "Currency", "Population"]
+                            "enum": [
+                                "Integer",
+                                "Decimal",
+                                "Percentage",
+                                "String",
+                                "Ratio",
+                                "Numeric",
+                                "Currency",
+                                "Population"
+                            ]
                         },
                         "tolerance": {
                             "type": "number",
                             "description": "Tolerance for data comparison"
                         },
                         "sourceName": {
-                            "type": ["string", "object"],
+                            "type": [
+                                "string",
+                                "object"
+                            ],
                             "description": "Name of the data source"
                         },
                         "additionalInfo": {
-                            "type": ["string", "object"],
+                            "type": [
+                                "string",
+                                "object"
+                            ],
                             "description": "Additional information about the indicator"
                         },
                         "colorScaleNumericMinValue": {
@@ -491,11 +541,17 @@
                             "description": "Semicolon-separated values defining bins for color scale"
                         },
                         "sourceLink": {
-                            "type": ["string", "object"],
+                            "type": [
+                                "string",
+                                "object"
+                            ],
                             "description": "Link to the data source"
                         },
                         "dataPublishedBy": {
-                            "type": ["string", "object"],
+                            "type": [
+                                "string",
+                                "object"
+                            ],
                             "description": "Organization that published the data"
                         },
                         "color": {
