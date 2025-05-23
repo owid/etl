@@ -337,6 +337,7 @@ class Collection(MDIMBase):
             # This is needed to activate file handler below. Unfortunately, fastjsonschema does not
             # support file references out of the box
             s = s.replace("dataset-schema.json#", "file://dataset-schema.json#")
+            s = s.replace("definitions.json#", "file://definitions.json#")
 
             schema = json.loads(s)
 
