@@ -845,7 +845,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.2.3" },
     { name = "pyarrow", specifier = ">=10.0.1" },
     { name = "pyyaml", specifier = ">=6.0.1" },
-    { name = "rdata", specifier = "==0.9" },
+    { name = "rdata", specifier = "==0.11.2" },
     { name = "requests", specifier = ">=2.26.0" },
     { name = "structlog", specifier = ">=21.5.0" },
     { name = "unidecode", specifier = ">=1.3.4" },
@@ -1468,16 +1468,17 @@ wheels = [
 
 [[package]]
 name = "rdata"
-version = "0.9"
+version = "0.11.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "pandas" },
+    { name = "typing-extensions" },
     { name = "xarray" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a2/56/fc193254273aa19bb17dbff29e1b16b28efcb317a3253dfe0cd280ea7d97/rdata-0.9.tar.gz", hash = "sha256:5e2c61aad1366be8c4363a0ae58fbcf6ec894dc1b861e80af713c0c38d1887ba", size = 21186 }
+sdist = { url = "https://files.pythonhosted.org/packages/47/07/97936fdd91fb71b4d48e0f72da65e35b40f992819ddf793abf390dc0f06e/rdata-0.11.2.tar.gz", hash = "sha256:86f50312f97569c656f01d6dc343b920ded0ccf884a31decfb670cbef80bab39", size = 38531 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fc/9b/ed2b7c25bc8eb173ed8a4906e4300401c4bebcadd7ac0f456e911eef8245/rdata-0.9-py3-none-any.whl", hash = "sha256:eec68fa652b2bbadadd81ee27f6e561b488c61d844b4a70482c160b311c5361d", size = 19696 },
+    { url = "https://files.pythonhosted.org/packages/df/0b/56f33362cb4e4319e7de8dff31ea1f27517df8f4087066bc946b2272324d/rdata-0.11.2-py3-none-any.whl", hash = "sha256:d819241bcec2aaaf5d267256cbdbcbe4fcbfae66b605e7a34980049f80521450", size = 46478 },
 ]
 
 [[package]]
