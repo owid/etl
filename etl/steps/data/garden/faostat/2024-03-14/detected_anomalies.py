@@ -368,7 +368,7 @@ class TeaProductionAnomaly(DataAnomaly):
             assert high_value / low_value > 3
 
     def inspect(self, tb):
-        log.info("The anomaly causes: \n* The production of tea to increase dramatically from 1990 to 1991.")
+        log.info("The anomaly causes: " "\n* The production of tea to increase dramatically from 1990 to 1991.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -419,7 +419,7 @@ class HighYieldAnomaly(DataAnomaly):
         ).all()
 
     def inspect(self, tb):
-        log.info("The anomaly causes: \n* The yield of certain items, countries and years to be unreasonably high.")
+        log.info("The anomaly causes: " "\n* The yield of certain items, countries and years to be unreasonably high.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -829,7 +829,7 @@ class MalaysiaHighMilkConsumption(DataAnomaly):
             assert value_after.item() > (10 * value_before.item())
 
     def inspect(self, tb):
-        log.info("The anomaly causes: \n* Milk consumption in Malaysia is unreasonably high after 2010.")
+        log.info("The anomaly causes: " "\n* Milk consumption in Malaysia is unreasonably high after 2010.")
         for element_code in self.affected_element_codes:
             selection = (tb["item_code"].isin(self.affected_item_codes)) & (tb["element_code"] == element_code)
             tb_affected = tb[selection].astype({"country": str}).sort_values(["country", "year"])

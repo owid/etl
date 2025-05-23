@@ -275,9 +275,9 @@ def var_metadata_income(var, wel, ext) -> VariableMeta:
     if var == "p0p100_avg" or var == "median":
         meta = VariableMeta(
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""{var_dict[var]["description"]}
+            description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]["description"]}
+            {inc_cons_dict[wel]['description']}
 
             {ppp_description}
 
@@ -293,9 +293,9 @@ def var_metadata_income(var, wel, ext) -> VariableMeta:
     else:
         meta = VariableMeta(
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""{var_dict[var]["description"]}
+            description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]["description"]}
+            {inc_cons_dict[wel]['description']}
 
             {additional_description}""",
             unit=var_dict[var]["unit"],
@@ -313,9 +313,9 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
     if var == "thr":
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""{var_dict[var]["description"]}
+            description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]["description"]}
+            {inc_cons_dict[wel]['description']}
 
             {ppp_description}
 
@@ -331,9 +331,9 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
     elif var == "avg":
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""{var_dict[var]["description"]}
+            description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]["description"]}
+            {inc_cons_dict[wel]['description']}
 
             {ppp_description}
 
@@ -350,9 +350,9 @@ def var_metadata_income_percentiles(var, wel, pct, ext) -> VariableMeta:
     else:
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}) ({extrapolation_dict[ext]})",
-            description=f"""{var_dict[var]["description"]}
+            description=f"""{var_dict[var]['description']}
 
-            {inc_cons_dict[wel]["description"]}
+            {inc_cons_dict[wel]['description']}
 
             {additional_description}""",
             unit=var_dict[var]["unit"],

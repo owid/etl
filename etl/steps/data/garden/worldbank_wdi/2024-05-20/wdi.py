@@ -501,17 +501,17 @@ def create_description(var: Dict[str, Any]) -> Optional[str]:
         desc += var["short_definition"]
 
     if pd.notnull(var["limitations_and_exceptions"]) and len(var["limitations_and_exceptions"].strip()) > 0:
-        desc += f"\n\nLimitations and exceptions: {var['limitations_and_exceptions']}"
+        desc += f'\n\nLimitations and exceptions: {var["limitations_and_exceptions"]}'
 
     if (
         pd.notnull(var["statistical_concept_and_methodology"])
         and len(var["statistical_concept_and_methodology"].strip()) > 0
     ):
-        desc += f"\n\nStatistical concept and methodology: {var['statistical_concept_and_methodology']}"
+        desc += f'\n\nStatistical concept and methodology: {var["statistical_concept_and_methodology"]}'
 
     # retrieves additional source info, if it exists.
     if pd.notnull(var["notes_from_original_source"]) and len(var["notes_from_original_source"].strip()) > 0:
-        desc += f"\n\nNotes from original source: {var['notes_from_original_source']}"
+        desc += f'\n\nNotes from original source: {var["notes_from_original_source"]}'
 
     desc = re.sub(r" *(\n+) *", r"\1", re.sub(r"[ \t]+", " ", desc)).strip()
 

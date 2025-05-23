@@ -21,12 +21,12 @@ def run(dest_dir: str) -> None:
         # Add the column names
         cols = [
             "country",
-            f"sales_for_food_producing_animals_{year - 1}",
+            f"sales_for_food_producing_animals_{year-1}",
             "sales_for_food_producing_animals",
-            f"pcu_{year - 1}",
+            f"pcu_{year-1}",
             "pcu",
             "percentage_change_pcu",
-            f"mg_per_pcu_{year - 1}",
+            f"mg_per_pcu_{year-1}",
             "mg_per_pcu",
             "percentage_change_mg_per_pcu",
             "year",
@@ -67,9 +67,9 @@ def run(dest_dir: str) -> None:
         # Drop columns that are not needed
         tb = tb.drop(
             columns=[
-                f"sales_for_food_producing_animals_{year - 1}",
-                f"pcu_{year - 1}",
-                f"mg_per_pcu_{year - 1}",
+                f"sales_for_food_producing_animals_{year-1}",
+                f"pcu_{year-1}",
+                f"mg_per_pcu_{year-1}",
             ]
         )
         # Combine tables

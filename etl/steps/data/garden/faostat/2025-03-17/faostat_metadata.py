@@ -351,7 +351,8 @@ def clean_global_items_table(tb_items: Table, tb_custom_items: Table) -> Table:
     ]
     if len(changed_descriptions) > 0:
         log.warning(
-            f"{len(changed_descriptions)} domains have changed item descriptions. Consider updating custom_items.csv."
+            f"{len(changed_descriptions)} domains have changed item descriptions. "
+            f"Consider updating custom_items.csv."
         )
 
     tb_items = tb_items.drop(columns="fao_item_description_old").rename(

@@ -140,7 +140,7 @@ for v in vars:
         for i in range(len(deciles)):
             if i <= 8:
                 col1 = f"{deciles[i]}_{m}_{v}"
-                col2 = f"{deciles[i + 1]}_{m}_{v}"
+                col2 = f"{deciles[i+1]}_{m}_{v}"
 
                 col_check = f"monotonicity_check_{i}"
                 check_vars.append(col_check)

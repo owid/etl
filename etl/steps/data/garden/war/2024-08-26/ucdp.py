@@ -988,7 +988,7 @@ def _add_missing_values(
     # I've soften the assertion, otherwise a bit of a pain!
     assert (
         (diff := gdf.shape[0] - gdf_match.shape[0]) <= num_missing_location
-    ), f"Unexpected number of events without exact coordinate match! {diff} < {num_missing_location} doesn't hold! ({diff - num_missing_location} off)"
+    ), f"Unexpected number of events without exact coordinate match! {diff} < {num_missing_location} doesn't hold! ({diff-num_missing_location} off)"
     # DEBUG: Examine which are these unlabeled conflicts
     # mask = ~tb["relid"].isin(gdf_match["relid"])
     # tb.loc[mask, ["relid", "year", "conflict_name", "side_a", "side_b", "best"]]

@@ -180,16 +180,16 @@ def create_above_and_between_vars(tb: Table, poverty_lines: list, smooth_suffix:
         # For each poverty line in cols_wb
         for i in range(len(poverty_lines)):
             if i != 0:
-                tb[f"headcount_ratio_between_{poverty_lines[i - 1]}_{poverty_lines[i]}{smooth}"] = (
+                tb[f"headcount_ratio_between_{poverty_lines[i-1]}_{poverty_lines[i]}{smooth}"] = (
                     tb[f"headcount_ratio_{poverty_lines[i]}{smooth}"]
-                    - tb[f"headcount_ratio_{poverty_lines[i - 1]}{smooth}"]
+                    - tb[f"headcount_ratio_{poverty_lines[i-1]}{smooth}"]
                 )
-                cols_between.append(f"headcount_ratio_between_{poverty_lines[i - 1]}_{poverty_lines[i]}{smooth}")
+                cols_between.append(f"headcount_ratio_between_{poverty_lines[i-1]}_{poverty_lines[i]}{smooth}")
 
-                tb[f"headcount_between_{poverty_lines[i - 1]}_{poverty_lines[i]}{smooth}"] = (
-                    tb[f"headcount_ratio_between_{poverty_lines[i - 1]}_{poverty_lines[i]}{smooth}"] * tb["pop"] / 100
+                tb[f"headcount_between_{poverty_lines[i-1]}_{poverty_lines[i]}{smooth}"] = (
+                    tb[f"headcount_ratio_between_{poverty_lines[i-1]}_{poverty_lines[i]}{smooth}"] * tb["pop"] / 100
                 )
-                cols_number_between.append(f"headcount_between_{poverty_lines[i - 1]}_{poverty_lines[i]}{smooth}")
+                cols_number_between.append(f"headcount_between_{poverty_lines[i-1]}_{poverty_lines[i]}{smooth}")
 
     # Round to integer numbers
     tb[cols_number + cols_number_above + cols_number_between] = tb[

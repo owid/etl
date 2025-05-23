@@ -366,7 +366,7 @@ def var_metadata_income(var, origins, wel, ext) -> VariableMeta:
             description_key=[PPP_DESCRIPTION] + description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
-{EXTRAPOLATION_DICT[ext]["description"]}""",
+{EXTRAPOLATION_DICT[ext]['description']}""",
             unit=VAR_DICT[var]["unit"],
             short_unit=VAR_DICT[var]["short_unit"],
             origins=origins,
@@ -379,7 +379,7 @@ def var_metadata_income(var, origins, wel, ext) -> VariableMeta:
             description_key=description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
-{EXTRAPOLATION_DICT[ext]["description"]}""",
+{EXTRAPOLATION_DICT[ext]['description']}""",
             unit=VAR_DICT[var]["unit"],
             short_unit=VAR_DICT[var]["short_unit"],
             origins=origins,
@@ -408,7 +408,7 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
             description_key=[PPP_DESCRIPTION] + description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
-{EXTRAPOLATION_DICT[ext]["description"]}""",
+{EXTRAPOLATION_DICT[ext]['description']}""",
             unit=VAR_DICT[var]["unit"],
             short_unit=VAR_DICT[var]["short_unit"],
             origins=origins,
@@ -421,7 +421,7 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
             description_key=[PPP_DESCRIPTION] + description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
-{EXTRAPOLATION_DICT[ext]["description"]}""",
+{EXTRAPOLATION_DICT[ext]['description']}""",
             unit=VAR_DICT[var]["unit"],
             short_unit=VAR_DICT[var]["short_unit"],
             origins=origins,
@@ -435,7 +435,7 @@ def var_metadata_income_percentiles(var, origins, wel, pct, ext) -> VariableMeta
             description_key=description_welfare_list,
             description_processing=f"""{PROCESSING_DESCRIPTION}
 
-{EXTRAPOLATION_DICT[ext]["description"]}""",
+{EXTRAPOLATION_DICT[ext]['description']}""",
             unit=VAR_DICT[var]["unit"],
             short_unit=VAR_DICT[var]["short_unit"],
             origins=origins,
@@ -465,7 +465,7 @@ def var_metadata_income_relative(var, origins, wel, rel, ext) -> VariableMeta:
 
 {RELATIVE_POVERTY_DESCRIPTION}
 
-{EXTRAPOLATION_DICT[ext]["description"]}""",
+{EXTRAPOLATION_DICT[ext]['description']}""",
         unit=VAR_DICT[var]["unit"],
         short_unit=VAR_DICT[var]["short_unit"],
         origins=origins,

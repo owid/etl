@@ -339,14 +339,14 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     tb_total = tb_total.assign(age="all")
 
     # Get 5-year age groups from 0 to 100
-    age_group_mapping = {str(i): f"{i // 5 * 5}-{i // 5 * 5 + 4}" for i in range(0, 100, 1)}
+    age_group_mapping = {str(i): f"{i//5 * 5}-{i//5 * 5 + 4}" for i in range(0, 100, 1)}
     tb_5 = tb.copy()
     tb_5["age"] = tb_5["age"].map(age_group_mapping)
     tb_5 = cast(Table, tb_5.dropna(subset=["age"]))
     tb_5 = tb_5.groupby(COLUMNS_INDEX, as_index=False, observed=True)["deaths"].sum()
 
     # Get 10-year age groups from 0 to 100
-    age_group_mapping = {str(i): f"{i // 10 * 10}-{i // 10 * 10 + 9}" for i in range(0, 100, 1)}
+    age_group_mapping = {str(i): f"{i//10 * 10}-{i//10 * 10 + 9}" for i in range(0, 100, 1)}
     tb_10 = tb.copy()
     tb_10["age"] = tb_10["age"].map(age_group_mapping)
     tb_10 = cast(Table, tb_10.dropna(subset=["age"]))
@@ -613,7 +613,7 @@ def estimate_age_groups(tb: Table) -> Table:
 
     # 1/ Basic age groups
     age_map = {
-        **{str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)},
+        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
         **{"100+": "100+"},
     }
     tb_basic = tb_.assign(age=tb_.age.map(age_map))

@@ -117,7 +117,7 @@ def get_tfr_estimation(tb_b, tb_p):
     tb_b = tb_b.loc[tb_b["sex"] == "total", ["country", "year", "births"]]
 
     ## Get female population aged 15-49
-    ages = {f"{a}-{a + 4}" for a in range(15, 50, 5)}
+    ages = {f"{a}-{a+4}" for a in range(15, 50, 5)}
     tb_p = tb_p.loc[(tb_p["sex"] == "female") & tb_p.age.isin(ages)]
     ## sanity check
     x = tb_p.groupby(["country", "year"]).agg({"age": ("unique", "nunique")})
