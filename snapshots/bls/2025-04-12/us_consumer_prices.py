@@ -27,7 +27,7 @@ KEY = os.getenv("US_BLS_API_KEY")
 SERIES_IDS = [
     "CUUR0000SEEB01",  # College tuition fees
     "CUUR0000SAE1",  # Education aggregate
-    "CUUR0000SEEB",  # Tuition, other school fees, and childcare
+    "CUUR0000SEEB03",  # Day care and preschool
     "CUUR0000SAM",  # Medical care
     "CUUR0000SAH21",  # Household energy
     "CUUR0000SAH",  # Housing

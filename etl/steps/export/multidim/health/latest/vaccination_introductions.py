@@ -36,7 +36,6 @@ def run() -> None:
     # Create and save collection
     c = paths.create_collection(
         config=config,
-        short_name="mdd-vaccination-introductions-who",
         tb=tb,
         indicator_names=["intro"],
         dimensions=["description"],

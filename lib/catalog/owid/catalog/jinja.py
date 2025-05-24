@@ -1,6 +1,6 @@
 from dataclasses import is_dataclass
 from functools import lru_cache
-from typing import Any, Dict, Optional, Union
+from typing import Any
 
 import jinja2
 import structlog
@@ -30,7 +30,7 @@ def raise_helper(msg):
 jinja_env.globals["raise"] = raise_helper
 
 
-def _uses_jinja(text: Optional[str]):
+def _uses_jinja(text: str | None):
     """Check if a string uses Jinja templating."""
     if not text:
         return False
@@ -42,7 +42,7 @@ def _cached_jinja_template(text: str) -> jinja2.environment.Template:
     return jinja_env.from_string(text)
 
 
-def _expand_jinja_text(text: str, dim_dict: Dict[str, str], remove_dods: bool = False) -> Union[str, bool]:
+def _expand_jinja_text(text: str, dim_dict: dict[str, str], remove_dods: bool = False) -> str | bool:
     if not _uses_jinja(text):
         out = text
     else:
@@ -67,7 +67,7 @@ def _expand_jinja_text(text: str, dim_dict: Dict[str, str], remove_dods: bool = 
     return out
 
 
-def _expand_jinja(obj: Any, dim_dict: Dict[str, str], **kwargs) -> Any:
+def _expand_jinja(obj: Any, dim_dict: dict[str, str], **kwargs) -> Any:
     """Expand Jinja in all metadata fields. This modifies the original object in place."""
     if obj is None:
         return None

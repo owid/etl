@@ -76,7 +76,7 @@ STOCK_ITEM_CODES = {
     "00001107": "donkeys",  # Asses
     "00001110": "mules",  # Mules and hinnies
     "00001140": "rabbits",  # Rabbits
-    "00001181": "bees",  # Bees
+    # "00001181": "bees",  # Bees
     "00001126": "camels",  # Camels
     "00001072": "geese",  # Geese
     "00001150": "other rodents",  # Other rodents
@@ -255,7 +255,7 @@ def improve_metadata(tb, tb_qcl_flat):
         tb[column].metadata.unit = """animals<% if per_capita == True %> per person<% endif %>"""
         tb[column].metadata.short_unit = ""
         if "_alive" in column:
-            title = """Live << animal >> raised for meat<% if per_capita == True %> per person<% endif %>"""
+            title = """Live << animal >><% if per_capita == True %> per person<% endif %>"""
             tb[
                 column
             ].metadata.description_short = """Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year."""

@@ -37,28 +37,33 @@ def run(dest_dir: str) -> None:
     # Load meadow dataset.
     ds_ucdp = paths.load_dataset("ucdp")
     # Read table from meadow dataset.
-    tb_ucdp = ds_ucdp["ucdp"].reset_index()
+    tb_ucdp = ds_ucdp.read("ucdp")
     # tb_ucdp_countries = ds_ucdp["ucdp_country"].reset_index()
 
     # Load meadow dataset.
     ds_prio = paths.load_dataset("prio_v31")
     # Read table from meadow dataset.
-    tb_prio = ds_prio["prio_v31"].reset_index()
+    tb_prio = ds_prio.read("prio_v31")
     # tb_prio_countries = ds_prio["prio_v31_country"].reset_index()
 
     # Read table from COW codes
     ds_gw = paths.load_dataset("gleditsch")
-    tb_regions = ds_gw["gleditsch_regions"].reset_index()
+    tb_regions = ds_gw.read("gleditsch_regions")
 
     #
     # Process data.
     #
     ## Remove suffix (PRIO) or (UCDP/PRIO)
+    tb_ucdp = tb_ucdp.rename(columns={"country": "region"})
     tb_ucdp["region"] = tb_ucdp["region"].str.replace(r" \(.+\)", "", regex=True)
     tb_prio["region"] = tb_prio["region"].str.replace(r" \(.+\)", "", regex=True)
 
     ## In PRIO, change conflict_type 'all' to 'state-based'
     tb_prio["conflict_type"] = tb_prio["conflict_type"].replace({"all": "state-based"})
+
+    # Remove country data in UCDP
+    regions = set(tb_prio["region"].unique())
+    tb_ucdp = tb_ucdp.loc[tb_ucdp["region"].isin(regions)]
 
     # Sanity checks
     assert set(tb_ucdp["region"]) == set(tb_prio["region"]), "Missmatch in regions between UCDP and PRIO"
@@ -83,7 +88,7 @@ def run(dest_dir: str) -> None:
     tb = add_indicators_extra(
         tb,
         tb_regions,
-        columns_conflict_mortality=[
+        columns_conflict_deaths=[
             "number_deaths_ongoing_conflicts",
             "number_deaths_ongoing_conflicts_high",
             "number_deaths_ongoing_conflicts_low",

@@ -1,0 +1,56 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Nuclear Weapons
+        - War & Peace
+    processing_level: major
+    unit: ""
+    short_unit: ""
+    description_key:
+      - A country is classified as not considering nuclear weapons if it neither considers, pursues, or possesses nuclear weapons.
+      - A country is classified as considering nuclear weapons if its leaders explore whether it is possible and desirable for them to attempt to acquire nuclear weapons, or they work to increase their nuclear weapons capabilities, but without launching a dedicated program.
+      - A country is classified as pursuing nuclear weapons if it has an active program to acquire nuclear weapons or to obtain the ability to construct them on short notice.
+      - A country is classified as possessing nuclear weapons if it has a nuclear-explosive device that it can deliver. Conducting an explosive nuclear test is therefore neither sufficient nor necessary.
+      - Belarus, Kazakhstan, and Ukraine are not classified as possessing nuclear weapons because they never had operational control of the nuclear weapons left over from the Soviet Union.
+    description_processing: |-
+      - The information on the number and status of nuclear weapons was manually extracted from Bleek (2017). For recent years, the data has been double-checked with information from the Nuclear Threat Initiative.
+    display:
+      numDecimalPlaces: 0
+
+dataset:
+  update_period_days: 365
+  title: Nuclear Weapons Proliferation
+
+tables:
+  nuclear_weapons_proliferation:
+    variables:
+      status:
+        title: Nuclear weapons status
+        description_short: Whether a country does not consider (0), considers (1), pursues (2), or possesses (3) nuclear weapons.
+  nuclear_weapons_proliferation_counts:
+    variables:
+      n_countries_not_considering:
+        title: Number of countries not considering nuclear weapons
+        display:
+          name: Not considering
+        presentation:
+          title_public: Number of countries not considering nuclear weapons
+      n_countries_considering:
+        title: Number of countries considering nuclear weapons
+        display:
+          name: Considering
+        presentation:
+          title_public: Number of countries considering nuclear weapons
+      n_countries_pursuing:
+        title: Number of countries pursuing nuclear weapons
+        display:
+          name: Pursuing
+        presentation:
+          title_public: Number of countries pursuing nuclear weapons
+      n_countries_possessing:
+        title: Number of countries possessing nuclear weapons
+        display:
+          name: Possessing
+        presentation:
+          title_public: Number of countries possessing nuclear weapons

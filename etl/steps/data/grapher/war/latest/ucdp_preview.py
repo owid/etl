@@ -1,12 +1,12 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -14,12 +14,10 @@ def run(dest_dir: str) -> None:
     ds_garden = paths.load_dataset("ucdp_preview")
 
     # Read table from garden dataset.
-    tb = ds_garden["ucdp_preview"]
+    tb = ds_garden.read("ucdp_preview")
 
     # Process data.
     #
-    # Rename index column `region` to `country`.
-    tb = tb.reset_index().rename(columns={"region": "country"})
     # Remove suffixes in region names
     tb["country"] = tb["country"].str.replace(r" \(.+\)", "", regex=True)
     # Set index
@@ -39,8 +37,10 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_garden.metadata
+    ds_grapher = paths.create_dataset(
+        tables=tables,
+        check_variables_metadata=True,
+        default_metadata=ds_garden.metadata,
     )
 
     # Remove source description so that it doesn't get appended to the dataset description.

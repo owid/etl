@@ -1,6 +1,6 @@
 import contextlib
 import warnings
-from typing import Iterable
+from collections.abc import Iterable
 from warnings import catch_warnings, simplefilter, warn  # noqa: F401
 
 import structlog

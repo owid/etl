@@ -1,0 +1,22 @@
+title:
+  title: Perception of corruption
+  title_variant: by institution
+default_selection:
+  - World
+  - Europe
+  - Asia
+  - Oceania
+  - North America
+  - South America
+  - Africa
+dimensions:
+  - slug: institution
+    name: Institution
+    choices:
+      - slug: "side_by_side"
+        name: Comparison of all institutions
+        description: See all institutions side by side
+  - slug: answer
+    name: Answer
+
+views: []

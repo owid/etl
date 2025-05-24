@@ -3,3 +3,9 @@
 
 class DuplicateCollectionViews(Exception):
     pass
+
+
+class ParamKeyError(KeyError):
+    """Raised when a placeholder is not found in `params`."""
+
+    pass

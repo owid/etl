@@ -1,0 +1,23 @@
+meta:
+  origin:
+    producer: United Nations Office on Drugs and Crime
+    title: Access and Functioning of Justice
+    description: |-
+      The tables on access and functioning of justice include national figures on persons suspected/arrested/cautioned, persons prosecuted, and persons convicted for all crimes and for selected crimes. They also include data on persons brought before criminal court by type of legal representation.
+
+      National data is submitted by Member States to UNODC through the United Nations Survey of Crime Trends and Operations of Criminal Justice Systems (UN-CTS) or other means.
+    citation_full: UNODC (2024), UNODC Research - Data Portal – Access and functioning of justice. https://dataunodc.un.org/dp-cjs-persons-convicted (Accessed on 09 May 2025).
+    attribution_short: UNODC
+
+    url_main: https://dataunodc.un.org/dp-cjs-persons-convicted
+    url_download: https://dataunodc.un.org/sites/dataunodc.un.org/files/data_cts_access_and_functioning_of_justice.xlsx
+    date_accessed: '2025-05-12'
+    date_published: '2024-05-16'
+
+    license:
+      name: CC BY 3.0 IGO
+      url: https://dataunodc.un.org/termsofuse#:~:text=Neither%20the%20United%20Nations%20nor,or%20for%20its%20timeliness%20or
+outs:
+  - md5: 6e1b57c75bfa6d061baad0450a430ae3
+    size: 4947528
+    path: justice.xlsx

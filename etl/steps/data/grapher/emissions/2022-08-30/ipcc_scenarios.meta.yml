@@ -1,0 +1,568 @@
+definitions:
+  common:
+    display:
+      entityAnnotationsMap: |-
+        SSP1 - 1.9: Sustainability - Taking the Green Road
+        SSP1 - 2.6: Sustainability - Taking the Green Road
+        SSP1 - 3.4: Sustainability - Taking the Green Road
+        SSP1 - 4.5: Sustainability - Taking the Green Road
+        SSP1 - Baseline: Sustainability - Taking the Green Road
+        SSP2 - 1.9: Middle of the Road
+        SSP2 - 2.6: Middle of the Road
+        SSP2 - 3.4: Middle of the Road
+        SSP2 - 4.5: Middle of the Road
+        SSP2 - 6.0: Middle of the Road
+        SSP2 - Baseline: Middle of the Road
+        SSP3 - 3.4: Regional Rivalry - A Rocky Road
+        SSP3 - 4.5: Regional Rivalry - A Rocky Road
+        SSP3 - 6.0: Regional Rivalry - A Rocky Road
+        SSP3 - Baseline: Regional Rivalry - A Rocky Road
+        SSP4 - 2.6: Inequality - A Road Divided
+        SSP4 - 3.4: Inequality - A Road Divided
+        SSP4 - 4.5: Inequality - A Road Divided
+        SSP4 - 6.0: Inequality - A Road Divided
+        SSP4 - Baseline: Inequality - A Road Divided
+        SSP5 - 1.9: Fossil-fueled Development - Taking the Highway
+        SSP5 - 2.6: Fossil-fueled Development - Taking the Highway
+        SSP5 - 3.4: Fossil-fueled Development - Taking the Highway
+        SSP5 - 4.5: Fossil-fueled Development - Taking the Highway
+        SSP5 - 6.0: Fossil-fueled Development - Taking the Highway
+        SSP5 - Baseline: Fossil-fueled Development - Taking the Highway
+tables:
+  ipcc_scenarios:
+    variables:
+      gdp_per_capita:
+        title: GDP per capita
+        unit: $
+        short_unit: $
+      gdp:
+        title: GDP
+        unit: 2005 US$
+        short_unit: $
+      econ_consumption_dollars:
+        title: Economic consumption ($)
+        unit: 2005 US$
+        short_unit: $
+      econ_consumption_per_capita:
+        title: Economic consumption per capita
+        unit: 2005 US$
+        short_unit: $
+      population:
+        title: Population
+        unit: people
+      temp:
+        title: Temperature
+        unit: °C
+        short_unit: °C
+      forcing:
+        title: Radiative forcing
+        unit: watts per meter squared
+        short_unit: W/m²
+      forcing_co2:
+        title: Radiative forcing (CO2)
+        unit: watts per meter squared
+        short_unit: W/m²
+      forcing_ch4:
+        title: Radiative forcing (methane)
+        unit: watts per meter squared
+        short_unit: W/m²
+      forcing_n2o:
+        title: Radiative forcing (nitrous oxide)
+        unit: watts per meter squared
+        short_unit: W/m²
+      forcing_fgases:
+        title: Radiative forcing (f-gases)
+        unit: watts per meter squared
+        short_unit: W/m²
+      forcing_aerosol:
+        title: Radiative forcing (aerosols)
+        unit: watts per meter squared
+        short_unit: W/m²
+      concentration_co2:
+        title: CO2 concentration
+        unit: parts per million
+        short_unit: ppm
+      concentration_ch4:
+        title: Methane concentration
+        unit: parts per billion
+        short_unit: ppb
+      concentration_n2o:
+        title: Nitrous oxide concentration
+        unit: parts per billion
+        short_unit: ppb
+      emissions_co2:
+        title: CO2 emissions
+        unit: tonnes
+        short_unit: t
+      co2_per_capita:
+        title: CO2 emissions per capita
+        unit: tonnes per person
+        short_unit: t
+      emissions_ch4:
+        title: Methane emissions
+        unit: tonnes
+        short_unit: t
+      ch4_per_capita:
+        title: Methane emisisons per capita
+        unit: tonnes per person
+        short_unit: t
+      emissions_n2o:
+        title: Nitrous oxide emissions
+        unit: tonnes
+        short_unit: t
+      n2o_per_capita:
+        title: Nitrous oxide emissions per capita
+        unit: tonnes per person
+        short_unit: t
+      emissions_fgas:
+        title: F-gas emissions
+        unit: tonnes
+        short_unit: t
+      emissions_sulfur:
+        title: Sulfur emissions
+        unit: tonnes
+        short_unit: t
+      emissions_blackcarbon:
+        title: Black carbon emissions
+        unit: tonnes
+        short_unit: t
+      emissions_nox:
+        title: NOx emissions
+        unit: tonnes
+        short_unit: t
+      emissions_voc:
+        title: VOC emissions
+        unit: tonnes
+        short_unit: t
+      carbon_price:
+        title: Carbon price
+        unit: 2005 US$ per tonne
+        short_unit: $
+      carbon_intensity_economy:
+        title: Carbon intensity of economy
+        unit: kgCO2 per $
+        short_unit: kg
+      carbon_intensity_energy:
+        title: Carbon intensity of energy
+        unit: kgCO2 per kWh
+        short_unit: kg
+      primary_final_efficiency:
+        title: Final energy as a share of primary energy
+        unit: '%'
+        short_unit: '%'
+      final_energy:
+        title: Final energy
+        unit: terawatt-hours
+        short_unit: TWh
+      final_energy_per_capita:
+        title: Final energy per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+      energy_intensity_final:
+        title: Final energy intensity
+        unit: kWh per $
+        short_unit: kWh
+      electricity_per_capita:
+        title: Electricity per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+      final_energy_elec:
+        title: Final energy (electricity)
+        unit: terawatt-hours
+        short_unit: TWh
+      heat_per_capita:
+        title: Final heat per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+      final_energy_heat:
+        title: Final energy (heat)
+        unit: terawatt-hours
+        short_unit: TWh
+      industry_per_capita:
+        title: Final industry per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+      final_energy_industry:
+        title: Final energy (industry)
+        unit: terawatt-hours
+        short_unit: TWh
+      transport_per_capita:
+        title: Final transport per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+      final_energy_transport:
+        title: Final energy (transport)
+        unit: terawatt-hours
+        short_unit: TWh
+      final_energy_residentialcommercial:
+        title: Final energy (residential/commercial)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec:
+        title: Secondary electricity
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_elec_per_capita:
+        title: Secondary electricity per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+      secondary_energy_elec_coal:
+        title: Secondary electricity (coal)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_coal_ccs:
+        title: Secondary electricity (coal CCS)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_gas:
+        title: Secondary electricity (gas)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_gas_ccs:
+        title: Secondary electricity (gas CCS)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_oil:
+        title: Secondary electricity (oil)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_nuclear:
+        title: Secondary electricity (nuclear)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_biomass:
+        title: Secondary electricity (biomass)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_biomass_ccs:
+        title: Secondary electricity (biomass CCS)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_nonbiorenewables:
+        title: Secondary electricity (renewables excl. bio)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_hydro:
+        title: Secondary electricity (hydro)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_solar:
+        title: Secondary electricity (solar)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_wind:
+        title: Secondary electricity (wind)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_geothermal:
+        title: Secondary electricity (geothermal)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_heat:
+        title: Secondary energy (heat)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_heat_per_capita:
+        title: Secondary heat per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+      secondary_energy_gas:
+        title: Secondary energy (gas)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_oil:
+        title: Secondary energy (oil)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_hydrogen:
+        title: Secondary energy (hydrogen)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_liquid_biofuel:
+        title: Secondary energy (biofuels)
+        unit: terawatt-hours
+        short_unit: TWh
+      secondary_energy_elec_biomass_share:
+        title: Secondary electricity (%, biomass)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_biomass_ccs_share:
+        title: Secondary electricity (%, biomass CCS)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_coal_share:
+        title: Secondary electricity (%, coal)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_coal_ccs_share:
+        title: Secondary electricity (%, coal CCS)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_gas_share:
+        title: Secondary electricity (%, gas)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_gas_ccs_share:
+        title: Secondary electricity (%, gas CCS)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_geothermal_share:
+        title: Secondary electricity (%, geothermal)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_hydro_share:
+        title: Secondary electricity (%, hydro)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_nonbiorenewables_share:
+        title: Secondary electricity (%, renewables excl. bio)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_nuclear_share:
+        title: Secondary electricity (%, nuclear)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_oil_share:
+        title: Secondary electricity (%, oil)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_solar_share:
+        title: Secondary electricity (%, solar)
+        unit: '%'
+        short_unit: '%'
+      secondary_energy_elec_wind_share:
+        title: Secondary electricity (%, wind)
+        unit: '%'
+        short_unit: '%'
+      primary_energy:
+        title: Primary energy
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_per_capita:
+        title: Primary energy per capita
+        unit: kilowatt-hours
+        short_unit: kWh
+      energy_intensity_primary:
+        title: Primary energy intensity
+        unit: kWh per $
+        short_unit: kWh
+      primary_energy_coal:
+        title: Primary energy (coal)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_coal_ccs:
+        title: Primary energy (coal, CCS)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_oil:
+        title: Primary energy (oil)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_oil_ccs:
+        title: Primary energy (oil, CCS)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_gas:
+        title: Primary energy (gas)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_gas_ccs:
+        title: Primary energy (gas, CCS)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_fossil:
+        title: Primary energy (fossil)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_fossil_ccs:
+        title: Primary energy (fossil, CCS)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_nuclear:
+        title: Primary energy (nuclear)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_solar:
+        title: Primary energy (solar)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_wind:
+        title: Primary energy (wind)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_hydro:
+        title: Primary energy (hydro)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_geothermal:
+        title: Primary energy (geothermal)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_biomass:
+        title: Primary energy (biomass)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_biomass_ccs:
+        title: Primary energy (biomass, CCS)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_tradbiomass:
+        title: Primary energy (trad biomass)
+        unit: terawatt-hours
+        short_unit: TWh
+      primary_energy_share_coal:
+        title: Primary energy (%, coal)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_coal_ccs:
+        title: Primary energy (%, coal CCS)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_oil:
+        title: Primary energy (%, oil)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_oil_ccs:
+        title: Primary energy (%, oil CCS)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_gas:
+        title: Primary energy (%, gas)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_gas_ccs:
+        title: Primary energy (%, gas CCS)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_fossil:
+        title: Primary energy (%, fossil)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_nuclear:
+        title: Primary energy (%, nuclear)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_solar:
+        title: Primary energy (%, solar)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_wind:
+        title: Primary energy (%, wind)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_hydro:
+        title: Primary energy (%, hydro)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_geothermal:
+        title: Primary energy (%, geothermal)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_biomass:
+        title: Primary energy (%, biomass)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_biomass_ccs:
+        title: Primary energy (%, biomass CCS)
+        unit: '%'
+        short_unit: '%'
+      primary_energy_share_tradbiomass:
+        title: Primary energy (%, trad biomass)
+        unit: '%'
+        short_unit: '%'
+      elec_capacity:
+        title: Electricity capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_biomass:
+        title: Biomass capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_coal:
+        title: Coal capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_gas:
+        title: Gas capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_oil:
+        title: Oil capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_nuclear:
+        title: Nuclear capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_hydro:
+        title: Hydropower capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_wind:
+        title: Wind capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_onshorewind:
+        title: Onshore wind capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_offshorewind:
+        title: Offshore wind capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_solar:
+        title: Solar capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_solarpv:
+        title: Solar PV capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_csp:
+        title: Concentrated solar capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_geothermal:
+        title: Geothermal capacity
+        unit: gigawatts
+        short_unit: GW
+      elec_capacity_other:
+        title: Other electricity capacity
+        unit: gigawatts
+        short_unit: GW
+      land_forest:
+        title: Forest
+        unit: hectares
+        short_unit: ha
+      land_cropland:
+        title: Cropland
+        unit: hectares
+        short_unit: ha
+      land_pasture:
+        title: Pasture
+        unit: hectares
+        short_unit: ha
+      agri_demand_crops:
+        title: Crop demand
+        unit: tonnes digestible matter
+        short_unit: t
+      agri_demand_energycrops:
+        title: Energy crop demand
+        unit: tonnes digestible matter
+        short_unit: t
+      agri_demand_livestock:
+        title: Livestock demand
+        unit: tonnes digestible matter
+        short_unit: t
+      agri_prod_crops_nonenergy:
+        title: Non-energy crop production
+        unit: tonnes digestible matter
+        short_unit: t
+      agri_prod_crops_energy:
+        title: Energy crop production
+        unit: tonnes digestible matter
+        short_unit: t
+      agri_prod_livestock:
+        title: Livestock production
+        unit: tonnes digestible matter
+        short_unit: t

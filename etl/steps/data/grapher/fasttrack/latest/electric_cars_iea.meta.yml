@@ -1,5 +1,5 @@
 dataset:
-  title: Electric car sales (IEA, 2024)
+  title: Electric car sales (IEA, 2025)
   description: Electric car sales and stocks data from the International Energy Agency.
   licenses:
     - {}
@@ -77,3 +77,8 @@ tables:
         short_unit: cars
         description: |-
           The total number of new cars sold that are not electric. This includes, petrol, diesel and hybrids. It does not include plug-in hybrids.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

@@ -79,3 +79,13 @@ steps:
   ######################################################################################################################
   # Older versions to be archived once they are not used by any other steps.
   ######################################################################################################################
+
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/papers/2025-05-14/davenport_2021:
+    - snapshot://papers/2025-05-14/davenport_2021.xlsx
+  data://garden/papers/2025-05-14/davenport_2021:
+    - data://meadow/papers/2025-05-14/davenport_2021
+  data://grapher/papers/2025-05-14/davenport_2021:
+    - data://garden/papers/2025-05-14/davenport_2021

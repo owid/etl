@@ -461,7 +461,7 @@ def st_wizard_page_link(alias: str, border: bool = False, **kwargs) -> None:
                 st.page_link(**kwargs)
         else:
             st.page_link(**kwargs)
-    except streamlit.errors.StreamlitPageNotFoundError:
+    except (streamlit.errors.StreamlitPageNotFoundError, KeyError):
         # it must be run as a multi-page app to display the link, show warning
         # if run via `streamlit .../app.py`
         st.warning(f"App must be run via `make wizard` to display link to `{alias}`.")

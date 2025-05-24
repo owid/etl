@@ -399,6 +399,13 @@ def _get_explorer_config(owid_env: OWIDEnv, name: str) -> Dict[str, Any]:
     return db_exp.config
 
 
+def reorder_dimensions(config: Dict[str, Any], dim_order: List[str]) -> Dict[str, Any]:
+    """Reorder dimensions in the config dictionary."""
+    config = deepcopy(config)
+    config["dimensions"] = [[dim for dim in config["dimensions"] if dim["slug"] == slug][0] for slug in dim_order]
+    return config
+
+
 def migrate_csv_explorer(name: str, owid_env: Optional[OWIDEnv] = None):
     """Migrate the TSV-based config of a CSV-based explorer to the new format.
 

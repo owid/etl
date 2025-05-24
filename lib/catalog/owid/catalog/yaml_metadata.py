@@ -1,6 +1,6 @@
 import io
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Literal
 
 import yaml
 
@@ -13,9 +13,9 @@ from .utils import dynamic_yaml_load, dynamic_yaml_to_dict
 
 def update_metadata_from_yaml(
     tb: Table,
-    path: Union[Path, str],
+    path: Path | str,
     table_name: str,
-    yaml_params: Optional[Dict[str, Any]] = None,
+    yaml_params: dict[str, Any] | None = None,
     extra_variables: Literal["raise", "ignore"] = "raise",
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
 ) -> None:
@@ -85,7 +85,7 @@ def update_metadata_from_yaml(
     tb.metadata = TableMeta.from_dict(tb_meta_dict)
 
 
-def merge_with_shared_meta(path: Path) -> Union[io.StringIO, Path]:
+def merge_with_shared_meta(path: Path) -> io.StringIO | Path:
     """Merge metadata with shared.meta.yml if it exists."""
     shared_meta_path = path.parent / "shared.meta.yml"
     if shared_meta_path.exists():
@@ -133,7 +133,7 @@ def _merge_variable_metadata(
     md: dict,
     new: dict,
     if_origins_exist: SOURCE_EXISTS_OPTIONS,
-    merge_fields: List[str] = ["presentation", "grapher_config"],
+    merge_fields: list[str] = ["presentation", "grapher_config"],
 ) -> dict:
     """Merge VariableMeta in a dictionary with another dictionary. It modifies the original object."""
     # NOTE: when this gets stable, consider removing flag `if_origins_exist`
@@ -186,6 +186,6 @@ def _validate_variables(t_annot: dict, tb: Table) -> None:
         raise ValueError(msg)
 
 
-def _flatten(lst: List[Any]) -> List[str]:
+def _flatten(lst: list[Any]) -> list[str]:
     """Flatten list that contains either strings or lists."""
     return [item for sublist in lst for item in ([sublist] if isinstance(sublist, str) else sublist)]

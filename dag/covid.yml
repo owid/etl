@@ -31,7 +31,7 @@ steps:
     - data://garden/un/2024-07-12/un_wpp
     # Econ
     - data://garden/wb/2024-10-07/world_bank_pip
-    - data://garden/un/2024-04-09/undp_hdr
+    - data://garden/un/2025-05-07/undp_hdr
     # Health
     - data://garden/wash/2024-01-06/who
     - data://garden/who/2024-07-30/ghe

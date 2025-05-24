@@ -140,13 +140,11 @@ def test_variable_metadata():
         "shortName": "population_density",
         "source": {
             "additionalInfo": "Our World in Data builds...",
-            "dataPublishedBy": "Gapminder (v6); United Nations - Population "
-            "Division (2022); HYDE (v3.2); World Bank",
+            "dataPublishedBy": "Gapminder (v6); United Nations - Population Division (2022); HYDE (v3.2); World Bank",
             "dataPublisherSource": "",
             "id": 27065,
             "link": "https://www.gapminder.org/data/documentation/gd003/",
-            "name": "Gapminder (v6); UN (2022); HYDE (v3.2); Food and "
-            "Agriculture Organization of the United Nations",
+            "name": "Gapminder (v6); UN (2022); HYDE (v3.2); Food and Agriculture Organization of the United Nations",
             "retrievedDate": "October 8, 2021",
         },
         "timespan": "-10000-2100",

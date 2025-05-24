@@ -40,6 +40,7 @@ from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
 from etl.grapher import model as gm
+from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
@@ -49,6 +50,9 @@ DAG = Dict[str, Any]
 
 
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
+
+# Dictionary to store metadata changes for each dataset if INSTANT flag is set
+INSTANT_METADATA_DIFF = {}
 
 
 def compile_steps(
@@ -403,6 +407,11 @@ class DataStep(Step):
 
         ds_idex_mtime = self._dataset_index_mtime()
 
+        # if INSTANT flag is set, just update the metadata
+        if config.INSTANT and self.channel == "garden":
+            self._run_instant_metadata()
+            return
+
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             if config.DEBUG:
@@ -448,6 +457,10 @@ class DataStep(Step):
             else:
                 raise e
         exp_source_checksum = self.checksum_input()
+
+        # if INSTANT is on, we use _instant suffix in a checksum
+        if config.INSTANT and found_source_checksum:
+            found_source_checksum = found_source_checksum.replace("_instant", "")
 
         if found_source_checksum != exp_source_checksum:
             return True
@@ -528,6 +541,44 @@ class DataStep(Step):
     @property
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
+
+    def _run_instant_metadata(self) -> None:
+        """If INSTANT flag is set, instead of running the whole garden step, just load
+        the existing dataset and update its metadata. This is useful for fast-tracking
+        metadata changes without having to rerun the whole step.
+        """
+
+        meta_path = get_metadata_path(self._dest_dir.as_posix())
+        if not meta_path.exists():
+            return
+
+        ds = catalog.Dataset(self._dest_dir.as_posix())
+
+        # Read metadata before
+        table_meta_before = _load_tables_metadata(ds)
+
+        # Save dataset, but use _instant suffix in the checksum to make sure we
+        # trigger fresh run when not using INSTANT
+        ds.update_metadata(meta_path)
+        ds.metadata.source_checksum = self.checksum_input() + "_instant"
+        ds.save()
+
+        # Read metadata after
+        table_meta_after = _load_tables_metadata(ds)
+
+        INSTANT_METADATA_DIFF[ds.m.short_name] = defaultdict(list)
+
+        for table_name in ds.table_names:
+            # Find variables with metadata changes
+            for var_name in table_meta_before[table_name]["fields"]:
+                if (
+                    table_meta_before[table_name]["fields"][var_name]
+                    != table_meta_after[table_name]["fields"][var_name]
+                ):
+                    log.info("instant.update", table_name=table_name, var_name=var_name)
+                    # Add the variable to a global variable so that we can only rerun changed
+                    # variables in the grapher step
+                    INSTANT_METADATA_DIFF[ds.m.short_name][table_name].append(var_name)
 
     def _run_py_isolated(self) -> None:
         """
@@ -768,7 +819,7 @@ class GrapherStep(Step):
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
         dataset = self.dataset
-        return db.fetch_db_checksum(dataset) != self.data_step.checksum_input()
+        return db.fetch_db_checksum(dataset) != self.checksum_input()
 
     def run(self) -> None:
         import etl.grapher.to_db as db
@@ -812,9 +863,29 @@ class GrapherStep(Step):
             for table in dataset:
                 assert not table.empty, f"table {table.metadata.short_name} is empty"
 
-                # if GRAPHER_FILTER is set, only upsert matching columns
+                # if GRAPHER_FILTER is set, only upsert matching variables
                 if config.GRAPHER_FILTER:
-                    cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                    cols_regex = config.GRAPHER_FILTER
+                # if INSTANT is set, only upsert variables with changed metadata
+                elif config.INSTANT:
+                    dataset_name = dataset.m.short_name
+                    table_name = table.metadata.short_name
+
+                    # dataset wasn't run with instant, rerun it
+                    if dataset_name not in INSTANT_METADATA_DIFF:
+                        cols_regex = None
+                    else:
+                        instant_variables = INSTANT_METADATA_DIFF[dataset_name].get(table_name)
+                        if not instant_variables:
+                            # no changes in table, skip it
+                            continue
+                        else:
+                            cols_regex = "|".join(instant_variables)
+                else:
+                    cols_regex = None
+
+                if cols_regex:
+                    cols = table.filter(regex=cols_regex).columns.tolist()
                     if not cols:
                         continue
                     cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
@@ -859,7 +930,16 @@ class GrapherStep(Step):
             # wait for all tables to be inserted
             [future.result() for future in as_completed(futures)]
 
-        if not config.GRAPHER_FILTER and not config.SUBSET:
+        # If INSTANT flag is set, don't clean ghost variables, but update the checksum (with _instant suffix)
+        if INSTANT_METADATA_DIFF:
+            db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.checksum_input())
+
+        # If filtering is on, don't set checksum. Allow the next ETL run to set it
+        elif config.GRAPHER_FILTER or config.SUBSET:
+            pass
+
+        # Otherwise, clean up ghost resources and set checksum
+        else:
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
@@ -869,12 +949,15 @@ class GrapherStep(Step):
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
-                checksum = self.data_step.checksum_input()
+                checksum = self.checksum_input()
             # if cleanup was not successful, don't set checksum and let ETL rerun it on its next try
             else:
                 checksum = "to_be_rerun"
 
             db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
+
+    def checksum_input(self) -> str:
+        return self.data_step.checksum_input()
 
     def checksum_output(self) -> str:
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
@@ -1117,3 +1200,12 @@ def isolated_env(
 
     # remove module dir from pythonpath
     sys.path.remove(working_dir.as_posix())
+
+
+def _load_tables_metadata(ds: catalog.Dataset) -> Dict[str, Dict[str, Any]]:
+    """Load metadata for all tables in a dataset."""
+    table_meta = {}
+    for table_name in ds.table_names:
+        with open(Path(ds.path) / f"{table_name}.meta.json") as f:
+            table_meta[table_name] = json.load(f)
+    return table_meta

@@ -1,0 +1,30 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Enterprise Surveys - Corruption"
+    description: |-
+     The World Bank Enterprise Surveys provide comprehensive economic data on more than 250,000 firms across 168 economies. The data is designed to support researchers, policymakers, and the public. It includes information from over 405 standard surveys, 15 informal sector enterprise surveys in multiple cities, micro-enterprise surveys, other specialized surveys, and cross-economy databases.
+
+     In some economies, businesses may face demands for unofficial payments or gifts to "get things done." The indicators in this dataset capture the prevalence of different forms of bribery across 159 economies, based on surveys of more than 219,000 firms.
+    date_published: "2024"
+
+    # Citation
+    producer: World Bank Enterprise Surveys
+    citation_full: |-
+      World Bank Enterprise Surveys, www.enterprisesurveys.org
+    attribution_short: World Bank
+
+    # Files
+    url_main: https://www.enterprisesurveys.org/en/data/exploretopics/corruption
+    date_accessed: '2025-05-12'
+
+    # License
+    license:
+      name: CC BY 4.0
+      url:  https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets
+outs:
+  - md5: 69660a486954db449a351eb26ee43143
+    size: 284324
+    path: enterprise_surveys.xlsx

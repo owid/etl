@@ -196,6 +196,9 @@ CONTINUE_ON_FAILURE = env.get("CONTINUE_ON_FAILURE", "0") in ("True", "true", "1
 # of data pages for a single indicator
 GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
 
+# if set, skip the actual garden step and only apply the metadata
+INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
+
 # if set, always upload grapher data & metadata JSON files even if checksums match
 FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 

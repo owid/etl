@@ -22,6 +22,12 @@ EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE = {
     "Yugoslavia",
 }
 
+# Define French overseas territories where we want to assign the same income group as France
+FRENCH_OVERSEAS_TERRITORIES = [
+    "French Guiana",
+    "French Southern Territories",
+]
+
 # Define regions to aggregate
 REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceania", "World"]
 
@@ -76,6 +82,16 @@ def run(dest_dir: str) -> None:
         ds_population=ds_population,
         regions=REGIONS,
         missing_data_on_columns=False,
+    )
+
+    # Assign the same income group as France to the French overseas territories.
+    tb = assign_french_overseas_group_same_as_france(
+        tb=tb,
+        list_of_territories=FRENCH_OVERSEAS_TERRITORIES,
+    )
+    tb_latest = assign_french_overseas_group_same_as_france(
+        tb=tb_latest,
+        list_of_territories=FRENCH_OVERSEAS_TERRITORIES,
     )
 
     # Set an appropriate index and sort conveniently.
@@ -226,5 +242,35 @@ def add_country_counts_and_population_by_status(
 
     # Merge the two tables
     tb = pr.merge(tb, tb_regions, on=["country", "year"], how="outer")
+
+    return tb
+
+
+def assign_french_overseas_group_same_as_france(tb: Table, list_of_territories: List[str]) -> Table:
+    """
+    Assign the same income group as France to the French overseas territories.
+    """
+
+    tb = tb.copy()
+
+    # Filter the rows where we have data for France
+    tb_france = tb[tb["country"] == "France"].reset_index(drop=True)
+
+    # # Keep only the columns we need
+    # tb_france = tb_france[["year", "classification"]]
+
+    tb_french_overseas = Table()
+
+    for territory in list_of_territories:
+        tb_territory = tb_france.copy()
+
+        # Add country
+        tb_territory["country"] = territory
+
+        # Concatenate the two tables
+        tb_french_overseas = pr.concat([tb_french_overseas, tb_territory], ignore_index=True)
+
+    # Concatenate the two tables
+    tb = pr.concat([tb, tb_french_overseas], ignore_index=True)
 
     return tb
