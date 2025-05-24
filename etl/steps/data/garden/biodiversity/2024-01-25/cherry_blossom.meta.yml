@@ -1,4 +1,6 @@
 dataset:
+  owid_data_managers:
+    - Fiona Spooner
   update_period_days: 365
 tables:
   cherry_blossom:
