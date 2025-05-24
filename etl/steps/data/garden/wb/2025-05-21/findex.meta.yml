@@ -1,0 +1,34 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    unit: "%"
+    short_unit: "%"
+    display:
+      numDecimalPlaces: 1
+    presentation:
+      topic_tags:
+        - Economic Growth
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  findex:
+    variables:
+      both_accounts:
+        title: Both accounts
+        description_short: Percentage of adults with both a mobile money account and a bank account.
+
+      only_mobile_money_account:
+        title: Only mobile money account
+        description_short: Percentage of adults with only a mobile money account.
+
+      only_financial_institution_account:
+        title: Only financial institution account
+        description_short: Percentage of adults with only a financial institution account.
+
