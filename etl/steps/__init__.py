@@ -863,9 +863,9 @@ class GrapherStep(Step):
             for table in dataset:
                 assert not table.empty, f"table {table.metadata.short_name} is empty"
 
-                # if GRAPHER_FILTER is set, only upsert matching variables
-                if config.GRAPHER_FILTER:
-                    cols_regex = config.GRAPHER_FILTER
+                # if SUBSET is set, only upsert matching variables
+                if config.SUBSET:
+                    cols_regex = config.SUBSET
                 # if INSTANT is set, only upsert variables with changed metadata
                 elif config.INSTANT:
                     dataset_name = dataset.m.short_name
@@ -935,7 +935,7 @@ class GrapherStep(Step):
             db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.checksum_input())
 
         # If filtering is on, don't set checksum. Allow the next ETL run to set it
-        elif config.GRAPHER_FILTER or config.SUBSET:
+        elif config.SUBSET:
             pass
 
         # Otherwise, clean up ghost resources and set checksum

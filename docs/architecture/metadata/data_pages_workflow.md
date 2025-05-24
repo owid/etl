@@ -19,7 +19,7 @@ For illustration, the step `grapher/gcp/2023-07-10/global_carbon_budget` is cons
 - Execute the ETL command with the `--watch` flag. This monitors the YAML file for changes and automatically re-executes the corresponding step. This might not be as useful for long-running steps.
 
 ### Data Filtering
-- If the dataset contains numerous indicators, consider using `GRAPHER_FILTER=consumption_emissions_per_capita` to filter the data to only relevant variables. This is optional for smaller datasets.
+- If the dataset contains numerous indicators, consider using `SUBSET=consumption_emissions_per_capita` to filter the data to only relevant variables. This is optional for smaller datasets.
 
 ### Instant YAML Updates
 - Use `INSTANT=1` environment variable to enable instant YAML updates, which bypasses the normal ETL pipeline for metadata changes. This makes YAML changes appear almost immediately in the grapher without re-running the entire ETL process.
@@ -38,7 +38,7 @@ This might fail, be slow or give unexpected results in the following cases:
 ### Command Summary
 ```bash
 # Basic command with watch mode
-ENV_FILE=.env.myname GRAPHER_FILTER=consumption_emissions_per_capita etl grapher/gcp/2023-07-10/global_carbon_budget --grapher --watch --only
+ENV_FILE=.env.myname SUBSET=consumption_emissions_per_capita etl grapher/gcp/2023-07-10/global_carbon_budget --grapher --watch --only
 ```
 !!! note
 

@@ -78,7 +78,10 @@ def run(dest_dir: str) -> None:
 
     if SUBSET:
         required_causes = ["Drug use disorders", "Alcohol use disorders", "Self-harm"]
-        tb = tb[tb.cause.isin(SUBSET.split(",") + required_causes)]
+        # Filter by regex pattern or include required causes
+        subset_mask = tb.cause.str.contains(SUBSET, na=False, regex=True)
+        required_mask = tb.cause.isin(required_causes)
+        tb = tb[subset_mask | required_mask]
 
     # Load countries regions
     regions = paths.load_dataset("regions")["regions"]
