@@ -71,9 +71,16 @@ def run(dest_dir: str) -> None:
 
         # Read table from meadow dataset.
         tb = ds_meadow.read(label, safe_types=False)
+
+        # Use safer types
+        tb = tb.astype({"country": str})
+
         # Exclude archived indicators from garden
         if "_archived" in label or tb.m.title.endswith("(archived)"):
             continue
+
+        # if underscore(tb.m.title) != "number_of_new_leprosy_cases":
+        #     continue
 
         #
         # Process data.
@@ -91,25 +98,25 @@ def run(dest_dir: str) -> None:
         tb = add_region_source_suffix(tb)
 
         # Remove null columns
-        tb = tb.dropna(axis=1, how="all")
-        assert tb is not None
+        # tb = tb.dropna(axis=1, how="all")
+        # assert tb is not None
 
-        if tb.empty:
-            continue
+        # if tb.empty:
+        #     continue
 
         # Drop indicator column
-        assert len(set(tb["indicator"])) == 1
-        tb = tb.drop(columns=["indicator"])
+        # assert len(set(tb["indicator"])) == 1
+        # tb = tb.drop(columns=["indicator"])
 
         # Drop publish_states column
-        tb = tb.drop(columns=["publish_states"])
+        # tb = tb.drop(columns=["publish_states"])
 
         # Drop data_source
-        tb = tb.drop(columns=["data_source"], errors="ignore")
+        # tb = tb.drop(columns=["data_source"], errors="ignore")
 
         # Exclude indicators without year
-        if "year" not in tb.columns:
-            continue
+        # if "year" not in tb.columns:
+        #     continue
 
         # Standardize dimension values
         if "sex" in tb.columns:
@@ -119,6 +126,11 @@ def run(dest_dir: str) -> None:
         if tb.year.dtype == "category":
             tb = tb.loc[tb.year.astype(str) != "nan"]
             tb["year"] = normalize_year_range(tb["year"])
+
+        # Remove unused columns & rename
+        tb = tb.drop(columns=["spatialdimtype", "timedimtype"]).rename(
+            columns={"numericvalue": "numeric", "value": "display_value"}
+        )
 
         # Set dimensions
         tb = set_dimensions(tb)
@@ -228,15 +240,21 @@ def drop_excess_region_sources(tb: pd.DataFrame, priority_regions: list[str]) ->
 
 def add_region_source_suffix(tb: Table) -> Table:
     """Add region source as suffix to region name, e.g. Africa (WHO)"""
-    if "region_source" in tb.columns:
-        tb = drop_excess_region_sources(tb.copy(), PRIORITY_OF_REGIONS)
-        ix = tb.region_source.notnull() & (tb.country != "World")
-        if ix.any():
-            tb["country"] = tb["country"].astype(str)
-            tb.loc[ix, "country"] = tb.loc[ix, "country"] + " (" + tb.loc[ix, "region_source"].astype(str) + ")"
-            tb["country"] = tb["country"].astype("category")
-        tb = tb.drop(columns=["region_source"])
+    ix = tb.spatialdimtype == "REGION"
+
+    tb.loc[ix, "country"] = tb.loc[ix, "country"] + " (WHO)"
+
     return tb
+
+    # if "region_source" in tb.columns:
+    #     tb = drop_excess_region_sources(tb.copy(), PRIORITY_OF_REGIONS)
+    #     ix = tb.region_source.notnull() & (tb.country != "World")
+    #     if ix.any():
+    #         tb["country"] = tb["country"].astype(str)
+    #         tb.loc[ix, "country"] = tb.loc[ix, "country"] + " (" + tb.loc[ix, "region_source"].astype(str) + ")"
+    #         tb["country"] = tb["country"].astype("category")
+    #     tb = tb.drop(columns=["region_source"])
+    # return tb
 
 
 def merge_identical_tables(tables: list[Table]) -> list[Table]:

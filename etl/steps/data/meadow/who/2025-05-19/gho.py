@@ -56,6 +56,7 @@ if SUBSET:
         "E_Group",
         "P_count_places_sf",
         "R_afford_gdp",
+        "SDGNTDTREATMENT",
     ]
     SUBSET += "," + ",".join(subset_list)
 
@@ -104,54 +105,56 @@ def run(dest_dir: str) -> None:
                 # Use `indicator's name - column` as title
                 tb[col].m.title = f"{ind_meta['display']} - {col}"
 
+            # Drop unused columns
+            tb = tb.drop(columns=["ParentLocation", "TimeDimensionValue"])
+
             #
             # Process data.
             #
             tb = tb.rename(
                 columns={
-                    "Countries, territories and areas": "country",
+                    "Country": "country",
                     "Year": "year",
                 }
             )
 
-            if "country" not in tb.columns:
-                tb["country"] = None
-            else:
-                tb.country = tb.country.astype(str).replace("nan", None)
+            # if "country" not in tb.columns:
+            #     tb["country"] = None
+            # else:
+            #     tb.country = tb.country.astype(str).replace("nan", None)
 
-            tb = _remove_voided_rows(tb)
+            # tb = _remove_voided_rows(tb)
 
-            tb = _remove_invalid_data_source_values(tb)
+            # tb = _remove_invalid_data_source_values(tb)
 
-            if "World Bank income group" in tb.columns and tb["World Bank income group"].isnull().all():
-                del tb["World Bank income group"]
+            # if "World Bank income group" in tb.columns and tb["World Bank income group"].isnull().all():
+            #     del tb["World Bank income group"]
 
             # tb = tb[(tb.country == "Honduras") & (tb.year == 2014)]
 
-            tb = _fill_country_from_regions(tb)
+            # tb = _fill_country_from_regions(tb)
 
             tb = tb.underscore()
 
-            tb = _exclude_invalid_rows(tb)
+            # tb = _exclude_invalid_rows(tb)
 
-            tb = tb.drop(
-                columns=[
-                    "who_region",
-                    "un_region",
-                    "un_sdg_region",
-                    "unicef_region",
-                    "world_bank_region",
-                    "world_bank_income_group",
-                ],
-                errors="ignore",
-            )
+            # tb = tb.drop(
+            #     columns=[
+            #         "who_region",
+            #         "un_region",
+            #         "un_sdg_region",
+            #         "unicef_region",
+            #         "world_bank_region",
+            #         "world_bank_income_group",
+            #     ],
+            #     errors="ignore",
+            # )
 
             # Drop low and high estimates - we could add them to the dataset, but we don't use them yet
             # and they're quite noisy.
-            tb = tb.drop(
-                columns=["low", "high"],
-                errors="ignore",
-            )
+            # tb = tb.drop(
+            #     columns=["Value"],
+            # )
 
             assert tb.country.notnull().all()
             tb.m.short_name = label
