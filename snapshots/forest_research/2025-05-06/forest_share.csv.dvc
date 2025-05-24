@@ -1,0 +1,18 @@
+meta:
+  origin:
+    producer: Forest Research
+    title: National inventory of woodland and trees
+    citation_full: |-
+      National inventory of woodland and trees - England, Wales and Scotland. Forest Research, Forestry Commission.
+    attribution_short: Forest Research
+    url_main: |-
+      https://www.forestresearch.gov.uk/tools-and-resources/national-forest-inventory/national-inventory-of-woodland-and-trees/
+    date_accessed: "2025-05-06"
+    date_published: "2002-01-01"
+    license:
+      name: © Crown copyright 2002
+      url: https://www.forestresearch.gov.uk/crown-copyright/
+outs:
+  - md5: d2cb0af714ae8eee83b6cbb9a333c730
+    size: 6090
+    path: forest_share.csv
