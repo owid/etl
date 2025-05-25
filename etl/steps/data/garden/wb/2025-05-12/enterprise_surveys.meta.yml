@@ -5,13 +5,13 @@ definitions:
     short_unit: "%"
     processing_level: minor
     display:
-      tolerance: 5
+      tolerance: 10
     presentation:
       grapher_config:
         hasMapTab: true
         maxTime: 2024
         map:
-          timeTolerance: 5
+          timeTolerance: 10
           colorScale:
             binningStrategy: manual
             customNumericValues: [10,20,30,40,50,60]
