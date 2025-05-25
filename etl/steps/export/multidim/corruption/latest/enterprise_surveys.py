@@ -85,8 +85,8 @@ def adjust_dimensions_corruption(tb):
         "percent_of_firms_expected_to_give_gifts_to_get_an_electrical_connection": "Electrical connection",
         "percent_of_firms_expected_to_give_gifts_to_secure_government_contract": "Government contract",
         "percent_of_firms_expected_to_give_gifts_to_get_an_import_license": "Import license",
-        "percent_of_firms_expected_to_give_gifts_to_get_an_operating_license": "Operating_license",
-        "percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials": "Tax official",
+        "percent_of_firms_expected_to_give_gifts_to_get_an_operating_license": "Operating license",
+        "percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials": "Tax officials",
         "percent_of_firms_expected_to_give_gifts_to_public_officials_to_get_things_done": "To get things done",
         "percent_of_firms_expected_to_give_gifts_to_get_a_water_connection": "Water connection",
     }
