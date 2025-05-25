@@ -6,11 +6,14 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
+
 # Provide a minimal stub for the ``deprecated`` package required by the module
 def _deprecated(reason):
     def decorator(func):
         return func
+
     return decorator
+
 
 sys.modules.setdefault("deprecated", types.SimpleNamespace(deprecated=_deprecated))
 
@@ -18,9 +21,7 @@ sys.modules.setdefault("deprecated", types.SimpleNamespace(deprecated=_deprecate
 # without installing heavy dependencies.
 pkg_collection = sys.modules.setdefault("etl.collection", types.ModuleType("etl.collection"))
 
-spec_exc = importlib.util.spec_from_file_location(
-    "etl.collection.exceptions", ROOT / "etl/collection/exceptions.py"
-)
+spec_exc = importlib.util.spec_from_file_location("etl.collection.exceptions", ROOT / "etl/collection/exceptions.py")
 exc = importlib.util.module_from_spec(spec_exc)
 sys.modules["etl.collection.exceptions"] = exc
 spec_exc.loader.exec_module(exc)
@@ -40,9 +41,7 @@ sys.modules.setdefault("etl.paths", types.SimpleNamespace(DATA_DIR=Path(".")))
 
 # Avoid importing etl.collection package (which has heavy dependencies) by
 # loading the modules directly from their file paths.
-spec_utils = importlib.util.spec_from_file_location(
-    "collection_utils", ROOT / "etl/collection/utils.py"
-)
+spec_utils = importlib.util.spec_from_file_location("collection_utils", ROOT / "etl/collection/utils.py")
 utils = importlib.util.module_from_spec(spec_utils)
 assert spec_utils.loader
 spec_utils.loader.exec_module(utils)
@@ -61,6 +60,7 @@ ParamKeyError = exc.ParamKeyError
 # ----------------------------------------------------------------------------
 # expand_combinations and get_complete_dimensions_filter
 # ----------------------------------------------------------------------------
+
 
 def test_expand_combinations():
     dims = {"a": ["x", "y"], "b": ["1"]}
@@ -88,6 +88,7 @@ def test_get_complete_dimensions_filter():
 # move_field_to_top and extract_definitions
 # ----------------------------------------------------------------------------
 
+
 def test_move_field_to_top():
     data = {"b": 2, "a": 1, "c": 3}
     moved = move_field_to_top(data, "a")
@@ -100,17 +101,7 @@ def test_move_field_to_top():
 
 
 def test_extract_definitions_simple():
-    config = {
-        "views": [
-            {
-                "indicators": {
-                    "y": [
-                        {"display": {"additionalInfo": "Line1\\nLine2"}}
-                    ]
-                }
-            }
-        ]
-    }
+    config = {"views": [{"indicators": {"y": [{"display": {"additionalInfo": "Line1\\nLine2"}}]}}]}
     out = extract_definitions(config)
     # definitions moved to top
     assert list(out.keys())[0] == "definitions"
@@ -119,15 +110,13 @@ def test_extract_definitions_simple():
     anchor = next(iter(defs))
     assert defs[anchor] == "Line1\nLine2"
     # indicator references the anchor
-    assert (
-        out["views"][0]["indicators"]["y"][0]["display"]["additionalInfo"]
-        == f"*{anchor}"
-    )
+    assert out["views"][0]["indicators"]["y"][0]["display"]["additionalInfo"] == f"*{anchor}"
 
 
 # ----------------------------------------------------------------------------
 # fill_placeholders
 # ----------------------------------------------------------------------------
+
 
 def test_fill_placeholders():
     data = {
@@ -152,6 +141,7 @@ def test_fill_placeholders():
 # ----------------------------------------------------------------------------
 # group_views_legacy and helpers
 # ----------------------------------------------------------------------------
+
 
 def test_group_views_legacy():
     views = [
@@ -179,6 +169,7 @@ def test_group_views_legacy():
 # ----------------------------------------------------------------------------
 # records_to_dictionary and unique_records
 # ----------------------------------------------------------------------------
+
 
 def test_records_to_dictionary_and_unique_records():
     recs = [
