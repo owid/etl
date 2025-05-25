@@ -1,60 +1,80 @@
-import importlib.util
+"""
+Tests for ETL collection utility functions.
+
+This module tests utility functions from etl.collection.utils that handle
+data manipulation, view processing, and configuration management.
+"""
 from pathlib import Path
-import types
-import sys
+from unittest.mock import Mock
+
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
+
+# Mock dependencies to avoid heavy imports
+@pytest.fixture(autouse=True)
+def mock_dependencies(monkeypatch):
+    """
+    Mock heavy dependencies to make tests lightweight and fast.
+    
+    Uses monkeypatch to cleanly mock modules without polluting sys.modules.
+    This approach is much cleaner than manual sys.modules manipulation.
+    """
+    # Mock deprecated decorator
+    def mock_deprecated(reason):
+        def decorator(func):
+            return func
+        return decorator
+    
+    monkeypatch.setattr("deprecated.deprecated", mock_deprecated)
+    
+    # Mock catalog and database dependencies
+    monkeypatch.setattr("owid.catalog.Dataset", object)
+    monkeypatch.setattr("sqlalchemy.orm.Session", object)
+    
+    # Mock ETL modules
+    monkeypatch.setattr("etl.config.OWID_ENV", None)
+    monkeypatch.setattr("etl.config.OWIDEnv", object)
+    monkeypatch.setattr("etl.db.read_sql", Mock(return_value=None))
+    monkeypatch.setattr("etl.files.yaml_dump", Mock(return_value=""))
+    monkeypatch.setattr("etl.paths.DATA_DIR", Path("."))
+    
+    # Mock grapher model
+    monkeypatch.setattr("etl.grapher.model", Mock())
 
 
-# Provide a minimal stub for the ``deprecated`` package required by the module
-def _deprecated(reason):
-    def decorator(func):
-        return func
-
-    return decorator
-
-
-sys.modules.setdefault("deprecated", types.SimpleNamespace(deprecated=_deprecated))
-
-# Stub modules required by ``collection.utils`` so that the module can be loaded
-# without installing heavy dependencies.
-pkg_collection = sys.modules.setdefault("etl.collection", types.ModuleType("etl.collection"))
-
-spec_exc = importlib.util.spec_from_file_location("etl.collection.exceptions", ROOT / "etl/collection/exceptions.py")
-exc = importlib.util.module_from_spec(spec_exc)
-sys.modules["etl.collection.exceptions"] = exc
-spec_exc.loader.exec_module(exc)
-pkg_collection.exceptions = exc
-
-sys.modules.setdefault("owid.catalog", types.SimpleNamespace(Dataset=object))
-sys.modules.setdefault("sqlalchemy.orm", types.SimpleNamespace(Session=object))
-grapher_pkg = types.ModuleType("etl.grapher")
-grapher_model = types.SimpleNamespace()
-grapher_pkg.model = grapher_model
-sys.modules.setdefault("etl.grapher", grapher_pkg)
-sys.modules.setdefault("etl.grapher.model", grapher_model)
-sys.modules.setdefault("etl.config", types.SimpleNamespace(OWID_ENV=None, OWIDEnv=object))
-sys.modules.setdefault("etl.db", types.SimpleNamespace(read_sql=lambda *a, **k: None))
-sys.modules.setdefault("etl.files", types.SimpleNamespace(yaml_dump=lambda d: ""))
-sys.modules.setdefault("etl.paths", types.SimpleNamespace(DATA_DIR=Path(".")))
-
-# Avoid importing etl.collection package (which has heavy dependencies) by
-# loading the modules directly from their file paths.
-spec_utils = importlib.util.spec_from_file_location("collection_utils", ROOT / "etl/collection/utils.py")
-utils = importlib.util.module_from_spec(spec_utils)
-assert spec_utils.loader
-spec_utils.loader.exec_module(utils)
-
-expand_combinations = utils.expand_combinations
-get_complete_dimensions_filter = utils.get_complete_dimensions_filter
-move_field_to_top = utils.move_field_to_top
-extract_definitions = utils.extract_definitions
-fill_placeholders = utils.fill_placeholders
-group_views_legacy = utils.group_views_legacy
-unique_records = utils.unique_records
-records_to_dictionary = utils.records_to_dictionary
-ParamKeyError = exc.ParamKeyError
+@pytest.fixture
+def collection_utils():
+    """
+    Import and return the collection utils module with mocked dependencies.
+    
+    This fixture handles the import after mocking is in place, ensuring
+    the module loads cleanly without heavy dependencies.
+    """
+    # Import after mocking is set up
+    import importlib.util
+    
+    ROOT = Path(__file__).resolve().parents[1]
+    
+    # Load exceptions module first
+    spec_exc = importlib.util.spec_from_file_location(
+        "etl.collection.exceptions", 
+        ROOT / "etl/collection/exceptions.py"
+    )
+    exc_module = importlib.util.module_from_spec(spec_exc)
+    spec_exc.loader.exec_module(exc_module)
+    
+    # Load utils module
+    spec_utils = importlib.util.spec_from_file_location(
+        "collection_utils", 
+        ROOT / "etl/collection/utils.py"
+    )
+    utils_module = importlib.util.module_from_spec(spec_utils)
+    spec_utils.loader.exec_module(utils_module)
+    
+    # Attach exception classes to utils for easy access
+    utils_module.ParamKeyError = exc_module.ParamKeyError
+    
+    return utils_module
 
 
 # ----------------------------------------------------------------------------
@@ -62,9 +82,10 @@ ParamKeyError = exc.ParamKeyError
 # ----------------------------------------------------------------------------
 
 
-def test_expand_combinations():
+def test_expand_combinations(collection_utils):
+    """Test expanding dimension combinations into all possible permutations."""
     dims = {"a": ["x", "y"], "b": ["1"]}
-    combos = expand_combinations(dims)
+    combos = collection_utils.expand_combinations(dims)
     assert len(combos) == 2
     assert {tuple(sorted(c.items())) for c in combos} == {
         tuple(sorted({"a": "x", "b": "1"}.items())),
@@ -72,16 +93,17 @@ def test_expand_combinations():
     }
 
 
-def test_get_complete_dimensions_filter():
+def test_get_complete_dimensions_filter(collection_utils):
+    """Test completing partial dimension filters with all available values."""
     dims_avail = {"metric": {"cases", "deaths"}, "age": {"0-9", "10-19"}}
     dims_filter = {"metric": "cases"}
-    result = get_complete_dimensions_filter(dims_avail, dims_filter)
+    result = collection_utils.get_complete_dimensions_filter(dims_avail, dims_filter)
     assert {tuple(sorted(r.items())) for r in result} == {
         tuple(sorted({"metric": "cases", "age": "0-9"}.items())),
         tuple(sorted({"metric": "cases", "age": "10-19"}.items())),
     }
     with pytest.raises(AssertionError):
-        get_complete_dimensions_filter(dims_avail, {"metric": "unknown"})
+        collection_utils.get_complete_dimensions_filter(dims_avail, {"metric": "unknown"})
 
 
 # ----------------------------------------------------------------------------
@@ -89,20 +111,22 @@ def test_get_complete_dimensions_filter():
 # ----------------------------------------------------------------------------
 
 
-def test_move_field_to_top():
+def test_move_field_to_top(collection_utils):
+    """Test moving a dictionary field to the top while preserving order."""
     data = {"b": 2, "a": 1, "c": 3}
-    moved = move_field_to_top(data, "a")
+    moved = collection_utils.move_field_to_top(data, "a")
     assert list(moved.keys())[:1] == ["a"]
     # Ensure other fields preserved
     assert list(moved.keys()) == ["a", "b", "c"]
     # Field not present: object should be returned unchanged
-    same = move_field_to_top(data, "missing")
+    same = collection_utils.move_field_to_top(data, "missing")
     assert same is data
 
 
-def test_extract_definitions_simple():
+def test_extract_definitions_simple(collection_utils):
+    """Test extracting common definitions to reduce config duplication."""
     config = {"views": [{"indicators": {"y": [{"display": {"additionalInfo": "Line1\\nLine2"}}]}}]}
-    out = extract_definitions(config)
+    out = collection_utils.extract_definitions(config)
     # definitions moved to top
     assert list(out.keys())[0] == "definitions"
     defs = out["definitions"]["additionalInfo"]
@@ -118,7 +142,8 @@ def test_extract_definitions_simple():
 # ----------------------------------------------------------------------------
 
 
-def test_fill_placeholders():
+def test_fill_placeholders(collection_utils):
+    """Test filling template placeholders in nested data structures."""
     data = {
         "a": "{x} is {y}",
         "b": ["{y}", 1],
@@ -126,7 +151,7 @@ def test_fill_placeholders():
         "e": ("{x}", "{y}"),
     }
     params = {"x": "foo", "y": "bar"}
-    out = fill_placeholders(data, params)
+    out = collection_utils.fill_placeholders(data, params)
     assert out == {
         "a": "foo is bar",
         "b": ["bar", 1],
@@ -134,8 +159,8 @@ def test_fill_placeholders():
         "e": ("foo", "bar"),
     }
 
-    with pytest.raises(ParamKeyError):
-        fill_placeholders("{x} {z}", {"x": "foo"})
+    with pytest.raises(collection_utils.ParamKeyError):
+        collection_utils.fill_placeholders("{x} {z}", {"x": "foo"})
 
 
 # ----------------------------------------------------------------------------
@@ -143,13 +168,14 @@ def test_fill_placeholders():
 # ----------------------------------------------------------------------------
 
 
-def test_group_views_legacy():
+def test_group_views_legacy(collection_utils):
+    """Test grouping views by dimensions for legacy compatibility."""
     views = [
         {"dimensions": {"country": "a"}, "indicators": {"y": "ind1"}},
         {"dimensions": {"country": "a"}, "indicators": {"y": "ind2"}},
         {"dimensions": {"country": "b"}, "indicators": {"y": "ind3"}},
     ]
-    grouped = group_views_legacy(views, by=["country"])
+    grouped = collection_utils.group_views_legacy(views, by=["country"])
     assert grouped == [
         {
             "dimensions": {"country": "a"},
@@ -163,7 +189,7 @@ def test_group_views_legacy():
 
     err_view = {"dimensions": {"country": "c"}, "indicators": {"y": ["a", "b"]}}
     with pytest.raises(NotImplementedError):
-        group_views_legacy([err_view], by=["country"])
+        collection_utils.group_views_legacy([err_view], by=["country"])
 
 
 # ----------------------------------------------------------------------------
@@ -171,16 +197,17 @@ def test_group_views_legacy():
 # ----------------------------------------------------------------------------
 
 
-def test_records_to_dictionary_and_unique_records():
+def test_records_to_dictionary_and_unique_records(collection_utils):
+    """Test converting records to dictionary and removing duplicates."""
     recs = [
         {"id": 1, "v": "a"},
         {"id": 2, "v": "b"},
         {"id": 1, "v": "a"},
     ]
-    dic = records_to_dictionary(recs, "id")
+    dic = collection_utils.records_to_dictionary(recs, "id")
     assert dic == {1: {"v": "a"}, 2: {"v": "b"}}
 
-    uniq = unique_records(recs)
+    uniq = collection_utils.unique_records(recs)
     assert uniq == [
         {"id": 1, "v": "a"},
         {"id": 2, "v": "b"},
