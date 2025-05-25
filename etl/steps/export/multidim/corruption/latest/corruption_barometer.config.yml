@@ -3,12 +3,6 @@ title:
   title_variant: by institution
 default_selection:
   - World
-  - Europe
-  - Asia
-  - Oceania
-  - North America
-  - South America
-  - Africa
 dimensions:
   - slug: institution
     name: Institution
