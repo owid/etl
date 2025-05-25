@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from owid.catalog.meta import GrapherConfig
 
+from etl.collection.exceptions import ExtraIndicatorsInUseError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.utils import CHART_DIMENSIONS
 
@@ -279,8 +280,8 @@ class View(MDIMBase):
         ## E.g. the indicator used to sort, should be in use in the chart! Or, the indicator in the map tab should be in use in the chart!
         invalid_indicators = set(self.indicators_in_config).difference(set(indicators))
         if not tolerate_extra_indicators and invalid_indicators:
-            raise ValueError(
-                f"Extra indicators not in use. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}. If this is expected, set `tolerate_extra_indicators=True`."
+            raise ExtraIndicatorsInUseError(
+                f"Extra indicators not allowed. This means that some indicators are referenced in the chart config (e.g. map.columnSlug or sortColumnSlug), but never used in the chart tab. Unexpected indicators: {invalid_indicators}. If this is expected, set `tolerate_extra_indicators=True`."
             )
         elif invalid_indicators:
             indicators = indicators + list(invalid_indicators)
