@@ -79,7 +79,7 @@ def run() -> None:
         },
     )
     # Sort choices alphabetically
-    c.sort_choices({"answer": lambda x: sorted(x)})
+    c.sort_choices({"choices": lambda x: sorted(x)})
 
     #
     # Save garden dataset.
