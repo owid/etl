@@ -49,9 +49,9 @@ def run() -> None:
                     "chartTypes": ["DiscreteBar"],
                     "tab": "chart",
                     "facettingLabelByYVariables": "service",
-                    "selectedFacetStrategy": "metric",
-                    "title": "Share of businesses asked for bribes, by type of transaction",
-                    "subtitle": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials.",
+                    "selectedFacetStrategy": "entity",
+                    "title": "Share of firms that were asked to pay a bribe, by interaction",
+                    "subtitle": "Share of firms that were asked to pay a bribe, by type of interaction with public officials.",
                 },
                 "view_metadata": {
                     "description_short": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials."
@@ -87,7 +87,7 @@ def adjust_dimensions_corruption(tb):
         "percent_of_firms_expected_to_give_gifts_to_get_an_import_license": "Import license",
         "percent_of_firms_expected_to_give_gifts_to_get_an_operating_license": "Operating license",
         "percent_of_firms_expected_to_give_gifts_in_meetings_with_tax_officials": "Tax officials",
-        "percent_of_firms_expected_to_give_gifts_to_public_officials_to_get_things_done": "To get things done",
+        "percent_of_firms_expected_to_give_gifts_to_public_officials_to_get_things_done": 'To "get things done"',
         "percent_of_firms_expected_to_give_gifts_to_get_a_water_connection": "Water connection",
     }
 
