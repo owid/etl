@@ -93,7 +93,7 @@ Beginning interactive harmonization...
    7) [skip]
 ```
 
-The output mapping is saved in `mapping.json`. If this file existed before, it will resume teh session from where it left off.
+The output mapping is saved in `mapping.json`. If this file existed before, it will resume the session from where it left off.
 
 ## Using the interactive shell
 

@@ -24,8 +24,9 @@ jobs:
 
     - name: Publish
       env:
-        TWINE_USERNAME: ourworldindata
+        TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+
       run: |
         cd lib/catalog &&
         uv build &&
