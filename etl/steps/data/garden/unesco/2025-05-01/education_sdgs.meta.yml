@@ -597,6 +597,6 @@ tables:
 
           Original source: UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022.
         presentation:
-          title: Public spending on education as a share of GDP
+          title_public: Public spending on education as a share of GDP
         display:
           numDecimalPlaces: 1
