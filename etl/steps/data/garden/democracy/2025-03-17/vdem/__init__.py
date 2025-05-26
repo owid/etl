@@ -114,6 +114,14 @@ def run() -> None:
         tb_population_counts,
     ) = aggregate.run(tb, ds_regions, ds_population)
 
+    # %% TEMPORARY
+    mask = tb_uni_with_regions.aggregate_method == "average"
+    a = tb_uni_with_regions[mask].copy()
+    b = tb_uni_with_regions[~mask].copy()
+    b["country"] = b["country"] + " (population-weight)"
+    tb_uni_with_regions2 = pr.concat([a, b], ignore_index=True)
+    tb_uni_with_regions2.drop(columns=["aggregate_method"], inplace=True)
+
     # %% PART 5: Format and prepare tables
     paths.log.info("5/ Formatting tables...")
     tb_meta = tb.loc[:, ["year", "country", "regime_imputed", "regime_imputed_country", "histname"]]
@@ -123,15 +131,16 @@ def run() -> None:
         keys=["country", "year"],
         short_name="vdem_uni_without_regions",
     )
+    tb_uni_with_regions2 = tb_uni_with_regions2.format(
+        keys=["country", "year"],
+        short_name="vdem_uni_with_regions2",
+    )
     tb_uni_with_regions = tb_uni_with_regions.format(
         keys=["country", "year", "aggregate_method"],
         short_name="vdem_uni_with_regions",
     )
     tb_multi_without_regions = tb_multi_without_regions.format(
         keys=["country", "year", "estimate"], short_name="vdem_multi_without_regions"
-    )
-    tb_multi_with_regions2 = tb_multi_with_regions.format(
-        keys=["country", "year", "estimate"], short_name="vdem_multi_with_regions2"
     )
     tb_multi_with_regions = tb_multi_with_regions.format(
         keys=["country", "year", "estimate"], short_name="vdem_multi_with_regions"
@@ -150,11 +159,11 @@ def run() -> None:
         tb_uni_without_regions,  # some have 0 origins
         # Main indicators (uni-dimensional) with regions
         tb_uni_with_regions,
+        tb_uni_with_regions2,
         # Main indicators (multi-dimensional) without regions
         tb_multi_without_regions,
         # Main indicators (multi-dimensional) with regions
         tb_multi_with_regions,
-        tb_multi_with_regions2,
         # Number of countries with X properties
         tb_countries_counts,
         # Number of people living in countries with X property
