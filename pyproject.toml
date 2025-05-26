@@ -109,7 +109,7 @@ dev-dependencies = [
     # unpinning those would introduce tons of type errors
     "pyright==1.1.373",
     "pandas-stubs==1.2.0.62",
-    "ruff==0.8.6",
+    "ruff==0.11.11",
     "ipdb>=0.13.13",
     "commentjson>=0.9.0",
 ]
