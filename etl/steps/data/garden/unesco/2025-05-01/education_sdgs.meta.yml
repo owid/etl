@@ -557,7 +557,7 @@ tables:
           display:
             numDecimalPlaces: 1
 
-      combined_literacy:
+      combined_literate:
         title: Literacy rate (historical and recent)
         unit: "%"
         short_unit: "%"
@@ -579,7 +579,7 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      combined_expenditure:
+      combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
         unit: "%"
         short_unit: "%"
