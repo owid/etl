@@ -189,6 +189,12 @@ export function activate(context: vscode.ExtensionContext) {
   };
 
   function updateDecorations(editor: vscode.TextEditor) {
+    const filePath = editor.document.uri.fsPath;
+    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+    if (!workspaceFolder || !filePath.includes(path.join(workspaceFolder.uri.fsPath, 'dag'))) {
+      return;
+    }
+
     const greenRanges: vscode.DecorationOptions[] = [];
     const yellowRanges: vscode.DecorationOptions[] = [];
     const redRanges: vscode.DecorationOptions[] = [];
@@ -215,12 +221,6 @@ export function activate(context: vscode.ExtensionContext) {
       const version = parsed.version;
       const allVersions = stepVersionsIndex.get(key);
       const defCount = stepDefinitionCount.get(fullKey) || 0;
-
-      const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-      if (!workspaceFolder) {
-        redRanges.push({ range });
-        continue;
-      }
 
       const existingPath = parsed.filePaths
         .map(p => path.join(workspaceFolder.uri.fsPath, p))
