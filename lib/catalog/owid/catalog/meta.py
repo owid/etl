@@ -329,7 +329,7 @@ class VariableMeta(MetaBase):
             try:
                 color_scale = gconf["map"]["colorScale"]
                 if isinstance(color_scale["customNumericValues"], str):
-                    color_scale["customNumericValues"] = ast.literal_eval(color_scale["customNumericValues"])
+                    color_scale["customNumericValues"] = list(ast.literal_eval(color_scale["customNumericValues"]))
             except KeyError:
                 pass
 
@@ -588,7 +588,7 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
         try:
             color_scale = gconf["map"]["colorScale"]
             if isinstance(color_scale["customNumericValues"], str):
-                color_scale["customNumericValues"] = ast.literal_eval(color_scale["customNumericValues"])
+                color_scale["customNumericValues"] = list(ast.literal_eval(color_scale["customNumericValues"]))
         except KeyError:
             pass
 
