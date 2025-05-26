@@ -2,10 +2,11 @@
 
 **Clickable DAG Steps** is a VS Code extension that makes `dag.yml` files easier to navigate by turning DAG entries like `data://...` and `export://...` into clickable links. These links open the corresponding Python ETL scripts in your workspace, or, in the case of snapshots, the corresponding `.dvc` file of the snapshot.
 
-This extension also shows a circle next to each entry in the dag, which is:
-- Green, if a file exists for that entry, and that's the latest version of the entry.
-- Yellow, if a file exists for that entry, but there is a newer version of that entry.
-- Red, if no file is found for that entry.
+This extension also shows a symbol next to each entry in the dag, which is:
+- 🟢 if a file exists for that step, and the step's version is the latest in the DAG.
+- 🟡 if a file exists for that step, but there is a newer version of that step.
+- 🔴 if no file is found for that step.
+- ⚠️ if the step is repeated in the DAG.
 
 ## Usage
 

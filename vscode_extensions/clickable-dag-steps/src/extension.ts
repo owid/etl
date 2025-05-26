@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
-function parseStepUri(uri: string): { scheme: string; key: string; version: string, filePaths: string[] } | null {
+function parseStepUri(uri: string): { scheme: string; key: string; version: string, fullKey: string, filePaths: string[] } | null {
   const parts = uri.split('://');
   if (parts.length !== 2) {
     return null;
@@ -22,8 +22,9 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     const version = segments[1];
     const shortName = segments.slice(2).join('/');
     const key = `snapshot://${namespace}/${shortName}`;
+    const fullKey = `snapshot://${namespace}/${version}/${shortName}`;
     const filePath = path.join('snapshots', namespace, version, shortName + '.dvc');
-    return { scheme, key, version, filePaths: [filePath] };
+    return { scheme, key, version, fullKey, filePaths: [filePath] };
   }
 
   if (scheme === 'data' || scheme === 'export') {
@@ -35,6 +36,7 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     const version = segments[2];
     const shortName = segments.slice(3).join('/');
     const key = `${scheme}://${channel}/${namespace}/${shortName}`;
+    const fullKey = `${scheme}://${channel}/${namespace}/${version}/${shortName}`;
     const base = scheme === 'data' ? 'etl/steps/data' : 'etl/steps/export';
     const dir = path.join(base, channel, namespace, version);
     const filePaths = [
@@ -42,16 +44,19 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
       path.join(dir, shortName, '__init__.py'),
       path.join(dir, shortName + '.ipynb')
     ];
-    return { scheme, key, version, filePaths };
+    return { scheme, key, version, fullKey, filePaths };
   }
 
   return null;
 }
 
 let stepVersionsIndex: Map<string, Set<string>> = new Map();
+let stepDefinitionCount: Map<string, number> = new Map();
 
 function buildDAGIndex(): void {
   stepVersionsIndex.clear();
+  stepDefinitionCount.clear();
+
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
   if (!workspaceFolder) {
     return;
@@ -86,6 +91,12 @@ function buildDAGIndex(): void {
               stepVersionsIndex.set(parsed.key, new Set());
             }
             stepVersionsIndex.get(parsed.key)!.add(parsed.version);
+
+            // Count full definitions (scheme+channel+namespace+version+shortname)
+            if (line.trim().endsWith(':')) {
+              const count = stepDefinitionCount.get(parsed.fullKey) || 0;
+              stepDefinitionCount.set(parsed.fullKey, count + 1);
+            }
           }
         }
       }
@@ -125,6 +136,9 @@ export function activate(context: vscode.ExtensionContext) {
     }),
     red: vscode.window.createTextEditorDecorationType({
       after: { contentText: '🔴', margin: '0 0 0 0.25em' }
+    }),
+    warning: vscode.window.createTextEditorDecorationType({
+      after: { contentText: '⚠️', margin: '0 0 0 0.25em' }
     })
   };
 
@@ -178,6 +192,8 @@ export function activate(context: vscode.ExtensionContext) {
     const greenRanges: vscode.DecorationOptions[] = [];
     const yellowRanges: vscode.DecorationOptions[] = [];
     const redRanges: vscode.DecorationOptions[] = [];
+    const warningRanges: vscode.DecorationOptions[] = [];
+
     const text = editor.document.getText();
     const regex = /(?:data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
     let match: RegExpExecArray | null;
@@ -186,8 +202,8 @@ export function activate(context: vscode.ExtensionContext) {
       const uri = match[0];
       const parsed = parseStepUri(uri);
       const startPos = editor.document.positionAt(match.index);
-      const lineEnd = editor.document.lineAt(startPos.line).range.end;
-      const range = new vscode.Range(lineEnd, lineEnd);
+      const line = editor.document.lineAt(startPos.line);
+      const range = new vscode.Range(line.range.end, line.range.end);
 
       if (!parsed) {
         redRanges.push({ range });
@@ -195,8 +211,10 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const key = parsed.key;
+      const fullKey = parsed.fullKey;
       const version = parsed.version;
       const allVersions = stepVersionsIndex.get(key);
+      const defCount = stepDefinitionCount.get(fullKey) || 0;
 
       const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
       if (!workspaceFolder) {
@@ -210,6 +228,11 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (!existingPath) {
         redRanges.push({ range });
+        continue;
+      }
+
+      if (defCount > 1 && line.text.trim().endsWith(':')) {
+        warningRanges.push({ range, hoverMessage: '⚠️ Step is defined more than once in the DAG' });
         continue;
       }
 
@@ -228,6 +251,7 @@ export function activate(context: vscode.ExtensionContext) {
     editor.setDecorations(emojiDecorations.green, greenRanges);
     editor.setDecorations(emojiDecorations.yellow, yellowRanges);
     editor.setDecorations(emojiDecorations.red, redRanges);
+    editor.setDecorations(emojiDecorations.warning, warningRanges);
   }
 
   context.subscriptions.push(
