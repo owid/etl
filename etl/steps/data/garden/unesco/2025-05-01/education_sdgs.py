@@ -56,7 +56,7 @@ def run() -> None:
     tb = tb[tb["indicator_label_en"].notna()]
     tb["indicator_label_en"] = tb["indicator_label_en"].astype(str) + ", " + tb["indicator_id"].astype(str)
 
-    # Pivot the table to have the indicators as columns to add descriptions from producer
+    # # Pivot the table to have the indicators as columns to add descriptions from producer
     tb_pivoted = tb.pivot(index=["country", "year"], columns="indicator_label_en", values="value")
 
     for column in tb_pivoted.columns:
@@ -89,12 +89,9 @@ def run() -> None:
             update_metadata(meta, 0, " ", " ")
 
     tb_pivoted = tb_pivoted.reset_index()
-
+    tb_pivoted = tb_pivoted.format(["country", "year"])
     # Combine recent literacy estimates and expenditure data with historical estimates from a migrated dataset
     tb_pivoted = combine_historical_literacy_expenditure(tb_pivoted, tb_literacy, tb_expenditure)
-    print(tb_pivoted["combined_literacy"].head())
-
-    tb_pivoted = tb_pivoted.format(["country", "year"])
 
     #
     # Save outputs.
@@ -117,13 +114,13 @@ def combine_historical_literacy_expenditure(tb: Table, tb_literacy: Table, tb_ex
     it falls back to historical data, which could also be missing (NaN).
 
     """
-
-    historic_literacy = (
-        tb_literacy[["literacy_rates__world_bank__cia_world_factbook__and_other_sources"]].reset_index().copy()
-    )
-    historic_expenditure = (
-        tb_expenditure[["public_expenditure_on_education__tanzi__and__schuktnecht__2000"]].reset_index().copy()
-    )
+    tb = tb.reset_index()
+    historic_literacy = tb_literacy[
+        ["year", "country", "literacy_rates__world_bank__cia_world_factbook__and_other_sources"]
+    ].copy()
+    historic_expenditure = tb_expenditure[
+        ["year", "country", "public_expenditure_on_education__tanzi__and__schuktnecht__2000"]
+    ].copy()
     # Recent literacy rates
     recent_literacy = tb[
         ["year", "country", "adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99"]
@@ -164,6 +161,7 @@ def combine_historical_literacy_expenditure(tb: Table, tb_literacy: Table, tb_ex
         on=["year", "country"],
         how="outer",
     )
+    tb = tb.format(["country", "year"])
 
     return tb
 
