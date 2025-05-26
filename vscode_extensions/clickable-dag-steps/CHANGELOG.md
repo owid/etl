@@ -1,9 +1,9 @@
-# Change Log
+# Changelog
 
-All notable changes to the "clickable-dag-steps" extension will be documented in this file.
+## [0.0.2] – 2025-05-26
+- Sidebar emoji (🟢🟡🔴) to indicate step version status and file existence.
+- Tooltip showing file status when hovering a step.
+- Detection of duplicate DAG step definitions.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+## [0.0.1] – 2025-05-26
+- Clickable DAG step entries (`Cmd+Click`) that open the corresponding `.py`, `.ipynb`, or `.dvc` file.
