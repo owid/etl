@@ -2,6 +2,7 @@
 
 from typing import List
 
+import owid.catalog.processing as pr
 import vdem_aggregate as aggregate  # VDEM's aggregating library
 import vdem_clean as clean  # VDEM's cleaning library
 import vdem_impute as impute  # VDEM's imputing library
@@ -129,8 +130,11 @@ def run() -> None:
     tb_multi_without_regions = tb_multi_without_regions.format(
         keys=["country", "year", "estimate"], short_name="vdem_multi_without_regions"
     )
+    tb_multi_with_regions2 = tb_multi_with_regions.format(
+        keys=["country", "year", "estimate"], short_name="vdem_multi_with_regions2"
+    )
     tb_multi_with_regions = tb_multi_with_regions.format(
-        keys=["country", "year", "estimate", "aggregate_method"], short_name="vdem_multi_with_regions"
+        keys=["country", "year", "estimate"], short_name="vdem_multi_with_regions"
     )
     tb_countries_counts = tb_countries_counts.format(
         keys=["country", "year", "category"], short_name="vdem_num_countries"
@@ -150,6 +154,7 @@ def run() -> None:
         tb_multi_without_regions,
         # Main indicators (multi-dimensional) with regions
         tb_multi_with_regions,
+        tb_multi_with_regions2,
         # Number of countries with X properties
         tb_countries_counts,
         # Number of people living in countries with X property
