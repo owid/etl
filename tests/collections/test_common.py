@@ -458,7 +458,7 @@ def test_merge_common_metadata_4():
 
 def test_merge_common_metadata_5():
     """Test conflict detection when multiple dimensions compete for same property.
-    
+
     This test verifies that the system properly detects and reports conflicts when:
     - Multiple common params at the same priority level try to set the same property
     - sex=female and age=10 both attempt to set others1.description_aux1
@@ -549,7 +549,7 @@ def test_merge_common_metadata_5():
     }
 
     common_params = [CommonView.from_dict(r) for r in common_params]
-    with pytest.raises(ValueError):
+    with pytest.raises(CommonViewParamConflict):
         _ = merge_common_metadata_by_dimension(
             common_config=common_params,
             view_dimensions=active_dimensions,
