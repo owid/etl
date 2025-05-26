@@ -9,7 +9,8 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     return null;
   }
 
-  const scheme = parts[0];
+  const rawScheme = parts[0];
+  const scheme = rawScheme.replace('-private', '');
   const remainder = parts[1].replace(/:$/, '');
   const segments = remainder.split('/');
 
@@ -70,7 +71,7 @@ function buildDAGIndex(): void {
   };
   walk(dagDir);
 
-  const uriRegex = /^(?:\s*-\s*|\s*)(data|export|snapshot):\/\/[^\s#]+/;
+  const uriRegex = /^(?:\s*-\s*|\s*)(data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s#]+/;
 
   for (const filePath of allYmlFiles) {
     try {
@@ -131,7 +132,7 @@ export function activate(context: vscode.ExtensionContext) {
   const linkProvider: vscode.DocumentLinkProvider = {
     provideDocumentLinks(document: vscode.TextDocument) {
       const links: vscode.DocumentLink[] = [];
-      const regex = /(?:data|export|snapshot):\/\/[^\s"']+/g;
+      const regex = /(?:data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
       const text = document.getText();
       let match: RegExpExecArray | null;
 
@@ -179,7 +180,7 @@ export function activate(context: vscode.ExtensionContext) {
     const yellowRanges: vscode.DecorationOptions[] = [];
     const redRanges: vscode.DecorationOptions[] = [];
     const text = editor.document.getText();
-    const regex = /(?:data|export|snapshot):\/\/[^\s"']+/g;
+    const regex = /(?:data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
     let match: RegExpExecArray | null;
 
     while ((match = regex.exec(text)) !== null) {
