@@ -11,6 +11,7 @@ definitions:
         hasMapTab: true
         maxTime: 2024
         map:
+          time: 2024
           timeTolerance: 10
           colorScale:
             binningStrategy: manual
