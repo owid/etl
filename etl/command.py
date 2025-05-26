@@ -69,6 +69,11 @@ log = structlog.get_logger()
     help="Run private steps.",
 )
 @click.option(
+    "--instant",
+    is_flag=True,
+    help="Only apply YAML metadata in the garden step.",
+)
+@click.option(
     "--grapher/--no-grapher",
     "-g/-ng",
     default=False,
@@ -152,6 +157,7 @@ def main_cli(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
+    instant: bool = False,
     grapher: bool = False,
     export: bool = False,
     ipdb: bool = False,
@@ -198,6 +204,9 @@ def main_cli(
     # GRAPHER_INSERT_WORKERS should be split among workers
     if workers > 1:
         config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
+
+    # Set INSTANT mode from CLI flag
+    config.INSTANT = instant
 
     kwargs = dict(
         steps=steps,
