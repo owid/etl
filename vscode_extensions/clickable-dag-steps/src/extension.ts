@@ -1,76 +1,256 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
+
+function parseStepUri(uri: string): { scheme: string; key: string; version: string, filePath: string } | null {
+  const parts = uri.split('://');
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const scheme = parts[0];
+  const remainder = parts[1].replace(/:$/, '');
+  const segments = remainder.split('/');
+
+  if (scheme === 'snapshot') {
+    if (segments.length < 3) {
+      return null;
+    }
+    const namespace = segments[0];
+    const version = segments[1];
+    const shortName = segments.slice(2).join('/');
+    const key = `snapshot://${namespace}/${shortName}`;
+    const filePath = path.join('snapshots', namespace, version, shortName + '.dvc');
+    return { scheme, key, version, filePath };
+  }
+
+  if (scheme === 'data' || scheme === 'export') {
+    if (segments.length < 4) {
+      return null;
+    }
+    const channel = segments[0];
+    const namespace = segments[1];
+    const version = segments[2];
+    const shortName = segments.slice(3).join('/');
+    const key = `${scheme}://${channel}/${namespace}/${shortName}`;
+    const base = scheme === 'data' ? 'etl/steps/data' : 'etl/steps/export';
+    const filePath = path.join(base, channel, namespace, version, shortName + '.py');
+    return { scheme, key, version, filePath };
+  }
+
+  return null;
+}
+
+let stepVersionsIndex: Map<string, Set<string>> = new Map();
+
+function buildDAGIndex(): void {
+  stepVersionsIndex.clear();
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  if (!workspaceFolder) {
+    return;
+  }
+  const dagDir = path.join(workspaceFolder.uri.fsPath, 'dag');
+
+  const allYmlFiles: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(fullPath);
+      } else if (entry.isFile() && fullPath.endsWith('.yml')) {
+        allYmlFiles.push(fullPath);
+      }
+    }
+  };
+  walk(dagDir);
+
+  const uriRegex = /^(?:\s*-\s*|\s*)(data|export|snapshot):\/\/[^\s#]+/;
+
+  for (const filePath of allYmlFiles) {
+    try {
+      const lines = fs.readFileSync(filePath, 'utf8').split('\n');
+      for (const line of lines) {
+        const match = uriRegex.exec(line);
+        if (match) {
+          const uri = match[0].replace(/^\s*-\s*/, '').trim();
+          const parsed = parseStepUri(uri);
+          if (parsed) {
+            console.log(`[INDEX] Adding key: ${parsed.key}, version: ${parsed.version}`);
+            if (!stepVersionsIndex.has(parsed.key)) {
+              stepVersionsIndex.set(parsed.key, new Set());
+            }
+            stepVersionsIndex.get(parsed.key)!.add(parsed.version);
+          }
+        }
+      }
+    } catch (err) {
+      console.error(`Error parsing DAG file ${filePath}:`, err);
+    }
+  }
+}
+
+function getLatestVersion(versions: Set<string>): string {
+  if (versions.has('latest')) {
+    return 'latest';
+  }
+
+  const sorted = Array.from(versions).sort((a, b) => {
+    const aDate = Date.parse(a);
+    const bDate = Date.parse(b);
+    if (!isNaN(aDate) && !isNaN(bDate)) {
+      return aDate - bDate;
+    }
+    return a.localeCompare(b);
+  });
+
+  return sorted[sorted.length - 1];
+}
 
 export function activate(context: vscode.ExtensionContext) {
-	console.log('Clickable DAG Steps extension is active.');
+  console.log('Clickable DAG Steps with status highlighting activated.');
+  buildDAGIndex();
 
-	const linkProvider: vscode.DocumentLinkProvider = {
-		provideDocumentLinks(document: vscode.TextDocument) {
-			const links: vscode.DocumentLink[] = [];
+  const decorationIcons = {
+    green: vscode.window.createTextEditorDecorationType({
+      after: { contentIconPath: context.asAbsolutePath('resources/green-dot.svg'), margin: '0 0 0 0.25em' }
+    }),
+    yellow: vscode.window.createTextEditorDecorationType({
+      after: { contentIconPath: context.asAbsolutePath('resources/yellow-dot.svg'), margin: '0 0 0 0.25em' }
+    }),
+    red: vscode.window.createTextEditorDecorationType({
+      after: { contentIconPath: context.asAbsolutePath('resources/red-dot.svg'), margin: '0 0 0 0.25em' }
+    })
+  };
 
-			// Match URIs like data://..., export://..., or snapshot://... (stop before colon or whitespace)
-			const dagUriRegex = /\b(?:data|export|snapshot):\/\/[a-zA-Z0-9_/.\-]+/g;
+  const linkProvider: vscode.DocumentLinkProvider = {
+    provideDocumentLinks(document: vscode.TextDocument) {
+      const links: vscode.DocumentLink[] = [];
+      const regex = /(?:data|export|snapshot):\/\/[^\s"']+/g;
+      const text = document.getText();
+      let match: RegExpExecArray | null;
 
-			for (let line = 0; line < document.lineCount; line++) {
-				const textLine = document.lineAt(line);
-				let match: RegExpExecArray | null;
+      while ((match = regex.exec(text)) !== null) {
+        const uri = match[0];
+        const parsed = parseStepUri(uri);
+        if (!parsed) {
+          continue;
+        }
 
-				while ((match = dagUriRegex.exec(textLine.text)) !== null) {
-					const matchedUri = match[0].trim();
+        const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
+        if (!workspaceFolder) {
+          continue;
+        }
 
-					// Identify scheme and determine base path + file extension
-					let baseDir: string;
-					let fileExtension: string;
+        const fullPath = path.join(workspaceFolder.uri.fsPath, parsed.filePath);
+        console.log(`[LINK] URI: ${uri}`);
+        console.log(`[LINK] → file path: ${fullPath}`);
 
-					if (matchedUri.startsWith('data://')) {
-						baseDir = 'etl/steps/data/';
-						fileExtension = '.py';
-					} else if (matchedUri.startsWith('export://')) {
-						baseDir = 'etl/steps/export/';
-						fileExtension = '.py';
-					} else if (matchedUri.startsWith('snapshot://')) {
-						baseDir = 'snapshots/';
-						fileExtension = '.dvc';
-					} else {
-						continue;
-					}
+        const fileUri = vscode.Uri.file(fullPath);
+        const startPos = document.positionAt(match.index);
+        const endPos = document.positionAt(match.index + uri.length);
+        const range = new vscode.Range(startPos, endPos);
 
-					// Strip the scheme (e.g. data://, snapshot://) and split the path
-					const relativePath = matchedUri.replace(/^(data|export|snapshot):\/\//, '');
-					const segments = relativePath.split('/');
+        links.push(new vscode.DocumentLink(range, fileUri));
+      }
 
-					if (segments.length < 2) {
-						continue;
-					}
+      return links;
+    }
+  };
 
-					const fullRelativePath = path.join(baseDir, ...segments) + fileExtension;
+  context.subscriptions.push(
+    vscode.languages.registerDocumentLinkProvider({ language: 'yaml', scheme: 'file' }, linkProvider)
+  );
 
-					const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
-					if (!workspaceFolder) {
-						continue;
-					}
+  function updateDecorations(editor: vscode.TextEditor) {
+    const greenRanges: vscode.DecorationOptions[] = [];
+    const yellowRanges: vscode.DecorationOptions[] = [];
+    const redRanges: vscode.DecorationOptions[] = [];
+    const text = editor.document.getText();
+    const regex = /(?:data|export|snapshot):\/\/[^\s"']+/g;
+    let match: RegExpExecArray | null;
 
-					const fileUri = vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, fullRelativePath));
+    while ((match = regex.exec(text)) !== null) {
+      const uri = match[0];
+      const parsed = parseStepUri(uri);
+      const startPos = editor.document.positionAt(match.index);
+      const lineEnd = editor.document.lineAt(startPos.line).range.end;
+      const range = new vscode.Range(lineEnd, lineEnd);
 
-					const range = new vscode.Range(
-						new vscode.Position(line, match.index!),
-						new vscode.Position(line, match.index! + matchedUri.length)
-					);
+      if (!parsed) {
+        redRanges.push({ range });
+        continue;
+      }
 
-					const link = new vscode.DocumentLink(range, fileUri);
-					// The following tooltip is long and may be annoying
-					// link.tooltip = `Open file: ${fullRelativePath}`;
-					link.tooltip = `Open file`;
-					links.push(link);
-				}
-			}
+      const key = parsed.key;
+      const version = parsed.version;
+      const allVersions = stepVersionsIndex.get(key);
 
-			return links;
-		}
-	};
+      const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+      if (!workspaceFolder) {
+        redRanges.push({ range });
+        continue;
+      }
 
-	const selector: vscode.DocumentSelector = { language: 'yaml', scheme: 'file' };
-	context.subscriptions.push(vscode.languages.registerDocumentLinkProvider(selector, linkProvider));
+      const fullPath = path.join(workspaceFolder.uri.fsPath, parsed.filePath);
+      if (!fs.existsSync(fullPath)) {
+        redRanges.push({ range });
+        continue;
+      }
+
+      if (!allVersions || !allVersions.has(version)) {
+        redRanges.push({ range });
+      } else {
+        const latest = getLatestVersion(allVersions);
+        if (version === latest) {
+          greenRanges.push({ range });
+        } else {
+          yellowRanges.push({ range });
+        }
+      }
+    }
+
+    editor.setDecorations(decorationIcons.green, greenRanges);
+    editor.setDecorations(decorationIcons.yellow, yellowRanges);
+    editor.setDecorations(decorationIcons.red, redRanges);
+  }
+
+  const updateAllEditors = () => {
+    for (const editor of vscode.window.visibleTextEditors) {
+      if (editor.document.languageId === 'yaml') {
+        updateDecorations(editor);
+      }
+    }
+  };
+
+  const watcher = vscode.workspace.createFileSystemWatcher('**/dag/**/*.yml');
+  watcher.onDidChange(() => {
+    buildDAGIndex();
+    updateAllEditors();
+  });
+  watcher.onDidCreate(() => {
+    buildDAGIndex();
+    updateAllEditors();
+  });
+  watcher.onDidDelete(() => {
+    buildDAGIndex();
+    updateAllEditors();
+  });
+
+  context.subscriptions.push(watcher);
+
+  vscode.workspace.onDidChangeTextDocument(event => {
+    const editor = vscode.window.visibleTextEditors.find(e => e.document.uri === event.document.uri);
+    if (editor) {
+      updateDecorations(editor);
+    }
+  });
+
+  vscode.window.onDidChangeVisibleTextEditors(() => {
+    updateAllEditors();
+  });
+
+  updateAllEditors();
 }
 
 export function deactivate() {}
