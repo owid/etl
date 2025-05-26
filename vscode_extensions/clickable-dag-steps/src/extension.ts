@@ -58,7 +58,9 @@ export function activate(context: vscode.ExtensionContext) {
 					);
 
 					const link = new vscode.DocumentLink(range, fileUri);
-					link.tooltip = `Open file: ${fullRelativePath}`;
+					// The following tooltip is long and may be annoying
+					// link.tooltip = `Open file: ${fullRelativePath}`;
+					link.tooltip = `Open file`;
 					links.push(link);
 				}
 			}
