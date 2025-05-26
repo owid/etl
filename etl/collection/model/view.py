@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from owid.catalog.meta import GrapherConfig
 
-from etl.collection.exceptions import ExtraIndicatorsInUseError
+from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.utils import CHART_DIMENSIONS
 
@@ -527,6 +527,6 @@ def merge_common_metadata_by_dimension(
             # List sources and values involved in this conflict
             sources = [f"{rec['source']} (value={rec['value']})" for rec in info_list]
             messages.append(f"'{key_path}' from " + " vs ".join(sources))
-        raise ValueError("Unresolved conflicts for keys: " + "; ".join(messages))
+        raise CommonViewParamConflict("Unresolved conflicts for keys: " + "; ".join(messages))
 
     return final_result

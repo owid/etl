@@ -11,6 +11,12 @@ class ParamKeyError(KeyError):
     pass
 
 
+class CommonViewParamConflict(Exception):
+    """Raised when there is a conflict because multiple common views are trying to set the same parameter."""
+
+    pass
+
+
 class MissingChoiceError(Exception):
     """Raised when a choice is missing in the dimension choices."""
 
