@@ -564,7 +564,7 @@ tables:
         description_short: Percentage of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
         description_key:
           - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
-          - It captures the percentage of individuals in a given age group (such as those aged 15–24 or 15 and above) who are considered literate, based on their ability to both read and write.
+          - It captures the percentage of individuals aged 15 and above who are considered literate, based on their ability to both read and write.
           - The literacy rate is calculated by dividing the number of literate individuals by the total population in the same age group, excluding those with unknown literacy status.
           - A high literacy rate suggests that most people have acquired basic reading and writing skills, typically through primary education or literacy programs.
           - Data typically come from population censuses or household surveys and are often self-reported.
@@ -591,8 +591,7 @@ tables:
         title: Public spending on education as a share of GDP (historical and recent)
         unit: "%"
         short_unit: "%"
-        description_short: Total general government expenditure on education (all levels of government and all levels of education), given as a share of GDP.
-
+        description_short: Total [general government](#dod:general-government) expenditure on education (all levels of government and all levels of education), given as a share of GDP.
         description_processing: |-
           **Historical expenditure data:**
 
@@ -608,7 +607,8 @@ tables:
         presentation:
           title_public: Public spending on education as a share of GDP
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
+          name: Literate
 
       combined_illiterate:
         title: Illiteracy rate (historical and recent)
@@ -620,4 +620,5 @@ tables:
         presentation:
           title_public: Illiteracy rate
         display:
-          numDecimalPlaces: 1
+          numDecimalPlaces: 2
+          name: Illiterate
