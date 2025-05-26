@@ -133,9 +133,9 @@ def run() -> None:
     tb.loc[tb["unit_multiplier"] == "Millions", "value"] *= 1_000_000
 
     # Check if all unit keys are in the dataset.
-    assert set(tb["unit"].unique()) == set(
-        UNITS.keys()
-    ), f"Some unit keys are not in the dataset: {set(tb['unit'].unique())- set(UNITS.keys())}".format()
+    assert set(tb["unit"].unique()) == set(UNITS.keys()), (
+        f"Some unit keys are not in the dataset: {set(tb['unit'].unique()) - set(UNITS.keys())}".format()
+    )
 
     # Rename unit column.
     tb["unit"] = tb["unit"].map(UNITS)
@@ -144,9 +144,9 @@ def run() -> None:
     tb["indicator"] = tb["indicator"].map(INDICATORS).fillna(tb["indicator"])
 
     # Check if all the functions are in the dataset, excluding NA values.
-    assert (
-        set(tb["function"].dropna().unique()) == set(FUNCTIONS.keys())
-    ), f"Some function keys are not in the dataset: {set(tb['function'].dropna().unique()) - set(FUNCTIONS.keys())}".format()
+    assert set(tb["function"].dropna().unique()) == set(FUNCTIONS.keys()), (
+        f"Some function keys are not in the dataset: {set(tb['function'].dropna().unique()) - set(FUNCTIONS.keys())}".format()
+    )
 
     # Rename function column.
     tb["function"] = tb["function"].map(FUNCTIONS)

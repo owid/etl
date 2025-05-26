@@ -136,9 +136,9 @@ class ExplorerMigration:
         for block in self.table_columns_block:
             if block["type"] == "columns":
                 # Sanity checks
-                assert (
-                    len(block["args"]) == 1
-                ), f"columns is expected to have only one argument. Instead got: {block['args']}"
+                assert len(block["args"]) == 1, (
+                    f"columns is expected to have only one argument. Instead got: {block['args']}"
+                )
 
                 # Get table URI
                 table_slug = block["args"][0]

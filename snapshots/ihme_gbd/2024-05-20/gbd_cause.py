@@ -57,13 +57,13 @@ def main(upload: bool) -> None:
             # Downloading the second batch of files
             file_number_two = file_number - NUMBER_OF_FILES
             df = download_data(file_number_two, base_url=BASE_URL_TWO)
-        log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
+        log.info(f"Download of file {file_number} finished", size=f"{df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
         dfs.append(df)
 
     # Concatenate the dataframes while keeping categorical columns to reduce memory usage.
     df = repack_frame(concatenate(dfs))
 
-    log.info("Uploading final file", size=f"{df.memory_usage(deep=True).sum()/1e6:.2f} MB")
+    log.info("Uploading final file", size=f"{df.memory_usage(deep=True).sum() / 1e6:.2f} MB")
     snap.create_snapshot(upload=upload, data=df)
 
 

@@ -144,13 +144,13 @@ def create_comment_body(branch: str, services: Dict[str, str], start_time: float
 **Login**: `ssh owid@{container_name}`
 
 <!--grapher-start-->
-{services.get('grapher', '')}
+{services.get("grapher", "")}
 <!--grapher-end-->
 <!--chart-diff-start-->
-{services.get('chart-diff', '')}
+{services.get("chart-diff", "")}
 <!--chart-diff-end-->
 <!--data-diff-start-->
-{services.get('data-diff', '')}
+{services.get("data-diff", "")}
 <!--data-diff-end-->
 
 _Edited: {dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")} UTC_

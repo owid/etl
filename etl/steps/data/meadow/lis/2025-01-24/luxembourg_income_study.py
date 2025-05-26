@@ -108,9 +108,9 @@ def edit_snapshots_and_add_to_dataset(
 
             # Assert if there are missing values in the name column and show which countries are missing
             missing_countries = tb[tb["name"].isnull()]["country"].unique()
-            assert (
-                len(missing_countries) == 0
-            ), f"Missing countries in the table {tb_name}{age_suffix}: {missing_countries}"
+            assert len(missing_countries) == 0, (
+                f"Missing countries in the table {tb_name}{age_suffix}: {missing_countries}"
+            )
 
             tb = tb.drop(columns=["country", "iso_alpha2"])
             tb = tb.rename(columns={"name": "country"})

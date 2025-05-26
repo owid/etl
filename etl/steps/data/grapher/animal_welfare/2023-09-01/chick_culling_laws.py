@@ -66,9 +66,9 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     # Check that all status values are defined.
-    assert (
-        status_unknown := (set(tb["status"]) - STATUS_ALL)
-    ) == set(), f"Undefined status of banning: {status_unknown}"
+    assert (status_unknown := (set(tb["status"]) - STATUS_ALL)) == set(), (
+        f"Undefined status of banning: {status_unknown}"
+    )
 
     # Add annotations for each country to metadata.
     # NOTE: For now annotations are not shown in map tabs. Possibly in the future they will appear in map tab tooltips.

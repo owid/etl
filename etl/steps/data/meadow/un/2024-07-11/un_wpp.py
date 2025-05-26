@@ -197,9 +197,9 @@ def combine_births(tb_age, tb_sex) -> Table:
         "Female",
         "Male",
     }, "Unknown columns in sex table!"
-    assert {col for col in tb_age.columns if col not in columns} == {
-        f"{i}-{i+4}" for i in range(10, 60, 5)
-    }, "Unknown columns in age table!"
+    assert {col for col in tb_age.columns if col not in columns} == {f"{i}-{i + 4}" for i in range(10, 60, 5)}, (
+        "Unknown columns in age table!"
+    )
 
     # total births by age of mother
     tb_age = tb_age.melt(list(columns), var_name="Age", value_name="Value")

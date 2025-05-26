@@ -138,9 +138,9 @@ def test_app_harmonizer():
     sel.set_value(dataset_uri).run()
     assert not at.exception
 
-    assert (
-        len(at.selectbox) == 3
-    ), f"By selecting dataset {dataset_uri}, there should be three selectboxes (automatically populated)."
+    assert len(at.selectbox) == 3, (
+        f"By selecting dataset {dataset_uri}, there should be three selectboxes (automatically populated)."
+    )
 
     # Check selectbox options
     sel2 = at.selectbox[1]

@@ -102,7 +102,7 @@ def _indicator_to_frame(indicator: dict, codes: bool = False) -> pd.DataFrame:
     df["entities"] = df.entities.apply(id_to_name.__getitem__)
 
     # make the "values" column more interestingly named
-    short_name = metadata.get("shortName", f'_{metadata["id"]}')
+    short_name = metadata.get("shortName", f"_{metadata['id']}")
     df = df.rename(columns={"values": short_name})
 
     time_col = _detect_time_col_type(metadata)

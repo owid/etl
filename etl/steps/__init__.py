@@ -625,7 +625,7 @@ class DataStep(Step):
         except subprocess.CalledProcessError:
             # swallow this exception and just exit -- the important stack trace
             # will already have been printed to stderr
-            print(f'\nCOMMAND: {" ".join(args)}', file=sys.stderr)
+            print(f"\nCOMMAND: {' '.join(args)}", file=sys.stderr)
             sys.exit(1)
 
     def _run_notebook(self) -> None:

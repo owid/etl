@@ -139,14 +139,14 @@ def get_complete_dimensions_filter(
             dimensions_filter_complete[dim] = choices
         else:
             if isinstance(dimensions_filter[dim], str):
-                assert (
-                    dimensions_filter[dim] in choices
-                ), f"Choice {dimensions_filter[dim]} not found for dimension {dim}!"
+                assert dimensions_filter[dim] in choices, (
+                    f"Choice {dimensions_filter[dim]} not found for dimension {dim}!"
+                )
                 dimensions_filter_complete[dim] = [dimensions_filter[dim]]
             elif isinstance(dimensions_filter[dim], list):
-                assert all(
-                    choice in choices for choice in dimensions_filter[dim]
-                ), f"Choices {dimensions_filter[dim]} not found for dimension {dim}!"
+                assert all(choice in choices for choice in dimensions_filter[dim]), (
+                    f"Choices {dimensions_filter[dim]} not found for dimension {dim}!"
+                )
                 dimensions_filter_complete[dim] = dimensions_filter[dim]
 
     return expand_combinations(dimensions_filter_complete)

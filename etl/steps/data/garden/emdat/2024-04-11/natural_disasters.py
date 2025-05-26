@@ -229,9 +229,9 @@ def sanity_checks_on_inputs(tb: Table) -> None:
     assert (tb.select_dtypes("number").fillna(0) >= 0).all().all(), error
 
     error = "Column 'total_affected' should be the sum of columns 'injured', 'affected', and 'homeless'."
-    assert (
-        tb["total_affected"].fillna(0) == tb[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)
-    ).all(), error
+    assert (tb["total_affected"].fillna(0) == tb[["injured", "affected", "homeless"]].sum(axis=1).fillna(0)).all(), (
+        error
+    )
 
     error = "Natural disasters are not expected to last more than 9 years."
     assert (tb["end_year"] - tb["start_year"]).max() < 10, error

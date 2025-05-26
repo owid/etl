@@ -328,11 +328,11 @@ def var_metadata_income_and_equivalence_scale(var, wel, e) -> VariableMeta:
     if var == "mean" or var == "median":
         meta = VariableMeta(
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-            description=f"""{var_dict[var]['description']}
+            description=f"""{var_dict[var]["description"]}
 
-{inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]["description"]}
 
-{equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]["description"]}
 
 {ppp_description}
 
@@ -352,11 +352,11 @@ def var_metadata_income_and_equivalence_scale(var, wel, e) -> VariableMeta:
     else:
         meta = VariableMeta(
             title=f"{var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-            description=f"""{var_dict[var]['description']}
+            description=f"""{var_dict[var]["description"]}
 
-{inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]["description"]}
 
-{equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]["description"]}
 
 {notes_title}
 
@@ -378,11 +378,11 @@ def var_metadata_income_and_equivalence_scale(var, wel, e) -> VariableMeta:
 def var_metadata_income_equivalence_scale_relative(var, wel, e, rel) -> VariableMeta:
     meta = VariableMeta(
         title=f"{rel_dict[rel]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-        description=f"""{var_dict[var]['description']}
+        description=f"""{var_dict[var]["description"]}
 
-{inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]["description"]}
 
-{equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]["description"]}
 
 {notes_title}
 
@@ -402,11 +402,11 @@ def var_metadata_income_equivalence_scale_relative(var, wel, e, rel) -> Variable
 def var_metadata_income_equivalence_scale_absolute(var, wel, e, abs) -> VariableMeta:
     meta = VariableMeta(
         title=f"{abs_dict[abs]} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-        description=f"""{var_dict[var]['description']}
+        description=f"""{var_dict[var]["description"]}
 
-{inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]["description"]}
 
-{equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]["description"]}
 
 {ppp_description}
 
@@ -429,11 +429,11 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
     if var == "thr":
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile9']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-            description=f"""{var_dict[var]['description']}
+            description=f"""{var_dict[var]["description"]}
 
-{inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]["description"]}
 
-{equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]["description"]}
 
 {ppp_description}
 
@@ -453,11 +453,11 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
     elif var == "avg":
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-            description=f"""{var_dict[var]['description']}
+            description=f"""{var_dict[var]["description"]}
 
-{inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]["description"]}
 
-{equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]["description"]}
 
 {ppp_description}
 
@@ -477,11 +477,11 @@ def var_metadata_income_equivalence_scale_percentiles(var, wel, e, pct) -> Varia
     else:
         meta = VariableMeta(
             title=f"{pct_dict[pct]['decile10']} - {var_dict[var]['title']} ({inc_cons_dict[wel]['name']}, {equivalence_scales_dict[e]['name']})",
-            description=f"""{var_dict[var]['description']}
+            description=f"""{var_dict[var]["description"]}
 
-{inc_cons_dict[wel]['description']}
+{inc_cons_dict[wel]["description"]}
 
-{equivalence_scales_dict[e]['description']}
+{equivalence_scales_dict[e]["description"]}
 
 {notes_title}
 
@@ -570,7 +570,7 @@ def var_metadata_distribution(var: str) -> VariableMeta:
     if var == "share":
         meta = VariableMeta(
             title=f"Income {var_dict_distribution[var]['title'].lower()}",
-            description=f"""{var_dict_distribution[var]['description']}
+            description=f"""{var_dict_distribution[var]["description"]}
 
 {welfare_definitions}
 
@@ -593,7 +593,7 @@ def var_metadata_distribution(var: str) -> VariableMeta:
     else:
         meta = VariableMeta(
             title=f"{var_dict_distribution[var]['title']} income",
-            description=f"""{var_dict_distribution[var]['description']}
+            description=f"""{var_dict_distribution[var]["description"]}
 
 {welfare_definitions}
 

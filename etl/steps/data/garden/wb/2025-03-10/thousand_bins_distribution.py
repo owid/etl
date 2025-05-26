@@ -61,9 +61,9 @@ def rename_columns_regions_and_multiply_pop(tb: Table, regions_mapping: dict) ->
     tb = tb.rename(columns={"region_pip": "region", "welf": "avg"})
 
     # Rename region column with REGIONS_MAPPING. Assert that all regions are mapped.
-    assert set(tb["region"].unique()) == set(
-        REGIONS_MAPPING.keys()
-    ), f"There are undefined regions: {set(tb['region'].unique()) - set(REGIONS_MAPPING.keys())}"
+    assert set(tb["region"].unique()) == set(REGIONS_MAPPING.keys()), (
+        f"There are undefined regions: {set(tb['region'].unique()) - set(REGIONS_MAPPING.keys())}"
+    )
     tb["region"] = tb["region"].map(REGIONS_MAPPING)
 
     # Multiply pop by 1,000,000

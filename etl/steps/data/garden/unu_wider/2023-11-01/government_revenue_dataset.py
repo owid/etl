@@ -165,7 +165,7 @@ def check_negative_values(tb: Table):
             tb_error = tb[mask].reset_index(drop=True).copy()
             paths.log.warning(
                 f"""{len(tb_error)} observations for {v} are negative:
-                {_tabulate(tb_error[['country', 'year', 'caution1accuracyqualityorco', 'caution2resourcerevenuestax','caution3unexcludedresourcere','caution4inconsistencieswiths',v]], long_format=LONG_FORMAT)}"""
+                {_tabulate(tb_error[["country", "year", "caution1accuracyqualityorco", "caution2resourcerevenuestax", "caution3unexcludedresourcere", "caution4inconsistencieswiths", v]], long_format=LONG_FORMAT)}"""
             )
 
     return tb

@@ -48,7 +48,7 @@ def get_reviews_id(object_type: str):
 
 
 def get_charts_with_slug_rename_last_year():
-    query = f"""SELECT chart_id FROM chart_slug_redirects WHERE createdAt >= '{YEAR_AGO.strftime('%Y-%m-%d')}'"""
+    query = f"""SELECT chart_id FROM chart_slug_redirects WHERE createdAt >= '{YEAR_AGO.strftime("%Y-%m-%d")}'"""
     df = OWID_ENV.read_sql(query)
     return df["chart_id"].tolist()
 
@@ -97,7 +97,7 @@ def get_chart_summary(chart):
     num_chart_views = chart["views_365d"]
 
     # Prepare user prompt
-    user_prompt = f"1) Chart config:\n{config}\n{'='*20}\n2) {variable_description}\n{'='*20}\n3) Timeline edits:\n{edit_summary}\n4) Chart views: {num_chart_views}"
+    user_prompt = f"1) Chart config:\n{config}\n{'=' * 20}\n2) {variable_description}\n{'=' * 20}\n3) Timeline edits:\n{edit_summary}\n4) Chart views: {num_chart_views}"
 
     # Query GPT
     gpt_response = ask_gpt(user_prompt)

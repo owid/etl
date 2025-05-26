@@ -106,7 +106,9 @@ def run(dest_dir: str) -> None:
         equal_nan=True,
     )
 
-    assert is_equal.all(), "Values in 'share_of_urban_population' (provided by GHSL) and 'share_of_urban_population_owid' (calculated) are not the same for all non-exception entities"
+    assert is_equal.all(), (
+        "Values in 'share_of_urban_population' (provided by GHSL) and 'share_of_urban_population_owid' (calculated) are not the same for all non-exception entities"
+    )
     # Check that our calculation for "World" corresponds to "World (GHSL)"
     world_values = tb["share_of_urban_population_owid"][tb["country"] == "World"]
     world_ghsl_values = tb["share_of_urban_population"][tb["country"] == "World (GHSL)"]
@@ -119,7 +121,9 @@ def run(dest_dir: str) -> None:
         equal_nan=True,
     )
 
-    assert is_equal_world.all(), "Values for 'World' and 'World (GHSL)' are not the same in 'share_of_urban_population' and 'share_of_urban_population_owid'"
+    assert is_equal_world.all(), (
+        "Values for 'World' and 'World (GHSL)' are not the same in 'share_of_urban_population' and 'share_of_urban_population_owid'"
+    )
     # Remove 'share_of_urban_population' column (we will use 'share_of_urban_population_owid' instead)
     tb = tb.drop(columns=["share_of_urban_population"])
 

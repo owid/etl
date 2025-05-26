@@ -232,9 +232,9 @@ def make_table_with_dummies(
             # Assert that there are actually NaNs
             assert tb_[indicator["name"]].isna().any(), f"No NA found in {indicator['name']}!"
             # If NA, we should not have category '-1', otherwise these would get merged!
-            assert "-1" not in set(
-                tb_[indicator["name"]].unique()
-            ), f"Error for indicator `{indicator['name']}`. Found -1, which is not allowed when `has_na=True`!"
+            assert "-1" not in set(tb_[indicator["name"]].unique()), (
+                f"Error for indicator `{indicator['name']}`. Found -1, which is not allowed when `has_na=True`!"
+            )
             tb_[indicator["name"]] = tb_[indicator["name"]].fillna("-1")
             # Add '-1' as a possible category
             if isinstance(values_expected, dict):
@@ -245,9 +245,9 @@ def make_table_with_dummies(
             assert not tb_[indicator["name"]].isna().any(), f"NA found in {indicator['name']}!"
 
         values_found = set(tb_[indicator["name"]].unique())
-        assert values_found == set(
-            values_expected
-        ), f"Error for indicator `{indicator['name']}`. Expected {set(values_expected)} but found {values_found}"
+        assert values_found == set(values_expected), (
+            f"Error for indicator `{indicator['name']}`. Expected {set(values_expected)} but found {values_found}"
+        )
 
         # Rename dimension values
         if isinstance(values_expected, dict):
@@ -383,7 +383,7 @@ def add_age_groups(
     assert len(age_bins) > 1, "There should be at least two age groups."
     labels = []
     for i in range(len(age_bins) - 1):
-        labels.append(f"{age_bins[i]+1}-{age_bins[i+1]} years".replace("-inf", "+"))
+        labels.append(f"{age_bins[i] + 1}-{age_bins[i + 1]} years".replace("-inf", "+"))
 
     # Create variable for age group of electoral demcoracies
     tb[column_new] = pd.cut(
@@ -446,9 +446,9 @@ def add_imputes(
         # Sanity checks
         assert tb_imp_.shape[0] > 0, f"No data found for {impute['country_impute']}"
         assert tb_imp_["year"].max() == impute["year_max"], f"Missing years (max check) for {impute['country_impute']}"
-        assert (a := tb_imp_["year"].min()) == (
-            b := impute["year_min"]
-        ), f"Missing years (min check) for {impute['country']} imputed from {impute['country_impute']}: {a} != {b}"
+        assert (a := tb_imp_["year"].min()) == (b := impute["year_min"]), (
+            f"Missing years (min check) for {impute['country']} imputed from {impute['country_impute']}: {a} != {b}"
+        )
 
         # Tweak them
         # tb_ = tb_.rename(

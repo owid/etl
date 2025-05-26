@@ -755,9 +755,9 @@ def integrate_bo(tb, tb_bo, cols_index, core_indicators, check=True, check_limit
             do_check = check.get(col, True)
 
         if do_check:
-            assert (
-                (((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE).all()
-            ).all(), f"Integration failed for {col}. Core indicator is not equivalent between main and `bo` tables."
+            assert ((((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE).all()).all(), (
+                f"Integration failed for {col}. Core indicator is not equivalent between main and `bo` tables."
+            )
         elif check_limit_wrong is not None:
             max_allowed = check_limit_wrong
             if isinstance(check_limit_wrong, dict):
@@ -766,9 +766,9 @@ def integrate_bo(tb, tb_bo, cols_index, core_indicators, check=True, check_limit
                 max_allowed = check_limit_wrong[col]
 
             num = (~(((tb[col] - tb[f"{col}__bo"]) / tb[col]).dropna().abs() < TOLERANCE)).sum()
-            assert (
-                num == max_allowed
-            ), f"Integration failed for {col}. There are too many ({num}) allowed miss-matches ({check_limit_wrong})!"
+            assert num == max_allowed, (
+                f"Integration failed for {col}. There are too many ({num}) allowed miss-matches ({check_limit_wrong})!"
+            )
         # Actual integration
         tb[col] = tb[col].fillna(tb[f"{col}__bo"])
         tb = tb.drop(columns=[f"{col}__bo"])
@@ -901,9 +901,9 @@ def make_table_share_women_with_n_kids(tb):
     tb_share_women["q"] = 1 - tb_share_women["share_women"]
     ## Shift the value of q one up for each (country, cohort)
     tb_share_women["q"] = tb_share_women.groupby(["country", "cohort"])["q"].shift(-1)
-    assert set(tb_share_women.loc[tb_share_women["q"].isna(), "num_births"].unique()) == {
-        "4"
-    }, "Unknown probability should only be there for 4"
+    assert set(tb_share_women.loc[tb_share_women["q"].isna(), "num_births"].unique()) == {"4"}, (
+        "Unknown probability should only be there for 4"
+    )
 
     # Share of women with N kids (cumulative)
     tb_share_women["share_women"] = tb_share_women.groupby(["country", "cohort"], as_index=False)[
