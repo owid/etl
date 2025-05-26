@@ -116,15 +116,15 @@ export function activate(context: vscode.ExtensionContext) {
   console.log('Clickable DAG Steps with status highlighting activated.');
   buildDAGIndex();
 
-  const decorationIcons = {
+  const emojiDecorations = {
     green: vscode.window.createTextEditorDecorationType({
-      after: { contentIconPath: context.asAbsolutePath('resources/green-dot.svg'), margin: '0 0 0 0.25em' }
+      after: { contentText: '🟢', margin: '0 0 0 0.25em' }
     }),
     yellow: vscode.window.createTextEditorDecorationType({
-      after: { contentIconPath: context.asAbsolutePath('resources/yellow-dot.svg'), margin: '0 0 0 0.25em' }
+      after: { contentText: '🟡', margin: '0 0 0 0.25em' }
     }),
     red: vscode.window.createTextEditorDecorationType({
-      after: { contentIconPath: context.asAbsolutePath('resources/red-dot.svg'), margin: '0 0 0 0.25em' }
+      after: { contentText: '🔴', margin: '0 0 0 0.25em' }
     })
   };
 
@@ -225,9 +225,9 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }
 
-    editor.setDecorations(decorationIcons.green, greenRanges);
-    editor.setDecorations(decorationIcons.yellow, yellowRanges);
-    editor.setDecorations(decorationIcons.red, redRanges);
+    editor.setDecorations(emojiDecorations.green, greenRanges);
+    editor.setDecorations(emojiDecorations.yellow, yellowRanges);
+    editor.setDecorations(emojiDecorations.red, redRanges);
   }
 
   context.subscriptions.push(
