@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
-function parseStepUri(uri: string): { scheme: string; key: string; version: string, filePath: string } | null {
+function parseStepUri(uri: string): { scheme: string; key: string; version: string, filePaths: string[] } | null {
   const parts = uri.split('://');
   if (parts.length !== 2) {
     return null;
@@ -22,7 +22,7 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     const shortName = segments.slice(2).join('/');
     const key = `snapshot://${namespace}/${shortName}`;
     const filePath = path.join('snapshots', namespace, version, shortName + '.dvc');
-    return { scheme, key, version, filePath };
+    return { scheme, key, version, filePaths: [filePath] };
   }
 
   if (scheme === 'data' || scheme === 'export') {
@@ -35,8 +35,13 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
     const shortName = segments.slice(3).join('/');
     const key = `${scheme}://${channel}/${namespace}/${shortName}`;
     const base = scheme === 'data' ? 'etl/steps/data' : 'etl/steps/export';
-    const filePath = path.join(base, channel, namespace, version, shortName + '.py');
-    return { scheme, key, version, filePath };
+    const dir = path.join(base, channel, namespace, version);
+    const filePaths = [
+      path.join(dir, shortName + '.py'),
+      path.join(dir, shortName, '__init__.py'),
+      path.join(dir, shortName + '.ipynb')
+    ];
+    return { scheme, key, version, filePaths };
   }
 
   return null;
@@ -142,7 +147,14 @@ export function activate(context: vscode.ExtensionContext) {
           continue;
         }
 
-        const fullPath = path.join(workspaceFolder.uri.fsPath, parsed.filePath);
+        const fullPath = parsed.filePaths
+          .map(p => path.join(workspaceFolder.uri.fsPath, p))
+          .find(p => fs.existsSync(p));
+
+        if (!fullPath) {
+          continue;
+        }
+
         console.log(`[LINK] URI: ${uri}`);
         console.log(`[LINK] → file path: ${fullPath}`);
 
@@ -192,8 +204,11 @@ export function activate(context: vscode.ExtensionContext) {
         continue;
       }
 
-      const fullPath = path.join(workspaceFolder.uri.fsPath, parsed.filePath);
-      if (!fs.existsSync(fullPath)) {
+      const existingPath = parsed.filePaths
+        .map(p => path.join(workspaceFolder.uri.fsPath, p))
+        .find(p => fs.existsSync(p));
+
+      if (!existingPath) {
         redRanges.push({ range });
         continue;
       }
