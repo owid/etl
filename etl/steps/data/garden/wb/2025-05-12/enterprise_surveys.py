@@ -26,7 +26,7 @@ def run() -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb.replace("n.a.", pd.NA)
 
-    # Improve table format.
+    # Improve table format
     tb = tb.format(["country", "year"])
 
     #
