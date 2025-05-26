@@ -2,7 +2,6 @@
 
 from typing import List
 
-import owid.catalog.processing as pr
 import vdem_aggregate as aggregate  # VDEM's aggregating library
 import vdem_clean as clean  # VDEM's cleaning library
 import vdem_impute as impute  # VDEM's imputing library
