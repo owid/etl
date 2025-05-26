@@ -4434,7 +4434,7 @@ dev = [
     { name = "pyright", specifier = "==1.1.373" },
     { name = "pytest", specifier = ">=6.2.5" },
     { name = "pytest-cov", specifier = ">=2.12.1" },
-    { name = "ruff", specifier = "==0.8.6" },
+    { name = "ruff", specifier = "==0.11.11" },
     { name = "watchdog", specifier = ">=2.1.5" },
 ]
 
@@ -4483,7 +4483,7 @@ dev = [
     { name = "pyright", specifier = "==1.1.373" },
     { name = "pytest", specifier = ">=6.2.5" },
     { name = "pytest-cov", specifier = ">=2.12.1" },
-    { name = "ruff", specifier = "==0.8.6" },
+    { name = "ruff", specifier = "==0.11.11" },
     { name = "sphinx", specifier = "==4.5.0" },
     { name = "watchdog", specifier = ">=2.1.5" },
 ]
@@ -4510,7 +4510,7 @@ dev = [
     { name = "ipdb", specifier = ">=0.13.13" },
     { name = "pyright", specifier = "==1.1.373" },
     { name = "pytest", specifier = ">=7.2.0" },
-    { name = "ruff", specifier = "==0.8.6" },
+    { name = "ruff", specifier = "==0.11.11" },
 ]
 
 [[package]]

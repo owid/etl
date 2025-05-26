@@ -9,7 +9,7 @@ from typing import Any, Literal, Union
 _MOCK_STRINGS = [
     "alpha",
     "beta",
-    "gamma" "delta",
+    "gammadelta",
     "epsilon",
     "zeta",
     "eta",

@@ -60,9 +60,7 @@ def from_file(
         if file_type:
             extension = file_type
         else:
-            raise ValueError(
-                "To be able to read from a compressed file, you need to provide a value" " for `file_type`."
-            )
+            raise ValueError("To be able to read from a compressed file, you need to provide a value for `file_type`.")
 
     # Check path is valid
     if not file_path.exists():
@@ -83,7 +81,7 @@ def from_file(
         "xml": pd.read_xml,
     }
     if extension not in input_methods:
-        raise ValueError("Failed reading dataframe because of an unknown file extension:" f" {extension}")
+        raise ValueError(f"Failed reading dataframe because of an unknown file extension: {extension}")
     # Select the appropriate reading method.
     read_function = input_methods[extension]
 

@@ -101,9 +101,9 @@ class Table(pd.DataFrame):
 
         # use supplied short_name
         if short_name:
-            assert self.metadata.short_name is None or (
-                self.metadata.short_name == short_name
-            ), "short_name is different from the one in metadata"
+            assert self.metadata.short_name is None or (self.metadata.short_name == short_name), (
+                "short_name is different from the one in metadata"
+            )
             self.metadata.short_name = short_name
 
         # all columns have empty metadata by default

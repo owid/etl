@@ -45,7 +45,7 @@ class _Indicator:
         df["entities"] = df.entities.apply(id_to_name.__getitem__)
 
         # make the "values" column more interestingly named
-        short_name = self.metadata.get("shortName", f'_{self.metadata["id"]}')
+        short_name = self.metadata.get("shortName", f"_{self.metadata['id']}")
         df = df.rename(columns={"values": short_name})
 
         time_col = self._detect_time_col_type()

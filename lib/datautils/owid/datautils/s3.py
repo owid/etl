@@ -210,8 +210,7 @@ class S3:
                     raise ValueError("pd.DataFrame must be exported to either CSV or XLS/XLSX!")
             else:
                 raise ValueError(
-                    f"Type of `obj` is not supported ({type(obj).__name__}). Supported"
-                    " are json, str and pd.DataFrame"
+                    f"Type of `obj` is not supported ({type(obj).__name__}). Supported are json, str and pd.DataFrame"
                 )
             self.upload_to_s3(local_path=output_path, s3_path=s3_path, public=public)
 

@@ -14,7 +14,7 @@ def log(action: str, message: str) -> None:
 
 def bail(message: str) -> NoReturn:
     """Print an error message then exit."""
-    print(f'{red("ERROR:")} {message}', file=sys.stderr)
+    print(f"{red('ERROR:')} {message}", file=sys.stderr)
     sys.exit(1)
 
 
