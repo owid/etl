@@ -50,8 +50,8 @@ def run() -> None:
                     "tab": "chart",
                     "facettingLabelByYVariables": "service",
                     "selectedFacetStrategy": "metric",
-                    "title": "Share of businesses asked for bribes, by type of transaction",
-                    "subtitle": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials.",
+                    "title": "Share of firms that were asked to pay a bribe, by interaction",
+                    "subtitle": "Share of firms that were asked to pay a bribe, by type of interaction with public officials.",
                 },
                 "view_metadata": {
                     "description_short": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials."
