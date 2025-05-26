@@ -8,8 +8,8 @@ export function activate(context: vscode.ExtensionContext) {
 		provideDocumentLinks(document: vscode.TextDocument) {
 			const links: vscode.DocumentLink[] = [];
 
-			// Match URIs like data://... or export://... (stop before colon or whitespace)
-			const dagUriRegex = /\b(?:data|export):\/\/[a-zA-Z0-9_/.\-]+/g;
+			// Match URIs like data://..., export://..., or snapshot://... (stop before colon or whitespace)
+			const dagUriRegex = /\b(?:data|export|snapshot):\/\/[a-zA-Z0-9_/.\-]+/g;
 
 			for (let line = 0; line < document.lineCount; line++) {
 				const textLine = document.lineAt(line);
@@ -18,30 +18,39 @@ export function activate(context: vscode.ExtensionContext) {
 				while ((match = dagUriRegex.exec(textLine.text)) !== null) {
 					const matchedUri = match[0].trim();
 
+					// Identify scheme and determine base path + file extension
 					let baseDir: string;
+					let fileExtension: string;
+
 					if (matchedUri.startsWith('data://')) {
 						baseDir = 'etl/steps/data/';
+						fileExtension = '.py';
 					} else if (matchedUri.startsWith('export://')) {
 						baseDir = 'etl/steps/export/';
+						fileExtension = '.py';
+					} else if (matchedUri.startsWith('snapshot://')) {
+						baseDir = 'snapshots/';
+						fileExtension = '.dvc';
 					} else {
 						continue;
 					}
 
-					const relativePath = matchedUri.replace(/^(data|export):\/\//, '');
+					// Strip the scheme (e.g. data://, snapshot://) and split the path
+					const relativePath = matchedUri.replace(/^(data|export|snapshot):\/\//, '');
 					const segments = relativePath.split('/');
 
 					if (segments.length < 2) {
 						continue;
 					}
 
-					const scriptPath = path.join(baseDir, ...segments) + '.py';
+					const fullRelativePath = path.join(baseDir, ...segments) + fileExtension;
 
 					const workspaceFolder = vscode.workspace.getWorkspaceFolder(document.uri);
 					if (!workspaceFolder) {
 						continue;
 					}
 
-					const fileUri = vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, scriptPath));
+					const fileUri = vscode.Uri.file(path.join(workspaceFolder.uri.fsPath, fullRelativePath));
 
 					const range = new vscode.Range(
 						new vscode.Position(line, match.index!),
@@ -49,7 +58,7 @@ export function activate(context: vscode.ExtensionContext) {
 					);
 
 					const link = new vscode.DocumentLink(range, fileUri);
-					link.tooltip = `Open script: ${scriptPath}`;
+					link.tooltip = `Open file: ${fullRelativePath}`;
 					links.push(link);
 				}
 			}
