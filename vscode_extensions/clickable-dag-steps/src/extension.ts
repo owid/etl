@@ -82,7 +82,6 @@ function buildDAGIndex(): void {
           const uri = match[0].replace(/^\s*-\s*/, '').trim();
           const parsed = parseStepUri(uri);
           if (parsed) {
-            console.log(`[INDEX] Adding key: ${parsed.key}, version: ${parsed.version}`);
             if (!stepVersionsIndex.has(parsed.key)) {
               stepVersionsIndex.set(parsed.key, new Set());
             }
@@ -152,28 +151,28 @@ export function activate(context: vscode.ExtensionContext) {
           .map(p => path.join(workspaceFolder.uri.fsPath, p))
           .find(p => fs.existsSync(p));
 
-        if (!fullPath) {
-          continue;
-        }
-
-        console.log(`[LINK] URI: ${uri}`);
-        console.log(`[LINK] → file path: ${fullPath}`);
-
-        const fileUri = vscode.Uri.file(fullPath);
         const startPos = document.positionAt(match.index);
         const endPos = document.positionAt(match.index + uri.length);
         const range = new vscode.Range(startPos, endPos);
+        const link = new vscode.DocumentLink(range);
 
-        links.push(new vscode.DocumentLink(range, fileUri));
+        const allVersions = stepVersionsIndex.get(parsed.key);
+        if (fullPath) {
+          link.target = vscode.Uri.file(fullPath);
+          if (allVersions && allVersions.has(parsed.version)) {
+            const latest = getLatestVersion(allVersions);
+            link.tooltip = parsed.version === latest ? `🟢 Open file` : `🟡 Open file (latest: ${latest})`;
+          }
+        } else {
+          link.tooltip = '🔴 File not found';
+        }
+
+        links.push(link);
       }
 
       return links;
     }
   };
-
-  context.subscriptions.push(
-    vscode.languages.registerDocumentLinkProvider({ language: 'yaml', scheme: 'file' }, linkProvider)
-  );
 
   function updateDecorations(editor: vscode.TextEditor) {
     const greenRanges: vscode.DecorationOptions[] = [];
@@ -230,6 +229,10 @@ export function activate(context: vscode.ExtensionContext) {
     editor.setDecorations(decorationIcons.yellow, yellowRanges);
     editor.setDecorations(decorationIcons.red, redRanges);
   }
+
+  context.subscriptions.push(
+    vscode.languages.registerDocumentLinkProvider({ language: 'yaml', scheme: 'file' }, linkProvider)
+  );
 
   const updateAllEditors = () => {
     for (const editor of vscode.window.visibleTextEditors) {
