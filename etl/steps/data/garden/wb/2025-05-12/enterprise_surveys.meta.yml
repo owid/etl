@@ -42,7 +42,7 @@ tables:
           - Corruption imposes administrative and financial burdens, reduces operational efficiency, and increases costs and risks for firms.
           - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
         presentation:
-          title_public:  Share of firms experiencing at least one bribe payment request
+          title_public:  Share of firms that were asked to pay a bribe
         display:
             name: At least one bribe request
 
@@ -71,7 +71,7 @@ tables:
             - Corruption in tax inspections increases operational unpredictability and creates unofficial costs.
             - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
           presentation:
-            title_public: Share of firms expected to bribe tax officials
+            title_public: Share of firms that were asked to pay a bribe to tax officials
           display:
             name: Tax officials
 
@@ -87,7 +87,7 @@ tables:
             - Bribery in procurement increases business costs, reduces fairness, and deters competition from firms unwilling or unable to pay.
             - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
           presentation:
-            title_public: Share of firms expected to give bribes to secure government contracts
+            title_public: Share of firms that were asked to pay a bribe to secure a government contract
           display:
             name: Government contract
 
@@ -103,7 +103,7 @@ tables:
             - Corruption in licensing increases delays, costs, and risks, especially for smaller and newer firms.
             - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
           presentation:
-            title_public: Share of firms expected to give bribes to obtain an operating license
+            title_public: Share of firms that were asked to pay a bribe to obtain an operating license
           display:
             name: Operating license
 
@@ -119,7 +119,7 @@ tables:
               - Corruption increases delays and uncertainty for firms attempting to engage in cross-border business.
               - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
           presentation:
-            title_public: Share of firms expected to give bribes to obtain an import license
+            title_public: Share of firms that were asked to pay a bribe to obtain an import license
           display:
             name: Import license
 
@@ -135,7 +135,7 @@ tables:
             - Corruption in construction permits can prevent market entry for smaller firms.
             - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
           presentation:
-            title_public: Share of firms expected to give bribes to obtain a construction permit
+            title_public: Share of firms that were asked to pay a bribe to obtain a construction permit
           display:
             name: Construction permit
 
@@ -151,7 +151,7 @@ tables:
             - Bribery for utility services creates barriers to firm entry and expansion.
             - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
           presentation:
-            title_public: Share of firms expected to give bribes to obtain an electrical connection
+            title_public: Share of firms that were asked to pay a bribe to get an electrical connection
           display:
             name: Electrical connection
 
@@ -167,7 +167,7 @@ tables:
             - Bribery for essential services affects firm competitiveness and investment decisions.
             - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
           presentation:
-            title_public: Share of firms expected to give bribes to get a water connection
+            title_public: Share of firms that were asked to pay a bribe to get a water connection
           display:
             name: Water connection
 
@@ -183,7 +183,7 @@ tables:
             - Bribery to overcome regulatory or administrative barriers increases unpredictability, raises costs, and creates competitive disadvantages.
             - Regional and global averages are computed by taking a simple average of country-level results using only the latest available survey data per country since 2014.
           presentation:
-            title_public: Share of firms expected to bribe public officials to "get things done"
+            title_public: Share of firms that were asked to pay a bribe to "get things done"
           display:
             name: To "get things done"
 
