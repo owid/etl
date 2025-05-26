@@ -4,6 +4,7 @@ Tests for ETL collection utility functions.
 This module tests utility functions from etl.collection.utils that handle
 data manipulation, view processing, and configuration management.
 """
+
 from pathlib import Path
 from unittest.mock import Mock
 
@@ -15,29 +16,31 @@ import pytest
 def mock_dependencies(monkeypatch):
     """
     Mock heavy dependencies to make tests lightweight and fast.
-    
+
     Uses monkeypatch to cleanly mock modules without polluting sys.modules.
     This approach is much cleaner than manual sys.modules manipulation.
     """
+
     # Mock deprecated decorator
     def mock_deprecated(reason):
         def decorator(func):
             return func
+
         return decorator
-    
+
     monkeypatch.setattr("deprecated.deprecated", mock_deprecated)
-    
+
     # Mock catalog and database dependencies
     monkeypatch.setattr("owid.catalog.Dataset", object)
     monkeypatch.setattr("sqlalchemy.orm.Session", object)
-    
+
     # Mock ETL modules
     monkeypatch.setattr("etl.config.OWID_ENV", None)
     monkeypatch.setattr("etl.config.OWIDEnv", object)
     monkeypatch.setattr("etl.db.read_sql", Mock(return_value=None))
     monkeypatch.setattr("etl.files.yaml_dump", Mock(return_value=""))
     monkeypatch.setattr("etl.paths.DATA_DIR", Path("."))
-    
+
     # Mock grapher model
     monkeypatch.setattr("etl.grapher.model", Mock())
 
@@ -46,34 +49,30 @@ def mock_dependencies(monkeypatch):
 def collection_utils():
     """
     Import and return the collection utils module with mocked dependencies.
-    
+
     This fixture handles the import after mocking is in place, ensuring
     the module loads cleanly without heavy dependencies.
     """
     # Import after mocking is set up
     import importlib.util
-    
+
     ROOT = Path(__file__).resolve().parents[1]
-    
+
     # Load exceptions module first
     spec_exc = importlib.util.spec_from_file_location(
-        "etl.collection.exceptions", 
-        ROOT / "etl/collection/exceptions.py"
+        "etl.collection.exceptions", ROOT / "etl/collection/exceptions.py"
     )
     exc_module = importlib.util.module_from_spec(spec_exc)
     spec_exc.loader.exec_module(exc_module)
-    
+
     # Load utils module
-    spec_utils = importlib.util.spec_from_file_location(
-        "collection_utils", 
-        ROOT / "etl/collection/utils.py"
-    )
+    spec_utils = importlib.util.spec_from_file_location("collection_utils", ROOT / "etl/collection/utils.py")
     utils_module = importlib.util.module_from_spec(spec_utils)
     spec_utils.loader.exec_module(utils_module)
-    
+
     # Attach exception classes to utils for easy access
     utils_module.ParamKeyError = exc_module.ParamKeyError
-    
+
     return utils_module
 
 

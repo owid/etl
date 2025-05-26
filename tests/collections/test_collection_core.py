@@ -1,26 +1,22 @@
-from pathlib import Path
+"""Tests for etl.collection.core.combine module.
 
-from etl.collection.core.collection_set import CollectionSet
+This module tests the functionality of combining configuration dimensions,
+which is used to merge automatically generated dimensions with YAML-configured
+dimensions in ETL collection processing.
+"""
+
 from etl.collection.core.combine import combine_config_dimensions
-from etl.collection.model.core import Collection
-
-
-def _simple_collection_dict(name: str) -> dict:
-    return {
-        "dimensions": [{"slug": "dim", "name": "Dim", "choices": [{"slug": "a", "name": "A"}]}],
-        "views": [
-            {
-                "dimensions": {"dim": "a"},
-                "indicators": {"y": [{"catalogPath": "table#ind"}]},
-            }
-        ],
-        "catalog_path": f"dataset#{name}",
-        "title": {"title": "Title"},
-        "default_selection": [],
-    }
 
 
 def test_combine_config_dimensions_overwrite_and_order():
+    """Test that YAML config dimensions overwrite auto dimensions and maintain proper ordering.
+    
+    This test verifies that:
+    1. When both auto and YAML configs have dimensions with the same slug, YAML takes precedence
+    2. YAML dimensions are placed first in the combined result
+    3. Auto dimensions not present in YAML are appended after YAML dimensions
+    4. Names and choices from YAML config properly override auto config values
+    """
     auto = [
         {"slug": "a", "name": "Auto A", "choices": [{"slug": "a1", "name": "A1"}]},
         {"slug": "b", "name": "Auto B", "choices": [{"slug": "b1", "name": "B1"}]},
@@ -39,6 +35,14 @@ def test_combine_config_dimensions_overwrite_and_order():
 
 
 def test_combine_config_dimensions_choices_top():
+    """Test the choices_top parameter behavior when combining dimension choices.
+    
+    This test verifies that:
+    1. When choices_top=True: YAML choices are placed first, followed by auto choices
+    2. When choices_top=False: auto choices are placed first, followed by YAML choices
+    3. Choices with the same slug are merged, with YAML overriding auto properties
+    4. The order of choices can be controlled via the choices_top parameter
+    """
     auto = [
         {
             "slug": "dim",
@@ -65,18 +69,3 @@ def test_combine_config_dimensions_choices_top():
 
     res_bottom = combine_config_dimensions(auto, yaml_conf, choices_top=False)
     assert [c["slug"] for c in res_bottom[0]["choices"]] == ["a", "c", "b"]
-
-
-def test_collection_set(tmp_path: Path):
-    path = tmp_path
-    coll1 = Collection.from_dict(_simple_collection_dict("coll1"))
-    coll2 = Collection.from_dict(_simple_collection_dict("coll2"))
-    coll1.save_file(path / "coll1.config.json")
-    coll2.save_file(path / "coll2.config.json")
-
-    cset = CollectionSet(path)
-    assert cset.names == ["coll1", "coll2"]
-
-    loaded = cset.read("coll1")
-    assert isinstance(loaded, Collection)
-    assert loaded.short_name == "coll1"

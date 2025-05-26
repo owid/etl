@@ -1,11 +1,34 @@
+"""Tests for common metadata merging functionality in ETL collections.
+
+This module tests the complex logic for merging metadata configurations based on
+dimensions and priority rules, which is essential for creating dynamic collection views.
+
+Table of Contents:
+- test_merge_common_metadata_1: Tests basic metadata merging with dimension-based priority
+- test_merge_common_metadata_2: Tests complex nested metadata merging scenarios
+- test_merge_common_metadata_3: Tests error handling when dimensions cannot be resolved
+- test_definitions: Tests validation of common view definitions for duplicates
+- test_merge_common_metadata_4: Tests priority system where common params override view config
+- test_merge_common_metadata_5: Tests conflict detection when multiple dimensions compete
+"""
+
 import pytest
 
+from etl.collection.exceptions import CommonViewParamConflict
 from etl.collection.model.core import Definitions
 from etl.collection.model.view import CommonView, merge_common_metadata_by_dimension
 
 
 def test_merge_common_metadata_1():
-    """Work as expected."""
+    """Test basic metadata merging with hierarchical dimension-based priority.
+
+    This test verifies the core functionality where:
+    - Top-level params apply to all views
+    - Level-1 params apply when specific dimensions match
+    - Level-2 params (more specific) override level-1 params
+    - Only relevant dimensions are considered for merging
+    - Custom config gets merged with common metadata
+    """
     common_params = [
         # Top-level params
         {
@@ -87,7 +110,15 @@ def test_merge_common_metadata_1():
 
 
 def test_merge_common_metadata_2():
-    """Work as expected, more complex example."""
+    """Test complex nested metadata merging with deep object structures.
+
+    This test extends the basic functionality to handle:
+    - Deeply nested configuration objects
+    - Arrays within nested structures
+    - Multiple levels of nesting (others1.others2.others3)
+    - Proper merging of nested objects at different hierarchy levels
+    - Custom config overriding specific nested properties
+    """
     common_params = [
         # Top-level params
         {
@@ -196,7 +227,13 @@ def test_merge_common_metadata_2():
 
 
 def test_merge_common_metadata_3():
-    """Work as expected."""
+    """Test error handling when dimension resolution fails.
+
+    This test verifies that the system properly raises a CommonViewParamConflict when:
+    - Required dimensions cannot be resolved from common params
+    - The active dimensions don't have sufficient matching common views
+    - Missing level-2 params prevent proper metadata resolution
+    """
     common_params = [
         # Top-level params
         {
@@ -252,12 +289,18 @@ def test_merge_common_metadata_3():
 
     common_params = [CommonView.from_dict(r) for r in common_params]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(CommonViewParamConflict):
         _ = merge_common_metadata_by_dimension(common_params, active_dimensions, custom_config, "config")
 
 
 def test_definitions():
-    """Work as expected."""
+    """Test validation of common view definitions for duplicate detection.
+
+    This test ensures that the Definitions class properly validates:
+    - Duplicate common_views with identical dimension combinations
+    - Proper error reporting when conflicting definitions are found
+    - Data integrity enforcement in collection configurations
+    """
     common_params = [
         # Top-level params
         {
@@ -291,9 +334,14 @@ def test_definitions():
 
 
 def test_merge_common_metadata_4():
-    """Now we test when we give priority to the common params.
+    """Test priority system where common params override view config.
 
-    That is, common_params should override the view_config."""
+    This test verifies the `common_has_priority=True` behavior where:
+    - Common parameters take precedence over view configuration
+    - More specific common params (level-2) still override less specific ones
+    - Custom view config is used only when no common param conflicts exist
+    - The priority system resolves configuration conflicts appropriately
+    """
     common_params = [
         # Top-level params
         {
@@ -409,11 +457,14 @@ def test_merge_common_metadata_4():
 
 
 def test_merge_common_metadata_5():
-    """Now we test when we give priority to the common params.
-
-    That is, common_params should override the view_config.
-
-    In this case, the code should fail. That's because there is a conflict in others1.description_aux1. Both sex=female and age=10 are trying to set it and they have the same priority. Since view_config has no priority, the conflict is not resolved!"""
+    """Test conflict detection when multiple dimensions compete for same property.
+    
+    This test verifies that the system properly detects and reports conflicts when:
+    - Multiple common params at the same priority level try to set the same property
+    - sex=female and age=10 both attempt to set others1.description_aux1
+    - View config cannot resolve the conflict due to lower priority
+    - A ValueError is raised to indicate the unresolvable conflict
+    """
     common_params = [
         # Top-level params
         {
