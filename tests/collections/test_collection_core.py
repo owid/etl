@@ -10,7 +10,7 @@ from etl.collection.core.combine import combine_config_dimensions
 
 def test_combine_config_dimensions_overwrite_and_order():
     """Test that YAML config dimensions overwrite auto dimensions and maintain proper ordering.
-    
+
     This test verifies that:
     1. When both auto and YAML configs have dimensions with the same slug, YAML takes precedence
     2. YAML dimensions are placed first in the combined result
@@ -36,7 +36,7 @@ def test_combine_config_dimensions_overwrite_and_order():
 
 def test_combine_config_dimensions_choices_top():
     """Test the choices_top parameter behavior when combining dimension choices.
-    
+
     This test verifies that:
     1. When choices_top=True: YAML choices are placed first, followed by auto choices
     2. When choices_top=False: auto choices are placed first, followed by YAML choices

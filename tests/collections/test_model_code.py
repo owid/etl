@@ -13,10 +13,10 @@ from etl.collection.model.core import Collection
 
 def _simple_collection_dict(name: str) -> dict:
     """Create a minimal collection dictionary for testing purposes.
-    
+
     Args:
         name: The name to use for the collection (used in catalog_path)
-        
+
     Returns:
         A dictionary representing a basic collection with:
         - One dimension with one choice
@@ -39,14 +39,14 @@ def _simple_collection_dict(name: str) -> dict:
 
 def test_collection_set(tmp_path: Path):
     """Test CollectionSet functionality for managing multiple collections.
-    
+
     This test verifies that:
     1. Collections can be created from dictionaries and saved to files
     2. CollectionSet can discover and list collection files in a directory
     3. CollectionSet can load individual collections by name
     4. Loaded collections maintain their properties (short_name, etc.)
     5. The file naming convention (*.config.json) works correctly
-    
+
     Args:
         tmp_path: Pytest fixture providing a temporary directory for test files
     """
