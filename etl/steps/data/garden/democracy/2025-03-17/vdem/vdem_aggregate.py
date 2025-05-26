@@ -690,11 +690,11 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
     tb_uni_without_regions = tb_uni.drop(columns=columns_uni).copy()
 
     ## Get columns from tb_*_avg tables relevant
-    tb_uni_with_regions["aggregate_method"] = "average"
     tb_countries_avg_uni = tb_countries_avg.loc[:, cols_index + columns_uni].dropna(subset=columns_uni, how="all")
-    tb_countries_avg_uni["aggregate_method"] = "average"
     tb_population_avg_uni = tb_population_avg.loc[:, cols_index + columns_uni].dropna(subset=columns_uni, how="all")
-    tb_population_avg_uni["aggregate_method"] = "population-weighted average"
+
+    ## Add suffix (population-weighted) where applicable
+    tb_population_avg_uni["country"] = tb_population_avg_uni["country"] + " (population-weighted)"
 
     ## Concatenate and create tb_uni_with_regions
     tb_uni_with_regions = concat(
