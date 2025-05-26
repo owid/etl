@@ -8,7 +8,7 @@ dimensions:
     name: Type of transaction
     choices:
       - slug: "side_by_side"
-        name: All trasnasctions
+        name: All transactions
         description: See all transactions side by side
 
 views: []

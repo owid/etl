@@ -49,7 +49,7 @@ def run() -> None:
                     "chartTypes": ["DiscreteBar"],
                     "tab": "chart",
                     "facettingLabelByYVariables": "service",
-                    "selectedFacetStrategy": "metric",
+                    "selectedFacetStrategy": "entity",
                     "title": "Share of firms that were asked to pay a bribe, by interaction",
                     "subtitle": "Share of firms that were asked to pay a bribe, by type of interaction with public officials.",
                 },
