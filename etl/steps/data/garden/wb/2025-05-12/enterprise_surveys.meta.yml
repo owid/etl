@@ -15,7 +15,7 @@ definitions:
           timeTolerance: 10
           colorScale:
             binningStrategy: manual
-            customNumericValues: [5,10,15,20,25,30]
+            customNumericValues: [5,10,15,20,25,30,35,40]
             baseColorScheme: OrRd
       topic_tags:
         - Corruption
@@ -126,6 +126,7 @@ tables:
       percent_of_firms_expected_to_give_gifts_to_get_a_construction_permit:
           title: Share of firms that were asked to pay a bribe to obtain a construction permit
           description_short: Share of firms that were asked to pay a bribe to obtain a construction permit (a permit required to start construction projects).
+          description_from_producer: |-
             Percentage of firms reporting that they were expected to provide gifts or informal payments to obtain a construction-related permit.
           description_key:
             - Measures the percentage of firms reporting that they were expected to pay informal payments to obtain a construction permit.
