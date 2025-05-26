@@ -44,8 +44,8 @@ class S3:
         cfg = Config(
             # These are necessary to avoid sending header `content-encoding: gzip,aws-chunked` which breaks Admin
             # see https://developers.cloudflare.com/r2/examples/aws/boto3/
-            request_checksum_calculation="when_required",
-            response_checksum_validation="when_required",
+            request_checksum_calculation="when_required",  # type: ignore
+            response_checksum_validation="when_required",  # type: ignore
         )
 
         session = boto3.Session(profile_name=profile_name)
