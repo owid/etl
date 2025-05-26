@@ -10,6 +10,7 @@ from urllib.parse import urlparse
 # import botocore.client.S3 as BaseClient
 import structlog
 from botocore.client import BaseClient
+from botocore.config import Config
 from botocore.exceptions import ClientError
 
 log = structlog.get_logger()
@@ -168,12 +169,20 @@ def connect_r2() -> BaseClient:
         except KeyError:
             pass
 
+    cfg = Config(
+        # These are necessary to avoid sending header `content-encoding: gzip,aws-chunked` which breaks Admin
+        # see https://developers.cloudflare.com/r2/examples/aws/boto3/
+        request_checksum_calculation="when_required",
+        response_checksum_validation="when_required",
+    )
+
     client = boto3.client(
         service_name="s3",
         aws_access_key_id=R2_ACCESS_KEY,
         aws_secret_access_key=R2_SECRET_KEY,
         endpoint_url=R2_ENDPOINT or "https://078fcdfed9955087315dd86792e71a7e.r2.cloudflarestorage.com",
         region_name=R2_REGION_NAME or "auto",
+        config=cfg,
     )
 
     return client
