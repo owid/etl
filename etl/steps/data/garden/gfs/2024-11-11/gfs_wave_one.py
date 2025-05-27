@@ -39,8 +39,7 @@ COUNTRY_MAPPING = {
 # 98: Don't know
 # 99: Refused
 
-# TODO: Think about categorical estimates for "scored" variables with less than 10 options
-# binary values are given as 1/2
+# binary values are given as 1/2, 1 if yes, 2 if no
 COLUMNS_MAPPING = {
     "id": "system",
     "country": "system",
@@ -226,6 +225,7 @@ def run(dest_dir: str) -> None:
     # Custom column: people who think their life will get better in the next 5 years
     tb["wb_improvement"] = tb.apply(get_ineq_nan, axis=1)  # 1 if yes, 2 if no
 
+    # reverse scoring for some variables, to make them more intuitive
     for col in ["expenses", "lonely", "worry_safety"]:
         tb[col] = reverse_score(tb, col)
 
@@ -239,8 +239,8 @@ def run(dest_dir: str) -> None:
     tb_cat_other = share_categorical(tb, cols=LOW_SCORED_COLS)
 
     # 97 is treated as 97 rather than 97+ (topcoded)
-    # drinks: 116 rows
-    # cigarettes: 45 rows
+    # drinks: 116 rows with maximum value of 97
+    # cigarettes: 45 rows with maximum value of 97
     tb_scored_97 = average_scored(tb, cols=["cigarettes", "drinks"])
 
     # Merge all tables and remove duplicate columns (na shares are calculated twice for some variables)
@@ -256,7 +256,7 @@ def run(dest_dir: str) -> None:
     # 2023    170562
     # 2022     32334
     # 2024         2
-    tbs_full["year"] = 2023  # alternative would be: pd.to_datetime(tb["doi_annual"]).dt.year
+    tbs_full["year"] = 2023
 
     tbs_full.metadata = tb.metadata
     tbs_full.m.short_name = "gfs_wave_one"
@@ -266,7 +266,6 @@ def run(dest_dir: str) -> None:
 
     tbs_full = tbs_full.format(["country", "year"])
 
-    #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
@@ -344,7 +343,6 @@ def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
     tb_cat = tb[groups + cols + ["annual_weight1"]].copy()
     res_tbs = []
     for col in cols:
-        # res = tb_cat.groupby(groups + [col], dropna=False)[col].value_counts(normalize=True, dropna=False).unstack()
         res = tb_cat.groupby(groups + [col], dropna=False)["annual_weight1"].sum()
         denom = res.groupby(groups).sum()
         res = (res / denom).unstack()

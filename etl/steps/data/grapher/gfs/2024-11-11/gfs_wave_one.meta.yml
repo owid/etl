@@ -47,9 +47,6 @@ definitions:
       {definitions.common.description_processing}
       - The original survey question used a scale where 0 meant "worry all of the time" and 10 meant "do not ever worry". We have reversed the scale so that 0 is "never" and 10 is "always", to make the interpretation of the data more intuitive.
 
-
-# Learn more about the available fields:
-# http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
 
