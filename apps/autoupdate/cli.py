@@ -75,11 +75,7 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
         github_repo.create_branch(branch_name, master_sha)
     else:
         # Merge with master, resolving any conflicts in favor of our branch
-        merge_successful = github_repo.merge_with_master_resolve_conflicts(branch_name)
-
-        if not merge_successful:
-            log.error(f"Failed to merge master into {branch_name}")
-            return
+        github_repo.merge_with_master_resolve_conflicts(branch_name)
 
     # Prepare parent and base tree SHA
     if branch_exists:
