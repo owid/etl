@@ -1,4 +1,4 @@
-![](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11-blue.svg)
+![](https://img.shields.io/badge/python-3.10%20|%203.11%20|%203.12%20|%203.13-blue.svg)
 
 # etl
 

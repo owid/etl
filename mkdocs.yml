@@ -224,6 +224,7 @@ nav:
           - Harmonize country names: "guides/harmonize-countries.md"
           - Backport from database: "guides/backport.md"
           - Regular updates: "guides/auto-regular-updates.md"
+          - Automatic updates via metadata: "guides/autoupdate-cli.md"
           - Pull requests: "guides/pull-requests.md"
           - Tips when working with ETL: "guides/etl-tips.md"
           - Metadata in data pages: "guides/metadata-play.md"
