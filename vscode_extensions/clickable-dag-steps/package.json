@@ -1,6 +1,7 @@
 {
   "name": "clickable-dag-steps",
   "icon": "clickable-dag-steps.png",
+  "publisher": "owid",
   "displayName": "Clickable DAG Steps",
   "description": "Make steps in ETL DAG clickable",
   "version": "0.0.3",
