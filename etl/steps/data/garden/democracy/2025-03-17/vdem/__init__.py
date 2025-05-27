@@ -123,14 +123,14 @@ def run() -> None:
         short_name="vdem_uni_without_regions",
     )
     tb_uni_with_regions = tb_uni_with_regions.format(
-        keys=["country", "year", "aggregate_method"],
+        keys=["country", "year"],
         short_name="vdem_uni_with_regions",
     )
     tb_multi_without_regions = tb_multi_without_regions.format(
         keys=["country", "year", "estimate"], short_name="vdem_multi_without_regions"
     )
     tb_multi_with_regions = tb_multi_with_regions.format(
-        keys=["country", "year", "estimate", "aggregate_method"], short_name="vdem_multi_with_regions"
+        keys=["country", "year", "estimate"], short_name="vdem_multi_with_regions"
     )
     tb_countries_counts = tb_countries_counts.format(
         keys=["country", "year", "category"], short_name="vdem_num_countries"

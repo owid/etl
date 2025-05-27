@@ -62,8 +62,8 @@ dimensions:
   - slug: sub_metric
     name: Sub-metric
     choices:
-      - slug: ''
-        name: ''
+      - slug: na
+        name: ""
       - slug: total_radiative_forcing
         name: Total radiative forcing
       - slug: forcing_from_co2
@@ -203,8 +203,8 @@ dimensions:
         name: Per capita
       - slug: total
         name: Total
-      - slug: ''
-        name: ''
+      - slug: na
+        name: ""
       - slug: share_of_total
         name: Share of total
     presentation:
@@ -229,7 +229,7 @@ views:
       rate: per_capita
       metric: gdp
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp_per_capita__region_global
@@ -243,7 +243,7 @@ views:
       rate: total
       metric: gdp
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp__region_global
@@ -257,7 +257,7 @@ views:
       rate: total
       metric: consumption
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_dollars__region_global
@@ -271,7 +271,7 @@ views:
       rate: per_capita
       metric: consumption
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_per_capita__region_global
@@ -282,10 +282,10 @@ views:
       subtitle: |-
         Economic consumption measures the expenditure of private households. It is gross domestic product minus government expenditures, investments, and exports. It is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
   - dimensions:
-      rate: ''
+      rate: na
       metric: population
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#population__region_global
@@ -294,10 +294,10 @@ views:
     config:
       title: World population
   - dimensions:
-      rate: ''
+      rate: na
       metric: temperature_increase
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#temp__region_global
@@ -308,7 +308,7 @@ views:
       subtitle: The global average temperature increase relative to the pre-industrial era, which is taken to be the year
         1750.
   - dimensions:
-      rate: ''
+      rate: na
       metric: radiative_forcing
       region: global
       sub_metric: total_radiative_forcing
@@ -322,7 +322,7 @@ views:
       subtitle: |-
         Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
   - dimensions:
-      rate: ''
+      rate: na
       metric: radiative_forcing
       region: global
       sub_metric: forcing_from_co2
@@ -336,7 +336,7 @@ views:
       subtitle: |-
         Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
   - dimensions:
-      rate: ''
+      rate: na
       metric: radiative_forcing
       region: global
       sub_metric: forcing_from_ch4
@@ -350,7 +350,7 @@ views:
       subtitle: |-
         Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
   - dimensions:
-      rate: ''
+      rate: na
       metric: radiative_forcing
       region: global
       sub_metric: forcing_from_n2o
@@ -364,7 +364,7 @@ views:
       subtitle: |-
         Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
   - dimensions:
-      rate: ''
+      rate: na
       metric: radiative_forcing
       region: global
       sub_metric: forcing_from_f_gases
@@ -378,7 +378,7 @@ views:
       subtitle: |-
         Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
   - dimensions:
-      rate: ''
+      rate: na
       metric: radiative_forcing
       region: global
       sub_metric: forcing_from_aerosols
@@ -392,7 +392,7 @@ views:
       subtitle: |-
         Radiative forcing measures the difference in incoming and outgoing energy in Earth's climate system. It is given in watts per square meter. Warming occurs when radiative forcing is positive.
   - dimensions:
-      rate: ''
+      rate: na
       metric: greenhouse_gas_concentrations
       region: global
       sub_metric: carbon_dioxide__co2
@@ -405,7 +405,7 @@ views:
       title: Atmospheric concentrations of carbon dioxide
       subtitle: Global atmospheric concentrations of carbon dioxide are measured in parts per million.
   - dimensions:
-      rate: ''
+      rate: na
       metric: greenhouse_gas_concentrations
       region: global
       sub_metric: methane__ch4
@@ -418,7 +418,7 @@ views:
       title: Atmospheric concentrations of methane
       subtitle: Global atmospheric concentrations of methane are measured in parts per billion.
   - dimensions:
-      rate: ''
+      rate: na
       metric: greenhouse_gas_concentrations
       region: global
       sub_metric: nitrous_oxide__n2o
@@ -506,7 +506,7 @@ views:
       title: Per capita nitrous oxide emissions
       subtitle: This is measured as the global average.
   - dimensions:
-      rate: ''
+      rate: na
       metric: greenhouse_gas_emissions
       region: global
       sub_metric: f_gases
@@ -520,7 +520,7 @@ views:
       subtitle: |-
         Fluorinated gases (‘F-gases’) are greenhouse gases used in industrial applications such as refrigerants, aerosols and white goods.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: global
       sub_metric: sulfur_dioxide__so2
@@ -534,7 +534,7 @@ views:
       subtitle: |-
         Sulfur dioxide (SO₂) is an air pollutant produced as a by-product when fuels that contain sulfur are burned. It is often produced from the burning of coal.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: global
       sub_metric: black_carbon
@@ -548,7 +548,7 @@ views:
       subtitle: Black carbon is an air pollutant produced through the incomplete combustion of fossil fuels, biofuel, and
         biomass.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: global
       sub_metric: nitrous_oxides__nox
@@ -562,7 +562,7 @@ views:
       subtitle: |-
         Nitrous oxides (NOx) are local air pollutants produced when fuel is burned at high temperatures. NOx is often emitted by road vehicles, and industrial sources such as power plants.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: global
       sub_metric: volatile_organic_compounds__voc
@@ -576,10 +576,10 @@ views:
       subtitle: |-
         Volatile organic compounds (VOCs) are local air pollutants which are emitted from certain organic compounds which are present in fuels, as well as chemicals used in paints, varnishes and cleaning products.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_price
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_price__region_global
@@ -591,10 +591,10 @@ views:
       subtitle: |-
         This assumes a global carbon price on carbon, measured in 2005 US$ per tonne of CO₂. This means prices are adjusted for inflation.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_economy
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_economy__region_global
@@ -604,10 +604,10 @@ views:
       title: Carbon intensity of the economy
       subtitle: The carbon intensity of the economy is measured as the kilograms of carbon dioxide emitted per dollar of GDP.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_energy
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_energy__region_global
@@ -618,10 +618,10 @@ views:
       subtitle: |-
         The carbon intensity of energy is measured as the kilograms of carbon dioxide emitted per kilowatt-hour of primary energy.
   - dimensions:
-      rate: ''
+      rate: na
       metric: energy_conversion_efficiency
       region: global
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#primary_final_efficiency__region_global
@@ -660,7 +660,7 @@ views:
       subtitle: |-
         Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
   - dimensions:
-      rate: ''
+      rate: na
       metric: final_energy
       region: global
       sub_metric: energy_intensity
@@ -1269,7 +1269,7 @@ views:
       subtitle: |-
         Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
   - dimensions:
-      rate: ''
+      rate: na
       metric: primary_energy
       region: global
       sub_metric: energy_intensity
@@ -1926,7 +1926,7 @@ views:
       subtitle: |-
         Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: global
       sub_metric: forest_area
@@ -1939,7 +1939,7 @@ views:
       title: Global forest area
       subtitle: This covers forest of all types, including primary and planted forests. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: global
       sub_metric: cropland
@@ -1953,7 +1953,7 @@ views:
       subtitle: |-
         Cropland area includes land used for crop production for human food, animal feed, and industrial uses. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: global
       sub_metric: pasture
@@ -1966,7 +1966,7 @@ views:
       title: Global pasture land area
       subtitle: Pasture land is land used for livestock grazing. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: global
       sub_metric: crops_for_non_energy
@@ -1980,7 +1980,7 @@ views:
       subtitle: |-
         Crop demand is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: global
       sub_metric: crop_for_energy
@@ -1994,7 +1994,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: global
       sub_metric: livestock
@@ -2006,7 +2006,7 @@ views:
     config:
       title: Global livestock demand
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: global
       sub_metric: crops
@@ -2020,7 +2020,7 @@ views:
       subtitle: |-
         Total crop production is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: global
       sub_metric: crop_for_energy
@@ -2034,7 +2034,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: global
       sub_metric: livestock
@@ -2049,7 +2049,7 @@ views:
       rate: per_capita
       metric: gdp
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp_per_capita__region_asia
@@ -2062,7 +2062,7 @@ views:
       rate: total
       metric: gdp
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp__region_asia
@@ -2076,7 +2076,7 @@ views:
       rate: total
       metric: consumption
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_dollars__region_asia
@@ -2090,7 +2090,7 @@ views:
       rate: per_capita
       metric: consumption
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_per_capita__region_asia
@@ -2101,10 +2101,10 @@ views:
       subtitle: |-
         Economic consumption measures the expenditure of private households. It is gross domestic product minus government expenditures, investments, and exports. It is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
   - dimensions:
-      rate: ''
+      rate: na
       metric: population
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#population__region_asia
@@ -2188,7 +2188,7 @@ views:
       title: Per capita nitrous oxide emissions in Asia
       subtitle: This is measured as the average across Asia.
   - dimensions:
-      rate: ''
+      rate: na
       metric: greenhouse_gas_emissions
       region: asia
       sub_metric: f_gases
@@ -2202,10 +2202,10 @@ views:
       subtitle: |-
         Fluorinated gases (‘F-gases’) are greenhouse gases used in industrial applications such as refrigerants, aerosols and white goods.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_economy
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_economy__region_asia
@@ -2215,7 +2215,7 @@ views:
       title: Carbon intensity of the economy
       subtitle: The carbon intensity of the economy is measured as the kilograms of carbon dioxide emitted per dollar of GDP.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: asia
       sub_metric: sulfur_dioxide__so2
@@ -2229,7 +2229,7 @@ views:
       subtitle: |-
         Sulfur dioxide (SO₂) is an air pollutant produced as a by-product when fuels that contain sulfur are burned. It is often produced from the burning of coal.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: asia
       sub_metric: black_carbon
@@ -2243,7 +2243,7 @@ views:
       subtitle: Black carbon is an air pollutant produced through the incomplete combustion of fossil fuels, biofuel, and
         biomass.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: asia
       sub_metric: nitrous_oxides__nox
@@ -2257,7 +2257,7 @@ views:
       subtitle: |-
         Nitrous oxides (NOx) are local air pollutants produced when fuel is burned at high temperatures. NOx is often emitted by road vehicles, and industrial sources such as power plants.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: asia
       sub_metric: volatile_organic_compounds__voc
@@ -2271,10 +2271,10 @@ views:
       subtitle: |-
         Volatile organic compounds (VOCs) are local air pollutants which are emitted from certain organic compounds which are present in fuels, as well as chemicals used in paints, varnishes and cleaning products.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_price
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_price__region_asia
@@ -2284,10 +2284,10 @@ views:
       note: No carbon pricing is assumed in all baseline scenarios.
       title: Carbon price in Asia
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_energy
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_energy__region_asia
@@ -2298,10 +2298,10 @@ views:
       subtitle: |-
         The carbon intensity of energy is measured as the kilograms of carbon dioxide emitted per kilowatt-hour of primary energy.
   - dimensions:
-      rate: ''
+      rate: na
       metric: energy_conversion_efficiency
       region: asia
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#primary_final_efficiency__region_asia
@@ -2340,7 +2340,7 @@ views:
       subtitle: |-
         Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
   - dimensions:
-      rate: ''
+      rate: na
       metric: final_energy
       region: asia
       sub_metric: energy_intensity
@@ -2949,7 +2949,7 @@ views:
       subtitle: |-
         Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
   - dimensions:
-      rate: ''
+      rate: na
       metric: primary_energy
       region: asia
       sub_metric: energy_intensity
@@ -3606,7 +3606,7 @@ views:
       subtitle: |-
         Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: asia
       sub_metric: forest_area
@@ -3619,7 +3619,7 @@ views:
       title: Forest area in Asia
       subtitle: This covers forest of all types, including primary and planted forests. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: asia
       sub_metric: cropland
@@ -3633,7 +3633,7 @@ views:
       subtitle: |-
         Cropland area includes land used for crop production for human food, animal feed, and industrial uses. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: asia
       sub_metric: pasture
@@ -3646,7 +3646,7 @@ views:
       title: Pasture land area in Asia
       subtitle: Pasture land is land used for livestock grazing. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: asia
       sub_metric: crops_for_non_energy
@@ -3660,7 +3660,7 @@ views:
       subtitle: |-
         Crop demand is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: asia
       sub_metric: crop_for_energy
@@ -3674,7 +3674,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: asia
       sub_metric: livestock
@@ -3686,7 +3686,7 @@ views:
     config:
       title: Livestock demand in Asia
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: asia
       sub_metric: crops
@@ -3700,7 +3700,7 @@ views:
       subtitle: |-
         Total crop production is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: asia
       sub_metric: crop_for_energy
@@ -3714,7 +3714,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: asia
       sub_metric: livestock
@@ -3729,7 +3729,7 @@ views:
       rate: per_capita
       metric: gdp
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp_per_capita__region_middle_east_and_africa
@@ -3743,7 +3743,7 @@ views:
       rate: total
       metric: gdp
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp__region_middle_east_and_africa
@@ -3757,7 +3757,7 @@ views:
       rate: total
       metric: consumption
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_dollars__region_middle_east_and_africa
@@ -3771,7 +3771,7 @@ views:
       rate: per_capita
       metric: consumption
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_per_capita__region_middle_east_and_africa
@@ -3782,10 +3782,10 @@ views:
       subtitle: |-
         Economic consumption measures the expenditure of private households. It is gross domestic product minus government expenditures, investments, and exports. It is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
   - dimensions:
-      rate: ''
+      rate: na
       metric: population
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#population__region_middle_east_and_africa
@@ -3869,7 +3869,7 @@ views:
       title: Per capita nitrous oxide emissions in the Middle East and Africa
       subtitle: This is measured as the average across the Middle East and Africa.
   - dimensions:
-      rate: ''
+      rate: na
       metric: greenhouse_gas_emissions
       region: middle_east_and_africa
       sub_metric: f_gases
@@ -3883,10 +3883,10 @@ views:
       subtitle: |-
         Fluorinated gases (‘F-gases’) are greenhouse gases used in industrial applications such as refrigerants, aerosols and white goods.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_economy
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_economy__region_middle_east_and_africa
@@ -3896,7 +3896,7 @@ views:
       title: Carbon intensity of the economy
       subtitle: The carbon intensity of the economy is measured as the kilograms of carbon dioxide emitted per dollar of GDP.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: middle_east_and_africa
       sub_metric: sulfur_dioxide__so2
@@ -3910,7 +3910,7 @@ views:
       subtitle: |-
         Sulfur dioxide (SO₂) is an air pollutant produced as a by-product when fuels that contain sulfur are burned. It is often produced from the burning of coal.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: middle_east_and_africa
       sub_metric: black_carbon
@@ -3924,7 +3924,7 @@ views:
       subtitle: Black carbon is an air pollutant produced through the incomplete combustion of fossil fuels, biofuel, and
         biomass.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: middle_east_and_africa
       sub_metric: nitrous_oxides__nox
@@ -3938,7 +3938,7 @@ views:
       subtitle: |-
         Nitrous oxides (NOx) are local air pollutants produced when fuel is burned at high temperatures. NOx is often emitted by road vehicles, and industrial sources such as power plants.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: middle_east_and_africa
       sub_metric: volatile_organic_compounds__voc
@@ -3952,10 +3952,10 @@ views:
       subtitle: |-
         Volatile organic compounds (VOCs) are local air pollutants which are emitted from certain organic compounds which are present in fuels, as well as chemicals used in paints, varnishes and cleaning products.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_price
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_price__region_middle_east_and_africa
@@ -3967,10 +3967,10 @@ views:
       subtitle: |-
         This assumes a global carbon price on carbon, measured in 2005 US$ per tonne of CO₂. This means prices are adjusted for inflation.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_energy
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_energy__region_middle_east_and_africa
@@ -3981,10 +3981,10 @@ views:
       subtitle: |-
         The carbon intensity of energy is measured as the kilograms of carbon dioxide emitted per kilowatt-hour of primary energy.
   - dimensions:
-      rate: ''
+      rate: na
       metric: energy_conversion_efficiency
       region: middle_east_and_africa
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#primary_final_efficiency__region_middle_east_and_africa
@@ -4023,7 +4023,7 @@ views:
       subtitle: |-
         Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
   - dimensions:
-      rate: ''
+      rate: na
       metric: final_energy
       region: middle_east_and_africa
       sub_metric: energy_intensity
@@ -4632,7 +4632,7 @@ views:
       subtitle: |-
         Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
   - dimensions:
-      rate: ''
+      rate: na
       metric: primary_energy
       region: middle_east_and_africa
       sub_metric: energy_intensity
@@ -5289,7 +5289,7 @@ views:
       subtitle: |-
         Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: middle_east_and_africa
       sub_metric: forest_area
@@ -5302,7 +5302,7 @@ views:
       title: Forest area in the Middle East and Africa
       subtitle: This covers forest of all types, including primary and planted forests. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: middle_east_and_africa
       sub_metric: cropland
@@ -5316,7 +5316,7 @@ views:
       subtitle: |-
         Cropland area includes land used for crop production for human food, animal feed, and industrial uses. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: middle_east_and_africa
       sub_metric: pasture
@@ -5329,7 +5329,7 @@ views:
       title: Pasture land area in the Middle East and Africa
       subtitle: Pasture land is land used for livestock grazing. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: middle_east_and_africa
       sub_metric: crops_for_non_energy
@@ -5343,7 +5343,7 @@ views:
       subtitle: |-
         Crop demand is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: middle_east_and_africa
       sub_metric: crop_for_energy
@@ -5357,7 +5357,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: middle_east_and_africa
       sub_metric: livestock
@@ -5369,7 +5369,7 @@ views:
     config:
       title: Livestock demand in the Middle East and Africa
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: middle_east_and_africa
       sub_metric: crops
@@ -5383,7 +5383,7 @@ views:
       subtitle: |-
         Total crop production is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: middle_east_and_africa
       sub_metric: crop_for_energy
@@ -5397,7 +5397,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: middle_east_and_africa
       sub_metric: livestock
@@ -5412,7 +5412,7 @@ views:
       rate: per_capita
       metric: gdp
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp_per_capita__region_latin_america
@@ -5426,7 +5426,7 @@ views:
       rate: total
       metric: gdp
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp__region_latin_america
@@ -5440,7 +5440,7 @@ views:
       rate: total
       metric: consumption
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_dollars__region_latin_america
@@ -5454,7 +5454,7 @@ views:
       rate: per_capita
       metric: consumption
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_per_capita__region_latin_america
@@ -5465,10 +5465,10 @@ views:
       subtitle: |-
         Economic consumption measures the expenditure of private households. It is gross domestic product minus government expenditures, investments, and exports. It is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
   - dimensions:
-      rate: ''
+      rate: na
       metric: population
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#population__region_latin_america
@@ -5552,7 +5552,7 @@ views:
       title: Per capita nitrous oxide emissions in Latin America
       subtitle: This is measured as the average across Latin America.
   - dimensions:
-      rate: ''
+      rate: na
       metric: greenhouse_gas_emissions
       region: latin_america
       sub_metric: f_gases
@@ -5566,10 +5566,10 @@ views:
       subtitle: |-
         Fluorinated gases (‘F-gases’) are greenhouse gases used in industrial applications such as refrigerants, aerosols and white goods.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_economy
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_economy__region_latin_america
@@ -5579,7 +5579,7 @@ views:
       title: Carbon intensity of the economy
       subtitle: The carbon intensity of the economy is measured as the kilograms of carbon dioxide emitted per dollar of GDP.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: latin_america
       sub_metric: sulfur_dioxide__so2
@@ -5593,7 +5593,7 @@ views:
       subtitle: |-
         Sulfur dioxide (SO₂) is an air pollutant produced as a by-product when fuels that contain sulfur are burned. It is often produced from the burning of coal.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: latin_america
       sub_metric: black_carbon
@@ -5607,7 +5607,7 @@ views:
       subtitle: Black carbon is an air pollutant produced through the incomplete combustion of fossil fuels, biofuel, and
         biomass.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: latin_america
       sub_metric: nitrous_oxides__nox
@@ -5621,7 +5621,7 @@ views:
       subtitle: |-
         Nitrous oxides (NOx) are local air pollutants produced when fuel is burned at high temperatures. NOx is often emitted by road vehicles, and industrial sources such as power plants.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: latin_america
       sub_metric: volatile_organic_compounds__voc
@@ -5635,10 +5635,10 @@ views:
       subtitle: |-
         Volatile organic compounds (VOCs) are local air pollutants which are emitted from certain organic compounds which are present in fuels, as well as chemicals used in paints, varnishes and cleaning products.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_price
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_price__region_latin_america
@@ -5650,10 +5650,10 @@ views:
       subtitle: |-
         This assumes a global carbon price on carbon, measured in 2005 US$ per tonne of CO₂. This means prices are adjusted for inflation.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_energy
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_energy__region_latin_america
@@ -5664,10 +5664,10 @@ views:
       subtitle: |-
         The carbon intensity of energy is measured as the kilograms of carbon dioxide emitted per kilowatt-hour of primary energy.
   - dimensions:
-      rate: ''
+      rate: na
       metric: energy_conversion_efficiency
       region: latin_america
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#primary_final_efficiency__region_latin_america
@@ -5706,7 +5706,7 @@ views:
       subtitle: |-
         Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
   - dimensions:
-      rate: ''
+      rate: na
       metric: final_energy
       region: latin_america
       sub_metric: energy_intensity
@@ -6315,7 +6315,7 @@ views:
       subtitle: |-
         Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
   - dimensions:
-      rate: ''
+      rate: na
       metric: primary_energy
       region: latin_america
       sub_metric: energy_intensity
@@ -6972,7 +6972,7 @@ views:
       subtitle: |-
         Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: latin_america
       sub_metric: forest_area
@@ -6985,7 +6985,7 @@ views:
       title: Forest area in Latin America
       subtitle: This covers forest of all types, including primary and planted forests. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: latin_america
       sub_metric: cropland
@@ -6999,7 +6999,7 @@ views:
       subtitle: |-
         Cropland area includes land used for crop production for human food, animal feed, and industrial uses. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: latin_america
       sub_metric: pasture
@@ -7012,7 +7012,7 @@ views:
       title: Pasture land area in Latin America
       subtitle: Pasture land is land used for livestock grazing. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: latin_america
       sub_metric: crops_for_non_energy
@@ -7026,7 +7026,7 @@ views:
       subtitle: |-
         Crop demand is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: latin_america
       sub_metric: crop_for_energy
@@ -7040,7 +7040,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: latin_america
       sub_metric: livestock
@@ -7052,7 +7052,7 @@ views:
     config:
       title: Livestock demand in Latin America
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: latin_america
       sub_metric: crops
@@ -7066,7 +7066,7 @@ views:
       subtitle: |-
         Total crop production is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: latin_america
       sub_metric: crop_for_energy
@@ -7080,7 +7080,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: latin_america
       sub_metric: livestock
@@ -7095,7 +7095,7 @@ views:
       rate: per_capita
       metric: gdp
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp_per_capita__region_oecd
@@ -7109,7 +7109,7 @@ views:
       rate: total
       metric: gdp
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#gdp__region_oecd
@@ -7123,7 +7123,7 @@ views:
       rate: total
       metric: consumption
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_dollars__region_oecd
@@ -7137,7 +7137,7 @@ views:
       rate: per_capita
       metric: consumption
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#econ_consumption_per_capita__region_oecd
@@ -7148,10 +7148,10 @@ views:
       subtitle: |-
         Economic consumption measures the expenditure of private households. It is gross domestic product minus government expenditures, investments, and exports. It is measured in 2005 international-dollars. This means it is adjusted for inflation and cross-country price differences.
   - dimensions:
-      rate: ''
+      rate: na
       metric: population
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#population__region_oecd
@@ -7235,7 +7235,7 @@ views:
       title: Per capita nitrous oxide emissions in OECD countries
       subtitle: This is measured as the average across OECD countries.
   - dimensions:
-      rate: ''
+      rate: na
       metric: greenhouse_gas_emissions
       region: oecd
       sub_metric: f_gases
@@ -7249,10 +7249,10 @@ views:
       subtitle: |-
         Fluorinated gases (‘F-gases’) are greenhouse gases used in industrial applications such as refrigerants, aerosols and white goods.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_economy
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_economy__region_oecd
@@ -7262,7 +7262,7 @@ views:
       title: Carbon intensity of the economy
       subtitle: The carbon intensity of the economy is measured as the kilograms of carbon dioxide emitted per dollar of GDP.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: oecd
       sub_metric: sulfur_dioxide__so2
@@ -7276,7 +7276,7 @@ views:
       subtitle: |-
         Sulfur dioxide (SO₂) is an air pollutant produced as a by-product when fuels that contain sulfur are burned. It is often produced from the burning of coal.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: oecd
       sub_metric: black_carbon
@@ -7290,7 +7290,7 @@ views:
       subtitle: Black carbon is an air pollutant produced through the incomplete combustion of fossil fuels, biofuel, and
         biomass.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: oecd
       sub_metric: nitrous_oxides__nox
@@ -7304,7 +7304,7 @@ views:
       subtitle: |-
         Nitrous oxides (NOx) are local air pollutants produced when fuel is burned at high temperatures. NOx is often emitted by road vehicles, and industrial sources such as power plants.
   - dimensions:
-      rate: ''
+      rate: na
       metric: air_pollution
       region: oecd
       sub_metric: volatile_organic_compounds__voc
@@ -7318,10 +7318,10 @@ views:
       subtitle: |-
         Volatile organic compounds (VOCs) are local air pollutants which are emitted from certain organic compounds which are present in fuels, as well as chemicals used in paints, varnishes and cleaning products.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_price
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_price__region_oecd
@@ -7333,10 +7333,10 @@ views:
       subtitle: |-
         This assumes a global carbon price on carbon, measured in 2005 US$ per tonne of CO₂. This means prices are adjusted for inflation.
   - dimensions:
-      rate: ''
+      rate: na
       metric: carbon_intensity_of_energy
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#carbon_intensity_energy__region_oecd
@@ -7347,10 +7347,10 @@ views:
       subtitle: |-
         The carbon intensity of energy is measured as the kilograms of carbon dioxide emitted per kilowatt-hour of primary energy.
   - dimensions:
-      rate: ''
+      rate: na
       metric: energy_conversion_efficiency
       region: oecd
-      sub_metric: ''
+      sub_metric: na
     indicators:
       y:
         - catalogPath: ipcc_scenarios#primary_final_efficiency__region_oecd
@@ -7389,7 +7389,7 @@ views:
       subtitle: |-
         Final energy is the energy delivered to consumers for end consumption e.g. household electricity, or petrol sold at the pump. It is primary energy energy minus losses which occur in the transformation of fuels into usable energy products (giving us 'secondary energy') minus transmission and distribution losses of getting electricity or heat to the end user.
   - dimensions:
-      rate: ''
+      rate: na
       metric: final_energy
       region: oecd
       sub_metric: energy_intensity
@@ -7998,7 +7998,7 @@ views:
       subtitle: |-
         Primary energy is the energy embodied in natural resources prior to transformation into useful end products. For example, the energy stored in coal or oil before combustion in a power plant. The transformation of fossil fuels into their secondary form (such as electricity) results in large inefficiencies due to heat loss. This means primary energy is higher than the energy used by a population.
   - dimensions:
-      rate: ''
+      rate: na
       metric: primary_energy
       region: oecd
       sub_metric: energy_intensity
@@ -8655,7 +8655,7 @@ views:
       subtitle: |-
         Electricity capacity is the maximum output an energy source if it runs continuously. To convert this to actual electricity output it has to be multiplied by the time that this source is running, and its capacity factor.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: oecd
       sub_metric: forest_area
@@ -8668,7 +8668,7 @@ views:
       title: Forest area in OECD countries
       subtitle: This covers forest of all types, including primary and planted forests. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: oecd
       sub_metric: cropland
@@ -8682,7 +8682,7 @@ views:
       subtitle: |-
         Cropland area includes land used for crop production for human food, animal feed, and industrial uses. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: land_cover
       region: oecd
       sub_metric: pasture
@@ -8695,7 +8695,7 @@ views:
       title: Pasture land area in OECD countries
       subtitle: Pasture land is land used for livestock grazing. It is measured in hectares.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: oecd
       sub_metric: crops_for_non_energy
@@ -8709,7 +8709,7 @@ views:
       subtitle: |-
         Crop demand is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: oecd
       sub_metric: crop_for_energy
@@ -8723,7 +8723,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_demand
       region: oecd
       sub_metric: livestock
@@ -8735,7 +8735,7 @@ views:
     config:
       title: Livestock demand in OECD countries
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: oecd
       sub_metric: crops
@@ -8749,7 +8749,7 @@ views:
       subtitle: |-
         Total crop production is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: oecd
       sub_metric: crop_for_energy
@@ -8763,7 +8763,7 @@ views:
       subtitle: |-
         Energy crops include all crops used for biofuels or solid energy sources. It is measured in tonnes of dry matter. This adjusts for differences in the physical composition and water content of different crops.
   - dimensions:
-      rate: ''
+      rate: na
       metric: agricultural_production
       region: oecd
       sub_metric: livestock
