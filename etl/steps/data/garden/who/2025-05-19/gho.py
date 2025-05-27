@@ -198,7 +198,7 @@ def clean_numeric_column(tb: Table) -> Table:
         tb.loc[ix, "display_value"] = np.nan
 
     # If numeric value is all nan (does not exist), use display_value
-    if "numeric" not in tb.columns:
+    if "numeric" not in tb.columns or tb.numeric.isnull().all():
         tb["numeric"] = tb["display_value"]
 
     # Sometimes numeric is missing, but display_value is present (e.g. in table cholera_0000000001)

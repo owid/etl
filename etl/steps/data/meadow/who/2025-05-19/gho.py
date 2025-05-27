@@ -57,6 +57,7 @@ if SUBSET:
         "P_count_places_sf",
         "R_afford_gdp",
         "SDGNTDTREATMENT",
+        "MH_1",
     ]
     SUBSET += "," + ",".join(subset_list)
 
@@ -88,6 +89,8 @@ def run(dest_dir: str) -> None:
                     or "tobacco" in ind_meta["display"].lower()
                     or "tax" in ind_meta["display"].lower()
                 ) and "estimate" in ind_meta["display"].lower():
+                    pass
+                elif "stunting" in ind_meta["display"].lower():
                     pass
                 elif underscore(label) in underscore(SUBSET):
                     pass

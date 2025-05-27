@@ -81,6 +81,7 @@ if SUBSET:
         "P_count_places_sf",
         "R_afford_gdp",
         "SDGNTDTREATMENT",
+        "MH_1",
     ]
     SUBSET += "," + ",".join(subset_list)
 
