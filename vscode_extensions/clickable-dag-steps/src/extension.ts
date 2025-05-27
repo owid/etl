@@ -190,39 +190,79 @@ export function activate(context: vscode.ExtensionContext) {
   buildDAGIndex();
 
   const emojiDecorations = {
-    // Primary status indicators
+    // Primary status indicators - using before for line start placement
     green: vscode.window.createTextEditorDecorationType({
-      before: { contentText: symbols.green },
+      before: { 
+        contentText: symbols.green,
+        margin: '0 8px 0 0',
+        textDecoration: 'none; pointer-events: none; user-select: none'
+      },
+      isWholeLine: false,
       rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     yellow: vscode.window.createTextEditorDecorationType({
-      before: { contentText: symbols.yellow },
+      before: { 
+        contentText: symbols.yellow,
+        margin: '0 8px 0 0',
+        textDecoration: 'none; pointer-events: none; user-select: none'
+      },
+      isWholeLine: false,
       rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     red: vscode.window.createTextEditorDecorationType({
-      before: { contentText: symbols.red },
+      before: { 
+        contentText: symbols.red,
+        margin: '0 8px 0 0',
+        textDecoration: 'none; pointer-events: none; user-select: none'
+      },
+      isWholeLine: false,
       rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     grey: vscode.window.createTextEditorDecorationType({
-      before: { contentText: symbols.grey },
+      before: { 
+        contentText: symbols.grey,
+        margin: '0 8px 0 0',
+        textDecoration: 'none; pointer-events: none; user-select: none'
+      },
+      isWholeLine: false,
       rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     
     // Additional error indicators (shown alongside the main status)
     noFile: vscode.window.createTextEditorDecorationType({
-      before: { contentText: symbols.noFile },
+      before: { 
+        contentText: symbols.noFile,
+        margin: '0 0 0 0',
+        textDecoration: 'none; pointer-events: none; user-select: none'
+      },
+      isWholeLine: false,
       rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     multipleDefinitions: vscode.window.createTextEditorDecorationType({
-      before: { contentText: symbols.multipleDefinitions },
+      before: { 
+        contentText: symbols.multipleDefinitions,
+        margin: '0 0 0 0',
+        textDecoration: 'none; pointer-events: none; user-select: none'
+      },
+      isWholeLine: false,
       rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     archivedStepUsedInActiveDag: vscode.window.createTextEditorDecorationType({
-      before: { contentText: symbols.archivedStepUsedInActiveDag },
+      before: { 
+        contentText: symbols.archivedStepUsedInActiveDag,
+        margin: '0 0 0 0',
+        textDecoration: 'none; pointer-events: none; user-select: none'
+      },
+      isWholeLine: false,
       rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     undefinedStep: vscode.window.createTextEditorDecorationType({
-      before: { contentText: symbols.undefinedStep },
+      before: { 
+        contentText: symbols.undefinedStep,
+        margin: '0 0 0 0',
+        textDecoration: 'none; pointer-events: none; user-select: none'
+      },
+      isWholeLine: false,
       rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     })
   };
@@ -403,9 +443,9 @@ function updateDecorations(editor: vscode.TextEditor) {
     }
 
     const parsed = parseStepUri(uri);
-    // Calculate position right after the URI instead of end of line
-    const endPos = editor.document.positionAt(match.index + uri.length);
-    const range = new vscode.Range(endPos, endPos);
+    // Get the start position of the line for the URI
+    const linePos = getLineStart(editor.document, editor.document.positionAt(match.index));
+    const range = new vscode.Range(linePos, linePos);
 
     if (!parsed) {
       redRanges.push({ range, hoverMessage: `${symbols.red} Invalid URI format` });
@@ -513,6 +553,11 @@ function updateDecorations(editor: vscode.TextEditor) {
   editor.setDecorations(emojiDecorations.multipleDefinitions, multipleDefinitionsRanges);
   editor.setDecorations(emojiDecorations.archivedStepUsedInActiveDag, archivedStepUsedInActiveDagRanges);
   editor.setDecorations(emojiDecorations.undefinedStep, undefinedStepRanges);
+}
+
+// Helper function to find the line start position (to place decorations at the beginning of the line)
+function getLineStart(document: vscode.TextDocument, position: vscode.Position): vscode.Position {
+  return new vscode.Position(position.line, 0);
 }
 
   context.subscriptions.push(
