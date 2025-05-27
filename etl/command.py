@@ -143,7 +143,6 @@ log = structlog.get_logger()
 )
 @click.option(
     "--watch",
-    "-w",
     is_flag=True,
     help="Run ETL infinitely and update changed files.",
 )
