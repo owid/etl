@@ -28,10 +28,10 @@ def run() -> None:
     #
 
     # Make reporting_level and welfare_type strings
-    tb["reporting_level"] = tb["reporting_level"].astype(str)
-    tb["welfare_type"] = tb["welfare_type"].astype(str)
-    tb_percentiles["reporting_level"] = tb_percentiles["reporting_level"].astype(str)
-    tb_percentiles["welfare_type"] = tb_percentiles["welfare_type"].astype(str)
+    tb["reporting_level"] = tb["reporting_level"].astype("string")
+    tb["welfare_type"] = tb["welfare_type"].astype("string")
+    tb_percentiles["reporting_level"] = tb_percentiles["reporting_level"].astype("string")
+    tb_percentiles["welfare_type"] = tb_percentiles["welfare_type"].astype("string")
 
     # Set index and sort
     tb = tb.format(["ppp_version", "poverty_line", "country", "year", "reporting_level", "welfare_type"])
