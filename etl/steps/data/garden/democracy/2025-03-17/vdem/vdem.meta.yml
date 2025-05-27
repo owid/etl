@@ -63,7 +63,7 @@ tables:
       description_processing: |-
         The default regional aggregates (including values for the World) have been estimated by averaging the country values.
 
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
+        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
       description_key:
         - *key_regions
       presentation: &ppt_uni_w_regions
@@ -420,6 +420,21 @@ tables:
         display:
           numDecimalPlaces: 2
 
+      # Custom
+      held_national_election:
+        title: Held national election
+        description_short: |-
+          Denotes whether a country held a national election in the given year.
+        description_processing: |-
+          It's value is conditioned on some of the original V-Dem indicators:
+
+          - 1 if any of the following indicators was 1: `v2eltype_0`, `v2eltype_1`, `v2eltype_4`, `v2eltype_5`, `v2eltype_6`, or `v2eltype_7`.
+          - 0 otherwise (i.e. all previous indicators were 0).
+
+        unit: ""
+        display:
+          numDecimalPlaces: 0
+
   ##################################################################################################
   ##################################################################################################
   # TABLE: MULTI-DIMENSIONAL TABLES, WITH REGIONS
@@ -428,7 +443,7 @@ tables:
       description_processing: |-
         The default regional aggregates (including values for the World) have been estimated by averaging the country values.
 
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
+        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
       display:
         numDecimalPlaces: 2
       description_key:
