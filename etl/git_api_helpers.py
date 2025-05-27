@@ -259,7 +259,7 @@ class GithubApiRepo:
             except GithubException:
                 # If merge fails due to conflicts, create a merge commit manually
                 log.warning(
-                    f"Merge conflicts detected, creating merge commit using master's tree (conflicts will be resolved by file commits)"
+                    "Merge conflicts detected, creating merge commit using master's tree (conflicts will be resolved by file commits)"
                 )
 
                 branch_commit = self.repo.get_git_commit(branch.commit.sha)
