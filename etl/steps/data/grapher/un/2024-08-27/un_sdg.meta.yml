@@ -8,6 +8,15 @@ definitions:
 dataset:
   update_period_days: 730
 tables:
+  _2_4_1__ag_lnd_sust_prxts:
+    variables:
+      _2_4_1__ag_lnd_sust_prxts:
+        description_from_producer: |-
+          [PROXY] Progress toward productive and sustainable agriculture, trend score
+
+          Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-02-04-01.pdf and https://unstats.un.org/sdgs/metadata/files/Metadata-02-04-01proxy.pdf.
+
+          This indicator is a proxy variable. The rationale behind reporting a proxy as well as the methodology of the proxy variable can be found at: https://unstats.un.org/sdgs/files/meetings/iaeg-sdgs-meeting-14/7b_rev_Indicator_2.4.1_proxy_presentation_FAO.pdf
   _6_2_1__sh_san_safe__all_areas:
     variables:
       _6_2_1__sh_san_safe__all_areas:
@@ -170,3 +179,60 @@ tables:
           Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-16-05-01.pdf
          display:
            numDecimalPlaces: 1
+  _17_1_1__gr_g14_gdp:
+    variables:
+      _17_1_1__gr_g14_gdp:
+        title: 17.1.1 - Total government revenue as a proportion of GDP (%) - GR_G14_GDP
+        description_short: Taxes, social contributions, and other revenues such as fines, fees, rent, and income from property or sales included.
+        presentation:
+          title_public: Government revenues as a share of GDP
+          grapher_config:
+            note: |-
+              Coverage varies by country. Data for [general government](#dod:general-government) (including central, state, and local governments, and social security funds) is used when available. Otherwise, it reflects [consolidated or budgetary central government](#dod:central-government), as reported by each country.
+        description_key:
+          - Government revenue in this indicator includes all types of revenue, such as taxes, social contributions, grants, and other income. The total revenue is expressed as a percentage of gross domestic product (GDP).
+          - This indicator refers to revenues of the [general government](#dod:general-government), which includes all levels of government (central, state, and local) and social security funds. Where general government data is not available, it relies on [consolidated or budgetary central government](#dod:central-government) data, which may not include all levels of government.
+
+
+        description_from_producer: |-
+          Total government revenue as a proportion of GDP (%)
+
+          #### Definition:
+
+          Revenue is defined as an increase in net worth resulting from a transaction. It is a fiscal indicator for assessing the sustainability of fiscal activities.
+
+          General government units have four types of revenue. The major types of revenue are taxes, social contributions, grants, and other revenue. Of these, compulsory levies and transfers are the main sources of revenue for most general government units.
+
+          In particular, taxes are compulsory, unrequited amounts receivable by government units from institutional units.
+          Social contributions are actual or imputed revenue receivable by social insurance schemes to make provision for social insurance benefits payable.
+          Grants are transfers receivable by government units from other resident or non-resident government units or international organizations, and that do not meet the definition of a tax, subsidy, or social contribution.
+
+          Other revenue is all revenue receivable excluding taxes, social contributions, and grants. Other revenue comprises: (i)
+          property income; (ii) sales of goods and services; (iii) fines, penalties, and forfeits; (iv) transfers not elsewhere classified; and (v) premiums, fees, and claims related to non-life insurance and standardized guarantee schemes.
+
+          Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-17-01-01.pdf
+  _17_1_2__gc_gob_taxd:
+    variables:
+      _17_1_2__gc_gob_taxd:
+        title: 17.1.2 - Proportion of budgetary central government funded by domestic taxes (%) - GC_GOB_TAXD
+        presentation:
+          title_public: Share of central government spending funded by taxes
+        description_short: Spending refers to the [budgetary central government](#dod:central-government) which includes the core institutions of the national government. Funds only include taxes; Fines, penalties, and most social security contributions are excluded.
+        description_key:
+          - This indicator measures the share of [central government](#dod:central-government) spending that is covered by domestic tax revenue.
+          - Government expenditures refer to the budgetary central government. These are all institutions that are directly financed through the main central government budget, such as the core ministries, departments and agencies.
+          - This indicator does not include other sources of government revenue, such as grants, loans, fines, penalties, and most social security contributions.
+        description_from_producer: |-
+          Proportion of domestic budgetary central government expenditure funded by taxes (%)
+
+          #### Definition:
+          Budgetary central government is an institutional unit of the general government sector particularly important in terms of size and power, particularly the power to exercise control over many other units and entities.
+
+          The budgetary central government is often a single unit of the central government that encompasses the fundamental activities of the national executive, legislative, and judiciary powers. This component of general government is usually covered by the main (or general) budget.
+
+          The budgetary central government’s revenue (and expense) are normally regulated and controlled by a ministry of finance, or its functional equivalent, by means of a budget approved by the legislature.
+
+          Most of the ministries, departments, agencies, boards, commissions, judicial authorities, legislative bodies, and other entities that make up the budgetary central government are not separate institutional units. This is because they generally do not have the authority to own assets, incur liabilities, or engage in transactions in their own right, including references to standards and classifications, preferably relying on international agreed definitions.
+
+          Further information available at: https://unstats.un.org/sdgs/metadata/files/Metadata-17-01-02.pdf
+

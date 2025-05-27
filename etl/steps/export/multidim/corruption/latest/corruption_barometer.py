@@ -64,22 +64,22 @@ def run() -> None:
                     "hasMapTab": False,
                     "chartTypes": ["DiscreteBar"],
                     "tab": "chart",
-                    "facettingLabelByYVariables": "institution",
-                    "selectedFacetStrategy": "metric",
+                    # "facettingLabelByYVariables": "institution",
+                    # "selectedFacetStrategy": "metric",
                     "title": "How many of the following people do you think are involved in corruption? {answer}",
                     "subtitle": 'Percentage of respondents who answered {answer} to the question "How many of the following people do you think are involved in corruption?".',
-                },
-                "view_params": {
-                    "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
                 },
                 "view_metadata": {
                     "description_short": 'Percentage of respondents who answered "{answer}" to the question "How many of the following people do you think are involved in corruption?".',
                 },
             },
-        ]
+        ],
+        params={
+            "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
+        },
     )
     # Sort choices alphabetically
-    c.sort_choices({"answer": lambda x: sorted(x)})
+    c.sort_choices({"institution": lambda x: sorted(x)})
 
     #
     # Save garden dataset.
