@@ -3,6 +3,21 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 
+// Status symbols configuration (centralized for easy customization)
+const symbols = {
+  // Primary status indicators
+  green: '🟢',      // File exists, latest version, properly defined
+  yellow: '🟡',     // File exists, not latest version, properly defined
+  red: '🔴',        // Error state (various issues)
+  grey: '⚪',       // Archive state (defined in archive)
+  
+  // Additional error indicators
+  noFile: '❌',                      // No file was found
+  multipleDefinitions: '⚠️',         // Step defined more than once
+  archivedStepUsedInActiveDag: '❗',  // Step defined in archive but used in active DAG
+  undefinedStep: '❓'                // Step not defined anywhere
+};
+
 function parseStepUri(uri: string): { scheme: string; key: string; version: string, fullKey: string, filePaths: string[] } | null {
   const parts = uri.split('://');
   if (parts.length !== 2) {
@@ -50,12 +65,16 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
   return null;
 }
 
-let stepVersionsIndex: Map<string, Set<string>> = new Map();
+// Track versions separately for definitions and dependencies
+let definedVersionsByKey: Map<string, Set<string>> = new Map(); // For versions from active DAG definitions
+let allVersionsByKey: Map<string, Set<string>> = new Map();     // For versions from all references
+
 let stepDefinitionCount: Map<string, number> = new Map();
 let archiveDefinedSteps: Set<string> = new Set();
 
 function buildDAGIndex(): void {
-  stepVersionsIndex.clear();
+  definedVersionsByKey.clear();
+  allVersionsByKey.clear();
   stepDefinitionCount.clear();
   archiveDefinedSteps.clear();
 
@@ -91,12 +110,26 @@ function buildDAGIndex(): void {
           const uri = match[0].replace(/^\s*-\s*/, '').trim();
           const parsed = parseStepUri(uri);
           if (parsed) {
-            if (!stepVersionsIndex.has(parsed.key)) {
-              stepVersionsIndex.set(parsed.key, new Set());
+            const isDefinition = line.trim().endsWith(':');
+            const isSnapshot = parsed.key.startsWith('snapshot://');
+            
+            // Only add references from active DAG to the allVersionsByKey
+            if (!isArchive) {
+              if (!allVersionsByKey.has(parsed.key)) {
+                allVersionsByKey.set(parsed.key, new Set());
+              }
+              allVersionsByKey.get(parsed.key)!.add(parsed.version);
             }
-            stepVersionsIndex.get(parsed.key)!.add(parsed.version);
+            
+            // If it's a definition in active DAG, track it separately
+            if (isDefinition && !isArchive) {
+              if (!definedVersionsByKey.has(parsed.key)) {
+                definedVersionsByKey.set(parsed.key, new Set());
+              }
+              definedVersionsByKey.get(parsed.key)!.add(parsed.version);
+            }
 
-            if (line.trim().endsWith(':')) {
+            if (isDefinition) {
               const count = stepDefinitionCount.get(parsed.fullKey) || 0;
               stepDefinitionCount.set(parsed.fullKey, count + 1);
               if (isArchive) {
@@ -121,12 +154,35 @@ function getLatestVersion(versions: Set<string>): string {
     const aDate = Date.parse(a);
     const bDate = Date.parse(b);
     if (!isNaN(aDate) && !isNaN(bDate)) {
-      return aDate - bDate;
+      return bDate - aDate; // Sort in descending order to get latest first
     }
-    return a.localeCompare(b);
+    return b.localeCompare(a); // Compare in reverse order
   });
 
-  return sorted[sorted.length - 1];
+  return sorted[0]; // First element is now the latest
+}
+
+// For all steps (including snapshots), only consider versions from active DAG
+function getLatestVersionForStep(key: string, isSnapshot: boolean): string | undefined {
+  // First check active DAG for any versions (both for regular steps and snapshots)
+  const activeDagVersions = new Set<string>();
+  
+  // Collect versions of this key from all files in active DAG
+  const allReferences = allVersionsByKey.get(key);
+  const definedVersions = definedVersionsByKey.get(key);
+  
+  // For non-snapshots, prioritize versions defined in the active DAG
+  if (!isSnapshot && definedVersions && definedVersions.size > 0) {
+    return getLatestVersion(definedVersions);
+  }
+  
+  // For snapshots or as a fallback, get all versions from active DAG references
+  // We'll filter out archive versions by checking file paths in buildDAGIndex
+  if (allReferences && allReferences.size > 0) {
+    return getLatestVersion(allReferences);
+  }
+  
+  return undefined;
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -134,26 +190,40 @@ export function activate(context: vscode.ExtensionContext) {
   buildDAGIndex();
 
   const emojiDecorations = {
+    // Primary status indicators
     green: vscode.window.createTextEditorDecorationType({
-      after: { contentText: '🟢', margin: '0 0 0 0.25em' }
+      before: { contentText: symbols.green },
+      rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     yellow: vscode.window.createTextEditorDecorationType({
-      after: { contentText: '🟡', margin: '0 0 0 0.25em' }
+      before: { contentText: symbols.yellow },
+      rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     red: vscode.window.createTextEditorDecorationType({
-      after: { contentText: '🔴', margin: '0 0 0 0.25em' }
-    }),
-    warning: vscode.window.createTextEditorDecorationType({
-      after: { contentText: '⚠️', margin: '0 0 0 0.25em' }
-    }),
-    archive: vscode.window.createTextEditorDecorationType({
-      after: { contentText: '❗', margin: '0 0 0 0.25em' }
+      before: { contentText: symbols.red },
+      rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
     grey: vscode.window.createTextEditorDecorationType({
-      after: { contentText: '⚪', margin: '0 0 0 0.25em' }
+      before: { contentText: symbols.grey },
+      rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     }),
-    question: vscode.window.createTextEditorDecorationType({
-      after: { contentText: '❓', margin: '0 0 0 0.25em' }
+    
+    // Additional error indicators (shown alongside the main status)
+    noFile: vscode.window.createTextEditorDecorationType({
+      before: { contentText: symbols.noFile },
+      rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
+    }),
+    multipleDefinitions: vscode.window.createTextEditorDecorationType({
+      before: { contentText: symbols.multipleDefinitions },
+      rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
+    }),
+    archivedStepUsedInActiveDag: vscode.window.createTextEditorDecorationType({
+      before: { contentText: symbols.archivedStepUsedInActiveDag },
+      rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
+    }),
+    undefinedStep: vscode.window.createTextEditorDecorationType({
+      before: { contentText: symbols.undefinedStep },
+      rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed
     })
   };
 
@@ -166,6 +236,13 @@ export function activate(context: vscode.ExtensionContext) {
       const isArchiveFile = document.uri.fsPath.includes(path.join('dag', 'archive'));
 
       while ((match = regex.exec(text)) !== null) {
+        // Skip commented lines
+        const lineStart = document.positionAt(match.index).line;
+        const lineText = document.lineAt(lineStart).text;
+        if (lineText.trim().startsWith('#')) {
+          continue;
+        }
+
         const uri = match[0];
         const parsed = parseStepUri(uri);
         if (!parsed) {
@@ -186,38 +263,103 @@ export function activate(context: vscode.ExtensionContext) {
         const range = new vscode.Range(startPos, endPos);
         const link = new vscode.DocumentLink(range);
 
-        const allVersions = stepVersionsIndex.get(parsed.key);
-        let tooltip = '';
-
         if (fullPath) {
           link.target = vscode.Uri.file(fullPath);
-          if (allVersions && allVersions.has(parsed.version)) {
-            const latest = getLatestVersion(allVersions);
-            tooltip = parsed.version === latest ? '🟢 Open file' : `🟡 Open file (latest: ${latest})`;
-          }
-        } else {
-          tooltip = '🔴 File not found';
         }
 
+        // Build tooltip with status information based on the exact same rules
+        // we use for decorations to ensure consistency
+        const tooltipParts = [];
+        
+        // Get basic information
+        const key = parsed.key;
+        const fullKey = parsed.fullKey;
+        const version = parsed.version;
+        const isSnapshot = key.startsWith('snapshot://');
+        const isDefinition = text.substr(match.index, uri.length + 1).trim().endsWith(':');
+        const isDefinedInArchive = archiveDefinedSteps.has(parsed.fullKey);
+        const isDefinedSomewhere = stepDefinitionCount.has(fullKey) || isSnapshot;
         const defCount = stepDefinitionCount.get(parsed.fullKey) || 0;
+        
+        // For all steps, we now consider only versions from active DAG
+        // This is set up in buildDAGIndex and getLatestVersionForStep
 
-        if (!isArchiveFile && archiveDefinedSteps.has(parsed.fullKey)) {
-          tooltip += (tooltip ? '\n' : '') + '❗ Step defined in the archive';
+        // Check if file exists
+        const fileExists = !!fullPath;
+
+        // Check version
+        let isLatestVersion = false;
+        const latest = getLatestVersionForStep(key, isSnapshot);
+        if (latest) {
+          isLatestVersion = version === latest;
         }
 
-        if (defCount > 1 && text.substr(match.index, uri.length + 1).trim().endsWith(':')) {
-          tooltip += (tooltip ? '\n' : '') + '⚠️ Step defined more than once';
+        // CASE: File doesn't exist (always red)
+        if (!fileExists) {
+          tooltipParts.push(`${symbols.red} ${symbols.noFile} No file was found`);
+        } 
+        // File exists - apply the same rules as in updateDecorations
+        else {
+          // CASE: Archive DAG file
+          if (isArchiveFile) {
+            // File exists and defined in active DAG
+            if (isDefinedSomewhere && !isDefinedInArchive) {
+              if (isLatestVersion) {
+                tooltipParts.push(`${symbols.green} Open file`);
+              } else if (latest) {
+                tooltipParts.push(`${symbols.yellow} Open file (latest: ${latest})`);
+              } else {
+                tooltipParts.push(`${symbols.yellow} Open file`);
+              }
+            }
+            // File exists and defined in archive DAG
+            else if (isDefinedInArchive) {
+              if (latest && version !== latest) {
+                tooltipParts.push(`${symbols.grey} Step defined in archive DAG (latest: ${latest})`);
+              } else {
+                tooltipParts.push(`${symbols.grey} Step defined in archive DAG`);
+              }
+            }
+            // File exists but not defined anywhere (and not a snapshot)
+            else {
+              tooltipParts.push(`${symbols.red} ${symbols.undefinedStep} Step not defined anywhere`);
+            }
+          } 
+          // CASE: Active DAG file
+          else {
+            // Check for archive definition misuse in active DAG
+            if (isDefinedInArchive) {
+              tooltipParts.push(`${symbols.red} ${symbols.archivedStepUsedInActiveDag} Step defined in the archive DAG, but used in the active DAG`);
+            }
+            // Check if defined anywhere (except for snapshots)
+            else if (!isDefinedSomewhere) {
+              tooltipParts.push(`${symbols.red} ${symbols.undefinedStep} Step not defined anywhere`);
+            }
+            // Check if this version exists in the active DAG
+            else {
+              // Only show green for the latest version
+              if (isLatestVersion) {
+                tooltipParts.push(`${symbols.green} Open file`);
+              }
+              // If it's a valid version but not the latest
+              else if (latest) {
+                tooltipParts.push(`${symbols.yellow} Open file (latest: ${latest})`);
+              }
+              // Something's wrong with the version
+              else {
+                tooltipParts.push(`${symbols.red} Version not found in any active DAG file`);
+              }
+            }
+          }
+
+          // Handle steps defined more than once (should override other statuses)
+          if (defCount > 1 && isDefinition) {
+            tooltipParts.length = 0; // Clear previous tooltip parts
+            tooltipParts.push(`${symbols.red} ${symbols.multipleDefinitions} Step defined more than once in the DAG`);
+          }
         }
 
-        if (isArchiveFile && archiveDefinedSteps.has(parsed.fullKey)) {
-          tooltip += (tooltip ? '\n' : '') + '⚪ Step defined in archive DAG';
-        }
-
-        if (!stepDefinitionCount.has(parsed.fullKey) && !parsed.key.startsWith('snapshot://')) {
-          tooltip += (tooltip ? '\n' : '') + '❓ Step not defined anywhere';
-        }
-
-        link.tooltip = tooltip;
+        link.tooltip = tooltipParts.join('\n');
         links.push(link);
       }
 
@@ -232,13 +374,17 @@ function updateDecorations(editor: vscode.TextEditor) {
     return;
   }
 
+  // Decorations for the main indicators
   const greenRanges: vscode.DecorationOptions[] = [];
   const yellowRanges: vscode.DecorationOptions[] = [];
   const redRanges: vscode.DecorationOptions[] = [];
-  const warningRanges: vscode.DecorationOptions[] = [];
-  const archiveRanges: vscode.DecorationOptions[] = [];
   const greyRanges: vscode.DecorationOptions[] = [];
-  const questionRanges: vscode.DecorationOptions[] = [];
+  
+  // Additional error indicators
+  const noFileRanges: vscode.DecorationOptions[] = [];
+  const multipleDefinitionsRanges: vscode.DecorationOptions[] = [];
+  const archivedStepUsedInActiveDagRanges: vscode.DecorationOptions[] = [];
+  const undefinedStepRanges: vscode.DecorationOptions[] = [];
 
   const isArchiveFile = filePath.includes(path.join('dag', 'archive'));
 
@@ -249,78 +395,124 @@ function updateDecorations(editor: vscode.TextEditor) {
   while ((match = regex.exec(text)) !== null) {
     const uri = match[0];
 
+    // Skip commented lines
     const lineStart = editor.document.positionAt(match.index).line;
     const lineText = editor.document.lineAt(lineStart).text;
     if (lineText.trim().startsWith('#')) {
-      continue; // Ignore commented lines
+      continue;
     }
 
     const parsed = parseStepUri(uri);
-    const startPos = editor.document.positionAt(match.index);
-    const line = editor.document.lineAt(startPos.line);
-    const range = new vscode.Range(line.range.end, line.range.end);
+    // Calculate position right after the URI instead of end of line
+    const endPos = editor.document.positionAt(match.index + uri.length);
+    const range = new vscode.Range(endPos, endPos);
 
     if (!parsed) {
-      redRanges.push({ range });
+      redRanges.push({ range, hoverMessage: `${symbols.red} Invalid URI format` });
       continue;
     }
 
     const key = parsed.key;
     const fullKey = parsed.fullKey;
     const version = parsed.version;
-    const allVersions = stepVersionsIndex.get(key);
+    const isDefinition = lineText.trim().endsWith(':');
+    const isSnapshot = key.startsWith('snapshot://');
+    const isDefinedSomewhere = stepDefinitionCount.has(fullKey) || isSnapshot;
+    const isDefinedInArchive = archiveDefinedSteps.has(fullKey);
     const defCount = stepDefinitionCount.get(fullKey) || 0;
-    const isDefinition = line.text.trim().endsWith(':');
-
+    
+    // Check if file exists
     const existingPath = parsed.filePaths
       .map(p => path.join(workspaceFolder.uri.fsPath, p))
       .find(p => fs.existsSync(p));
+    
+    const fileExists = !!existingPath;
 
-    if (!existingPath) {
+    // Check version
+    let isLatestVersion = false;
+    const latest = getLatestVersionForStep(key, isSnapshot);
+    if (latest) {
+      isLatestVersion = version === latest;
+    }
+
+    // Apply decoration based on the specific rules
+    
+    // CASE: File doesn't exist (always red)
+    if (!fileExists) {
       redRanges.push({ range });
+      noFileRanges.push({ range, hoverMessage: `${symbols.noFile} No file was found` });
       continue;
     }
 
-    // GREY for anything in archive DAG that is also defined in archive
-    if (isArchiveFile && archiveDefinedSteps.has(fullKey)) {
-      greyRanges.push({ range, hoverMessage: '⚪ Step defined in archive DAG' });
-      continue;
-    }
-
-    // ❗ for anything outside archive DAG that is defined in archive
-    if (!isArchiveFile && archiveDefinedSteps.has(fullKey)) {
-      archiveRanges.push({ range, hoverMessage: '❗ Step defined in the archive DAG' });
-    }
-
-    // ❓ for anything not defined in any DAG (skip snapshots)
-    if (!stepDefinitionCount.has(fullKey) && !key.startsWith('snapshot://')) {
-      questionRanges.push({ range, hoverMessage: '❓ Step not defined anywhere' });
-    }
-
+    // CASE: Step defined more than once (always show red + warning)
     if (defCount > 1 && isDefinition) {
-      warningRanges.push({ range, hoverMessage: '⚠️ Step defined more than once' });
-      continue;
-    }
-
-    if (!allVersions || !allVersions.has(version)) {
       redRanges.push({ range });
-    } else {
-      const latest = getLatestVersion(allVersions);
-      if (version === latest) {
+      multipleDefinitionsRanges.push({ range, hoverMessage: `${symbols.multipleDefinitions} Step defined more than once in the DAG` });
+      continue; // Skip further processing since we've already marked it as an error
+    }
+    
+    // CASE: Archive DAG file
+    if (isArchiveFile) {
+      // File exists and defined in active DAG
+      if (isDefinedSomewhere && !isDefinedInArchive) {
+        if (isLatestVersion) {
+          greenRanges.push({ range });
+        } else {
+          yellowRanges.push({ range });
+        }
+      }
+      // File exists and defined in archive DAG
+      else if (isDefinedInArchive) {
+        greyRanges.push({ range, hoverMessage: `${symbols.grey} Step defined in archive DAG` });
+      }
+      // File exists but not defined anywhere (and not a snapshot)
+      else {
+        redRanges.push({ range });
+        undefinedStepRanges.push({ range, hoverMessage: `${symbols.undefinedStep} Step not defined anywhere` });
+      }
+    }
+    // CASE: Active DAG file
+    else {
+      // Check for archive definition misuse in active DAG
+      if (isDefinedInArchive) {
+        redRanges.push({ range });
+        archivedStepUsedInActiveDagRanges.push({ range, hoverMessage: `${symbols.archivedStepUsedInActiveDag} Step defined in the archive DAG, but used in the active DAG` });
+        continue;
+      }
+      
+      // Check if defined anywhere (except for snapshots)
+      if (!isDefinedSomewhere) {
+        redRanges.push({ range });
+        undefinedStepRanges.push({ range, hoverMessage: `${symbols.undefinedStep} Step not defined anywhere` });
+        continue;
+      }
+      
+      // Only the latest version should get a green circle
+      if (isLatestVersion) {
         greenRanges.push({ range });
-      } else {
+      }
+      // If it's a valid version but not the latest
+      else if (latest && version !== latest) {
         yellowRanges.push({ range });
+      }
+      // Something's wrong with the version
+      else {
+        redRanges.push({ range });
       }
     }
   }
 
+  // Apply decorations
   editor.setDecorations(emojiDecorations.green, greenRanges);
   editor.setDecorations(emojiDecorations.yellow, yellowRanges);
   editor.setDecorations(emojiDecorations.red, redRanges);
-  editor.setDecorations(emojiDecorations.warning, warningRanges);
-  editor.setDecorations(emojiDecorations.archive, archiveRanges);
   editor.setDecorations(emojiDecorations.grey, greyRanges);
-  editor.setDecorations(emojiDecorations.question, questionRanges);
+  
+  // Apply additional error indicators
+  editor.setDecorations(emojiDecorations.noFile, noFileRanges);
+  editor.setDecorations(emojiDecorations.multipleDefinitions, multipleDefinitionsRanges);
+  editor.setDecorations(emojiDecorations.archivedStepUsedInActiveDag, archivedStepUsedInActiveDagRanges);
+  editor.setDecorations(emojiDecorations.undefinedStep, undefinedStepRanges);
 }
 
   context.subscriptions.push(

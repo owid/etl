@@ -2,15 +2,18 @@
 
 **Clickable DAG Steps** is a VS Code extension that makes `dag.yml` files easier to navigate and maintain. It turns DAG entries into clickable links that open the corresponding `.py` files (for data and export steps) or `.dvc` files (for snapshots).
 
-Additionally, it displays an emoji indicator next to each step to signal its status:
+Additionally, it displays emoji indicators next to each step to signal its status:
 
-- 🟢 (OK) The step file exists and is the latest version in the DAG.
-- 🟡 (OK) The step file exists but a newer version exists in the DAG. On hover, the corresponding latest version is shown in the tooltip.
-- ⚪ (OK) The step file exists, the step is defined in the archive DAG, and used in the archive DAG.
-- ❗ (ERROR) The step file exists, the step is defined in the archive DAG, and mistakenly used in the active DAG.
-- ❓ (ERROR) The step file exists, but the step is defined nowhere in the DAG.
-- 🔴 (ERROR) No file exists for the step.
-- ⚠️ (ERROR) This step is mistakenly defined more than once in the DAG.
+- 🟢 There are no issues, and the step is the latest version.
+- 🟡 There are no issues, but there is a newer version of the step.
+- ⚪ There are no issues, but the step is archived (i.e. defined in the archive DAG).
+- 🔴 There are issues with the step.
+
+Types of issues:
+- ❌ No file was found for the step.
+- ⚠️ The step is defined more than once in the DAG.
+- ❗ The step is defined in the archive DAG, but used in the active DAG.
+- ❓ The step is not defined anywhere in the DAG.
 
 ### Installation
 
