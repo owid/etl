@@ -420,10 +420,10 @@ def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
     Select regional data only from 1990 onwards, due to the uncertainty in 1980s data
     """
     # Create a regions table
-    tb_regions = tb[(tb["year"] >= 1990) & (tb["country"].isin(regions_list))].reset_index(drop=True).copy()
+    tb_regions = tb[(tb["year"] >= 1990) & (tb["country"].isin(regions_list))].reset_index(drop=True)
 
     # Remove regions from tb
-    tb = tb[~tb["country"].isin(regions_list)].reset_index(drop=True).copy()
+    tb = tb[~tb["country"].isin(regions_list)].reset_index(drop=True)
 
     # Concatenate both tables
     tb = pr.concat([tb, tb_regions], ignore_index=True)
@@ -862,7 +862,7 @@ def sanity_checks(
         mask = (tb_pivot["sum_pct"] >= 100 + PRECISION_PERCENTAGE) | (
             tb_pivot["sum_pct"] <= 100 - PRECISION_PERCENTAGE
         ) & (tb_pivot[cols_to_check].notnull().any(axis=1))
-        tb_error = tb_pivot[mask].reset_index(drop=True).copy()
+        tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
             log.warning(
@@ -883,7 +883,7 @@ def sanity_checks(
         mask = (tb_pivot["sum_pct"] >= 100 + PRECISION_PERCENTAGE) | (
             tb_pivot["sum_pct"] <= 100 - PRECISION_PERCENTAGE
         ) & (tb_pivot[cols_to_check].notnull().any(axis=1))
-        tb_error = tb_pivot[mask].reset_index(drop=True).copy()
+        tb_error = tb_pivot[mask].reset_index(drop=True)
 
         if not tb_error.empty:
             log.warning(
@@ -1157,7 +1157,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> None:
             & (tb["check_diff_year"] <= 5)
             & ~tb["check_diff_welfare_type"].fillna(False)
         )
-        tb_error = tb[mask].reset_index(drop=True).copy()
+        tb_error = tb[mask].reset_index(drop=True)
 
         if not tb_error.empty:
             log.warning(
@@ -1188,7 +1188,7 @@ def survey_count(tb: Table) -> Table:
     tb = tb.copy()
 
     # Remove regions from the table
-    tb_survey = tb[~tb["country"].isin(REGIONS_LIST)].reset_index(drop=True).copy()
+    tb_survey = tb[~tb["country"].isin(REGIONS_LIST)].reset_index(drop=True)
 
     # Obtain the value of the second key in INTERNATIONAL_POVERTY_LINES
     # This is the value of the poverty line for the current year

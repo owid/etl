@@ -667,7 +667,7 @@ def sanity_checks(
         .lt(0)
         .any(axis=1)
     )
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.fatal(
@@ -681,14 +681,14 @@ def sanity_checks(
     # stacked values not adding up to 100%
     tb["sum_pct"] = tb[col_stacked_pct].sum(axis=1)
     mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9)
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.warning(
             f"""{len(tb_error)} observations of stacked values are not adding up to 100% and will be deleted:
             {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
         )
-        tb = tb[~mask].reset_index(drop=True).copy()
+        tb = tb[~mask].reset_index(drop=True)
 
     ############################
     # missing poverty values (headcount, poverty gap, total shortfall)
@@ -698,7 +698,7 @@ def sanity_checks(
     mask = (tb[cols_to_check].isna().any(axis=1)) & (
         ~tb["country"].isin(["World (excluding China)", "World (excluding India)"])
     )
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.warning(
@@ -710,7 +710,7 @@ def sanity_checks(
     ############################
     # Missing median
     mask = tb["median"].isna()
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.info(f"""There are {len(tb_error)} observations with missing median. They will be not deleted.""")
@@ -718,7 +718,7 @@ def sanity_checks(
     ############################
     # Missing mean
     mask = tb["mean"].isna()
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.info(f"""There are {len(tb_error)} observations with missing mean. They will be not deleted.""")
@@ -726,7 +726,7 @@ def sanity_checks(
     ############################
     # Missing gini
     mask = tb["gini"].isna()
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.info(f"""There are {len(tb_error)} observations with missing gini. They will be not deleted.""")
@@ -734,7 +734,7 @@ def sanity_checks(
     ############################
     # Missing decile shares
     mask = tb[col_decile_share].isna().any(axis=1)
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.info(f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted.""")
@@ -742,7 +742,7 @@ def sanity_checks(
     ############################
     # Missing decile thresholds
     mask = tb[col_decile_thr].isna().any(axis=1)
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.info(
@@ -782,7 +782,7 @@ def sanity_checks(
     # Drop rows if columns in col_decile_thr are all null. Keep if some are null
     mask = (~tb["check_total"]) & (tb[col_decile_thr].notnull().any(axis=1))
 
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.warning(
@@ -804,7 +804,7 @@ def sanity_checks(
 
     # Drop rows if columns in col_decile_share are all null. Keep if some are null
     mask = (~tb["check_total"]) & (tb[col_decile_share].notnull().any(axis=1))
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.warning(
@@ -820,7 +820,7 @@ def sanity_checks(
 
     # Drop rows if columns in col_decile_share are all null. Keep if some are null
     mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9) & (tb[col_decile_share].notnull().any(axis=1))
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.warning(
@@ -839,7 +839,7 @@ def sanity_checks(
 
     # Drop rows if columns in col_decile_share_top are all null. Keep if some are null
     mask = (tb["sum_pct"] >= 100.1) | (tb["sum_pct"] <= 99.9) & (tb[col_decile_share_top].notnull().any(axis=1))
-    tb_error = tb[mask].reset_index(drop=True).copy()
+    tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
         log.warning(
@@ -866,8 +866,8 @@ def separate_ppp_data(tb: Table) -> Tuple[Table, Table]:
 
     # Filter table to include only the right ppp_version
     # Also, drop columns with all NaNs (which are the ones that are not relevant for the ppp_version)
-    tb_ppp_old = tb[tb["ppp_version"] == PPP_YEAR_OLD].dropna(axis=1, how="all").reset_index(drop=True).copy()
-    tb_ppp_current = tb[tb["ppp_version"] == PPP_YEAR_CURRENT].dropna(axis=1, how="all").reset_index(drop=True).copy()
+    tb_ppp_old = tb[tb["ppp_version"] == PPP_YEAR_OLD].dropna(axis=1, how="all").reset_index(drop=True)
+    tb_ppp_current = tb[tb["ppp_version"] == PPP_YEAR_CURRENT].dropna(axis=1, how="all").reset_index(drop=True)
 
     return tb_ppp_old, tb_ppp_current
 
@@ -878,8 +878,8 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
     """
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
-    tb_inc = tb[tb["welfare_type"] == "income"].reset_index(drop=True).copy()
-    tb_cons = tb[tb["welfare_type"] == "consumption"].reset_index(drop=True).copy()
+    tb_inc = tb[tb["welfare_type"] == "income"].reset_index(drop=True)
+    tb_cons = tb[tb["welfare_type"] == "consumption"].reset_index(drop=True)
     tb_inc_or_cons = tb.copy()
     tb_inc_or_cons_unsmoothed = tb.copy()
 
@@ -906,10 +906,10 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb["only_inc_or_cons"] = tb.groupby(["country"])["welfare_type"].transform(lambda x: x.nunique() == 1)
 
     # Select only the rows with only income or consumption
-    tb_only_inc_or_cons = tb[tb["only_inc_or_cons"]].reset_index(drop=True).copy()
+    tb_only_inc_or_cons = tb[tb["only_inc_or_cons"]].reset_index(drop=True)
 
     # Create a table with the rest
-    tb_both_inc_and_cons = tb[~tb["only_inc_or_cons"]].reset_index(drop=True).copy()
+    tb_both_inc_and_cons = tb[~tb["only_inc_or_cons"]].reset_index(drop=True)
 
     # Create a list of the countries with both income and consumption in the series
     countries_inc_cons = list(tb_both_inc_and_cons["country"].unique())
@@ -923,7 +923,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb_both_inc_and_cons_smoothed = Table()
     for country in countries_inc_cons:
         # Filter country
-        tb_country = tb_both_inc_and_cons[tb_both_inc_and_cons["country"] == country].reset_index(drop=True).copy()
+        tb_country = tb_both_inc_and_cons[tb_both_inc_and_cons["country"] == country].reset_index(drop=True)
 
         # Save the max_year for the country
         max_year = tb_country["year"].max()
@@ -1048,7 +1048,7 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
             & (tb["check_diff_year"] <= 5)
             & ~tb["check_diff_welfare_type"].fillna(False)
         )
-        tb_error = tb[mask].reset_index(drop=True).copy()
+        tb_error = tb[mask].reset_index(drop=True)
 
         if not tb_error.empty:
             log.warning(
@@ -1078,7 +1078,7 @@ def regional_headcount(tb: Table) -> Table:
     """
 
     # Keep only regional data: for regions, these are the reporting_level rows not in ['national', 'urban', 'rural']
-    tb_regions = tb[~tb["reporting_level"].isin(["national", "urban", "rural"])].reset_index(drop=True).copy()
+    tb_regions = tb[~tb["reporting_level"].isin(["national", "urban", "rural"])].reset_index(drop=True)
 
     # Remove Western and Central and Eastern and Southern Africa. It's redundant with Sub-Saharan Africa (PIP)
     tb_regions = tb_regions[
@@ -1164,7 +1164,7 @@ def survey_count(tb: Table) -> Table:
     Create survey count indicator, by counting the number of surveys available for each country in the past decade
     """
     # Remove regions from the table
-    tb_survey = tb[~tb["country"].isin(REGIONS_LIST)].reset_index(drop=True).copy()
+    tb_survey = tb[~tb["country"].isin(REGIONS_LIST)].reset_index(drop=True)
 
     min_year = int(tb_survey["year"].min())
     max_year = int(tb_survey["year"].max())
@@ -1300,8 +1300,8 @@ def create_survey_spells_inc_cons(tb_inc: Table, tb_cons: Table) -> list:
     This version recombines income and consumption tables to not lose dropped rows.
     """
 
-    tb_inc = tb_inc.reset_index().copy()
-    tb_cons = tb_cons.reset_index().copy()
+    tb_inc = tb_inc.reset_index()
+    tb_cons = tb_cons.reset_index()
 
     # Concatenate the two tables
     tb_inc_or_cons_spells = pr.concat(
@@ -1385,10 +1385,10 @@ def regional_data_from_1990(tb: Table, regions_list: list) -> Table:
     Select regional data only from 1990 onwards, due to the uncertainty in 1980s data
     """
     # Create a regions table
-    tb_regions = tb[(tb["year"] >= 1990) & (tb["country"].isin(regions_list))].reset_index(drop=True).copy()
+    tb_regions = tb[(tb["year"] >= 1990) & (tb["country"].isin(regions_list))].reset_index(drop=True)
 
     # Remove regions from tb
-    tb = tb[~tb["country"].isin(regions_list)].reset_index(drop=True).copy()
+    tb = tb[~tb["country"].isin(regions_list)].reset_index(drop=True)
 
     # Concatenate both tables
     tb = pr.concat([tb, tb_regions], ignore_index=True)
