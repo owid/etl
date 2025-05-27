@@ -95,7 +95,13 @@ def combine_config_dimensions(
                         # Overwrite choice name
                         choice["name"] = choice_overwrite.get("name", dim["name"])
                         # Overwrite choice description
-                        choice["description"] = choice_overwrite.get("description", choice["description"])
+                        description = choice_overwrite.get("description", choice.get("description"))
+                        if description is not None:
+                            choice["description"] = description
+                        # Overwrite group
+                        group = choice_overwrite.get("group")
+                        if group is not None:
+                            choice["group"] = group
 
                 # Handle choices from YAML not present in config_dimensions
                 if choices_overwrite:

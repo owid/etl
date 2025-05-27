@@ -1,5 +1,6 @@
 import urllib.parse
 from pathlib import Path
+from typing import Dict, Optional
 
 import pandas as pd
 import streamlit as st
@@ -64,7 +65,7 @@ def _fetch_mdim_catalog_paths(hide_unchanged_mdims: bool) -> list[str]:
         df_target = read_sql(q, engine=TARGET_ENGINE)
 
         # Filter catalogPath with same hashes
-        df_source = pd.merge(df_source, df_target, on="catalogPath", suffixes=("_source", "_target"))
+        df_source = pd.merge(df_source, df_target, on="catalogPath", suffixes=("_source", "_target"), how="left")
         df_source = df_source[df_source["configMd5_source"] != df_source["configMd5_target"]]
 
     return df_source["catalogPath"].tolist()
@@ -106,18 +107,21 @@ def _fetch_mdims(mdim_catalog_path: str) -> tuple[gm.MultiDimDataPage, gm.MultiD
 
     if source_mdim.slug is None:
         source_mdim.slug = source_mdim.catalogPath.split("/")[-1]  # type: ignore
-    if target_mdim.slug is None:
+    if target_mdim is not None and target_mdim.slug is None:
         target_mdim.slug = target_mdim.catalogPath.split("/")[-1]  # type: ignore
 
     return source_mdim, target_mdim
 
 
-def _display_config_diff(config_source, config_target):
+def _display_config_diff(config_source: Dict, config_target: Optional[Dict]):
     """Display MDIM config diff."""
     st.subheader("Config Diff")
 
     diff_str = compare_strings(
-        yaml_dump(config_target), yaml_dump(config_source), fromfile="production", tofile="staging"
+        yaml_dump(config_target) if config_target else "",
+        yaml_dump(config_source),
+        fromfile="production",
+        tofile="staging",
     )
     if diff_str == "":
         st.success("No differences found.")
@@ -125,7 +129,7 @@ def _display_config_diff(config_source, config_target):
         st_show_diff(truncate_lines(diff_str, MAX_DIFF_LINES))
 
 
-def _display_config_in_tabs(config_target, config_source, max_lines):
+def _display_config_in_tabs(config_source: Dict, config_target: Optional[Dict], max_lines: int):
     """Display config sections in tabs for easy comparison."""
     st.subheader("Config Sections")
 
@@ -139,12 +143,18 @@ def _display_config_in_tabs(config_target, config_source, max_lines):
             # Prepare content based on section_key
             if section_key is None:
                 # Base config (excluding dimensions and views)
-                content_target = {k: v for k, v in config_target.items() if k not in ("dimensions", "views")}
                 content_source = {k: v for k, v in config_source.items() if k not in ("dimensions", "views")}
+                if config_target:
+                    content_target = {k: v for k, v in config_target.items() if k not in ("dimensions", "views")}
+                else:
+                    content_target = {}
             else:
                 # Specific section (dimensions or views)
-                content_target = {section_key: config_target[section_key]}
                 content_source = {section_key: config_source[section_key]}
+                if config_target:
+                    content_target = {section_key: config_target[section_key]}
+                else:
+                    content_target = {}
 
             # Display in columns
             with col1:
@@ -205,6 +215,16 @@ def _get_mdim_views(db_mdim: gm.MultiDimDataPage) -> list[dict]:
     return views
 
 
+@st.fragment
+def display_mdim_comparison(source_mdim):
+    explorer_views = _get_mdim_views(source_mdim)
+    view = _display_view_options(source_mdim.slug, explorer_views)
+
+    # Step 2: Display MDIM comparison
+    st.warning("If you see **Sorry, that page doesn’t exist!**, it means the MDIM has not been published yet.")
+    _display_mdim_comparison(source_mdim.slug, source_mdim.catalogPath, view)
+
+
 def main():
     st.warning("This application is currently in beta. We greatly appreciate your feedback and suggestions!")
     st.title(
@@ -233,18 +253,14 @@ def main():
     assert source_mdim.slug, f"MDIM slug does not exist for {mdim_catalog_path}"
     assert source_mdim.catalogPath, f"MDIM catalogPath does not exist for {mdim_catalog_path}"
 
-    explorer_views = _get_mdim_views(source_mdim)
-    view = _display_view_options(source_mdim.slug, explorer_views)
-
     # Step 2: Display MDIM comparison
-    st.warning("If you see **Sorry, that page doesn’t exist!**, it means the MDIM has not been published yet.")
-    _display_mdim_comparison(source_mdim.slug, source_mdim.catalogPath, view)
+    display_mdim_comparison(source_mdim)
 
     # Step 3: Display config diff
-    _display_config_diff(source_mdim.config, target_mdim.config)
+    _display_config_diff(source_mdim.config, target_mdim.config if target_mdim else None)
 
     # Step 4: Display config sections in tabs
-    _display_config_in_tabs(source_mdim.config, target_mdim.config, MAX_DIFF_LINES)
+    _display_config_in_tabs(source_mdim.config, target_mdim.config if target_mdim else None, MAX_DIFF_LINES)
 
 
 main()

@@ -21,6 +21,7 @@ import pandas as pd
 import structlog
 from owid import catalog
 from owid.catalog import Table, Variable, VariableMeta, utils
+from owid.catalog.meta import update_variable_metadata
 from owid.catalog.utils import hash_any
 from sqlalchemy import select, text, update
 from sqlalchemy.engine.base import Engine
@@ -29,7 +30,6 @@ from sqlalchemy.orm import Session
 from apps.backport.datasync import data_metadata as dm
 from apps.backport.datasync.datasync import upload_gzip_string
 from apps.chart_sync.admin_api import AdminAPI
-from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
 from etl import config
 from etl.db import get_engine, production_or_master_engine, read_sql
 from etl.grapher import helpers as gh
@@ -161,28 +161,6 @@ def _add_or_update_source(
     return source_id
 
 
-def _update_variables_metadata(table: catalog.Table) -> None:
-    """Update variables metadata."""
-    for col in table.columns:
-        meta = table[col].metadata
-
-        # Grapher uses units from field `display` instead of fields `unit` and `short_unit`
-        # before we fix grapher data model, copy them to `display`.
-        meta.display = meta.display or {}
-        if meta.short_unit:
-            meta.display.setdefault("shortUnit", meta.short_unit)
-        if meta.unit:
-            meta.display.setdefault("unit", meta.unit)
-
-        # Templates can make numDecimalPlaces string, convert it to int
-        if meta.display and isinstance(meta.display.get("numDecimalPlaces"), str):
-            meta.display["numDecimalPlaces"] = int(meta.display["numDecimalPlaces"])
-
-        # Prune empty fields from description_key
-        if meta.description_key:
-            meta.description_key = [k for k in meta.description_key if k.strip()]
-
-
 def check_table(table: Table) -> None:
     assert set(table.index.names) >= {"year", "entityId", "entityCode", "entityName"}, (
         "Table to be upserted must have those 4 indices: year, entityId, entityCode, entityName. Instead"
@@ -259,11 +237,11 @@ def upsert_table(
 
     _check_upserted_variable(table.iloc[:, 0])
 
-    _update_variables_metadata(table)
-
     # For easy retrieveal of the value series we store the name
     column_name = table.columns[0]
     variable_meta: VariableMeta = table[column_name].metadata
+
+    variable_meta = update_variable_metadata(variable_meta)
 
     # All following functions assume that `value` is string
     # NOTE: we could make the code more efficient if we didn't convert `value` to string
@@ -597,6 +575,10 @@ def _raise_error_for_deleted_variables(rows: pd.DataFrame) -> bool:
     if config.ENV == "staging":
         # It's possible that we merged changes to ETL, but the staging server still uses old charts. In
         # that case, we first check that the charts were really modified on our staging server.
+
+        # Load this dynamically for performance reasons
+        from apps.wizard.app_pages.chart_diff.chart_diff import ChartDiffsLoader
+
         modified_charts = ChartDiffsLoader(config.OWID_ENV.get_engine(), production_or_master_engine()).df
         return bool(set(modified_charts.index) & set(rows.chartId))
     # Only show a warning in production. We can't raise an error because if someone merges changes to ETL

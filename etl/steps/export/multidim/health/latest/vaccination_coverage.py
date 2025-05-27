@@ -16,7 +16,6 @@ def run() -> None:
     # Create and save collection
     c = paths.create_collection(
         config=config,
-        short_name="mdd-vaccination-who",
         tb=tb,
         indicator_names=["coverage", "unvaccinated", "vaccinated"],
         dimensions=["antigen"],

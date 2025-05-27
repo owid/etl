@@ -9,6 +9,7 @@ from urllib.parse import urlparse
 
 import pandas as pd
 import structlog
+from botocore.config import Config
 from botocore.exceptions import ClientError
 
 logger = structlog.get_logger()
@@ -40,10 +41,18 @@ class S3:
 
         check_for_aws_profile(profile_name)
 
+        cfg = Config(
+            # These are necessary to avoid sending header `content-encoding: gzip,aws-chunked` which breaks Admin
+            # see https://developers.cloudflare.com/r2/examples/aws/boto3/
+            request_checksum_calculation="when_required",  # type: ignore
+            response_checksum_validation="when_required",  # type: ignore
+        )
+
         session = boto3.Session(profile_name=profile_name)
         client = session.client(
             service_name="s3",
             endpoint_url=R2_ENDPOINT,
+            config=cfg,
         )
         return client
 
