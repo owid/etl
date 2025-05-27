@@ -16,6 +16,8 @@ definitions:
       << "central" if estimate == 'best' else estimate >>
     estimate_title: |-
       << "Central" if estimate == 'best' else estimate.title() >>
+    key_regions: &key_regions |-
+      V-Dem covers many more countries since 1900, which affects regional averages.
 
 dataset:
   title: V-Dem Country-Year (Full + Others)
@@ -62,6 +64,8 @@ tables:
         The default regional aggregates (including values for the World) have been estimated by averaging the country values.
 
         In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
+      description_key:
+        - *key_regions
       presentation: &ppt_uni_w_regions
         grapher_config:
           selectedEntityNames:
@@ -130,6 +134,7 @@ tables:
           - Measures the percentage of registered voters who cast a ballot in national elections, based on official results.
           - Reported as a continuous percentage; higher values indicate greater voter participation.
           - Data sourced from IPU, IFES, IDEA, and various electoral databases.
+          - *key_regions
         description_from_producer: |-
           Question: In this national election, what percentage (%) of all registered voters cast a vote according to official results?
 
@@ -426,9 +431,14 @@ tables:
         In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by popupalation. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
       display:
         numDecimalPlaces: 2
+      description_key:
+        - *key_regions
       presentation: &ppt_multi_w_regions
         title_variant: |-
+          <% if estimate != "best" %>
           ({definitions.auxiliary.estimate} estimate)
+          <%- endif %>
+        attribution_short: V-Dem
         grapher_config:
           selectedEntityNames:
             - "Africa"
@@ -478,6 +488,7 @@ tables:
           - Measures how closely countries adhere to liberal democracy, emphasizing protection of individual and minority rights against state and majority tyranny.
           - Integrates electoral democracy with constitutionally protected civil liberties, strong rule of law, judicial independence, and effective checks and balances.
           - Higher scores (0-1 scale) indicate stronger achievement of liberal democratic ideals.
+          - *key_regions
         description_from_producer: |-
           Question: To what extent is the ideal of liberal democracy achieved?
 
@@ -701,6 +712,7 @@ tables:
           - Measures the percentage of female members in the lower (or unicameral) chamber of the national legislature.
           - Values are expressed as a percentage; higher values indicate greater gender representation.
           - Data is compiled from authoritative sources like the Inter-Parliamentary Union and is cleaned to exclude non-bicameral systems.
+          - *key_regions
         description_from_producer: |-
           Question: What percentage (%) of the lower (or unicameral) chamber of the legislature is female?
 
@@ -978,6 +990,7 @@ tables:
           - The Civil Liberties Index measures the extent to which individuals are free from government-imposed physical harm and unjust restrictions on private and political liberties.
           - It is a composite index averaging scores on physical violence, political civil liberties, and private civil liberties.
           - Higher values (on a 0–1 scale) indicate stronger protection of liberal freedoms such as safety, expression, and movement.
+          - *key_regions
         description_from_producer: |-
           Question: To what extent is civil liberty respected?
 
@@ -1058,6 +1071,7 @@ tables:
           - Measures the extent of political corruption across executive, legislative, judicial, and public sectors.
           - Includes both petty and grand corruption, such as bribery, embezzlement, and misuse of office.
           - Higher values (0–1 scale) indicate more pervasive corruption, reversing the typical V-Dem index direction.
+          - *key_regions
         description_from_producer: |-
           Question: How pervasive is political corruption?
 
@@ -1191,6 +1205,7 @@ tables:
           - Measures how well laws are enforced transparently, impartially, independently, predictably, and equally.
           - Includes indicators such as judicial independence, compliance with courts, public sector corruption, and access to justice.
           - Higher values (0–1 scale) indicate stronger adherence to the rule of law.
+          - *key_regions
         description_from_producer: |-
           Question: To what extent are laws transparently, independently, predictably, impartially, and equally enforced, and to what extent do the actions of government officials comply with the law?
 
@@ -1323,6 +1338,7 @@ tables:
           - Measures the extent to which elections are free from fraud, irregularities, intimidation, vote buying, and violence.
           - Based on indicators such as EMB autonomy/capacity, voter registry quality, and fairness of election procedures.
           - Higher values (0–1 scale) indicate cleaner, more democratic electoral processes.
+          - *key_regions
         description_from_producer: |-
           Question: To what extent are elections free and fair?
 
@@ -1425,6 +1441,7 @@ tables:
           - Measures the extent to which governments respect freedoms of expression, academic and cultural expression, and access to alternative sources of information.
           - Based on media censorship, harassment of journalists, media bias, self-censorship, freedom of discussion, and pluralism in media perspectives.
           - Higher values (0–1 scale) indicate broader and more secure access to free and diverse information sources.
+          - *key_regions
         description_from_producer: |-
           Question: To what extent does government respect press and media freedom, the freedom of ordinary people to discuss political matters at home and in the public sphere, as well as the freedom of academic and cultural expression?
 
@@ -1837,7 +1854,11 @@ tables:
       display:
         numDecimalPlaces: 2
       presentation: &ppt_multi_wo_regions
-        title_variant: ({definitions.auxiliary.estimate} estimate)
+        title_variant: |-
+          <% if estimate != "best" %>
+          ({definitions.auxiliary.estimate} estimate)
+          <%- endif %>
+        attribution_short: V-Dem
 
     variables:
       ## [RE-ESTIMATE, BINARY CATEGORISATION] 3.8.2.3 Access to justice for men
