@@ -4,10 +4,13 @@
 
 Additionally, it displays an emoji indicator next to each step to signal its status:
 
-- 🟢 The step file exists and is the latest version in the DAG.
-- 🟡 The step file exists but a newer version is present in the DAG. On hover, the corresponding latest version is shown in the tooltip.
-- 🔴 No corresponding file found for the step.
-- ⚠️ This step is **defined more than once** in the DAG (a likely mistake).
+- 🟢 (OK) The step file exists and is the latest version in the DAG.
+- 🟡 (OK) The step file exists but a newer version exists in the DAG. On hover, the corresponding latest version is shown in the tooltip.
+- ⚪ (OK) The step file exists, the step is defined in the archive DAG, and used in the archive DAG.
+- ❗ (ERROR) The step file exists, the step is defined in the archive DAG, and mistakenly used in the active DAG.
+- ❓ (ERROR) The step file exists, but the step is defined nowhere in the DAG.
+- 🔴 (ERROR) No file exists for the step.
+- ⚠️ (ERROR) This step is mistakenly defined more than once in the DAG.
 
 ### Installation
 

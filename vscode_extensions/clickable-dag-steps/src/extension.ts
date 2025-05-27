@@ -52,10 +52,12 @@ function parseStepUri(uri: string): { scheme: string; key: string; version: stri
 
 let stepVersionsIndex: Map<string, Set<string>> = new Map();
 let stepDefinitionCount: Map<string, number> = new Map();
+let archiveDefinedSteps: Set<string> = new Set();
 
 function buildDAGIndex(): void {
   stepVersionsIndex.clear();
   stepDefinitionCount.clear();
+  archiveDefinedSteps.clear();
 
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
   if (!workspaceFolder) {
@@ -79,6 +81,8 @@ function buildDAGIndex(): void {
   const uriRegex = /^(?:\s*-\s*|\s*)(data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s#]+/;
 
   for (const filePath of allYmlFiles) {
+    const isArchive = filePath.includes(path.join('dag', 'archive'));
+
     try {
       const lines = fs.readFileSync(filePath, 'utf8').split('\n');
       for (const line of lines) {
@@ -92,10 +96,12 @@ function buildDAGIndex(): void {
             }
             stepVersionsIndex.get(parsed.key)!.add(parsed.version);
 
-            // Count full definitions (scheme+channel+namespace+version+shortname)
             if (line.trim().endsWith(':')) {
               const count = stepDefinitionCount.get(parsed.fullKey) || 0;
               stepDefinitionCount.set(parsed.fullKey, count + 1);
+              if (isArchive) {
+                archiveDefinedSteps.add(parsed.fullKey);
+              }
             }
           }
         }
@@ -139,6 +145,15 @@ export function activate(context: vscode.ExtensionContext) {
     }),
     warning: vscode.window.createTextEditorDecorationType({
       after: { contentText: '⚠️', margin: '0 0 0 0.25em' }
+    }),
+    archive: vscode.window.createTextEditorDecorationType({
+      after: { contentText: '❗', margin: '0 0 0 0.25em' }
+    }),
+    grey: vscode.window.createTextEditorDecorationType({
+      after: { contentText: '⚪', margin: '0 0 0 0.25em' }
+    }),
+    question: vscode.window.createTextEditorDecorationType({
+      after: { contentText: '❓', margin: '0 0 0 0.25em' }
     })
   };
 
@@ -148,6 +163,7 @@ export function activate(context: vscode.ExtensionContext) {
       const regex = /(?:data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
       const text = document.getText();
       let match: RegExpExecArray | null;
+      const isArchiveFile = document.uri.fsPath.includes(path.join('dag', 'archive'));
 
       while ((match = regex.exec(text)) !== null) {
         const uri = match[0];
@@ -171,16 +187,37 @@ export function activate(context: vscode.ExtensionContext) {
         const link = new vscode.DocumentLink(range);
 
         const allVersions = stepVersionsIndex.get(parsed.key);
+        let tooltip = '';
+
         if (fullPath) {
           link.target = vscode.Uri.file(fullPath);
           if (allVersions && allVersions.has(parsed.version)) {
             const latest = getLatestVersion(allVersions);
-            link.tooltip = parsed.version === latest ? `🟢 Open file` : `🟡 Open file (latest: ${latest})`;
+            tooltip = parsed.version === latest ? '🟢 Open file' : `🟡 Open file (latest: ${latest})`;
           }
         } else {
-          link.tooltip = '🔴 File not found';
+          tooltip = '🔴 File not found';
         }
 
+        const defCount = stepDefinitionCount.get(parsed.fullKey) || 0;
+
+        if (!isArchiveFile && archiveDefinedSteps.has(parsed.fullKey)) {
+          tooltip += (tooltip ? '\n' : '') + '❗ Step defined in the archive';
+        }
+
+        if (defCount > 1 && text.substr(match.index, uri.length + 1).trim().endsWith(':')) {
+          tooltip += (tooltip ? '\n' : '') + '⚠️ Step defined more than once';
+        }
+
+        if (isArchiveFile && archiveDefinedSteps.has(parsed.fullKey)) {
+          tooltip += (tooltip ? '\n' : '') + '⚪ Step defined in archive DAG';
+        }
+
+        if (!stepDefinitionCount.has(parsed.fullKey) && !parsed.key.startsWith('snapshot://')) {
+          tooltip += (tooltip ? '\n' : '') + '❓ Step not defined anywhere';
+        }
+
+        link.tooltip = tooltip;
         links.push(link);
       }
 
@@ -188,71 +225,103 @@ export function activate(context: vscode.ExtensionContext) {
     }
   };
 
-  function updateDecorations(editor: vscode.TextEditor) {
-    const filePath = editor.document.uri.fsPath;
-    const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
-    if (!workspaceFolder || !filePath.includes(path.join(workspaceFolder.uri.fsPath, 'dag'))) {
-      return;
-    }
-
-    const greenRanges: vscode.DecorationOptions[] = [];
-    const yellowRanges: vscode.DecorationOptions[] = [];
-    const redRanges: vscode.DecorationOptions[] = [];
-    const warningRanges: vscode.DecorationOptions[] = [];
-
-    const text = editor.document.getText();
-    const regex = /(?:data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = regex.exec(text)) !== null) {
-      const uri = match[0];
-      const parsed = parseStepUri(uri);
-      const startPos = editor.document.positionAt(match.index);
-      const line = editor.document.lineAt(startPos.line);
-      const range = new vscode.Range(line.range.end, line.range.end);
-
-      if (!parsed) {
-        redRanges.push({ range });
-        continue;
-      }
-
-      const key = parsed.key;
-      const fullKey = parsed.fullKey;
-      const version = parsed.version;
-      const allVersions = stepVersionsIndex.get(key);
-      const defCount = stepDefinitionCount.get(fullKey) || 0;
-
-      const existingPath = parsed.filePaths
-        .map(p => path.join(workspaceFolder.uri.fsPath, p))
-        .find(p => fs.existsSync(p));
-
-      if (!existingPath) {
-        redRanges.push({ range });
-        continue;
-      }
-
-      if (defCount > 1 && line.text.trim().endsWith(':')) {
-        warningRanges.push({ range, hoverMessage: '⚠️ Step is defined more than once in the DAG' });
-        continue;
-      }
-
-      if (!allVersions || !allVersions.has(version)) {
-        redRanges.push({ range });
-      } else {
-        const latest = getLatestVersion(allVersions);
-        if (version === latest) {
-          greenRanges.push({ range });
-        } else {
-          yellowRanges.push({ range });
-        }
-      }
-    }
-
-    editor.setDecorations(emojiDecorations.green, greenRanges);
-    editor.setDecorations(emojiDecorations.yellow, yellowRanges);
-    editor.setDecorations(emojiDecorations.red, redRanges);
-    editor.setDecorations(emojiDecorations.warning, warningRanges);
+function updateDecorations(editor: vscode.TextEditor) {
+  const filePath = editor.document.uri.fsPath;
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0];
+  if (!workspaceFolder || !filePath.includes(path.join(workspaceFolder.uri.fsPath, 'dag'))) {
+    return;
   }
+
+  const greenRanges: vscode.DecorationOptions[] = [];
+  const yellowRanges: vscode.DecorationOptions[] = [];
+  const redRanges: vscode.DecorationOptions[] = [];
+  const warningRanges: vscode.DecorationOptions[] = [];
+  const archiveRanges: vscode.DecorationOptions[] = [];
+  const greyRanges: vscode.DecorationOptions[] = [];
+  const questionRanges: vscode.DecorationOptions[] = [];
+
+  const isArchiveFile = filePath.includes(path.join('dag', 'archive'));
+
+  const text = editor.document.getText();
+  const regex = /(?:data(?:-private)?|export(?:-private)?|snapshot(?:-private)?):\/\/[^\s"']+/g;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    const uri = match[0];
+
+    const lineStart = editor.document.positionAt(match.index).line;
+    const lineText = editor.document.lineAt(lineStart).text;
+    if (lineText.trim().startsWith('#')) {
+      continue; // Ignore commented lines
+    }
+
+    const parsed = parseStepUri(uri);
+    const startPos = editor.document.positionAt(match.index);
+    const line = editor.document.lineAt(startPos.line);
+    const range = new vscode.Range(line.range.end, line.range.end);
+
+    if (!parsed) {
+      redRanges.push({ range });
+      continue;
+    }
+
+    const key = parsed.key;
+    const fullKey = parsed.fullKey;
+    const version = parsed.version;
+    const allVersions = stepVersionsIndex.get(key);
+    const defCount = stepDefinitionCount.get(fullKey) || 0;
+    const isDefinition = line.text.trim().endsWith(':');
+
+    const existingPath = parsed.filePaths
+      .map(p => path.join(workspaceFolder.uri.fsPath, p))
+      .find(p => fs.existsSync(p));
+
+    if (!existingPath) {
+      redRanges.push({ range });
+      continue;
+    }
+
+    // GREY for anything in archive DAG that is also defined in archive
+    if (isArchiveFile && archiveDefinedSteps.has(fullKey)) {
+      greyRanges.push({ range, hoverMessage: '⚪ Step defined in archive DAG' });
+      continue;
+    }
+
+    // ❗ for anything outside archive DAG that is defined in archive
+    if (!isArchiveFile && archiveDefinedSteps.has(fullKey)) {
+      archiveRanges.push({ range, hoverMessage: '❗ Step defined in the archive DAG' });
+    }
+
+    // ❓ for anything not defined in any DAG (skip snapshots)
+    if (!stepDefinitionCount.has(fullKey) && !key.startsWith('snapshot://')) {
+      questionRanges.push({ range, hoverMessage: '❓ Step not defined anywhere' });
+    }
+
+    if (defCount > 1 && isDefinition) {
+      warningRanges.push({ range, hoverMessage: '⚠️ Step defined more than once' });
+      continue;
+    }
+
+    if (!allVersions || !allVersions.has(version)) {
+      redRanges.push({ range });
+    } else {
+      const latest = getLatestVersion(allVersions);
+      if (version === latest) {
+        greenRanges.push({ range });
+      } else {
+        yellowRanges.push({ range });
+      }
+    }
+  }
+
+  editor.setDecorations(emojiDecorations.green, greenRanges);
+  editor.setDecorations(emojiDecorations.yellow, yellowRanges);
+  editor.setDecorations(emojiDecorations.red, redRanges);
+  editor.setDecorations(emojiDecorations.warning, warningRanges);
+  editor.setDecorations(emojiDecorations.archive, archiveRanges);
+  editor.setDecorations(emojiDecorations.grey, greyRanges);
+  editor.setDecorations(emojiDecorations.question, questionRanges);
+}
 
   context.subscriptions.push(
     vscode.languages.registerDocumentLinkProvider({ language: 'yaml', scheme: 'file' }, linkProvider)
