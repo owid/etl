@@ -30,6 +30,15 @@ def run() -> None:
         if tb_name == col:
             tb[[col, col + "_low", col + "_high"]] /= 1000
 
+        # There are zero values for countries which are obviously wrong.
+        if tb_name == "proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct":
+            x = tb["proportion_of_population_with_primary_reliance_on_clean_fuels_and_technologies_for_cooking__pct"]
+            for country in ("Bulgaria", "Libya", "Lebanon"):
+                assert (
+                    x.xs(country, level="country") == 0
+                ).all(), "These countries have zero values by mistake. If they get fixed, remove this hotfix."
+                tb.loc[tb.index.get_level_values("country") == country, :] = pd.NA
+
         # Invalid data from GHO, drop them for now.
         if tb_name == "attribution_of_road_traffic_deaths_to_alcohol__pct":
             col = "attribution_of_road_traffic_deaths_to_alcohol__pct"

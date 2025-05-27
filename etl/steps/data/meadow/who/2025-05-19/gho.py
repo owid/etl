@@ -20,7 +20,6 @@ import zipfile
 
 import owid.catalog.processing as pr
 import structlog
-from owid.catalog import Table
 from owid.catalog.utils import underscore
 
 from etl.helpers import PathFinder, create_dataset
@@ -92,6 +91,8 @@ def run(dest_dir: str) -> None:
                     pass
                 elif "stunting" in ind_meta["display"].lower():
                     pass
+                elif "cooking" in ind_meta["display"].lower():
+                    pass
                 elif underscore(label) in underscore(SUBSET):
                     pass
                 else:
@@ -121,44 +122,6 @@ def run(dest_dir: str) -> None:
                 }
             )
 
-            # if "country" not in tb.columns:
-            #     tb["country"] = None
-            # else:
-            #     tb.country = tb.country.astype(str).replace("nan", None)
-
-            # tb = _remove_voided_rows(tb)
-
-            # tb = _remove_invalid_data_source_values(tb)
-
-            # if "World Bank income group" in tb.columns and tb["World Bank income group"].isnull().all():
-            #     del tb["World Bank income group"]
-
-            # tb = tb[(tb.country == "Honduras") & (tb.year == 2014)]
-
-            # tb = _fill_country_from_regions(tb)
-
-            tb = tb.underscore()
-
-            # tb = _exclude_invalid_rows(tb)
-
-            # tb = tb.drop(
-            #     columns=[
-            #         "who_region",
-            #         "un_region",
-            #         "un_sdg_region",
-            #         "unicef_region",
-            #         "world_bank_region",
-            #         "world_bank_income_group",
-            #     ],
-            #     errors="ignore",
-            # )
-
-            # Drop low and high estimates - we could add them to the dataset, but we don't use them yet
-            # and they're quite noisy.
-            # tb = tb.drop(
-            #     columns=["Value"],
-            # )
-
             assert tb.country.notnull().all()
             tb.m.short_name = label
             tb.m.title = ind_meta["display"]
@@ -181,77 +144,3 @@ def run(dest_dir: str) -> None:
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
-
-
-def _remove_voided_rows(tb: Table) -> Table:
-    # Exclude `Void approved` rows
-    if "PUBLISH STATES" in tb.columns:
-        tb = tb.loc[tb["PUBLISH STATES"] != "Void approved", :]
-    return tb
-
-
-def _remove_invalid_data_source_values(tb: Table) -> Table:
-    # Remove const Data source values
-    if "Data Source" not in tb.columns:
-        return tb
-
-    if tb["Data Source"].isnull().all() or set(tb["Data Source"].str.lower()) == {"data source"}:
-        del tb["Data Source"]
-
-    return tb
-
-
-def _exclude_invalid_rows(tb: Table) -> Table:
-    # Sudan (former) belongs to both Eastern Mediterranean and Africa regions, pick only one
-    if "who_region" in tb.columns:
-        exclude = (tb.country == "Sudan (former)") & (tb.who_region == "Eastern Mediterranean")
-        tb = tb[~exclude]
-    return tb
-
-
-def _fill_country_from_regions(tb: Table) -> Table:
-    # Ordered by priority
-    REGION_SOURCES = [
-        "WHO region",
-        "UN Region",
-        "UN SDG Region",
-        "UNICEF region",
-        "World Bank Region",
-    ]
-
-    # Start with countries
-    tbs = [tb[tb.country.notnull()]]
-
-    # Add all regions to country column
-    for region_source in REGION_SOURCES:
-        if region_source in tb.columns:
-            ix = tb.country.isnull() & tb[region_source].notnull()
-            tbs.append(
-                tb[ix].assign(
-                    region_source=region_source.replace(" region", "").replace(" Region", ""),
-                    country=tb[ix][region_source],
-                )
-            )
-
-    # Concatenate all tables
-    tb = pr.concat([t.copy() for t in tbs])
-
-    # Add origin to `region_source`
-    if "region_source" in tb.columns:
-        tb.region_source.m.origins = tb["Indicator"].m.origins
-
-    # Exclude `Global` which is not an income group and would introduce duplicate rows.
-    if "World Bank income group" in tb.columns:
-        tb = tb[tb["World Bank income group"] != "Global"]
-
-    # Move `World Bank income group` to `country` column.
-    if "World Bank income group" in tb.columns:
-        ix = (
-            tb["country"].isnull()
-            & tb["World Bank income group"].notnull()
-            & (tb["World Bank income group"] != "Global")
-        )
-        if ix.any():
-            tb.loc[ix, "country"] = tb.loc[ix, "World Bank income group"]
-
-    return tb

@@ -246,16 +246,6 @@ def add_region_source_suffix(tb: Table) -> Table:
 
     return tb
 
-    # if "region_source" in tb.columns:
-    #     tb = drop_excess_region_sources(tb.copy(), PRIORITY_OF_REGIONS)
-    #     ix = tb.region_source.notnull() & (tb.country != "World")
-    #     if ix.any():
-    #         tb["country"] = tb["country"].astype(str)
-    #         tb.loc[ix, "country"] = tb.loc[ix, "country"] + " (" + tb.loc[ix, "region_source"].astype(str) + ")"
-    #         tb["country"] = tb["country"].astype("category")
-    #     tb = tb.drop(columns=["region_source"])
-    # return tb
-
 
 def merge_identical_tables(tables: list[Table]) -> list[Table]:
     """Some indicators like ncd_ccs_cancerregnational and ncd_ccs_pbcr are the same

@@ -657,7 +657,7 @@ class DataStep(Step):
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
-        url = f"{OWID_CATALOG_URI}/{self.path}/index.json"
+        url = f"{OWID_CATALOG_URI}{self.path}/index.json"
         resp = requests.get(url, verify=TLS_VERIFY)
         if not resp.ok:
             return False
