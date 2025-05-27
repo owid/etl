@@ -523,3 +523,4 @@ include:
   - dag/archive/survey.yml
   - dag/archive/migration.yml
   - dag/archive/redistribution.yml
+  - dag/archive/wizard.yml
