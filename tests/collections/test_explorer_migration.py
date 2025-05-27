@@ -1,5 +1,7 @@
-"""
-NOTE: The influenza example contains one dimension (`confirmed_cases_or_symptoms`), which contains only one choice. Hence, when saving the explorer, the dimension is dropped if prune_dimensions is not set to False. That's why we have `test_explorer_legacy_1` and `test_explorer_legacy_2`, so that we account for both cases (dropping dimensions with only one choice and not dropping them).
+"""Tests for CSV explorer migration to new collection format.
+
+The influenza example contains one dimension with only one choice, which gets
+dropped during save unless prune_dimensions=False is set.
 """
 
 import re
@@ -200,6 +202,7 @@ views:
 
 
 def test_migrate_csv_explorer():
+    """Test migration from old CSV explorer config to new YAML format."""
     with mock.patch("etl.collection.explorer.migration._get_explorer_config", return_value=influenza_config):
         config = migrate_csv_explorer("influenza")
         out_yaml = yaml_dump(config)
@@ -258,7 +261,7 @@ columns
 
 @pytest.mark.integration
 def test_explorer_legacy_1(tmp_path, monkeypatch):
-    """When saving the explorer, the dimension `confirmed_cases_or_symptoms` is dropped because it has only one choice."""
+    """Test legacy explorer save with dimension pruning (dimensions with one choice are dropped)."""
     # Monkeypatch ExplorerLegacy.save() to return its content
     from etl.collection.explorer.legacy import ExplorerLegacy
 
@@ -309,7 +312,7 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
 
 @pytest.mark.integration
 def test_explorer_legacy_2(tmp_path, monkeypatch):
-    """When saving the explorer, the dimension `confirmed_cases_or_symptoms` is not dropped because even if it has only one choice because we set prune_dimensions=False."""
+    """Test legacy explorer save without dimension pruning (all dimensions kept)."""
     # Monkeypatch ExplorerLegacy.save() to return its content
     from etl.collection.explorer.legacy import ExplorerLegacy
 

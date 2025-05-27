@@ -1,7 +1,8 @@
 [project]
 name = "owid-catalog"
-version = "0.4.0"
+version = "0.4.2"
 description = "Core data types used by OWID for managing data."
+readme = "README.md"
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
@@ -25,6 +26,23 @@ dependencies = [
     "jinja2>=3.1.6",
     "typing-extensions>=4.7.1",
     "rdata>=0.11.2",
+]
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 4 - Beta",
+
+  # Indicate who your project is intended for
+  "Intended Audience :: Developers",
+
+  # Specify the Python versions you support here.
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13"
 ]
 
 [tool.uv]
@@ -55,3 +73,8 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["owid"]
+
+[project.urls]
+Homepage = "https://github.com/owid/etl/tree/master/lib/catalog"
+Repository = "https://github.com/etl/etl.git"
+

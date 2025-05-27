@@ -74,23 +74,24 @@ def create_autoupdate_pr(update_name: str, files: list[Path]):
     if not branch_exists:
         github_repo.create_branch(branch_name, master_sha)
     else:
-        # Always merge with master, regardless of whether there are changes
-        merge_successful = github_repo.merge_with_master(branch_name)
-
-        # If merge unsuccessful, log warning but continue to create PR
-        if not merge_successful:
-            log.warning(f"Failed to merge master into {branch_name}, but will still create PR")
+        # Merge with master, resolving any conflicts in favor of our branch
+        github_repo.merge_with_master_resolve_conflicts(branch_name)
 
     # Prepare parent and base tree SHA
-    parent_sha = master_sha
-    base_tree_sha = master_sha
-
-    # If branch exists, use its latest commit as parent instead of master
     if branch_exists:
-        parent_sha = branch_info["object"]["sha"]
-        base_tree_sha = parent_sha
+        # Get the current branch HEAD (after merge)
+        _, current_branch_info = github_repo.check_branch_exists(branch_name)
+        parent_sha = current_branch_info["object"]["sha"]
+        # Get the tree SHA from the parent commit, not the commit SHA itself
+        parent_commit = github_repo.repo.get_git_commit(parent_sha)
+        base_tree_sha = parent_commit.tree.sha
+    else:
+        parent_sha = master_sha
+        # Get the tree SHA from master commit
+        master_commit = github_repo.repo.get_git_commit(master_sha)
+        base_tree_sha = master_commit.tree.sha
 
-    # Create commit with files
+    # Create commit with files (this will now be on top of the merged state)
     has_changes, _ = github_repo.create_commit_with_files(
         files=files, branch_name=branch_name, commit_message=title, parent_sha=parent_sha, base_tree_sha=base_tree_sha
     )

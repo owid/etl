@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Publish owid-catalog to PyPI. Make sure you have bumped the version.'
+        description: 'Publish owid-catalog to PyPI. Make sure you have bumped the version in catalog/pyproject.toml.'
 
 jobs:
   publish:
@@ -29,5 +29,6 @@ jobs:
 
       run: |
         cd lib/catalog &&
+        rm -rf dist &&
         uv build &&
         uvx twine upload dist/*

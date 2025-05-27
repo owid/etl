@@ -35,8 +35,6 @@ steps:
     - snapshot://war/2023-03-14/cow_inter_state_dyadic.zip
     - snapshot://war/2023-03-14/cow_intra_state.zip
     - snapshot://war/2023-03-14/cow_non_state.csv
-  data://garden/war/2023-07-18/cow:
-    - data://meadow/war/2023-06-07/cow
 
   # COW - MID
   data://meadow/war/2023-06-09/cow_mid:
@@ -122,8 +120,6 @@ steps:
     - data://garden/countries/2023-09-25/gleditsch
   data://grapher/war/2023-10-24/ucdp_prio:
     - data://garden/war/2023-09-21/ucdp_prio
-  data://grapher/war/2023-09-21/prio_v31:
-    - data://garden/war/2023-09-21/prio_v31
 
   # UCDP (candidate data)
   data://meadow/war/2024-10-02/ucdp_ced:
