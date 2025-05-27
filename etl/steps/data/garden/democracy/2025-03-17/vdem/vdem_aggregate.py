@@ -623,7 +623,7 @@ def expand_observations_without_leading_to_duplicates(tb: Table) -> Table:
 def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> Tuple[Table, Table, Table, Table]:
     """Create final tables combining country data with regional aggregates.
 
-    Splits indicators into unidimensional vs multidimensional, then combines
+    Splits indicators into uni-dimensional vs multidimensional, then combines
     country-level data with both simple and population-weighted regional averages.
 
     Args:
@@ -633,8 +633,8 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
 
     Returns:
         Tuple of 4 tables:
-        - Unidimensional indicators without regions (country data only)
-        - Unidimensional indicators with regions (includes regional aggregates)
+        - Uni-dimensional indicators without regions (country data only)
+        - Uni-dimensional indicators with regions (includes regional aggregates)
         - Multidimensional indicators without regions
         - Multidimensional indicators with regions
 
