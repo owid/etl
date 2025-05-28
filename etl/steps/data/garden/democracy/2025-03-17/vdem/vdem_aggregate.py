@@ -1005,6 +1005,9 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
     for indicator in indicators:
         values_expected = indicator["values_expected"]
         # Check and fix NA (convert NAs to -1 category)
+        ## Should use one flag or another depending on whether we are counting people or countries
+        ## If counting people (people_living_in=True), we should use `has_na_once_expanded` flag, otherwise `has_na`
+        ## Else, if we are counting countries, we should use `has_na` flag
         if people_living_in:
             has_na = indicator.get("has_na_once_expanded", indicator["has_na"])
         else:
