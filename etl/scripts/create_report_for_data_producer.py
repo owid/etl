@@ -14,7 +14,7 @@ from structlog import get_logger
 from apps.utils.google import GoogleDoc, GoogleDrive
 from apps.wizard.app_pages.producer_analytics.data_io import get_producers_per_chart
 from etl.analytics import get_chart_views_by_chart_id, get_post_views_by_chart_id
-from etl.data_helpers.misc import round_to_sig_figs
+from etl.data_helpers.misc import humanize_number
 from etl.db import get_engine
 
 # Initialize logger.
@@ -28,50 +28,6 @@ FOLDER_ID = "1SySOSNXgNLEJe2L1k7985p-zSeUoU4kN"
 
 # Document ID of template.
 TEMPLATE_ID = "149cLrJK9VI-BNjnM-LxnWgbQoB7mwjSpgjO497rzxeU"
-
-
-# TODO: Move to data_helpers.
-def humanize_number(number, sig_figs=2):
-    if isinstance(number, int) and (number < 11):
-        humanized = {
-            0: "zero",
-            1: "one",
-            2: "two",
-            3: "three",
-            4: "four",
-            5: "five",
-            6: "six",
-            7: "seven",
-            8: "eight",
-            9: "nine",
-            10: "ten",
-        }[number]
-    else:
-        scale_factors = {
-            "quadrillion": 1e15,
-            "trillion": 1e12,
-            "billion": 1e9,
-            "million": 1e6,
-        }
-        for scale_name, threshold in scale_factors.items():
-            if number >= threshold:
-                value = round_to_sig_figs(number / threshold, sig_figs)
-                break
-        else:
-            value = round_to_sig_figs(number, sig_figs)
-            scale_name = ""
-
-        # Format number with commas.
-        value_str = f"{value:,}"
-
-        # Remove trailing zeros.
-        if ("." in value_str) and (len(value_str.split(".")[0]) >= sig_figs):
-            value_str = value_str.split(".")[0]
-
-        # Combine number and scale.
-        humanized = f"{value_str} {scale_name}".strip()
-
-    return humanized
 
 
 def get_chart_title_from_url(chart_url):
