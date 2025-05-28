@@ -288,6 +288,15 @@ class Collection(MDIMBase):
             ## Dimension slug
             assert dim.slug in dimension_mapping, "Dimension slug not found in mapping!"
             dim.slug = dimension_mapping[dim.slug]
+            ## Presentation: choice_slug_true
+            if dim.presentation and dim.presentation.choice_slug_true:
+                # Check if the choice slug is in the mapping
+                if dim.presentation.choice_slug_true not in choice_mapping[dim.slug]:
+                    raise ValueError(
+                        f"Choice slug {dim.presentation.choice_slug_true} not found in mapping for dimension {dim.slug}!"
+                    )
+                # Set the new slug
+                dim.presentation.choice_slug_true = choice_mapping[dim.slug][dim.presentation.choice_slug_true]
 
         # 4) Snake case all slugs in views based on the mapping from 1. Raise error if any slug is not found in the mapping.
         for view in self.views:
