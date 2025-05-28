@@ -526,8 +526,8 @@ def run():
         default_view={
             "item": "maize",
             "metric": "production",
-            "unit": "",
-            "per_capita": "False",
+            "unit": "na",
+            "per_capita": "false",
         },
     )
 
