@@ -985,7 +985,9 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb["duplicate_flag"] = tb.duplicated(subset=[("country", "", "", ""), ("year", "", "", "")], keep=False)
 
     # Create a boolean column that is true if each country has only income or consumption
-    tb["only_inc_or_cons"] = tb.groupby(["country"])["welfare_type"].transform(lambda x: x.nunique() == 1)
+    tb["only_inc_or_cons"] = tb["welfare_type"].isnull() | tb.groupby(["country"])["welfare_type"].transform(
+        lambda x: x.nunique() == 1
+    )
 
     # Select only the rows with only income or consumption
     tb_only_inc_or_cons = tb[tb["only_inc_or_cons"]].reset_index(drop=True)
