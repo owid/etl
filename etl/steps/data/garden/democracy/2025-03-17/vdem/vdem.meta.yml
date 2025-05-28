@@ -422,7 +422,7 @@ tables:
 
       # Custom
       held_national_election:
-        title: Held national election
+        title: Country held national election (0/1)
         description_short: |-
           Denotes whether a country held a national election in the given year.
         description_processing: |-
