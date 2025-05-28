@@ -4,7 +4,6 @@
 #  Metadata helpers.
 #
 
-import ast
 import dataclasses
 import datetime as dt
 import json
@@ -12,14 +11,13 @@ import re
 import sys
 from dataclasses import dataclass, field, is_dataclass
 from pathlib import Path
-from typing import (
-    Any,
-    List,
-    Literal,
-    NewType,
-    TypedDict,
-    TypeVar,
-)
+from typing import Any, Literal, NewType, TypedDict, TypeVar
+
+# For Python 3.10 compatibility
+if sys.version_info >= (3, 11):
+    from typing import NotRequired, Required, Self
+else:
+    from typing_extensions import NotRequired, Required, Self
 
 import mistune
 import pandas as pd
@@ -27,13 +25,7 @@ from dataclasses_json import DataClassJsonMixin
 
 from . import jinja
 from .processing_log import ProcessingLog
-from .utils import dataclass_from_dict, hash_any, pruned_json
-
-# For Python 3.10 compatibility
-if sys.version_info >= (3, 11):
-    from typing import NotRequired, Required, Self
-else:
-    from typing_extensions import NotRequired, Required, Self
+from .utils import dataclass_from_dict, hash_any, parse_numeric_list, pruned_json
 
 SOURCE_EXISTS_OPTIONS = Literal["fail", "append", "replace"]
 
