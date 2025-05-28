@@ -12,8 +12,11 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.utils.google import GoogleDoc, GoogleDrive
-from apps.wizard.app_pages.producer_analytics.data_io import get_producers_per_chart
-from etl.analytics import get_chart_views_by_chart_id, get_post_views_by_chart_id
+from etl.analytics import (
+    get_chart_views_by_chart_id,
+    get_post_views_by_chart_id,
+    get_visualizations_using_data_by_producer,
+)
 from etl.data_helpers.misc import humanize_number
 from etl.db import get_engine
 
@@ -67,7 +70,10 @@ def run(producer, quarter, year):
 
     # Gather all necessary analytics data.
     # TODO: Refactor, clean up, and explain code.
-    df_producer_charts = get_producers_per_chart(excluded_steps=[])
+    df_producer_charts = get_visualizations_using_data_by_producer()
+    # Select relevant columns and drop duplicated rows (e.g. because the same chart is used for multiple variables).
+    df_producer_charts = df_producer_charts[["producer", "chart_url", "chart_id"]].drop_duplicates()
+    # Select relevant producer.
     df_producer_charts = df_producer_charts[df_producer_charts["producer"] == producer].reset_index(drop=True)
     producer_chart_ids = sorted(set(df_producer_charts["chart_id"]))
     df_producer = get_chart_views_by_chart_id(chart_ids=producer_chart_ids, date_min=min_date, date_max=max_date)
