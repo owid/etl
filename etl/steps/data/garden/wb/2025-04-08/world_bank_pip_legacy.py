@@ -97,6 +97,9 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Ukraine",
 ]
 
+# Set debug mode
+DEBUG = False
+
 # Set table format when printing
 TABLEFMT = "pretty"
 
@@ -326,11 +329,11 @@ def run() -> None:
 
 def process_data(tb: Table) -> Table:
     # rename columns
-    tb = tb.rename(columns={"headcount": "headcount_ratio", "poverty_gap": "poverty_gap_index"})
+    tb = tb.rename(columns={"headcount": "headcount_ratio", "poverty_gap": "poverty_gap_index"}, errors="raise")
 
     # Changing the decile(i) variables for decile(i)_share
     for i in range(1, 11):
-        tb = tb.rename(columns={f"decile{i}": f"decile{i}_share"})
+        tb = tb.rename(columns={f"decile{i}": f"decile{i}_share"}, errors="raise")
 
     # Calculate number in poverty
     tb["headcount"] = tb["headcount_ratio"] * tb["reporting_pop"]
@@ -684,10 +687,11 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(
-            f"""{len(tb_error)} observations of stacked values are not adding up to 100% and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-        )
+        if DEBUG:
+            log.warning(
+                f"""{len(tb_error)} observations of stacked values are not adding up to 100% and will be deleted:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
         tb = tb[~mask].reset_index(drop=True)
 
     ############################
@@ -701,53 +705,12 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(
-            f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount], headers = 'keys', tablefmt = TABLEFMT)}"""
-        )
+        if DEBUG:
+            log.warning(
+                f"""There are {len(tb_error)} observations with missing poverty values and will be deleted:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount], headers = 'keys', tablefmt = TABLEFMT)}"""
+            )
         tb = tb[~mask].reset_index(drop=True)
-
-    ############################
-    # Missing median
-    mask = tb["median"].isna()
-    tb_error = tb[mask].reset_index(drop=True)
-
-    if not tb_error.empty:
-        log.info(f"""There are {len(tb_error)} observations with missing median. They will be not deleted.""")
-
-    ############################
-    # Missing mean
-    mask = tb["mean"].isna()
-    tb_error = tb[mask].reset_index(drop=True)
-
-    if not tb_error.empty:
-        log.info(f"""There are {len(tb_error)} observations with missing mean. They will be not deleted.""")
-
-    ############################
-    # Missing gini
-    mask = tb["gini"].isna()
-    tb_error = tb[mask].reset_index(drop=True)
-
-    if not tb_error.empty:
-        log.info(f"""There are {len(tb_error)} observations with missing gini. They will be not deleted.""")
-
-    ############################
-    # Missing decile shares
-    mask = tb[col_decile_share].isna().any(axis=1)
-    tb_error = tb[mask].reset_index(drop=True)
-
-    if not tb_error.empty:
-        log.info(f"""There are {len(tb_error)} observations with missing decile shares. They will be not deleted.""")
-
-    ############################
-    # Missing decile thresholds
-    mask = tb[col_decile_thr].isna().any(axis=1)
-    tb_error = tb[mask].reset_index(drop=True)
-
-    if not tb_error.empty:
-        log.info(
-            f"""There are {len(tb_error)} observations with missing decile thresholds. They will be not deleted."""
-        )
 
     ############################
     # headcount monotonicity check
@@ -762,10 +725,11 @@ def sanity_checks(
     tb_error = tb[~tb["check_total"]].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(
-            f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
-        )
+        if DEBUG:
+            log.warning(
+                f"""There are {len(tb_error)} observations with headcount not monotonically increasing and will be deleted:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_headcount], headers = 'keys', tablefmt = TABLEFMT, floatfmt="0.0f")}"""
+            )
         tb = tb[tb["check_total"]].reset_index(drop=True)
 
     ############################
@@ -785,10 +749,11 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(
-            f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type']], headers = 'keys', tablefmt = TABLEFMT)}"""
-        )
+        if DEBUG:
+            log.warning(
+                f"""There are {len(tb_error)} observations with thresholds not monotonically increasing and will be deleted:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type']], headers = 'keys', tablefmt = TABLEFMT)}"""
+            )
         tb = tb[~mask].reset_index(drop=True)
 
     ############################
@@ -807,10 +772,11 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(
-            f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_decile_share], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-        )
+        if DEBUG:
+            log.warning(
+                f"""There are {len(tb_error)} observations with shares not monotonically increasing and will be deleted:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type'] + col_decile_share], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
         tb = tb[~mask].reset_index(drop=True)
 
     ############################
@@ -823,10 +789,11 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(
-            f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-        )
+        if DEBUG:
+            log.warning(
+                f"""{len(tb_error)} observations of shares are not adding up to 100% and will be deleted:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
         tb = tb[~mask].reset_index(drop=True)
 
     ############################
@@ -842,16 +809,17 @@ def sanity_checks(
     tb_error = tb[mask].reset_index(drop=True)
 
     if not tb_error.empty:
-        log.warning(
-            f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
-            {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-        )
+        if DEBUG:
+            log.warning(
+                f"""{len(tb_error)} observations of shares (with top 1%) are not adding up to 100% and will be converted to null:
+                {tabulate(tb_error[['country', 'year', 'reporting_level', 'welfare_type', 'sum_pct']], headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+            )
         # Make columns None if mask is True
         tb.loc[mask, ["top90_99_share", "top1_share"]] = None
 
     ############################
     # delete columns created for the checks
-    tb = tb.drop(columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"])
+    tb = tb.drop(columns=m_check_vars + ["m_check_1", "check_total", "sum_pct"], errors="raise")
 
     obs_after_checks = len(tb)
     log.info(f"Sanity checks deleted {obs_before_checks - obs_after_checks} observations for {ppp_version} PPPs.")
@@ -1007,7 +975,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
     tb_inc_or_cons = pr.concat([tb_only_inc_or_cons, tb_both_inc_and_cons_smoothed], ignore_index=True)
 
     # Drop the columns created in this function
-    tb_inc_or_cons = tb_inc_or_cons.drop(columns=["only_inc_or_cons", "duplicate_flag"])
+    tb_inc_or_cons = tb_inc_or_cons.drop(columns=["only_inc_or_cons", "duplicate_flag"], errors="raise")
 
     return tb_inc_or_cons
 
@@ -1053,10 +1021,11 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
         tb_error = tb[mask].reset_index(drop=True)
 
         if not tb_error.empty:
-            log.warning(
-                f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
-                {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
-            )
+            if DEBUG:
+                log.warning(
+                    f"""There are {len(tb_error)} observations with abnormal jumps for {col}:
+                    {tabulate(tb_error[['ppp_version', 'country', 'year', 'reporting_level', col, 'check_diff_column', 'check_diff_year']].sort_values('year').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT, floatfmt=".1f")}"""
+                )
             # tb = tb[~mask].reset_index(drop=True)
 
     # Drop the columns created for the check
@@ -1068,7 +1037,8 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
             "check_diff_column",
             "check_diff_year",
             "check_diff_welfare_type",
-        ]
+        ],
+        errors="raise",
     )
 
     return tb
@@ -1112,7 +1082,7 @@ def regional_headcount(tb: Table) -> Table:
         )
         tb_regions = tb_regions[~mask].reset_index()
 
-    tb_regions = tb_regions.drop(columns="check_total")
+    tb_regions = tb_regions.drop(columns="check_total", errors="raise")
 
     # Get difference between world and (total) regional headcount, to patch rows with one missing value
     cols_to_sum = [e for e in list(tb_regions.columns) if e not in ["year", "World"]]
@@ -1123,7 +1093,7 @@ def regional_headcount(tb: Table) -> Table:
     # Fill null values with the difference and drop aux variables
     col_dictionary = dict.fromkeys(cols_to_sum, tb_regions["diff_world_regions"])
     tb_regions.loc[:, cols_to_sum] = tb_regions[cols_to_sum].fillna(col_dictionary)
-    tb_regions = tb_regions.drop(columns=["World", "sum_regions", "diff_world_regions"])
+    tb_regions = tb_regions.drop(columns=["World", "sum_regions", "diff_world_regions"], errors="raise")
 
     # NOTE: I am not extracting data for China and India at least for now, because we are only extracting non filled data
     # The data originally came from filled data to plot properly.
@@ -1152,7 +1122,8 @@ def regional_headcount(tb: Table) -> Table:
     tb_regions = tb_regions.rename(
         columns={
             f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}": f"headcount_{INTERNATIONAL_POVERTY_LINE_CURRENT}_regions"
-        }
+        },
+        errors="raise",
     )
 
     # Merge with original table
@@ -1179,7 +1150,7 @@ def survey_count(tb: Table) -> Table:
 
     # Make a cartesian product of both dataframes: join all the combinations between all the entities and all the years
     cross = pr.merge(entity_tb_survey, year_tb_survey, how="cross")
-    cross = cross.rename(columns={"0_x": "country", "0_y": "year"})
+    cross = cross.rename(columns={"0_x": "country", "0_y": "year"}, errors="raise")
 
     # Merge cross and df_country, to include all the possible rows in the dataset
     tb_survey = pr.merge(cross, tb_survey[["country", "year"]], on=["country", "year"], how="left", indicator=True)
@@ -1224,7 +1195,8 @@ def drop_columns(tb: Table) -> Table:
             "estimation_type",
             "survey_comparability",
             "comparable_spell",
-        ]
+        ],
+        errors="raise",
     )
 
     return tb
@@ -1251,7 +1223,7 @@ def create_survey_spells(tb: Table) -> list:
     # Remove columns not needed: stacked, above, etc
     drop_list = ["above", "between", "poverty_severity", "watts"]
     for var in drop_list:
-        tb = tb[tb.columns.drop(list(tb.filter(like=var)))]
+        tb = tb[tb.columns.drop(list(tb.filter(like=var)), errors="raise")]
 
     vars = [
         i
@@ -1334,10 +1306,10 @@ def combine_tables_ppp_comparison(tb_ppp_old: Table, tb_ppp_current: Table, shor
     # Rename all the non-id columns with the suffix _ppp(year)
     # (the suffix option in merge only adds suffix when columns coincide)
     tb_ppp_old = tb_ppp_old.rename(
-        columns={c: c + f"_ppp{PPP_YEAR_OLD}" for c in tb_ppp_old.columns if c not in id_cols}
+        columns={c: c + f"_ppp{PPP_YEAR_OLD}" for c in tb_ppp_old.columns if c not in id_cols}, errors="raise"
     )
     tb_ppp_current = tb_ppp_current.rename(
-        columns={c: c + f"_ppp{PPP_YEAR_CURRENT}" for c in tb_ppp_current.columns if c not in id_cols}
+        columns={c: c + f"_ppp{PPP_YEAR_CURRENT}" for c in tb_ppp_current.columns if c not in id_cols}, errors="raise"
     )
 
     # Merge the two files (it's OK to have an inner join, because we want to keep country-year pairs that are in both files)
@@ -1432,12 +1404,14 @@ def add_top_1_percentile(tb: Table, tb_percentiles: Table) -> Table:
     tb_percentiles_thr = tb_percentiles_thr[
         ["ppp_version", "country", "year", "reporting_level", "welfare_type", "thr"]
     ]
-    tb_percentiles_thr = tb_percentiles_thr.rename(columns={"thr": "top1_thr"})
+    tb_percentiles_thr = tb_percentiles_thr.rename(columns={"thr": "top1_thr"}, errors="raise")
 
     tb_percentiles_share = tb_percentiles_share[
         ["ppp_version", "country", "year", "reporting_level", "welfare_type", "share", "avg"]
     ]
-    tb_percentiles_share = tb_percentiles_share.rename(columns={"share": "top1_share", "avg": "top1_avg"})
+    tb_percentiles_share = tb_percentiles_share.rename(
+        columns={"share": "top1_share", "avg": "top1_avg"}, errors="raise"
+    )
 
     # Merge with the main table
     tb = pr.merge(
