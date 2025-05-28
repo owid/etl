@@ -245,7 +245,10 @@ class Collection(MDIMBase):
         """
 
         def _validated_underscore(text):
-            text = underscore(text)
+            if text == "":
+                text = "na"
+            else:
+                text = underscore(text)
             # Validate that the text contains only lowercase letters and underscores
             if not re.match(r"^[a-z][a-z0-9_]*$|^_[a-z0-9][a-z0-9_]*$", text):
                 raise ValueError(
@@ -261,7 +264,22 @@ class Collection(MDIMBase):
             for dim_slug, choice_slugs in dimension_choices.items()
         }
 
-        # 1) Snake case all slugs in dimensions+choices
+        # 2) Check that all mappings are not repeated (dimension_mapping)
+        # Check that all dimension slugs are unique and raise error with duplicates
+        def ensure_unique(mapping: Dict[str, str], mapping_name: str):
+            if len(set(mapping.values())) != len(mapping):
+                duplicates = [
+                    slug for slug, count in pd.Series(list(mapping.values())).value_counts().items() if count > 1
+                ]
+                raise ValueError(
+                    f"Duplicate {mapping_name} slugs found: {duplicates}\n\n (note: if 'na', source could be in empty slug)"
+                )
+
+        ensure_unique(dimension_mapping, "dimension")
+        for dim_slug, choices in choice_mapping.items():
+            ensure_unique(choices, f"choice slugs for dimension {dim_slug}")
+
+        # 3) Snake case all slugs in dimensions + choices
         for dim in self.dimensions:
             ## Choice slug
             for choice in dim.choices:
@@ -271,7 +289,7 @@ class Collection(MDIMBase):
             assert dim.slug in dimension_mapping, "Dimension slug not found in mapping!"
             dim.slug = dimension_mapping[dim.slug]
 
-        # 2) Snake case all slugs in views based on the mapping from 1. Raise error if any slug is not found in the mapping.
+        # 4) Snake case all slugs in views based on the mapping from 1. Raise error if any slug is not found in the mapping.
         for view in self.views:
             view_dimensions = {}
             for dim_slug, choice_slug in view.dimensions.items():
