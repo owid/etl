@@ -526,8 +526,8 @@ def run():
         default_view={
             "item": "maize",
             "metric": "production",
-            "unit": "na",
-            "per_capita": "false",
+            "unit": "",
+            "per_capita": "False",
         },
     )
 
@@ -541,20 +541,9 @@ def run():
     # Make per capita a checkbox and unit a radio button.
     for dimension in config["dimensions"]:
         if dimension["slug"] == "per_capita":
-            dimension["presentation"] = {"type": "checkbox", "choice_slug_true": "true"}
+            dimension["presentation"] = {"type": "checkbox", "choice_slug_true": "True"}
         if dimension["slug"] == "unit":
             dimension["presentation"] = {"type": "radio"}
-
-    # Slugify dimensions and views
-    for dim in config["dimensions"]:
-        for choice in dim["choices"]:
-            if choice["slug"] == "":
-                choice["slug"] = "na"
-            else:
-                choice["slug"] = underscore(choice["slug"])
-
-    for view in config["views"]:
-        view["dimensions"] = {d: "na" if not v else underscore(v) for d, v in view["dimensions"].items()}
 
     #
     # Save outputs.
