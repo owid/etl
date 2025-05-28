@@ -1,6 +1,4 @@
-"""General data tools.
-
-"""
+"""General data tools."""
 
 import math
 from datetime import date, datetime
