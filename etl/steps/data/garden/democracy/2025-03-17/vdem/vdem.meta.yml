@@ -426,7 +426,7 @@ tables:
         description_short: |-
           Denotes whether a country held a national election in the given year.
         description_processing: |-
-          It's value is conditioned on some of the original V-Dem indicators:
+          Its value is conditioned on some of the original V-Dem indicators:
 
           - 1 if any of the following indicators was 1: `v2eltype_0`, `v2eltype_1`, `v2eltype_4`, `v2eltype_5`, `v2eltype_6`, or `v2eltype_7`.
           - 0 otherwise (i.e. all previous indicators were 0).
