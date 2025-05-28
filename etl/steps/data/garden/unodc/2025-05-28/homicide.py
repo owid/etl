@@ -51,7 +51,7 @@ def clean_data(tb: Table) -> list[Table]:
     Splitting the data into four dataframes/tables based on the dimension columns:
     * Total
     * by mechanism
-    * by relationship to perpertrator
+    * by relationship to perpetrator
     * by situational context
     """
     tb_mech = create_table(tb, table_name="by mechanisms")

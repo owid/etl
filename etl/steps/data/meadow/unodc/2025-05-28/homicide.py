@@ -90,7 +90,7 @@ def clean_data_regional(tb_region: Table) -> Table:
             "Unknown",
         ),
     )
-    assert sum(tb_region["series"] == "Unknown") == 0, "Unexpected series value in tb_region"
+    assert sum(tb_region["unit_of_measurement"] == "Unknown") == 0, "Unexpected unit_of_measurement value in tb_region"
     # Drop columns that aren't in tb and aren't needed for the final table.
     tb_region = tb_region.drop(columns=["note", "obs_status", "series"])
     return tb_region
