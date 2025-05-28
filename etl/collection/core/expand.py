@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Literal, Optional, Union
 
 import pandas as pd
 from owid.catalog import Table
+from owid.catalog.utils import underscore, underscore_series
 
 from etl.collection.utils import INDICATORS_SLUG
 
@@ -257,7 +258,8 @@ class CollectionConfigExpander:
                 # Build choices for given dimension
                 choices = [
                     {
-                        "slug": str(val),
+                        # "slug": underscore(str(val)) if str(val) else "na",
+                        "slug": underscore(str(val)) if str(val) else "",
                         "name": str(val),
                         "description": None,
                     }
@@ -299,13 +301,16 @@ class CollectionConfigExpander:
         # Keep only relevant dimensions
         if dimension_choices is not None:
             for dim_name, choices in dimension_choices.items():
-                df_dims_filt = df_dims_filt[df_dims_filt[dim_name].isin(choices)]
+                df_dims_filt = df_dims_filt[underscore_series(df_dims_filt[dim_name]).isin(choices)]
 
         # Filter to only relevant dimensions
         config_views = []
         for _, indicator in df_dims_filt.iterrows():
             view = {
-                "dimensions": {dim_name: indicator[dim_name] for dim_name in self.dimension_names},
+                "dimensions": {
+                    dim_name: underscore(indicator[dim_name]) if indicator[dim_name] else ""
+                    for dim_name in self.dimension_names
+                },
                 "indicators": {
                     "y": self._expand_indicator_path(
                         indicator.short_name

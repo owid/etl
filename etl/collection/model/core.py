@@ -193,6 +193,8 @@ class Collection(MDIMBase):
         # Check that no choice name or slug is repeated
         self.validate_choice_uniqueness()
 
+        # TODO: we should check snake case slugs in dimensions and views
+
         # Check that all indicators in explorer exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)

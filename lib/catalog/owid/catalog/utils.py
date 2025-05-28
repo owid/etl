@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, TextIO, TypeVar, get_args, get_origin, overload
 
 import dynamic_yaml
+import pandas as pd
 import structlog
 import yaml
 from unidecode import unidecode
@@ -145,6 +146,13 @@ def underscore(name: str | None, validate: bool = True, camel_to_snake: bool = F
         validate_underscore(name, f"`{orig_name}`")
 
     return name
+
+
+def underscore_series(s: pd.Series) -> pd.Series:
+    """Optimized underscore function for pandas Series."""
+    unique_vals = s.unique()
+    mapping = {val: underscore(val, validate=False) if val else "" for val in unique_vals}
+    return s.map(mapping)
 
 
 def _camel_to_snake(name: str) -> str:
