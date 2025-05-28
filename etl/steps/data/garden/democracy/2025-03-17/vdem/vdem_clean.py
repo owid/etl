@@ -196,6 +196,8 @@ def estimate_national_election(tb: Table) -> Table:
     colname = "held_national_election"
     tb[colname] = 0
     tb.loc[mask, colname] = 1
+    # Copy metadata
+    tb[colname] = tb[colname].copy_metadata(tb["v2eltype_0"])
     return tb
 
 
