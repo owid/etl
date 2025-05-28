@@ -545,13 +545,16 @@ def run():
         if dimension["slug"] == "unit":
             dimension["presentation"] = {"type": "radio"}
 
+    # Slugify dimensions and views
     for dim in config["dimensions"]:
         for choice in dim["choices"]:
             if choice["slug"] == "":
                 choice["slug"] = "na"
+            else:
+                choice["slug"] = underscore(choice["slug"])
 
     for view in config["views"]:
-        view["dimensions"] = {d: v or "na" for d, v in view["dimensions"].items()}
+        view["dimensions"] = {d: "na" if not v else underscore(v) for d, v in view["dimensions"].items()}
 
     #
     # Save outputs.
