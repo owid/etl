@@ -61,7 +61,7 @@ tables:
         title: |-
           {definitions.metric} - << category >>
         description_short: |-
-          {definitions.metric} {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+          {definitions.metric} {definitions.sex} {definitions.age} where the weapon was << category.lower() >>.
         unit: |-
           {definitions.unit}
         presentation:
@@ -75,7 +75,7 @@ tables:
         title: |-
           {definitions.metric} - << category >> - sex: << sex >>
         description_short: |-
-          {definitions.metric} {definitions.sex} {definitions.age} where the << category.lower() >>
+          {definitions.metric} {definitions.sex} {definitions.age} where the << category.lower() >>.
         unit: |-
           {definitions.unit}
         presentation:
@@ -89,7 +89,7 @@ tables:
         title: |-
           {definitions.metric} - << category >> - sex: << sex >>
         description_short: |-
-          {definitions.metric} {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+          {definitions.metric} {definitions.sex} {definitions.age} where the situation was << category.lower() >>.
         unit: |-
           {definitions.unit}
         presentation:
@@ -103,7 +103,7 @@ tables:
         title: |-
           {definitions.metric} - sex: << sex >> - age: << age >>
         description_short: |-
-          {definitions.metric} {definitions.sex} {definitions.age}
+          {definitions.metric} {definitions.sex} {definitions.age}.
         presentation:
           title_public: |-
             {definitions.metric} {definitions.sex} {definitions.age}
