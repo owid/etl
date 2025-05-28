@@ -191,13 +191,16 @@ def estimate_national_election(tb: Table) -> Table:
         "v2eltype_6",
         "v2eltype_7",
     ]
-    mask = tb[columns].sum(axis=1) >= 1
+    mask_1 = tb[columns].sum(axis=1) >= 1
+    # mask_na = tb[columns].notna().all(axis=1)
     # Create new column
     colname = "held_national_election"
     tb[colname] = 0
-    tb.loc[mask, colname] = 1
+    # tb[colname] = np.nan
+    tb.loc[mask_1, colname] = 1
+    # tb.loc[~mask_1 & mask_na, colname] = 0
     # Copy metadata
-    tb[colname] = tb[colname].copy_metadata(tb["v2eltype_0"])
+    tb[colname] = tb[colname].copy_metadata(tb["v2eltype_0"]).astype("Int64")
     return tb
 
 
