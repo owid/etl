@@ -7,12 +7,13 @@ import os
 import random
 import shutil
 import tempfile
+from collections.abc import Iterator
 from contextlib import contextmanager
 from glob import glob
 from os import rmdir
 from os.path import exists, join
 from pathlib import Path
-from typing import Any, Iterator, Optional, Union
+from typing import Any
 from unittest.mock import patch
 
 import pandas as pd
@@ -330,7 +331,7 @@ def temp_dataset_dir(create: bool = False) -> Iterator[str]:
         yield dirname
 
 
-def create_temp_dataset(dirname: Union[Path, str], n_tables: Optional[int] = None) -> Dataset:
+def create_temp_dataset(dirname: Path | str, n_tables: int | None = None) -> Dataset:
     d = Dataset.create_empty(dirname)
     d.metadata = mock(DatasetMeta)
     d.metadata.version = random.choice(["latest", "2023-01-01"])

@@ -1,8 +1,27 @@
+definitions:
+  common_views:
+    - config:
+        hasMapTab: true
+        originUrl: ourworldindata.org/ucdp
+        map:
+          colorScale:
+            baseColorScheme: "OrRd"
+        # tab: "map"
+
 title:
   title: Data on conflict since 1989
   title_variant: "from UCDP"
 default_selection:
-  - World
+  - Afghanistan
+  - Ethiopia
+  - Rwanda
+  - Syria
+  - Ukraine
+default_dimensions:
+  indicator: deaths
+  conflict_type: all
+  people: all
+  estimate: best
 
 dimensions:
   - slug: indicator
@@ -14,7 +33,7 @@ dimensions:
         name: "Death rate"
         description: The number of deaths divided by the total population
       - slug: "num_conflicts"
-        name: "Number of wars"
+        name: "Number of conflicts"
 
   - slug: conflict_type
     name: "Conflict type"

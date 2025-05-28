@@ -26,7 +26,6 @@
   "Costa Rica": "Costa Rica",
   "Croatia": "Croatia",
   "Cuba": "Cuba",
-  "Cura\u00e7ao": "Curacao",
   "Cyprus": "Cyprus",
   "Czechia": "Czechia",
   "Democratic Republic of the Congo": "Democratic Republic of Congo",
@@ -118,8 +117,6 @@
   "Viet Nam": "Vietnam",
   "Saint Martin": "Saint Martin (French part)",
   "The United Kingdom": "United Kingdom",
-  "T\u00fcrkiye": "Turkey",
-  "Côte d’Ivoire": "Cote d'Ivoire",
   "Gabon": "Gabon",
   "Guinea": "Guinea",
   "Zimbabwe": "Zimbabwe",
@@ -130,5 +127,9 @@
   "Kosovo": "Kosovo",
   "South Sudan": "South Sudan",
   "Angola": "Angola",
-  "Sierra Leone": "Sierra Leone"
+  "Sierra Leone": "Sierra Leone",
+  "CuraÃ§ao": "Curacao",
+  "Malawi": "Malawi",
+  "Cote d'Ivoire": "Cote d'Ivoire",
+  "TÃ¼rkiye": "Turkey"
 }

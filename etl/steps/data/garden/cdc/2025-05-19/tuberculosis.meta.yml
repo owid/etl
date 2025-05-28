@@ -1,0 +1,105 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Tuberculosis
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  cases_before_1975:
+    variables:
+      tb_cases_no:
+        title: Tuberculosis cases (pre-1975)
+        description_short: Reported cases of tuberculosis.
+        description_key:
+          - The data is split at 1975 for cases due to changes in surveillance methods implemented by the CDC during those years.
+          - Prior to 1975, only new cases of tuberculosis were counted in the data and relapses were not included.
+          - Pre-1975 data may not be directly comparable with post-1975 data due to these methodological differences.
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+      tb_cases_rate:
+        title: Tuberculosis cases per 100,000 people (pre-1975)
+        description_short: Reported cases of tuberculosis per 100,000 people.
+        description_key:
+          - The data is split at 1975 for cases due to changes in surveillance methods implemented by the CDC during those years.
+          - Prior to 1975, only new cases of tuberculosis were counted in the data and relapses were not included.
+          - Pre-1975 data may not be directly comparable with post-1975 data due to these methodological differences.
+        unit: cases per 100,000 people
+        display:
+          numDecimalPlaces: 1
+
+  cases_after_1975:
+    variables:
+      tb_cases_no:
+        title: Tuberculosis cases (post-1975)
+        description_short: Reported cases of tuberculosis.
+        description_key:
+          - The data is split at 1975 for cases due to changes in surveillance methods implemented by the CDC during those years.
+          - After 1975, the data includes all cases of tuberculosis, including relapses.
+          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
+          - Pre-1975 data may not be directly comparable with post-1975 data due to these methodological differences.
+          - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have symptoms of tuberculosis, or if they have laboratory confirmed diagnosis.
+        unit: cases
+        display:
+          numDecimalPlaces: 0
+
+      tb_cases_rate:
+        title: Tuberculosis cases per 100,000 people (post-1975)
+        description_short: Reported cases of tuberculosis per 100,000 people.
+        description_key:
+          - The data is split at 1975 for cases due to changes in surveillance methods implemented by the CDC during those years.
+          - After 1975, the data includes all cases of tuberculosis, including relapses.
+          - A person may have multiple episodes of tuberculosis, separate episodes are counted here if they occur more than one year apart.
+          - Pre-1975 data may not be directly comparable with post-1975 data due to these methodological differences.
+          - Tuberculosis cases are counted if the patient tests positive for the bacteria that causes tuberculosis and they have tuberculosis symptoms, or if they have laboratory confirmed diagnosis.
+        unit: cases per 100,000 people
+        display:
+          numDecimalPlaces: 1
+
+  deaths_before_1979:
+    variables:
+      tb_deaths_no:
+        title: Tuberculosis deaths (pre-1979)
+        description_short: Reported deaths from tuberculosis.
+        description_key:
+          - Before 1979, this variable had a broader definition and included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+
+      tb_deaths_rate:
+        title: Tuberculosis deaths per 100,000 people (pre-1979)
+        description_short: Reported deaths from tuberculosis per 100,000 people.
+        description_key:
+          - Before 1979, this variable had a broader definition and included deaths caused by the late effects of tuberculosis, such as lung damage or fluid around the lungs.
+        unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1
+
+  deaths_after_1979:
+    variables:
+      tb_deaths_no:
+        title: Tuberculosis deaths (post-1979)
+        description_short: Reported deaths from tuberculosis.
+        description_key:
+          - After 1979, only deaths directly caused by active tuberculosis are counted.
+          - Unlike the pre-1979 definition, this excludes deaths caused by late effects of tuberculosis.
+        unit: deaths
+        display:
+          numDecimalPlaces: 0
+
+      tb_deaths_rate:
+        title: Tuberculosis deaths per 100,000 people (post-1979)
+        description_short: Reported deaths from tuberculosis per 100,000 people.
+        description_key:
+          - After 1979, only deaths directly caused by active tuberculosis are counted.
+          - Unlike the pre-1979 definition, this excludes deaths caused by late effects of tuberculosis.
+        unit: deaths per 100,000 people
+        display:
+          numDecimalPlaces: 1

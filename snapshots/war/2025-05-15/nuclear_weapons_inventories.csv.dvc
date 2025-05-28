@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Federation of American Scientists
+    title: Estimated Global Nuclear Warhead Inventories
+    description: This dataset provides information on the number of stockpiled nuclear warheads by the nuclear powers.
+    citation_full: |-
+      Hans M. Kristensen, Matt Korda, Robert S. Norris, Eliana Johns, and Mackenzie Knight, Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
+    attribution_short: FAS
+    url_main: https://fas.org/initiative/status-world-nuclear-forces/
+    date_accessed: '2025-05-15'
+    date_published: '2024-12-16'
+    license:
+      name: CC BY 4.0
+outs:
+  - md5: 91726f57481d8dd34df330b18c0431c4
+    size: 6984
+    path: nuclear_weapons_inventories.csv

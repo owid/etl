@@ -73,7 +73,7 @@ def run() -> None:
                     "extrasystemic",
                 ],
                 "choice_new_slug": "state_based_stacked",
-                "config_new": {
+                "view_config": {
                     "chartTypes": ["StackedBar"],
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -84,7 +84,7 @@ def run() -> None:
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "config_new": {
+                "view_config": {
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -94,6 +94,7 @@ def run() -> None:
         ]
     )
 
+    # Drop views
     c.drop_views(
         [
             {"estimate": ["low", "high"]},
@@ -238,46 +239,33 @@ def edit_faust(c):
     """Edit FAUST of views: Chart and indicator-level."""
     choice_names = c.get_choice_names("conflict_type")
     for view in c.views:
-        # Edit title and subtitle in charts
-        edit_view_title(view, choice_names)
-
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
-        edit_view_display_estimates_ci(view)
+        edit_indicator_displays(view)
+
+    c.edit_views(
+        [
+            {"config": {"timelineMinTime": 1946}},
+            {"dimensions": {"indicator": "deaths"}, "config": {"title": "Deaths in {conflict_name}"}},
+            {
+                "dimensions": {"indicator": "death_rate"},
+                "config": {"title": "Death rate in {conflict_name}"},
+            },
+            {
+                "dimensions": {"indicator": "wars_ongoing"},
+                "config": {"title": "Number of {conflict_name}"},
+            },
+            {
+                "dimensions": {"indicator": "wars_ongoing_country_rate"},
+                "config": {"title": "Rate of {conflict_name}"},
+            },
+        ],
+        params={
+            "conflict_name": lambda view: _get_conflict_type(view, choice_names),
+        },
+    )
 
 
-def edit_view_title(view, conflict_renames):
-    """Edit FAUST titles and subtitles."""
-    # Get conflict type name
-    conflict_name = "state-based conflicts"
-    if view.dimensions["conflict_type"] not in {"state-based", "state_based_stacked"}:
-        conflict_name = conflict_renames.get(view.dimensions["conflict_type"]).lower()
-
-    # Add title based on indicator
-    if view.dimensions["indicator"] == "deaths":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Deaths in {conflict_name}",
-        }
-    elif view.dimensions["indicator"] == "death_rate":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Death rate in {conflict_name}",
-        }
-    elif view.dimensions["indicator"] == "wars_ongoing":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Number of {conflict_name}",
-            # "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-        }
-    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Rate of {conflict_name}",
-            # "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-        }
-
-
-def edit_view_display_estimates_ci(view):
+def edit_indicator_displays(view):
     """Edit FAUST estimates for confidence intervals."""
     if view.dimensions["estimate"] == "best_ci":
         assert view.indicators.y is not None
@@ -297,3 +285,10 @@ def edit_view_display_estimates_ci(view):
                     "name": "Best estimate",
                     "color": "#B13507",
                 }
+
+
+def _get_conflict_type(view, choice_names):
+    conflict_name = "state-based conflicts"
+    if view.dimensions["conflict_type"] not in {"state-based", "state_based_stacked"}:
+        conflict_name = choice_names.get(view.dimensions["conflict_type"]).lower()
+    return conflict_name

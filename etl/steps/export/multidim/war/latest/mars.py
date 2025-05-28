@@ -66,7 +66,13 @@ def run() -> None:
             view.indicators.y[0].display = {"name": "Interstate wars"}
         elif view.dimensions["conflict_type"] == "all":
             assert view.indicators.y is not None
-            view.indicators.y[0].display = {"name": f"{view.dimensions['estimate'].title()} estimate"}
+            view.indicators.y[0].display = {
+                "name": f"{view.dimensions['estimate'].title()} estimate",
+            }
+            if view.dimensions["estimate"] == "high":
+                view.indicators.y[0].display["color"] = "#561802"
+            elif view.dimensions["estimate"] == "low":
+                view.indicators.y[0].display["color"] = "#B13507"
 
     # Group certain views together: used to create StackedBar charts
     c.group_views(
@@ -75,7 +81,7 @@ def run() -> None:
                 "dimension": "conflict_type",
                 "choices": ["civil war", "others (non-civil)"],
                 "choice_new_slug": "all",
-                "config_new": {
+                "view_config": {
                     "chartTypes": ["StackedBar"],
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -87,7 +93,7 @@ def run() -> None:
                 "dimension": "estimate",
                 "choices": ["low", "high"],
                 "choice_new_slug": "low_high",
-                "config_new": {
+                "view_config": {
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -106,31 +112,39 @@ def run() -> None:
     )
 
     # Edit FAUST
-    for view in c.views:
-        if view.dimensions["indicator"] == "deaths":
-            view.config = {
-                **(view.config or {}),
-                "title": "Deaths in wars",
-                "subtitle": "Included are deaths of combatants due to fighting in [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-            }
-        elif view.dimensions["indicator"] == "death_rate":
-            view.config = {
-                **(view.config or {}),
-                "title": "Death rate in wars",
-                "subtitle": "Deaths of combatants due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-            }
-        elif view.dimensions["indicator"] == "wars_ongoing":
-            view.config = {
-                **(view.config or {}),
-                "title": "Number of wars",
-                "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-            }
-        elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
-            view.config = {
-                **(view.config or {}),
-                "title": "Rate of wars",
-                "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-            }
+    c.edit_views(
+        [
+            {"config": {"timelineMinTime": 1800}},
+            {
+                "dimensions": {"indicator": "deaths"},
+                "config": {
+                    "title": "Deaths in wars",
+                    "subtitle": "Included are deaths of combatants due to fighting in [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+                },
+            },
+            {
+                "dimensions": {"indicator": "death_rate"},
+                "config": {
+                    "title": "Death rate in wars",
+                    "subtitle": "Deaths of combatants due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+                },
+            },
+            {
+                "dimensions": {"indicator": "wars_ongoing"},
+                "config": {
+                    "title": "Number of wars",
+                    "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+                },
+            },
+            {
+                "dimensions": {"indicator": "wars_ongoing_country_rate"},
+                "config": {
+                    "title": "Rate of wars",
+                    "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
+                },
+            },
+        ]
+    )
 
     # Save & upload
     c.save()
