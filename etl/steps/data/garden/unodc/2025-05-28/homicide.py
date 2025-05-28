@@ -110,7 +110,7 @@ def clean_up_categories(tb: Table) -> Table:
     category_dict = {
         "Another weapon - sharp object": "a sharp object",
         "Unspecified means": "unspecified means",
-        "Without a weapon/ other Mechanism": " without a weapon or by another mechanism",
+        "Without a weapon/ other Mechanism": "without a weapon or by another mechanism",
         "Firearms or explosives": "firearms or explosives",
         "Another weapon": "sharp or blunt object, including motor vehicles",
         "Intimate partner or family member": "Perpetrator is an intimate partner or family member of the victim",
@@ -144,7 +144,7 @@ def calculate_united_kingdom(tb: Table, ds_population: Dataset) -> Table:
         .agg(value=("value", "sum"), count=("value", "size"))
         .reset_index()
     )
-    # Use only rows where all three entites are in the data
+    # Use only rows where all three entities are in the data
     tb_uk = tb_uk[tb_uk["count"] == 3]
     tb_uk["country"] = "United Kingdom"
     tb_uk = tb_uk.drop(columns="count")
