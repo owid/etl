@@ -81,6 +81,7 @@ def clean_data_regional(tb_region: Table) -> Table:
     tb_region["dimension"] = "Total"
     tb_region["category"] = "Total"
     tb_region["age"] = "Total"
+    tb_region["sex"] = "Total"
     tb_region["unit_of_measurement"] = np.where(
         tb_region["series"] == "Number of victims of intentional homicide",
         "Counts",
