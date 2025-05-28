@@ -291,7 +291,7 @@ def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = add_regions_and_global_aggregates(tb_, ds_regions)
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 52, "Unexpected number of columns."
+    assert tb_.shape[1] == 54, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Wide to long format
     tb_ = from_wide_to_long(tb_)
@@ -400,7 +400,7 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
     tb_ = tb.copy()
 
     # Get dummy indicators
-    tb_ = make_table_with_dummies(tb_)
+    tb_ = make_table_with_dummies(tb_, people_living_in=True)
 
     # Add population in dummies (population value replaces 1, 0 otherwise)
     tb_ = add_population_in_dummies(
@@ -444,7 +444,7 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
     )
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 52, "Unexpected number of columns."
+    assert tb_.shape[1] == 55, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Long format
     tb_ = from_wide_to_long(tb_)
@@ -460,6 +460,7 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
             "num_countries_wom_parl": "population_wom_parl",
             "num_countries_years_in_electdem": "population_years_in_electdem",
             "num_countries_years_in_libdem": "population_years_in_libdem",
+            "num_countries_natelect": "population_natelect",
         }
     )
 
@@ -860,7 +861,7 @@ def add_regions_and_global_aggregates(
     return tb
 
 
-def make_table_with_dummies(tb: Table) -> Table:
+def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
     """Convert categorical indicators to dummy variables for aggregation.
 
     Transforms categorical variables (like regime types) into binary dummy variables
@@ -868,6 +869,7 @@ def make_table_with_dummies(tb: Table) -> Table:
 
     Args:
         tb: V-Dem data with categorical indicators
+        people_living_in: True if we are counting people instead of countries. In that case, the time-serie might contain additional rows (NA most likely) after expanding observations.
 
     Returns:
         Table with binary dummy variables for each category
@@ -983,6 +985,16 @@ def make_table_with_dummies(tb: Table) -> Table:
             },
             "has_na": True,
         },
+        {
+            "name": "held_national_election",
+            "name_new": "num_countries_natelect",
+            "values_expected": {
+                "0": "didn't hold a national election",
+                "1": "held a national election",
+            },
+            "has_na": False,
+            "has_na_once_expanded": True,
+        },
     ]
 
     # Convert to string
@@ -993,9 +1005,14 @@ def make_table_with_dummies(tb: Table) -> Table:
     for indicator in indicators:
         values_expected = indicator["values_expected"]
         # Check and fix NA (convert NAs to -1 category)
-        if indicator["has_na"]:
+        if people_living_in:
+            has_na = indicator.get("has_na_once_expanded", indicator["has_na"])
+        else:
+            has_na = indicator["has_na"]
+
+        if has_na:
             # Assert that there are actually NaNs
-            assert tb_[indicator["name"]].isna().any(), "No NA found!"
+            assert tb_[indicator["name"]].isna().any(), f"No NA found for indicator {indicator['name']}!"
             # If NA, we should not have category '-1', otherwise these would get merged!
             assert "-1" not in set(
                 tb_[indicator["name"]].unique()
@@ -1007,7 +1024,7 @@ def make_table_with_dummies(tb: Table) -> Table:
             else:
                 values_expected |= {"-1"}
         else:
-            assert not tb_[indicator["name"]].isna().any(), "NA found!"
+            assert not tb_[indicator["name"]].isna().any(), f"NA found for {indicator['name']}!"
 
         values_found = set(tb_[indicator["name"]].unique())
         assert values_found == set(

@@ -2146,7 +2146,6 @@ tables:
           <%- else -%>
           Number of countries with << category >> in parliament
           <%- endif -%>
-        unit: "countries"
 
       num_countries_years_in_electdem:
         title: |-
@@ -2162,6 +2161,23 @@ tables:
           <%- else -%>
           Number of liberal democracies aged << category >>
           <%- endif -%>
+
+      num_countries_natelect:
+        title: |-
+          Number of countries that << category >>
+        description_short: |-
+          Number of countries that << category >> in the given year.
+        description_processing: &country_natelect_processing |-
+          A country is considered to have held national elections if any of the following elections were held in the given year:
+
+          - Legislative; lower, sole, or both chambers, first or only round. [`v2eltype_0`]
+          - Legislative, lower, sole, or both chambers, second round. [`v2eltype_1`]
+          - Constituent Assembly, first or only round. [`v2eltype_4`]
+          - Constituent Assembly, second round. [`v2eltype_5`]
+          - Presidential, first or only round. [`v2eltype_6`]
+          - Presidential, second round. [`v2eltype_7`]
+
+          Otherwise this variable is zero.
 
   ##################################################################################################
   ##################################################################################################
@@ -2232,3 +2248,18 @@ tables:
           <%- else -%>
           People living in liberal democracies aged << category >>
           <%- endif -%>
+
+      population_natelect:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries where it is unclear if national elections were held
+          <%- else -%>
+          People living in countries that << category >>
+          <%- endif -%>
+        description_short: |-
+          <%- if category == '-1' -%>
+          People living in countries where it is unclear if national elections were held in the given year
+          <%- else -%>
+          People living in countries that << category >> in the given year.
+          <%- endif -%>
+        description_processing: *country_natelect_processing
