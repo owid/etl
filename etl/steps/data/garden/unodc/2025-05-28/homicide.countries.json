@@ -204,5 +204,30 @@
   "T\u00fcrkiye": "Turkey",
   "United Kingdom (England and Wales)": "England and Wales",
   "United Kingdom (Northern Ireland)": "Northern Ireland",
-  "United Kingdom (Scotland)": "Scotland"
+  "United Kingdom (Scotland)": "Scotland",
+  "Oceania": "Oceania (UN)",
+  "Americas": "Americas (UN)",
+  "Eastern Asia": "Eastern Asia (UN)",
+
+  "Micronesia": "Micronesia (UN)",
+
+  "Central Asia": "Central Asia (UN)",
+  "Western Asia": "Western Asia (UN)",
+  "Southern Asia": "Southern Asia (UN)",
+  "Sub-Saharan Africa": "Sub-Saharan Africa (UN)",
+  "South-eastern Asia": "South-eastern Asia (UN)",
+  "Eastern Europe": "Eastern Europe (UN)",
+  "Asia": "Asia (UN)",
+  "Latin America and the Caribbean": "Latin America and the Caribbean (UN)",
+  "Europe": "Europe (UN)",
+  "Africa": "Africa (UN)",
+  "Northern Africa": "Northern Africa (UN)",
+  "Melanesia": "Melanesia (UN)",
+  "Northern Europe": "Northern Europe (UN)",
+  "Australia and New Zealand": "Australia and New Zealand (UN)",
+  "Southern Europe": "Southern Europe (UN)",
+  "World": "World",
+  "Polynesia": "Polynesia (UN)",
+  "Western Europe": "Western Europe (UN)",
+  "Northern America": "Northern America (UN)"
 }
