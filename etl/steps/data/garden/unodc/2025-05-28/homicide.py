@@ -125,7 +125,7 @@ def clean_up_categories(tb: Table) -> Table:
 
     for key in category_dict.keys():
         assert key in tb["category"].values, f"{key} not in table"
-    tb["category"] = tb["category"].rename(category_dict)
+    tb["category"] = tb["category"].replace(category_dict)
 
     assert tb["category"].isna().sum() == 0
     return tb

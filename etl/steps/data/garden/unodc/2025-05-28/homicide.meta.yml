@@ -48,7 +48,7 @@ definitions:
   unit: |-
     <% if unit_of_measurement == "Counts" %>
     homicides
-    <%- elif sex == "Rate per 100,000 population" %>
+    <%- elif unit_of_measurement == "Rate per 100,000 population" %>
     homicides per 100,000 population
     <%- endif %>
 # Learn more about the available fields:
