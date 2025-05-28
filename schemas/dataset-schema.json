@@ -1295,12 +1295,7 @@
                               "pattern": "{definitions"
                             }
                           ],
-                          "description": "The tab that is shown initially",
-                          "enum": [
-                            "chart",
-                            "map",
-                            "table"
-                          ]
+                          "description": "The tab that is shown initially"
                         },
                         "matchingEntitiesOnly": {
                           "type": "boolean",

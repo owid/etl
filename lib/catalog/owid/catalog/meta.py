@@ -317,32 +317,6 @@ class VariableMeta(MetaBase):
 
         meta = update_variable_metadata(meta)
 
-        # Convert from string to proper type when it comes from YAML
-        grapher_config = getattr(getattr(meta, "presentation", None), "grapher_config", {}) or {}
-        color_scale = grapher_config.get("map", {}).get("colorScale", {})
-        if isinstance(color_scale.get("customNumericMinValue"), str):
-            color_scale["customNumericMinValue"] = float(color_scale["customNumericMinValue"])
-
-        # Convert strings to lists when needed
-        gconf = getattr(meta.presentation, "grapher_config", None)
-        if gconf:
-            try:
-                color_scale = gconf["map"]["colorScale"]
-                if isinstance(color_scale["customNumericValues"], str):
-                    color_scale["customNumericValues"] = list(ast.literal_eval(color_scale["customNumericValues"]))
-            except KeyError:
-                pass
-
-        # Prune faqs with empty fragment_id
-        if meta.presentation and meta.presentation.faqs:
-            faqs: List[FaqLink] = []
-            for faq in meta.presentation.faqs:
-                if not faq.fragment_id.strip():
-                    continue
-                else:
-                    faqs.append(faq)
-            meta.presentation.faqs = faqs
-
         return meta
 
     def copy(self, deep=True) -> Self:
@@ -543,11 +517,7 @@ def _deepcopy_dataclass(dc) -> Any:
                 lis = type(v)(lis)
             setattr(dc, k, lis)
         elif isinstance(v, dict):
-            setattr(
-                dc,
-                k,
-                {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()},
-            )
+            setattr(dc, k, {x: _deepcopy_dataclass(y) if is_dataclass(y) else y for x, y in v.items()})
         else:
             pass
     return dc
@@ -588,7 +558,7 @@ def update_variable_metadata(meta: VariableMeta) -> VariableMeta:
         try:
             color_scale = gconf["map"]["colorScale"]
             if isinstance(color_scale["customNumericValues"], str):
-                color_scale["customNumericValues"] = list(ast.literal_eval(color_scale["customNumericValues"]))
+                color_scale["customNumericValues"] = parse_numeric_list(color_scale["customNumericValues"])
         except KeyError:
             pass
 

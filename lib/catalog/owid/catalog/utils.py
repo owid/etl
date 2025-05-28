@@ -1,4 +1,3 @@
-import ast
 import dataclasses
 import hashlib
 import re
@@ -361,5 +360,8 @@ def parse_numeric_list(val: list | str) -> list[float | int]:
     """
     if isinstance(val, list):
         return val
+    stripped = val.strip()
+    if stripped.startswith("[") and stripped.endswith("]"):
+        stripped = stripped[1:-1]
 
-    return ast.literal_eval(val)
+    return [float(x) if "." in x else int(x) for x in stripped.split(",") if x.strip()]
