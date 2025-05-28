@@ -15,15 +15,13 @@ definitions:
     <%- endif %>
   sex: |-
     <% if sex == "Total" %>
-    all victims
     <%- elif sex == "Male" -%>
-    male victims
+    of male victims
     <%- elif sex == "Female" -%>
-    female victims
+    of female victims
     <% endif %>
   age: |-
     <% if age == "Total" %>
-    in all age-groups
     <%- elif age == "30-44" %>
     aged 30-44 years
     <%- elif age == "45-59" %>
@@ -63,12 +61,12 @@ tables:
         title: |-
           {definitions.metric} - << category >>
         description_short: |-
-          {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+          {definitions.metric} {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
         unit: |-
           {definitions.unit}
         presentation:
           title_public: |-
-            {definitions.metric} of {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
+            {definitions.metric} {definitions.sex} {definitions.age} where the weapon was << category.lower() >>
         display:
           numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
   by_relationship_to_perpetrator:
@@ -77,12 +75,12 @@ tables:
         title: |-
           {definitions.metric} - << category >> - sex: << sex >>
         description_short: |-
-          {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
+          {definitions.metric} {definitions.sex} {definitions.age} where the << category.lower() >>
         unit: |-
           {definitions.unit}
         presentation:
           title_public: |-
-            {definitions.metric} of {definitions.sex} {definitions.age} where the << category.lower() >>
+            {definitions.metric} {definitions.sex} {definitions.age} where the << category.lower() >>
         display:
           numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
   by_situational_context:
@@ -91,12 +89,12 @@ tables:
         title: |-
           {definitions.metric} - << category >> - sex: << sex >>
         description_short: |-
-          {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+          {definitions.metric} {definitions.sex} {definitions.age} where the situation was << category.lower() >>
         unit: |-
           {definitions.unit}
         presentation:
           title_public: |-
-            {definitions.metric} of {definitions.sex} {definitions.age} where the situation was << category.lower() >>
+            {definitions.metric} {definitions.sex} {definitions.age} where the situation was << category.lower() >>
         display:
           numDecimalPlaces: <%-  if unit_of_measurement == "Counts" -%> 0<%-  elif unit_of_measurement == "Rate per 100,000 population" -%> 1<%- endif -%>
   total:
@@ -105,7 +103,10 @@ tables:
         title: |-
           {definitions.metric} - sex: << sex >> - age: << age >>
         description_short: |-
-          {definitions.metric} of {definitions.sex} {definitions.age}
+          {definitions.metric} {definitions.sex} {definitions.age}
+        presentation:
+          title_public: |-
+            {definitions.metric} {definitions.sex} {definitions.age}
         unit: |-
           {definitions.unit}
         display:
