@@ -79,6 +79,8 @@ def run() -> None:
         tb = tb.dropna(how="all")  # Drop rows where all values are NaN
         tb = tb.dropna(axis=1, how="all")  # Drop columns where all values are NaN
 
+        for col in tb.select_dtypes(include=["float", "int"]).columns:
+            tb[col] = normalize_percentages(tb[col])
         # Add a column for the question
         tb["question"] = question
         if sheet_name in ["Q3", "Q4"]:
@@ -108,3 +110,8 @@ def run() -> None:
 
     # Save meadow dataset.
     ds_meadow.save()
+
+
+def normalize_percentages(col):
+    # Assume anything <= 1 is a percentage (like 0.25 = 25%)
+    return col.apply(lambda x: x * 100 if 0 < x <= 1 else x)

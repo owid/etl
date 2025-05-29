@@ -44,7 +44,6 @@ def run() -> None:
     }
 
     tb["answer"] = tb["answer"].replace(answer_mapping).str.lower().str.capitalize()
-    tb["value"] = tb["value"] * 100  # Convert to percentage
 
     # Add regional aggregates by adding population, multiplying the "share" by the population, adding regions and then dividing by the population.
     tb = geo.add_population_to_table(tb, ds_population)
