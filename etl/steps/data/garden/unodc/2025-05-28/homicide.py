@@ -65,10 +65,14 @@ def calculate_rates_for_most_recent_year(tb: Table, tb_pop_full: Table) -> Table
     # Get the most recent year in the table for counts
     tb_counts = tb[tb["unit_of_measurement"] == "Counts"]
     tb_rates = tb[tb["unit_of_measurement"] == "Rate per 100,000 population"]
+    if tb_rates.empty:
+        most_recent_year_rates = None
+        print("No rates found in the table, check spelling.")
+    else:
+        most_recent_year_rates = tb_rates["year"].max()
     most_recent_year_counts = tb_counts["year"].max()
-    most_recent_year_rates = tb_rates["year"].max()
 
-    if most_recent_year_counts > most_recent_year_rates:
+    if most_recent_year_rates is not None and most_recent_year_counts > most_recent_year_rates:
         tb_recent = tb_counts[tb_counts["year"] == most_recent_year_counts]
         tb_pop_recent = tb_pop_full[tb_pop_full["year"] == most_recent_year_counts]
         tb_merge = pr.merge(left=tb_recent, right=tb_pop_recent, on=["country", "year", "sex"])
