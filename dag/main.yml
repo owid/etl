@@ -37,15 +37,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-    # Homicide - UNODC - update
-  data://meadow/homicide/2024-10-30/unodc:
-    - snapshot://homicide/2024-10-30/unodc.xlsx
-  data://garden/homicide/2024-10-30/unodc:
-    - data://meadow/homicide/2024-10-30/unodc
-    - data://garden/demography/2023-03-31/population
-  data://grapher/homicide/2024-10-30/unodc:
-    - data://garden/homicide/2024-10-30/unodc
-
   #
   # UN
   # UN SDG - current
