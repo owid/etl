@@ -199,8 +199,10 @@ def preprocess(tb: Table) -> Table:
             "two_turnover_period",
             # Democratic transition
             "democratic_transition",
+            "transition_type",
             # DEmocratic breakdown
             "democratic_breakdown",
+            "breakdown_type",
         ],
     ]
 
@@ -332,6 +334,55 @@ def get_region_aggregates(
                 "0.0": "no suffrage",
                 "1.0": "male suffrage",
                 "2.0": "universal suffrage",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "is_full_democracy",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "is_electoral_democracy",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "turnover_event",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "transition_type",
+            "values_expected": {
+                "0": "0",
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "breakdown_type",
+            "values_expected": {
+                "0": "0",
+                "1": "1",
+                "2": "2",
+                "3": "3",
+                "4": "4",
+                "5": "5",
+                "6": "6",
             },
             "has_na": False,
         },
