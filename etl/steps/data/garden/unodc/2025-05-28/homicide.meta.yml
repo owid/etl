@@ -6,8 +6,9 @@ definitions:
         - Homicides
     description_processing: |-
       Values for the United Kingdom are calculated by Our World in Data from UNODC data for England, Wales, Scotland and Northern Ireland.
+      Rates for the most recent year are calculated using medium population projection estimates from the United Nations World Population Prospects.
     description_key:
-      - UNODC collects intentional homicide data from criminal justice systems (law enforcement records) and public health systems (death certificates)
+      - UNODC collects intentional homicide data from criminal justice systems (law enforcement records) and public health systems (death certificates).
       - "Intentional homicide requires three elements: one person killing another, intent to kill or seriously injure, and the act was illegal. For example, a person who kills another in self-defence is not considered to have committed an intentional homicide as justifiable homicide in self-defence is not illegal."
       - All killings that meet the criteria listed below are to be considered intentional homicides, irrespective of definitions provided by national legislations or practices.
       - Terrorist killings are included as intentional homicides.

@@ -18,8 +18,13 @@ def run() -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("homicide")
-    # Load population dataset.
+    # Load population dataset only goes up to 2023
     ds_population = paths.load_dataset("population")
+    # Load full population dataset including projections to calculate rates for 2024
+    ds_pop_full = paths.load_dataset("un_wpp")
+    tb_pop_full = ds_pop_full.read("population")
+    # Format the population table
+    tb_pop_full = format_pop_full(tb_pop_full)
     # Read table from meadow dataset.
     tb = ds_meadow.read("homicide")
 
@@ -31,6 +36,7 @@ def run() -> None:
 
     tb = clean_up_categories(tb)
     tb = calculate_united_kingdom(tb, ds_population)
+
     tables = clean_data(tb)
     # Improve table format.
 
@@ -42,6 +48,38 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def format_pop_full(tb_pop_full: Table) -> Table:
+    tb_pop_full = tb_pop_full[(tb_pop_full["variant"] == "medium") & (tb_pop_full["age"] == "all")]
+    tb_pop_full = tb_pop_full.drop(columns=["variant", "age", "population_change", "population_density"])
+    tb_pop_full = tb_pop_full.replace({"male": "Male", "female": "Female", "all": "All"})
+    return tb_pop_full
+
+
+def calculate_rates_for_most_recent_year(tb: Table, tb_pop_full: Table) -> Table:
+    """
+    Calculate rates for the most recent year in the dataset using the full population dataset, with projections included.
+    """
+    # Get the most recent year in the table for counts
+    tb_counts = tb[tb["unit_of_measurement"] == "Counts"]
+    tb_rates = tb[tb["unit_of_measurement"] == "Rate per 100,000 population"]
+    most_recent_year_counts = tb_counts["year"].max()
+    most_recent_year_rates = tb_rates["year"].max()
+
+    if most_recent_year_counts > most_recent_year_rates:
+        tb_recent = tb_counts[tb_counts["year"] == most_recent_year_counts]
+        tb_pop_recent = tb_pop_full[tb_pop_full["year"] == most_recent_year_counts]
+        tb_merge = pr.merge(left=tb_recent, right=tb_pop_recent, on=["country", "year", "sex"])
+        tb_merge["value_new"] = tb_merge["value"] / tb_merge["population"] * 100000
+
+        tb_merge["unit_of_measurement"] = "Rate per 100,000 population"
+        tb_merge = tb_merge.drop(columns=["population", "value"])
+
+        tb_merge = tb_merge.rename(columns={"value_new": "value"})
+        tb = pr.concat([tb, tb_merge])
+
+    return tb
 
 
 def clean_data(tb: Table) -> list[Table]:

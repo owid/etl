@@ -726,6 +726,7 @@ steps:
   data://garden/unodc/2025-05-28/homicide:
     - data://meadow/unodc/2025-05-28/homicide
     - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
   data://grapher/unodc/2025-05-28/homicide:
     - data://garden/unodc/2025-05-28/homicide
 
