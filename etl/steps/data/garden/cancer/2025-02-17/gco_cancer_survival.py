@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -23,8 +25,7 @@ def run() -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = tb[tb["survival_year"] == 5]
-    # Print rows where country is Australia and cancer is Stomach
-    print(tb[(tb["country"] == "Australia") & (tb["cancer"] == "Stomach")])
+
     tb = tb.drop("survival_year", axis=1)
     # Replace specific values in the "cancer" column
     tb["cancer"] = tb["cancer"].replace(
@@ -40,6 +41,9 @@ def run() -> None:
             "Stomach": "Stomach",
         }
     )
+    # Replace "-" values with pd.NA
+    tb = tb.replace("-", pd.NA)
+
     tb = tb.format(["country", "year", "gender", "cancer"])
 
     #
