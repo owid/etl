@@ -54,7 +54,7 @@ def run() -> None:
 def format_pop_full(tb_pop_full: Table) -> Table:
     tb_pop_full = tb_pop_full[(tb_pop_full["variant"] == "medium") & (tb_pop_full["age"] == "all")]
     tb_pop_full = tb_pop_full.drop(columns=["variant", "age", "population_change", "population_density"])
-    tb_pop_full = tb_pop_full.replace({"male": "Male", "female": "Female", "all": "All"})
+    tb_pop_full = tb_pop_full.replace({"male": "Male", "female": "Female", "all": "Total"})
     return tb_pop_full
 
 
