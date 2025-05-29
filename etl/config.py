@@ -192,19 +192,16 @@ GRAPHER_INSERT_WORKERS = int(env.get("GRAPHER_WORKERS", 40))
 #   not using it, it could be as well removed
 CONTINUE_ON_FAILURE = env.get("CONTINUE_ON_FAILURE", "0") in ("True", "true", "1")
 
-# only upsert indicators matching this filter, this is useful for fast development
-# of data pages for a single indicator
-GRAPHER_FILTER = env.get("GRAPHER_FILTER", None)
-
 # if set, skip the actual garden step and only apply the metadata
 INSTANT = env.get("INSTANT", "0") in ("True", "true", "1")
 
 # if set, always upload grapher data & metadata JSON files even if checksums match
 FORCE_UPLOAD = env.get("FORCE_UPLOAD") in ("True", "true", "1")
 
-# if set, don't delete indicators from MySQL, only append / update new ones
-# you can use this to only process subset of indicators in your step to
-# speed up development. It's up to you how you define filtering logic in your step
+# Filter to speed up development - works as regex for both data processing and grapher upload
+# - In data steps: filters data rows by matching against relevant columns (e.g. causes, indicators)
+#                  this has to be implemented manually
+# - In grapher steps: filters which variables get upserted to MySQL
 SUBSET = env.get("SUBSET", None)
 
 # forbid any individual step from consuming more than this much memory
