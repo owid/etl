@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 
 from etl.data_helpers import geo
@@ -26,7 +27,7 @@ def run() -> None:
 
     tb = tb[tb["survival_year"] == 5]
     # Print rows where country is Australia and cancer is Stomach
-    print(tb[(tb["country"] == "Australia") & (tb["cancer"] == "Stomach")])
+    # print(tb[(tb["country"] == "Australia") & (tb["cancer"] == "Stomach")])
     tb = tb.drop("survival_year", axis=1)
     # Replace specific values in the "cancer" column
     tb["cancer"] = tb["cancer"].replace(
@@ -48,7 +49,7 @@ def run() -> None:
     # Fix indicators with mixed types.
     # There are rows with "-".
     for column in ["mortality__asr", "net_survival"]:
-        tb[column] = pd.to_numeric(tb[column], errors="coerce")
+        tb[column] = tb[column].mask(tb[column] == "-", np.nan).astype(float)
     assert all(pd.api.types.is_numeric_dtype(tb[column]) for column in tb.columns)
     ####################################################################################################################
 
