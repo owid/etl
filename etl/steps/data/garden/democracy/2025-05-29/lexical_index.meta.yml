@@ -425,7 +425,7 @@ tables:
 
       num_transition_type:
         title: |-
-          <%- if category == 'none' -%>
+          <%- if category == '0' -%>
           Number of countries with no transition
           <%- elif category == "1" -%>
           Number of countries with conversion (incumbent-led) transition
@@ -445,7 +445,7 @@ tables:
 
       num_breakdown_type:
         title: |-
-          <%- if category == 'none' -%>
+          <%- if category == '0' -%>
           Number of countries with no breakdown
           <%- elif category == "1" -%>
           Number of countries with implicit regression induced by incumbents
@@ -559,7 +559,7 @@ tables:
 
       pop_transition_type:
         title: |-
-          <%- if category == 'none' -%>
+          <%- if category == '0' -%>
           People living in countries with no transition
           <%- elif category == "1" -%>
           People living in countries with conversion (incumbent-led) transition
@@ -579,7 +579,7 @@ tables:
 
       pop_breakdown_type:
         title: |-
-          <%- if category == 'none' -%>
+          <%- if category == '0' -%>
           People living in countries with no breakdown
           <%- elif category == "1" -%>
           People living in countries with implicit regression induced by incumbents
