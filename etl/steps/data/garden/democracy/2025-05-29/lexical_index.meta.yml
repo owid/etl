@@ -99,7 +99,7 @@ tables:
           Equivalent indicator: `lexical_index`
 
       regime_lied:
-        title: Political regime
+        title: Political regime (LIED+)
         unit: ""
         description_short: |-
           Identifies the political regime of a country. It distinguishes between non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), electoral democracies (score 6), and full democracies (score 7).
@@ -164,7 +164,7 @@ tables:
         title: "Electoral democracy"
         unit: ""
         description_short: |-
-          The variable identifies the political regime of a country using the reduced Lexical Index of Electoral Democracy. It distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, and electoral democracies (including full democracies or polyarchies).
+          Identifies the political regime of a country using the reduced Lexical Index of Electoral Democracy. It distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, and electoral democracies (including full democracies or polyarchies).
         description_key:
           - In non-electoral autocracies, citizens do not have the right to elect the chief executive or the legislature.
           - In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only have one choice.
@@ -173,6 +173,22 @@ tables:
           - In exclusive democracies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, but suffrage is restricted.
           - Male democracies are exclusive democracies that have comprehensive suffrage for men.
           - Electoral democracies are male democracies that also have comprehensive suffrage for women.
+
+      is_full_democracy:
+        title: Country is a full democracy
+        description_short: |-
+          Identifies if a country is a full democracy using the extended Lexical Index of Electoral Democracy (LIED+).
+        description_processing: |-
+          It is a boolean indicator that indicates whether the country is a full democracy (score 7 in the `lexical_index_plus` indicator).
+        unit: ""
+
+      is_electoral_democracy:
+        title: Country is an electoral democracy
+        description_short: |-
+          Identifies if a country is a full democracy using the extended Lexical Index of Electoral Democracy (LIED+).
+        description_processing: |-
+          It is a boolean indicator that indicates whether the country is an electoral democracy (score 6 in the `lexical_index_plus` indicator).
+        unit: ""
 
       age_electdem_lied:
         title: "Age of electoral democracy"

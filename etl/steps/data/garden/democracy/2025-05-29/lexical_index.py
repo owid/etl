@@ -226,11 +226,16 @@ def rename_columns(tb: Table) -> Table:
 
 
 def add_is_democracy(tb: Table) -> Table:
-    """Create variable distinguishing between democracies and autocracies."""
-    tb.loc[tb["regime_redux_lied"] == 6, "democracy_lied"] = 1
-    tb.loc[(tb["regime_redux_lied"] >= 0) & (tb["regime_redux_lied"] < 6), "democracy_lied"] = 0
-    tb["democracy_lied"] = tb["democracy_lied"].astype(int)
-    tb["democracy_lied"].metadata = tb["regime_redux_lied"].metadata
+    """Create columns classifying country-year into democracies:
+
+    - `democracy_lied`: distinguishing between democracies and autocracies.
+    - `is_full_democracy`: distinguishing between full democracies and the rest.
+    - `is_electoral_democracy`: distinguishing between electoral democracies and the rest.
+
+    """
+    tb["democracy_lied"] = tb["regime_redux_lied"].eq(6).astype("Int64")
+    tb["is_full_democracy"] = tb["regime_lied"].eq(7).astype("Int64")
+    tb["is_electoral_democracy"] = tb["regime_lied"].eq(6).astype("Int64")
     return tb
 
 
