@@ -14,7 +14,18 @@ def run() -> None:
     snap = paths.load_snapshot("lexical_index.xlsx")
 
     # Load data from snapshot.
-    tb = snap.read(na_values=[","])
+    tb = snap.read(na_values=[","])  # , dtype={"year": "Int64"})
+
+    # Fix year column
+    tb["year"] = (
+        tb["year"]
+        .replace(
+            {
+                "¨2023": "2023",
+            }
+        )
+        .astype("Int64")
+    )
 
     #
     # Process data.
