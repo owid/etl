@@ -27,7 +27,6 @@ from etl.config import OWID_ENV
 ####################################################################################################
 COLOR_SCALE_NUMERIC_MIN_VALUE = 0
 TOLERANCE = 5
-COLOR_SCALE_EQUAL_SIZEBINS = "true"
 NEW_LINE = "\\n\\n"
 Y_AXIS_MIN = 0
 

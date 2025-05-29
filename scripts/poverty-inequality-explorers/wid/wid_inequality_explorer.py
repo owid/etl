@@ -105,7 +105,6 @@ for tab in range(len(tables)):
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = welfare["scale_gini"][wel]
         df_tables.loc[j, "colorScaleNumericMinValue"] = 1
-        df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables.loc[j, "colorScaleScheme"] = "Oranges"
         j += 1
 
@@ -126,7 +125,6 @@ for tab in range(len(tables)):
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = welfare["scale_top10"][wel]
         df_tables.loc[j, "colorScaleNumericMinValue"] = 100
-        df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables.loc[j, "colorScaleScheme"] = "OrRd"
         j += 1
 
@@ -147,7 +145,6 @@ for tab in range(len(tables)):
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = welfare["scale_top1"][wel]
         df_tables.loc[j, "colorScaleNumericMinValue"] = 0
-        df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables.loc[j, "colorScaleScheme"] = "OrRd"
         j += 1
 
@@ -168,7 +165,6 @@ for tab in range(len(tables)):
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = welfare["scale_top01"][wel]
         df_tables.loc[j, "colorScaleNumericMinValue"] = 0
-        df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables.loc[j, "colorScaleScheme"] = "OrRd"
         j += 1
 
@@ -189,7 +185,6 @@ for tab in range(len(tables)):
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = welfare["scale_bottom50"][wel]
         df_tables.loc[j, "colorScaleNumericMinValue"] = 100
-        df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables.loc[j, "colorScaleScheme"] = "Blues"
         j += 1
 
@@ -208,7 +203,6 @@ for tab in range(len(tables)):
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = welfare["scale_palma_ratio"][wel]
         df_tables.loc[j, "colorScaleNumericMinValue"] = 0
-        df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables.loc[j, "colorScaleScheme"] = "YlOrBr"
         j += 1
 
