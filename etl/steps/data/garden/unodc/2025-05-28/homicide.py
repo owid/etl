@@ -36,7 +36,8 @@ def run() -> None:
 
     tb = clean_up_categories(tb)
     tb = calculate_united_kingdom(tb, ds_population)
-
+    # Calculate rates for 2024 using counts from UNODC and medium population projections from UN WPP
+    tb = calculate_rates_for_most_recent_year(tb, tb_pop_full)
     tables = clean_data(tb)
     # Improve table format.
 
