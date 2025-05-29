@@ -6,6 +6,7 @@ definitions:
         - Homicides
     description_processing: |-
       Values for the United Kingdom are calculated by Our World in Data from UNODC data for England, Wales, Scotland and Northern Ireland.
+
       Rates for the most recent year are calculated using medium population projection estimates from the United Nations World Population Prospects.
     description_key:
       - UNODC collects intentional homicide data from criminal justice systems (law enforcement records) and public health systems (death certificates).
