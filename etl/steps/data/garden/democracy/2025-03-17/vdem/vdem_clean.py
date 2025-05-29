@@ -31,6 +31,8 @@ def run(tb: Table, country_mapping_path) -> Table:
     tb = estimate_ex_indicators(tb)
     # (L109-L122) Create indicators for multi-party legislative elections, and multi-party legislative elections with imputed values between election-years
     tb = estimate_leg_indicators(tb)
+    # Estimate an indicator for whether a country held a national election in a given year (i.e. it should = 1 IF v2eltype_0 = 1 OR v2eltype_1 = 1 OR v2eltype_4 = 1 OR v2eltype_5 = 1 OR v2eltype_6 = 1 OR v2eltype_7 = 1; it should = 0 if all of those = 0)
+    tb = estimate_national_election(tb)
     # (L122-L141) Create indicators for multi-party head of state elections with imputed values between election-years
     tb = estimate_hos_indicators(tb)
     # (L141-L167) Create indicators for multi-party head of government elections with imputed values between election-years
@@ -176,6 +178,29 @@ def estimate_leg_indicators(tb: Table) -> Table:
     ## Forward fill indicators when there are regularly scheduled national elections on the legislature on course, as stipulated by election law or well-established precedent
     mask = tb["v2xlg_elecreg"] == 1
     tb.loc[mask, columns_new] = tb.groupby(["country"])[columns_new].ffill().loc[mask]
+    return tb
+
+
+def estimate_national_election(tb: Table) -> Table:
+    """Estimate an indicator for whether a country held a national election in a given year."""
+    columns = [
+        "v2eltype_0",
+        "v2eltype_1",
+        "v2eltype_4",
+        "v2eltype_5",
+        "v2eltype_6",
+        "v2eltype_7",
+    ]
+    mask_1 = tb[columns].sum(axis=1) >= 1
+    # mask_na = tb[columns].notna().all(axis=1)
+    # Create new column
+    colname = "held_national_election"
+    tb[colname] = 0
+    # tb[colname] = np.nan
+    tb.loc[mask_1, colname] = 1
+    # tb.loc[~mask_1 & mask_na, colname] = 0
+    # Copy metadata
+    tb[colname] = tb[colname].copy_metadata(tb["v2eltype_0"]).astype("Int64")
     return tb
 
 
