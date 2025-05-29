@@ -112,8 +112,6 @@ def run() -> None:
     ds_meadow.save()
 
 
-
 def normalize_percentages(col):
     # Assume anything <= 1 is a percentage (like 0.25 = 25%)
     return col.apply(lambda x: x * 100 if 0 <= x <= 1 else x)
-
