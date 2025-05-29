@@ -1146,7 +1146,7 @@ tables:
                 baseColorScheme: "Oranges"
                 binningStrategy: "manual"
                 customNumericMinValue: 1
-                customNumericValues: [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 1]
+                customNumericValues: [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.1]
             selectedEntityNames: *entity_names_inequality
 
       palma_ratio:
@@ -1378,7 +1378,7 @@ tables:
               colorScale:
                 baseColorScheme: "BuGn"
                 binningStrategy: "manual"
-                customNumericValues: [0, 1, 2, 5, 10, 20, 50, 1]
+                customNumericValues: [1, 2, 5, 10, 20, 50, 1]
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
@@ -1418,7 +1418,7 @@ tables:
               colorScale:
                 baseColorScheme: "Blues"
                 binningStrategy: "manual"
-                customNumericValues: [0, 1, 2, 5, 10, 20, 50, 1]
+                customNumericValues: [1, 2, 5, 10, 20, 50, 1]
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       avg:
