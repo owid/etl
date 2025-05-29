@@ -1,8 +1,4 @@
-"""Script to generate a quarterly analytics report for a data producer.
-
-TODO: This is work in progress. Clean up code and move to producer analytics (and/or consider creating appropriate tables in analytics or metabase).
-
-"""
+"""Script to generate a quarterly analytics report for a data producer."""
 
 from datetime import datetime
 from typing import Dict
@@ -95,7 +91,7 @@ def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Di
     run_sanity_checks(df_charts=df_charts, df_posts=df_posts, df_insights=df_insights)
 
     # Create a dictionary with all analytics.
-    analytics = {"charts": df_charts, "posts": df_posts, "insights": df_insights}
+    analytics = {"charts": df_charts, "posts": df_posts, "insights_in_quarter": df_insights}
 
     return analytics
 
@@ -143,22 +139,27 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
 
     # Create a dataframe of the top charts.
     df_top_charts = (
-        analytics["charts"].sort_values("views", ascending=False)[["url", "views"]].reset_index(drop=True).iloc[0:10]
+        analytics["charts"]
+        .sort_values("views", ascending=False)[["url", "views", "title"]]
+        .reset_index(drop=True)
+        .iloc[0:10]
     )
     # Create a dataframe of the top posts (articles, topic pages and DIs).
     df_top_posts = analytics["posts"].sort_values(["views"], ascending=False).reset_index(drop=True).iloc[0:10]
     # Create a dataframe of the top DIs (althought it will likely be the same as all DIs).
-    df_top_insights = analytics["insights"].sort_values(["views"], ascending=False).reset_index(drop=True).iloc[0:10]
+    df_top_insights = (
+        analytics["insights_in_quarter"].sort_values(["views"], ascending=False).reset_index(drop=True).iloc[0:10]
+    )
 
     # Create the required numeric inputs for the document.
     n_charts = len(analytics["charts"])
     n_articles = len(analytics["posts"])
-    n_insights = len(analytics["insights"])
+    n_insights = len(analytics["insights_in_quarter"])
     n_chart_views = analytics["charts"]["views"].sum()
     n_post_views = analytics["posts"]["views"].sum()
     # We have the average number of daily views for each chart. But we now want the macroaverage number of daily views.
     n_daily_chart_views = n_chart_views / analytics["charts"]["n_days"].max()
-    n_daily_article_views = n_post_views / analytics["posts"]["n_days"].max()
+    n_daily_post_views = n_post_views / analytics["posts"]["n_days"].max()
 
     # Humanize numbers.
     n_charts_humanized = humanize_number(n_charts)
@@ -166,7 +167,7 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
     n_chart_views_humanized = humanize_number(n_chart_views)
     n_daily_chart_views_humanized = humanize_number(n_daily_chart_views)
     n_post_views_humanized = humanize_number(n_post_views)
-    n_daily_post_views_humanized = humanize_number(n_daily_article_views)
+    n_daily_post_views_humanized = humanize_number(n_daily_post_views)
     n_insights_humanized = humanize_number(n_insights)
     max_date_humanized = datetime.strptime(f"{year}-{QUARTERS[quarter]['max_date']}", "%Y-%m-%d").strftime("%B %d, %Y")
     quarter_date_humanized = f"the {QUARTERS[quarter]['name']} quarter of {year}"
@@ -216,12 +217,12 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
         r"{{quarter}}": str(quarter),
         r"{{executive_summary_intro}}": executive_summary_intro,
         r"{{n_charts_humanized}}": n_charts_humanized,
-        r"{{n_articles_humanized}}": n_posts_humanized,
-        r"{{n_article_views_humanized}}": n_post_views_humanized,
+        r"{{n_posts_humanized}}": n_posts_humanized,
+        r"{{n_post_views_humanized}}": n_post_views_humanized,
         r"{{quarter_date_humanized}}": quarter_date_humanized,
         r"{{n_chart_views_humanized}}": n_chart_views_humanized,
         r"{{n_daily_chart_views_humanized}}": n_daily_chart_views_humanized,
-        r"{{n_daily_article_views_humanized}}": n_daily_post_views_humanized,
+        r"{{n_daily_post_views_humanized}}": n_daily_post_views_humanized,
     }
     google_doc.replace_text(mapping=replacements)
 
@@ -231,7 +232,7 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
     top_chart_url = df_top_charts.iloc[0]["url"] + ".png"
     google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
     insert_list_with_links_in_gdoc(google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
-    insert_list_with_links_in_gdoc(google_doc, df=df_top_posts, placeholder=r"{{top_articles_list}}")
+    insert_list_with_links_in_gdoc(google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")
     if not df_top_insights.empty:
         # Get the index of the position of the data_insights placeholder.
         insert_index = google_doc.find_marker_index(marker=r"{{data_insights}}")
@@ -275,8 +276,6 @@ def run(producer, quarter, year):
 
     ####################################################################################################################
     # Generate report.
-    # TODO: Handle plurals and cases where no DIs are published in the quarter. For now, manually edit the text.
-    # TODO: Number of views of articles and DIs appear as floats; make them integers.
     create_report(producer=producer, quarter=quarter, year=year, analytics=analytics)
 
 
