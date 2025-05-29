@@ -314,6 +314,46 @@ tables:
         description_short: Categorisation of women's political representation in parliament
         unit: ""
 
+      # Had female HOE ever
+      wom_hoe_vdem_cum: # wom_hoe_vdem_owid
+        title: Country had a woman chief executive at least once
+        description_short: |-
+          The variable denotes whether a country ever had a female chief executive of government in office as of December 31 of the given year.
+        description_processing: |-
+          To get the gender of the chief executive for a given year, we have used the gender of the most powerful chief: either Head of state or Head of government.
+
+          Used gender from HOS:
+            - If head of state is more powerful than head of government, and head of state is the head of the executive.
+            - If head of state is also head of government.
+            - If head of government is less powerful than head of state.
+
+          Used HOG if:
+            - If head of state is less powerful than head of government
+
+          We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+        unit: ""
+
+      # Had female democratically elected HOE ever
+      wom_hoe_vdem_cum_dem: # wom_hoe_vdem_owid
+        title: Country had a woman chief executive democratically elected at least once
+        description_short: |-
+          The variable denotes whether a country ever had a democratically elected female chief executive of government in office as of December 31 of the given year.
+        description_processing: |-
+          To get the gender of the chief executive for a given year, we have used the gender of the most powerful chief: either Head of state or Head of government.
+
+          Used gender from HOS:
+            - If head of state is more powerful than head of government, and head of state is the head of the executive.
+            - If head of state is also head of government.
+            - If head of government is less powerful than head of state.
+
+          Used HOG if:
+            - If head of state is less powerful than head of government
+
+          We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+
+          In addition, we used the V-Dem indicator `electmulpar_hoe_row_owid`, which is based on V-Dem indicator `v2elmulpar_osp_hoe`, to assess if the country goes through electoral processes to elect the chief executive.
+        unit: ""
+
       ## Other regime indicators
       regime_row_owid:
         title: Political regime
@@ -2179,6 +2219,26 @@ tables:
 
           Otherwise this variable is zero.
 
+      num_countries_wom_hoe_ever:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown female chief executive history
+          <%- elif category == "yes" %>
+          Number of countries that had a woman chief executive
+          <%- elif category == "no" %>
+          Number of countries that never had a woman chief executive
+          <%- endif -%>
+
+      num_countries_wom_hoe_ever_demelect:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown democratically elected female chief executive history
+          <%- elif category == "yes" %>
+          Number of countries that had a woman chief executive elected democratically
+          <%- elif category == "no" %>
+          Number of countries that never had a woman chief executive elected democratically
+          <%- endif -%>
+
   ##################################################################################################
   ##################################################################################################
   # TABLE: NUMBER OF PEOPLE LIVING IN COUNTRIES WITH X REGIME
@@ -2263,3 +2323,23 @@ tables:
           People living in countries that << category >> in the given year.
           <%- endif -%>
         description_processing: *country_natelect_processing
+
+      population_wom_hoe_ever:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown female chief executive history
+          <%- elif category == "yes" %>
+          People living in countries that had a woman chief executive
+          <%- elif category == "no" %>
+          People living in countries that never had a woman chief executive
+          <%- endif -%>
+
+      population_wom_hoe_ever_demelect:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown democratically elected female chief executive history
+          <%- elif category == "yes" %>
+          People living in countries that had a woman chief executive elected democratically
+          <%- elif category == "no" %>
+          People living in countries that never had a woman chief executive elected democratically
+          <%- endif -%>

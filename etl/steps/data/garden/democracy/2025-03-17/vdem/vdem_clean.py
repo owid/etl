@@ -12,6 +12,7 @@ from etl.data_helpers import geo
 
 
 def run(tb: Table, country_mapping_path) -> Table:
+    # %% Initial cleaning
     tb = cast(Table, tb)
     tb = initial_cleaning(tb)
 
@@ -69,6 +70,22 @@ def run(tb: Table, country_mapping_path) -> Table:
     # Estimate gender of HOG
     tb.loc[(tb["wom_hos_vdem"].notna()) & (tb["v2exhoshog"] == 1), "wom_hog_vdem"] = tb["wom_hos_vdem"]
     tb = tb.drop(columns=["v2exhoshog"])
+
+    # Estimate if a country ever had a female HOE
+    # wom_hoe_vdem
+    tb["wom_hoe_vdem_cum"] = tb.groupby("country")["wom_hoe_vdem"].ffill().cumsum().gt(0).astype("Int64")
+
+    # Estimate if a country ever had a female HOE democratically elected: electmulpar_hoe_row_owid AND wom_hoe_vdem_cum
+    tb["wom_hoe_vdem_cum_dem"] = np.where(
+        (tb["wom_hoe_vdem_cum"] == 1) & (tb["electmulpar_hoe_row_owid"] == 1),
+        1,  # Both conditions are 1
+        np.where(
+            (tb["wom_hoe_vdem_cum"] == 0) & (tb["electmulpar_hoe_row_owid"] == 0),
+            0,  # Both conditions are 0
+            np.nan,  # Otherwise (any other combination)
+        ),
+    )
+    tb["wom_hoe_vdem_cum_dem"] = tb["wom_hoe_vdem_cum_dem"].astype("Int64")
 
     return tb
 

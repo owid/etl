@@ -291,7 +291,7 @@ def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = add_regions_and_global_aggregates(tb_, ds_regions)
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 54, f"Unexpected number of columns {tb_.shape[1]}."
+    assert tb_.shape[1] == 59, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Wide to long format
     tb_ = from_wide_to_long(tb_)
@@ -444,7 +444,7 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
     )
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 55, f"Unexpected number of columns {tb_.shape[1]}."
+    assert tb_.shape[1] == 61, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Long format
     tb_ = from_wide_to_long(tb_)
@@ -461,6 +461,8 @@ def make_table_population_counts(tb: Table, ds_regions: Dataset, ds_population: 
             "num_countries_years_in_electdem": "population_years_in_electdem",
             "num_countries_years_in_libdem": "population_years_in_libdem",
             "num_countries_natelect": "population_natelect",
+            "num_countries_wom_hoe_ever": "population_wom_hoe_ever",
+            "num_countries_wom_hoe_ever_demelect": "population_wom_hoe_ever_demelect",
         }
     )
 
@@ -993,6 +995,26 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
                 "1": "held a national election",
             },
             "has_na": False,
+            "has_na_once_expanded": True,
+        },
+        {
+            "name": "wom_hoe_vdem_cum",
+            "name_new": "num_countries_wom_hoe_ever",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+            "has_na_once_expanded": True,
+        },
+        {
+            "name": "wom_hoe_vdem_cum_dem",
+            "name_new": "num_countries_wom_hoe_ever_demelect",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": True,
             "has_na_once_expanded": True,
         },
     ]

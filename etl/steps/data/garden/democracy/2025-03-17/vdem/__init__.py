@@ -56,6 +56,8 @@ INDICATORS_NO_ORIGINS = [
     "regime_amb_row_owid",
     "regime_redux_row_owid",
     "wom_hoe_vdem",
+    "wom_hoe_vdem_cum",
+    "wom_hoe_vdem_cum_dem",
     "regime_imputed",
     "num_years_in_electdem_consecutive",
     "num_years_in_libdem_consecutive",
