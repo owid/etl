@@ -88,7 +88,6 @@ sourceName = SOURCE_NAME_PIP
 dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 additional_description = ADDITIONAL_DESCRIPTION_PIP_COMPARISON
@@ -134,7 +133,6 @@ for survey in range(len(pip_tables)):
     df_tables_pip.loc[j, "type"] = "Numeric"
     df_tables_pip.loc[j, "colorScaleNumericBins"] = "0.25;0.3;0.35;0.4;0.45;0.5;0.55;0.6"
     df_tables_pip.loc[j, "colorScaleNumericMinValue"] = 1
-    df_tables_pip.loc[j, "colorScaleEqualSizeBins"] = "true"
     df_tables_pip.loc[j, "colorScaleScheme"] = "Oranges"
     df_tables_pip.loc[j, "tableSlug"] = pip_tables["table_name"][survey]
     j += 1
@@ -155,7 +153,6 @@ for survey in range(len(pip_tables)):
     df_tables_pip.loc[j, "type"] = "Numeric"
     df_tables_pip.loc[j, "colorScaleNumericBins"] = "20;25;30;35;40;45;50"
     df_tables_pip.loc[j, "colorScaleNumericMinValue"] = 100
-    df_tables_pip.loc[j, "colorScaleEqualSizeBins"] = "true"
     df_tables_pip.loc[j, "colorScaleScheme"] = "OrRd"
     df_tables_pip.loc[j, "tableSlug"] = pip_tables["table_name"][survey]
     j += 1
@@ -176,7 +173,6 @@ for survey in range(len(pip_tables)):
     df_tables_pip.loc[j, "type"] = "Numeric"
     df_tables_pip.loc[j, "colorScaleNumericBins"] = "15;20;25;30;35"
     df_tables_pip.loc[j, "colorScaleNumericMinValue"] = 100
-    df_tables_pip.loc[j, "colorScaleEqualSizeBins"] = "true"
     df_tables_pip.loc[j, "colorScaleScheme"] = "Blues"
     df_tables_pip.loc[j, "tableSlug"] = pip_tables["table_name"][survey]
     j += 1
@@ -197,7 +193,6 @@ for survey in range(len(pip_tables)):
     df_tables_pip.loc[j, "type"] = "Numeric"
     df_tables_pip.loc[j, "colorScaleNumericBins"] = "0.5;1;1.5;2;2.5;3;3.5;4;4.5;5;5.5"
     df_tables_pip.loc[j, "colorScaleNumericMinValue"] = 0
-    df_tables_pip.loc[j, "colorScaleEqualSizeBins"] = "true"
     df_tables_pip.loc[j, "colorScaleScheme"] = "YlOrBr"
     df_tables_pip.loc[j, "tableSlug"] = pip_tables["table_name"][survey]
     j += 1
@@ -220,7 +215,6 @@ for survey in range(len(pip_tables)):
     df_tables_pip.loc[j, "type"] = "Numeric"
     df_tables_pip.loc[j, "colorScaleNumericBins"] = "3;6;9;12;15;18;21;24;27"
     df_tables_pip.loc[j, "colorScaleNumericMinValue"] = 0
-    df_tables_pip.loc[j, "colorScaleEqualSizeBins"] = "true"
     df_tables_pip.loc[j, "colorScaleScheme"] = "YlOrBr"
     df_tables_pip.loc[j, "tableSlug"] = pip_tables["table_name"][survey]
     j += 1
@@ -277,7 +271,6 @@ for tab in range(len(wid_tables)):
         df_tables_wid.loc[j, "type"] = "Numeric"
         df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_gini"][wel]
         df_tables_wid.loc[j, "colorScaleNumericMinValue"] = 1
-        df_tables_wid.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables_wid.loc[j, "colorScaleScheme"] = "Oranges"
         j += 1
 
@@ -298,7 +291,6 @@ for tab in range(len(wid_tables)):
         df_tables_wid.loc[j, "type"] = "Numeric"
         df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_top10"][wel]
         df_tables_wid.loc[j, "colorScaleNumericMinValue"] = 100
-        df_tables_wid.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables_wid.loc[j, "colorScaleScheme"] = "OrRd"
         j += 1
 
@@ -319,7 +311,6 @@ for tab in range(len(wid_tables)):
         df_tables_wid.loc[j, "type"] = "Numeric"
         df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_top1"][wel]
         df_tables_wid.loc[j, "colorScaleNumericMinValue"] = 0
-        df_tables_wid.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables_wid.loc[j, "colorScaleScheme"] = "OrRd"
         j += 1
 
@@ -340,7 +331,6 @@ for tab in range(len(wid_tables)):
         df_tables_wid.loc[j, "type"] = "Numeric"
         df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_top01"][wel]
         df_tables_wid.loc[j, "colorScaleNumericMinValue"] = 0
-        df_tables_wid.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables_wid.loc[j, "colorScaleScheme"] = "OrRd"
         j += 1
 
@@ -361,7 +351,6 @@ for tab in range(len(wid_tables)):
         df_tables_wid.loc[j, "type"] = "Numeric"
         df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_bottom50"][wel]
         df_tables_wid.loc[j, "colorScaleNumericMinValue"] = 100
-        df_tables_wid.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables_wid.loc[j, "colorScaleScheme"] = "Blues"
         j += 1
 
@@ -380,7 +369,6 @@ for tab in range(len(wid_tables)):
         df_tables_wid.loc[j, "type"] = "Numeric"
         df_tables_wid.loc[j, "colorScaleNumericBins"] = wid_welfare["scale_palma_ratio"][wel]
         df_tables_wid.loc[j, "colorScaleNumericMinValue"] = 0
-        df_tables_wid.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables_wid.loc[j, "colorScaleScheme"] = "YlOrBr"
         j += 1
 

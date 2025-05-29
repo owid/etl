@@ -66,7 +66,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 yAxisMin = Y_AXIS_MIN
@@ -473,7 +472,6 @@ df_tables["dataPublishedBy"] = dataPublishedBy
 df_tables["sourceLink"] = sourceLink
 df_tables["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables["tolerance"] = tolerance
-df_tables["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 # Make tolerance integer (to not break the parameter in the platform)
 df_tables["tolerance"] = df_tables["tolerance"].astype("Int64")
