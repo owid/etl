@@ -210,9 +210,6 @@ def run() -> None:
     # Do the same for poverty_line
     tb["poverty_line"] = tb["poverty_line"].fillna("No poverty line")
 
-    # And for welfare_type
-    tb["welfare_type"] = tb["welfare_type"].fillna("Income and consumption")
-
     # Improve table format.
     tb = tb.format(
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile", "table", "survey_comparability"],
@@ -919,6 +916,9 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table]:
 
     # Also, rename welfare_type to "Income or consumption" for tb_no_spells_smooth
     tb_no_spells_smooth["welfare_type"] = "income or consumption"
+
+    # Fill missing values in welfare_type for tb_no_spells
+    tb_no_spells["welfare_type"] = tb_no_spells["welfare_type"].fillna("income or consumption")
 
     # Concatenate all these tables
     tb = pr.concat(
