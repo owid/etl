@@ -282,6 +282,7 @@ tables:
         description_processing: |-
           Indicates whether a democratic breakdown took place in a given year as signified by a change in the competitive_elections indicator from 1 in the previous year to 0 in the current year. 1=present, 0=absent.
         unit: ""
+        type: ordinal
 
       breakdown_type:
         title: Breakdown type
@@ -301,6 +302,7 @@ tables:
         description_processing: |-
           Breakdown_type: For all country-years with democratic transitions, we have coded the mode of transition based on a distinction between: 1 = implicit regression induced by incumbents, 2 = military coup, 3 = foreign occupation, 4 = self-coup (incumbents close down parliament unduly and take full political control), 5 = coup or civil conflict headed by opposition party/movement, 6 = coup headed by monarch. Country-years without democratic breakdowns are scored 0.
         unit: ""
+        type: ordinal
 
       democratic_transition:
         title: Democratic transition
@@ -313,6 +315,7 @@ tables:
         description_processing: |-
           Indicates whether a democratic transition took place in a given year as signified by a change in the competitive_elections indicator from 0 in the previous year to 1 in the current year. 1=present, 0=absent.
         unit: ""
+        type: ordinal
 
       transition_type:
         title: Transition type
@@ -331,6 +334,7 @@ tables:
         description_processing: |-
           Transition_type: For all country-years with democratic transitions, we have coded the mode of transition based on a distinction between: 1 = conversion (incumbent-led), 2 = cooperative (pact between incumbents and opposition/balanced influence), 3 = collapse (opposition-led), 4 = foreign supervision (imposition by foreign power based on intervention or highly asymmetrical – partial or full – decolonization), 5 = foreign liberalization (democracy reemerges after occupational power has lost war to foreign powers). Country-years without democratic transitions are scored 0.
         unit: ""
+        type: ordinal
 
   region_aggregates:
     variables:
