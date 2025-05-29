@@ -111,7 +111,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 tableSlug = "poverty_inequality"
 new_line = NEW_LINE
 
@@ -454,7 +453,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_LIS
 sourceLink = SOURCE_LINK_LIS
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 notes_title = NOTES_TITLE_LIS
@@ -862,7 +860,6 @@ df_tables_lis["dataPublishedBy"] = dataPublishedBy
 df_tables_lis["sourceLink"] = sourceLink
 df_tables_lis["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables_lis["tolerance"] = tolerance
-df_tables_lis["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 # Remove all the rows that have the "equivalized" value in the equivalized column
 df_tables_lis = df_tables_lis[df_tables_lis["equivalized"] != "equivalized"].reset_index(drop=True)

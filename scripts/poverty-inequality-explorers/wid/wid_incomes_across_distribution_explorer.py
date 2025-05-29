@@ -127,7 +127,6 @@ for tab in range(len(tables)):
         df_tables.loc[j, "shortUnit"] = "$"
         df_tables.loc[j, "type"] = "Numeric"
         df_tables.loc[j, "colorScaleNumericBins"] = welfare["scale_mean"][wel]
-        df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables.loc[j, "colorScaleScheme"] = "BuGn"
         j += 1
 
@@ -146,7 +145,6 @@ for tab in range(len(tables)):
         df_tables.loc[j, "shortUnit"] = "$"
         df_tables.loc[j, "type"] = "Numeric"
         # df_tables.loc[j, "colorScaleNumericBins"] = welfare["scale_median"][wel]
-        df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
         df_tables.loc[j, "colorScaleScheme"] = "Blues"
         j += 1
 
@@ -166,7 +164,6 @@ for tab in range(len(tables)):
             df_tables.loc[j, "shortUnit"] = "$"
             df_tables.loc[j, "type"] = "Numeric"
             # df_tables.loc[j, "colorScaleNumericBins"] = deciles9["scale_thr"][dec9]
-            df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
             df_tables.loc[j, "colorScaleScheme"] = "Purples"
             j += 1
 
@@ -186,7 +183,6 @@ for tab in range(len(tables)):
             df_tables.loc[j, "shortUnit"] = "$"
             df_tables.loc[j, "type"] = "Numeric"
             # df_tables.loc[j, "colorScaleNumericBins"] = deciles10["scale_avg"][dec10]
-            df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
             df_tables.loc[j, "colorScaleScheme"] = "Greens"
             j += 1
 
@@ -206,7 +202,6 @@ for tab in range(len(tables)):
             df_tables.loc[j, "type"] = "Numeric"
             df_tables.loc[j, "colorScaleNumericBins"] = deciles10[f"scale_share_{welfare['slug'][wel]}"][dec10]
             df_tables.loc[j, "colorScaleNumericMinValue"] = 100
-            df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
             df_tables.loc[j, "colorScaleScheme"] = "OrRd"
             j += 1
 
@@ -226,7 +221,6 @@ for tab in range(len(tables)):
             df_tables.loc[j, "shortUnit"] = "$"
             df_tables.loc[j, "type"] = "Numeric"
             # df_tables.loc[j, "colorScaleNumericBins"] = top_pct["scale_thr"][top]
-            df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
             df_tables.loc[j, "colorScaleScheme"] = "Purples"
             j += 1
 
@@ -246,7 +240,6 @@ for tab in range(len(tables)):
             df_tables.loc[j, "shortUnit"] = "$"
             df_tables.loc[j, "type"] = "Numeric"
             # df_tables.loc[j, "colorScaleNumericBins"] = top_pct["scale_avg"][top]
-            df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
             df_tables.loc[j, "colorScaleScheme"] = "Greens"
             j += 1
 
@@ -265,7 +258,6 @@ for tab in range(len(tables)):
             df_tables.loc[j, "shortUnit"] = "%"
             df_tables.loc[j, "type"] = "Numeric"
             df_tables.loc[j, "colorScaleNumericBins"] = top_pct[f"scale_share_{welfare['slug'][wel]}"][top]
-            df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
             df_tables.loc[j, "colorScaleScheme"] = "OrRd"
             j += 1
 
@@ -286,7 +278,6 @@ for tab in range(len(tables)):
             df_tables.loc[j, "shortUnit"] = "$"
             df_tables.loc[j, "type"] = "Numeric"
             df_tables.loc[j, "colorScaleNumericBins"] = income_aggregation[f"scale_{welfare['slug'][wel]}"][agg]
-            df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
             df_tables.loc[j, "colorScaleScheme"] = "BuGn"
             df_tables.loc[j, "transform"] = (
                 f"multiplyBy p0p100_avg_{welfare['slug'][wel]} {income_aggregation['multiplier'][agg]}"
@@ -308,7 +299,6 @@ for tab in range(len(tables)):
             df_tables.loc[j, "shortUnit"] = "$"
             df_tables.loc[j, "type"] = "Numeric"
             df_tables.loc[j, "colorScaleNumericBins"] = income_aggregation[f"scale_{welfare['slug'][wel]}"][agg]
-            df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
             df_tables.loc[j, "colorScaleScheme"] = "Blues"
             df_tables.loc[j, "transform"] = (
                 f"multiplyBy median_{welfare['slug'][wel]} {income_aggregation['multiplier'][agg]}"
@@ -335,7 +325,6 @@ for tab in range(len(tables)):
                 df_tables.loc[j, "colorScaleNumericBins"] = deciles9[
                     f"scale_thr_{welfare['slug'][wel]}_{income_aggregation['aggregation'][agg]}"
                 ][dec9]
-                df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
                 df_tables.loc[j, "colorScaleScheme"] = "Purples"
                 df_tables.loc[j, "transform"] = (
                     f"multiplyBy {deciles9['wid_notation'][dec9]}_thr_{welfare['slug'][wel]} {income_aggregation['multiplier'][agg]}"
@@ -362,7 +351,6 @@ for tab in range(len(tables)):
                 df_tables.loc[j, "colorScaleNumericBins"] = deciles10[
                     f"scale_avg_{welfare['slug'][wel]}_{income_aggregation['aggregation'][agg]}"
                 ][dec10]
-                df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
                 df_tables.loc[j, "colorScaleScheme"] = "Greens"
                 df_tables.loc[j, "transform"] = (
                     f"multiplyBy {deciles10['wid_notation'][dec10]}_avg_{welfare['slug'][wel]} {income_aggregation['multiplier'][agg]}"
@@ -389,7 +377,6 @@ for tab in range(len(tables)):
                 df_tables.loc[j, "colorScaleNumericBins"] = top_pct[
                     f"scale_thr_{welfare['slug'][wel]}_{income_aggregation['aggregation'][agg]}"
                 ][top]
-                df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
                 df_tables.loc[j, "colorScaleScheme"] = "Purples"
                 df_tables.loc[j, "transform"] = (
                     f"multiplyBy {top_pct['wid_notation'][top]}_thr_{welfare['slug'][wel]} {income_aggregation['multiplier'][agg]}"
@@ -416,7 +403,6 @@ for tab in range(len(tables)):
                 df_tables.loc[j, "colorScaleNumericBins"] = top_pct[
                     f"scale_avg_{welfare['slug'][wel]}_{income_aggregation['aggregation'][agg]}"
                 ][top]
-                df_tables.loc[j, "colorScaleEqualSizeBins"] = "true"
                 df_tables.loc[j, "colorScaleScheme"] = "Greens"
                 df_tables.loc[j, "transform"] = (
                     f"multiplyBy {top_pct['wid_notation'][top]}_avg_{welfare['slug'][wel]} {income_aggregation['multiplier'][agg]}"

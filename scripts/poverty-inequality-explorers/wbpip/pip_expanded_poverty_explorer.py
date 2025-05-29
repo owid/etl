@@ -59,7 +59,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 yAxisMin = Y_AXIS_MIN
@@ -412,7 +411,6 @@ df_tables["dataPublishedBy"] = dataPublishedBy
 df_tables["sourceLink"] = sourceLink
 df_tables["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables["tolerance"] = tolerance
-df_tables["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 # Make tolerance integer (to not break the parameter in the platform)
 df_tables["tolerance"] = df_tables["tolerance"].astype("Int64")
@@ -454,7 +452,6 @@ for i in range(len(df_tables)):
         df_spells.loc[j, "type"] = df_tables.type[i]
         df_spells.loc[j, "colorScaleNumericMinValue"] = df_tables.colorScaleNumericMinValue[i]
         df_spells.loc[j, "colorScaleNumericBins"] = df_tables.colorScaleNumericBins[i]
-        df_spells.loc[j, "colorScaleEqualSizeBins"] = df_tables.colorScaleEqualSizeBins[i]
         df_spells.loc[j, "colorScaleScheme"] = df_tables.colorScaleScheme[i]
         df_spells.loc[j, "survey_type"] = df_tables.survey_type[i]
         j += 1
@@ -473,7 +470,6 @@ for i in range(len(df_tables)):
         df_spells.loc[j, "type"] = df_tables.type[i]
         df_spells.loc[j, "colorScaleNumericMinValue"] = df_tables.colorScaleNumericMinValue[i]
         df_spells.loc[j, "colorScaleNumericBins"] = df_tables.colorScaleNumericBins[i]
-        df_spells.loc[j, "colorScaleEqualSizeBins"] = df_tables.colorScaleEqualSizeBins[i]
         df_spells.loc[j, "colorScaleScheme"] = df_tables.colorScaleScheme[i]
         df_spells.loc[j, "survey_type"] = df_tables.survey_type[i]
         j += 1
