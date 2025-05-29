@@ -27,9 +27,7 @@ def run() -> None:
     # Process data.
     #
     # Harmonize country names.
-    tb = geo.harmonize_countries(
-        df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
-    )
+    tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = clean_up_categories(tb)
     tb = calculate_united_kingdom(tb, ds_population)
