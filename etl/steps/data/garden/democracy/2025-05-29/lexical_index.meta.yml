@@ -4,7 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Democracy
-
+  aux:
+    polyarchy_fulldem: &polyarchy_fulldem_proc We have replaced the term "polyarchy" with "full democracy".
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -23,7 +24,7 @@ tables:
     variables:
       exelec_lied:
         title: Elections for chief executive
-        unit: ''
+        unit: ""
         description_short: |-
           The variable indicates whether some citizens directly or indirectly elect the chief executive. It considers political system which do not govern themselves — such as due to external interventions, occupations, or colonization — as not holding executive elections.
         description_from_producer: |-
@@ -33,7 +34,7 @@ tables:
 
       legelec_lied:
         title: Legislative elections
-        unit: ''
+        unit: ""
         description_short: |-
           The variable indicates whether some citizens elect a legislature which does issue some laws, but does not perform executive functions.
         description_from_producer: |-
@@ -43,7 +44,7 @@ tables:
 
       opposition_lied:
         title: Political opposition
-        unit: ''
+        unit: ""
         description_short: |-
           Indicates whether more than one party or non-party candidate are able to compete in elections for the legislature.
         description_from_producer: |-
@@ -53,7 +54,7 @@ tables:
 
       competition_lied:
         title: Competitive elections
-        unit: ''
+        unit: ""
         description_short: |-
           Whether the outcomes of elections are uncertain because their timing is not violated, voters are not systematically coerced, and election fraud is not consequential.
         description_key:
@@ -66,7 +67,7 @@ tables:
 
       poliberties_lied:
         title: Political liberties
-        unit: ''
+        unit: ""
         description_short: Indicates whether the freedoms of expression, assembly, and association are respected.
         description_from_producer: |-
           Freedom of expression, freedom of assembly, and freedom of association are respected. All groups, which are not openly anti-democratic, are allowed to organize freely and to assemble peacefully, and free speech, including critique of government and state-authorities, is tolerated and practiced freely by individuals and groups, including private as well as public media outlets. 1=present, 0=absent.
@@ -74,8 +75,8 @@ tables:
           Equivalent indicator: ``
 
       regime_redux_lied:
-        title:  Political regime (reduced)
-        unit: ''
+        title: Political regime (reduced)
+        unit: ""
         description_short: |-
           Identifies the political regime of a country. It distinguishes between non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), electoral democracies (score 6).
         description_from_producer: |-
@@ -99,9 +100,9 @@ tables:
 
       regime_lied:
         title: Political regime
-        unit: ''
+        unit: ""
         description_short: |-
-          Identifies the political regime of a country. It distinguishes between non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), electoral democracies (score 6), and polyarchies (score 7).
+          Identifies the political regime of a country. It distinguishes between non-electoral autocracies (score 0), one-party autocracies (score 1), multi-party autocracies without elected executive (score 2), multi-party autocracies (score 3), exclusive democracies (score 4), male democracies (score 5), electoral democracies (score 6), and full democracies (score 7).
         description_key:
           - In non-electoral autocracies, citizens do not have the right to elect the chief executive or the legislature.
           - In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only have one choice.
@@ -112,13 +113,15 @@ tables:
           - Electoral democracies are male democracies that also have comprehensive suffrage for women.
           - Polyarchies are electoral democracies that also protect the freedoms of expression, assembly, and association.
         description_from_producer: |-
-          This index, LIED+, add an extra layer to the upper-end of LIED in the form of political liberties. This is done to distinguish between electoral democracies and polyarchies. The meaning of the scores from 0 to 5 are identical to LIED, whereas 6 and 7 refer to the following configurations of indicator values:
+          This index, LIED+, add an extra layer to the upper-end of LIED in the form of political liberties. This is done to distinguish between electoral democracies and full democracies. The meaning of the scores from 0 to 5 are identical to LIED, whereas 6 and 7 refer to the following configurations of indicator values:
 
           6: legislative_elections=1 & multi-party_legislative_elections=1 & executive_elections=1 & competitive_elections=1 & male_suffrage=1 & female_suffrage=1 & political_liberties=0 (regime type: electoral democracies)
 
-          7: legislative_elections=1 & multi-party_legislative_elections=1 & executive_elections=1 & competitive_elections=1 & male_suffrage=1 & female_suffrage=1 & political_liberties=1 (regime type: polyarchies)
+          7: legislative_elections=1 & multi-party_legislative_elections=1 & executive_elections=1 & competitive_elections=1 & male_suffrage=1 & female_suffrage=1 & political_liberties=1 (regime type: full democracies)
 
           Equivalent indicator: `lexical_index_plus`
+
+          {definitions.aux.polyarchy_fulldem}
         description_processing: |-
           0: non-electoral autocracy
           1: one-party autocracy
@@ -127,11 +130,11 @@ tables:
           4: exclusive Democracy
           5: male democracy
           6: elecotral democracy
-          7: polyarchy
+          7: full democracy (polyarchy)
 
       male_suffrage_lied:
         title: Universal right to vote for men
-        unit: ''
+        unit: ""
         description_short: |-
           Indicates whether all men are allowed to vote in national elections. It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
         description_from_producer: |-
@@ -141,7 +144,7 @@ tables:
 
       female_suffrage_lied:
         title: Universal right to vote for women
-        unit: ''
+        unit: ""
         description_short: |-
           Indicates whether all women are allowed to vote in national elections. It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
         description_from_producer: |-
@@ -151,7 +154,7 @@ tables:
 
       suffrage_lied:
         title: Universal suffrage
-        unit: ''
+        unit: ""
         description_short: |-
           Indicates whether virtually all men and women that are citizens are allowed to vote in national elections (score 2), whether it is only men (score 1), or there is no universal rights to vote for either men or women (score 0). It neither considers informal restrictions nor legal restrictions based on age, criminal conviction, disability, and local residency.
         description_processing: |-
@@ -159,9 +162,9 @@ tables:
 
       democracy_lied:
         title: "Electoral democracy"
-        unit: ''
+        unit: ""
         description_short: |-
-          The variable identifies the political regime of a country using the reduced Lexical Index of Electoral Democracy. It distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, and electoral democracies (including polyarchies).
+          The variable identifies the political regime of a country using the reduced Lexical Index of Electoral Democracy. It distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, and electoral democracies (including full democracies or polyarchies).
         description_key:
           - In non-electoral autocracies, citizens do not have the right to elect the chief executive or the legislature.
           - In one-party autocracies, some citizens have the right to choose the chief executive or the legislature, but only have one choice.
@@ -172,46 +175,109 @@ tables:
           - Electoral democracies are male democracies that also have comprehensive suffrage for women.
 
       age_electdem_lied:
-        title: 'Age of electoral democracy'
-        unit: ''
+        title: "Age of electoral democracy"
+        unit: ""
         description_short: |-
           Number of consecutive years in electoral democracy.
         description_key: &key_electdem
           - Electoral democracies are understood here as political systems in which citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections.
 
       group_age_electdem_lied:
-        title: 'Age of electoral democracy (category)'
-        unit: ''
+        title: "Age of electoral democracy (category)"
+        unit: ""
         description_short: |-
           The variable distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, electoral democracies aged 1-18 years, 19-30 years, 31-60 years, 61-90 years, and 91+ years in electoral democracy.
         description_key: *key_electdem
 
       experience_electdem_lied:
-        title: 'Experience with electoral democracy'
-        unit: ''
+        title: "Experience with electoral democracy"
+        unit: ""
         description_short: |-
           Number of total years in electoral democracy. It sums all periods of electoral democracy.
         description_key: *key_electdem
 
       age_polyarchy_lied:
-        title: 'Age of polyarchy'
-        unit: ''
-        description_short: Number of consecutive years in a polyarchy.
+        title: "Age of full democracy"
+        unit: ""
+        description_short: Number of consecutive years in a full democracy.
         description_key: &key_poly
-          - In polyarchies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
+          - In full democracies, citizens have the right to choose the chief executive and the legislature in multi-party, uncertain elections, and enjoy freedoms of expression, assembly, and association.
+        description_processing: *polyarchy_fulldem_proc
 
       group_age_polyarchy_lied:
-        title: 'Age of polyarchy (category)'
-        unit: ''
+        title: "Age of full democracy (category)"
+        unit: ""
         description_short: |-
-          The variable distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, electoral democracies, polyarchies aged 1-18 years, 19-30 years, 31-60 years, 61-90 years, and 91+ years in a polyarchy.
+          The variable distinguishes between non-electoral autocracies, one-party autocracies, multi-party autocracies without elected executive, multi-party autocracies, exclusive democracies, male democracies, electoral democracies, full democracies aged 1-18 years, 19-30 years, 31-60 years, 61-90 years, and 91+ years in a full democracy.
         description_key: *key_poly
+        description_processing: *polyarchy_fulldem_proc
 
       experience_polyarchy_lied:
-        title: 'Experience with polyarchy'
-        unit: ''
-        description_short: Number of total years in a polyarchy. It sums all periods of polyarchy.
+        title: "Experience with full democracy"
+        unit: ""
+        description_short: Number of total years in a full democracy. It sums all periods of full democracy.
         description_key: *key_poly
+
+      turnover_event:
+        title: Turnover event
+        description_short: |-
+          Binary flag set to 1 in a country-year when partisan control of government alternates to an opposition party/coalition/candidate as a result of an election.
+        description_key:
+          - Captures an *event*, not a spell; recorded only in the year the alternation occurs.
+          - Requires multi-party legislative elections **and** direct or indirect executive elections to be on track.
+          - "Values are binary: 1 = turnover occurred, 0 = no turnover."
+        description_from_producer: |-
+          Indicates whether partisan control over government power alternated from an elected chief executive to another party/coalition/candidate representing the opposition as a consequence of a multi-party election in a particular country-year. Multi-party legislative and (direct or indirect) executive elections are considered necessary conditions for a genuine turnover. 1=present, 0=absent.
+        unit: ""
+
+      turnover_period:
+        title: Turnover period
+        description_short: |-
+          Flags every year that forms part of the spell beginning with the *first* electoral turnover event and ending when the multi-party electoral regime is interrupted.
+        description_key:
+          - "A *period* indicator: once triggered, remains 1 until democracy is interrupted or a new spell starts."
+          - Interruption defined as loss of either executive elections or multi-party legislative elections.
+          - Each subsequent turnover after an interruption starts a new turnover_period.
+          - "Values are binary: 1 = year lies within an ongoing turnover spell, 0 = otherwise."
+        description_processing: |-
+          Indicates whether a particular country-year is part of a period between an initial electoral government alternation (as indicated by a turnover event) in a multi-party electoral regime and an interruption of the same multi-party electoral regime (as indicated by a score of 0 on executive elections or multi-party_legislative_elections). If another turnover event happens later in the same polity, a new turnover period begins. 1=present, 0=absent.
+        unit: ""
+
+      two_turnover_period:
+        title: Two-turnover period
+        description_short: |-
+          Flags every year in the spell that starts with the *second* electoral turnover event and continues until the multi-party electoral regime is interrupted.
+        description_key:
+          - Implements the “two-turnover” criterion of democratic consolidation.
+          - Enters 1 after the second turnover within the same uninterrupted regime; resets if democracy is interrupted.
+          - "Values are binary: 1 = year lies within a two-turnover spell, 0 = otherwise."
+        description_processing: |-
+          Indicates whether a particular country-year is part of a period between a second electoral government alternation (as indicated by a turnover event, see below) in a multi-party electoral regime and an interruption of the same multi-party electoral regime (as indicated by a score of 0 on executive elections or multi-party_legislative_elections, see above). If two turnover events happens later in the same polity under a new multi_party electoral regime, a new two-turnover period begins. 1=present, 0=absent.
+        unit: "binary (0 / 1)"
+
+      democratic_breakdown:
+        title: Democratic breakdown
+        description_short: |-
+          Binary flag that equals 1 in the year a democratic regime collapses—i.e. when competitive elections switch from present to absent.
+        description_key:
+          - Detects transition **from** competitive (1) **to** non-competitive (0) elections between consecutive years.
+          - Captures the *moment* of breakdown; subsequent years revert to 0 unless democracy is later restored and breaks down again.
+          - "Values are binary: 1 = breakdown occurred, 0 = no breakdown."
+        description_processing: |-
+          Indicates whether a democratic breakdown took place in a given year as signified by a change in the competitive_elections indicator from 1 in the previous year to 0 in the current year. 1=present, 0=absent.
+        unit: ""
+
+      democratic_transition:
+        title: Democratic transition
+        description_short: |-
+          Binary flag that equals 1 in the year a regime becomes democratic—i.e. when competitive elections switch from absent to present.
+        description_key:
+          - Detects transition **from** non-competitive (0) **to** competitive (1) elections between consecutive years.
+          - Captures the *moment* of transition; following years revert to 0 unless another transition occurs.
+          - "Values are binary: 1 = transition occurred, 0 = no transition."
+        description_processing: |-
+          Indicates whether a democratic transition took place in a given year as signified by a change in the competitive_elections indicator from 0 in the previous year to 1 in the current year. 1=present, 0=absent.
+        unit: ""
 
   region_aggregates:
     variables:
@@ -219,6 +285,8 @@ tables:
         title: |-
           <%- if category == '-1' -%>
           Number of countries with unknown regime (democracy/autocracy)
+          <%- elif category == 'polyarchy' -%>
+          Number of full democracies
           <%- else -%>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <%- endif -%>
@@ -237,18 +305,21 @@ tables:
       num_group_age_polyarchy_lied:
         title: |-
           <%- if 'years' in category -%>
-          Number of polyarchies aged << category >>
+          Number of full democracies aged << category >>
           <%- elif category == '-1' -%>
-          Number of countries with unknown regime (age groups polyarchy)
+          Number of countries with unknown regime (age groups full democracy)
           <%- else -%>
-          Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups polyarchy)
+          Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >> (age groups full democracy)
           <%- endif -%>
         # description_short:
         unit: "countries"
+        description_processing: *polyarchy_fulldem_proc
       num_regime_lied:
         title: |-
           <%- if category == '-1' -%>
           Number of countries with unknown regime
+          <%- elif category == 'polyarchy' -%>
+          Number of full democracies
           <%- else -%>
           Number of << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <%- endif -%>
@@ -268,6 +339,8 @@ tables:
         title: |-
           <%- if category == '-1' -%>
           People living in countries with unknown regime (autocracy/democracy)
+          <%- elif category == 'polyarchy' -%>
+          People living in full democracies
           <%- else -%>
           People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <%- endif -%>
@@ -275,7 +348,9 @@ tables:
         unit: "people"
       pop_group_age_electdem_lied:
         title: |-
-          <%- if 'years' in category -%>
+          <%- if category == '-1' -%>
+          People living in countries with unknown regime (age groups electoral)
+          <%- elif 'years' in category -%>
           People living in electoral democracies aged << category >>
           <%- else -%>
           People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>  (age groups electoral)
@@ -284,10 +359,12 @@ tables:
         unit: "people"
       pop_group_age_polyarchy_lied:
         title: |-
-          <%- if 'years' in category -%>
-          People living in polyarchies aged << category >>
+          <%- if category == '-1' -%>
+          People living in countries with unknown regime (age groups full democracy)
+          <%- elif 'years' in category -%>
+          People living in full democracies aged << category >>
           <%- else -%>
-          People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>  (age groups polyarchy)
+          People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>  (age groups full democracy)
           <%- endif -%>
         # description_short:
         unit: "people"
@@ -295,6 +372,8 @@ tables:
         title: |-
           <%- if category == '-1' -%>
           People living in countries with unknown regime
+          <%- elif category == 'polyarchy' -%>
+          People living in full democracies
           <%- else -%>
           People living in << category.replace('_', ' ').replace('cracy', 'cracies').replace('archy', 'archies') >>
           <%- endif -%>

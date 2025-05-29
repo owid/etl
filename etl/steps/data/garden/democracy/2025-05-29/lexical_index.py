@@ -193,6 +193,14 @@ def preprocess(tb: Table) -> Table:
             "male_suffrage_lied",
             "female_suffrage_lied",
             "poliberties_lied",
+            # Turnover indicators
+            "turnover_event",
+            "turnover_period",
+            "two_turnover_period",
+            # Democratic transition
+            "democratic_transition",
+            # DEmocratic breakdown
+            "democratic_breakdown",
         ],
     ]
 
