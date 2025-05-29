@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import pandas as pd
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
@@ -41,6 +43,14 @@ def run() -> None:
         }
     )
     tb = tb.format(["country", "year", "gender", "cancer"])
+
+    ####################################################################################################################
+    # Fix indicators with mixed types.
+    # There are rows with "-".
+    for column in ["mortality__asr", "net_survival"]:
+        tb[column] = pd.to_numeric(tb[column], errors="coerce")
+    assert all(pd.api.types.is_numeric_dtype(tb[column]) for column in tb.columns)
+    ####################################################################################################################
 
     #
     # Save outputs.
