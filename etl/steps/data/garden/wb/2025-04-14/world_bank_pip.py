@@ -210,6 +210,9 @@ def run() -> None:
     # Do the same for poverty_line
     tb["poverty_line"] = tb["poverty_line"].fillna("No poverty line")
 
+    # And for welfare_type
+    tb["welfare_type"] = tb["welfare_type"].fillna("Income and consumption")
+
     # Improve table format.
     tb = tb.format(
         ["country", "year", "ppp_version", "poverty_line", "welfare_type", "decile", "table", "survey_comparability"],
