@@ -22,9 +22,9 @@ definitions:
     <%- endif %>
   sex: |-
     <% if sex == "Total" %>
-    <%- elif sex == "Male" -%>
+    <%- elif sex == "Male" %>
     of male victims
-    <%- elif sex == "Female" -%>
+    <%- elif sex == "Female" %>
     of female victims
     <% endif %>
   age: |-
