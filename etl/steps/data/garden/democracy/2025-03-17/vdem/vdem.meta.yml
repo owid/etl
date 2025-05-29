@@ -2241,6 +2241,33 @@ tables:
 
   ##################################################################################################
   ##################################################################################################
+  # TABLE: SHARE OF COUNTRIES WITH X
+  vdem_share_countries:
+    common:
+      unit: "%"
+    variables:
+      share_countries_wom_hoe_ever:
+        title: |-
+          <%- if category == '-1' -%>
+          Share of countries with unknown female chief executive history
+          <%- elif category == "yes" %>
+          Share of countries that had a woman chief executive
+          <%- elif category == "no" %>
+          Share of countries that never had a woman chief executive
+          <%- endif -%>
+
+      share_countries_wom_hoe_ever_demelect:
+        title: |-
+          <%- if category == '-1' -%>
+          Share of countries with unknown democratically elected female chief executive history
+          <%- elif category == "yes" %>
+          Share of countries that had a woman chief executive elected democratically
+          <%- elif category == "no" %>
+          Share of countries that never had a woman chief executive elected democratically
+          <%- endif -%>
+
+  ##################################################################################################
+  ##################################################################################################
   # TABLE: NUMBER OF PEOPLE LIVING IN COUNTRIES WITH X REGIME
   vdem_population:
     common:

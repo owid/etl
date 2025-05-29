@@ -73,18 +73,29 @@ def run(tb: Table, country_mapping_path) -> Table:
 
     # Estimate if a country ever had a female HOE
     # wom_hoe_vdem
-    tb["wom_hoe_vdem_cum"] = tb.groupby("country")["wom_hoe_vdem"].ffill().cumsum().gt(0).astype("Int64")
+    tb["wom_hoe_vdem_cum"] = tb.groupby("country")["wom_hoe_vdem"].transform(
+        lambda x: x.ffill().cumsum().gt(0).astype("Int64")
+    )
+
+    # Handle the case where we've only seen NAs and 0s
+    mask_only_na_and_zeros = tb.groupby("country")["wom_hoe_vdem"].transform(
+        lambda x: x.ffill().cumsum() == 0
+    ) & tb.groupby("country")["wom_hoe_vdem"].transform(lambda x: x.isna().any())
+
+    # Set to NA where we've only seen NAs and zeros
+    tb.loc[mask_only_na_and_zeros, "wom_hoe_vdem_cum"] = np.nan
 
     # Estimate if a country ever had a female HOE democratically elected: electmulpar_hoe_row_owid AND wom_hoe_vdem_cum
-    tb["wom_hoe_vdem_cum_dem"] = np.where(
-        (tb["wom_hoe_vdem_cum"] == 1) & (tb["electmulpar_hoe_row_owid"] == 1),
-        1,  # Both conditions are 1
-        np.where(
-            (tb["wom_hoe_vdem_cum"] == 0) & (tb["electmulpar_hoe_row_owid"] == 0),
-            0,  # Both conditions are 0
-            np.nan,  # Otherwise (any other combination)
-        ),
-    )
+    # Create masks for the conditions
+    mask_both_1 = (tb["wom_hoe_vdem_cum"] == 1) & (tb["electmulpar_hoe_row_owid"] == 1)
+    mask_both_0 = (tb["wom_hoe_vdem_cum"] == 0) & (tb["electmulpar_hoe_row_owid"] == 0)
+
+    # Initialize with NaN
+    tb["wom_hoe_vdem_cum_dem"] = np.nan
+
+    # Set values based on masks
+    tb.loc[mask_both_1, "wom_hoe_vdem_cum_dem"] = 1
+    tb.loc[mask_both_0, "wom_hoe_vdem_cum_dem"] = 0
     tb["wom_hoe_vdem_cum_dem"] = tb["wom_hoe_vdem_cum_dem"].astype("Int64")
 
     return tb

@@ -291,7 +291,7 @@ def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
     tb_ = add_regions_and_global_aggregates(tb_, ds_regions)
 
     # Sanity check on output shape
-    assert tb_.shape[1] == 59, f"Unexpected number of columns {tb_.shape[1]}."
+    assert tb_.shape[1] == 60, f"Unexpected number of columns {tb_.shape[1]}."
 
     # Wide to long format
     tb_ = from_wide_to_long(tb_)
@@ -1004,7 +1004,7 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
                 "0": "no",
                 "1": "yes",
             },
-            "has_na": False,
+            "has_na": True,
             "has_na_once_expanded": True,
         },
         {

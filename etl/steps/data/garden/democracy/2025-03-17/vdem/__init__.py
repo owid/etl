@@ -115,6 +115,30 @@ def run() -> None:
         tb_population_counts,
     ) = aggregate.run(tb, ds_regions, ds_population)
 
+    # %% PART 4B: Share of population
+    paths.log.info("4B/ Share of countries...")
+    columns_rename = {
+        "num_countries_wom_hoe_ever": "share_countries_wom_hoe_ever",
+        "num_countries_wom_hoe_ever_demelect": "share_countries_wom_hoe_ever_demelect",
+    }
+    columns = list(columns_rename.keys())
+    tb_countries_share = (
+        tb_countries_counts[["country", "year", "category"] + columns]
+        .copy()
+        .dropna(how="all", subset=columns)
+        .rename(columns=columns_rename)
+    )
+    # Add a column with the total count of countries per year-country
+    tb_countries_share["total_countries"] = tb_countries_share.groupby(["country", "year"], as_index=False)[
+        "share_countries_wom_hoe_ever"
+    ].transform("sum")
+
+    assert tb_countries_share["total_countries"].notna().all(), "NA detected!"
+    tb_countries_share["share_countries_wom_hoe_ever"] /= tb_countries_share["total_countries"] * 0.01
+    tb_countries_share["share_countries_wom_hoe_ever_demelect"] /= tb_countries_share["total_countries"] * 0.01
+
+    tb_countries_share = tb_countries_share.drop(columns=["total_countries"])
+
     # %% PART 5: Format and prepare tables
     paths.log.info("5/ Formatting tables...")
     tb_meta = tb.loc[:, ["year", "country", "regime_imputed", "regime_imputed_country", "histname"]]
@@ -137,6 +161,9 @@ def run() -> None:
     tb_countries_counts = tb_countries_counts.format(
         keys=["country", "year", "category"], short_name="vdem_num_countries"
     )
+    tb_countries_share = tb_countries_share.format(
+        keys=["country", "year", "category"], short_name="vdem_share_countries"
+    )
     tb_population_counts = tb_population_counts.format(
         keys=["year", "country", "category"], short_name="vdem_population"
     )
@@ -154,6 +181,8 @@ def run() -> None:
         tb_multi_with_regions,
         # Number of countries with X properties
         tb_countries_counts,
+        # Share of countries with X properties
+        tb_countries_share,
         # Number of people living in countries with X property
         tb_population_counts,
     ]
