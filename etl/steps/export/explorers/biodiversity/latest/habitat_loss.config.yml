@@ -13,7 +13,6 @@ definitions:
     colorScaleInvert: true
     colorScaleScheme: YlOrRd
     colorScaleNumericBins: -15,;-10,;-5,;0,;5,
-    colorScaleEqualSizeBins: true
     colorScaleNumericMinValue: -20
 
   display_cropland: &display_cropland
@@ -23,7 +22,6 @@ definitions:
     colorScaleInvert: true
     colorScaleScheme: RdYlBu
     colorScaleNumericBins: -100,,;-75,,;-50,,;-25,,;0,,;25,,;50,,;75,,;100,,;250
-    colorScaleEqualSizeBins: true
     colorScaleNumericMinValue: -250
 
 config:
