@@ -2,8 +2,6 @@
 definitions:
   common:
     processing_level: minor
-    description_key:
-      - Regional aggregation of the World Bank do not include high-income countries.
     unit: "%"
     short_unit: "%"
     display:
