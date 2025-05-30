@@ -38,7 +38,7 @@ def run() -> None:
     tb = combine_countries(
         tb,
         "Sub-Saharan Africa (WB)",
-        "Sub-Saharan Africa (WB) (excluding high income)",
+        "Sub-Saharan Africa (excluding high income) (WB)",
         new_country_name="Sub-Saharan Africa (WB)",
     )
 
