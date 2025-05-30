@@ -161,7 +161,7 @@ def combine_historical_literacy_expenditure(tb: Table, tb_literacy: Table, tb_ex
         on=["year", "country"],
         how="outer",
     )
-    # Create a new column for combined historical and recent estimates for the share of population that are illterate
+    # Create a new column for combined historical and recent estimates for the share of population that are illiterate
     tb["combined_illiterate"] = 100 - tb["combined_literate"]
     tb = tb.format(["country", "year"])
 
