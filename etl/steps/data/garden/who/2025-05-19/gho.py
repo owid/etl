@@ -193,12 +193,20 @@ def add_region_source_suffix(tb: Table) -> Table:
                 continue  # No suffix for countries and global
             case "FAOREGION":
                 suffix = "FAO"
-            case "REGION":
+            case "REGION" | "WHOINCOMEREGION":
                 suffix = "WHO"
             case "UNREGION":
                 suffix = "UN"
-            case "WORLDBANKINCOMEGROUP":
+            case "WORLDBANKINCOMEGROUP" | "WORLDBANKREGION":
                 suffix = "WB"
+            case "UNSDGREGION":
+                suffix = "UN SDG"
+            case "UNICEFREGION":
+                suffix = "UNICEF"
+            case "MGHEREG":
+                suffix = "MGH"
+            case "GBDREGION":
+                suffix = "GBD"
             case _:
                 raise ValueError(f"Unknown region source: {region_source}")
 

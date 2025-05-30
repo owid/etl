@@ -8,7 +8,7 @@ indicator in https://apps.who.int/gho/athena/api/GHO?format=json.
 
 Then run the following ETL command to process it
 ```
-SUBSET=LIFE_0000000030 etl run who/2024-01-03/gho --grapher
+SUBSET=AIR_11 etl run who/2025-05-19/gho --grapher
 ```
 This will upsert the indicator to MySQL and don't delete other indicators that are already in MySQL,
 making it useful for adding new / updating indicators.
