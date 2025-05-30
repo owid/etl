@@ -592,7 +592,7 @@ tables:
 
       pop_breakdown_type:
         title: |-
-          People living in conutries with
+          People living in countries with
           <%- if category == '0' %>
            no breakdown
           <%- elif category == '-1' %>
