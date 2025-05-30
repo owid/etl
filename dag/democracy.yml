@@ -39,15 +39,15 @@ steps:
   data://grapher/democracy/2025-05-05/ert:
     - data://garden/democracy/2025-05-05/ert
 
-  # Lexical Index (2023)
-  data://meadow/democracy/2024-05-09/lexical_index:
-    - snapshot://democracy/2024-05-09/lexical_index.xlsx
-  data://garden/democracy/2024-03-07/lexical_index:
-    - data://meadow/democracy/2024-05-09/lexical_index
+  # Lexical Index (2024)
+  data://meadow/democracy/2025-05-29/lexical_index:
+    - snapshot://democracy/2025-05-29/lexical_index.xlsx
+  data://garden/democracy/2025-05-29/lexical_index:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/democracy/2025-05-29/lexical_index
     - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/democracy/2024-05-09/lexical_index:
-    - data://garden/democracy/2024-03-07/lexical_index
+  data://grapher/democracy/2025-05-29/lexical_index:
+    - data://garden/democracy/2025-05-29/lexical_index
 
   # Polity (2020)
   data://meadow/democracy/2024-05-13/polity:
