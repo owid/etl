@@ -269,7 +269,7 @@ tables:
           - "Values are binary: 1 = year lies within a two-turnover spell, 0 = otherwise."
         description_processing: |-
           Indicates whether a particular country-year is part of a period between a second electoral government alternation (as indicated by a turnover event, see below) in a multi-party electoral regime and an interruption of the same multi-party electoral regime (as indicated by a score of 0 on executive elections or multi-party_legislative_elections, see above). If two turnover events happens later in the same polity under a new multi_party electoral regime, a new two-turnover period begins. 1=present, 0=absent.
-        unit: "binary (0 / 1)"
+        unit: ""
 
       democratic_breakdown:
         title: Democratic breakdown
@@ -282,7 +282,6 @@ tables:
         description_processing: |-
           Indicates whether a democratic breakdown took place in a given year as signified by a change in the competitive_elections indicator from 1 in the previous year to 0 in the current year. 1=present, 0=absent.
         unit: ""
-        type: ordinal
 
       breakdown_type:
         title: Breakdown type
@@ -297,12 +296,11 @@ tables:
             3 = foreign occupation
             4 = self-coup (incumbents shutter parliament & seize full control)
             5 = opposition-led coup or civil conflict
-            6 = monarch-led coup.
+            6 = monarch-led coup
           - Distinguishes the mechanism of breakdown for comparative analyses of autocratization.
         description_processing: |-
           Breakdown_type: For all country-years with democratic transitions, we have coded the mode of transition based on a distinction between: 1 = implicit regression induced by incumbents, 2 = military coup, 3 = foreign occupation, 4 = self-coup (incumbents close down parliament unduly and take full political control), 5 = coup or civil conflict headed by opposition party/movement, 6 = coup headed by monarch. Country-years without democratic breakdowns are scored 0.
         unit: ""
-        type: ordinal
 
       democratic_transition:
         title: Democratic transition
@@ -315,7 +313,6 @@ tables:
         description_processing: |-
           Indicates whether a democratic transition took place in a given year as signified by a change in the competitive_elections indicator from 0 in the previous year to 1 in the current year. 1=present, 0=absent.
         unit: ""
-        type: ordinal
 
       transition_type:
         title: Transition type
@@ -334,7 +331,6 @@ tables:
         description_processing: |-
           Transition_type: For all country-years with democratic transitions, we have coded the mode of transition based on a distinction between: 1 = conversion (incumbent-led), 2 = cooperative (pact between incumbents and opposition/balanced influence), 3 = collapse (opposition-led), 4 = foreign supervision (imposition by foreign power based on intervention or highly asymmetrical – partial or full – decolonization), 5 = foreign liberalization (democracy reemerges after occupational power has lost war to foreign powers). Country-years without democratic transitions are scored 0.
         unit: ""
-        type: ordinal
 
   region_aggregates:
     variables:
@@ -429,42 +425,50 @@ tables:
 
       num_transition_type:
         title: |-
-          <%- if category == '0' -%>
-          Number of countries with no transition
-          <%- elif category == "1" -%>
-          Number of countries with conversion (incumbent-led) transition
-          <%- elif category == "2" -%>
-          Number of countries with cooperative (pact between incumbents and opposition/balanced influence) transition
-          <%- elif category == "3" -%>
-          Number of countries with collapse (opposition-led) transition
-          <%- elif category == "4" -%>
-          Number of countries with foreign supervision transition
-          <%- elif category == "5" -%>
-          Number of countries with foreign liberalization transition
-          <%- else -%>
-          Number of countries with unknown transition type
+          Number of countries with
+          <%- if category == '0' %>
+           no transition
+          <%- elif category == '-1' %>
+           unknown transition type
+          <%- else %>
+           transition type:
+          <%- if category == "1" %>
+           conversion (incumbent-led)
+          <%- elif category == "2" %>
+           cooperative (pact between incumbents and opposition/balanced influence)
+          <%- elif category == "3" %>
+           collapse (opposition-led)
+          <%- elif category == "4" %>
+           foreign supervision
+          <%- elif category == "5" %>
+           foreign liberalization
+          <%- endif -%>
           <%- endif -%>
         # description_short:
         unit: "people"
 
       num_breakdown_type:
         title: |-
-          <%- if category == '0' -%>
-          Number of countries with no breakdown
-          <%- elif category == "1" -%>
-          Number of countries with implicit regression induced by incumbents
-          <%- elif category == "2" -%>
-          Number of countries with military coup
-          <%- elif category == "3" -%>
-          Number of countries with foreign occupation
-          <%- elif category == "4" -%>
-          Number of countries with self-coup
-          <%- elif category == "5" -%>
-          Number of countries with coup or civil conflict headed by opposition party/movement
-          <%- elif category == "6" -%>
-          Number of countries with coup headed by monarch
-          <%- else -%>
-          Number of countries with unknown breakdown type
+          Number of countries with
+          <%- if category == '0' %>
+           no breakdown
+          <%- elif category == '-1' %>
+           unknown breakdown type
+          <%- else %>
+           breakdown type:
+          <%- if category == "1" %>
+           implicit regression induced by incumbents
+          <%- elif category == "2" %>
+           military coup
+          <%- elif category == "3" %>
+           foreign occupation
+          <%- elif category == "4" %>
+           self-coup
+          <%- elif category == "5" %>
+           coup or civil conflict headed by opposition party/movement
+          <%- elif category == "6" %>
+           coup headed by monarch
+          <%- endif -%>
           <%- endif -%>
 
         # description_short:
@@ -563,42 +567,51 @@ tables:
 
       pop_transition_type:
         title: |-
-          <%- if category == '0' -%>
-          People living in countries with no transition
-          <%- elif category == "1" -%>
-          People living in countries with conversion (incumbent-led) transition
-          <%- elif category == "2" -%>
-          People living in countries with cooperative (pact between incumbents and opposition/balanced influence) transition
-          <%- elif category == "3" -%>
-          People living in countries with collapse (opposition-led) transition
-          <%- elif category == "4" -%>
-          People living in countries with foreign supervision transition
-          <%- elif category == "5" -%>
-          People living in countries with foreign liberalization transition
-          <%- else -%>
-          People living in countries with unknown transition type
+          People living in countries with
+          <%- if category == '0' %>
+           no transition
+          <%- elif category == '-1' %>
+           unknown transition type
+          <%- else %>
+           transition type:
+          <%- if category == "1" %>
+           conversion (incumbent-led)
+          <%- elif category == "2" %>
+           cooperative (pact between incumbents and opposition/balanced influence)
+          <%- elif category == "3" %>
+           collapse (opposition-led)
+          <%- elif category == "4" %>
+           foreign supervision
+          <%- elif category == "5" %>
+           foreign liberalization
           <%- endif -%>
+          <%- endif -%>
+
         # description_short:
         unit: "people"
 
       pop_breakdown_type:
         title: |-
-          <%- if category == '0' -%>
-          People living in countries with no breakdown
-          <%- elif category == "1" -%>
-          People living in countries with implicit regression induced by incumbents
-          <%- elif category == "2" -%>
-          People living in countries with military coup
-          <%- elif category == "3" -%>
-          People living in countries with foreign occupation
-          <%- elif category == "4" -%>
-          People living in countries with self-coup
-          <%- elif category == "5" -%>
-          People living in countries with coup or civil conflict headed by opposition party/movement
-          <%- elif category == "6" -%>
-          People living in countries with coup headed by monarch
-          <%- else -%>
-          People living in countries with unknown breakdown type
+          People living in conutries with
+          <%- if category == '0' %>
+           no breakdown
+          <%- elif category == '-1' %>
+           unknown breakdown type
+          <%- else %>
+           breakdown type:
+          <%- if category == "1" %>
+           implicit regression induced by incumbents
+          <%- elif category == "2" %>
+           military coup
+          <%- elif category == "3" %>
+           foreign occupation
+          <%- elif category == "4" %>
+           self-coup
+          <%- elif category == "5" %>
+           coup or civil conflict headed by opposition party/movement
+          <%- elif category == "6" %>
+           coup headed by monarch
+          <%- endif -%>
           <%- endif -%>
 
         # description_short:
