@@ -54,96 +54,6 @@ NAN_VALUES = [
     "…",
 ]
 
-# See all regions https://ghoapi.azureedge.net/api/DIMENSION/REGION/DimensionValues
-#   or https://apps.who.int/gho/data/node.searo-metadata.REGION?lang=en
-# Mapping of region codes to their sources. These will be added as suffixes to region names
-#   e.g. "Africa -> Africa (WHO)" when code is "AFR".
-# Regions with "exclude" will be excluded.
-REGION_CODE_TO_SOURCE_MAPPING = {
-    # Africa
-    "AFR": "WHO",
-    # Americas
-    "AMR": "WHO",
-    # Eastern Mediterranean
-    "EMR": "WHO",
-    # Europe
-    "EUR": "WHO",
-    # South-East Asia
-    "SEAR": "WHO",
-    # Western Pacific
-    "WPR": "WHO",
-    # Africa region, stratum D (AFR D)
-    "GBD_REG14_AFRD": "exclude",
-    # Africa region, stratum E(AFR E)
-    "GBD_REG14_AFRE": "exclude",
-    # Americas region, stratum A (AMR A)
-    "GBD_REG14_AMRA": "exclude",
-    # Americas region, stratum B (AMR B)
-    "GBD_REG14_AMRB": "exclude",
-    # Americas region, stratum D (AMR D)
-    "GBD_REG14_AMRD": "exclude",
-    # Eastern Mediterranean region, stratum B (EMR B)
-    "GBD_REG14_EMRB": "exclude",
-    # Eastern Mediterranean region, stratum D (EMR D)
-    "GBD_REG14_EMRD": "exclude",
-    # Europe region, stratum A (EUR A)
-    "GBD_REG14_EURA": "exclude",
-    # Europe region, stratum B (EUR B)
-    "GBD_REG14_EURB": "exclude",
-    # Europe region, stratum C (EUR C)
-    "GBD_REG14_EURC": "exclude",
-    # South East Asia region, stratum B (SEAR B)
-    "GBD_REG14_SEARB": "exclude",
-    # South East Asia region, stratum D (SEAR D)
-    "GBD_REG14_SEARD": "exclude",
-    # Western Pacific region, stratum A (WPR A)
-    "GBD_REG14_WPRA": "exclude",
-    # Western Pacific region, stratum B (WPR B)
-    "GBD_REG14_WPRB": "exclude",
-    # Not specified
-    "NOTSPEC": "exclude",
-    # Americas, high-income OECD
-    "OECD_HII_AMR": "OECD",
-    # Europe, high-income OECD
-    "OECD_HII_EUR": "OECD",
-    # Western Pacific , high-income OECD
-    "OECD_HII_WPR": "OECD",
-    # Africa (non-OECD)
-    "OECD_NON_AFR": "OECD",
-    # Americas, non-OECD
-    "OECD_NON_AMR": "OECD",
-    # Eastern Mediterranean (non-OECD)
-    "OECD_NON_EMR": "OECD",
-    # Europe, non-OECD
-    "OECD_NON_EUR": "OECD",
-    # South-East Asia (non-OECD)
-    "OECD_NON_SEAR": "OECD",
-    # Western Pacific, non-OECD
-    "OECD_NON_WPR": "OECD",
-    # WHO High income countries of the world
-    "WHO_HI_GLOBAL": "WHO",
-    # Low-and-middle-income countries of the African Region
-    "WHO_LMI_AFR": "WHO",
-    # Low-and-middle-income countries of the Americas
-    "WHO_LMI_AMR": "WHO",
-    # Low-and-middle-income countries of the Eastern Mediterranean Region
-    "WHO_LMI_EMR": "WHO",
-    # Low-and-middle-income countries of the European Region
-    "WHO_LMI_EUR": "WHO",
-    # High income countries
-    "WHO_LMI_HIC": "WHO",
-    # Low-and-middle-income countries of the South-East Asia Region
-    "WHO_LMI_SEAR": "WHO",
-    # Global (WHO LMI)
-    "WHO_LMI_WORLD": "WHO",
-    # Low-and-middle-income countries of the Western Pacific Region
-    "WHO_LMI_WPR": "WHO",
-    # WHO Non Members
-    "WHO_NONMEM": "WHO",
-}
-
-PRIORITY_OF_REGIONS = ["World Bank", "WHO", "UNICEF", "UN", "UN SDG"]
-
 
 def run(dest_dir: str) -> None:
     #
@@ -279,12 +189,10 @@ def add_region_source_suffix(tb: Table) -> Table:
     """Add region source as suffix to region name, e.g. Africa (WHO)"""
     for region_source in tb.spatialdimtype.unique():
         match region_source:
-            case "COUNTRY":
-                continue  # No suffix for countries
+            case "COUNTRY" | "GLOBAL":
+                continue  # No suffix for countries and global
             case "FAOREGION":
                 suffix = "FAO"
-            case "GLOBAL":
-                continue  # No suffix for global
             case "REGION":
                 suffix = "WHO"
             case "UNREGION":
@@ -298,41 +206,6 @@ def add_region_source_suffix(tb: Table) -> Table:
         tb.loc[ix, "country"] = tb.loc[ix, "country"].astype(str) + " (" + suffix + ")"
 
     return tb
-
-    # def add_region_source_suffix(tb: Table) -> Table:
-    # """Add region source as suffix to region name, e.g. Africa (WHO)"""
-    # ix = tb.spatialdimtype == "REGION"
-
-    # tb.loc[ix, "country"] = tb.loc[ix, "country"] + " (WHO)"
-
-    # return tb
-
-    if "region_source" in tb.columns:
-        tb = drop_excess_region_sources(tb.copy(), PRIORITY_OF_REGIONS)
-        ix = tb.region_source.notnull() & (tb.country != "World")
-        if ix.any():
-            tb["country"] = tb["country"].astype(str)
-            tb.loc[ix, "country"] = tb.loc[ix, "country"] + " (" + tb.loc[ix, "region_source"].astype(str) + ")"
-            tb["country"] = tb["country"].astype("category")
-        tb = tb.drop(columns=["region_source"])
-    return tb
-
-
-# def add_region_suffix(tb: Table) -> Table:
-#     """Add region source as suffix to region name, e.g. Africa (WHO)"""
-#     ix = tb.spatialdimtype == "REGION"
-#     if not ix.any():
-#         # No regions in the table, return as is
-#         return tb
-
-#     # Add suffixes
-#     suffix = tb[ix].spatialdim.map(REGION_CODE_TO_SOURCE_MAPPING)
-#     tb.loc[ix, "country"] = tb.loc[ix, "country"] + " (" + suffix + ")"
-
-#     # Exclude regions
-#     tb = tb[~tb.country.str.endswith(" (exclude)")]
-
-#     return tb
 
 
 def clean_numeric_column(tb: Table) -> Table:
