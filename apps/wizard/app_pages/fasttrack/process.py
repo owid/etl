@@ -153,7 +153,29 @@ def _convert_percentages(data: pd.DataFrame, variables_meta_dict: Dict[str, Vari
     """Convert percentages to numbers."""
     for col in data.columns:
         if getattr(variables_meta_dict.get(col, {}), "unit", "") == "%":
-            data[col] = data[col].astype(str).str.replace("%", "").astype(float)
+            # Remove % symbol first
+            cleaned_values = data[col].astype(str).str.replace("%", "")
+
+            # Try to convert to float and check for invalid values
+            try:
+                numeric_values = pd.to_numeric(cleaned_values, errors="coerce")
+                # Check if any values couldn't be converted (excluding NaN from original data)
+                original_nulls = data[col].isna()
+                conversion_failures = numeric_values.isna() & ~original_nulls
+
+                if conversion_failures.any():
+                    failed_values = cleaned_values[conversion_failures].unique()
+                    raise ValidationError(
+                        f"Column '{col}' contains percentage values that cannot be converted to numbers: {list(failed_values)}. "
+                        "Please ensure all percentage values are numeric (e.g., '5.2%' not '<0.1%')."
+                    )
+
+                data[col] = numeric_values
+            except ValidationError:
+                raise
+            except Exception as e:
+                raise ValidationError(f"Error converting percentages in column '{col}': {str(e)}")
+
     return data
 
 
