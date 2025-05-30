@@ -93,7 +93,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new garden dataset.
-    ds_garden = paths.create_dataset(tables=[tb], default_metadata=snap_meadow_defra.metadata)
+    ds_garden = paths.create_dataset(tables=[tb], default_metadata=snap_meadow_defra.metadata, formats=["csv"])
     # Save garden dataset.
 
     ds_garden.save()
