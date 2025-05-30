@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import numpy as np
-import pandas as pd
 from owid.catalog import Table
 from owid.catalog import processing as pr
 
@@ -32,15 +30,11 @@ def run() -> None:
     # Convert to %
     tb["value"] = tb["value"] * 100
 
+    # combine the two series for Sub-Saharan Africa (WB) and Sub-Saharan Africa (excluding high income) (WB)
+    tb = merge_ssa(tb)
+
     # Add metadata to the table.
     tb = add_metadata(tb)
-
-    tb = combine_countries(
-        tb,
-        "Sub-Saharan Africa (WB)",
-        "Sub-Saharan Africa (excluding high income) (WB)",
-        new_country_name="Sub-Saharan Africa (WB)",
-    )
 
     # Improve table format.
     tb = tb.format(["country", "year"])
@@ -68,30 +62,6 @@ def run() -> None:
     ds_garden.save()
 
 
-def combine_countries(tb, country1, country2, new_country_name):
-    # check if both countries have the same values
-    rel_cols = [col for col in tb.columns if col not in ["country"]]
-    c1_tb = tb[tb["country"] == country1]
-    c2_tb = tb[tb["country"] == country2]
-    equal = tables_equal_values(c1_tb[rel_cols], c2_tb[rel_cols])
-
-    if not equal:
-        raise ValueError(f"Countries {country1} and {country2} have different values for {rel_cols}.")
-
-    # combine the two countries
-    c2_tb.index = c1_tb.index  # align indices
-    comb_tb = c1_tb.combine_first(c2_tb)
-    comb_tb["country"] = new_country_name
-
-    # remove the old countries
-    tb = tb[~tb["country"].isin([country1, country2])]
-
-    # append the combined country
-    tb = pr.concat([tb, comb_tb], ignore_index=True)
-
-    return tb
-
-
 def add_metadata(tb: Table) -> Table:
     """
     Add metadata to the table.
@@ -112,31 +82,62 @@ def add_metadata(tb: Table) -> Table:
     return tb_pivoted
 
 
-def tables_equal_values(tb1, tb2) -> bool:
+def merge_ssa(tb: Table) -> Table:
     """
-    Check if two tables have the same values at all positions,
-    regardless of index or column labels.
+    Merge the two Sub-Saharan Africa series in the given table if they are consistent.
+
+    This function checks that the series for:
+      - "Sub-Saharan Africa (WB)"
+      - "Sub-Saharan Africa (excluding high income) (WB)"
+    have identical values for each (year, indicator) pair, allowing both to be NaN.
+
+    If all overlapping non-null values agree, the function:
+      1. Combines the two series by taking the first non-null value for each (year, indicator).
+      2. Drops the original separate rows.
+      3. Assigns the combined rows to "Sub-Saharan Africa (WB)".
+      4. Returns the updated table with a new combined series.
+
+    Raises:
+        ValueError: If any (year, indicator) pair has differing non-null values between the two series.
+
+    Args:
+        tb (Table): A table containing columns ['country', 'value', 'year', 'indicator_name'].
 
     Returns:
-        bool: True if all values are the same, False otherwise.
+        Table: A new table with the two SSA series merged.
     """
-    # First, check shape
-    if tb1.shape != tb2.shape:
-        print("Tables have different shapes:", tb1.shape, "vs", tb2.shape)
-        return False
+    # Define the two country labels
+    full = "Sub-Saharan Africa (WB)"
+    excl = "Sub-Saharan Africa (excluding high income) (WB)"
 
-    a = tb1.to_numpy(dtype="object")
-    b = tb2.to_numpy(dtype="object")
+    # Extract the 'value' series for each label, indexed by (year, indicator_name)
+    s_full = (
+        tb.loc[tb["country"] == full, ["value", "year", "indicator_name"]]
+        .set_index(["year", "indicator_name"])["value"]
+        .sort_index()
+    )
+    s_excl = (
+        tb.loc[tb["country"] == excl, ["value", "year", "indicator_name"]]
+        .set_index(["year", "indicator_name"])["value"]
+        .sort_index()
+    )
 
-    result = np.empty(a.shape, dtype=bool)
+    # Identify mismatches: both non-null and unequal
+    mismatch = s_full.notna() & s_excl.notna() & (s_full != s_excl)
+    if mismatch.any():
+        # List all (year, indicator_name) pairs where values differ
+        bad_pairs = mismatch.loc[mismatch].index.tolist()
+        raise ValueError(f"Mismatched values for '{full}' vs '{excl}' at (year, indicator) pairs: {bad_pairs}")
 
-    for i in range(a.shape[0]):
-        for j in range(a.shape[1]):
-            val1 = a[i, j]
-            val2 = b[i, j]
-            if pd.isna(val1) or pd.isna(val2):
-                result[i, j] = True
-            else:
-                result[i, j] = val1 == val2
+    # Combine the series by taking the first non-null value
+    combined_series = s_full.combine_first(s_excl)
 
-    return result.all()
+    # Assign the country label
+    combined_df = combined_series.reset_index()
+    combined_df["country"] = full
+
+    # Remove the original two series rows and append the new combined rows
+    tb = tb[~tb["country"].isin([full, excl])]
+    tb = pr.concat([tb, combined_df], ignore_index=True)
+
+    return tb
