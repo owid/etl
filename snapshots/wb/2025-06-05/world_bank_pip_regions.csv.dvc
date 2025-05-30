@@ -5,8 +5,8 @@ meta:
     description: |-
       This is a dataset of the complete set of regions and their countries as defined by the World Bank Poverty and Inequality Platform (PIP). This is extracted separately from the main dataset using the `country_list` module in the auxiliary tables available at the API.
     citation_full: |-
-      World Bank (2025). Poverty and Inequality Platform (version 20250605_2021 and 20240605_2017) [Data set]. World Bank Group. https://pip.worldbank.org/.
-    version_producer: 20250605_2021, 20240605_2017
+      World Bank (2025). Poverty and Inequality Platform (version 20250605_2021 and 20250605_2017) [Data set]. World Bank Group. https://pip.worldbank.org/.
+    version_producer: 20250605_2021, 20250605_2017
     url_main: https://pip.worldbank.org
     date_accessed: '2025-06-05'
     date_published: '2025-06-05'
