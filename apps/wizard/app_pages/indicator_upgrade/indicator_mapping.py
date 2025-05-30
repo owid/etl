@@ -494,7 +494,8 @@ def get_indicator_id_to_display(old_indicators, new_indicators):
 @st.cache_data(show_spinner=False)
 def get_indicator_data_cached(indicator_ids: List[int]):
     with st.spinner(
-        "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section."
+        "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section.",
+        show_time=True,
     ):
         df = variable_data_df_from_s3(
             get_engine(),

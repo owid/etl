@@ -39,91 +39,91 @@ tables:
       january:
         title: January
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       february:
         title: February
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       march:
         title: March
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       april:
         title: April
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       may:
         title: May
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       june:
         title: June
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       july:
         title: July
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       august:
         title: August
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       september:
         title: September
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       october:
         title: October
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       november:
         title: November
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       december:
         title: December
         description_short: |-
-            The deviation in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific month's average surface temperature from the mean temperature of the same month during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}
       annual:
         title: Annual
         description_short: |-
-            The deviation in a specific year's average surface temperature from the mean temperature of the same year during the period 1991-2020, measured in degrees Celsius.
+            The difference in a specific year's average surface temperature from the mean temperature of the same year during the period 1991-2020, measured in degrees Celsius.
         description_processing: |-
             {definitions.common_processing}
             {definitions.temperature_anomaly}

@@ -1,0 +1,27 @@
+meta:
+  origin:
+    producer: UNDP, Human Development Report
+    title: Human Development Report
+    description: |-
+      Artificial intelligence (AI) has broken into a dizzying gallop. While AI feats grab headlines, they privilege technology in a make-believe vacuum, obscuring what really matters: people's choices.
+
+      The choices that people have and can realize, within ever expanding freedoms, are essential to human development, whose goal is for people to live lives they value and have reason to value. A world with AI is flush with choices the exercise of which is both a matter of human development and a means to advance it.
+
+      Going forward, development depends less on what AI can do—not on how human-like it is perceived to be—and more on mobilizing people's imaginations to reshape economies and societies to make the most of it. Instead of trying vainly to predict what will happen, the 2025's Human Development Report asks what choices can be made so that new development pathways for all countries dot the horizon, helping everyone have a shot at thriving in a world with AI.
+
+      For more details, refer to https://hdr.undp.org/data-center/documentation-and-downloads
+    citation_full: |-
+      UNDP (United Nations Development Programme). 2025. Human Development Report 2025: A matter of choice: People and possibilities in the age of AI. New York.
+    attribution_short: UNDP
+    url_main: https://hdr.undp.org/
+    # Link extracted from https://hdr.undp.org/data-center/documentation-and-downloads
+    url_download: https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv
+    date_accessed: "2025-05-07"
+    date_published: "2025-05-06"
+    license:
+      name: CC BY 3.0 IGO
+      url: https://hdr.undp.org/copyright-and-terms-use
+outs:
+  - md5: 4026e513775f3431488a2d77bc6b6a1d
+    size: 2001263
+    path: undp_hdr.csv

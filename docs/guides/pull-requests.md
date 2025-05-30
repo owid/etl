@@ -1,7 +1,6 @@
 ---
 tags:
   - 👷 Staff
-status: new
 ---
 
 We use pull requests (PRs) to propose changes to the codebase. They are the best way to suggest changes to the codebase, and they are also the best way to get feedback on your work.

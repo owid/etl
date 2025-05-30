@@ -9,16 +9,17 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
     # Load grapher config from YAML
-    config = paths.load_explorer_config()
+    config = paths.load_collection_config()
 
     # Create explorer
-    ds_explorer = paths.create_explorer(
+    explorer = paths.create_collection(
         config=config,
+        explorer=True,
     )
 
-    ds_explorer.save(tolerate_extra_indicators=True)
+    explorer.save(tolerate_extra_indicators=True)

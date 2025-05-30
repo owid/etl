@@ -1,0 +1,15 @@
+meta:
+  origin:
+    producer: test
+    title: test
+    url_download: |-
+      gAAAAABn29036O_y_q_mXYwKvstPVvY_9NIo42Y9SecGnf_5T7PwgVslp6wqWc86D7qP1W8swLUCPYnbVCiBrt2HAAywR0xn3fQByIum0zY9UxAyFCSsOjClTAmMpoNpV9mGLR_ZH2SEDIEXQzXmI1zPcE9031xc4fp6ERSRhmLuQ-vNol7p4d8AO9JMPOnaqms36MuPGC25wvAvzRcycy2kGnS1G1RmVYB7aGycXb5DQmJyQYtsWalqh_vJcb2wwzSF_DCsveLe
+    date_accessed: '2025-03-20'
+  name: test
+  description: ''
+  license: {}
+  is_public: false
+outs:
+  - md5: 3bb6dc415a6a2d54abf328747aaec7e8
+    size: 748
+    path: test.csv

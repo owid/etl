@@ -1,0 +1,581 @@
+tables:
+  flu:
+    variables:
+      pcnt_poscombined:
+        title: pcnt_poscombined
+        unit: '%'
+        display:
+          name: Share of positive tests - All types of surveillance
+        short_unit: '%'
+      pcnt_possentinel:
+        title: pcnt_possentinel
+        unit: '%'
+        display:
+          name: Share of positive tests - Sentinel surveillance
+        short_unit: '%'
+      pcnt_posnonsentinel:
+        title: pcnt_posnonsentinel
+        unit: '%'
+        display:
+          name: Share of positive tests - Non-sentinel surveillance
+        short_unit: '%'
+      ah1n12009combined_zfilled:
+        title: ah1n12009combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H1N12009
+      ah1combined_zfilled:
+        title: ah1combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H1
+      ah3combined_zfilled:
+        title: ah3combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H3
+      ah5combined_zfilled:
+        title: ah5combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H5
+      ah7n9combined_zfilled:
+        title: ah7n9combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H7N9
+      a_no_subtypecombined_zfilled:
+        title: a_no_subtypecombined_zfilled
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype)
+      bviccombined_zfilled:
+        title: bviccombined_zfilled
+        unit: confirmed cases
+        display:
+          name: B Victoria
+      byamcombined_zfilled:
+        title: byamcombined_zfilled
+        unit: confirmed cases
+        display:
+          name: B Yamagata
+      bnotdeterminedcombined_zfilled:
+        title: bnotdeterminedcombined_zfilled
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage)
+      ah1n12009sentinel_zfilled:
+        title: ah1n12009sentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A H1N12009
+      ah3sentinel_zfilled:
+        title: ah3sentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A H3
+      a_no_subtypesentinel_zfilled:
+        title: a_no_subtypesentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype)
+      bvicsentinel_zfilled:
+        title: bvicsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B Victoria
+      byamsentinel_zfilled:
+        title: byamsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B Yamagata
+      bnotdeterminedsentinel_zfilled:
+        title: bnotdeterminedsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage)
+      ah1n12009nonsentinel_zfilled:
+        title: ah1n12009nonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A H1N12009
+      ah3nonsentinel_zfilled:
+        title: ah3nonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A H3
+      a_no_subtypenonsentinel_zfilled:
+        title: a_no_subtypenonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype)
+      bvicnonsentinel_zfilled:
+        title: bvicnonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B Victoria
+      byamnonsentinel_zfilled:
+        title: byamnonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B Yamagata
+      bnotdeterminednonsentinel_zfilled:
+        title: bnotdeterminednonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage)
+      inf_allcombined:
+        title: inf_allcombined
+        unit: confirmed cases
+        display:
+          name: All strains - All types of surveillance
+      inf_allsentinel:
+        title: inf_allsentinel
+        unit: confirmed cases
+        display:
+          name: All strains - Sentinel surveillance
+      inf_allnonsentinel:
+        title: inf_allnonsentinel
+        unit: confirmed cases
+        display:
+          name: All strains - Non-sentinel surveillance
+      reported_ari_cases:
+        title: reported_ari_cases
+        unit: reported cases
+        display:
+          name: Cases of acute respiratory infections
+      reported_ili_cases:
+        title: reported_ili_cases
+        unit: reported cases
+        display:
+          name: Cases of influenza-like illnesses
+      reported_sari_cases:
+        title: reported_sari_cases
+        unit: reported cases
+        display:
+          name: Cases of severe acute respiratory infections
+      inf_asentinel:
+        title: inf_asentinel
+        unit: confirmed cases
+        display:
+          name: Influenza A - Sentinel surveillance
+      inf_anonsentinel:
+        title: inf_anonsentinel
+        unit: confirmed cases
+        display:
+          name: Influenza A - Non-sentinel surveillance
+      inf_acombined:
+        title: inf_acombined
+        unit: confirmed cases
+        display:
+          name: Influenza A - All types of surveillance
+      ah1n12009sentinel:
+        title: ah1n12009sentinel
+        unit: confirmed cases
+        display:
+          name: A H1N12009 - Sentinel surveillance
+      ah1n12009nonsentinel:
+        title: ah1n12009nonsentinel
+        unit: confirmed cases
+        display:
+          name: A H1N12009 - Non-sentinel surveillance
+      ah1n12009combined:
+        title: ah1n12009combined
+        unit: confirmed cases
+        display:
+          name: A H1N12009 - All types of surveillance
+      ah1combined:
+        title: ah1combined
+        unit: confirmed cases
+        display:
+          name: A H1 - All types of surveillance
+      ah3sentinel:
+        title: ah3sentinel
+        unit: confirmed cases
+        display:
+          name: A H3 - Sentinel surveillance
+      ah3nonsentinel:
+        title: ah3nonsentinel
+        unit: confirmed cases
+        display:
+          name: A H3 - Non-sentinel surveillance
+      ah3combined:
+        title: ah3combined
+        unit: confirmed cases
+        display:
+          name: A H3 - All types of surveillance
+      ah5combined:
+        title: ah5combined
+        unit: confirmed cases
+        display:
+          name: A H5 - All types of surveillance
+      ah7n9combined:
+        title: ah7n9combined
+        unit: confirmed cases
+        display:
+          name: A H7N9 - All types of surveillance
+      a_no_subtypesentinel:
+        title: a_no_subtypesentinel
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype) - Sentinel surveillance
+      a_no_subtypenonsentinel:
+        title: a_no_subtypenonsentinel
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype) - Non-sentinel surveillance
+      a_no_subtypecombined:
+        title: a_no_subtypecombined
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype) - All types of surveillance
+      inf_bsentinel:
+        title: inf_bsentinel
+        unit: confirmed cases
+        display:
+          name: Influenza B - Sentinel surveillance
+      inf_bnonsentinel:
+        title: inf_bnonsentinel
+        unit: confirmed cases
+        display:
+          name: Influenza B - Non-sentinel surveillance
+      inf_bcombined:
+        title: inf_bcombined
+        unit: confirmed cases
+        display:
+          name: Influenza B - All types of surveillance
+      bvicsentinel:
+        title: bvicsentinel
+        unit: confirmed cases
+        display:
+          name: B Victoria - Sentinel surveillance
+      bvicnonsentinel:
+        title: bvicnonsentinel
+        unit: confirmed cases
+        display:
+          name: B Victoria - Non-sentinel surveillance
+      bviccombined:
+        title: bviccombined
+        unit: confirmed cases
+        display:
+          name: B Victoria - All types of surveillance
+      byamsentinel:
+        title: byamsentinel
+        unit: confirmed cases
+        display:
+          name: B Yamagata - Sentinel surveillance
+      byamnonsentinel:
+        title: byamnonsentinel
+        unit: confirmed cases
+        display:
+          name: B Yamagata - Non-sentinel surveillance
+      byamcombined:
+        title: byamcombined
+        unit: confirmed cases
+        display:
+          name: B Yamagata - All types of surveillance
+      bnotdeterminedsentinel:
+        title: bnotdeterminedsentinel
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage) - Sentinel surveillance
+      bnotdeterminednonsentinel:
+        title: bnotdeterminednonsentinel
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage) - Non-sentinel surveillance
+      bnotdeterminedcombined:
+        title: bnotdeterminedcombined
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage) - All types of surveillance
+  flu_monthly:
+    variables:
+      pcnt_poscombined:
+        title: pcnt_poscombined
+        unit: '%'
+        display:
+          name: Share of positive tests - All types of surveillance
+        short_unit: '%'
+      pcnt_possentinel:
+        title: pcnt_possentinel
+        unit: '%'
+        display:
+          name: Share of positive tests - Sentinel surveillance
+        short_unit: '%'
+      pcnt_posnonsentinel:
+        title: pcnt_posnonsentinel
+        unit: '%'
+        display:
+          name: Share of positive tests - Non-sentinel surveillance
+        short_unit: '%'
+      ah1n12009combined_zfilled:
+        title: ah1n12009combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H1N12009
+      ah1combined_zfilled:
+        title: ah1combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H1
+      ah3combined_zfilled:
+        title: ah3combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H3
+      ah5combined_zfilled:
+        title: ah5combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H5
+      ah7n9combined_zfilled:
+        title: ah7n9combined_zfilled
+        unit: confirmed cases
+        display:
+          name: A H7N9
+      a_no_subtypecombined_zfilled:
+        title: a_no_subtypecombined_zfilled
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype)
+      bviccombined_zfilled:
+        title: bviccombined_zfilled
+        unit: confirmed cases
+        display:
+          name: B Victoria
+      byamcombined_zfilled:
+        title: byamcombined_zfilled
+        unit: confirmed cases
+        display:
+          name: B Yamagata
+      bnotdeterminedcombined_zfilled:
+        title: bnotdeterminedcombined_zfilled
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage)
+      ah1n12009sentinel_zfilled:
+        title: ah1n12009sentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A H1N12009
+      ah3sentinel_zfilled:
+        title: ah3sentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A H3
+      a_no_subtypesentinel_zfilled:
+        title: a_no_subtypesentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype)
+      bvicsentinel_zfilled:
+        title: bvicsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B Victoria
+      byamsentinel_zfilled:
+        title: byamsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B Yamagata
+      bnotdeterminedsentinel_zfilled:
+        title: bnotdeterminedsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage)
+      ah1n12009nonsentinel_zfilled:
+        title: ah1n12009nonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A H1N12009
+      ah3nonsentinel_zfilled:
+        title: ah3nonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A H3
+      a_no_subtypenonsentinel_zfilled:
+        title: a_no_subtypenonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype)
+      bvicnonsentinel_zfilled:
+        title: bvicnonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B Victoria
+      byamnonsentinel_zfilled:
+        title: byamnonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B Yamagata
+      bnotdeterminednonsentinel_zfilled:
+        title: bnotdeterminednonsentinel_zfilled
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage)
+      inf_allcombined:
+        title: inf_allcombined
+        unit: confirmed cases
+        display:
+          name: All strains - All types of surveillance
+      inf_allsentinel:
+        title: inf_allsentinel
+        unit: confirmed cases
+        display:
+          name: All strains - Sentinel surveillance
+      inf_allnonsentinel:
+        title: inf_allnonsentinel
+        unit: confirmed cases
+        display:
+          name: All strains - Non-sentinel surveillance
+      reported_ari_cases:
+        title: reported_ari_cases
+        unit: reported cases
+        display:
+          name: Reported cases of acute respiratory infections
+      reported_ili_cases:
+        title: reported_ili_cases
+        unit: reported cases
+        display:
+          name: Reported cases of influenza-like illnesses
+      reported_sari_cases:
+        title: reported_sari_cases
+        unit: reported cases
+        display:
+          name: Reported cases of severe acute respiratory infections
+      inf_asentinel:
+        title: inf_asentinel
+        unit: confirmed cases
+        display:
+          name: Influenza A - Sentinel surveillance
+      inf_anonsentinel:
+        title: inf_anonsentinel
+        unit: confirmed cases
+        display:
+          name: Influenza A - Non-sentinel surveillance
+      inf_acombined:
+        title: inf_acombined
+        unit: confirmed cases
+        display:
+          name: Influenza A - All types of surveillance
+      ah1n12009sentinel:
+        title: ah1n12009sentinel
+        unit: confirmed cases
+        display:
+          name: A H1N12009 - Sentinel surveillance
+      ah1n12009nonsentinel:
+        title: ah1n12009nonsentinel
+        unit: confirmed cases
+        display:
+          name: A H1N12009 - Non-sentinel surveillance
+      ah1n12009combined:
+        title: ah1n12009combined
+        unit: confirmed cases
+        display:
+          name: A H1N12009 - All types of surveillance
+      ah1combined:
+        title: ah1combined
+        unit: confirmed cases
+        display:
+          name: A H1 - All types of surveillance
+      ah3sentinel:
+        title: ah3sentinel
+        unit: confirmed cases
+        display:
+          name: A H3 - Sentinel surveillance
+      ah3nonsentinel:
+        title: ah3nonsentinel
+        unit: confirmed cases
+        display:
+          name: A H3 - Non-sentinel surveillance
+      ah3combined:
+        title: ah3combined
+        unit: confirmed cases
+        display:
+          name: A H3 - All types of surveillance
+      ah5combined:
+        title: ah5combined
+        unit: confirmed cases
+        display:
+          name: A H5 - All types of surveillance
+      ah7n9combined:
+        title: ah7n9combined
+        unit: confirmed cases
+        display:
+          name: A H7N9 - All types of surveillance
+      a_no_subtypesentinel:
+        title: a_no_subtypesentinel
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype) - Sentinel surveillance
+      a_no_subtypenonsentinel:
+        title: a_no_subtypenonsentinel
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype) - Non-sentinel surveillance
+      a_no_subtypecombined:
+        title: a_no_subtypecombined
+        unit: confirmed cases
+        display:
+          name: A (unknown subtype) - All types of surveillance
+      inf_bsentinel:
+        title: inf_bsentinel
+        unit: confirmed cases
+        display:
+          name: Influenza B - Sentinel surveillance
+      inf_bnonsentinel:
+        title: inf_bnonsentinel
+        unit: confirmed cases
+        display:
+          name: Influenza B - Non-sentinel surveillance
+      inf_bcombined:
+        title: inf_bcombined
+        unit: confirmed cases
+        display:
+          name: Influenza B - All types of surveillance
+      byamsentinel:
+        title: byamsentinel
+        unit: confirmed cases
+        display:
+          name: B Yamagata - Sentinel surveillance
+      byamnonsentinel:
+        title: byamnonsentinel
+        unit: confirmed cases
+        display:
+          name: B Yamagata - Non-sentinel surveillance
+      byamcombined:
+        title: byamcombined
+        unit: confirmed cases
+        display:
+          name: B Yamagata - All types of surveillance
+      bvicsentinel:
+        title: bvicsentinel
+        unit: confirmed cases
+        display:
+          name: B Victoria - Sentinel surveillance
+      bvicnonsentinel:
+        title: bvicnonsentinel
+        unit: confirmed cases
+        display:
+          name: B Victoria - Non-sentinel surveillance
+      bviccombined:
+        title: bviccombined
+        unit: confirmed cases
+        display:
+          name: B Victoria - All types of surveillance
+      bnotdeterminedsentinel:
+        title: bnotdeterminedsentinel
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage)  - Sentinel surveillance
+      bnotdeterminednonsentinel:
+        title: bnotdeterminednonsentinel
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage) - Non-sentinel surveillance
+      bnotdeterminedcombined:
+        title: bnotdeterminedcombined
+        unit: confirmed cases
+        display:
+          name: B (unknown lineage) - All types of surveillance

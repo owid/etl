@@ -71,10 +71,10 @@ If a mapping file already exists, it will resume where the mapping file left off
 ╰──────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
-As an example, start the harmonization interactive session for table `undp_hdr` from dataset `meadow/un/2024-04-09/undp_hdr`, which has `country` column with the raw country names:
+As an example, start the harmonization interactive session for table `undp_hdr` from dataset `meadow/un/2025-05-07/undp_hdr`, which has `country` column with the raw country names:
 
 ```bash
-uv run etl harmonize data/meadow/un/2024-04-09/undp_hdr/undp_hdr.feather country mapping.json
+uv run etl harmonize data/meadow/un/2025-05-07/undp_hdr/undp_hdr.feather country mapping.json
 206 countries/regions to harmonize
   └ 188 automatically matched
   └ 18 ambiguous countries/regions
@@ -93,7 +93,7 @@ Beginning interactive harmonization...
    7) [skip]
 ```
 
-The output mapping is saved in `mapping.json`. If this file existed before, it will resume teh session from where it left off.
+The output mapping is saved in `mapping.json`. If this file existed before, it will resume the session from where it left off.
 
 ## Using the interactive shell
 

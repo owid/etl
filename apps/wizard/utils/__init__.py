@@ -156,7 +156,7 @@ class classproperty(property):
 class AppState:
     """Management of state variables shared across different apps."""
 
-    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data"]
+    steps: List[str] = ["snapshot", "meadow", "garden", "grapher", "explorers", "express", "data", "collection"]
     dataset_edit: Dict[str, Dataset | None] = {
         "snapshot": None,
         "meadow": None,
@@ -164,6 +164,7 @@ class AppState:
         "grapher": None,
         "express": None,
         "data": None,
+        "collection": None,
     }
     _previous_step: str | None = None
 
@@ -367,39 +368,6 @@ class AppState:
         # Show error message
         self.display_error(key)
         return widget
-
-    def st_selectbox_responsive(
-        self: "AppState",
-        custom_label: str,
-        **kwargs,
-    ) -> None:
-        """Render the namespace field within the form.
-
-        We want the namespace field to be a selectbox, but with the option to add a custom namespace.
-
-        This is a workaround to have repsonsive behaviour within a form.
-
-        Source: https://discuss.streamlit.io/t/can-i-add-to-a-selectbox-an-other-option-where-the-user-can-add-his-own-answer/28525/5
-        """
-        # Handle kwargs
-        kwargs["options"] = [custom_label] + kwargs["options"]
-        key = cast(str, kwargs["key"])
-
-        # Render and get element depending on selection in selectbox
-        with st.container():
-            field = self.st_widget(**kwargs)
-        with st.empty():
-            if (field == custom_label) | (str(field) not in kwargs["options"]):
-                st.toast("showing custom input")
-                default_value = self.default_value(key)
-                field = self.st_widget(
-                    st.text_input,
-                    label="↳ *Use custom value*",
-                    placeholder="",
-                    help="Enter custom value.",
-                    key=f"{key}_custom",
-                    default_last=default_value,
-                )
 
     @classproperty
     def args(cls: "AppState") -> argparse.Namespace:

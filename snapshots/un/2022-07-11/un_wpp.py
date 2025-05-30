@@ -12,8 +12,9 @@ import zipfile
 from pathlib import Path
 
 import requests
-from owid.walden import add_to_catalog
-from owid.walden.catalog import Dataset
+
+# from owid.walden import add_to_catalog
+# from owid.walden.catalog import Dataset
 from structlog import get_logger
 
 log = get_logger()
@@ -124,14 +125,14 @@ def prepare_data(directory):
 def prepare_metadata():
     log.info("Preparing metadata...")
     path = Path(__file__).parent / f"{Path(__file__).stem}.meta.yml"
-    return Dataset.from_yaml(path)
+    return Dataset.from_yaml(path)  # noqa
 
 
 def main():
     with tempfile.TemporaryDirectory() as tmp_dir:
         metadata = prepare_metadata()
         output_file = prepare_data(tmp_dir)
-        add_to_catalog(metadata, output_file, upload=True, public=True)
+        add_to_catalog(metadata, output_file, upload=True, public=True)  # noqa
 
 
 if __name__ == "__main__":

@@ -26,7 +26,7 @@ Snapshots are edge nodes in the computational graph. They represent a copy of a 
 ```mermaid
 flowchart LR
 
-    upstream((____)):::node -.->|copy| snapshot((____)):::node
+    upstream((&nbsp;&nbsp;&nbsp;)):::node -.->|copy| snapshot((&nbsp;&nbsp;&nbsp;)):::node
     subgraph id [Snapshot]
     snapshot
     end
@@ -49,15 +49,6 @@ snapshot://<namespace>/<version>/<filename>
     snapshot://aviation_safety_network/2022-10-14/aviation_statistics.csv
     ```
 
-??? warning "Old-style snapshots are managed by the [walden](https://github.com/owid/walden) codebase and begin with the prefix `walden://`."
-
-    There are still several snapshots using this channel.
-
-    !!! example
-
-        ```
-        walden://irena/2022-10-07/renewable_power_generation_costs
-        ```
 
 ## Datasets
 

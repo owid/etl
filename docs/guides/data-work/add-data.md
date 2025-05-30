@@ -35,44 +35,18 @@ There are different ways you can add data to the catalog, depending on your tech
 </div>
 
 
-## Create your new environment
-Before starting to add a new dataset, make sure to create your new environment. This means creating a new branch, its corresponding pull request and staging server. This can all be made with one command:
-
-```bash
-etl pr "{short_name}: new dataset" data
-```
-
-This will create a new git branch in your local repository with an empty commit, which will be pushed to remote. It will also create a draft pull request in github, and a staging server. Wait for a notification from [@owidbot](https://github.com/owidbot). It should take a few minutes, and will inform you that the staging server `http://staging-site-data-{short_name}` has been created.
-
-
 ## Using Wizard (recommended)
+Wizard is an interactive web app that serves as OWID's ETL admin. One of the main uses of Wizard is to create ETL steps, as it is has provides templates to ease the creation of a new step.
 
-!!! info
+Use the command `etlwiz` to start it and then go to [localhost:8053](localhost:8053). There, you will see all options available in Wizard. For the purpose of this guide, we are just interested in those that fall under the section "ETL Steps", with which you can create Snapshot and Data steps (and, alternatively, also Fast-Track steps).
 
-    Learn more about Wizard in [this dedicated guideline](wizard.md).
+When creating a step, you will be presented with a form to submit the metadata details for your data (fields such as `namespace`, `version`, `date_published`, etc.). Based on this, all necessary files will be created in the appropriate `snapshots/` or `etl/` directories.
 
-
-The Wizard is an interactive web app that serves as OWID's ETL admin. One of the main uses of Wizard is to create ETL steps, as it is has provides templates to ease the creation of a new step.
-
-Just start it with
-
-```bash
-etlwiz
-```
-
-And then go to [localhost:8053](localhost:8053). In there, you will see all options available in Wizard. For the purpose of this guide, we are just interested in those that fall under the section "ETL Steps", with which you can create Snapshot, Meadow, Garden and Grapher steps (and, alternatively, also Fast-Track steps).
-
-
-!!! tip "Use Express to quickly create Meadow-Garden-Grapher steps at once"
-
-    We have an "Express" mode which creates the three steps at once. This is useful when you have a simple dataset that doesn't require complex processing.
-
-
-When creating a step, you will be presented with a form to fill in the metadata of the step (fields such as `namespace`, `version`, `date_published`, etc.). Based on your input, it will generate the required files in the appropriate `snapshots/` or `etl/` directories.
-
-!!! note "Wizard will guide you through"
+!!! note "Learn more"
 
     **Wizard will guide you through the whole process, describing all the steps you need to follow to successfully create a new ETL step.**
+
+    Learn more about Wizard in [this dedicated guideline :octicons-arrow-right-24:](wizard.md).
 
 ### Adding the dataset to Grapher
 Once you have created all the steps, you can run them _and_ push the final version to Grapher with
@@ -91,12 +65,6 @@ etl run <short_name> --grapher
 
     Major issue<br>
     [Create a new issue :octicons-arrow-right-24:](https://github.com/owid/etl/issues/new)
-
-::: mkdocs-click
-    :module: apps.wizard.cli
-    :command: cli
-    :depth: 2
-    :prog_name: etlwiz
 
 ## Using the Fast-Track
 
@@ -174,7 +142,7 @@ git checkout -b data/new-dataset
 
 1. **Create the step**
     - Path of the step should be similar to `etl/steps/data/meadow/<namespace>/<version>/<dataset_short_name>.py`.
-    - The step script must contain a `run(dest_dir)` function that loads data from the `snapshot` and creates a dataset
+    - The step script must contain a `run()` function that loads data from the `snapshot` and creates a dataset
     (a `catalog.Dataset` object) with one or more tables (`catalog.Table` objects) containing the raw data.
     - Run `make format && make test` to ensure that the step runs well and is well formatted.
 
@@ -190,7 +158,7 @@ git checkout -b data/new-dataset
 
 1. **Create the step**
     - Path of the step should be similar to `etl/steps/data/garden/<namespace>/<version>/<dataset_short_name>.py`.
-    - The step must contain a `run(dest_dir)` function that loads data from the last `meadow` step, processes the data and
+    - The step must contain a `run()` function that loads data from the last `meadow` step, processes the data and
     creates a dataset with one or more tables and the necessary metadata.
     - Country names must be harmonized (for which the [harmonize](../architecture/workflow/harmonization.md) tool of `etl` can be used).
     - Add plenty of assertions and sanity checks to the step (if possible, compare the data with its previous version and
@@ -209,7 +177,7 @@ git checkout -b data/new-dataset
 
 1. **Create the step**
     - Path of the step should be similar to `etl/steps/data/grapher/<namespace>/<version>/<dataset_short_name>.py`.
-    - The step must contain a `run(dest_dir)` function that loads data from the last `garden` step, processes the data and
+    - The step must contain a `run()` function that loads data from the last `garden` step, processes the data and
     creates a dataset with one or more tables and the necessary metadata.
     - Run `make format && make test` to ensure that the step runs well and is well formatted.
 

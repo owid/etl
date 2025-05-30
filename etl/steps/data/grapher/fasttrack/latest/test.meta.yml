@@ -1,0 +1,16 @@
+dataset:
+  title: test
+  description: ''
+  licenses:
+    - {}
+tables:
+  test:
+    variables:
+      value:
+        title: value
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

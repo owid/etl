@@ -1,13 +1,13 @@
 # Biodiversity - cherry blossom dataset
 steps:
   # Cherry blossom
-  data://meadow/biodiversity/2025-01-29/cherry_blossom:
+  data://meadow/biodiversity/2025-04-07/cherry_blossom:
     - snapshot://biodiversity/2024-01-25/cherry_blossom.xls
-    - snapshot://biodiversity/2025-01-29/cherry_blossom.csv
-  data://garden/biodiversity/2025-01-29/cherry_blossom:
-    - data://meadow/biodiversity/2025-01-29/cherry_blossom
-  data://grapher/biodiversity/2025-01-29/cherry_blossom:
-    - data://garden/biodiversity/2025-01-29/cherry_blossom
+    - snapshot://biodiversity/2025-04-07/cherry_blossom.csv
+  data://garden/biodiversity/2025-04-07/cherry_blossom:
+    - data://meadow/biodiversity/2025-04-07/cherry_blossom
+  data://grapher/biodiversity/2025-04-07/cherry_blossom:
+    - data://garden/biodiversity/2025-04-07/cherry_blossom
 
   # Invasive species -  Seebens et al
   data://meadow/biodiversity/2024-08-12/invasive_species:
@@ -46,3 +46,14 @@ steps:
     - data://meadow/biodiversity/2024-12-23/iucn_number_each_status
   data://grapher/biodiversity/2024-12-23/iucn_number_each_status:
     - data://garden/biodiversity/2024-12-23/iucn_number_each_status
+
+
+  #
+  # Habitat loss
+  #
+  data://garden/biodiversity/2021-01-01/habitat_loss:
+    - snapshot://biodiversity/2021-01-01/habitat_loss.feather
+  data://grapher/biodiversity/2021-01-01/habitat_loss:
+    - data://garden/biodiversity/2021-01-01/habitat_loss
+  export://explorers/biodiversity/latest/habitat_loss:
+    - data://grapher/biodiversity/2021-01-01/habitat_loss

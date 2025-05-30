@@ -5,7 +5,7 @@ from owid.catalog import Table
 from structlog import get_logger
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
@@ -90,7 +90,7 @@ def prepare_annual_data(tb_monthly: Table) -> Table:
     return tb_annual
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -125,10 +125,8 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb_monthly, tb_annual],
-        check_variables_metadata=True,
         yaml_params={"EUROS_YEAR": PPI_EUROS_YEAR},
     )
 

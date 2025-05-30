@@ -1,0 +1,14 @@
+meta:
+  name: "World Bank list of economies - World Bank (July 2021)"
+  source_name: "World Bank"
+  url: https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups
+  source_data_url: https://walden.owid.io/wb/2021-07-01/wb_income.xlsx
+  date_accessed: 2021-07-01
+  publication_year: 2021
+  publication_date: 2021-07-01
+  license_name: "CC BY 4.0"
+  license_url: "https://www.worldbank.org/en/about/legal/terms-of-use-for-datasets"
+outs:
+  - md5: 35839e39566c48fd7019b53b7c2b7d93
+    size: 67899
+    path: wb_income.xlsx

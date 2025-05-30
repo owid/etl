@@ -42,8 +42,6 @@ steps:
     - snapshot://fasttrack/latest/whm_treatment_gap_anxiety_disorders.csv
   data-private://grapher/fasttrack/latest/pain_hours_hen_systems:
     - snapshot-private://fasttrack/latest/pain_hours_hen_systems.csv
-  data-private://grapher/fasttrack/latest/antibiotic_usage_livestock:
-    - snapshot-private://fasttrack/latest/antibiotic_usage_livestock.csv
   data://grapher/fasttrack/2023-08-07/pain_hours_days_hen_systems:
     - snapshot://fasttrack/2023-08-07/pain_hours_days_hen_systems.csv
   data-private://grapher/fasttrack/latest/historical_france_mortality_cause:
@@ -98,8 +96,6 @@ steps:
     - snapshot://fasttrack/latest/tomitaka_2018.csv
   data://grapher/fasttrack/latest/draft_joe_idd_oecd:
     - snapshot://fasttrack/latest/draft_joe_idd_oecd.csv
-  data://grapher/fasttrack/latest/daily_caloric_supply_fao_historical:
-    - snapshot://fasttrack/latest/daily_caloric_supply_fao_historical.csv
   data://grapher/fasttrack/latest/north_atlantic_hurricanes_noaa:
     - snapshot://fasttrack/latest/north_atlantic_hurricanes_noaa.csv
   data://grapher/fasttrack/latest/usa_hurricane_categories_noaa:
@@ -148,8 +144,6 @@ steps:
     - snapshot://fasttrack/latest/rock_metal_ratio_nassar_wang.csv
   data://grapher/fasttrack/latest/hdi_per_co2:
     - snapshot://fasttrack/latest/hdi_per_co2.csv
-  data://grapher/fasttrack/latest/nature_index_undp:
-    - snapshot://fasttrack/latest/nature_index_undp.csv
   data://grapher/fasttrack/latest/elephant_populations:
     - snapshot://fasttrack/latest/elephant_populations.csv
   data://grapher/fasttrack/latest/pivot_uk_public_spending:
@@ -174,8 +168,6 @@ steps:
     - snapshot://fasttrack/latest/antimicrobial_usage_livestock.csv
   data://grapher/fasttrack/latest/iucn_number_evaluated:
     - snapshot://fasttrack/latest/iucn_number_evaluated.csv
-  data://grapher/fasttrack/latest/cdc_measles:
-    - snapshot://fasttrack/latest/cdc_measles.csv
   data://grapher/fasttrack/latest/try_fast_track_in_donor_costs:
     - snapshot://fasttrack/latest/try_fast_track_in_donor_costs.csv
   data://grapher/fasttrack/latest/_1__2018_2023_in_donor_costs_dac_countries__sheet1:
@@ -190,8 +182,6 @@ steps:
     - snapshot://fasttrack/latest/road_miles_uk.csv
   data://grapher/fasttrack/2024-11-18/supercomputers:
     - snapshot://fasttrack/2024-11-18/supercomputers.csv
-  data://grapher/fasttrack/latest/in_donor_foreign_aid_categories_dac_countries:
-    - snapshot://fasttrack/latest/in_donor_foreign_aid_categories_dac_countries.csv
   data://grapher/fasttrack/latest/poverty_latam_idb:
     - snapshot://fasttrack/latest/poverty_latam_idb.csv
   data://grapher/fasttrack/latest/foreign_aid_govt_private:
@@ -204,8 +194,6 @@ steps:
     - snapshot://fasttrack/latest/skaaning_democracy_di.csv
   data://grapher/fasttrack/latest/pre_term_births_europe_usa:
     - snapshot://fasttrack/latest/pre_term_births_europe_usa.csv
-  data://grapher/fasttrack/latest/indonor_oda_costs_oecd:
-    - snapshot://fasttrack/latest/indonor_oda_costs_oecd.csv
   data://grapher/fasttrack/latest/aiddata_china_fasttrack__sheet1:
     - snapshot://fasttrack/latest/aiddata_china_fasttrack__sheet1.csv
   data://grapher/fasttrack/latest/aiddata_china_fasttrack_2014_2021__sheet1:
@@ -220,3 +208,33 @@ steps:
     - snapshot://fasttrack/latest/graduation_returns_table__sheet1.csv
   data://grapher/fasttrack/latest/housing_prices_eurostat_q4_2023__sheet1:
     - snapshot://fasttrack/latest/housing_prices_eurostat_q4_2023__sheet1.csv
+  data://grapher/fasttrack/latest/deflated_housing_prices__sheet1:
+    - snapshot://fasttrack/latest/deflated_housing_prices__sheet1.csv
+  data://grapher/fasttrack/latest/number_electricity_fuels_access_wb:
+    - snapshot://fasttrack/latest/number_electricity_fuels_access_wb.csv
+  data://grapher/fasttrack/latest/measles_cases:
+    - snapshot://fasttrack/latest/measles_cases.csv
+  data://grapher/fasttrack/latest/housing_construction_permits_europe:
+    - snapshot://fasttrack/latest/housing_construction_permits_europe.csv
+  data://grapher/fasttrack/latest/housing_overburden_rate_europe:
+    - snapshot://fasttrack/latest/housing_overburden_rate_europe.csv
+  data://grapher/fasttrack/latest/housing_rents_indexed_2002:
+    - snapshot://fasttrack/latest/housing_rents_indexed_2002.csv
+  data://grapher/fasttrack/latest/combined_housing_indices_2010:
+    - snapshot://fasttrack/latest/combined_housing_indices_2010.csv
+  data://grapher/fasttrack/latest/lives_saved_measles_vaccination_who:
+    - snapshot://fasttrack/latest/lives_saved_measles_vaccination_who.csv
+  data://grapher/fasttrack/latest/cdc_measles:
+    - snapshot://fasttrack/latest/cdc_measles.csv
+  data://grapher/fasttrack/latest/world_bank_pip_filled:
+    - snapshot://fasttrack/latest/world_bank_pip_filled.csv
+  data://grapher/fasttrack/latest/financial_inclusion_table:
+    - snapshot://fasttrack/latest/financial_inclusion_table.csv
+  data://grapher/fasttrack/latest/extended_financial_inclusion_table:
+    - snapshot://fasttrack/latest/extended_financial_inclusion_table.csv
+  data://grapher/fasttrack/latest/global_findex_2021:
+    - snapshot://fasttrack/latest/global_findex_2021.csv
+  data://grapher/fasttrack/latest/bank_account_selected_countries_global_findex_2021:
+    - snapshot://fasttrack/latest/bank_account_selected_countries_global_findex_2021.csv
+  data://grapher/fasttrack/latest/account_ownership_by_region:
+    - snapshot://fasttrack/latest/account_ownership_by_region.csv

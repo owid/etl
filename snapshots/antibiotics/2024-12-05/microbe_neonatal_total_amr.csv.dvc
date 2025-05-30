@@ -7,13 +7,11 @@ meta:
     description: |-
       The MICROBE (Measuring Infectious Causes and Resistance Outcomes for Burden Estimation) tool visualizes the fatal and nonfatal health outcomes of infections, pathogens, and antimicrobial resistance across different countries and regions. The tool shows a novel estimation method, [published in The Lancet](https://www.thelancet.com/journals/lancet/article/PIIS0140-6736(24)01867-1/fulltext), including the burden of infections and their underlying pathogens, as well as, the burden of pathogens that are both susceptible and resistant to antibiotics. This tool is useful for understanding the burden of these outcomes, as well as illustrating how they nest together. The tabs explore different health outcomes by geography, age and sex. All tabs include a bar visualization for comparison, as well as a map view for a global perspective.
     date_published: "2024-09-28"
-
     # Citation
     producer: Institute for Health Metrics and Evaluation (IHME); University of Oxford
     citation_full: |-
       Institute for Health Metrics and Evaluation (IHME), University of Oxford. MICROBE. Seattle, WA: IHME, University of Washington, 2024. Available from [https://vizhub.healthdata.org/microbe](https://vizhub.healthdata.org/microbe)
     attribution_short: MICROBE
-
     # Files
     url_main: https://vizhub.healthdata.org/microbe/
     date_accessed: 2024-12-05
@@ -22,8 +20,6 @@ meta:
     license:
       name: IHME's Free-of-Charge Non-commercial User Agreement
       url: https://www.healthdata.org/Data-tools-practices/data-practices/ihme-free-charge-non-commercial-user-agreement
-
-
   is_public: false
 outs:
   - md5: 992049355ab469d34378e2ae38ff2ef5

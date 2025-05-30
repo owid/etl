@@ -1,5 +1,4 @@
-"""Load a snapshot and create a meadow dataset.
-Meadow dataset is already very processed to"""
+"""Load a snapshot and create a meadow dataset."""
 
 from etl.helpers import PathFinder, create_dataset
 

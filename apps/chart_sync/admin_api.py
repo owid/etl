@@ -122,8 +122,9 @@ class AdminAPI(object):
 
     def put_mdim_config(self, mdim_catalog_path: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
         # Retry in case we're restarting Admin on staging server
+        url = self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}"
         resp = requests_with_retry().put(
-            self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}",
+            url,
             cookies={"sessionid": self._get_session_id(user_id)},
             json={"config": mdim_config},
         )
@@ -132,6 +133,19 @@ class AdminAPI(object):
             raise AdminAPIError(
                 {"error": js["error"], "mdim_catalog_path": mdim_catalog_path, "mdim_config": mdim_config}
             )
+        return js
+
+    def put_explorer_config(self, slug: str, tsv: str, user_id: Optional[int] = None) -> dict:
+        # Retry in case we're restarting Admin on staging server
+        url = self.owid_env.admin_api + f"/explorers/{slug}"
+        resp = requests_with_retry().put(
+            url,
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json={"tsv": tsv, "commitMessage": "Update explorer from ETL"},
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "slug": slug, "tsv": tsv[:1000]})
         return js
 
 

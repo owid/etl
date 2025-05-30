@@ -5,6 +5,19 @@ steps:
   # GENERAL
   ############################################################
 
+  #
+  # OECD Government at a Glance
+  #
+  data://meadow/oecd/2025-03-26/government_at_a_glance:
+    - snapshot://oecd/2025-03-26/govt_glance_public_finance.csv
+    - snapshot://oecd/2025-03-26/govt_glance_size_public_procurement.csv
+    - snapshot://oecd/2025-03-26/govt_glance_public_finance_economic_transaction.csv
+    - snapshot://oecd/2025-03-26/govt_glance_public_finance_by_function.csv
+  data://garden/oecd/2025-03-26/government_at_a_glance:
+    - data://meadow/oecd/2025-03-26/government_at_a_glance
+  data://grapher/oecd/2025-03-26/government_at_a_glance:
+    - data://garden/oecd/2025-03-26/government_at_a_glance
+
   # UNU-WIDER Government Revenue Dataset
   data://meadow/unu_wider/2023-11-01/government_revenue_dataset:
     - snapshot://unu_wider/2023-11-01/government_revenue_dataset.dta
@@ -14,12 +27,12 @@ steps:
     - data://garden/unu_wider/2023-11-01/government_revenue_dataset
 
   # Public Finances in Modern History dataset (IMF)
-  data://meadow/imf/2024-06-12/public_finances_modern_history:
-    - snapshot://imf/2024-06-12/public_finances_modern_history.xlsx
-  data://garden/imf/2024-06-12/public_finances_modern_history:
-    - data://meadow/imf/2024-06-12/public_finances_modern_history
-  data://grapher/imf/2024-06-12/public_finances_modern_history:
-    - data://garden/imf/2024-06-12/public_finances_modern_history
+  data://meadow/imf/2025-04-02/public_finances_modern_history:
+    - snapshot://imf/2025-04-02/public_finances_modern_history.xlsx
+  data://garden/imf/2025-04-02/public_finances_modern_history:
+    - data://meadow/imf/2025-04-02/public_finances_modern_history
+  data://grapher/imf/2025-04-02/public_finances_modern_history:
+    - data://garden/imf/2025-04-02/public_finances_modern_history
 
   # OECD Social Expenditure Database
   data://meadow/oecd/2025-02-25/social_expenditure:
@@ -98,25 +111,25 @@ steps:
   ############################################################
 
   # SIPRI Military Expenditure Database
-  data://meadow/sipri/2024-07-08/military_expenditure:
-    - snapshot://sipri/2024-07-08/military_expenditure.xlsx
-  data://garden/sipri/2024-07-08/military_expenditure:
-    - data://meadow/sipri/2024-07-08/military_expenditure
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-  data://grapher/sipri/2024-07-08/military_expenditure:
-    - data://garden/sipri/2024-07-08/military_expenditure
+  data://meadow/sipri/2025-04-28/military_expenditure:
+    - snapshot://sipri/2025-04-28/military_expenditure.xlsx
+  data://garden/sipri/2025-04-28/military_expenditure:
+    - data://meadow/sipri/2025-04-28/military_expenditure
+    - data://garden/worldbank_wdi/2025-01-24/wdi
+  data://grapher/sipri/2025-04-28/military_expenditure:
+    - data://garden/sipri/2025-04-28/military_expenditure
 
   # Global Military Spending Dataset
-  data://meadow/harvard/2024-11-26/global_military_spending_dataset:
-    - snapshot://harvard/2024-07-22/global_military_spending_dataset.rds
-    - snapshot://harvard/2024-11-26/global_military_spending_dataset_burden.rds
-  data://garden/harvard/2024-11-26/global_military_spending_dataset:
-    - data://meadow/harvard/2024-11-26/global_military_spending_dataset
+  data://meadow/harvard/2025-04-28/global_military_spending_dataset:
+    - snapshot://harvard/2025-04-28/global_military_spending_dataset.rds
+    - snapshot://harvard/2025-04-28/global_military_spending_dataset_burden.rds
+  data://garden/harvard/2025-04-28/global_military_spending_dataset:
     - data://garden/demography/2024-07-15/population
-    - data://garden/countries/2024-08-27/gleditsch
     - data://garden/cow/2024-07-26/national_material_capabilities
-  data://grapher/harvard/2024-11-26/global_military_spending_dataset:
-    - data://garden/harvard/2024-11-26/global_military_spending_dataset
+    - data://garden/countries/2024-08-27/gleditsch
+    - data://meadow/harvard/2025-04-28/global_military_spending_dataset
+  data://grapher/harvard/2025-04-28/global_military_spending_dataset:
+    - data://garden/harvard/2025-04-28/global_military_spending_dataset
 
   # Correlates of War - National Material Capabilities
   data://meadow/cow/2024-07-26/national_material_capabilities:

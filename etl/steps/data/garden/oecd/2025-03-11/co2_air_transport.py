@@ -4,7 +4,7 @@ import pandas as pd
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -16,7 +16,7 @@ REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceani
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -36,6 +36,7 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
     tb = tb[tb["flight_type"] == "Passenger flights"]
     tb = tb.drop("flight_type", axis=1)
+
     tb = tb[tb["emissions_source"].isin(["TER_DOM", "TER_INT"])]
 
     tb_annual = process_annual_data(tb)
@@ -67,9 +68,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -77,12 +76,14 @@ def run(dest_dir: str) -> None:
 
 def process_annual_data(tb):
     tb = tb[tb["frequency_of_observation"] == "Annual"]
+
     tb = tb.drop(["frequency_of_observation", "month"], axis=1)
 
     tb["emissions_source"] = tb["emissions_source"].apply(lambda x: x + "_a")
 
     tb = tb.pivot(values="value", index=["country", "year"], columns=["emissions_source"])
     tb = tb.reset_index()
+    tb["total_annual_emissions"] = tb["TER_INT_a"] + tb["TER_DOM_a"]
 
     return tb
 
@@ -129,7 +130,7 @@ def process_monthly_data(tb):
 
 def add_inbound_outbound_tour(tb, tb_tourism):
     just_inb_ratio = tb_tourism[["country", "year", "inbound_outbound_tourism"]]
-    tb = pr.merge(tb, just_inb_ratio, on=["year", "country"])
+    tb = pr.merge(tb, just_inb_ratio, on=["year", "country"], how="left")
 
     # Calculate the interaction between TER_INT_a and inb_outb_tour
     tb["int_inb_out_per_capita"] = tb["per_capita_TER_INT_a"] / tb["inbound_outbound_tourism"]

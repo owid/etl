@@ -2,13 +2,13 @@
 
 import pandas as pd
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -34,7 +34,6 @@ def run(dest_dir: str) -> None:
     tb["month"] = tb["TIME_PERIOD"].dt.month
     tb["year"] = tb["TIME_PERIOD"].dt.year
     tb = tb.drop(["TIME_PERIOD"], axis=1)
-
     tb = tb.rename(columns={"Reference area": "country", "OBS_VALUE": "value"})
     #
     # Process data.
@@ -46,7 +45,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()

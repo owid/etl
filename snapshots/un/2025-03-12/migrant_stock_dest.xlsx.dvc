@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "International Migrant Stock"
+    description: |-
+      The 2024 edition of the International Migrant Stock dataset presents the latest United Nations estimates of the numbers and characteristics of international migrants around the world. Covering the period from 1990 to 2024, the dataset includes estimates of the total number of international migrants by sex, as well as their places of origin and destination, for 233 countries and areas.
+
+      In producing the 2024 edition of the International Migrant Stock dataset, the Population Division has prioritized revising the estimates for countries with new empirical information from population censuses or registers and relatively large numbers of international migrants, as well as for countries affected by ongoing or emergent refugee flows as documented by UNHCR.  In the new edition of these data, a total of 60 countries and areas received a full reassessment of trends in the number of international migrants residing in the territory. For the remaining countries and areas, the estimates generated in 2024 reflect extrapolations of estimates published in the 2020 edition of the dataset.
+    date_published: "2024"
+    version_producer: 2024 - POP/DB/MIG/Stock/Rev.2024
+    title_snapshot: Destination
+    description_snapshot: |-
+      Includes figures on migrant stock by destination, disagreggated by sex.
+
+    # Citation
+    producer: United Nations Department of Economic and Social Affairs
+    citation_full: |-
+      United Nations Department of Economic and Social Affairs, Population Division (2024). International Migrant Stock 2024.
+    attribution_short: UN DESA
+
+    # Files
+    url_main: https://www.un.org/development/desa/pd/content/international-migrant-stock
+    url_download: https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2024_ims_stock_by_sex_and_destination.xlsx
+    date_accessed: 2025-03-12
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://www.un.org/development/desa/pd/content/international-migrant-stock
+
+outs:
+  - md5: 82d3edb8acd1c608e77b77390719418d
+    size: 541936
+    path: migrant_stock_dest.xlsx

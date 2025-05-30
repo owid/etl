@@ -6,14 +6,13 @@ from typing import Any, Dict, Iterable, List, Literal, Optional, Set, Union, cas
 import numpy as np
 import pandas as pd
 import pymysql
-import sqlalchemy
 import structlog
 from jsonschema import validate
 from owid import catalog
 from owid.catalog import Table, jinja, warnings
 from owid.catalog.utils import dynamic_yaml_load, dynamic_yaml_to_dict, underscore
 from owid.catalog.yaml_metadata import merge_with_shared_meta
-from sqlalchemy import text
+from sqlalchemy import exc, text
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
@@ -103,11 +102,9 @@ def _yield_wide_table(
             # Silence - DeprecationWarning: Passing a BlockManager to Table is deprecated and will raise
             # in a future version. Use public APIs instead.
             with warnings.ignore_warnings([DeprecationWarning]):
+                mask = table_to_yield[column].notna() if na_action == "drop" else slice(None)
                 # NOTE: this copy is important, otherwise we'd ruin metadata
-                tab = table_to_yield.loc[:, [column]].copy(deep=False)
-
-            # Drop NA values
-            tab = tab.dropna() if na_action == "drop" else tab
+                tab = table_to_yield.loc[mask, [column]].copy(deep=False)
 
             # Create underscored name of a new column from the combination of column and dimensions
             short_name = _underscore_column_and_dimensions(
@@ -337,7 +334,7 @@ def _get_and_create_entities_in_db(countries: Set[str], engine: Engine | None = 
                     {"name": name},
                 )
                 session.commit()
-            except (pymysql.IntegrityError, sqlalchemy.exc.IntegrityError):
+            except (pymysql.IntegrityError, exc.IntegrityError):
                 # If another process inserted the same entity before us, we can
                 # safely ignore the error and fetch the ID
                 pass

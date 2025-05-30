@@ -11,6 +11,13 @@ def run(dest_dir: str) -> None:
     # load data
     tb = snap.read_csv()
 
+    # Rename wars
+    tb["country"] = tb["country"].replace(
+        {
+            "Second Sino-Japanese War": "Japanese Invasion of Manchuria",
+            "Third Sino-Japanese War": "Second Sino-Japanese War",
+        }
+    )
     # add table, update metadata from *.meta.yml and save
     ds = create_dataset(dest_dir, tables=[tb.set_index(["country", "year"])], default_metadata=snap.metadata)
 

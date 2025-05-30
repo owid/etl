@@ -13,7 +13,7 @@ from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()
@@ -44,7 +44,7 @@ REGIONS = [
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("wdi.start")
 
     #
@@ -106,13 +106,17 @@ def run(dest_dir: str) -> None:
             ds_population=ds_population,
         )
 
+    tb_garden = add_energy_access_variables(tb_garden)
+
+    tb_garden = add_patents_articles_per_million_people(tb_garden)
+
     ####################################################################################################################
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_garden], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -759,4 +763,48 @@ def add_population_weighted_aggregations(
     # Merge the regional data back to the original table
     tb = pr.concat([tb, tb_regions], ignore_index=True)
 
+    return tb
+
+
+def add_energy_access_variables(tb: Table) -> Table:
+    """
+    Calculate the following energy related variables:
+
+    1. Share of the population without access to electricity
+    2. Number of people with access to electricity
+    3. Number of people without access to electricity
+    4. Share of the population without access to clean cooking fuels
+    5. Number of people with access to clean cooking fuels
+    6. Number of people without access to clean cooking fuels
+
+    """
+
+    # Add energy access variables
+    tb = tb.reset_index()
+
+    tb["eg_elc_accs_zs_without"] = 100 - tb["eg_elc_accs_zs"]
+    tb["eg_cft_accs_zs_without"] = 100 - tb["eg_cft_accs_zs"]
+
+    # Calculate number of people with and without access to electricity
+    tb["eg_elc_accs_zs_number"] = tb["eg_elc_accs_zs"] / 100 * tb["sp_pop_totl"]
+    tb["eg_elc_accs_zs_without_number"] = tb["eg_elc_accs_zs_without"] / 100 * tb["sp_pop_totl"]
+
+    # Calculate number of people with and without access to clean cooking fuels
+    tb["eg_cft_accs_zs_number"] = tb["eg_cft_accs_zs"] / 100 * tb["sp_pop_totl"]
+    tb["eg_cft_accs_zs_without_number"] = tb["eg_cft_accs_zs_without"] / 100 * tb["sp_pop_totl"]
+    tb = tb.format(["country", "year"])
+    return tb
+
+
+def add_patents_articles_per_million_people(tb: Table) -> Table:
+    """
+    Add patents and articles per million people.
+    """
+    tb = tb.reset_index()
+
+    # Calculate patents and articles per million people
+    tb["patents_per_million_people"] = tb["ip_pat_resd"] / tb["sp_pop_totl"] * 1000000
+    tb["articles_per_million_people"] = tb["ip_jrn_artc_sc"] / tb["sp_pop_totl"] * 1000000
+
+    tb = tb.format(["country", "year"])
     return tb

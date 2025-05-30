@@ -11,7 +11,6 @@ import re
 import subprocess
 import sys
 import tempfile
-import time
 import warnings
 from collections import defaultdict
 from collections.abc import Generator
@@ -32,9 +31,6 @@ from owid import catalog
 from owid.catalog import s3_utils
 from owid.catalog.catalogs import OWID_CATALOG_URI
 from owid.catalog.datasets import DEFAULT_FORMATS
-from owid.walden import CATALOG as WALDEN_CATALOG
-from owid.walden import Catalog as WaldenCatalog
-from owid.walden import Dataset as WaldenDataset
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
@@ -44,6 +40,7 @@ from etl.config import OWID_ENV, TLS_VERIFY
 from etl.db import get_engine
 from etl.grapher import helpers as gh
 from etl.grapher import model as gm
+from etl.helpers import get_metadata_path
 from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
@@ -53,6 +50,9 @@ DAG = Dict[str, Any]
 
 
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
+
+# Dictionary to store metadata changes for each dataset if INSTANT flag is set
+INSTANT_METADATA_DIFF = {}
 
 
 def compile_steps(
@@ -193,9 +193,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
     if step_type == "data":
         step = DataStep(path, dependencies)
 
-    elif step_type == "walden":
-        step = WaldenStep(path)
-
     elif step_type == "snapshot":
         step = SnapshotStep(path)
 
@@ -213,9 +210,6 @@ def parse_step(step_name: str, dag: Dict[str, Any]) -> "Step":
 
     elif step_type == "data-private":
         step = DataStepPrivate(path, dependencies)
-
-    elif step_type == "walden-private":
-        step = WaldenStepPrivate(path)
 
     elif step_type == "snapshot-private":
         step = SnapshotStepPrivate(path)
@@ -273,7 +267,7 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
         version = "latest"
         name = root
         identifier = root
-    elif prefix in ["snapshot", "walden"]:
+    elif prefix in ["snapshot"]:
         # Ingestion steps.
         channel = prefix
 
@@ -305,16 +299,11 @@ def extract_step_attributes(step: str) -> Dict[str, str]:
     return attributes
 
 
-def load_from_uri(uri: str) -> catalog.Dataset | Snapshot | WaldenDataset:
+def load_from_uri(uri: str) -> catalog.Dataset | Snapshot:
     """Load an ETL dataset from a URI."""
     attributes = extract_step_attributes(cast(str, uri))
-    # Walden
-    if attributes["channel"] == "walden":
-        dataset = WaldenCatalog().find_one(
-            namespace=attributes["namespace"], version=attributes["version"], short_name=attributes["name"]
-        )
     # Snapshot
-    elif attributes["channel"] == "snapshot":
+    if attributes["channel"] == "snapshot":
         path = f"{attributes['namespace']} / {attributes['version']} / {attributes['name']}"
         try:
             dataset = Snapshot(path)
@@ -418,6 +407,11 @@ class DataStep(Step):
 
         ds_idex_mtime = self._dataset_index_mtime()
 
+        # if INSTANT flag is set, just update the metadata
+        if config.INSTANT and self.channel == "garden":
+            self._run_instant_metadata()
+            return
+
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             if config.DEBUG:
@@ -463,6 +457,10 @@ class DataStep(Step):
             else:
                 raise e
         exp_source_checksum = self.checksum_input()
+
+        # if INSTANT is on, we use _instant suffix in a checksum
+        if config.INSTANT and found_source_checksum:
+            found_source_checksum = found_source_checksum.replace("_instant", "")
 
         if found_source_checksum != exp_source_checksum:
             return True
@@ -543,6 +541,44 @@ class DataStep(Step):
     @property
     def _dest_dir(self) -> Path:
         return paths.DATA_DIR / self.path.lstrip("/")
+
+    def _run_instant_metadata(self) -> None:
+        """If INSTANT flag is set, instead of running the whole garden step, just load
+        the existing dataset and update its metadata. This is useful for fast-tracking
+        metadata changes without having to rerun the whole step.
+        """
+
+        meta_path = get_metadata_path(self._dest_dir.as_posix())
+        if not meta_path.exists():
+            return
+
+        ds = catalog.Dataset(self._dest_dir.as_posix())
+
+        # Read metadata before
+        table_meta_before = _load_tables_metadata(ds)
+
+        # Save dataset, but use _instant suffix in the checksum to make sure we
+        # trigger fresh run when not using INSTANT
+        ds.update_metadata(meta_path)
+        ds.metadata.source_checksum = self.checksum_input() + "_instant"
+        ds.save()
+
+        # Read metadata after
+        table_meta_after = _load_tables_metadata(ds)
+
+        INSTANT_METADATA_DIFF[ds.m.short_name] = defaultdict(list)
+
+        for table_name in ds.table_names:
+            # Find variables with metadata changes
+            for var_name in table_meta_before[table_name]["fields"]:
+                if (
+                    table_meta_before[table_name]["fields"][var_name]
+                    != table_meta_after[table_name]["fields"][var_name]
+                ):
+                    log.info("instant.update", table_name=table_name, var_name=var_name)
+                    # Add the variable to a global variable so that we can only rerun changed
+                    # variables in the grapher step
+                    INSTANT_METADATA_DIFF[ds.m.short_name][table_name].append(var_name)
 
     def _run_py_isolated(self) -> None:
         """
@@ -685,69 +721,6 @@ class DataStep(Step):
 
 
 @dataclass
-class WaldenStep(Step):
-    path: str
-    dependencies = []
-
-    def __init__(self, path: str) -> None:
-        self.path = path
-
-    def __str__(self) -> str:
-        return f"walden://{self.path}"
-
-    def run(self) -> None:
-        "Ensure the dataset we're looking for is there."
-        self._walden_dataset.ensure_downloaded(quiet=True)
-
-    def is_dirty(self) -> bool:
-        if not Path(self._walden_dataset.local_path).exists():
-            return True
-
-        if files.checksum_file(self._walden_dataset.local_path) != self._walden_dataset.md5:
-            return True
-
-        return False
-
-    def has_existing_data(self) -> bool:
-        return True
-
-    def checksum_output(self) -> str:
-        if not self._walden_dataset.md5:
-            raise Exception(f"walden dataset is missing checksum: {self}")
-
-        inputs = [
-            # the contents of the dataset
-            self._walden_dataset.md5,
-            # the metadata describing the dataset
-            files.checksum_file(self._walden_dataset.index_path),
-        ]
-
-        checksum = hashlib.md5(",".join(inputs).encode("utf8")).hexdigest()
-
-        return checksum
-
-    @property
-    def _walden_dataset(self) -> WaldenDataset:
-        if self.path.count("/") != 2:
-            raise ValueError(f"malformed walden path: {self.path}")
-
-        namespace, version, short_name = self.path.split("/")
-
-        # normally version is a year or date, but we also accept "latest"
-        if version == "latest":
-            dataset = WALDEN_CATALOG.find_latest(namespace=namespace, short_name=short_name)
-        else:
-            dataset = WALDEN_CATALOG.find_one(namespace=namespace, version=version, short_name=short_name)
-
-        return dataset
-
-    @property
-    def version(self) -> str:
-        # namspace / version / dataset
-        return self.path.split("/")[1]
-
-
-@dataclass
 class SnapshotStep(Step):
     path: str
     dependencies = []
@@ -846,7 +819,7 @@ class GrapherStep(Step):
 
         # dataset exists, but it is possible that we haven't inserted everything into DB
         dataset = self.dataset
-        return db.fetch_db_checksum(dataset) != self.data_step.checksum_input()
+        return db.fetch_db_checksum(dataset) != self.checksum_input()
 
     def run(self) -> None:
         import etl.grapher.to_db as db
@@ -881,21 +854,51 @@ class GrapherStep(Step):
             verbose = True
             i = 0
 
+            # Get checksums for all variables in a dataset
+            preloaded_checksums = db.load_dataset_variables(dataset_upsert_results.dataset_id, engine)
+
             # NOTE: multiple tables will be saved under a single dataset, this could cause problems if someone
             # is fetching the whole dataset from data-api as they would receive all tables merged in a single
             # table. This won't be a problem after we introduce the concept of "tables"
             for table in dataset:
                 assert not table.empty, f"table {table.metadata.short_name} is empty"
 
-                # if GRAPHER_FILTER is set, only upsert matching columns
-                if config.GRAPHER_FILTER:
-                    cols = table.filter(regex=config.GRAPHER_FILTER).columns.tolist()
+                # if SUBSET is set, only upsert matching variables
+                if config.SUBSET:
+                    cols_regex = config.SUBSET
+                # if INSTANT is set, only upsert variables with changed metadata
+                elif config.INSTANT:
+                    dataset_name = dataset.m.short_name
+                    table_name = table.metadata.short_name
+
+                    # dataset wasn't run with instant, rerun it
+                    if dataset_name not in INSTANT_METADATA_DIFF:
+                        cols_regex = None
+                    else:
+                        instant_variables = INSTANT_METADATA_DIFF[dataset_name].get(table_name)
+                        if not instant_variables:
+                            # no changes in table, skip it
+                            continue
+                        else:
+                            cols_regex = "|".join(instant_variables)
+                else:
+                    cols_regex = None
+
+                if cols_regex:
+                    cols = table.filter(regex=cols_regex).columns.tolist()
                     if not cols:
                         continue
                     cols += [c for c in table.columns if c in {"year", "date", "country"} and c not in cols]
                     table = table.loc[:, cols]
 
                 table = gh._adapt_table_for_grapher(table, engine)
+
+                # Validation
+                db.check_table(table)
+
+                # Upsert origins
+                with Session(engine, expire_on_commit=False) as session:
+                    db_origins = db.upsert_origins(session, table)
 
                 for t in gh._yield_wide_table(table, na_action="drop"):
                     i += 1
@@ -906,9 +909,7 @@ class GrapherStep(Step):
                     # stop logging to stop cluttering logs
                     if i > 20 and verbose:
                         verbose = False
-                        thread_pool.submit(
-                            lambda: (time.sleep(10), log.info("upsert_dataset.continue_without_logging"))
-                        )
+                        log.info("showing only the first 20 logs")
 
                     # generate table with entity_id, year and value for every column
                     futures.append(
@@ -920,6 +921,8 @@ class GrapherStep(Step):
                             dataset_upsert_results,
                             catalog_path=catalog_path,
                             dimensions=(t.iloc[:, 0].metadata.additional_info or {}).get("dimensions"),
+                            checksums=preloaded_checksums.get(catalog_path, {}),
+                            db_origins=[db_origins[origin] for origin in t.iloc[:, 0].origins],
                             verbose=verbose,
                         )
                     )
@@ -927,7 +930,16 @@ class GrapherStep(Step):
             # wait for all tables to be inserted
             [future.result() for future in as_completed(futures)]
 
-        if not config.GRAPHER_FILTER and not config.SUBSET:
+        # If INSTANT flag is set, don't clean ghost variables, but update the checksum (with _instant suffix)
+        if INSTANT_METADATA_DIFF:
+            db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, self.checksum_input())
+
+        # If filtering is on, don't set checksum. Allow the next ETL run to set it
+        elif config.SUBSET:
+            pass
+
+        # Otherwise, clean up ghost resources and set checksum
+        else:
             # cleaning up ghost resources could be unsuccessful if someone renamed short_name of a variable
             # and remapped it in chart-sync. In that case, we cannot delete old variables because they are still
             # needed for remapping. However, we can delete it on next ETL run
@@ -937,12 +949,15 @@ class GrapherStep(Step):
 
             # set checksum and updatedAt timestamps after all data got inserted
             if success:
-                checksum = self.data_step.checksum_input()
+                checksum = self.checksum_input()
             # if cleanup was not successful, don't set checksum and let ETL rerun it on its next try
             else:
                 checksum = "to_be_rerun"
 
             db.set_dataset_checksum_and_editedAt(dataset_upsert_results.dataset_id, checksum)
+
+    def checksum_input(self) -> str:
+        return self.data_step.checksum_input()
 
     def checksum_output(self) -> str:
         """Checksum of a grapher step is the same as checksum of the underyling data://grapher step."""
@@ -985,7 +1000,7 @@ class GrapherStep(Step):
 class ExportStep(DataStep):
     """
     A step which exports something once. For instance committing to a Github repository
-    or creating a TSV file for owid-content.
+    or upserting an Explorer to DB.
     """
 
     path: str
@@ -1002,6 +1017,11 @@ class ExportStep(DataStep):
         # make sure the enclosing folder is there
         self._dest_dir.parent.mkdir(parents=True, exist_ok=True)
 
+        from etl.helpers import create_dataset
+
+        # Create folder for the dataset, export step can save files there
+        ds = create_dataset(self._dest_dir, tables=[])
+
         sp = self._search_path
         if sp.with_suffix(".py").exists() or (sp / "__init__.py").exists():
             if config.DEBUG:
@@ -1010,14 +1030,12 @@ class ExportStep(DataStep):
                 DataStep._run_py(self)  # type: ignore
 
         # save checksum
-        from etl.helpers import create_dataset
-
-        ds = create_dataset(self._dest_dir, tables=[])
         ds.metadata.source_checksum = self.checksum_input()
         ds.save()
 
     def checksum_output(self) -> str:
-        raise NotImplementedError("ExportStep should not be used as an input")
+        # output checksum is checksum of all ingredients
+        return self.checksum_input()
 
     @property
     def _search_path(self) -> Path:
@@ -1111,14 +1129,6 @@ class DataStepPrivate(PrivateMixin, DataStep):
         return f"data-private://{self.path}"
 
 
-class WaldenStepPrivate(WaldenStep):
-    is_public = False
-    dependencies = []
-
-    def __str__(self) -> str:
-        return f"walden-private://{self.path}"
-
-
 def select_dirty_steps(steps: List[Step], workers: int = 1) -> List[Step]:
     """Select dirty steps using threadpool."""
     # dynamically add cached version of `is_dirty` to all steps to avoid re-computing
@@ -1190,3 +1200,12 @@ def isolated_env(
 
     # remove module dir from pythonpath
     sys.path.remove(working_dir.as_posix())
+
+
+def _load_tables_metadata(ds: catalog.Dataset) -> Dict[str, Dict[str, Any]]:
+    """Load metadata for all tables in a dataset."""
+    table_meta = {}
+    for table_name in ds.table_names:
+        with open(Path(ds.path) / f"{table_name}.meta.json") as f:
+            table_meta[table_name] = json.load(f)
+    return table_meta

@@ -5,7 +5,7 @@ tables:
   surface_global_monthly_anomaly:
     variables:
       temperature_anomaly:
-        description_short: The deviation of a specific year's average surface temperature from the 1991-2020 mean, in degrees
+        description_short: The difference of a specific year's average surface temperature from the 1991-2020 mean, in degrees
           Celsius.
         description_processing: |-
             - Temperature measured in kelvin was converted to degrees Celsius (°C) by subtracting 273.15.

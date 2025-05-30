@@ -2,14 +2,15 @@ steps:
   # Health
   data://garden/owid/latest/covid:
     - etag://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv
-  # Death completion (Karlinsky,2023)
-  data://meadow/health/2023-08-16/deaths_karlinsky:
-    - snapshot://health/2023-08-16/deaths_karlinsky.csv
-  data://garden/health/2023-08-16/deaths_karlinsky:
-    - data://meadow/health/2023-08-16/deaths_karlinsky
-    - data://garden/demography/2023-03-31/population
-  data://grapher/health/2023-08-16/deaths_karlinsky:
-    - data://garden/health/2023-08-16/deaths_karlinsky
+
+  # Death completion (Karlinsky, 2024)
+  data://meadow/health/2025-04-18/deaths_karlinsky:
+    - snapshot://health/2025-04-18/deaths_karlinsky.csv
+  data://garden/health/2025-04-18/deaths_karlinsky:
+    - data://meadow/health/2025-04-18/deaths_karlinsky
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-04-18/deaths_karlinsky:
+    - data://garden/health/2025-04-18/deaths_karlinsky
 
   # IHME GBD Leading cause of  deaths - update
   data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy:
@@ -22,7 +23,7 @@ steps:
 
   # Postnatal care coverage - World Bank (2022)
   data://meadow/postnatal_care/2022-09-19/postnatal_care:
-    - walden://postnatal_care/2022-09-19/postnatal_care
+    - snapshot://postnatal_care/2022-09-19/postnatal_care.csv
   data://garden/postnatal_care/2022-09-19/postnatal_care:
     - data://meadow/postnatal_care/2022-09-19/postnatal_care
   data://grapher/postnatal_care/2022-09-19/postnatal_care:
@@ -37,9 +38,11 @@ steps:
     - snapshot://who/latest/fluid.csv
   data://garden/who/latest/fluid:
     - data://meadow/who/latest/fluid
-  data://explorers/who/latest/flu:
+  data://grapher/who/latest/flu:
     - data://garden/who/latest/fluid
     - data://garden/who/latest/flunet
+  export://explorers/who/latest/influenza:
+    - data://grapher/who/latest/flu
 
   # Flu vaccine policy - https://immunizationdata.who.int/pages/indicators-by-category/influenza.html?YEAR=
   data://meadow/who/2023-04-03/flu_vaccine_policy:
@@ -183,15 +186,6 @@ steps:
 
   data://garden/oecd/2018-03-11/road_deaths_and_injuries:
     - snapshot://oecd/2018-03-11/road_deaths_and_injuries.feather
-
-  # Kucharski
-  data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
-    - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
-  data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski:
-    - data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/health/2023-08-14/avian_influenza_h5n1_kucharski:
-    - data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski
 
   # European Society for Cardiology datasets
   data://meadow/cardiovascular_diseases/2023-10-10/esc:
@@ -463,6 +457,7 @@ steps:
   data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://meadow/ihme_gbd/2024-05-20/gbd_prevalence
     - data://garden/regions/2023-01-01/regions
+    - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2024-05-20/gbd_prevalence:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_prevalence
   data-private://grapher/ihme_gbd/2024-05-20/gbd_incidence:
@@ -518,6 +513,12 @@ steps:
     - data://garden/un/2022-07-11/un_wpp
   data-private://grapher/ihme_gbd/2024-05-20/gbd_child_mortality:
     - data-private://garden/ihme_gbd/2024-05-20/gbd_child_mortality
+
+  # GBD 2021 - GBD Child Mortality Leading Causes
+  data-private://garden/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes:
+    - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
+  data-private://grapher/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes:
+    - data-private://garden/ihme_gbd/2025-03-31/gbd_child_mortality_leading_causes
 
   # GBD 2021 - GBD Health-adjusted Life Expectancy and Life Expectancy
   data-private://meadow/ihme_gbd/2024-07-02/gbd_life_expectancy:
@@ -624,7 +625,6 @@ steps:
     - data://garden/who/2024-08-06/mortality_database_cancer
   data://grapher/who/2024-08-06/mortality_database_cancer_most_common:
     - data://garden/who/2024-08-06/mortality_database_cancer_most_common
-
   data://meadow/who/latest/monkeypox:
     - snapshot://who/latest/monkeypox.csv
   data://garden/who/latest/monkeypox:
@@ -632,12 +632,11 @@ steps:
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
     - data://garden/health/latest/global_health_mpox
-  data://explorers/who/latest/monkeypox:
-    - data://garden/who/latest/monkeypox
+
   data://grapher/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
-  # export://explorers/who/latest/monkeypox:
-  #   - data://grapher/who/latest/monkeypox
+  export://explorers/who/latest/monkeypox:
+    - data://grapher/who/latest/monkeypox
   export://github/who/latest/monkeypox:
     - data://garden/who/latest/monkeypox
   # Mpox - Global.health
@@ -908,12 +907,12 @@ steps:
   #
   # WHO Vaccine Introductions
   #
-  data://meadow/who/2025-01-09/vaccination_schedules:
-    - snapshot://who/2025-01-09/vaccination_schedules.xlsx
-  data://garden/who/2025-01-09/vaccination_schedules:
-    - data://meadow/who/2025-01-09/vaccination_schedules
-  data://grapher/who/2025-01-09/vaccination_schedules:
-    - data://garden/who/2025-01-09/vaccination_schedules
+  data://meadow/who/2025-01-09/vaccination_introductions:
+    - snapshot://who/2025-01-09/vaccination_introductions.xlsx
+  data://garden/who/2025-01-09/vaccination_introductions:
+    - data://meadow/who/2025-01-09/vaccination_introductions
+  data://grapher/who/2025-01-09/vaccination_introductions:
+    - data://garden/who/2025-01-09/vaccination_introductions
 
   #
   # WHO vaccine stock out
@@ -944,6 +943,14 @@ steps:
     - data://garden/demography/2025-01-23/us_state_population
     - data://garden/demography/2024-07-15/population
     - snapshot://fasttrack/latest/cdc_measles.csv
+    - snapshot://fasttrack/latest/measles_cases.csv
+    - data://garden/cdc/2025-01-26/measles_state_level
+  data://external/health/latest/measles_state_level:
+    - data://meadow/health/2025-01-22/measles_state_level
+    - data://garden/demography/2025-01-23/us_state_population
+    - data://garden/demography/2024-07-15/population
+    - snapshot://fasttrack/latest/cdc_measles.csv
+    - snapshot://fasttrack/latest/measles_cases.csv
     - data://garden/cdc/2025-01-26/measles_state_level
   data://grapher/health/2025-01-22/measles_state_level:
     - data://garden/health/2025-01-22/measles_state_level
@@ -1148,7 +1155,9 @@ steps:
   # Multi-dim indicators - vaccination coverage
   export://multidim/health/latest/vaccination_coverage:
     - data://grapher/who/2024-12-10/vaccination_coverage
-  #
+  export://multidim/health/latest/vaccination_introductions:
+    - data://grapher/who/2025-01-09/vaccination_introductions
+
   # US Pertussis cases - CDC
   #
   data://meadow/cdc/2025-03-04/pertussis_cases:
@@ -1160,7 +1169,7 @@ steps:
     - data://garden/cdc/2025-03-04/pertussis_cases
 
   #
-  # TODO: add step name (just something recognizable)
+  # Pertussis deaths - US Census Bureau
   #
   data://meadow/us_census_bureau/2025-03-06/pertussis_deaths:
     - snapshot://us_census_bureau/2025-03-06/pertussis_deaths.csv
@@ -1168,7 +1177,7 @@ steps:
     - data://meadow/us_census_bureau/2025-03-06/pertussis_deaths
 
   #
-  # TODO: add step name (just something recognizable)
+  # Pertussis deaths - combined
   #
   data://garden/health/2025-03-06/pertussis_deaths:
     - data://garden/us_census_bureau/2025-03-06/pertussis_deaths
@@ -1176,3 +1185,122 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/health/2025-03-06/pertussis_deaths:
     - data://garden/health/2025-03-06/pertussis_deaths
+
+  #
+  # Polio cases - Public Health Reports
+  #
+  data://meadow/public_health_reports/2025-03-12/polio_cases:
+    - snapshot://public_health_reports/2025-03-12/polio_cases.csv
+
+  #
+  # Polio cases - US Census Bureau
+  #
+  data://meadow/us_census_bureau/2025-03-12/polio_cases:
+    - snapshot://us_census_bureau/2025-03-12/polio_cases.csv
+
+  #
+  # Polio cases - CDC
+  #
+  data://meadow/cdc/2025-03-12/polio_cases:
+    - snapshot://cdc/2025-03-12/polio_cases.csv
+
+  #
+  # Polio cases - combined
+  #
+  data://garden/health/2025-03-12/polio_cases:
+    - data://meadow/cdc/2025-03-12/polio_cases
+    - data://meadow/us_census_bureau/2025-03-12/polio_cases
+    - data://meadow/public_health_reports/2025-03-12/polio_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-03-12/polio_cases:
+    - data://garden/health/2025-03-12/polio_cases
+
+  #
+  # Polio deaths - Public Health Reports
+  #
+  data://meadow/public_health_reports/2025-03-14/polio_deaths:
+    - snapshot://public_health_reports/2025-03-14/polio_deaths.csv
+
+  #
+  # Polio deaths - CDC
+  #
+  data://meadow/cdc/2025-03-14/polio_deaths:
+    - snapshot://cdc/2025-03-14/polio_deaths.csv
+
+  #
+  # Polio deaths - combined
+  data://garden/health/2025-03-14/polio_deaths:
+    - data://meadow/cdc/2025-03-14/polio_deaths
+    - data://meadow/public_health_reports/2025-03-14/polio_deaths
+    - data://garden/demography/2024-07-15/population
+  data://grapher/health/2025-03-14/polio_deaths:
+    - data://garden/health/2025-03-14/polio_deaths
+
+  #
+  # Mumps cases - CDC
+  #
+  data://meadow/cdc/2025-03-17/mumps_cases:
+    - snapshot://cdc/2025-03-17/mumps_cases.csv
+  data://garden/cdc/2025-03-17/mumps_cases:
+    - data://meadow/cdc/2025-03-17/mumps_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-17/mumps_cases:
+    - data://garden/cdc/2025-03-17/mumps_cases
+
+  #
+  # Mumps deaths - CDC
+  #
+  data://meadow/cdc/2025-03-17/mumps_deaths:
+    - snapshot://cdc/2025-03-17/mumps_deaths.csv
+  data://garden/cdc/2025-03-17/mumps_deaths:
+    - data://meadow/cdc/2025-03-17/mumps_deaths
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-17/mumps_deaths:
+    - data://garden/cdc/2025-03-17/mumps_deaths
+
+  # Rubella cases - CDC
+  #
+  data://meadow/cdc/2025-03-19/rubella_cases:
+    - snapshot://cdc/2025-03-19/rubella_cases.csv
+  data://garden/cdc/2025-03-19/rubella_cases:
+    - data://meadow/cdc/2025-03-19/rubella_cases
+    - data://garden/demography/2024-07-15/population
+  data://grapher/cdc/2025-03-19/rubella_cases:
+    - data://garden/cdc/2025-03-19/rubella_cases
+
+  #
+  # B Yamagata flu strain - from Flunet
+  #
+  data://garden/who/2025-03-19/flu_yamagata:
+    - data://garden/who/latest/flunet
+  data://grapher/who/2025-03-19/flu_yamagata:
+    - data://garden/who/2025-03-19/flu_yamagata
+
+  # WHO Smoking data
+  data://garden/who/2025-04-07/gho_smoking:
+    - data://garden/who/2024-01-03/gho
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/who/2025-04-07/gho_smoking:
+    - data://garden/who/2025-04-07/gho_smoking
+
+  #
+  # Rinderpest
+  #
+  data://meadow/health/2025-04-22/rinderpest:
+    - snapshot://health/2025-04-22/rinderpest.csv
+  data://garden/health/2025-04-22/rinderpest:
+    - data://meadow/health/2025-04-22/rinderpest
+  data://grapher/health/2025-04-22/rinderpest:
+    - data://garden/health/2025-04-22/rinderpest
+
+  #
+  # Tuberculosis - CDC
+  #
+  data://meadow/cdc/2025-05-19/tuberculosis:
+    - snapshot://cdc/2025-05-19/tuberculosis.csv
+  data://garden/cdc/2025-05-19/tuberculosis:
+    - data://meadow/cdc/2025-05-19/tuberculosis
+  data://grapher/cdc/2025-05-19/tuberculosis:
+    - data://garden/cdc/2025-05-19/tuberculosis

@@ -5,11 +5,11 @@ The following diagram shows the structure of the computational graph. Each step 
 ```mermaid
 flowchart LR
 
-    id00((____)):::node --> id11((____)):::node
-    id01((____)):::node --> id11((____)):::node --> id21((____)):::node  --> id31((____)):::node
-    id02((____)):::node --> id12((____)):::node --> id22((____)):::node
-                         id12((____)):::node --> id21((____)):::node
-    id03((____)):::node --> id13((____)):::node --> id22((____)):::node  --> id32((____)):::node
+    id00((&nbsp;&nbsp;&nbsp;)):::node --> id11((&nbsp;&nbsp;&nbsp;)):::node
+    id01((&nbsp;&nbsp;&nbsp;)):::node --> id11((&nbsp;&nbsp;&nbsp;)):::node --> id21((&nbsp;&nbsp;&nbsp;)):::node  --> id31((&nbsp;&nbsp;&nbsp;)):::node
+    id02((&nbsp;&nbsp;&nbsp;)):::node --> id12((&nbsp;&nbsp;&nbsp;)):::node --> id22((&nbsp;&nbsp;&nbsp;)):::node
+                         id12((&nbsp;&nbsp;&nbsp;)):::node --> id21((&nbsp;&nbsp;&nbsp;)):::node
+    id03((&nbsp;&nbsp;&nbsp;)):::node --> id13((&nbsp;&nbsp;&nbsp;)):::node --> id22((&nbsp;&nbsp;&nbsp;)):::node  --> id32((&nbsp;&nbsp;&nbsp;)):::node
     classDef node fill:#002147,color:#002147
     linkStyle default stroke-width:1px;
 ```
@@ -19,11 +19,11 @@ Whenever there is a change in a node (red node), all nodes that marked it as a d
 
 ```mermaid
 flowchart LR
-    id00((____)):::node --> id11((____)):::node
-    id01((____)):::node_nonodechange --> id11((____)):::node --> id21((____)):::node  --> id31((____)):::node_deps
-    id02((____)):::node_change --> id12((____)):::node_deps --> id22((____)):::node_deps
-                         id12((____)):::node_deps --> id21((____)):::node_deps
-    id03((____)):::node --> id13((____)):::node --> id22((____)):::node_deps  --> id32((____)):::node_deps
+    id00((&nbsp;&nbsp;&nbsp;)):::node --> id11((&nbsp;&nbsp;&nbsp;)):::node
+    id01((&nbsp;&nbsp;&nbsp;)):::node_nonodechange --> id11((&nbsp;&nbsp;&nbsp;)):::node --> id21((&nbsp;&nbsp;&nbsp;)):::node  --> id31((&nbsp;&nbsp;&nbsp;)):::node_deps
+    id02((&nbsp;&nbsp;&nbsp;)):::node_change --> id12((&nbsp;&nbsp;&nbsp;)):::node_deps --> id22((&nbsp;&nbsp;&nbsp;)):::node_deps
+                         id12((&nbsp;&nbsp;&nbsp;)):::node_deps --> id21((&nbsp;&nbsp;&nbsp;)):::node_deps
+    id03((&nbsp;&nbsp;&nbsp;)):::node --> id13((&nbsp;&nbsp;&nbsp;)):::node --> id22((&nbsp;&nbsp;&nbsp;)):::node_deps  --> id32((&nbsp;&nbsp;&nbsp;)):::node_deps
 
     classDef node fill:#002147,color:#002147
     classDef node_change fill:#ce261e,color:#ce261e,stroke-width:3px;

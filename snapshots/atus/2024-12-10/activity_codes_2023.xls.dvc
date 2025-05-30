@@ -1,0 +1,36 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: American Time Use Survey
+    description: |-
+      The American Time Use Survey (ATUS) measures the amount of time people spend doing various activities, such as paid work, childcare, volunteering, and socializing. It provides nationally representative estimates of how, where, and with whom Americans spend their time, and is the only federal survey providing data on the full range of nonmarket activities, from childcare to volunteering.
+    date_published: "2023"
+    version_producer: 2023
+    title_snapshot: American Time Use Survey - Single Activity codes
+    description_snapshot: |-
+      Activity codes used in the 2023 activity coding. The ATUS Activity Coding Lexicon is a 3-tiered classification system with 17 first-tier categories. Each of the first-tier categories has two additional levels of detail. Respondents' reported activities are assigned 6-digit activity codes based on this classification system. Activity codes are periodically evaluated and updated prior to the start of each year’s data collection.
+
+      Activity codes are comparable in the single activity files for 2013-2023. For more information about comparability of activity codes across years, see the changes to lexicon changes file (https://www.bls.gov/tus/lexicons/lexiconchanges.pdf) and ATUS activity coding lexicon (https://www.bls.gov/tus/lexicons/lexiconnoex0323.pdf).
+
+    # Citation
+    producer: U.S. Bureau of Labor Statistics
+    citation_full: |-
+      American Time Use Survey, U.S. Bureau of Labor Statistics (https://www.bls.gov/tus/data/datafiles-0323.htm) (2024)
+    attribution_short: BLS
+
+    # Files
+    url_main: https://www.bls.gov/tus/lexicons.htm
+    #just for reference - snapshot is created from local file, since this file leads to 403 - forbidden error
+    url_download: https://www.bls.gov/tus/lexicons/lexiconwex2023.xls
+    date_accessed: 2024-12-12
+
+    # License
+    license:
+      name: Public domain
+      url: https://www.bls.gov/opub/copyright-information.htm
+outs:
+  - md5: 4de237dbc8fc3a2030c8c203b15db5a4
+    size: 247808
+    path: activity_codes_2023.xls

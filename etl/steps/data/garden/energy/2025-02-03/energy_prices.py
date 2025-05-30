@@ -2,13 +2,13 @@
 
 import owid.catalog.processing as pr
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current data step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
@@ -110,5 +110,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new dataset with the same metadata as meadow
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb_annual, tb_monthly], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb_annual, tb_monthly])
     ds_garden.save()

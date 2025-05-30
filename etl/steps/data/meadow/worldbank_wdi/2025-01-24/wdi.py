@@ -6,7 +6,7 @@ from owid.catalog.utils import underscore
 from pandas.api.types import is_numeric_dtype  # type: ignore
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Initialize logger.
 log = get_logger()
@@ -15,7 +15,7 @@ log = get_logger()
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     log.info("wdi.start")
 
     #
@@ -91,7 +91,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=[tb, tb_meta], default_metadata=snap.metadata)
+    ds_meadow = paths.create_dataset(tables=[tb, tb_meta], default_metadata=snap.metadata)
 
     # Save changes in the new garden dataset.
     ds_meadow.save()

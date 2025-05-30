@@ -1,10 +1,9 @@
 """
-This mdim was created as a proof of concept. It can be deleted if not used.
+This collection was created as a proof of concept. It can be deleted if not used.
 """
 
 from owid.catalog.meta import TableDimension
 
-from etl.collections import multidim
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -13,14 +12,13 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
-    config = paths.load_mdim_config()
+    config = paths.load_collection_config()
 
     # Load (flattened) table from grapher channel with dimension metadata
-    table = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)
-
+    tb = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)
     # Use the updated function with mapping from original_short_name to configuration values.
     add_dimension(
-        table,
+        tb,
         dimension={"name": "Per capita", "slug": "per_capita"},
         mapping={
             "emissions_per_capita": {"new_short_name": "emissions", "value": "True"},
@@ -28,16 +26,17 @@ def run() -> None:
         },
     )
 
-    # Update config with dimensions and views
-    config.update(multidim.expand_config(table))
+    # Create collection
+    c = paths.create_collection(
+        config=config,
+        tb=tb,
+    )
 
-    # Sort pollutants by name
-    # TODO: should sorting be part of dimension metadata in garden channel?
-    config["dimensions"][0]["choices"] = sorted(config["dimensions"][0]["choices"], key=lambda x: x["name"])
+    # Sort choices alphabetically
+    c.sort_choices({"pollutant": lambda x: sorted(x)})
 
-    # Create MDIM and upsert its config to DB
-    mdim = paths.create_mdim(config=config)
-    mdim.save()
+    # Save
+    c.save()
 
 
 def add_dimension(table, dimension: TableDimension, mapping: dict) -> None:

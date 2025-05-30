@@ -1,0 +1,34 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+
+      grapher_config:
+        note:  For example, the [Identifying Outputs of Generative Adversarial Networks Act](https://www.govinfo.gov/content/pkg/PLAW-116publ258/pdf/PLAW-116publ258.pdf) passed into law by the US Congress.
+    display:
+      numDecimalPlaces: 0
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ai_bills:
+    variables:
+      number_of_ai_related_bills_passed_into_law__2016_24:
+        title: Cumulative AI-related bills passed into law since 2016, as of 2024
+        unit: 'bills'
+        short_unit: ''
+        description_short: Totall number of bills passed into law by national legislatures (e.g., congress or parliament) that include the term “artificial intelligence” (translated into local languages) in the title or text, from 2016 to 2024.
+        description_key:
+          - Some large bills, like the U.S. National Defense Authorization Act (NDAA), include multiple AI-related provisions but are counted as a single law—potentially leading to undercounting.
+          - The AI Index tracks laws in 116 geographic areas, including Hong Kong and Macao, even though they are not officially recognized as independent countries.
+
+
+
+
