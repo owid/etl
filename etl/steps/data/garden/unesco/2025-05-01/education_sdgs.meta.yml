@@ -557,11 +557,34 @@ tables:
           display:
             numDecimalPlaces: 1
 
+      combined_expenditure_share_gdp:
+        title: Public spending on education as a share of GDP (historical and recent)
+        unit: "%"
+        short_unit: "%"
+        description_short: Total [general government](#dod:general-government) expenditure on education (all levels of government and all levels of education), given as a share of GDP.
+        description_processing: |-
+          **Historical expenditure data:**
+
+          Historical data in this dataset is based on a wide array of sources, reflecting a comprehensive approach to data collection across different time periods and regions. However, the diverse nature of these sources leads to inconsistencies, as methodologies and data quality vary between sources. For instance, older sources like the League of Nations Statistical Yearbook or Mitchell's 1962 data may use different metrics or collection methods compared to more modern sources like the OECD Education reports or UN surveys. This variance in source material and methodology means that direct comparisons across different years or countries might be challenging, necessitating careful interpretation and cross-reference for accuracy. The dataset serves as a rich historical repository but also underscores the complexities and challenges inherent in compiling and harmonizing historical data from multiple, diverse sources.
+
+          **Recent estimates:**
+
+          General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments.
+
+          World Bank variable id: SE.XPD.TOTL.GD.ZS
+
+          Original source: UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022.
+        presentation:
+          title_public: Public spending on education as a share of GDP
+        display:
+          numDecimalPlaces: 2
+          name: Share of GDP
+
       combined_literate:
         title: Literacy rate (historical and recent)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
+        description_short: share of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
         description_key:
           - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
           - It captures the percentage of individuals aged 15 and above who are considered literate, based on their ability to both read and write.
@@ -586,35 +609,13 @@ tables:
           title_public: Literacy rate
         display:
           numDecimalPlaces: 1
-
-      combined_expenditure_share_gdp:
-        title: Public spending on education as a share of GDP (historical and recent)
-        unit: "%"
-        short_unit: "%"
-        description_short: Total [general government](#dod:general-government) expenditure on education (all levels of government and all levels of education), given as a share of GDP.
-        description_processing: |-
-          **Historical expenditure data:**
-
-          Historical data in this dataset is based on a wide array of sources, reflecting a comprehensive approach to data collection across different time periods and regions. However, the diverse nature of these sources leads to inconsistencies, as methodologies and data quality vary between sources. For instance, older sources like the League of Nations Statistical Yearbook or Mitchell's 1962 data may use different metrics or collection methods compared to more modern sources like the OECD Education reports or UN surveys. This variance in source material and methodology means that direct comparisons across different years or countries might be challenging, necessitating careful interpretation and cross-reference for accuracy. The dataset serves as a rich historical repository but also underscores the complexities and challenges inherent in compiling and harmonizing historical data from multiple, diverse sources.
-
-          **Recent estimates:**
-
-          General government expenditure on education (current, capital, and transfers) is expressed as a percentage of GDP. It includes expenditure funded by transfers from international sources to government. General government usually refers to local, regional and central governments.
-
-          World Bank variable id: SE.XPD.TOTL.GD.ZS
-
-          Original source: UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022.
-        presentation:
-          title_public: Public spending on education as a share of GDP
-        display:
-          numDecimalPlaces: 2
           name: Literate
 
       combined_illiterate:
         title: Illiteracy rate (historical and recent)
         unit: "%"
         short_unit: "%"
-        description_short: Percentage of the population aged 15 and above who cannot read and write a short, simple statement on their everyday life.
+        description_short: Share of the population aged 15 and above who cannot read and write a short, simple statement on their everyday life.
         description_processing: |-
           The illiteracy rate is calculated as 100% minus the literacy rate, which measures the share of people aged 15 and above who can read and write a short, simple statement.
         presentation:
