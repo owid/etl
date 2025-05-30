@@ -13,6 +13,14 @@ def run(dest_dir: str) -> None:
     # load data
     tb = snap.read_csv()
 
+    ####################################################################################################################
+    # Fix indicators with mixed types.
+    tb["african_elephant_population_definite"] = (
+        tb["african_elephant_population_definite"].str.replace(",", "").astype(float)
+    )
+    assert all(pd.api.types.is_numeric_dtype(tb[column]) for column in tb.drop(columns=["country", "year"]).columns)
+    ####################################################################################################################
+
     if uses_dates(tb["year"]):
         tb = tb.rename(columns={"year": "date"}).format(["country", "date"])
     else:
