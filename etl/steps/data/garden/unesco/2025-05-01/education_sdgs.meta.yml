@@ -577,7 +577,7 @@ tables:
         presentation:
           title_public: Public spending on education as a share of GDP
         display:
-          numDecimalPlaces: 2
+          numDecimalPlaces: 1
           name: Share of GDP
 
       combined_literate:
