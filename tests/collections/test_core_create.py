@@ -5,6 +5,7 @@ various collection utilities to create complete collections and explorers
 from configurations and optional table data.
 """
 
+from typing import Callable, cast
 from unittest.mock import Mock, patch
 
 import pytest
@@ -350,6 +351,7 @@ class TestRenameChoices:
         mock_collection.dimensions = [dimension]
 
         choice_renames = {"country": {"usa": "United States of America", "can": "Canada (Renamed)"}}
+        choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
         _rename_choices(mock_collection, choice_renames)
 
@@ -377,6 +379,7 @@ class TestRenameChoices:
             return None
 
         choice_renames = {"country": rename_func}
+        choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
         _rename_choices(mock_collection, choice_renames)
 
@@ -403,6 +406,7 @@ class TestRenameChoices:
             return None  # No rename for other slugs
 
         choice_renames = {"country": rename_func}
+        choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
         _rename_choices(mock_collection, choice_renames)
 
@@ -447,6 +451,7 @@ class TestRenameChoices:
                 "north_america": "North America"
             }
         }
+        choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
         _rename_choices(mock_collection, choice_renames)
 
@@ -472,7 +477,7 @@ class TestRenameChoices:
         }
 
         with pytest.raises(ValueError, match="Invalid choice_renames format"):
-            _rename_choices(mock_collection, choice_renames)
+            _rename_choices(mock_collection, choice_renames)  # type: ignore[arg-type]
 
 
 class TestIntegration:
@@ -486,6 +491,7 @@ class TestIntegration:
         tb = create_test_table()
 
         choice_renames = {"sex": {"male": "Male", "female": "Female"}}
+        choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
         with patch("etl.collection.core.create.has_duplicate_table_names") as mock_has_duplicates:
             with patch("etl.collection.core.create.create_collection_from_config") as mock_create:
