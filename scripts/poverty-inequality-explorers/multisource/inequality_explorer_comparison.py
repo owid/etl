@@ -6,6 +6,9 @@ import pandas as pd
 
 from ..common_parameters import *
 
+# NOTE: Define this for both PIP and LIS, to use the same year
+ppp_year_pip_lis = PPP_VERSION_COMPARISON_PIP
+
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each type of welfare measure or tables considered.
 
@@ -14,12 +17,12 @@ from ..common_parameters import *
 sheet_id = "1wcFsNZCEn_6SJ05BFkXKLUyvCrnigfR8eeemGKgAYsI"
 
 # Merged sheet (this contains PIP, WID and LIS dataset information together in one file)
-sheet_name = "merged_tables"
+sheet_name = f"merged_tables_{ppp_year_pip_lis}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 merged_tables = pd.read_csv(url, keep_default_na=False)
 
 # Source checkbox covers all the possible combinations to get for the multi-source selector
-sheet_name = "source_checkbox"
+sheet_name = f"source_checkbox_{ppp_year_pip_lis}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 source_checkbox = pd.read_csv(url, keep_default_na=False, dtype={"pip": "str", "wid": "str", "lis": "str"})
 
@@ -122,7 +125,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_PIP
 sourceLink = SOURCE_LINK_PIP
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 tableSlug = "poverty_inequality"
 new_line = NEW_LINE
 
@@ -131,7 +133,7 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP_COMPARISON
 notes_title = NOTES_TITLE_PIP
 
 processing_description = PROCESSING_DESCRIPTION_PIP_INEQUALITY
-ppp_description = PPP_DESCRIPTION_PIP_2017
+ppp_description = PPP_DESCRIPTION_PIP_CURRENT
 relative_poverty_description = RELATIVE_POVERTY_DESCRIPTION_PIP
 
 # Table generation
@@ -249,7 +251,6 @@ df_tables_pip["dataPublishedBy"] = dataPublishedBy
 df_tables_pip["sourceLink"] = sourceLink
 df_tables_pip["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables_pip["tolerance"] = tolerance
-df_tables_pip["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 ###########################################################################################
 # WORLD INEQUALITY DATABASE (WID)
@@ -262,7 +263,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_WID
 sourceLink = SOURCE_LINK_WID
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 additional_description = ADDITIONAL_DESCRIPTION_WID
@@ -358,7 +358,6 @@ df_tables_wid["dataPublishedBy"] = dataPublishedBy
 df_tables_wid["sourceLink"] = sourceLink
 df_tables_wid["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables_wid["tolerance"] = tolerance
-df_tables_wid["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 ###########################################################################################
 # LUXEMBOURG INCOME STUDY (LIS)
@@ -368,7 +367,6 @@ dataPublishedBy = DATA_PUBLISHED_BY_LIS
 sourceLink = SOURCE_LINK_LIS
 colorScaleNumericMinValue = COLOR_SCALE_NUMERIC_MIN_VALUE
 tolerance = TOLERANCE
-colorScaleEqualSizeBins = COLOR_SCALE_EQUAL_SIZEBINS
 new_line = NEW_LINE
 
 notes_title = NOTES_TITLE_LIS
@@ -511,7 +509,6 @@ df_tables_lis["dataPublishedBy"] = dataPublishedBy
 df_tables_lis["sourceLink"] = sourceLink
 df_tables_lis["colorScaleNumericMinValue"] = colorScaleNumericMinValue
 df_tables_lis["tolerance"] = tolerance
-df_tables_lis["colorScaleEqualSizeBins"] = colorScaleEqualSizeBins
 
 # Remove all the rows that have the "equivalized" value in the equivalized column
 df_tables_lis = df_tables_lis[df_tables_lis["equivalized"] != "equivalized"].reset_index(drop=True)
