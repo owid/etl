@@ -277,7 +277,7 @@ def add_universal_suffrage(tb: Table) -> Table:
     """Add general population's suffrage rights."""
     tb.loc[(tb["male_suffrage_lied"] == 0) & (tb["female_suffrage_lied"] == 0), "suffrage_lied"] = 0
     tb.loc[(tb["male_suffrage_lied"] == 1) & (tb["female_suffrage_lied"] == 0), "suffrage_lied"] = 1
-    tb.loc[(tb["male_suffrage_lied"] == 1) & (tb["female_suffrage_lied"] == 1), "suffrage_lied"] = 1.5
+    tb.loc[(tb["male_suffrage_lied"] == 0) & (tb["female_suffrage_lied"] == 1), "suffrage_lied"] = 1.5
     tb.loc[(tb["male_suffrage_lied"] == 1) & (tb["female_suffrage_lied"] == 1), "suffrage_lied"] = 2
     tb["suffrage_lied"].metadata = tb["female_suffrage_lied"].metadata
 
