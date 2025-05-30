@@ -141,7 +141,7 @@ def combine_datasets(tb_a: Table, tb_b: Table, table_name: str, preferred_source
 
 def remove_duplicates(tb: Table, preferred_source: str, dimensions: List[str]) -> Table:
     """
-    Removing rows where there are overlapping years with a preference for IGME data.
+    Removing rows where there are overlapping years with a preference for FRA data.
 
     """
     assert any(tb["source"] == preferred_source)

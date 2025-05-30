@@ -11,7 +11,6 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    # Load garden dataset.
     ds_garden = paths.load_dataset("forest_share")
 
     # Read table from garden dataset.
