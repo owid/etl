@@ -15,8 +15,8 @@ df = pd.DataFrame(
         "year": [1600, 1750],
         "forest_share": [5, 5],
         "source": [
-            "https://www.nature.com/articles/s41598-019-40063-1",
-            "https://www.nature.com/articles/s41598-019-40063-1",
+            "https://www.tandfonline.com/doi/abs/10.1080/00369220418737194",
+            "https://www.tandfonline.com/doi/abs/10.1080/00369220418737194",
         ],
     }
 )

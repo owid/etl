@@ -80,6 +80,3 @@ def run(upload: bool) -> None:
 
 if __name__ == "__main__":
     run()
-
-
-938.821

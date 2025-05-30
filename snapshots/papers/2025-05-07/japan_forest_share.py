@@ -15,7 +15,10 @@ df = pd.DataFrame(
         "year": [1600, 1850, 1900, 1939, 1945, 1950, 1963, 1970, 1980, 1985],
         "forest_share": [71.4, 67.5, 64.3, 62.5, 51.5, 65.9, 67.5, 66.5, 66.8, 65.6],
         "source": [
-            *["https://www.nature.com/articles/s41598-019-40063-1"] * 10,
+            *[
+                "https://www.cambridge.org/core/journals/journal-of-global-history/article/abs/forest-history-and-the-great-divergence-china-japan-and-the-west-compared/6140D78077980694B07B40B6396C0343"
+            ]
+            * 10,
         ],
     }
 )
