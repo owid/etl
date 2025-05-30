@@ -26,7 +26,6 @@ def run() -> None:
         for y in view.indicators.y:
             y.update_display(
                 {
-                    "colorScaleEqualSizeBins": True,
                     "colorScaleNumericMinValue": 0,
                 }
             )
