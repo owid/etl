@@ -30,7 +30,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 MC_API_TOKEN = os.getenv("MC_API_TOKEN")
-NYT_API_TOKEN = os.getend("NYT_API_TOKEN")
+NYT_API_TOKEN = os.getenv("NYT_API_TOKEN")
 
 YEAR = 2023
 
@@ -42,6 +42,7 @@ MEDIA_MENTIONS_PATH = f"/Users/tunaacisu/Data/Media Deaths/media_mentions_{YEAR}
 NYT_ID = 1
 WAPO_ID = 2
 GUARDIAN_ID = 300560
+FOX_ID = 1092
 
 US_NATIONAL_COLLECTION_ID = 34412234
 
@@ -337,6 +338,7 @@ def run() -> None:
         guardian_mentions = media_deaths_df[media_deaths_df["source"] == "The Guardian"]
         wapo_mentions = media_deaths_df[media_deaths_df["source"] == "The Washington Post"]
         collection_mentions = media_deaths_df[media_deaths_df["source"] == "US National Collection"]
+        fox_mentions = media_deaths_df[media_deaths_df["source"] == "Fox News"]
 
     #
     else:
@@ -373,6 +375,14 @@ def run() -> None:
             verbose=True,
         )
 
+        fox_mentions = get_mentions_from_source(
+            source_ids=[FOX_ID],
+            source_name="Fox News",
+            queries=all_queries,
+            death_df=death_df,
+            verbose=True,
+        )
+
     # plot media deaths:
 
     title_str = f"Media Mentions, Causes of Death (w/o war) - {YEAR}"
@@ -381,6 +391,20 @@ def run() -> None:
     plot_media_deaths(nyt_mentions, title=f"{title_str} - The New York Times")
     plot_media_deaths(wapo_mentions, title=f"{title_str} - The Washington Post")
     plot_media_deaths(collection_mentions, title=f"{title_str} - US National Collection")
+
+    all_mentions = [nyt_mentions, guardian_mentions, wapo_mentions, collection_mentions, fox_mentions]
+
+    mentions_pv = pivot_media_mentions(pd.concat(all_mentions, ignore_index=True))
+    plot_media_deaths(
+        mentions_pv,
+        columns=[
+            "deaths_share",
+            "mentions_share The New York Times",
+            "mentions_share The Guardian",
+            "mentions_share Fox News",
+        ],
+        bar_labels=["Deaths", "NYT", "Guardian", "Fox News"],
+    )
 
     # combine dataframes and save to csv
     if not use_saved_data:
