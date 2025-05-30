@@ -39,7 +39,7 @@ def run(dest_dir: str) -> None:
 
     # If subset is defined, filter the data to given causes.
     if SUBSET:
-        tb = tb[tb.cause.isin(SUBSET.split(","))]
+        tb = tb[tb.cause.str.contains(SUBSET, na=False, regex=True)]
 
     #
     # Process data.
