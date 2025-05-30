@@ -168,11 +168,14 @@ POVLINES_DICT = {
     2021: [100, 215, 365, 685, 1000, 2000, 3000, 4000],  # TODO: add lines
 }
 
-# Define current International Poverty Line (IPL) in the latest prices
-INTERNATIONAL_POVERTY_LINE_CURRENT = 2.15  # TODO: change to 2021 prices
+# Define international poverty lines as the second value in each list in POVLINES_DICT
+INTERNATIONAL_POVERTY_LINES = {ppp_year: poverty_lines[1] for ppp_year, poverty_lines in POVLINES_DICT.items()}
 
 # Define PPP versions from POVLINES_DICT
 PPP_VERSIONS = list(POVLINES_DICT.keys())
+
+# Define current International Poverty Line (IPL) in the latest prices
+INTERNATIONAL_POVERTY_LINE_CURRENT = INTERNATIONAL_POVERTY_LINES[PPP_VERSIONS[1]]
 
 # Define poverty lines to calculate percentiles
 POV_LINES_COUNTRIES = poverty_lines_countries()
