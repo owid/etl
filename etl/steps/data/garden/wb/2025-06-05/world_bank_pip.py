@@ -1357,6 +1357,7 @@ def make_distributional_indicators_long(tb: Table) -> Table:
         tb_distributional.groupby(
             index_columns + ["decile"],
             as_index=False,
+            dropna=False,
         )
         .agg(
             {
