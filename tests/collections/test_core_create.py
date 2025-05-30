@@ -180,6 +180,7 @@ class TestCreateCollection:
         dependencies = {"test#indicator1"}
         catalog_path = "test/latest/data#table"
         choice_renames = {"country": {"usa": "United States of America", "can": "Canada"}}
+        choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
         with patch("etl.collection.core.create.create_collection_from_config") as mock_create:
             # Create a mock collection with dimensions and choices
@@ -224,6 +225,7 @@ class TestCreateCollection:
             return None
 
         choice_renames = {"country": rename_country}
+        choice_renames = cast(dict[str, dict[str, str] | Callable], choice_renames)
 
         with patch("etl.collection.core.create.create_collection_from_config") as mock_create:
             # Create a mock collection with dimensions and choices
