@@ -3,6 +3,7 @@
 import numpy as np
 import pandas as pd
 from owid.catalog import Table
+from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
@@ -34,7 +35,7 @@ def run() -> None:
     # Add metadata to the table.
     tb = add_metadata(tb)
 
-    combine_countries(
+    tb = combine_countries(
         tb,
         "Sub-Saharan Africa (WB)",
         "Sub-Saharan Africa (WB) (excluding high income)",
@@ -79,14 +80,14 @@ def combine_countries(tb, country1, country2, new_country_name):
 
     # combine the two countries
     c2_tb.index = c1_tb.index  # align indices
-    comb_tb = c1_tb[rel_cols].combine_first(c2_tb[rel_cols])
+    comb_tb = c1_tb.combine_first(c2_tb)
     comb_tb["country"] = new_country_name
 
     # remove the old countries
     tb = tb[~tb["country"].isin([country1, country2])]
 
     # append the combined country
-    tb = pd.concat([tb, comb_tb], ignore_index=True)
+    tb = pr.concat([tb, comb_tb], ignore_index=True)
 
     return tb
 
