@@ -584,7 +584,7 @@ tables:
         title: Literacy rate (historical and recent)
         unit: "%"
         short_unit: "%"
-        description_short: share of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
+        description_short: Share of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
         description_key:
           - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
           - It captures the percentage of individuals aged 15 and above who are considered literate, based on their ability to both read and write.
