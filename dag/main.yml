@@ -725,6 +725,17 @@ steps:
   data://grapher/corruption/2025-05-12/corruption_barometer:
     - data://garden/corruption/2025-05-12/corruption_barometer
 
+
+  #
+  # Media deaths
+  #
+  #data://meadow/media_cloud/2025-05-19/media_deaths
+  #  - snapshot://media_cloud/2025-05-19/media_deaths.csv #TODO create this snapshot
+  data://garden/media_cloud/2025-05-19/media_deaths:
+    - data://meadow/media_cloud/2025-05-19/media_deaths
+  data://grapher/media_cloud/2025-05-19/media_deaths:
+    - data://garden/media_cloud/2025-05-19/media_deaths
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
