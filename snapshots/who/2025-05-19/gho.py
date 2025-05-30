@@ -329,7 +329,6 @@ def fetch_and_process_data(ind_code: str) -> pd.DataFrame:
         "TimeDimensionBegin",
         "TimeDimensionEnd",
         "Date",
-        "ParentLocationCode",
         "Id",
         "IndicatorCode",
         "DataSourceDimType",
@@ -368,7 +367,7 @@ def fetch_and_process_data(ind_code: str) -> pd.DataFrame:
         mapping.update(fetch_dimension_values(spatial_dim_code))
     df["Year"] = df["TimeDim"].astype("string").map(mapping)
 
-    df = df.drop(columns=["SpatialDim", "TimeDim"])
+    df = df.drop(columns=["TimeDim"])
 
     # make it smaller
     df = repack.repack_frame(df)
