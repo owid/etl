@@ -1,5 +1,7 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
+import pandas as pd
 from owid.catalog import Table
 
 from etl.data_helpers import geo
@@ -32,6 +34,13 @@ def run() -> None:
     # Add metadata to the table.
     tb = add_metadata(tb)
 
+    combine_countries(
+        tb,
+        "Sub-Saharan Africa (WB)",
+        "Sub-Saharan Africa (WB) (excluding high income)",
+        new_country_name="Sub-Saharan Africa (WB)",
+    )
+
     # Improve table format.
     tb = tb.format(["country", "year"])
 
@@ -58,6 +67,30 @@ def run() -> None:
     ds_garden.save()
 
 
+def combine_countries(tb, country1, country2, new_country_name):
+    # check if both countries have the same values
+    rel_cols = [col for col in tb.columns if col not in ["country"]]
+    c1_tb = tb[tb["country"] == country1]
+    c2_tb = tb[tb["country"] == country2]
+    equal = tables_equal_values(c1_tb[rel_cols], c2_tb[rel_cols])
+
+    if not equal:
+        raise ValueError(f"Countries {country1} and {country2} have different values for {rel_cols}.")
+
+    # combine the two countries
+    c2_tb.index = c1_tb.index  # align indices
+    comb_tb = c1_tb[rel_cols].combine_first(c2_tb[rel_cols])
+    comb_tb["country"] = new_country_name
+
+    # remove the old countries
+    tb = tb[~tb["country"].isin([country1, country2])]
+
+    # append the combined country
+    tb = pd.concat([tb, comb_tb], ignore_index=True)
+
+    return tb
+
+
 def add_metadata(tb: Table) -> Table:
     """
     Add metadata to the table.
@@ -76,3 +109,33 @@ def add_metadata(tb: Table) -> Table:
         meta.short_unit = "%"
     tb_pivoted = tb_pivoted.reset_index()
     return tb_pivoted
+
+
+def tables_equal_values(tb1, tb2) -> bool:
+    """
+    Check if two tables have the same values at all positions,
+    regardless of index or column labels.
+
+    Returns:
+        bool: True if all values are the same, False otherwise.
+    """
+    # First, check shape
+    if tb1.shape != tb2.shape:
+        print("Tables have different shapes:", tb1.shape, "vs", tb2.shape)
+        return False
+
+    a = tb1.to_numpy(dtype="object")
+    b = tb2.to_numpy(dtype="object")
+
+    result = np.empty(a.shape, dtype=bool)
+
+    for i in range(a.shape[0]):
+        for j in range(a.shape[1]):
+            val1 = a[i, j]
+            val2 = b[i, j]
+            if pd.isna(val1) or pd.isna(val2):
+                result[i, j] = True
+            else:
+                result[i, j] = val1 == val2
+
+    return result.all()
