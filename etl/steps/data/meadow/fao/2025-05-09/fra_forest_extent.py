@@ -23,7 +23,7 @@ def run() -> None:
         "country",
         "total_num_countries",
         "region_forest_area_2020",
-        "state_num_countres",
+        "state_num_countries",
         "state_forest_area_2020",
         "state_pct_total_forest_area",
         "forest_area_subtotal_2020",
