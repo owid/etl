@@ -29,8 +29,8 @@ log = get_logger()
 # NOTE: Modify if poverty lines are updated from source
 # TODO: Modify the lines in 2021 prices
 POVLINES_DICT = {
-    2011: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
+    2021: [100, 190, 320, 550, 1000, 2000, 3000, 4000],
 }
 
 # Define PPP versions from POVLINES_DICT
@@ -42,7 +42,11 @@ PPP_YEAR_CURRENT = PPP_VERSIONS[1]
 # Define current International Poverty Line (in cents)
 # NOTE: Modify if poverty lines are updated from source
 # TODO: Modify the lines in 2021 prices
-INTERNATIONAL_POVERTY_LINE_CURRENT = 215
+# Define international poverty lines as the second value in each list in POVLINES_DICT
+INTERNATIONAL_POVERTY_LINES = {ppp_year: poverty_lines[1] for ppp_year, poverty_lines in POVLINES_DICT.items()}
+
+# Define current International Poverty Line (IPL) in the latest prices
+INTERNATIONAL_POVERTY_LINE_CURRENT = INTERNATIONAL_POVERTY_LINES[PPP_VERSIONS[1]]
 
 # Define regions in the dataset
 REGIONS_LIST = [

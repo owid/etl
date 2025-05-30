@@ -30,7 +30,23 @@ definitions:
     <%- endif %>
 
   poverty_line: |-
-    <% if poverty_line == "190" %>
+    <% if poverty_line == "215" %>
+    $2.15
+    <%- elif poverty_line == "365" %>
+    $3.65
+    <%- elif poverty_line == "685" %>
+    $6.85
+    <%- elif poverty_line == "100 and 215" %>
+    $1 and $2.15
+    <%- elif poverty_line == "215 and 365" %>
+    $2.15 and $3.65
+    <%- elif poverty_line == "365 and 685" %>
+    $3.65 and $6.85
+    <%- elif poverty_line == "215 and 1000" %>
+    $2.15 and $10
+    <%- elif poverty_line == "685 and 1000" %>
+    $6.85 and $10
+    <%-elif poverty_line == "190" %>
     $1.90
     <%- elif poverty_line == "320" %>
     $3.20
@@ -48,22 +64,6 @@ definitions:
     $1.90 and $10
     <%- elif poverty_line == "550 and 1000" %>
     $5.50 and $10
-    <%- elif poverty_line == "215" %>
-    $2.15
-    <%- elif poverty_line == "365" %>
-    $3.65
-    <%- elif poverty_line == "685" %>
-    $6.85
-    <%- elif poverty_line == "100 and 215" %>
-    $1 and $2.15
-    <%- elif poverty_line == "215 and 365" %>
-    $2.15 and $3.65
-    <%- elif poverty_line == "365 and 685" %>
-    $3.65 and $6.85
-    <%- elif poverty_line == "215 and 1000" %>
-    $2.15 and $10
-    <%- elif poverty_line == "685 and 1000" %>
-    $6.85 and $10
     <%- elif poverty_line == "100" %>
     $1
     <%- elif poverty_line == "1000" %>

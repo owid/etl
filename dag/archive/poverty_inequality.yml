@@ -120,3 +120,19 @@ steps:
     - data://meadow/oecd/2024-04-10/income_distribution_database
   data://grapher/oecd/2024-04-10/income_distribution_database:
     - data://garden/oecd/2024-04-10/income_distribution_database
+
+  # World Bank Poverty and Inequality Platform
+  data://meadow/wb/2025-04-08/world_bank_pip:
+    - snapshot://wb/2025-04-08/world_bank_pip.csv
+    - snapshot://wb/2025-04-08/world_bank_pip_percentiles.csv
+    - snapshot://wb/2025-04-08/world_bank_pip_regions.csv
+
+  # Legacy PIP pipeline
+  data://garden/wb/2025-04-08/world_bank_pip_legacy:
+    - data://meadow/wb/2025-04-08/world_bank_pip
+
+  # Dimensional PIP pipeline
+  data://garden/wb/2025-04-14/world_bank_pip:
+    - data://meadow/wb/2025-04-08/world_bank_pip
+  data://grapher/wb/2025-04-14/world_bank_pip:
+    - data://garden/wb/2025-04-14/world_bank_pip
