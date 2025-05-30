@@ -185,7 +185,7 @@ tables:
       is_electoral_democracy:
         title: Country is an electoral democracy
         description_short: |-
-          Identifies if a country is a full democracy using the extended Lexical Index of Electoral Democracy (LIED+).
+          Identifies if a country is an electoral democracy using the extended Lexical Index of Electoral Democracy (LIED+).
         description_processing: |-
           It is a boolean indicator that indicates whether the country is an electoral democracy (score 6 in the `lexical_index_plus` indicator).
         unit: ""
