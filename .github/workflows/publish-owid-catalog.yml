@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       reason:
-        description: 'Publish owid-catalog to PyPI. Make sure you have bumped the version.'
+        description: 'Publish owid-catalog to PyPI. Make sure you have bumped the version in catalog/pyproject.toml.'
 
 jobs:
   publish:
@@ -24,9 +24,11 @@ jobs:
 
     - name: Publish
       env:
-        TWINE_USERNAME: ourworldindata
+        TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.POETRY_PYPI_TOKEN_PYPI }}
+
       run: |
         cd lib/catalog &&
+        rm -rf dist &&
         uv build &&
         uvx twine upload dist/*

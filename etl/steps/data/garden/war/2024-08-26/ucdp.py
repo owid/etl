@@ -328,11 +328,16 @@ def run_pipeline(
     ## For legacy reasons, we have generated two tables: `tb_locations` for country-data and `tb` for regional data. However, we want to combine them into one table.
     tb = merge_country_and_region_data(tb, tb_locations)
 
+    # Drop unused columns
+    column_index = ["year", "country", "conflict_type"]
+    columns_relevant = ["is_location_of_conflict", "number_locations"]
+    tb_locations = tb_locations.loc[:, column_index + columns_relevant]
+
     # Tables
     tables = [
-        tb.format(["year", "region", "conflict_type"], short_name=short_name),
-        tb_participants.format(["year", "country", "conflict_type"], short_name=f"{short_name}_country"),
-        tb_locations.format(["year", "country", "conflict_type"], short_name=f"{short_name}_locations"),
+        tb.format(column_index, short_name=short_name),
+        tb_participants.format(column_index, short_name=f"{short_name}_country"),
+        tb_locations.format(column_index, short_name=f"{short_name}_locations"),
     ]
 
     return tables
@@ -1511,6 +1516,9 @@ def merge_country_and_region_data(tb: Table, tb_locations: Table) -> Table:
 
     ## 3) Combine
     tb_new = pr.concat([tb, tb_locations_])
+
+    # 4) Final touch
+    tb_new = tb_new.rename(columns={"region": "country"})
 
     return tb_new
 

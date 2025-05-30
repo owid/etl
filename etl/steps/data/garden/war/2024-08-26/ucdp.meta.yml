@@ -239,13 +239,6 @@ tables:
             '1' indicates that there was a conflict event in the given country. '0' indicates that there was no conflict event in the given country.
           - "{definitions.all.conflict_type}"
 
-      number_ongoing_conflicts:
-        title: Number of ongoing conflicts (country)
-        unit: conflicts
-        description_short: |-
-          {definitions.number_ongoing_conflicts.description_short}
-        description_key: *description_key_ongoing
-
       number_locations:
         title: Number of countries where conflict took place
         unit: "countries"
@@ -269,75 +262,6 @@ tables:
           Included are << conflict_type >> conflicts that caused at least one death in the country that year.
 
           <%- endif -%>
-
-      number_deaths:
-        title: Deaths in ongoing conflicts in a country (best estimate)
-        unit: "deaths"
-        description_short: |-
-          <% set estimate = "best" %>
-          {definitions.number_deaths.description_short}
-
-      number_deaths_low:
-        title: Deaths in ongoing conflicts in a country (low estimate)
-        unit: "deaths"
-        description_short: |-
-          <% set estimate = "low" %>
-          {definitions.number_deaths.description_short}
-
-      number_deaths_high:
-        title: Deaths in ongoing conflicts in a country (high estimate)
-        unit: "deaths"
-        description_short: |-
-          <% set estimate = "high" %>
-          {definitions.number_deaths.description_short}
-
-      number_deaths_combatants:
-        title: Deaths of combatants in ongoing conflicts in a country
-        unit: "deaths"
-        description_short: |-
-          <% set people_type = "combatants" %>
-          {definitions.number_deaths_type.description_short}
-
-      number_deaths_civilians:
-        title: Deaths of civilians in ongoing conflicts in a country
-        unit: "deaths"
-        description_short: |-
-          <% set people_type = "civilians" %>
-          {definitions.number_deaths_type.description_short}
-
-      number_deaths_unknown:
-        title: Deaths of unknown type in ongoing conflicts in a country
-        unit: "deaths"
-        description_short: |-
-          <% set people_type = "unknown type" %>
-          {definitions.number_deaths_type.description_short}
-
-      death_rate:
-        title: Death rate in ongoing conflicts in a country (best estimate)
-        unit: "deaths per 100,000 people"
-        display:
-          numDecimalPlaces: 1
-        description_short: |-
-          <% set estimate = "best" %>
-          {definitions.number_deaths.description_short_per_capita}
-
-      death_rate_low:
-        title: Death rate in ongoing conflicts in a country (low estimate)
-        unit: "deaths per 100,000 people"
-        display:
-          numDecimalPlaces: 1
-        description_short: |-
-          <% set estimate = "low" %>
-          {definitions.number_deaths.description_short_per_capita}
-
-      death_rate_high:
-        title: Death rate in ongoing conflicts in a country (high estimate)
-        unit: "deaths per 100,000 people"
-        display:
-          numDecimalPlaces: 1
-        description_short: |-
-          <% set estimate = "high" %>
-          {definitions.number_deaths.description_short_per_capita}
 
   ucdp:
     common:

@@ -54,6 +54,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     ## Remove suffix (PRIO) or (UCDP/PRIO)
+    tb_ucdp = tb_ucdp.rename(columns={"country": "region"})
     tb_ucdp["region"] = tb_ucdp["region"].str.replace(r" \(.+\)", "", regex=True)
     tb_prio["region"] = tb_prio["region"].str.replace(r" \(.+\)", "", regex=True)
 
