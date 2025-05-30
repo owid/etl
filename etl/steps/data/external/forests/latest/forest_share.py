@@ -53,6 +53,8 @@ def run() -> None:
     snap_meadow_usa = paths.load_snapshot("forest_share", namespace="usda_fs")
     # Forest data for China
     snap_meadow_china = paths.load_snapshot("he_2025", namespace="papers")
+    # More recent forest data for England and Scotland - from the Scottish Government
+    snap_meadow_sg = paths.load_snapshot("scottish_government", namespace="papers")
 
     # Read table from meadow dataset.
     tb_defra = snap_meadow_defra.read()
@@ -66,6 +68,7 @@ def run() -> None:
     tb_south_korea = snap_meadow_south_korea.read()
     tb_usa = snap_meadow_usa.read()
     tb_china = snap_meadow_china.read()
+    tb_sg = snap_meadow_sg.read()
     # Concatenate tables.
     tb = pr.concat(
         [
@@ -80,6 +83,7 @@ def run() -> None:
             tb_south_korea,
             tb_usa,
             tb_china,
+            tb_sg,
         ]
     )
     # Improve table format.

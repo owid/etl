@@ -20,6 +20,7 @@ steps:
 
   # Forest Share combined sources
   data://garden/forests/2025-05-08/forest_share:
+    - snapshot://papers/2025-05-30/scottish_government.csv
     - snapshot://defra/2025-05-06/forest_share.csv
     - snapshot://fao/2025-05-07/forest_share.csv
     - snapshot://forest_research/2025-05-06/forest_share.csv
@@ -34,7 +35,9 @@ steps:
     - data://garden/fao/2025-05-09/fra_forest_extent
   # Forest Share combined historical sources for external channnel
   data://external/forests/latest/forest_share:
+    - snapshot://papers/2025-05-30/scottish_government.csv
     - snapshot://defra/2025-05-06/forest_share.csv
+    - snapshot://fao/2025-05-07/forest_share.csv
     - snapshot://forest_research/2025-05-06/forest_share.csv
     - snapshot://papers/2025-05-07/france_forest_share.csv
     - snapshot://papers/2025-05-07/japan_forest_share.csv
