@@ -13,6 +13,9 @@ from etl.grapher import model as gm
 
 log = get_logger()
 
+# Maximum number of variables to process for anomaly detection
+MAX_VARIABLES = 1000
+
 
 def run(branch: str) -> None:
     """Compute all anomalist for new and updated datasets."""
@@ -40,6 +43,13 @@ def run(branch: str) -> None:
     # Load all their variables
     q = """SELECT id FROM variables WHERE datasetId IN %(dataset_ids)s"""
     variable_ids = list(read_sql(q, source_engine, params={"dataset_ids": datasets_new_ids})["id"])
+
+    # Limit to MAX_VARIABLES if there are too many, using deterministic hash-based selection
+    if len(variable_ids) > MAX_VARIABLES:
+        # Sort by hash of variable ID for deterministic selection
+        variable_ids_sorted = sorted(variable_ids, key=lambda x: hash(x))
+        variable_ids = variable_ids_sorted[:MAX_VARIABLES]
+        log.info(f"Limited to {MAX_VARIABLES} variables from {len(variable_ids_sorted)} total variables")
 
     # Load variable mapping
     variable_mapping_dict = load_variable_mapping(datasets_new_ids)
