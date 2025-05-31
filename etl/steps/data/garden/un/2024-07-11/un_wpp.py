@@ -322,7 +322,7 @@ def process_deaths(tb: Table, tb_rate: Table) -> Table:
     age_group_mapping = {
         key: value
         for i in range(0, 100, 10)
-        for key, value in {f"{i}-{i+4}": f"{i}-{i+9}", f"{i+5}-{i+9}": f"{i}-{i+9}"}.items()
+        for key, value in {f"{i}-{i + 4}": f"{i}-{i + 9}", f"{i + 5}-{i + 9}": f"{i}-{i + 9}"}.items()
     }
     tb_10 = tb.copy()
     tb_10["age"] = tb_10["age"].map(age_group_mapping)
@@ -395,9 +395,9 @@ def process_fertility(tb: Table) -> Table:
     )
 
     # Drop 55-59 age group in fertility (is all zero!)
-    assert (
-        tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0
-    ).all(), "Unexpected non-zero fertility rate values for age group 55-59."
+    assert (tb.loc[tb["age"] == "55-59", "fertility_rate"] == 0).all(), (
+        "Unexpected non-zero fertility rate values for age group 55-59."
+    )
     tb = tb.loc[tb["age"] != "55-59"]
 
     return tb
@@ -459,12 +459,12 @@ def process_standard(tb: Table, allowed_nans: Optional[Dict[str, int]] = None) -
     # Sanity check
     if allowed_nans:
         for colname, num_nans in allowed_nans.items():
-            assert (
-                num_nans_real := tb[colname].isna().sum()
-            ) == num_nans, f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
-        assert (
-            tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None)
-        ), "Some NaNs detected"
+            assert (num_nans_real := tb[colname].isna().sum()) == num_nans, (
+                f"Unexpected number ({num_nans_real}) of NaNs for column {colname}"
+            )
+        assert tb[[col for col in tb.columns if col not in allowed_nans.keys()]].notna().all(axis=None), (
+            "Some NaNs detected"
+        )
     else:
         assert tb.notna().all(axis=None), "Some NaNs detected"
 
@@ -527,7 +527,7 @@ def estimate_age_groups(tb: Table) -> Table:
 
     # 1/ Basic age groups
     age_map = {
-        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+        **{str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)},
         **{"100+": "100+"},
     }
     tb_basic = tb_.assign(age=tb_.age.map(age_map))

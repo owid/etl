@@ -664,7 +664,7 @@ def remove_rows_with_nan_value(tb: Table, verbose: bool = False) -> Table:
     if n_rows_with_nan_value > 0:
         frac_nan_rows = n_rows_with_nan_value / len(tb)
         if verbose:
-            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) " f"with nan in column 'value'.")
+            log.info(f"Removing {n_rows_with_nan_value} rows ({frac_nan_rows: .2%}) with nan in column 'value'.")
         if frac_nan_rows > 0.15:
             log.warning(f"{frac_nan_rows: .0%} rows of nan values removed.")
         tb = tb.dropna(subset="value").reset_index(drop=True)
@@ -1213,9 +1213,9 @@ def add_fao_population_if_given(tb: Table) -> Table:
         fao_population = tb[population_rows_mask].reset_index(drop=True)
 
         # Check that population is given in "1000 persons" and convert to persons.
-        assert list(fao_population["unit"].unique()) == [
-            fao_population_unit_name
-        ], "FAO population may have changed units."
+        assert list(fao_population["unit"].unique()) == [fao_population_unit_name], (
+            "FAO population may have changed units."
+        )
         fao_population["value"] *= 1000
 
         # Note: Here we will dismiss the flags related to population. But they are only relevant for those columns

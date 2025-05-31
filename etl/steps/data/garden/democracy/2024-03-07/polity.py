@@ -159,9 +159,9 @@ def run() -> None:
     ##################################################
 
     # Add regions to main table (including population-weighted averages)
-    assert (
-        tb_avg_countries.shape[0] == tb_avg_w_countries.shape[0]
-    ), "Different number of rows in tb_avg_countries and tb_avg_w_countries"
+    assert tb_avg_countries.shape[0] == tb_avg_w_countries.shape[0], (
+        "Different number of rows in tb_avg_countries and tb_avg_w_countries"
+    )
     tb_avg_w_countries["country"] = tb_avg_w_countries["country"] + " (population-weighted)"
     tb = concat([tb, tb_avg_countries, tb_avg_w_countries], ignore_index=True)
 

@@ -33,8 +33,8 @@ AGES_POP_LIST = (
         "1",
         "1-4",
     ]
-    + [f"{i}-{i+4}" for i in range(5, 20, 5)]
-    + [f"{i}-{i+9}" for i in range(20, 100, 10)]
+    + [f"{i}-{i + 4}" for i in range(5, 20, 5)]
+    + [f"{i}-{i + 9}" for i in range(20, 100, 10)]
     + ["100+"]
 )
 AGES_POP = {age: f"{age.replace('-', '–')} years" if age != "1" else "At age 1" for age in AGES_POP_LIST}
@@ -46,7 +46,7 @@ AGES_SR = {
 }
 
 # Deaths
-AGES_DEATHS_LIST = [f"{i}-{i+4}" for i in range(5, 20, 5)] + [f"{i}-{i+9}" for i in range(20, 100, 10)] + ["100+"]
+AGES_DEATHS_LIST = [f"{i}-{i + 4}" for i in range(5, 20, 5)] + [f"{i}-{i + 9}" for i in range(20, 100, 10)] + ["100+"]
 AGES_DEATHS = {age: f"{age.replace('-', '–')} years" for age in AGES_POP_LIST}
 
 

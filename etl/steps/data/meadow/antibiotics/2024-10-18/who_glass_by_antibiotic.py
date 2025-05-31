@@ -45,9 +45,9 @@ def run(dest_dir: str) -> None:
             tb["syndrome"] = filters.iloc[3, 0].split(":")[-1]
             tb["pathogen"] = filters.iloc[4, 0].split(":")[-1]
             tb["antibiotic"] = filters.iloc[5, 0].split(":")[-1]
-            assert all(
-                tb[["year", "syndrome", "pathogen", "antibiotic"]].notna()
-            ), f"missing key information in {file_name}"
+            assert all(tb[["year", "syndrome", "pathogen", "antibiotic"]].notna()), (
+                f"missing key information in {file_name}"
+            )
             tables.append(tb)
 
     tb = pr.concat(tables)

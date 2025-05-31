@@ -105,7 +105,7 @@ def sanity_checks(tb: Table) -> None:
         if not tb_error.empty:
             log.fatal(
                 f"""There are {len(tb_error)} observations with negative values in {col}! In
-                {tabulate(tb_error[['country', 'year', col]], headers = 'keys', tablefmt = TABLEFMT)}"""
+                {tabulate(tb_error[["country", "year", col]], headers="keys", tablefmt=TABLEFMT)}"""
             )
 
     # Zero values
@@ -117,7 +117,7 @@ def sanity_checks(tb: Table) -> None:
         if not tb_error.empty:
             log.fatal(
                 f"""There are {len(tb_error)} observations with zero values in {col}! In
-                {tabulate(tb_error[['country', 'year', col]], headers = 'keys', tablefmt = TABLEFMT)}"""
+                {tabulate(tb_error[["country", "year", col]], headers="keys", tablefmt=TABLEFMT)}"""
             )
 
     # Subsistence levels
@@ -130,7 +130,7 @@ def sanity_checks(tb: Table) -> None:
     if not tb_error.empty:
         log.warning(
             f"""There are {len(tb_error)} observations with values under subsistence levels (${EXTREME_POVERTY_LINE}) for GDP per capita. For these {len(list_of_countries)} countries: {list_of_countries}
-            {tabulate(tb_error[['country', 'year', 'gdp_per_capita']].sort_values('gdp_per_capita').reset_index(drop=True), headers = 'keys', tablefmt = TABLEFMT)}"""
+            {tabulate(tb_error[["country", "year", "gdp_per_capita"]].sort_values("gdp_per_capita").reset_index(drop=True), headers="keys", tablefmt=TABLEFMT)}"""
         )
 
     return None

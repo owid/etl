@@ -82,9 +82,9 @@ def handle_nans(df: pd.DataFrame) -> pd.DataFrame:
     # Drop all-NaN rows
     df = df.dropna(how="all")
     # Check years
-    assert (
-        df[df["Unnamed: 1"].isna()].filter(regex=r"\d{4}").nunique() == 1
-    ).all(), "Same years used for all countries (same as in header's)."
+    assert (df[df["Unnamed: 1"].isna()].filter(regex=r"\d{4}").nunique() == 1).all(), (
+        "Same years used for all countries (same as in header's)."
+    )
     # Remove intermediate year-rows
     df = df.dropna(subset=["Unnamed: 0"])
 

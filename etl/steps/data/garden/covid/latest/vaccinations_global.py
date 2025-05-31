@@ -317,9 +317,9 @@ def add_booster_share(tb: Table) -> Table:
     )
     global_boosters = global_boosters.drop(columns=["total_vaccinations", "total_boosters"])
     tb = tb.merge(global_boosters, how="left", on=["country", "date"], validate="one_to_one")
-    assert (
-        tb.shape[0] == shape_before[0] and tb.shape[1] == shape_before[1] + 1
-    ), "Adding share_of_boosters has changed the shape of the dataframe in an unintended way!"
+    assert tb.shape[0] == shape_before[0] and tb.shape[1] == shape_before[1] + 1, (
+        "Adding share_of_boosters has changed the shape of the dataframe in an unintended way!"
+    )
     return tb
 
 

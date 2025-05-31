@@ -188,9 +188,9 @@ if st.session_state["run_gpt"]:
             with col11b:
                 st.button("Approve", type="primary", on_click=run_gpt_confirmed)
     else:
-        assert (
-            st.session_state.gpt_updater.channel == "snapshot"
-        ), "Cost for non-snapshot steps should have been calculated!"
+        assert st.session_state.gpt_updater.channel == "snapshot", (
+            "Cost for non-snapshot steps should have been calculated!"
+        )
     # st.button("Do you want to proceed?", type="primary", on_click=run_gpt_confirmed)
 
 

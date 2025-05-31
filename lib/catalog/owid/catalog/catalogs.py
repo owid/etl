@@ -258,7 +258,7 @@ class RemoteCatalog(CatalogMixin):
         if self.metadata["format_version"] > OWID_CATALOG_VERSION:
             raise PackageUpdateRequired(
                 f"library supports api version {OWID_CATALOG_VERSION}, "
-                f'but the remote catalog has version {self.metadata["format_version"]} '
+                f"but the remote catalog has version {self.metadata['format_version']} "
                 "-- please update"
             )
 

@@ -94,9 +94,9 @@ def _yield_wide_table(
                 continue
 
             # Safety check to see if the metadata is still intact
-            assert (
-                table_to_yield[column].metadata.unit is not None
-            ), f"Unit for column {column} should not be None here!"
+            assert table_to_yield[column].metadata.unit is not None, (
+                f"Unit for column {column} should not be None here!"
+            )
 
             # Select only one column and dimensions for performance
             # Silence - DeprecationWarning: Passing a BlockManager to Table is deprecated and will raise
@@ -266,9 +266,9 @@ def _assert_long_table(table: catalog.Table) -> None:
         "value",
     }, "Table must have columns `variable`, `meta` and `value`"
     assert isinstance(table, catalog.Table), "Table must be instance of `catalog.Table`"
-    assert (
-        table["meta"].dropna().map(lambda x: isinstance(x, catalog.VariableMeta)).all()
-    ), "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
+    assert table["meta"].dropna().map(lambda x: isinstance(x, catalog.VariableMeta)).all(), (
+        "Values in column `meta` must be either instances of `catalog.VariableMeta` or null"
+    )
 
 
 def long_to_wide_tables(
@@ -293,9 +293,9 @@ def long_to_wide_tables(
         # extract metadata from column and make sure it is identical for all rows
         meta = t.pop("meta")
         t.pop("variable")
-        assert set(meta.map(id)) == {
-            id(meta.iloc[0])
-        }, f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        assert set(meta.map(id)) == {id(meta.iloc[0])}, (
+            f"Variable `{var_name}` must have same metadata objects in column `meta` for all rows"
+        )
         t[var_name].metadata = meta.iloc[0]
 
         # name table as variable name
@@ -511,9 +511,9 @@ def _adapt_table_for_grapher(table: catalog.Table, engine: Engine) -> catalog.Ta
 
     variable_titles = pd.Series([table[col].title for col in table.columns]).dropna()
     variable_titles_counts = variable_titles.value_counts()
-    assert (
-        variable_titles_counts.empty or variable_titles_counts.max() == 1
-    ), f"Variable titles are not unique:\n{variable_titles_counts[variable_titles_counts > 1].index}."
+    assert variable_titles_counts.empty or variable_titles_counts.max() == 1, (
+        f"Variable titles are not unique:\n{variable_titles_counts[variable_titles_counts > 1].index}."
+    )
 
     # Remember original dimensions
     dim_names = [n for n in table.index.names if n and n not in ("year", "date", "entity_id", "country")]
@@ -561,9 +561,9 @@ def _ensure_source_per_variable(table: catalog.Table) -> catalog.Table:
 
         if len(variable_meta.sources) == 0:
             # Take the metadata sources from the dataset's metadata (after combining them into one).
-            assert (
-                len(dataset_meta.sources) > 0
-            ), f"If column `{column}` has no sources, dataset must have at least one."
+            assert len(dataset_meta.sources) > 0, (
+                f"If column `{column}` has no sources, dataset must have at least one."
+            )
             source = combine_metadata_sources(dataset_meta.sources)
 
             # Add the dataset description as if it was a source's description.
@@ -823,9 +823,9 @@ def grapher_checks(ds: catalog.Dataset, warn_title_public: bool = True) -> None:
             catalog.utils.validate_underscore(col)
             assert tab[col].metadata.unit is not None, f"Column `{col}` must have a unit."
             assert tab[col].metadata.title is not None, f"Column `{col}` must have a title."
-            assert (
-                tab[col].m.origins or tab[col].m.sources or ds.metadata.sources
-            ), f"Column `{col}` must have either sources or origins"
+            assert tab[col].m.origins or tab[col].m.sources or ds.metadata.sources, (
+                f"Column `{col}` must have either sources or origins"
+            )
 
             _validate_description_key(tab[col].m.description_key, col)
             _validate_ordinal_variables(tab, col)
@@ -865,9 +865,9 @@ def _validate_grapher_config(tab: Table, col: str) -> None:
 
 def _validate_description_key(description_key: list[str], col: str) -> None:
     if description_key:
-        assert not all(
-            len(x) == 1 for x in description_key
-        ), f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+        assert not all(len(x) == 1 for x in description_key), (
+            f"Column `{col}` uses string {description_key} as description_key, should be list of strings."
+        )
 
 
 def _validate_ordinal_variables(tab: Table, col: str) -> None:
@@ -876,6 +876,6 @@ def _validate_ordinal_variables(tab: Table, col: str) -> None:
         vals = tab[col].dropna()
 
         extra_values = set(vals) - set(vals.m.sort)
-        assert (
-            not extra_values
-        ), f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
+        assert not extra_values, (
+            f"Ordinal variable `{col}` has extra values that are not defined in field `sort`: {extra_values}"
+        )

@@ -346,9 +346,9 @@ def get_all_distances():
     distances = distances.astype({"distance": "int"})
 
     # Ensure distances are correct
-    assert not (
-        distances["distance"] > MAX_DISTANCE_ON_EARTH
-    ).any(), f"Unexpected error! Some countries have a distance greater than the maximum distance on Earth ({MAX_DISTANCE_ON_EARTH} km)"
+    assert not (distances["distance"] > MAX_DISTANCE_ON_EARTH).any(), (
+        f"Unexpected error! Some countries have a distance greater than the maximum distance on Earth ({MAX_DISTANCE_ON_EARTH} km)"
+    )
     # Filter own country
     return distances
 

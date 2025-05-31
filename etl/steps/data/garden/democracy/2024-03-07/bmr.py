@@ -687,9 +687,9 @@ def split_into_two_tables(
     ## Remove "unknown regime" for democracy with WS (should be equivalent to without WS, hence the check)
     mask = (slice(None), slice(None), "-1")
     diff = tb_1.loc[mask, col_regime] - tb_1.loc[mask, col_regime_ws]
-    assert (
-        diff == 0
-    ).all(), f"The number of countries with unknown regimes should be the same according to indicators `{col_regime}` and `{col_regime_ws}`. Please check!"
+    assert (diff == 0).all(), (
+        f"The number of countries with unknown regimes should be the same according to indicators `{col_regime}` and `{col_regime_ws}`. Please check!"
+    )
 
     # TABLE 2: Aggregate years in democracy (with or without WS)
     tb_2 = _get_table_subset(tb_, col_years_consec, col_years_ws_consec, table_2_name)
