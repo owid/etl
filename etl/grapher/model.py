@@ -2014,6 +2014,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
     assert values.notnull().all(), "values must not contain nulls"
     assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
     if values.empty:
+        log.warning("_infer_variable_type.mixed_type_detected", reason="empty_values")
         return "mixed"
     try:
         values = pd.to_numeric(values)
@@ -2026,6 +2027,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
             raise NotImplementedError()
     except ValueError:
         if values.map(_is_float).any():
+            log.warning("_infer_variable_type.mixed_type_detected", reason="mixed_numeric_and_string")
             return "mixed"
         else:
             return "string"
