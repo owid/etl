@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Literal, Optional, Union
 import pandas as pd
 from owid.catalog import Table
 
+from etl.collection.exceptions import MissingDimensionalIndicatorError
 from etl.collection.utils import INDICATORS_SLUG
 
 
@@ -391,6 +392,11 @@ class CollectionConfigExpander:
 
                 # Add entry to records
                 records.append(row)
+
+        if len(records) == 0:
+            raise MissingDimensionalIndicatorError(
+                "No indicators WITH dimensions found in the table. Please check that the table has columns with metadata.dimensions set."
+            )
 
         # Build dataframe with dimensional information
         df_dims = pd.DataFrame(records)
