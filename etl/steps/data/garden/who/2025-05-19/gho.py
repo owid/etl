@@ -54,8 +54,6 @@ NAN_VALUES = [
     "…",
 ]
 
-PRIORITY_OF_REGIONS = ["World Bank", "WHO", "UNICEF", "UN", "UN SDG"]
-
 
 def run(dest_dir: str) -> None:
     #
@@ -71,9 +69,16 @@ def run(dest_dir: str) -> None:
 
         # Read table from meadow dataset.
         tb = ds_meadow.read(label, safe_types=False)
+
+        # Use safer types
+        tb = tb.astype({"country": str})
+
         # Exclude archived indicators from garden
         if "_archived" in label or tb.m.title.endswith("(archived)"):
             continue
+
+        # Add region suffix.
+        tb = add_region_source_suffix(tb)
 
         #
         # Process data.
@@ -83,33 +88,30 @@ def run(dest_dir: str) -> None:
             countries_file=paths.country_mapping_path,
             excluded_countries_file=paths.excluded_countries_path,
             warn_on_unused_countries=False,
-            warn_on_missing_countries=False,
+            warn_on_missing_countries=True,
             warn_on_unknown_excluded_countries=False,
         )
 
-        # Add region source as suffix to region name, e.g. Africa (WHO)
-        tb = add_region_source_suffix(tb)
-
         # Remove null columns
-        tb = tb.dropna(axis=1, how="all")
-        assert tb is not None
+        # tb = tb.dropna(axis=1, how="all")
+        # assert tb is not None
 
-        if tb.empty:
-            continue
+        # if tb.empty:
+        #     continue
 
         # Drop indicator column
-        assert len(set(tb["indicator"])) == 1
-        tb = tb.drop(columns=["indicator"])
+        # assert len(set(tb["indicator"])) == 1
+        # tb = tb.drop(columns=["indicator"])
 
         # Drop publish_states column
-        tb = tb.drop(columns=["publish_states"])
+        # tb = tb.drop(columns=["publish_states"])
 
         # Drop data_source
-        tb = tb.drop(columns=["data_source"], errors="ignore")
+        # tb = tb.drop(columns=["data_source"], errors="ignore")
 
         # Exclude indicators without year
-        if "year" not in tb.columns:
-            continue
+        # if "year" not in tb.columns:
+        #     continue
 
         # Standardize dimension values
         if "sex" in tb.columns:
@@ -119,6 +121,11 @@ def run(dest_dir: str) -> None:
         if tb.year.dtype == "category":
             tb = tb.loc[tb.year.astype(str) != "nan"]
             tb["year"] = normalize_year_range(tb["year"])
+
+        # Remove unused columns & rename
+        tb = tb.drop(columns=["spatialdim", "spatialdimtype", "timedimtype", "parentlocationcode"]).rename(
+            columns={"numericvalue": "numeric", "value": "display_value"}
+        )
 
         # Set dimensions
         tb = set_dimensions(tb)
@@ -178,6 +185,37 @@ def run(dest_dir: str) -> None:
     ds_garden.save()
 
 
+def add_region_source_suffix(tb: Table) -> Table:
+    """Add region source as suffix to region name, e.g. Africa (WHO)"""
+    for region_source in tb.spatialdimtype.unique():
+        match region_source:
+            case "COUNTRY" | "GLOBAL":
+                continue  # No suffix for countries and global
+            case "FAOREGION":
+                suffix = "FAO"
+            case "REGION" | "WHOINCOMEREGION":
+                suffix = "WHO"
+            case "UNREGION":
+                suffix = "UN"
+            case "WORLDBANKINCOMEGROUP" | "WORLDBANKREGION":
+                suffix = "WB"
+            case "UNSDGREGION":
+                suffix = "UN SDG"
+            case "UNICEFREGION":
+                suffix = "UNICEF"
+            case "MGHEREG":
+                suffix = "MGH"
+            case "GBDREGION":
+                suffix = "GBD"
+            case _:
+                raise ValueError(f"Unknown region source: {region_source}")
+
+        ix = tb.spatialdimtype == region_source
+        tb.loc[ix, "country"] = tb.loc[ix, "country"].astype(str) + " (" + suffix + ")"
+
+    return tb
+
+
 def clean_numeric_column(tb: Table) -> Table:
     # Detect nans in display_value
     ix = tb["display_value"].isin(NAN_VALUES)
@@ -186,7 +224,7 @@ def clean_numeric_column(tb: Table) -> Table:
         tb.loc[ix, "display_value"] = np.nan
 
     # If numeric value is all nan (does not exist), use display_value
-    if "numeric" not in tb.columns:
+    if "numeric" not in tb.columns or tb.numeric.isnull().all():
         tb["numeric"] = tb["display_value"]
 
     # Sometimes numeric is missing, but display_value is present (e.g. in table cholera_0000000001)
@@ -205,6 +243,7 @@ def check_overlapping_names(tb: Table) -> None:
         raise ValueError(f"index names are overlapping with column names: {overlapping_names}")
 
 
+# TODO: remove this, we're not using it anymore
 def drop_excess_region_sources(tb: pd.DataFrame, priority_regions: list[str]) -> pd.DataFrame:
     """
     Drop specific region sources if there are more than two different sources for a given indicator,
@@ -223,19 +262,6 @@ def drop_excess_region_sources(tb: pd.DataFrame, priority_regions: list[str]) ->
         # Filter the DataFrame but KEEP NaN values
         tb = tb[tb["region_source"].isin(sources_to_keep) | tb["region_source"].isna()]
 
-    return tb
-
-
-def add_region_source_suffix(tb: Table) -> Table:
-    """Add region source as suffix to region name, e.g. Africa (WHO)"""
-    if "region_source" in tb.columns:
-        tb = drop_excess_region_sources(tb.copy(), PRIORITY_OF_REGIONS)
-        ix = tb.region_source.notnull() & (tb.country != "World")
-        if ix.any():
-            tb["country"] = tb["country"].astype(str)
-            tb.loc[ix, "country"] = tb.loc[ix, "country"] + " (" + tb.loc[ix, "region_source"].astype(str) + ")"
-            tb["country"] = tb["country"].astype("category")
-        tb = tb.drop(columns=["region_source"])
     return tb
 
 

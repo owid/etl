@@ -396,7 +396,8 @@ def add_region_aggregates(
         )
     else:
         # Remove rows in the original table containing rows for region, and append new rows for region.
-        df_updated = pd.concat([df[~(df[country_col] == region)], df_region], ignore_index=True)
+        dfs_to_concat = [df[~(df[country_col] == region)], df_region]
+        df_updated = pd.concat([df for df in dfs_to_concat if not df.empty], ignore_index=True)
         # WARNING: When an aggregate is added (e.g. "Europe") just for one of the columns (and no aggregation is
         # specified for the rest of columns) and there was already data for that region, the data for the rest of
         # columns is deleted for that particular region (in the following line).
@@ -412,7 +413,7 @@ def add_region_aggregates(
             )
 
     # Sort conveniently.
-    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)
+    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)  # type: ignore
 
     # Convert country to categorical if the original was
     if df[country_col].dtype.name == "category":

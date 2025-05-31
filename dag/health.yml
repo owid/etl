@@ -1304,3 +1304,13 @@ steps:
     - data://meadow/cdc/2025-05-19/tuberculosis
   data://grapher/cdc/2025-05-19/tuberculosis:
     - data://garden/cdc/2025-05-19/tuberculosis
+
+  # Global Health Observatory (GHO) from WHO
+  data://meadow/who/2025-05-19/gho:
+    - snapshot://who/2025-05-19/gho.zip
+  data://garden/who/2025-05-19/gho:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-05-19/gho
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2025-05-19/gho:
+    - data://garden/who/2025-05-19/gho
