@@ -21,9 +21,11 @@ import requests
 from owid.catalog import Dataset
 
 from etl import paths
+from etl.command import _set_dependencies_to_nondirty
 from etl.steps import (
     DataStep,
     DataStepPrivate,
+    GrapherStep,
     SnapshotStep,
     Step,
     compile_steps,
@@ -210,3 +212,40 @@ def test_isolated_env(tmp_path):
         import shared  # type: ignore
 
     assert "test_abc" not in sys.modules.keys()
+
+
+def test_set_dependencies_to_nondirty_data_and_grapher_step():
+    """Ensure _set_dependencies_to_nondirty marks child steps as clean."""
+    # DataStep branch
+    with temporary_step() as dep_name, temporary_step() as ds_name:
+        _create_mock_py_file(dep_name)
+        _create_mock_py_file(ds_name)
+
+        dep = DataStep(dep_name, [])
+        ds = DataStep(ds_name, [dep])
+
+        assert dep.is_dirty()
+        assert ds.is_dirty()
+
+        _set_dependencies_to_nondirty(ds)
+
+        assert not dep.is_dirty()
+        assert ds.is_dirty()
+
+    # GrapherStep branch
+    with temporary_step() as dep_name, temporary_step() as ds_name:
+        _create_mock_py_file(dep_name)
+        _create_mock_py_file(ds_name)
+
+        dep = DataStep(dep_name, [])
+        ds = DataStep(ds_name, [dep])
+        gs = GrapherStep(ds.path, [ds])
+
+        assert dep.is_dirty()
+        assert ds.is_dirty()
+
+        _set_dependencies_to_nondirty(gs)
+
+        # Only the dependency of the data step should be marked clean
+        assert not dep.is_dirty()
+        assert ds.is_dirty()
