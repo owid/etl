@@ -1,15 +1,4 @@
-"""General data tools.
-
-Use this module with caution. Functions added here are half-way their final destination: owid-datautils.
-
-When working on a specific project, it is often the case that we may identify functions that can be useful for other projects. These functions
-should probably be moved to owid-datautils. However this can be time consuming at the time we are working on the project. Therefore:
-
-- By adding them here we make them available for other projects.
-- We have these functions in one place if we ever wanted to move them to owid-datautils.
-- Prior to moving them to owid-datautils, we can test and discuss them.
-
-"""
+"""General data tools."""
 
 import math
 from datetime import date, datetime
@@ -771,3 +760,79 @@ def round_to_shifted_power_of_ten(
         closest_shifted_value = -closest_shifted_value
 
     return closest_shifted_value
+
+
+def humanize_number(number, sig_figs=2):
+    """Create a human-readable string representation of a number.
+
+    NOTE: This function has been designed to handle mostly positive integers, so it may not work as expected in other cases. Feel free to generalize it if new use cases arise.
+
+    Examples
+    --------
+    >>> humanize_number(3)
+    'three'
+    >>> humanize_number(12)
+    '12'
+    >>> humanize_number(1234567, sig_figs=2)
+    '1.2 million'
+    >>> humanize_number(1234567, sig_figs=3)
+    '1.23 million'
+    NOTE: By convention, we do not use the word 'thousand'.
+    >>> humanize_number(1234)
+    '1,200'
+    >>> humanize_number(123456, sig_figs=2)
+    '120,000'
+
+    Parameters
+    ----------
+    number : int or float
+        The number to be humanized.
+    sig_figs : int, optional
+        The number of significant figures to use for rounding.
+
+    Returns
+    -------
+    str
+        A human-readable string representation of the number, with appropriate scaling (e.g., million, billion).
+
+    """
+    if isinstance(number, int) and (number < 11):
+        humanized = {
+            0: "zero",
+            1: "one",
+            2: "two",
+            3: "three",
+            4: "four",
+            5: "five",
+            6: "six",
+            7: "seven",
+            8: "eight",
+            9: "nine",
+            10: "ten",
+        }[number]
+    else:
+        scale_factors = {
+            "quadrillion": 1e15,
+            "trillion": 1e12,
+            "billion": 1e9,
+            "million": 1e6,
+        }
+        for scale_name, threshold in scale_factors.items():
+            if number >= threshold:
+                value = round_to_sig_figs(number / threshold, sig_figs)
+                break
+        else:
+            value = round_to_sig_figs(number, sig_figs)
+            scale_name = ""
+
+        # Format number with commas.
+        value_str = f"{value:,}"
+
+        # Remove trailing zeros.
+        if ("." in value_str) and (len(value_str.split(".")[0]) >= sig_figs):
+            value_str = value_str.split(".")[0]
+
+        # Combine number and scale.
+        humanized = f"{value_str} {scale_name}".strip()
+
+    return humanized
