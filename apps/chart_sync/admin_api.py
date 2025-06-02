@@ -63,10 +63,21 @@ class AdminAPI(object):
         return js
 
     def create_chart(self, chart_config: dict, user_id: Optional[int] = None) -> dict:
+        # Extract isInheritanceEnabled from config and prepare request params
+        config = chart_config.copy()
+        is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
+
+        # Build request parameters
+        params = {}
+        if is_inheritance_enabled is not None:
+            inheritance_param = "enable" if is_inheritance_enabled else "disable"
+            params["inheritance"] = inheritance_param
+
         resp = requests.post(
             self.owid_env.admin_api + "/charts",
             cookies={"sessionid": self._get_session_id(user_id)},
-            json=chart_config,
+            json=config,
+            params=params,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -74,10 +85,21 @@ class AdminAPI(object):
         return js
 
     def update_chart(self, chart_id: int, chart_config: dict, user_id: Optional[int] = None) -> dict:
+        # Extract isInheritanceEnabled from config and prepare request params
+        config = chart_config.copy()
+        is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
+
+        # Build request parameters
+        params = {}
+        if is_inheritance_enabled is not None:
+            inheritance_param = "enable" if is_inheritance_enabled else "disable"
+            params["inheritance"] = inheritance_param
+
         resp = requests.put(
             f"{self.owid_env.admin_api}/charts/{chart_id}",
             cookies={"sessionid": self._get_session_id(user_id)},
-            json=chart_config,
+            json=config,
+            params=params,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
