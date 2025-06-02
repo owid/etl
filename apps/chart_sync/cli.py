@@ -234,7 +234,7 @@ def cli(
                         raise ValueError("Invalid chart diff state")
 
             # Sync DODs
-            dods_synced = _sync_dods(source_session, target_session, target_api, dry_run)
+            dods_synced = _sync_dods(source_session, target_session, target_api, dry_run, SERVER_CREATION_TIME)
 
     if charts_synced > 0:
         print(f"\n[bold green]Charts synced: {charts_synced}[/bold green]")
@@ -272,6 +272,23 @@ def _notify_slack_chart_create(source_chart_id: int, source: str, dry_run: bool)
     message = f"""
 :warning: *ETL chart-sync: Pending New Chart Not Synced* from `{source}`
 <http://{get_container_name(source)}/admin/charts/{source_chart_id}/edit|View Staging Chart>
+    """.strip()
+
+    print(message)
+
+    if config.SLACK_API_TOKEN and not dry_run:
+        send_slack_message(channel="#data-architecture-github", message=message)
+
+
+def _notify_slack_dod_conflict(
+    dod_name: str, source: str, source_updated_at: Any, target_updated_at: Any, server_creation_time: Any, dry_run: bool
+) -> None:
+    message = f"""
+:warning: *ETL chart-sync: DOD Conflict Not Synced* from `{source}`
+DOD "{dod_name}" has been updated in production after staging server was created.
+*Staging Updated*: {str(source_updated_at)} UTC
+*Production Updated*: {str(target_updated_at)} UTC
+*Staging Created*: {str(server_creation_time)} UTC
     """.strip()
 
     print(message)
@@ -320,14 +337,15 @@ def _chart_config_diff(
 def _sync_dods(
     source_session: Session,
     target_session: Session,
-    target_api: Optional[AdminAPI],
+    target_api: AdminAPI | None,
     dry_run: bool,
+    server_creation_time: Any,
 ) -> int:
     """Sync DODs from source to target."""
     dods_synced = 0
 
-    # Get DODs from source
-    source_dods = source_session.query(gm.Dod).all()
+    # Get DODs from source with updatedAt timestamp higher than staging server creation time
+    source_dods = source_session.query(gm.Dod).filter(gm.Dod.updatedAt > server_creation_time).all()
 
     log.info("dod_sync.start", n=len(source_dods), dod_ids=[dod.id for dod in source_dods])
 
@@ -336,17 +354,37 @@ def _sync_dods(
         target_dod = target_session.query(gm.Dod).filter(gm.Dod.name == source_dod.name).first()
 
         if target_dod:
-            # DOD exists, check if it needs updating
-            if source_dod.content != target_dod.content or source_dod.updatedAt > target_dod.updatedAt:
-                log.info("dod_sync.update", name=source_dod.name, dod_id=source_dod.id)
-                dods_synced += 1
-
-                if not dry_run and target_api:
-                    target_api.update_dod(
-                        target_dod.id, source_dod.name, source_dod.content, source_dod.lastUpdatedUserId
-                    )
-            else:
+            # First check if content matches - if yes, no need to sync
+            if source_dod.content == target_dod.content and source_dod.updatedAt <= target_dod.updatedAt:
                 log.info("dod_sync.skip", name=source_dod.name, reason="no changes detected")
+                continue
+
+            # Content differs, check if target DOD was updated after staging server creation time
+            if target_dod.updatedAt > server_creation_time:
+                log.warning(
+                    "dod_sync.production_conflict",
+                    name=source_dod.name,
+                    dod_id=source_dod.id,
+                    source_updatedAt=str(source_dod.updatedAt),
+                    target_updatedAt=str(target_dod.updatedAt),
+                    staging_created_at=str(server_creation_time),
+                )
+                _notify_slack_dod_conflict(
+                    source_dod.name,
+                    str(source_session.bind.url).split("@")[-1],  # type: ignore
+                    source_dod.updatedAt,
+                    target_dod.updatedAt,
+                    server_creation_time,
+                    dry_run,
+                )
+                continue
+
+            # DOD exists and needs updating (no conflict)
+            log.info("dod_sync.update", name=source_dod.name, dod_id=source_dod.id)
+            dods_synced += 1
+
+            if not dry_run and target_api:
+                target_api.update_dod(target_dod.id, source_dod.content, source_dod.lastUpdatedUserId)
         else:
             # DOD doesn't exist, create it
             log.info("dod_sync.create", name=source_dod.name, dod_id=source_dod.id)
