@@ -104,6 +104,7 @@ steps:
   data://meadow/democracy/2025-06-02/fh:
     - snapshot://democracy/2025-06-02/fh_ratings.xlsx
     - snapshot://democracy/2024-05-16/fh_scores.xlsx
+    - snapshot://democracy/2025-06-02/fh.xlsx
   data://garden/democracy/2025-06-02/fh:
     - data://meadow/democracy/2025-06-02/fh
     - data://garden/regions/2023-01-01/regions

@@ -1,7 +1,6 @@
 """Load a snapshot and create a meadow dataset."""
 
-from typing import cast
-
+import owid.catalog.processing as pr
 import pandas as pd
 from owid.catalog import Table
 from owid.catalog.tables import concat
@@ -23,13 +22,20 @@ def run() -> None:
 
     # Load scores snapshot as a table
     snap = paths.load_snapshot("fh_scores.xlsx")
-    tb_scores = snap.read(safe_types=False, sheet_name="FIW06-24")
+    tb_scores_0305 = snap.read(safe_types=False, sheet_name="FIW03-05", na_values=["-"])
+    tb_scores_0624 = snap.read(safe_types=False, sheet_name="FIW06-24")
+    snap = paths.load_snapshot("fh.xlsx")
+    tb_scores_1325 = snap.read(safe_types=False, sheet_name="FIW13-25", skiprows=1)
 
     #
     # Process data.
     #
     tb_ratings = reshape_ratings(tb_c=tb_ratings_countries, tb_t=tb_ratings_territories)
-    tb_scores = reshape_scores(tb_scores)
+    tb_scores = reshape_scores(
+        tb_0305=tb_scores_0305,
+        tb_0624=tb_scores_0624,
+        tb_1325=tb_scores_1325,
+    )
 
     #
     # Save outputs.
@@ -81,26 +87,69 @@ def reshape_ratings(tb_c: Table, tb_t: Table) -> Table:
     return tb
 
 
-def reshape_scores(tb: Table) -> Table:
+def reshape_scores(tb_0305, tb_0624, tb_1325):
+    # Data from 2003 to 2005
+    tb_0305 = reshape_scores_2003_2005(tb_0305)
+
+    # Data from 2004 to 2024
+    tb_0624 = reshape_scores_base(tb_0624)
+
+    # Data from 2013 to 2025
+    tb_1325 = reshape_scores_base(tb_1325)
+    tb_1325 = tb_1325.loc[tb_1325["year"] >= 2024]
+
+    # Combine
+    assert tb_0305["year"].min() == 2002, "tb_0305 should start in 2002"
+    assert tb_0624["year"].min() == tb_0305["year"].max() + 1, "tb_0624 should start the year after tb_0305 ends"
+    assert tb_1325["year"].min() == tb_0624["year"].max() + 1, "tb_1325 should start when tb_0624 ends"
+    tb = pr.concat([tb_0305, tb_0624, tb_1325], ignore_index=True)
+
+    # Set dtypes
+    tb = tb.astype({"country": "string"})
+    return tb
+
+
+def reshape_scores_2003_2005(tb: Table) -> Table:
+    id_vars = ["Country/Territory", "C/T?"]  # Columns to keep as identifiers
+    value_vars = [col for col in tb.columns if col.startswith("FIW")]  # Columns to melt
+    tb = pr.melt(tb, id_vars=id_vars, value_vars=value_vars, var_name="metric", value_name="value")
+    tb[["year", "metric_type"]] = tb["metric"].str.extract(r"FIW(\d{2})\s(.+)")
+
+    # Convert year code to full year (03 -> 2003, 04 -> 2004, 05 -> 2005)
+    tb["year"] = 2000 + tb["year"].astype(int)
+
+    tb = tb.pivot(index=id_vars + ["year"], columns="metric_type", values="value").reset_index()
+    # Flatten column names
+    tb.columns.name = None
+
+    tb = reshape_scores_base(tb)
+    return tb
+
+
+def reshape_scores_base(tb: Table) -> Table:
     """Format scores table.
 
     Rename columns, select relevant columns, set dtypes, fix year,
     """
-    tb = cast(Table, tb.dropna(axis=1, how="all"))
+    tb = tb.dropna(axis=1, how="all")
 
-    # Rename columns, keep relevant
-    columns = {
+    # Rename columns
+    columns_rename = {
         "Country/Territory": "country",
         "Edition": "year",
         "A": "electprocess",
         "PR": "polrights_score",
         "CL": "civlibs_score",
+        "Total": "total_score",
     }
-    tb = cast(Table, tb.rename(columns=columns)[columns.values()])
+    tb = tb.rename(columns=columns_rename)
+    # Keep relevant columns
+    columns = [col for col in columns_rename.values() if col in tb.columns]
+    tb = tb.loc[:, columns]
 
     # Set dtype to INT where applicable
-    column_ints = ["year", "electprocess", "polrights_score", "civlibs_score"]
-    tb[column_ints] = tb[column_ints].astype("Int64")
+    # column_ints = ["year", "electprocess", "polrights_score", "civlibs_score", "total_score"]
+    # tb[column_ints] = tb[column_ints].astype("Int64")
 
     # Recode edition year such that it becomes observation year (instead of edition year)
     tb["year"] = tb["year"] - 1
