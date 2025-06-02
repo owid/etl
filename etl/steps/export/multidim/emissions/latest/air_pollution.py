@@ -16,7 +16,6 @@ def run() -> None:
 
     # Load (flattened) table from grapher channel with dimension metadata
     tb = paths.load_dataset("ceds_air_pollutants").read("ceds_air_pollutants", load_data=False)
-
     # Use the updated function with mapping from original_short_name to configuration values.
     add_dimension(
         tb,

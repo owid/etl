@@ -42,7 +42,6 @@ def run() -> None:
                 "time": True,
             },
         },
-        # dimensions={},
     )
 
     # Edit indicator-level display settings
@@ -55,7 +54,7 @@ def run() -> None:
 
     # Aggregate views
     c.group_views(
-        params=[
+        groups=[
             {
                 "dimension": "conflict_type",
                 "choices": [
@@ -65,7 +64,7 @@ def run() -> None:
                     "one-sided violence",
                 ],
                 "choice_new_slug": "all_stacked",
-                "config_new": {
+                "view_config": {
                     "chartTypes": ["StackedBar"],
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -76,7 +75,7 @@ def run() -> None:
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "config_new": {
+                "view_config": {
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
                         "time": True,
@@ -87,7 +86,7 @@ def run() -> None:
                 "dimension": "people",
                 "choices": ["combatants", "civilians", "unknown"],
                 "choice_new_slug": "all_stacked",
-                "config_new": {
+                "view_config": {
                     "chartTypes": ["StackedBar"],
                     "selectedFacetStrategy": "entity",
                     "hideAnnotationFieldsInTitle": {
@@ -119,11 +118,23 @@ def run() -> None:
     # (optional) Edit views
     #
     for view in c.views:
-        # Edit title and subtitle in charts
-        edit_view_title(view, choice_names)
-
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
-        edit_view_display_estimates_ci(view)
+        edit_indicator_displays(view)
+
+    # Edit view configs
+    c.set_global_config(
+        {
+            "timelineMinTime": 1989,
+            "selectedFacetStrategy": "entity",
+            "yAxis": {
+                "facetDomain": True,
+            },
+            "title": "{title}",
+        },
+        params={
+            "title": lambda view: _set_title(view, choice_names),
+        },
+    )
 
     #
     # Save garden dataset.
@@ -208,37 +219,36 @@ def adjust_dimensions(tb):
     return tb
 
 
-def edit_view_title(view, conflict_renames):
-    """Edit FAUST titles and subtitles."""
-    # Get conflict type name
-    conflict_name = "armed conflicts"
-    if view.dimensions["conflict_type"] not in {"all", "all_stacked"}:
-        conflict_name = conflict_renames.get(view.dimensions["conflict_type"]).lower()
-
-    # Add title based on indicator
+def _set_title(view, choice_names):
+    conflict_name = _get_conflict_name(view, choice_names)
     if view.dimensions["indicator"] == "deaths":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Deaths in {conflict_name}",
-        }
+        return f"Deaths in {conflict_name}"
     elif view.dimensions["indicator"] == "death_rate":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Death rate in {conflict_name}",
-        }
-    elif view.dimensions["indicator"] == "num_conflicts":
-        if view.dimensions["conflict_type"] == "one-sided violence":
-            title = f"Number of conflicts with {conflict_name}"
-        else:
-            title = f"Number of {conflict_name}"
-        view.config = {
-            **(view.config or {}),
-            "title": title,
-        }
+        return f"Death rate in {conflict_name}"
+    else:
+        return f"Number of {conflict_name}"
 
 
-def edit_view_display_estimates_ci(view):
+def _get_conflict_name(view, choice_names):
+    """Get conflict name based on view dimensions."""
+    conflict_name = "armed conflicts"
+    if view.dimensions["conflict_type"] == "one-sided violence":
+        conflict_name = "episodes of one-sided violence"
+    elif view.dimensions["conflict_type"] not in {"all", "all_stacked"}:
+        conflict_name = choice_names[view.dimensions["conflict_type"]].lower()
+    return conflict_name
+
+
+def edit_indicator_displays(view):
     """Edit FAUST estimates for confidence intervals."""
+    # Set color to red if there is only one line in the chart
+    if (view.indicators.y is not None) and (len(view.indicators.y) == 1):
+        if view.indicators.y[0].display is None:
+            view.indicators.y[0].display = {"color": "#B13507"}
+        else:
+            view.indicators.y[0].display["color"] = "#B13507"
+
+    # Set colors for stacked bar charts
     if view.dimensions["estimate"] == "best_ci":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:

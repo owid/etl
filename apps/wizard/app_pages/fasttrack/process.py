@@ -51,6 +51,7 @@ def processing_part_1(import_method, dataset_uris, infer_metadata, is_private, _
         data, variables_meta_dict = _infer_metadata(data, variables_meta_dict)
 
     data = _convert_percentages(data, variables_meta_dict)
+    data = _clean_numeric_formatting(data, variables_meta_dict)
 
     # VALIDATION
     st.write("Validating data and metadata...")
@@ -152,7 +153,56 @@ def _convert_percentages(data: pd.DataFrame, variables_meta_dict: Dict[str, Vari
     """Convert percentages to numbers."""
     for col in data.columns:
         if getattr(variables_meta_dict.get(col, {}), "unit", "") == "%":
-            data[col] = data[col].astype(str).str.replace("%", "").astype(float)
+            # Remove % symbol first
+            cleaned_values = data[col].astype(str).str.replace("%", "")
+
+            # Try to convert to float and check for invalid values
+            try:
+                numeric_values = pd.to_numeric(cleaned_values, errors="coerce")
+                # Check if any values couldn't be converted (excluding NaN from original data)
+                original_nulls = data[col].isna()
+                conversion_failures = numeric_values.isna() & ~original_nulls
+
+                if conversion_failures.any():
+                    failed_values = cleaned_values[conversion_failures].unique()
+                    raise ValidationError(
+                        f"Column '{col}' contains percentage values that cannot be converted to numbers: {list(failed_values)}. "
+                        "Please ensure all percentage values are numeric (e.g., '5.2%' not '<0.1%')."
+                    )
+
+                data[col] = numeric_values
+            except ValidationError:
+                raise
+            except Exception as e:
+                raise ValidationError(f"Error converting percentages in column '{col}': {str(e)}")
+
+    return data
+
+
+def _clean_numeric_formatting(data: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta]) -> pd.DataFrame:
+    """Clean numeric formatting issues like commas, extra spaces, etc."""
+    data = data.copy()
+
+    for col in data.columns:
+        if col.startswith("dim_") or col in ["country", "year"]:
+            continue  # Skip dimension columns and standard index columns
+
+        non_null_values = data[col].dropna()
+        if len(non_null_values) == 0:
+            continue
+
+        # Try to clean and convert all values to numeric
+        cleaned_values = data[col].astype(str).str.replace(r"[,\s]+", "", regex=True)
+        numeric_values = pd.to_numeric(cleaned_values, errors="coerce")
+
+        # Count successful conversions
+        successful_conversions = numeric_values.notna().sum() - data[col].isna().sum()
+
+        if successful_conversions > 0:
+            # Replace the original values with cleaned numeric values where conversion succeeded
+            data[col] = data[col].where(data[col].isna(), numeric_values)
+            st.info(f"Cleaned numeric formatting in column '{col}' (converted {successful_conversions} values)")
+
     return data
 
 
@@ -178,6 +228,28 @@ def _validate_data(df: pd.DataFrame, variables_meta_dict: Dict[str, VariableMeta
     for col in df.columns:
         if col in variables_meta_dict and not variables_meta_dict[col].title:
             errors.append(ValidationError(f"Variable {col} is missing title (you can use its short name)"))
+
+    # check for mixed data types
+    for col in df.columns:
+        if col.startswith("dim_") or col in ["country", "year"]:
+            continue  # Skip dimension columns and standard index columns
+
+        non_null_values = df[col].dropna()
+        if len(non_null_values) == 0:
+            continue
+
+        # Check if column has mixed numeric and non-numeric values
+        numeric_mask = pd.to_numeric(non_null_values, errors="coerce").notna()
+        numeric_count = numeric_mask.sum()
+        total_count = len(non_null_values)
+
+        # If some but not all values are numeric, it's mixed
+        if 0 < numeric_count < total_count:
+            non_numeric_examples = non_null_values[~numeric_mask].unique()[:3]
+            error_msg = f"Variable {col} contains mixed data types ({numeric_count}/{total_count} values are numeric). "
+            error_msg += f"Non-numeric examples: {list(non_numeric_examples)}. "
+            error_msg += "Please ensure the column contains either all numeric values or all text values."
+            errors.append(ValidationError(error_msg))
 
     # no inf values
     for col in df.select_dtypes("number").columns:

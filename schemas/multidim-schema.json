@@ -37,6 +37,15 @@
                 "type": "string"
             }
         },
+        "default_dimensions": {
+            "type": "object",
+            "description": "The dimensions of the default view in the collection (shown by default on the site).",
+            "patternProperties": {
+                ".*": {
+                    "type": "string"
+                }
+            }
+        },
         "topic_tags": {
             "type": "array",
             "items": {
@@ -49,7 +58,7 @@
                 "type": "object",
                 "properties": {
                     "slug": {
-                        "type": "string"
+                        "$ref": "definitions.json#/slug_relaxed"
                     },
                     "name": {
                         "type": "string"
@@ -63,7 +72,7 @@
                             "type": "object",
                             "properties": {
                                 "slug": {
-                                    "type": "string"
+                                    "$ref": "definitions.json#/slug_relaxed"
                                 },
                                 "name": {
                                     "type": "string"

@@ -7,12 +7,15 @@ import re
 from collections import defaultdict
 from copy import deepcopy
 from itertools import product
-from typing import Any, Dict, List, Optional, Set
+from string import Formatter
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
+from deprecated import deprecated
 from owid.catalog import Dataset
 from sqlalchemy.orm import Session
 
 import etl.grapher.model as gm
+from etl.collection.exceptions import ParamKeyError
 from etl.config import OWID_ENV, OWIDEnv
 from etl.db import read_sql
 from etl.files import yaml_dump
@@ -247,8 +250,47 @@ def extract_definitions(config: dict) -> dict:
     return config
 
 
-# causes_of_death
-def group_views(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
+def _check_missing_fields(template: str, params: dict) -> None:
+    """
+    Scan a single format string and raise ParamKeyError
+    if it references a key that is missing from params.
+    """
+    fmt = Formatter()
+    missing = {
+        field_name for literal_text, field_name, *_ in fmt.parse(template) if field_name and field_name not in params
+    }
+    if missing:
+        raise ParamKeyError(f"Missing keys for placeholders {missing!r} in template: {template!r}")
+
+
+def fill_placeholders(data, params) -> Union[Dict[str, Any], List[Any], Set[Any], Tuple[Any], str]:
+    """
+    Recursively walk *data* (dicts, lists, tuples, sets, primitives) and
+    replace any `{placeholder}` found in strings using values from *params*.
+
+    Raises
+    ------
+    ParamKeyError
+        If a placeholder key is referenced that is absent from *params*.
+    """
+    if isinstance(data, dict):
+        return {k: fill_placeholders(v, params) for k, v in data.items()}
+
+    if isinstance(data, (list, tuple, set)):
+        container_type = type(data)
+        return container_type(fill_placeholders(item, params) for item in data)
+
+    if isinstance(data, str):
+        _check_missing_fields(data, params)
+        # All placeholders are present – safe to format
+        return data.format(**params)
+
+    # Any other type (int, bool, None, etc.) is returned unchanged
+    return data
+
+
+@deprecated("Use class method Collection.group_views instead.")
+def group_views_legacy(views: list[dict[str, Any]], by: list[str]) -> list[dict[str, Any]]:
     """
     Group views by the specified dimensions. Concatenate indicators for the same group.
 

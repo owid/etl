@@ -10,20 +10,20 @@ from etl.data_helpers.misc import expand_time_column
 def add_indicators_extra(
     tb: Table,
     tb_regions: Table,
-    columns_conflict_rate: Optional[List[str]] = None,
-    columns_conflict_mortality: Optional[List[str]] = None,
+    columns_conflict_count: Optional[List[str]] = None,
+    columns_conflict_deaths: Optional[List[str]] = None,
 ) -> Table:
     """Scale original columns to obtain new indicators (conflict rate and conflict mortality indicators).
 
     CONFLICT RATE:
-        Scale columns `columns_conflict_rate` based on the number of countries (and country-pairs) in each region and year.
+        Scale columns `columns_conflict_count` based on the number of countries (and country-pairs) in each region and year.
 
         For each indicator listed in `columns_to_scale`, two new columns are added to the table:
         - `{indicator}_per_country`: the indicator value divided by the number of countries in the region and year.
         - `{indicator}_per_country_pair`: the indicator value divided by the number of country-pairs in the region and year.
 
     CONFLICT MORTALITY:
-        Scale columns `columns_conflict_mortality` based on the population in each region.
+        Scale columns `columns_conflict_deaths` based on the population in each region.
 
         For each indicator listed in `columns_to_scale`, a new column is added to the table:
         - `{indicator}_per_capita`: the indicator value divided by the number of countries in the region and year.
@@ -58,15 +58,15 @@ def add_indicators_extra(
     # Add number of countries and number of country pairs to main table
     tb = tb.merge(tb_regions_, on=["year", "region"], how="left")
 
-    if not columns_conflict_rate and not columns_conflict_mortality:
+    if not columns_conflict_count and not columns_conflict_deaths:
         raise ValueError(
-            "Call to function is useless. Either provide `columns_conflict_rate` or `columns_conflict_mortality`."
+            "Call to function is useless. Either provide `columns_conflict_count` or `columns_conflict_deaths`."
         )
 
     # CONFLICT RATES ###########
-    if columns_conflict_rate:
+    if columns_conflict_count:
         # Add normalised indicators
-        for column_name in columns_conflict_rate:
+        for column_name in columns_conflict_count:
             # Add per country indicator
             column_name_new = f"{column_name}_per_country"
             tb[column_name_new] = (tb[column_name].astype(float) / tb["number_countries"].astype(float)).replace(
@@ -79,9 +79,9 @@ def add_indicators_extra(
             )
 
     # CONFLICT MORTALITY ###########
-    if columns_conflict_mortality:
+    if columns_conflict_deaths:
         # Add normalised indicators
-        for column_name in columns_conflict_mortality:
+        for column_name in columns_conflict_deaths:
             # Add per country indicator
             column_name_new = f"{column_name}_per_capita"
             tb[column_name_new] = (
@@ -115,7 +115,7 @@ def aggregate_conflict_types(
     if children_names is None:
         tb_agg = tb.copy()
     else:
-        tb_agg = tb[tb[dim_name].isin(children_names)].copy()
+        tb_agg = tb.loc[tb[dim_name].isin(children_names)].copy()
     # Obtain summations
     tb_agg = tb_agg.groupby(columns_to_groupby, as_index=False).agg({col: sum for col in columns_to_aggregate})
     # Threshold to 1 for binary columns

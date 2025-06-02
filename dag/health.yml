@@ -187,15 +187,6 @@ steps:
   data://garden/oecd/2018-03-11/road_deaths_and_injuries:
     - snapshot://oecd/2018-03-11/road_deaths_and_injuries.feather
 
-  # Kucharski
-  data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski:
-    - snapshot://health/2023-08-14/avian_influenza_h5n1_kucharski.xlsx
-  data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski:
-    - data://meadow/health/2023-08-14/avian_influenza_h5n1_kucharski
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/health/2023-08-14/avian_influenza_h5n1_kucharski:
-    - data://garden/health/2023-08-14/avian_influenza_h5n1_kucharski
-
   # European Society for Cardiology datasets
   data://meadow/cardiovascular_diseases/2023-10-10/esc:
     - snapshot://cardiovascular_diseases/2023-10-10/esc.csv
@@ -1295,7 +1286,7 @@ steps:
     - data://garden/who/2025-04-07/gho_smoking
 
   #
-  # TODO: add step name (just something recognizable)
+  # Rinderpest
   #
   data://meadow/health/2025-04-22/rinderpest:
     - snapshot://health/2025-04-22/rinderpest.csv
@@ -1303,3 +1294,13 @@ steps:
     - data://meadow/health/2025-04-22/rinderpest
   data://grapher/health/2025-04-22/rinderpest:
     - data://garden/health/2025-04-22/rinderpest
+
+  #
+  # Tuberculosis - CDC
+  #
+  data://meadow/cdc/2025-05-19/tuberculosis:
+    - snapshot://cdc/2025-05-19/tuberculosis.csv
+  data://garden/cdc/2025-05-19/tuberculosis:
+    - data://meadow/cdc/2025-05-19/tuberculosis
+  data://grapher/cdc/2025-05-19/tuberculosis:
+    - data://garden/cdc/2025-05-19/tuberculosis

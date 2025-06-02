@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import Callable, ClassVar, List, Optional, TypeGuard, Union
 
+from etl.collection.exceptions import DuplicateValuesError, MissingChoiceError
 from etl.collection.model.base import MDIMBase, pruned_json
 
 
@@ -104,7 +105,7 @@ class Dimension(MDIMBase):
         # Make sure all choices are in the given order
         choices_missing = set(choice_slugs) - set(slug_order_)
         if choices_missing:
-            raise ValueError(
+            raise MissingChoiceError(
                 f"All choices for dimension {self.slug} must be in the given order! Missing: {choices_missing}"
             )
 
@@ -119,10 +120,12 @@ class Dimension(MDIMBase):
         # TODO: Check if (name, group) is unique instead of just name
         names = [choice.name for choice in self.choices]
         if len(names) != len(set(names)):
-            raise ValueError(f"Dimension choices for '{self.slug}' must have unique names!")
+            raise DuplicateValuesError(f"Dimension choices for '{self.slug}' must have unique names!")
 
     def validate_unique_slugs(self):
         """Validate that all choice names are unique."""
         slug = [choice.slug for choice in self.choices]
         if len(slug) != len(set(slug)):
-            raise ValueError(f"Dimension choices for '{self.slug}' must have unique names! Review {self.choice_slugs}")
+            raise DuplicateValuesError(
+                f"Dimension choices for '{self.slug}' must have unique names! Review {self.choice_slugs}"
+            )

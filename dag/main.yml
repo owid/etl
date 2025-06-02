@@ -37,15 +37,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-    # Homicide - UNODC - update
-  data://meadow/homicide/2024-10-30/unodc:
-    - snapshot://homicide/2024-10-30/unodc.xlsx
-  data://garden/homicide/2024-10-30/unodc:
-    - data://meadow/homicide/2024-10-30/unodc
-    - data://garden/demography/2023-03-31/population
-  data://grapher/homicide/2024-10-30/unodc:
-    - data://garden/homicide/2024-10-30/unodc
-
   #
   # UN
   # UN SDG - current
@@ -68,14 +59,14 @@ steps:
     - data://garden/technology/2024-12-23/internet
 
   # UNDP
-  data://meadow/un/2024-04-09/undp_hdr:
-    - snapshot://un/2024-04-09/undp_hdr.csv
-  data://garden/un/2024-04-09/undp_hdr:
-    - data://meadow/un/2024-04-09/undp_hdr
+  data://meadow/un/2025-05-07/undp_hdr:
+    - snapshot://un/2025-05-07/undp_hdr.csv
+  data://garden/un/2025-05-07/undp_hdr:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-07-29/income_groups
-  data://grapher/un/2024-04-09/undp_hdr:
-    - data://garden/un/2024-04-09/undp_hdr
+    - data://meadow/un/2025-05-07/undp_hdr
+  data://grapher/un/2025-05-07/undp_hdr:
+    - data://garden/un/2025-05-07/undp_hdr
 
   # Maddison Database 2010
   data://meadow/ggdc/2022-12-23/maddison_database:
@@ -621,6 +612,14 @@ steps:
   data://grapher/wpf/2025-01-17/famines_by_trigger:
     - data://garden/wpf/2025-01-17/famines_by_trigger
 
+  # Global Flourishing Study
+  data-private://meadow/gfs/2024-11-11/gfs_wave_one:
+    - snapshot-private://gfs/2024-11-11/gfs_wave_one.csv
+  data-private://garden/gfs/2024-11-11/gfs_wave_one:
+    - data-private://meadow/gfs/2024-11-11/gfs_wave_one
+  data-private://grapher/gfs/2024-11-11/gfs_wave_one:
+    - data-private://garden/gfs/2024-11-11/gfs_wave_one
+
   data-private://meadow/owid/latest/ig_countries:
     - snapshot-private://owid/latest/ig_countries.csv
   data-private://garden/owid/latest/ig_countries:
@@ -687,7 +686,6 @@ steps:
   data://grapher/imf/2025-04-25/world_economic_outlook:
     - data://garden/imf/2025-04-25/world_economic_outlook
 
-
   #
   # World Airlines Traffic and Capacity
   #
@@ -698,34 +696,30 @@ steps:
   data://grapher/aviation/2025-04-01/air_traffic:
     - data://garden/aviation/2025-04-01/air_traffic
 
-  # UNODC - Access and Functioning of Justice
-  data://meadow/unodc/2025-05-12/justice:
-    - snapshot://unodc/2025-05-12/justice.xlsx
-  data://garden/unodc/2025-05-12/justice:
-    - data://meadow/unodc/2025-05-12/justice
-  data://grapher/unodc/2025-05-12/justice:
-    - data://garden/unodc/2025-05-12/justice
-
-  # UNODC - Corruption & Economic Crime
-  data://meadow/unodc/2025-05-12/corruption:
-    - snapshot://unodc/2025-05-12/corruption.xlsx
-  data://garden/unodc/2025-05-12/corruption:
-    - data://meadow/unodc/2025-05-12/corruption
-  data://grapher/unodc/2025-05-12/corruption:
-    - data://garden/unodc/2025-05-12/corruption
-
-
-  #
-  # Corruption Barometer
-  #
-  data://meadow/corruption/2025-05-12/corruption_barometer:
-    - snapshot://corruption/2025-05-12/corruption_barometer.xlsx
-  data://garden/corruption/2025-05-12/corruption_barometer:
-    - data://meadow/corruption/2025-05-12/corruption_barometer
+  # United Nations members
+  data://meadow/un/2025-05-15/un_members:
+    - snapshot://un/2025-05-15/un_members.csv
+  # United Nations members
+  data://garden/un/2025-05-15/un_members:
+    - data://garden/wb/2021-07-01/wb_income
     - data://garden/demography/2024-07-15/population
+    - data://meadow/un/2025-05-15/un_members
     - data://garden/regions/2023-01-01/regions
-  data://grapher/corruption/2025-05-12/corruption_barometer:
-    - data://garden/corruption/2025-05-12/corruption_barometer
+  # United Nations members
+  data://grapher/un/2025-05-15/un_members:
+    - data://garden/un/2025-05-15/un_members
+
+  #
+  # UNODC Homicide Data
+  #
+  data://meadow/unodc/2025-05-28/homicide:
+    - snapshot://unodc/2025-05-28/homicide.xlsx
+  data://garden/unodc/2025-05-28/homicide:
+    - data://meadow/unodc/2025-05-28/homicide
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/unodc/2025-05-28/homicide:
+    - data://garden/unodc/2025-05-28/homicide
 
 include:
   - dag/open_numbers.yml
@@ -766,3 +760,4 @@ include:
   - dag/families.yml
   - dag/technology.yml
   - dag/redistribution.yml
+  - dag/corruption.yml
