@@ -531,6 +531,7 @@ def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.Dat
         raise RuntimeError(f"Missing sources for indicators:\n{missing_sources}")
 
     # Underscore indicator codes
+    df_vars["indicator_code_original"] = df_vars["indicator_code"].copy()
     df_vars["indicator_code"] = df_vars["indicator_code"].apply(underscore)
     df_vars["indicator_name"] = df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
 
@@ -565,10 +566,29 @@ def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
         clean_source = clean_source_mapping.get(source_raw_name)
         assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
 
-        # create an origin with WDI source name as producer
-        tb[var_code].m.origins[0].producer = clean_source["name"]
+        # create an origin with WDI
+        assert len(tb[var_code].m.origins) == 1
+        origin = tb[var_code].m.origins[0]
 
-        tb[var_code].m.description_from_producer = create_description(var)
+        # Check out this issue for details on the origin: https://github.com/owid/etl/issues/3971#issuecomment-2921855209
+        #
+        # Example:
+        #
+        # origin:
+        #     producer: Food and Agriculture Organization of the United Nations
+        #     title: World Development Indicators (World Bank)
+        #     description: |-
+        #         The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.
+        #     url_main: https://data.worldbank.org/indicator/AG.CON.FERT.PT.ZS
+        #     citation_full: {rawName}. Indicator AG.CON.FERT.PT.ZS ({url_main}), {title} ({date_published})
+        #     attribution: None
+        origin.producer = clean_source["name"]
+        origin.title = "World Development Indicators (World Bank)"
+        origin.url_main = f"https://data.worldbank.org/indicator/{var['indicator_code_original']}"
+        origin.citation_full = f"{source_raw_name.rstrip('.')}. Indicator {var['indicator_code_original']} ({origin.url_main}), {origin.title} ({origin.date_published})"
+
+        # set description_from_producer
+        tb[var_code].m.description_from_producer = create_description_from_producer(var)
 
     if not all([len(tb[var_code].origins) == 1 for var_code in var_codes]):
         missing = [var_code for var_code in var_codes if len(tb[var_code].origins) != 1]
@@ -590,7 +610,7 @@ def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
     return source_mapping
 
 
-def create_description(var: Dict[str, Any]) -> Optional[str]:
+def create_description_from_producer(var: Dict[str, Any]) -> Optional[str]:
     desc = ""
     if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]
