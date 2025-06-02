@@ -23,7 +23,7 @@ tables:
       description_processing: |-
         The default regional aggregates (including values for the World) have been estimated by averaging the country values.
 
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
+        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. The population values are from the UN WPP 2024 revision dataset.
 
     variables:
       democracy_eiu:
