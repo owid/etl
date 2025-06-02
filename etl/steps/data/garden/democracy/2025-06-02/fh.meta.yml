@@ -113,7 +113,7 @@ tables:
           People living in countries without regime data
           <%- elif category == 'Not free' %>
           People living in not-free countries
-          <%- elif category == 'Partly free' ->
+          <%- elif category == 'Partly free' %>
           People living in partly-free countries
           <%- elif category == 'Free' %>
           People living in free countries
