@@ -151,7 +151,7 @@ def _add_metric_population(df: Table) -> Tuple[Table, Table]:
     df_p = df.loc[df.metric == "population"]
     # Basic age groups
     age_map = {
-        **{str(i): f"{i - i%5}-{i + 4 - i%5}" for i in range(0, 100)},
+        **{str(i): f"{i - i % 5}-{i + 4 - i % 5}" for i in range(0, 100)},
         **{"100+": "100+"},
     }
     df_p_granular = df_p.assign(age=df_p.age.map(age_map).astype("category"))

@@ -1145,9 +1145,9 @@ def remove_anomalies(tb, anomalies):
                 raise TypeError("Unexpected type for 'year' in anomaly! Must be INT or LIST[INT].")
 
         if "dimensions" in anomaly:
-            assert isinstance(
-                anomaly["dimensions"], dict
-            ), "Unexpected type for 'dimensions' in anomaly! Must be a DICT."
+            assert isinstance(anomaly["dimensions"], dict), (
+                "Unexpected type for 'dimensions' in anomaly! Must be a DICT."
+            )
             for dim, value in anomaly["dimensions"].items():
                 if isinstance(value, list):
                     mask &= tb[dim].isin(value)

@@ -130,9 +130,9 @@ def run() -> None:
     tb = tb.rename(columns={"Place": "country"})
 
     # Ensure there are no NaNs in the mortality estimates
-    assert (
-        not tb["WPF authoritative mortality estimate"].isna().any()
-    ), "There are NaN values in the mortality estimates"
+    assert not tb["WPF authoritative mortality estimate"].isna().any(), (
+        "There are NaN values in the mortality estimates"
+    )
 
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
     tb = tb.format(["date", "simplified_place"])

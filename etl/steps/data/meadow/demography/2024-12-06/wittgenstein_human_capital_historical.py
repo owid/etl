@@ -100,7 +100,9 @@ def run(dest_dir: str) -> None:
     )
 
     # Filter out rows that are >2020
-    year_ranges_ignore = [f"{i}-{i+5}" for i in range(2021, 2101, 5)] + [f"{i}.0-{i+5}.0" for i in range(2020, 2101, 5)]
+    year_ranges_ignore = [f"{i}-{i + 5}" for i in range(2021, 2101, 5)] + [
+        f"{i}.0-{i + 5}.0" for i in range(2020, 2101, 5)
+    ]
     year_ranges_ignore += [f"{i}.0" for i in range(2021, 2101)] + [f"{i}" for i in range(2020, 2101)]
 
     for tname, tbs in tables.items():

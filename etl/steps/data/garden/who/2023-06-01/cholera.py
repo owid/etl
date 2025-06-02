@@ -89,9 +89,9 @@ def add_global_total(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
     countries = regions[regions["region_type"] == "country"]["name"].to_list()
     manual_countries_to_allow = ["Serbia and Montenegro (former)"]
     countries = countries + manual_countries_to_allow
-    assert all(
-        df["country"].isin(countries)
-    ), f"{df['country'][~df['country'].isin(countries)].drop_duplicates()}, is not a country"
+    assert all(df["country"].isin(countries)), (
+        f"{df['country'][~df['country'].isin(countries)].drop_duplicates()}, is not a country"
+    )
     df_glob = df.groupby(["year"]).agg({"cholera_reported_cases": "sum", "cholera_deaths": "sum"}).reset_index()
     df_glob["country"] = "World"
     df_glob["cholera_case_fatality_rate"] = cholera_case_fatality_rate(df_glob)

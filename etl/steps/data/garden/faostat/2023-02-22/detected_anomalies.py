@@ -468,7 +468,7 @@ class TeaProductionAnomaly(DataAnomaly):
             assert high_value / low_value > 3
 
     def inspect(self, df):
-        log.info("The anomaly causes: " "\n* The production of tea to increase dramatically from 1990 to 1991.")
+        log.info("The anomaly causes: \n* The production of tea to increase dramatically from 1990 to 1991.")
         for element_code in self.affected_element_codes:
             selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
             df_affected = df[selection].astype({"country": str}).sort_values(["country", "year"])
@@ -519,7 +519,7 @@ class HighYieldAnomaly(DataAnomaly):
         ).all()
 
     def inspect(self, df):
-        log.info("The anomaly causes: " "\n* The yield of certain items, countries and years to be unreasonably high.")
+        log.info("The anomaly causes: \n* The yield of certain items, countries and years to be unreasonably high.")
         for element_code in self.affected_element_codes:
             selection = (df["item_code"].isin(self.affected_item_codes)) & (df["element_code"] == element_code)
             df_affected = df[selection].astype({"country": str}).sort_values(["country", "year"])

@@ -388,16 +388,14 @@ def add_recipient_dataset(tb: Table, tb_recipient: Table) -> Table:
     tb_recipient = tb_recipient.copy()
 
     # Assert if the donor categories are in the recipient dataset
-    assert set(
-        DONORS_TOTALS.keys()
-    ).issubset(
-        set(tb_recipient["donor"].unique())
-    ), f"There are missing donor categories in the recipient dataset: {set(DONORS_TOTALS) - set(tb_recipient['donor'].unique())}"
+    assert set(DONORS_TOTALS.keys()).issubset(set(tb_recipient["donor"].unique())), (
+        f"There are missing donor categories in the recipient dataset: {set(DONORS_TOTALS) - set(tb_recipient['donor'].unique())}"
+    )
 
     # Assert if the official donors aggregation is in the recipient dataset
-    assert set(OFFICIAL_DONORS.keys()).issubset(
-        set(tb_recipient["donor"].unique())
-    ), f"The official donot aggregate set is not in the recipient dataset: {OFFICIAL_DONORS.keys()}"
+    assert set(OFFICIAL_DONORS.keys()).issubset(set(tb_recipient["donor"].unique())), (
+        f"The official donot aggregate set is not in the recipient dataset: {OFFICIAL_DONORS.keys()}"
+    )
 
     # Rename donor categories set in DONORS_TOTALS and OFFICIAL_DONORS
     tb_recipient["donor"] = tb_recipient["donor"].cat.rename_categories(DONORS_TOTALS)
@@ -481,9 +479,9 @@ def add_aid_by_sector_donor_dataset(tb: Table, tb_sector: Table) -> Table:
     tb_sector = tb_sector.copy()
 
     # Assert if the sectors are in the sector dataset
-    assert set(SECTORS_DAC5.keys()).issubset(
-        set(tb_sector["sector"].unique())
-    ), f"There are missing sectors in the sector dataset: {set(SECTORS_DAC5) - set(tb_sector['sector'].unique())}"
+    assert set(SECTORS_DAC5.keys()).issubset(set(tb_sector["sector"].unique())), (
+        f"There are missing sectors in the sector dataset: {set(SECTORS_DAC5) - set(tb_sector['sector'].unique())}"
+    )
 
     # Filter categories
     tb_sector = tb_sector[tb_sector["sector"].isin(SECTORS_DAC5.keys())].reset_index(drop=True)

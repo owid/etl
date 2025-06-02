@@ -167,12 +167,12 @@ def _sanity_checks(tb: Table) -> None:
     # Low and High estimates
     columns = ["bdeadlow", "bdeadhig"]
     for column in columns:
-        assert (
-            tb[column].isna().sum() == 0
-        ), f"Missing values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
-        assert not set(
-            tb.loc[tb[column] < 0, column]
-        ), f"Negative values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
+        assert tb[column].isna().sum() == 0, (
+            f"Missing values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
+        )
+        assert not set(tb.loc[tb[column] < 0, column]), (
+            f"Negative values found in {column}. Consequently, we can't set to zero this field in `replace_missing_data_with_zeros`!"
+        )
 
     # Best estimate
     column = "bdeadbes"
@@ -182,12 +182,12 @@ def _sanity_checks(tb: Table) -> None:
     tb[column] = tb[column].replace(-999, np.nan)
 
     # Check regions
-    assert (
-        tb.groupby("id")["region"].nunique() == 1
-    ).all(), "Some conflicts occurs in multiple regions! That was not expected."
-    assert (
-        tb.groupby(["id", "year"])["conflict_type"].nunique() == 1
-    ).all(), "Some conflicts has different values for `type` in the same year! That was not expected."
+    assert (tb.groupby("id")["region"].nunique() == 1).all(), (
+        "Some conflicts occurs in multiple regions! That was not expected."
+    )
+    assert (tb.groupby(["id", "year"])["conflict_type"].nunique() == 1).all(), (
+        "Some conflicts has different values for `type` in the same year! That was not expected."
+    )
 
 
 def estimate_metrics(tb: Table) -> Table:
@@ -261,9 +261,9 @@ def _add_new_metrics(tb: Table) -> Table:
     tb_new = tb.sort_values("year").drop_duplicates(subset=["id", "region"], keep="first")[
         ["year", "region", "conflict_type", "id"]
     ]
-    assert (
-        tb_new["id"].value_counts().max() == 1
-    ), "There are multiple instances of a conflict with the same ID. Maybe same conflict in different regions or with different types? This is assumed not to happen"
+    assert tb_new["id"].value_counts().max() == 1, (
+        "There are multiple instances of a conflict with the same ID. Maybe same conflict in different regions or with different types? This is assumed not to happen"
+    )
 
     # Estimate metric for regions and types
     tb_new_regions = tb_new.groupby(["year", "region", "conflict_type"], as_index=False)["id"].nunique()
@@ -338,14 +338,12 @@ def _sanity_check_final(tb: Table) -> Table:
     tb_all = tb[tb["conflict_type"] == "all"]
     tb_ = tb_all.merge(tb_check, on=["year", "region"], suffixes=("_all", "_check"), validate="one_to_one")
     ## Assertions
-    assert (
-        tb_["number_ongoing_conflicts_all"] - tb_["number_ongoing_conflicts_check"] == 0
-    ).all(), (
+    assert (tb_["number_ongoing_conflicts_all"] - tb_["number_ongoing_conflicts_check"] == 0).all(), (
         "Number of ongoing conflicts for conflict_type='all' is not equivalent to the sum of individual conflict types"
     )
-    assert (
-        tb_["number_new_conflicts_all"] - tb_["number_new_conflicts_check"] == 0
-    ).all(), "Number of new conflicts for conflict_type='all' is not equivalent to the sum of individual conflict types"
+    assert (tb_["number_new_conflicts_all"] - tb_["number_new_conflicts_check"] == 0).all(), (
+        "Number of new conflicts for conflict_type='all' is not equivalent to the sum of individual conflict types"
+    )
 
     # 2)
     msk = tb["number_deaths_ongoing_conflicts_battle_low"] > tb["number_deaths_ongoing_conflicts_battle_high"]
