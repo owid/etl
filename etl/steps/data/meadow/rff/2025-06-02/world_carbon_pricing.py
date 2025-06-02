@@ -75,7 +75,8 @@ def run() -> None:
 
     # Sanity check.
     error = "IPCC codes found in data that are missing in IPCC codes file."
-    assert set(tb_ipcc_codes["ipcc_code"]) <= set(tb_ipcc_codes["ipcc_code"]), error
+    assert set(tb_national["ipcc_code"]) == set(tb_ipcc_codes["ipcc_code"]), error
+    assert set(tb_subnational["ipcc_code"]) == set(tb_ipcc_codes["ipcc_code"]), error
 
     # Add sector names to data, mapping IPCC codes.
     tb_national = tb_national.merge(tb_ipcc_codes, on="ipcc_code", how="left")
