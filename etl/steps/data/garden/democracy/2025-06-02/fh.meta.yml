@@ -13,6 +13,17 @@ dataset:
 tables:
   fh:
     variables:
+      total_score:
+        title: Total democracy score
+        unit: ""
+        description_short: |-
+          Freedom House's total democracy score is a 0-to-100 aggregate that adds up a country's points on 25 indicators of political rights (max 40) and civil liberties (max 60), creating a single snapshot of the freedoms people actually enjoy.
+
+        description_key:
+          - It distills a detailed checklist—10 political-rights and 15 civil-liberties questions—into one intuitive figure, making complex governance data easy to grasp.
+          - The number is the gateway to Freedom House's headline categories Free, Partly Free, Not Free, so a small point swing can shift a country's global status.
+          - "Scores are re-evaluated each year: analysts adjust points only when real-world events warrant, allowing the metric to flag both rapid crackdowns and gradual reforms."
+
       civlibs:
         title: Civil liberties rating
         unit: ""

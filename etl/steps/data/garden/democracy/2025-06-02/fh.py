@@ -89,7 +89,6 @@ def run() -> None:
     # Drop rows without values
     columns_excluded = ["country", "year", "country_flag"]
     tb = tb.dropna(subset=[col for col in tb.columns if col not in columns_excluded], how="all")
-    tb = cast(Table, tb)
 
     # Impute values
     col_flag_imputed = "values_imputed"
