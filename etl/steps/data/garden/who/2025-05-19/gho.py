@@ -54,6 +54,8 @@ NAN_VALUES = [
     "…",
 ]
 
+PRIORITY_OF_REGIONS = ["WORLDBANKREGION", "REGION", "UNICEFREGION", "UNREGION", "UNSDGREGION", "FAOREGION"]
+
 
 def run(dest_dir: str) -> None:
     #
@@ -92,26 +94,8 @@ def run(dest_dir: str) -> None:
             warn_on_unknown_excluded_countries=False,
         )
 
-        # Remove null columns
-        # tb = tb.dropna(axis=1, how="all")
-        # assert tb is not None
-
-        # if tb.empty:
-        #     continue
-
-        # Drop indicator column
-        # assert len(set(tb["indicator"])) == 1
-        # tb = tb.drop(columns=["indicator"])
-
-        # Drop publish_states column
-        # tb = tb.drop(columns=["publish_states"])
-
-        # Drop data_source
-        # tb = tb.drop(columns=["data_source"], errors="ignore")
-
-        # Exclude indicators without year
-        # if "year" not in tb.columns:
-        #     continue
+        # Drop excess region sources.
+        tb = drop_excess_region_sources(tb, PRIORITY_OF_REGIONS)
 
         # Standardize dimension values
         if "sex" in tb.columns:
@@ -243,26 +227,37 @@ def check_overlapping_names(tb: Table) -> None:
         raise ValueError(f"index names are overlapping with column names: {overlapping_names}")
 
 
-# TODO: remove this, we're not using it anymore
-def drop_excess_region_sources(tb: pd.DataFrame, priority_regions: list[str]) -> pd.DataFrame:
+def drop_excess_region_sources(tb: Table, priority_regions: list[str]) -> Table:
     """
     Drop specific region sources if there are more than two different sources for a given indicator,
     in the order of preference given in `priority_regions`.
     Keep rows where `region_source` is NaN.
     """
-    if tb["region_source"].nunique(dropna=True) > 2:  # Only count non-NaN values
-        unique_sources = tb["region_source"].dropna().unique().tolist()
+    regions_tb = tb[~tb.spatialdimtype.isin({"COUNTRY", "GLOBAL", "WORLDBANKINCOMEGROUP", "WHOINCOMEREGION"})]
 
-        # Sort sources based on priority list
-        unique_sources.sort(key=lambda x: priority_regions.index(x) if x in priority_regions else float("inf"))
+    if regions_tb.empty:
+        # If there are no regions, return the original table
+        return tb
 
-        # Keep only the top 2 priority sources
-        sources_to_keep = unique_sources[:2]
+    region_sources = set(regions_tb.spatialdimtype)
+    if len(region_sources) == 1:
+        # If there is only one region source, return the original table
+        return tb
 
-        # Filter the DataFrame but KEEP NaN values
-        tb = tb[tb["region_source"].isin(sources_to_keep) | tb["region_source"].isna()]
+    missing_priority_regions = set(region_sources) - set(priority_regions)
+    assert not missing_priority_regions, (
+        f"Some region sources are not in the priority list: {missing_priority_regions}. "
+        "Please update the priority_regions list."
+    )
 
-    return tb
+    # Keep only two regions
+    regions_to_keep = [region for region in priority_regions if region in region_sources][:2]
+    regions_to_drop = region_sources - set(regions_to_keep)
+
+    for region_to_remove in regions_to_drop:
+        tb = tb[tb.spatialdimtype != region_to_remove]
+
+    return tb.copy()
 
 
 def merge_identical_tables(tables: list[Table]) -> list[Table]:
