@@ -1,7 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
 import owid.catalog.processing as pr
-from owid.catalog import VariablePresentationMeta
 from owid.datautils.dataframes import map_series
 
 from etl.helpers import PathFinder
