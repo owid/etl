@@ -998,7 +998,7 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
             "has_na_once_expanded": True,
         },
         {
-            "name": "wom_hoe_vdem_cum",
+            "name": "wom_hoe_ever",
             "name_new": "num_countries_wom_hoe_ever",
             "values_expected": {
                 "0": "no",
@@ -1008,7 +1008,7 @@ def make_table_with_dummies(tb: Table, people_living_in: bool = False) -> Table:
             "has_na_once_expanded": True,
         },
         {
-            "name": "wom_hoe_vdem_cum_dem",
+            "name": "wom_hoe_ever_dem",
             "name_new": "num_countries_wom_hoe_ever_demelect",
             "values_expected": {
                 "0": "no",

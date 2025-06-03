@@ -3,7 +3,7 @@
 ref: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_do
 """
 
-from typing import Union, cast
+from typing import Union
 
 import numpy as np
 from owid.catalog import Table
@@ -13,7 +13,6 @@ from etl.data_helpers import geo
 
 def run(tb: Table, country_mapping_path) -> Table:
     # %% Initial cleaning
-    tb = cast(Table, tb)
     tb = initial_cleaning(tb)
 
     # While the head-of-government indicators generally should refer to the one in office on December 31, v2exfemhog seems to (occasionally?) refer to other points during the year. For most purposes, it makes sense to consistently refer to December 31, so I am recoding here.
@@ -71,9 +70,10 @@ def run(tb: Table, country_mapping_path) -> Table:
     tb.loc[(tb["wom_hos_vdem"].notna()) & (tb["v2exhoshog"] == 1), "wom_hog_vdem"] = tb["wom_hos_vdem"]
     tb = tb.drop(columns=["v2exhoshog"])
 
+    # %% Gender indicators (2)
     # Estimate if a country ever had a female HOE
     # wom_hoe_vdem
-    tb["wom_hoe_vdem_cum"] = tb.groupby("country")["wom_hoe_vdem"].transform(
+    tb["wom_hoe_ever"] = tb.groupby("country")["wom_hoe_vdem"].transform(
         lambda x: x.ffill().cumsum().gt(0).astype("Int64")
     )
 
@@ -83,20 +83,21 @@ def run(tb: Table, country_mapping_path) -> Table:
     ) & tb.groupby("country")["wom_hoe_vdem"].transform(lambda x: x.isna().any())
 
     # Set to NA where we've only seen NAs and zeros
-    tb.loc[mask_only_na_and_zeros, "wom_hoe_vdem_cum"] = np.nan
+    tb.loc[mask_only_na_and_zeros, "wom_hoe_ever"] = np.nan
 
-    # Estimate if a country ever had a female HOE democratically elected: electmulpar_hoe_row_owid AND wom_hoe_vdem_cum
+    # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `wom_hoe_ever`
     # Create masks for the conditions
-    mask_both_1 = (tb["wom_hoe_vdem_cum"] == 1) & (tb["electmulpar_hoe_row_owid"] == 1)
-    mask_both_0 = (tb["wom_hoe_vdem_cum"] == 0) & (tb["electmulpar_hoe_row_owid"] == 0)
+    regime_is_democratic = tb["regime_row_owid"].isin([2, 3])  # Democratic regimes
+    mask_both_1 = (tb["wom_hoe_ever"] == 1) & regime_is_democratic
+    mask_both_0 = (tb["wom_hoe_ever"] == 0) & (regime_is_democratic & tb["regime_row_owid"].notna())
 
     # Initialize with NaN
-    tb["wom_hoe_vdem_cum_dem"] = np.nan
+    tb["wom_hoe_ever_dem"] = np.nan
 
     # Set values based on masks
-    tb.loc[mask_both_1, "wom_hoe_vdem_cum_dem"] = 1
-    tb.loc[mask_both_0, "wom_hoe_vdem_cum_dem"] = 0
-    tb["wom_hoe_vdem_cum_dem"] = tb["wom_hoe_vdem_cum_dem"].astype("Int64")
+    tb.loc[mask_both_1, "wom_hoe_ever_dem"] = 1
+    tb.loc[mask_both_0, "wom_hoe_ever_dem"] = 0
+    tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].astype("Int64")
 
     return tb
 

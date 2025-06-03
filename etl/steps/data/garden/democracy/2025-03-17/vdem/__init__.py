@@ -56,8 +56,8 @@ INDICATORS_NO_ORIGINS = [
     "regime_amb_row_owid",
     "regime_redux_row_owid",
     "wom_hoe_vdem",
-    "wom_hoe_vdem_cum",
-    "wom_hoe_vdem_cum_dem",
+    "wom_hoe_ever",
+    "wom_hoe_ever_dem",
     "regime_imputed",
     "num_years_in_electdem_consecutive",
     "num_years_in_libdem_consecutive",
@@ -79,7 +79,7 @@ def run() -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("vdem").astype({"v2exnamhos": str})
+    tb = ds_meadow.read("vdem").astype({"v2exnamhos": "string"})
 
     #
     # Process data.
@@ -92,7 +92,7 @@ def run() -> None:
     # The following lines (until "PART 2") are the cleaning steps.
     # This is a transcription from Bastian's work: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_clean.do
     paths.log.info("1/ Cleaning data...")
-    tb = clean.run(tb, paths.country_mapping_path)
+    tb = clean.run(tb, country_mapping_path=paths.country_mapping_path)
 
     # %% PART 2: IMPUTE
     # The following lines concern imputing steps.

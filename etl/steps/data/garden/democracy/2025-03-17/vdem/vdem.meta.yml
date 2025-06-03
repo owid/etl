@@ -315,7 +315,7 @@ tables:
         unit: ""
 
       # Had female HOE ever
-      wom_hoe_vdem_cum: # wom_hoe_vdem_owid
+      wom_hoe_ever: # wom_hoe_vdem_owid
         title: Country had a woman chief executive at least once
         description_short: |-
           The variable denotes whether a country ever had a female chief executive of government in office as of December 31 of the given year.
@@ -334,7 +334,7 @@ tables:
         unit: ""
 
       # Had female democratically elected HOE ever
-      wom_hoe_vdem_cum_dem: # wom_hoe_vdem_owid
+      wom_hoe_ever_dem: # wom_hoe_vdem_owid
         title: Country had a woman chief executive democratically elected at least once
         description_short: |-
           The variable denotes whether a country ever had a democratically elected female chief executive of government in office as of December 31 of the given year.
