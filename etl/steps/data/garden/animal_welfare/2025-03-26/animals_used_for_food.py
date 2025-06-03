@@ -279,54 +279,8 @@ def improve_metadata(tb, tb_qcl_flat):
         if item_code in column and element_code in column
     }
 
-    # Set metadata for the single 'value' column
+    # Set metadata for description_from_producer
     meta = tb["value"].metadata
-
-    meta.unit = """animals<% if per_capita == True %> per person<% endif %>"""
-    meta.short_unit = ""
-
-    # Use Jinja template to decide based on metric dimension
-    title = (
-        f"""<% if metric == "animals_alive" %>"""
-        f"""Live << animal >><% if per_capita == True %> per person<% endif %>"""
-        f"""<% else %>"""
-        f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered for meat"""
-        f"""<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild"""
-        f"""<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food"""
-        f"""<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food"""
-        f"""<% else %><< animal.capitalize() >> slaughtered for meat<% endif %>"""
-        f"""<% if per_capita == True %> per person<% endif %>"""
-        f"""<% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)"""
-        f"""<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
-        f"""<% endif %>"""
-    )
-
-    meta.title = title
-
-    # Description short based on metric
-    meta.description_short = (
-        """<% if metric == "animals_alive" %>"""
-        """Livestock counts represent the total number of live animals at a given time in any year. """
-        """This is not to be confused with the total number of livestock animals slaughtered in any given year."""
-        """<% else %>"""
-        """Based on the country of production, not consumption."""
-        """<% endif %>"""
-    )
-
-    # Description key only for killed animals
-    meta.description_key = [
-        (
-            """<% if metric == "animals_killed" %>"""
-            """Additional deaths that happen during meat and dairy production prior to the slaughter, """
-            """for example due to disease or accidents, are not included."""
-            """<% endif %>"""
-        ),
-        (
-            """<% if metric == "animals_killed" and animal == "chickens" %>"""
-            """Male baby chickens slaughtered in the egg industry are not included."""
-            """<% endif %>"""
-        ),
-    ]
 
     # Build description from producer using Jinja for both alive and killed
     description_from_producer_killed_jinja = ""
@@ -350,9 +304,6 @@ def improve_metadata(tb, tb_qcl_flat):
         f"""<% if metric == "animals_alive" %>{description_from_producer_alive_jinja}"""
         f"""<% else %>{description_from_producer_killed_jinja}<% endif %>"""
     )
-
-    meta.display = {"name": """<< animal.capitalize() >>"""}
-    meta.presentation = VariablePresentationMeta(title_public=title)
 
 
 def run() -> None:
