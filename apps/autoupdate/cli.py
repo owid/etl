@@ -120,7 +120,6 @@ def run_updates(
     """Update all snapshots in a group."""
 
     files_to_update = []
-
     identicals = []
 
     for update in group_updates:
@@ -183,6 +182,16 @@ def run_updates(
     # If MD5 has changed, create a PR.
     if create_pr and not any(identical for identical in identicals):
         create_autoupdate_pr(update_name=update.name, files=files_to_update)  # type: ignore
+
+    # Restore the DVC files to their original state after processing
+    if not dry_run:
+        # Restore all DVC files that were processed
+        all_dvc_files = []
+        for update in group_updates:
+            all_dvc_files.extend([str(f) for f in update.dvc_files])
+
+        if all_dvc_files:
+            subprocess.run(["git", "restore", "--"] + all_dvc_files, check=True, capture_output=True)
 
 
 @click.command(
