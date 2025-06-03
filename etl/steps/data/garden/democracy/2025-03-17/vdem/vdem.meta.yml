@@ -2245,6 +2245,7 @@ tables:
   vdem_share_countries:
     common:
       unit: "%"
+      description_processing: We estimate the share based on the countries that V-Dem tracks in a given year, which may change over the years.
     variables:
       share_countries_wom_hoe_ever:
         title: |-

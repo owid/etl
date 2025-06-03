@@ -117,27 +117,7 @@ def run() -> None:
 
     # %% PART 4B: Share of population
     paths.log.info("4B/ Share of countries...")
-    columns_rename = {
-        "num_countries_wom_hoe_ever": "share_countries_wom_hoe_ever",
-        "num_countries_wom_hoe_ever_demelect": "share_countries_wom_hoe_ever_demelect",
-    }
-    columns = list(columns_rename.keys())
-    tb_countries_share = (
-        tb_countries_counts[["country", "year", "category"] + columns]
-        .copy()
-        .dropna(how="all", subset=columns)
-        .rename(columns=columns_rename)
-    )
-    # Add a column with the total count of countries per year-country
-    tb_countries_share["total_countries"] = tb_countries_share.groupby(["country", "year"], as_index=False)[
-        "share_countries_wom_hoe_ever"
-    ].transform("sum")
-
-    assert tb_countries_share["total_countries"].notna().all(), "NA detected!"
-    tb_countries_share["share_countries_wom_hoe_ever"] /= tb_countries_share["total_countries"] * 0.01
-    tb_countries_share["share_countries_wom_hoe_ever_demelect"] /= tb_countries_share["total_countries"] * 0.01
-
-    tb_countries_share = tb_countries_share.drop(columns=["total_countries"])
+    tb_countries_share = estimate_share_countries(tb_countries_counts)
 
     # %% PART 5: Format and prepare tables
     paths.log.info("5/ Formatting tables...")
@@ -360,3 +340,32 @@ def append_citation_full(tb: Table) -> Table:
                 f"{CITATION_LUHRMANN};\n\n" + tb[indicator_name].metadata.origins[0].citation_full
             )
     return tb
+
+
+def estimate_share_countries(tb: Table) -> Table:
+    """Estimate the share of countries with a certain property."""
+    # NOTE: The count of countries only considers *actually* existing countries, and skips imputed countries. That's due to how `aggregate.run` has implemented that. Therefore, we can estimate the share of countries easily by num_countries_women_ever / total_countries * 100. No need to worry about counting imputed countries!
+    # One thing that we could change, is if we only want to consider countries that exist as of today! IMO, that would be a different strategy compared to other indicators.
+    columns_rename = {
+        "num_countries_wom_hoe_ever": "share_countries_wom_hoe_ever",
+        "num_countries_wom_hoe_ever_demelect": "share_countries_wom_hoe_ever_demelect",
+    }
+    columns = list(columns_rename.keys())
+    tb_share = (
+        tb.loc[:, ["country", "year", "category"] + columns]
+        .copy()
+        .dropna(how="all", subset=columns)
+        .rename(columns=columns_rename)
+    )
+    # Add a column with the total count of countries per year-country
+    tb_share["total_countries"] = tb_share.groupby(["country", "year"], as_index=False)[
+        "share_countries_wom_hoe_ever"
+    ].transform("sum")
+
+    assert tb_share["total_countries"].notna().all(), "NA detected!"
+    tb_share["share_countries_wom_hoe_ever"] /= tb_share["total_countries"] * 0.01
+    tb_share["share_countries_wom_hoe_ever_demelect"] /= tb_share["total_countries"] * 0.01
+
+    tb_share = tb_share.drop(columns=["total_countries"])
+
+    return tb_share
