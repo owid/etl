@@ -4,7 +4,6 @@ from typing import Tuple, cast
 
 import numpy as np
 from owid.catalog import Dataset, Table
-from owid.catalog.tables import concat
 from shared import (
     add_population_in_dummies,
     add_regions_and_global_aggregates,
