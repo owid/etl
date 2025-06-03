@@ -136,6 +136,19 @@ def sanity_check_animals_alive(tb_stock):
 
 
 def prepare_fish_and_crustaceans_data(tb_wild_fish, tb_farmed_fish, tb_farmed_crustaceans):
+    # Set dimensions for origins in each table
+    for col in tb_wild_fish:
+        for origin in tb_wild_fish[col].m.origins:
+            origin.dimensions = [{"animal": WILD_FISH_LABEL}]
+
+    for col in tb_farmed_fish:
+        for origin in tb_farmed_fish[col].m.origins:
+            origin.dimensions = [{"animal": FARMED_FISH_LABEL}]
+
+    for col in tb_farmed_crustaceans:
+        for origin in tb_farmed_crustaceans[col].m.origins:
+            origin.dimensions = [{"animal": FARMED_CRUSTACEANS_LABEL}]
+
     with pr.ignore_warnings():
         tables = []
         for estimate in [ESTIMATE_MIDPOINT_LABEL, ESTIMATE_LOW_LABEL, ESTIMATE_HIGH_LABEL]:
@@ -148,35 +161,39 @@ def prepare_fish_and_crustaceans_data(tb_wild_fish, tb_farmed_fish, tb_farmed_cr
                 suffix_pc = "_per_capita" if per_capita else ""
                 tables.extend(
                     [
-                        tb_wild_fish[["country", "year", f"n_wild_fish{suffix_estimate}{suffix_pc}"]].assign(
+                        tb_wild_fish[["country", "year", f"n_wild_fish{suffix_estimate}{suffix_pc}"]]
+                        .assign(
                             **{
                                 "metric": "animals_killed",
                                 "per_capita": per_capita,
                                 "animal": WILD_FISH_LABEL,
                                 "estimate": estimate,
                             }
-                        ),
-                        tb_farmed_fish[["country", "year", f"n_farmed_fish{suffix_estimate}{suffix_pc}"]].assign(
+                        )
+                        .rename(columns={f"n_wild_fish{suffix_estimate}{suffix_pc}": "value"}),
+                        tb_farmed_fish[["country", "year", f"n_farmed_fish{suffix_estimate}{suffix_pc}"]]
+                        .assign(
                             **{
                                 "metric": "animals_killed",
                                 "per_capita": per_capita,
                                 "animal": FARMED_FISH_LABEL,
                                 "estimate": estimate,
                             }
-                        ),
-                        tb_farmed_crustaceans[
-                            ["country", "year", f"n_farmed_crustaceans{suffix_estimate}{suffix_pc}"]
-                        ].assign(
+                        )
+                        .rename(columns={f"n_farmed_fish{suffix_estimate}{suffix_pc}": "value"}),
+                        tb_farmed_crustaceans[["country", "year", f"n_farmed_crustaceans{suffix_estimate}{suffix_pc}"]]
+                        .assign(
                             **{
                                 "metric": "animals_killed",
                                 "per_capita": per_capita,
                                 "animal": FARMED_CRUSTACEANS_LABEL,
                                 "estimate": estimate,
                             }
-                        ),
+                        )
+                        .rename(columns={f"n_farmed_crustaceans{suffix_estimate}{suffix_pc}": "value"}),
                     ]
                 )
-        tb_fish = pr.multi_merge(tables, on=INDEX_COLUMNS, how="outer")
+        tb_fish = pr.concat(tables)
 
     return tb_fish
 
@@ -225,13 +242,24 @@ def prepare_land_animals_data(tb_qcl, killed_or_alive):
         warn_on_unused_mappings=True,
     )
 
-    # Select and rename columns.
-    tb = tb[INDEX_COLUMNS + ["value"]].rename(columns={"value": f"n_animals_{killed_or_alive}"}, errors="raise")
-    tb_per_capita = tb_per_capita[INDEX_COLUMNS + ["value"]].rename(
-        columns={"value": f"n_animals_{killed_or_alive}_per_capita"}, errors="raise"
-    )
+    # Set dimensions for origins in each table
+    for col in tb:
+        for origin in tb[col].m.origins:
+            origin.dimensions = [{"animal": animal_name} for animal_name in sorted(set(tb["animal"]))]
 
-    return tb, tb_per_capita
+    for col in tb_per_capita:
+        for origin in tb_per_capita[col].m.origins:
+            origin.dimensions = [{"animal": animal_name} for animal_name in sorted(set(tb_per_capita["animal"]))]
+
+    # Select and rename columns to match fish data structure.
+    tb = tb[INDEX_COLUMNS + ["value"]]
+    tb_per_capita = tb_per_capita[INDEX_COLUMNS + ["value"]]
+
+    # Combine both tables into one, similar to fish data
+    tables = [tb, tb_per_capita]
+    tb_combined = pr.concat(tables, ignore_index=True)
+
+    return tb_combined
 
 
 def improve_metadata(tb, tb_qcl_flat):
@@ -251,39 +279,80 @@ def improve_metadata(tb, tb_qcl_flat):
         if item_code in column and element_code in column
     }
 
-    for column in tb.columns:
-        tb[column].metadata.unit = """animals<% if per_capita == True %> per person<% endif %>"""
-        tb[column].metadata.short_unit = ""
-        if "_alive" in column:
-            title = """Live << animal >><% if per_capita == True %> per person<% endif %>"""
-            tb[
-                column
-            ].metadata.description_short = """Livestock counts represent the total number of live animals at a given time in any year. This is not to be confused with the total number of livestock animals slaughtered in any given year."""
-            description_from_producer = ""
-            for animal, description in descriptions_from_producer_alive.items():
-                if animal == list(descriptions_from_producer_alive)[0]:
-                    description_from_producer += f"""<% if animal == "{animal}" %>{description}"""
-                else:
-                    description_from_producer += f"""<% elif animal == "{animal}" %>{description}"""
-            description_from_producer += "<% endif %>"
+    # Set metadata for the single 'value' column
+    meta = tb["value"].metadata
+
+    meta.unit = """animals<% if per_capita == True %> per person<% endif %>"""
+    meta.short_unit = ""
+
+    # Use Jinja template to decide based on metric dimension
+    title = (
+        f"""<% if metric == "animals_alive" %>"""
+        f"""Live << animal >><% if per_capita == True %> per person<% endif %>"""
+        f"""<% else %>"""
+        f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered for meat"""
+        f"""<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild"""
+        f"""<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food"""
+        f"""<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food"""
+        f"""<% else %><< animal.capitalize() >> slaughtered for meat<% endif %>"""
+        f"""<% if per_capita == True %> per person<% endif %>"""
+        f"""<% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)"""
+        f"""<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
+        f"""<% endif %>"""
+    )
+
+    meta.title = title
+
+    # Description short based on metric
+    meta.description_short = (
+        """<% if metric == "animals_alive" %>"""
+        """Livestock counts represent the total number of live animals at a given time in any year. """
+        """This is not to be confused with the total number of livestock animals slaughtered in any given year."""
+        """<% else %>"""
+        """Based on the country of production, not consumption."""
+        """<% endif %>"""
+    )
+
+    # Description key only for killed animals
+    meta.description_key = [
+        (
+            """<% if metric == "animals_killed" %>"""
+            """Additional deaths that happen during meat and dairy production prior to the slaughter, """
+            """for example due to disease or accidents, are not included."""
+            """<% endif %>"""
+        ),
+        (
+            """<% if metric == "animals_killed" and animal == "chickens" %>"""
+            """Male baby chickens slaughtered in the egg industry are not included."""
+            """<% endif %>"""
+        ),
+    ]
+
+    # Build description from producer using Jinja for both alive and killed
+    description_from_producer_killed_jinja = ""
+    for animal, description in descriptions_from_producer_killed.items():
+        if animal == list(descriptions_from_producer_killed)[0]:
+            description_from_producer_killed_jinja += f"""<% if animal == "{animal}" %>{description}"""
         else:
-            title = f"""<% if animal == "{MEAT_TOTAL_LABEL}" %>Land animals slaughtered for meat<% elif animal == "{WILD_FISH_LABEL}" %>Fishes caught from the wild<% elif animal == "{FARMED_FISH_LABEL}" %>Farmed fishes killed for food<% elif animal == "{FARMED_CRUSTACEANS_LABEL}" %>Farmed crustaceans killed for food<% else %><< animal.capitalize() >> slaughtered for meat<% endif %><% if per_capita == True %> per person<% endif %><% if estimate == "{ESTIMATE_HIGH_LABEL}" %> (upper limit)<% elif estimate == "{ESTIMATE_LOW_LABEL}" %> (lower limit)<% endif %>"""
-            tb[column].metadata.description_short = """Based on the country of production, not consumption."""
-            tb[column].metadata.description_key = [
-                """Additional deaths that happen during meat and dairy production prior to the slaughter, for example due to disease or accidents, are not included.""",
-                """<% if animal == "chickens" %>Male baby chickens slaughtered in the egg industry are not included.<% endif %>""",
-            ]
-            description_from_producer = ""
-            for animal, description in descriptions_from_producer_killed.items():
-                if animal == list(descriptions_from_producer_killed)[0]:
-                    description_from_producer += f"""<% if animal == "{animal}" %>{description}"""
-                else:
-                    description_from_producer += f"""<% elif animal == "{animal}" %>{description}"""
-            description_from_producer += "<% endif %>"
-        tb[column].metadata.title = title
-        tb[column].metadata.display = {"name": """<< animal.capitalize() >>"""}
-        tb[column].metadata.presentation = VariablePresentationMeta(title_public=title)
-        tb[column].metadata.description_from_producer = description_from_producer
+            description_from_producer_killed_jinja += f"""<% elif animal == "{animal}" %>{description}"""
+    description_from_producer_killed_jinja += "<% endif %>"
+
+    description_from_producer_alive_jinja = ""
+    for animal, description in descriptions_from_producer_alive.items():
+        if animal == list(descriptions_from_producer_alive)[0]:
+            description_from_producer_alive_jinja += f"""<% if animal == "{animal}" %>{description}"""
+        else:
+            description_from_producer_alive_jinja += f"""<% elif animal == "{animal}" %>{description}"""
+    description_from_producer_alive_jinja += "<% endif %>"
+
+    # Combine both using metric condition
+    meta.description_from_producer = (
+        f"""<% if metric == "animals_alive" %>{description_from_producer_alive_jinja}"""
+        f"""<% else %>{description_from_producer_killed_jinja}<% endif %>"""
+    )
+
+    meta.display = {"name": """<< animal.capitalize() >>"""}
+    meta.presentation = VariablePresentationMeta(title_public=title)
 
 
 def run() -> None:
@@ -292,7 +361,7 @@ def run() -> None:
     #
     # Load faostat qcl dataset, and read its main table.
     ds_qcl = paths.load_dataset("faostat_qcl")
-    tb_qcl = ds_qcl.read("faostat_qcl")
+    tb_qcl = ds_qcl.read("faostat_qcl", safe_types=False)
 
     # Load the wide-format table, to get the already prepared descriptions from producer.
     # NOTE: In hindsight, I think it would have been much easier to work with flat tables from the start, to keep all the original metadata.
@@ -319,14 +388,19 @@ def run() -> None:
     )
 
     # Prepare land animals slaughtered data.
-    tb_killed, tb_killed_per_capita = prepare_land_animals_data(tb_qcl=tb_qcl, killed_or_alive="killed")
+    tb_killed = prepare_land_animals_data(tb_qcl=tb_qcl, killed_or_alive="killed")
 
     # Prepare land animals alive data.
-    tb_stock, tb_stock_per_capita = prepare_land_animals_data(tb_qcl=tb_qcl, killed_or_alive="alive")
+    tb_stock = prepare_land_animals_data(tb_qcl=tb_qcl, killed_or_alive="alive")
 
     # Combine tables.
-    tb = pr.multi_merge(
-        [tb_fish, tb_killed, tb_killed_per_capita, tb_stock, tb_stock_per_capita], on=INDEX_COLUMNS, how="outer"
+    tb = pr.concat(
+        [
+            tb_fish,
+            tb_killed,
+            tb_stock,
+        ],
+        ignore_index=True,
     )
 
     # Format table conveniently.

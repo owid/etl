@@ -150,6 +150,9 @@ class Origin(MetaBase):
     # License of the dataset
     license: License | None = None
 
+    # Dimensions
+    dimensions: dict[str, Any] | None = None
+
     def __post_init__(self):
         if self.date_published:
             # convert date or int to string

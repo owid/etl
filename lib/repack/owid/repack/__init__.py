@@ -1,8 +1,12 @@
 import datetime as dt
+import time
 from typing import Any, Dict, List, Optional, cast
 
 import numpy as np
 import pandas as pd
+import structlog
+
+log = structlog.get_logger()
 
 
 def repack_frame(
@@ -183,11 +187,19 @@ def _safe_dtype(dtype: Any) -> str:
 def to_safe_types(t: pd.DataFrame) -> pd.DataFrame:
     """Convert numeric columns to Float64 and Int64 and categorical
     columns to string[pyarrow]."""
+    start_time = time.time()
+
     t = t.astype({col: _safe_dtype(t[col].dtype) for col in t.columns})
 
     if isinstance(t.index, pd.MultiIndex):
         t.index = t.index.set_levels([level.astype(_safe_dtype(level.dtype)) for level in t.index.levels])
     else:
         t.index = t.index.astype(_safe_dtype(t.index.dtype))
+
+    elapsed_time = time.time() - start_time
+    if elapsed_time > 10:
+        log.warning(
+            f"Conversion to safe types took {elapsed_time:.2f} seconds. Consider using `.read(..., safe_types=False)` to speed it up."
+        )
 
     return t

@@ -266,3 +266,170 @@ def test__validate_description_key():
         gh._validate_description_key(description_key, col)
     except AssertionError:
         assert False, f"AssertionError raised for valid description_key: {description_key}"
+
+
+def test_yield_wide_table_with_origins_and_dimensions():
+    """Test that origins are properly filtered based on dimensions when converting long to wide."""
+    from owid.catalog import Origin
+
+    # Create origins with different dimensions - now using list of dictionaries
+    origin_male = Origin(
+        producer="Producer A",
+        title="Data for males",
+        dimensions=[{"sex": "male"}],
+    )
+    origin_female = Origin(
+        producer="Producer B",
+        title="Data for females",
+        dimensions=[{"sex": "female"}],
+    )
+    origin_both = Origin(
+        producer="Producer C",
+        title="Data for both",
+        dimensions=[{"sex": "female"}, {"sex": "male"}],  # List applies to both sexes
+    )
+    origin_all = Origin(
+        producer="Producer D",
+        title="Data for all",
+        # No dimensions - should apply to all
+    )
+
+    df = pd.DataFrame(
+        {
+            "year": [2019, 2019, 2019, 2019],
+            "entityId": [1, 1, 1, 1],
+            "sex": ["male", "female", "male", "female"],
+            "deaths": [10, 20, 30, 40],
+        }
+    )
+    table = Table(df.set_index(["entityId", "year", "sex"]))
+    table.deaths.metadata.unit = "people"
+    table.deaths.metadata.title = "Deaths"
+    table.deaths.metadata.origins = [origin_male, origin_female, origin_both, origin_all]
+
+    grapher_tables = list(gh._yield_wide_table(table))
+
+    assert len(grapher_tables) == 2
+
+    # Check male deaths table - use exact column name matching
+    male_table = [t for t in grapher_tables if t.columns[0] == "deaths__sex_male"][0]
+    male_origins = male_table[male_table.columns[0]].metadata.origins
+    assert len(male_origins) == 3  # origin_male, origin_both, and origin_all
+    origin_producers = [o.producer for o in male_origins]
+    assert "Producer A" in origin_producers  # male-specific origin
+    assert "Producer C" in origin_producers  # both sexes origin (list-based)
+    assert "Producer D" in origin_producers  # general origin
+    assert "Producer B" not in origin_producers  # female-specific origin should be filtered out
+
+    # Check female deaths table - use exact column name matching
+    female_table = [t for t in grapher_tables if t.columns[0] == "deaths__sex_female"][0]
+    female_origins = female_table[female_table.columns[0]].metadata.origins
+    assert len(female_origins) == 3  # origin_female, origin_both, and origin_all
+    origin_producers = [o.producer for o in female_origins]
+    assert "Producer B" in origin_producers  # female-specific origin
+    assert "Producer C" in origin_producers  # both sexes origin (list-based)
+    assert "Producer D" in origin_producers  # general origin
+    assert "Producer A" not in origin_producers  # male-specific origin should be filtered out
+
+
+def test_origin_matches_dimensions():
+    """Test the _origin_matches_dimensions helper function."""
+    from owid.catalog import Origin
+
+    # Origin with no dimensions should match any dim_dict
+    origin_no_dims = Origin(producer="Test", title="Test")
+    assert gh._origin_matches_dimensions(origin_no_dims, {"sex": "male", "age": "25-30"})
+    assert gh._origin_matches_dimensions(origin_no_dims, {})
+
+    # Origin with single dimension dictionary should only match when dimensions match
+    origin_single_dict = Origin(producer="Test", title="Test", dimensions=[{"sex": "male", "age": "25-30"}])
+    assert gh._origin_matches_dimensions(origin_single_dict, {"sex": "male", "age": "25-30"})
+    assert gh._origin_matches_dimensions(origin_single_dict, {"sex": "male", "age": "25-30", "country": "US"})
+    assert not gh._origin_matches_dimensions(origin_single_dict, {"sex": "female", "age": "25-30"})
+    assert not gh._origin_matches_dimensions(origin_single_dict, {"sex": "male"})  # missing age dimension
+    assert not gh._origin_matches_dimensions(origin_single_dict, {})
+
+    # Origin with multiple dimension dictionaries should match any of them
+    origin_multiple_dicts = Origin(producer="Test", title="Test", dimensions=[{"sex": "male"}, {"sex": "female"}])
+    assert gh._origin_matches_dimensions(origin_multiple_dicts, {"sex": "male", "age": "25-30"})
+    assert gh._origin_matches_dimensions(origin_multiple_dicts, {"sex": "female", "age": "25-30"})
+    assert not gh._origin_matches_dimensions(origin_multiple_dicts, {"sex": "other", "age": "25-30"})
+
+    # Origin with subset of dimensions should match when those dimensions match
+    origin_subset = Origin(producer="Test", title="Test", dimensions=[{"sex": "male"}])
+    assert gh._origin_matches_dimensions(origin_subset, {"sex": "male", "age": "25-30"})
+    assert not gh._origin_matches_dimensions(origin_subset, {"sex": "female", "age": "25-30"})
+
+
+def test_yield_wide_table_with_invalid_origin_dimensions():
+    """Test that an exception is raised when origins have dimensions that don't exist in the table."""
+    from owid.catalog import Origin
+
+    # Create origin with dimension that doesn't exist in table
+    origin_invalid = Origin(
+        producer="Producer A",
+        title="Data with invalid dimension",
+        dimensions={"nonexistent_dim": "some_value"},
+    )
+
+    df = pd.DataFrame(
+        {
+            "year": [2019, 2019],
+            "entityId": [1, 1],
+            "sex": ["male", "female"],
+            "deaths": [10, 20],
+        }
+    )
+    table = Table(df.set_index(["entityId", "year", "sex"]))
+    table.deaths.metadata.unit = "people"
+    table.deaths.metadata.title = "Deaths"
+    table.deaths.metadata.origins = [origin_invalid]
+
+    # Should raise ValueError when processing the table
+    try:
+        list(gh._yield_wide_table(table))
+        assert False, "Expected ValueError for invalid origin dimensions"
+    except ValueError as e:
+        assert "nonexistent_dim" in str(e)
+
+
+def test_long_to_wide_with_origins_dimensions():
+    """Test long_to_wide function properly handles origins with dimensions."""
+    from owid.catalog import Origin
+
+    # Create origins with dimensions
+    origin_young = Origin(producer="Youth Survey", title="Data for young people", dimensions={"age": "10-18"})
+    origin_old = Origin(producer="Senior Survey", title="Data for older people", dimensions={"age": "19-25"})
+
+    df = pd.DataFrame(
+        {
+            "year": [2019, 2019, 2019, 2019],
+            "country": ["France", "France", "France", "France"],
+            "age": ["10-18", "19-25", "26-30", np.nan],
+            "deaths": [1, 2, 3, 4],
+        }
+    )
+    table = Table(df.set_index(["country", "year", "age"]))
+    table.deaths.metadata.unit = "people"
+    table.deaths.metadata.title = "Deaths"
+    table.deaths.metadata.origins = [origin_young, origin_old]
+
+    wide = gh.long_to_wide(table)
+
+    # Check that young age group only has origin_young
+    young_origins = wide["deaths__age_10_18"].m.origins
+    assert len(young_origins) == 1
+    assert young_origins[0].producer == "Youth Survey"
+
+    # Check that old age group only has origin_old
+    old_origins = wide["deaths__age_19_25"].m.origins
+    assert len(old_origins) == 1
+    assert old_origins[0].producer == "Senior Survey"
+
+    # Check that other age groups have no origins (since no matching origin)
+    other_origins = wide["deaths__age_26_30"].m.origins
+    assert len(other_origins) == 0
+
+    # Check that NaN age group has no origins
+    nan_origins = wide["deaths"].m.origins
+    assert len(nan_origins) == 0
