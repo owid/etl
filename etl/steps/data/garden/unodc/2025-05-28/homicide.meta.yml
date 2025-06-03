@@ -44,7 +44,7 @@ definitions:
     aged 15-17 years
     <%- elif age == "18-19" -%>
     aged 18-19 years
-    <%-  elif age == "20-24" -%>
+    <%- elif age == "20-24" -%>
     aged 20-24 years
     <%- elif age == "25-29" -%>
     aged 25-29 years
