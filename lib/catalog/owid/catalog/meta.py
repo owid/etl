@@ -151,7 +151,10 @@ class Origin(MetaBase):
     license: License | None = None
 
     # Dimensions
-    dimensions: dict[str, Any] | None = None
+    #   Set this if the origin applies only to a subset of the data.
+    #   For example origin.dimensions = [{"animal": "cow"}, {"animal": "pig"}] is only added
+    #   to variables with dimensions "animal" that have values "cow" or "pig" when flattened.
+    dimensions: list[dict[str, Any]] | None = None
 
     def __post_init__(self):
         if self.date_published:
