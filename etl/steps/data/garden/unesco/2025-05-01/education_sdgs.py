@@ -147,20 +147,22 @@ def combine_historical_literacy_expenditure(tb: Table, tb_literacy: Table, tb_ex
     combined_df = pr.merge(
         combined_df, recent_expenditure, on=["year", "country"], how="outer", suffixes=("_historic_exp", "_recent_exp")
     )
-    combined_df["combined_literacy"] = combined_df[
+    combined_df["combined_literate"] = combined_df[
         "adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99"
     ].fillna(combined_df["literacy_rates__world_bank__cia_world_factbook__and_other_sources"])
-    combined_df["combined_expenditure"] = combined_df[
+    combined_df["combined_expenditure_share_gdp"] = combined_df[
         "government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov"
     ].fillna(combined_df["public_expenditure_on_education__tanzi__and__schuktnecht__2000"])
 
     # Now, merge the relevant columns in newly created table that includes both historic and more recent data back into the original tb based on 'year' and 'country'
     tb = pr.merge(
         tb,
-        combined_df[["year", "country", "combined_literacy", "combined_expenditure"]],
+        combined_df[["year", "country", "combined_literate", "combined_expenditure_share_gdp"]],
         on=["year", "country"],
         how="outer",
     )
+    # Create a new column for combined historical and recent estimates for the share of population that are illiterate
+    tb["combined_illiterate"] = 100 - tb["combined_literate"]
     tb = tb.format(["country", "year"])
 
     return tb

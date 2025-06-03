@@ -8,6 +8,9 @@ import pandas as pd
 
 from ..common_parameters import *
 
+# Define PPP year
+ppp_year = PPP_VERSION_CURRENT_PIP
+
 # ## Google sheets auxiliar data
 # These spreadsheets provide with different details depending on each poverty line or survey type.
 
@@ -15,7 +18,7 @@ from ..common_parameters import *
 sheet_id = "17KJ9YcvfdmO_7-Sv2Ij0vmzAQI6rXSIqHfJtgFHN-a8"
 
 # Absolute poverty sheet
-sheet_name = "povlines_abs"
+sheet_name = f"povlines_abs_{ppp_year}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 povlines_abs = pd.read_csv(url, dtype={"dollars_text": "str"})
 
@@ -25,7 +28,7 @@ url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sh
 povlines_rel = pd.read_csv(url)
 
 # Survey type sheet
-sheet_name = "survey_type"
+sheet_name = f"survey_type_{ppp_year}"
 url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/gviz/tq?tqx=out:csv&sheet={sheet_name}"
 survey_type = pd.read_csv(url)
 
@@ -68,8 +71,9 @@ additional_description = ADDITIONAL_DESCRIPTION_PIP
 
 notes_title = NOTES_TITLE_PIP
 
+
 processing_description = PROCESSING_DESCRIPTION_PIP
-ppp_description = PPP_DESCRIPTION_PIP_2017
+ppp_description = PPP_DESCRIPTION_PIP_CURRENT
 relative_poverty_description = RELATIVE_POVERTY_DESCRIPTION_PIP
 
 # Table generation
@@ -194,7 +198,7 @@ for survey in range(len(survey_type)):
             processing_description,
         ]
     )
-    df_tables.loc[j, "unit"] = "international-$ in 2017 prices"
+    df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
     df_tables.loc[j, "shortUnit"] = "$"
     df_tables.loc[j, "type"] = "Numeric"
     df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100"
@@ -215,7 +219,7 @@ for survey in range(len(survey_type)):
             processing_description,
         ]
     )
-    df_tables.loc[j, "unit"] = "international-$ in 2017 prices"
+    df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
     df_tables.loc[j, "shortUnit"] = "$"
     df_tables.loc[j, "type"] = "Numeric"
     df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100"
@@ -236,7 +240,7 @@ for survey in range(len(survey_type)):
             processing_description,
         ]
     )
-    df_tables.loc[j, "unit"] = "international-$ in 2017 prices"
+    df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
     df_tables.loc[j, "shortUnit"] = "$"
     df_tables.loc[j, "type"] = "Numeric"
     df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50"
@@ -257,7 +261,7 @@ for survey in range(len(survey_type)):
             processing_description,
         ]
     )
-    df_tables.loc[j, "unit"] = "international-$ in 2017 prices"
+    df_tables.loc[j, "unit"] = f"international-$ in {ppp_year} prices"
     df_tables.loc[j, "shortUnit"] = "$"
     df_tables.loc[j, "type"] = "Numeric"
     df_tables.loc[j, "colorScaleNumericBins"] = "1;2;5;10;20;50;100;200"
@@ -363,7 +367,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = f"{povlines_abs.subtitle[p]}"
         df_graphers.loc[j, "note"] = (
-            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -383,7 +387,7 @@ for survey in range(len(survey_type)):
         df_graphers.loc[j, "tableSlug"] = f"{survey_type.table_name[survey]}"
         df_graphers.loc[j, "subtitle"] = f"{povlines_abs.subtitle[p]}"
         df_graphers.loc[j, "note"] = (
-            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+            f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
         )
         df_graphers.loc[j, "type"] = np.nan
         df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -406,7 +410,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -429,7 +433,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -494,7 +498,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -516,7 +520,7 @@ for survey in range(len(survey_type)):
         "This data is adjusted for inflation and for differences in living costs between countries."
     )
     df_graphers.loc[j, "note"] = (
-        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2017 prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+        f"This data is expressed in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -538,7 +542,7 @@ for survey in range(len(survey_type)):
         f"This is the level of {survey_type.text[survey]} per day below which 10% of the population falls."
     )
     df_graphers.loc[j, "note"] = (
-        f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+        f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -560,7 +564,7 @@ for survey in range(len(survey_type)):
         f"This is the level of {survey_type.text[survey]} per day below which 90% of the population falls."
     )
     df_graphers.loc[j, "note"] = (
-        f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at 2017 prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
+        f"This data is measured in [international-$](#dod:int_dollar_abbreviation) at {ppp_year} prices to account for inflation and differences in living costs between countries. Depending on the country and year, it relates to {survey_type.detailed_text[survey]} [per capita](#dod:per-capita)."
     )
     df_graphers.loc[j, "type"] = np.nan
     df_graphers.loc[j, "yAxisMin"] = yAxisMin
@@ -661,7 +665,7 @@ df_graphers["note"] = df_graphers["note"].str.replace(
 # Select one default view
 df_graphers.loc[
     (df_graphers["ySlugs"] == "headcount_ratio_215")
-    & (df_graphers["tableSlug"] == "income_consumption_2017")
+    & (df_graphers["tableSlug"] == f"income_consumption_{ppp_year}")
     & (df_graphers["Show breaks between less comparable surveys Checkbox"] == "false"),
     ["defaultView"],
 ] = "true"
