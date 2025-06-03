@@ -4,6 +4,7 @@ definitions:
     presentation:
       topic_tags:
         - Homicides
+      attribution: UN, World Population Prospects (2024); United Nations Office on Drugs and Crime (2025)
     description_processing: |-
       Values for the United Kingdom are calculated by Our World in Data from UNODC data for England, Wales, Scotland and Northern Ireland.
 
@@ -16,9 +17,9 @@ definitions:
 
   metric: |-
     <% if unit_of_measurement == "Counts" %>
-    Number of homicides
+    Number of intentional [homicides](#dod:homicide)
     <%- elif unit_of_measurement == "Rate per 100,000 population" %>
-    Homicide rate per 100,000 population
+    [Intentional homicide](#dod:homicide) rate per 100,000 population
     <%- endif %>
   sex: |-
     <% if sex == "Total" %>
