@@ -63,7 +63,7 @@ def run(tb: Table, country_mapping_path) -> Table:
     # %% Ratio as share (share of adult citizens with vote right)
     tb["suffr_vdem"] = tb["suffr_vdem"] * 100
 
-    # %% Gender indicators
+    # %% Gender indicators (1)
     # Create variable identifying gender of chief executive
     tb = estimate_gender_hoe_indicator(tb)
     # Estimate gender of HOG
@@ -99,6 +99,9 @@ def run(tb: Table, country_mapping_path) -> Table:
     tb.loc[mask_both_0, "wom_hoe_ever_dem"] = 0
     tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].astype("Int64")
 
+    # Set old countries to NaN
+    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
+    tb.loc[~tb["country"].isin(countries_last), ["wom_hoe_ever", "wom_hoe_ever_dem"]] = np.nan
     return tb
 
 

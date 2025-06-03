@@ -117,7 +117,10 @@ def run() -> None:
 
     # %% PART 4B: Share of population
     paths.log.info("4B/ Share of countries...")
-    tb_countries_share = estimate_share_countries(tb_countries_counts)
+    num_countries = tb_uni_without_regions.loc[
+        tb_uni_without_regions["year"] == tb_uni_without_regions["year"].max()
+    ].shape[0]
+    tb_countries_share = estimate_share_countries(tb_countries_counts, num_countries=num_countries)
 
     # %% PART 5: Format and prepare tables
     paths.log.info("5/ Formatting tables...")
@@ -141,9 +144,7 @@ def run() -> None:
     tb_countries_counts = tb_countries_counts.format(
         keys=["country", "year", "category"], short_name="vdem_num_countries"
     )
-    tb_countries_share = tb_countries_share.format(
-        keys=["country", "year", "category"], short_name="vdem_share_countries"
-    )
+    tb_countries_share = tb_countries_share.format(keys=["country", "year"], short_name="vdem_share_countries")
     tb_population_counts = tb_population_counts.format(
         keys=["year", "country", "category"], short_name="vdem_population"
     )
@@ -342,10 +343,13 @@ def append_citation_full(tb: Table) -> Table:
     return tb
 
 
-def estimate_share_countries(tb: Table) -> Table:
+def estimate_share_countries(tb: Table, num_countries) -> Table:
     """Estimate the share of countries with a certain property."""
     # NOTE: The count of countries only considers *actually* existing countries, and skips imputed countries. That's due to how `aggregate.run` has implemented that. Therefore, we can estimate the share of countries easily by num_countries_women_ever / total_countries * 100. No need to worry about counting imputed countries!
-    # One thing that we could change, is if we only want to consider countries that exist as of today! IMO, that would be a different strategy compared to other indicators.
+    # The share is estimated relative to the number of countries as of 2024, which is a different strategy compared to the rest of indicators. That's because the framing is "looking backwards at the history of current countris".
+
+    assert num_countries == 179, "The number of countries should be 179 as of 2024."
+
     columns_rename = {
         "num_countries_wom_hoe_ever": "share_countries_wom_hoe_ever",
         "num_countries_wom_hoe_ever_demelect": "share_countries_wom_hoe_ever_demelect",
@@ -357,15 +361,27 @@ def estimate_share_countries(tb: Table) -> Table:
         .dropna(how="all", subset=columns)
         .rename(columns=columns_rename)
     )
+
+    # Keep only category "yes", and entity "World"
+    tb_share = tb_share[(tb_share["category"] == "yes") & (tb_share["country"] == "World")].drop(columns=["category"])
+
     # Add a column with the total count of countries per year-country
     tb_share["total_countries"] = tb_share.groupby(["country", "year"], as_index=False)[
         "share_countries_wom_hoe_ever"
     ].transform("sum")
 
     assert tb_share["total_countries"].notna().all(), "NA detected!"
-    tb_share["share_countries_wom_hoe_ever"] /= tb_share["total_countries"] * 0.01
-    tb_share["share_countries_wom_hoe_ever_demelect"] /= tb_share["total_countries"] * 0.01
 
+    # Option 1: Share of countries relative to current number of countries
+    # tb_share["share_countries_wom_hoe_ever"] /= tb_share["total_countries"] * 0.01
+    # tb_share["share_countries_wom_hoe_ever_demelect"] /= tb_share["total_countries"] * 0.01
     tb_share = tb_share.drop(columns=["total_countries"])
 
+    # Option 2: Share of countries relative to number of countries as of 2024
+    tb_share["share_countries_wom_hoe_ever"] /= num_countries * 0.01
+    tb_share["share_countries_wom_hoe_ever_demelect"] /= num_countries * 0.01
+
     return tb_share
+
+
+# %%
