@@ -320,6 +320,11 @@ tables:
         description_short: |-
           The variable denotes whether a country ever had a female chief executive of government in office as of December 31 of the given year.
         description_processing: |-
+          We derive this indicator as follows:
+
+          1) Estimate the gender of the chief executive for a given year. We have used the gender of the most powerful chief: either Head of state or Head of government.
+          2) Once 1) evaluates to "female", we assign the value 1 to the indicator for the given year and all following years.
+
           To get the gender of the chief executive for a given year, we have used the gender of the most powerful chief: either Head of state or Head of government.
 
           Used gender from HOS:
@@ -331,6 +336,8 @@ tables:
             - If head of state is less powerful than head of government
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+
+          This indicator is only estimated for countries listed in V-Dem in 2024.
         unit: ""
 
       # Had female democratically elected HOE ever
@@ -339,6 +346,11 @@ tables:
         description_short: |-
           The variable denotes whether a country ever had a democratically elected female chief executive of government in office as of December 31 of the given year.
         description_processing: |-
+          We derive this indicator as follows:
+
+          1) Estimate the gender of the chief executive for a given year. We have used the gender of the most powerful chief: either Head of state or Head of government.
+          2) If 1) evaluates to "female" and the country is an electoral or liberal democracy, we assign the value 1 to the indicator for the given year and all following years.
+
           To get the gender of the chief executive for a given year, we have used the gender of the most powerful chief: either Head of state or Head of government.
 
           Used gender from HOS:

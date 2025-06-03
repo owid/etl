@@ -72,36 +72,8 @@ def run(tb: Table, country_mapping_path) -> Table:
 
     # %% Gender indicators (2)
     # Estimate if a country ever had a female HOE
-    # wom_hoe_vdem
-    tb["wom_hoe_ever"] = tb.groupby("country")["wom_hoe_vdem"].transform(
-        lambda x: x.ffill().cumsum().gt(0).astype("Int64")
-    )
+    tb = estimate_hoe_ever_female(tb)
 
-    # Handle the case where we've only seen NAs and 0s
-    mask_only_na_and_zeros = tb.groupby("country")["wom_hoe_vdem"].transform(
-        lambda x: x.ffill().cumsum() == 0
-    ) & tb.groupby("country")["wom_hoe_vdem"].transform(lambda x: x.isna().any())
-
-    # Set to NA where we've only seen NAs and zeros
-    tb.loc[mask_only_na_and_zeros, "wom_hoe_ever"] = np.nan
-
-    # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `wom_hoe_ever`
-    # Create masks for the conditions
-    regime_is_democratic = tb["regime_row_owid"].isin([2, 3])  # Democratic regimes
-    mask_both_1 = (tb["wom_hoe_ever"] == 1) & regime_is_democratic
-    mask_both_0 = (tb["wom_hoe_ever"] == 0) & (regime_is_democratic & tb["regime_row_owid"].notna())
-
-    # Initialize with NaN
-    tb["wom_hoe_ever_dem"] = np.nan
-
-    # Set values based on masks
-    tb.loc[mask_both_1, "wom_hoe_ever_dem"] = 1
-    tb.loc[mask_both_0, "wom_hoe_ever_dem"] = 0
-    tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].astype("Int64")
-
-    # Set old countries to NaN
-    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
-    tb.loc[~tb["country"].isin(countries_last), ["wom_hoe_ever", "wom_hoe_ever_dem"]] = np.nan
     return tb
 
 
@@ -1100,4 +1072,32 @@ def estimate_gender_hoe_indicator(tb: Table) -> Table:
     return tb
 
 
-# %%
+def estimate_hoe_ever_female(tb):
+    tb["wom_hoe_ever"] = tb["wom_hoe_vdem"].fillna(0.5)
+    tb["wom_hoe_ever"] = tb.groupby("country")["wom_hoe_ever"].cummax()
+    tb["wom_hoe_ever"] = tb["wom_hoe_ever"].replace(0.5, np.nan).astype("Int64")
+
+    # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `wom_hoe_ever`
+    # Create masks for the conditions
+    regime_is_democratic = tb["regime_row_owid"].isin([2, 3])  # Democratic regimes
+    regime_is_not_democratic = tb["regime_row_owid"].isin([0, 1])  # Democratic regimes
+    mask_both_1 = (tb["wom_hoe_vdem"] == 1) & regime_is_democratic
+    mask_both_0 = regime_is_not_democratic | (tb["wom_hoe_ever"] == 0)
+
+    # Initialize with NaN
+    tb["wom_hoe_ever_dem"] = np.nan
+
+    # Set values based on masks
+    tb.loc[mask_both_1, "wom_hoe_ever_dem"] = 1
+    tb.loc[mask_both_0, "wom_hoe_ever_dem"] = 0
+
+    # Fill forward
+    tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].fillna(0.5)
+    tb["wom_hoe_ever_dem"] = tb.groupby("country")["wom_hoe_ever_dem"].cummax()
+    tb["wom_hoe_ever_dem"] = tb["wom_hoe_ever_dem"].replace(0.5, np.nan).astype("Int64")
+
+    # Set old countries to NaN
+    countries_last = tb.loc[tb["year"] == tb["year"].max(), "country"].unique()
+    tb.loc[~tb["country"].isin(countries_last), ["wom_hoe_ever", "wom_hoe_ever_dem"]] = np.nan
+
+    return tb
