@@ -14,7 +14,7 @@ from shared import (
 )
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -32,7 +32,7 @@ YEAR_MIN = 2005
 YEAR_MAX = 2023
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -42,7 +42,7 @@ def run(dest_dir: str) -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow["bti"].reset_index()
+    tb = ds_meadow.read("bti")
 
     #
     # Process data.
@@ -75,7 +75,7 @@ def run(dest_dir: str) -> None:
     ##################################################
 
     # Add regions to main table
-    tb = concat([tb, tb_avg_countries], ignore_index=True)
+    # tb = concat([tb, tb_avg_countries], ignore_index=True)
 
     #
     # Save outputs.
@@ -84,13 +84,11 @@ def run(dest_dir: str) -> None:
         tb.format(["country", "year"]),
         tb_num_countries.format(["country", "year", "category"], short_name="num_countries"),
         tb_num_people.format(["country", "year", "category"], short_name="num_people"),
-        tb_avg_w_countries.format(["country", "year"], short_name="avg_pop"),
+        # tb_avg_w_countries.format(["country", "year"], short_name="avg_pop"),
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=tables, check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

@@ -5,12 +5,10 @@ definitions:
       topic_tags:
         - Democracy
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
 
 tables:
   bti:
@@ -165,7 +163,6 @@ tables:
           <%- endif -%>
         unit: "countries"
 
-
   num_people:
     variables:
       pop_regime_bti:
@@ -177,11 +174,3 @@ tables:
           <%- endif -%>
         description_short: "Number of countries with available data."
         unit: "people"
-
-
-  avg_pop:
-    variables:
-      democracy_bti_weighted:
-        title: "Democracy score (population-weighted)"
-        description_short: Average democratic status, weighted by population.
-        unit: ""

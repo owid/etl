@@ -11,7 +11,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 
 @click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
+@click.option("--upload/--skip-upload", "-f", default=True, type=bool, help="Upload dataset to Snapshot")
 def main(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"democracy/{SNAPSHOT_VERSION}/bti.xlsx")
