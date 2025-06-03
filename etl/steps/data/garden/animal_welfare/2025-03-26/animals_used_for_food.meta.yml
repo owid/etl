@@ -15,16 +15,16 @@ tables:
         title: &title |-
           <% if metric == "animals_alive" %>
           Live << animal >><% if per_capita == True %> per person<% endif %>
-          <% else %>
+          <%- else %>
           <% if animal == "all land animals" %>Land animals slaughtered for meat
-          <% elif animal == "wild-caught fish" %>Fishes caught from the wild
-          <% elif animal == "farmed fish" %>Farmed fishes killed for food
-          <% elif animal == "farmed crustaceans" %>Farmed crustaceans killed for food
-          <% else %><< animal.capitalize() >> slaughtered for meat<% endif %>
+          <%- elif animal == "wild-caught fish" %>Fishes caught from the wild
+          <%- elif animal == "farmed fish" %>Farmed fishes killed for food
+          <%- elif animal == "farmed crustaceans" %>Farmed crustaceans killed for food
+          <%- else %><< animal.capitalize() >> slaughtered for meat<% endif %>
           <% if per_capita == True %> per person<% endif %>
           <% if estimate == "upper limit" %> (upper limit)
-          <% elif estimate == "lower limit" %> (lower limit)<% endif %>
-          <% endif %>
+          <%- elif estimate == "lower limit" %> (lower limit)<% endif %>
+          <%- endif %>
         short_unit: ""
         unit: animals<% if per_capita == True %> per person<% endif %>
         description_short: |-
