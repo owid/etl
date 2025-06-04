@@ -844,6 +844,7 @@ def add_regions_and_global_aggregates(
         Input: Country data for Germany, France, Italy...
         Output: Regional data for Europe, World
     """
+    # TODO: aggregations encodes the logic of: "estimate mean if >70% of 1900 countries are present in the region"
     tb_regions = geo.add_regions_to_table(
         tb.copy(),
         ds_regions,

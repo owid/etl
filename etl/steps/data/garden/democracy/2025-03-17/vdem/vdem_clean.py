@@ -16,7 +16,10 @@ def run(tb: Table, country_mapping_path) -> Table:
     tb = initial_cleaning(tb)
 
     # While the head-of-government indicators generally should refer to the one in office on December 31, v2exfemhog seems to (occasionally?) refer to other points during the year. For most purposes, it makes sense to consistently refer to December 31, so I am recoding here.
-    tb = clean_female_flag(tb)
+    # NOTE: one can double check these here at https://worldstatesmen.org/
+    tb = add_female_flag_31d(tb)
+    # There are some errors in `v2exfemhog` and `v2exfemhos`.
+    tb = correct_female_flag(tb)
 
     # Harmonize country names
     tb = geo.harmonize_countries(df=tb, countries_file=country_mapping_path)
@@ -100,29 +103,74 @@ def initial_cleaning(tb: Table) -> Table:
     return tb
 
 
-def clean_female_flag(tb: Table) -> Table:
+def add_female_flag_31d(tb: Table) -> Table:
     """While the head-of-government indicators generally should refer to the one in office on December 31, v2exfemhog seems to (occasionally?) refer to other points during the year. For most purposes, it makes sense to consistently refer to December 31, so I am recoding here.
 
     To make this distinction, we create two new indicators: v2exfemhog_31d and v2exfemhos_31d, with the corrections.
     """
     ## HOG
-    tb["v2exfemhog_31d"] = tb["v2exfemhog"].copy()
-    tb.loc[tb["v2exnamhog"] == "Diango Cissoko", "v2exfemhog_31d"] = 0
-    tb.loc[tb["v2exnamhog"] == "Ion Chicu", "v2exfemhog_31d"] = 0
-    tb.loc[tb["v2exnamhog"] == "Joseph Jacques Jean Chrétien", "v2exfemhog_31d"] = 0
-    tb.loc[tb["v2exnamhog"] == "KåreIsaachsen Willoch", "v2exfemhog_31d"] = 0
-    tb.loc[tb["v2exnamhog"] == "YuriiIvanovych Yekhanurov", "v2exfemhog_31d"] = 0
+    # Moldova
+    # Moldova: 2019 Male
+    # Mali: 2012 Male
+    # Canada: 1993-2002 Male
+    # Norway: 1981-1985 Male
+    # Ukraine: 2005 Male
+    ###########:
+    # HOS
+    # Gabon: 2009-2022
+    # China: 1908-1911 Male
+    # Mauritius: 2012-2014 Male
+    # Israel: 2007-2013 Male
+    # Thailand: 1873-1909 Male
+    # Lesotho: Male for ""
+    col = "v2exfemhog_31d"
+    # col = ["year", "country", col]
+    tb[col] = tb["v2exfemhog"].copy()
+    tb.loc[tb["v2exnamhog"] == "Diango Cissoko", col] = 0
+    tb.loc[tb["v2exnamhog"] == "Ion Chicu", col] = 0
+    tb.loc[tb["v2exnamhog"] == "Joseph Jacques Jean Chrétien", col] = 0
+    tb.loc[tb["v2exnamhog"] == "KåreIsaachsen Willoch", col] = 0
+    tb.loc[tb["v2exnamhog"] == "YuriiIvanovych Yekhanurov", col] = 0
     ## HOS
-    tb["v2exfemhos_31d"] = tb["v2exfemhos"].copy()
-    tb.loc[tb["v2exnamhos"] == "Ali Ben Bongo Ondimba", "v2exfemhos_31d"] = 0
-    tb.loc[tb["v2exnamhos"] == "Chulalongkorn (Rama V)", "v2exfemhos_31d"] = 0
-    tb.loc[tb["v2exnamhos"] == "Dieudonné François Joseph Marie Reste", "v2exfemhos_31d"] = 0
-    tb.loc[tb["v2exnamhos"] == "Letsie III", "v2exfemhos_31d"] = 0
-    tb.loc[tb["v2exnamhos"] == 'Miguel I "o Rei Absoluto"', "v2exfemhos_31d"] = 0
-    tb.loc[tb["v2exnamhos"] == "Moshoeshoe II", "v2exfemhos_31d"] = 0
-    tb.loc[tb["v2exnamhos"] == "Prince Zaifeng", "v2exfemhos_31d"] = 0
-    tb.loc[tb["v2exnamhos"] == "Rajkeswur Purryag", "v2exfemhos_31d"] = 0
-    tb.loc[tb["v2exnamhos"] == "Shimon Peres", "v2exfemhos_31d"] = 0
+    col = "v2exfemhos_31d"
+    # col = ["year", "country", "v2exfemhos"]
+    tb[col] = tb["v2exfemhos"].copy()
+    tb.loc[tb["v2exnamhos"] == "Ali Ben Bongo Ondimba", col] = 0
+    tb.loc[tb["v2exnamhos"] == "Chulalongkorn (Rama V)", col] = 0
+    tb.loc[tb["v2exnamhos"] == "Dieudonné François Joseph Marie Reste", col] = 0
+    tb.loc[tb["v2exnamhos"] == "Letsie III", col] = 0
+    tb.loc[tb["v2exnamhos"] == 'Miguel I "o Rei Absoluto"', col] = 0
+    tb.loc[tb["v2exnamhos"] == "Moshoeshoe II", col] = 0
+    tb.loc[tb["v2exnamhos"] == "Prince Zaifeng", col] = 0
+    tb.loc[tb["v2exnamhos"] == "Rajkeswur Purryag", col] = 0
+    tb.loc[tb["v2exnamhos"] == "Shimon Peres", col] = 0
+
+    return tb
+
+
+def correct_female_flag(tb: Table) -> Table:
+    """v2exfemhos and v2exfemhog refer to whether the country had a female hog/hos during the year. There are some errors in V-Dem, so we correct them here."""
+    ## HOG
+    # Moldova: 2019: Female
+    # Mali: 2012 Male
+    # Canada: 1993: Female
+    # Norway:: 1981 Female
+    # Ukraine:: 2005 Female
+    ###########
+    # HOS
+    # Gabon: 2009
+    # China: 1908 Female
+    # Mauritius: 2012 Female
+    # Israel: 2007 Female
+    # Thailand: 1873-1909 Male, 1897 Female
+    # Lesotho: 1990, 1996, 1960, 1970 Female
+    # Ivory Coast: 1932 male (for "Dieudonné François Joseph Marie Reste")
+
+    ## HOG
+    tb.loc[(tb["year"] == 2012) & (tb["country"] == "Mali"), "v2exfemhog"] = 0
+    ## HOS
+    tb.loc[(tb["year"] == 1990) & (tb["country"] == "Lesotho"), "v2exfemhos"] = 1
+    tb.loc[(tb["year"] == 1932) & (tb["country"] == "Ivory Coast"), "v2exfemhos"] = 0
 
     return tb
 
@@ -1114,3 +1162,6 @@ def estimate_hoe_ever_female(tb):
     tb.loc[~tb["country"].isin(countries_last), ["wom_hoe_ever", "wom_hoe_ever_dem"]] = np.nan
 
     return tb
+
+
+# %%
