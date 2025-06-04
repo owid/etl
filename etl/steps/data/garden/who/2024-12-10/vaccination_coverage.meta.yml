@@ -162,10 +162,10 @@ tables:
                 baseColorScheme: "YlGnBu"
                 binningStrategy: "manual"
                 customNumericValues:
-                  - 20
-                  - 40
-                  - 60
-                  - 80
+                  - 50
+                  - 75
+                  - 90
+                  - 95
                   - 100
       vaccinated:
         title: Number of {definitions.antigen_age_group} vaccinated with {definitions.antigen_title}
