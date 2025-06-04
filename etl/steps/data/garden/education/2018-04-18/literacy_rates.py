@@ -12,7 +12,7 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     #
     snap = paths.load_snapshot()
-    tb = snap.read(safe_types=False).set_index(["country", "year"])
+    tb = snap.read(safe_types=False)
     # Harmonize country names.
     tb = geo.harmonize_countries(
         tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
@@ -21,6 +21,7 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
+    tb = tb.format(["country", "year"])
     # Create a new garden dataset with the same metadata as the snapshot.
     ds_garden = create_dataset(dest_dir, tables=[tb], default_metadata=snap.metadata)
 
