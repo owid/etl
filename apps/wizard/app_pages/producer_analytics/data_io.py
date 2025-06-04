@@ -124,7 +124,6 @@ def get_producers_per_chart(excluded_steps) -> pd.DataFrame:
 
     Additionally, it incorporates the dataset URI and the dataset name of the variable in use by the chart. This will help us exclude certain steps (e.g. population).
 
-    TODO: add support to exclude steps.
     """
     df = get_visualizations_using_data_by_producer(excluded_steps=excluded_steps)
 
