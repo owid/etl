@@ -20,7 +20,6 @@ def run() -> None:
         ds_garden["eiu"],
         ds_garden["num_countries"],
         ds_garden["num_people"],
-        ds_garden["avg_pop"],
     ]
     #
     # Save outputs.
