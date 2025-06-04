@@ -85,7 +85,7 @@ definitions:
     <%- elif antigen == "MCV2X2" %>
     their second dose of the measles vaccine
     <%- elif antigen == "MENA_C" %>
-    their last dose of meningococcal A vaccine
+    their last dose of the meningococcal A vaccine
   antigen_description: |-
     <% if antigen == "BCG" %>
     one dose of the [tuberculosis (BCG) vaccine](#dod:bcg-vaccine)
