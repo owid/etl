@@ -63,20 +63,41 @@ def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Di
     # Get charts using data from the current data producer.
     df_producer_charts = get_visualizations_using_data_by_producer(producers=[producer])
 
+    # Remove duplicate rows.
+    # NOTE: This happens, for example, when a chart uses multiple snapshots of the same producer (so they are different origins for the same producer), e.g. chart 488 has two origins with producer "Global Carbon Project".
+    df_producer_charts = df_producer_charts.drop_duplicates(subset=["chart_id"]).reset_index(drop=True)
+
     # List IDs of charts using data from the current data producer.
     producer_chart_ids = sorted(set(df_producer_charts["chart_id"]))
 
     # Get views for those charts.
     df_charts = get_chart_views_by_chart_id(chart_ids=producer_chart_ids, date_min=min_date, date_max=max_date)
-    # Fetch titles for the top charts from chart API.
-    df_charts["title"] = df_charts["url"].apply(get_chart_title_from_url)
+
+    # Include chart titles.
+    df_charts = df_charts.merge(df_producer_charts[["chart_id", "chart_title"]], how="left", on="chart_id").rename(
+        columns={"chart_title": "title"}
+    )
+
+    # Include a column to signal if a chart was featured in the homepage.
+    df_charts["featured_on_homepage"] = False
 
     # Get posts showing charts using data from the current data producer.
     # NOTE: Include DIs as part of posts (for the total view count). But then create a separate dataframe for DIs.
     df_posts = get_post_views_by_chart_id(chart_ids=producer_chart_ids, date_min=min_date, date_max=max_date)
+
+    # This dataframe may contain the homepage among the list of posts.
+    homepage_mask = df_posts["post_type"] == "homepage"
+    # Remove the homepage from the list of posts, but add a column in the charts dataframe, to signal that the chart was featured in the homepage.
+    if homepage_mask.any():
+        df_charts.loc[
+            df_charts["chart_id"].isin(sorted(set(df_posts[homepage_mask]["chart_id"]))), "featured_on_homepage"
+        ] = True
+        df_posts = df_posts.drop(homepage_mask[homepage_mask].index).reset_index(drop=True)  # type: ignore
+    # Keep only the information about posts.
     df_posts = (
         df_posts.drop_duplicates(subset=["post_url"])
         .rename(columns={"post_title": "title", "post_url": "url"})
+        .drop(columns=["chart_url", "chart_id"])
         .reset_index(drop=True)
     )
 
@@ -110,6 +131,10 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
         numbered_title = f"{i}. {title}"
         line = f"{numbered_title} – {views} views\n"
 
+        # Add text for charts that have been featured on our homepage.
+        if row["featured_on_homepage"]:
+            line += "\n    This chart has also been featured on our homepage."
+
         # Insert line of text.
         edits.append({"insertText": {"location": {"index": end_index}, "text": line}})
         # Apply link to just the title (excluding "1. ").
@@ -140,15 +165,25 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
     # Create a dataframe of the top charts.
     df_top_charts = (
         analytics["charts"]
-        .sort_values("views", ascending=False)[["url", "views", "title"]]
+        .sort_values("views", ascending=False)[["url", "views", "title", "featured_on_homepage"]]
         .reset_index(drop=True)
         .iloc[0:10]
     )
     # Create a dataframe of the top posts (articles, topic pages and DIs).
-    df_top_posts = analytics["posts"].sort_values(["views"], ascending=False).reset_index(drop=True).iloc[0:10]
+    df_top_posts = (
+        analytics["posts"]
+        .sort_values(["views"], ascending=False)
+        .reset_index(drop=True)
+        .iloc[0:10]
+        .assign(**{"featured_on_homepage": False})
+    )
     # Create a dataframe of the top DIs (althought it will likely be the same as all DIs).
     df_top_insights = (
-        analytics["insights_in_quarter"].sort_values(["views"], ascending=False).reset_index(drop=True).iloc[0:10]
+        analytics["insights_in_quarter"]
+        .sort_values(["views"], ascending=False)
+        .reset_index(drop=True)
+        .iloc[0:10]
+        .assign(**{"featured_on_homepage": False})
     )
 
     # Create the required numeric inputs for the document.

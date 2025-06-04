@@ -960,9 +960,10 @@ def get_visualizations_using_data_by_producer(
     query = f"""WITH t_base AS (
 	SELECT
 		cd.chartId chart_id,
-		cf.slug chart_slug,
-		CONCAT('{GRAPHERS_BASE_URL}', cf.slug) chart_url,
-		JSON_EXTRACT(cf.full, '$.isPublished') is_published,
+		JSON_EXTRACT(cc.full, '$.title') chart_title,
+		cc.slug chart_slug,
+		CONCAT('{GRAPHERS_BASE_URL}', cc.slug) chart_url,
+		JSON_EXTRACT(cc.full, '$.isPublished') is_published,
 		cd.variableId variable_id,
 		v.name variable_name,
 		d.id dataset_id,
@@ -974,7 +975,7 @@ def get_visualizations_using_data_by_producer(
 		o.producer producer
 	FROM chart_dimensions cd
 	LEFT JOIN charts c ON c.id = cd.chartId
-	LEFT JOIN chart_configs cf ON cf.id = c.configId
+	LEFT JOIN chart_configs cc ON cc.id = c.configId
 	LEFT JOIN origins_variables ov ON ov.variableId = cd.variableId
 	LEFT JOIN origins o ON o.id = ov.originId
 	LEFT JOIN variables v ON cd.variableId = v.id
