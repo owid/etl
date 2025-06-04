@@ -11,17 +11,19 @@ def run() -> None:
     # Load inputs.
     #
     # Load garden dataset.
-    ds_garden = paths.load_dataset("bti")
+    ds_garden = paths.load_dataset("fh")
+
+    # Read table from garden dataset.
+    tb = ds_garden["fh"]
+    tb_regions = ds_garden["fh_regions"]
 
     #
     # Process data.
     #
     tables = [
-        ds_garden["bti"],
-        ds_garden["num_countries"],
-        ds_garden["num_people"],
+        tb,
+        tb_regions,
     ]
-
     #
     # Save outputs.
     #
