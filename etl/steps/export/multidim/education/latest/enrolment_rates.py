@@ -22,8 +22,8 @@ def run() -> None:
     ds_opri = paths.load_dataset("education_opri")
     tb_opri = ds_opri.read("education_opri", load_data=True)
 
-    ds_wdi = paths.load_dataset("education_wdi")
-    tb_wdi = ds_wdi.read("education_wdi", load_data=True)
+    ds_wdi = paths.load_dataset("wdi")
+    tb_wdi = ds_wdi.read("wdi", load_data=True)
 
     # List of columns to select from tb_opri
     cols_opri = [
@@ -50,10 +50,10 @@ def run() -> None:
     cols_sdgs = [
         "gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8",
         "gross_enrolment_ratio_for_tertiary_education__female__pct__ger_5t8_f",
-        "gross_enrolment_ratio_for_tertiary_education__male__pct__ger_5t8_f",
+        "gross_enrolment_ratio_for_tertiary_education__male__pct__ger_5t8_m",
         "net_enrolment_rate__pre_primary__both_sexes__pct__ner_02_cp",
         "net_enrolment_rate__pre_primary__female__pct__ner_02_f_cp",
-        "net_enrolment_rate__pre_primary__male__pct__ner_02_f_cp",
+        "net_enrolment_rate__pre_primary__male__pct__ner_02_m_cp",
     ]
 
     cols_wdi = [
@@ -63,20 +63,21 @@ def run() -> None:
     ]
 
     # Select only the relevant columns from tb_sdgs
-    tb_opri = tb_opri[cols_opri]
-    tb_sdgs = tb_sdgs[cols_sdgs]
-    tb_wdi = tb_wdi[cols_wdi]
+    tb_opri = tb_opri[["country", "year"] + cols_opri]
+    tb_sdgs = tb_sdgs[["country", "year"] + cols_sdgs]
+    tb_wdi = tb_wdi[["country", "year"] + cols_wdi]
 
     tb = pr.concat([tb_opri, tb_sdgs, tb_wdi])
-    print(tb)
 
     #
-    # (optional) Adjust dimensions if needed
+    # Adjust dimensions
     #
+    tb = adjust_dimensions_corruption(tb)
 
     #
     # Create collection object
     #
+    print(tb)
     c = paths.create_collection(
         config=config,
         short_name="enrolment_rates",
@@ -105,10 +106,7 @@ def adjust_dimensions_corruption(tb):
 
     """
 
-    indicator_name = "enrolment_rates"
-
     # Helper maps for pattern matching
-
     level_keywords = {
         "pre_primary": "Pre-Primary",
         "primary": "Primary",
@@ -151,17 +149,16 @@ def adjust_dimensions_corruption(tb):
                 break
         sex_mapping[var] = sex or "Both"  # fallback for non-disaggregated vars
 
-        for col in tb.columns:
-            if col in ["country", "year"]:
-                continue
+    for col in tb.columns:
+        if col in ["country", "year"]:
+            continue
+        tb[col].metadata.original_short_name = "enrolment_rates"
+        tb[col].metadata.dimensions = {}
 
-            # Set short name
-            tb[col].metadata.original_short_name = indicator_name
-            tb[col].metadata.dimensions = {}
-
-            # Set dimensions
-            tb[col].metadata.dimensions["gender"] = sex_mapping[col]
-            tb[col].metadata.dimensions["level"] = level_mapping[col]
+        # Set dimensions
+        tb[col].metadata.dimensions["sex"] = sex_mapping[col]
+        tb[col].metadata.dimensions["level"] = level_mapping[col]
+        tb[col].metadata.dimensions["enrolment_type"] = enrolment_type_mapping[col]
 
     # Add dimension definitions at table level
     if isinstance(tb.metadata.dimensions, list):
