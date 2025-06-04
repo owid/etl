@@ -1093,7 +1093,7 @@ def estimate_hoe_ever_female(tb):
     # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `v2exfemhoe`
     # Create masks for the conditions
     regime_is_democratic = tb["regime_row_owid"].isin([2, 3])  # Democratic regimes
-    regime_is_not_democratic = tb["regime_row_owid"].isin([0, 1])  # Democratic regimes
+    regime_is_not_democratic = tb["regime_row_owid"].isin([0, 1])  # Non-democratic regimes
     mask_both_1 = (tb["v2exfemhoe"] == 1) & regime_is_democratic
     mask_both_0 = regime_is_not_democratic | (tb["v2exfemhoe"] == 0)
 
