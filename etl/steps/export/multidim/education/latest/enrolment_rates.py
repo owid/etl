@@ -2,10 +2,18 @@
 
 import owid.catalog.processing as pr
 
+from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+MULTIDIM_CONFIG = {
+    "hasMapTab": True,
+    "tab": "map",
+    "chartTypes": ["DiscreteBar"],
+    "originUrl": "ourworldindata.org/education",
+}
 
 
 def run() -> None:
@@ -17,13 +25,12 @@ def run() -> None:
 
     # Load grapher dataset.
     ds_sdgs = paths.load_dataset("education_sdgs")
-    tb_sdgs = ds_sdgs.read("education_sdgs", load_data=True)
-
+    tb_sdgs = ds_sdgs.read("education_sdgs")
     ds_opri = paths.load_dataset("education_opri")
-    tb_opri = ds_opri.read("education_opri", load_data=True)
+    tb_opri = ds_opri.read("education_opri")
 
     ds_wdi = paths.load_dataset("wdi")
-    tb_wdi = ds_wdi.read("wdi", load_data=True)
+    tb_wdi = ds_wdi.read("wdi")
 
     # List of columns to select from tb_opri
     cols_opri = [
@@ -66,24 +73,29 @@ def run() -> None:
     tb_opri = tb_opri[["country", "year"] + cols_opri]
     tb_sdgs = tb_sdgs[["country", "year"] + cols_sdgs]
     tb_wdi = tb_wdi[["country", "year"] + cols_wdi]
-
-    tb = pr.concat([tb_opri, tb_sdgs, tb_wdi])
-
     #
     # Adjust dimensions
     #
-    tb = adjust_dimensions_corruption(tb)
-
+    tb_sdgs = adjust_dimensions_enrolment(tb_sdgs)
+    tb_opri = adjust_dimensions_enrolment(tb_opri)
+    tb_wdi = adjust_dimensions_enrolment(tb_wdi)
     #
     # Create collection object
     #
-    print(tb)
-    c = paths.create_collection(
+
+    collections = []
+    for tb in [tb_sdgs, tb_opri, tb_wdi]:
+        c_ = paths.create_collection(
+            config=config,
+            tb=tb,
+            common_view_config=MULTIDIM_CONFIG,
+        )
+        collections.append(c_)
+
+    c = combine_collections(
+        collections=collections,
+        collection_name=paths.short_name,  # Optional: add option to force a certain short_name
         config=config,
-        short_name="enrolment_rates",
-        tb=tb,
-        # indicator_names=[],
-        # dimensions={},
     )
 
     #
@@ -100,7 +112,7 @@ def run() -> None:
     c.save()
 
 
-def adjust_dimensions_corruption(tb):
+def adjust_dimensions_enrolment(tb):
     """
     Add dimensions to enrolment table columns.
 
@@ -164,7 +176,7 @@ def adjust_dimensions_corruption(tb):
     if isinstance(tb.metadata.dimensions, list):
         tb.metadata.dimensions.extend(
             [
-                {"name": "Gender", "slug": "gender"},
+                {"name": "Gender", "slug": "sex"},
                 {"name": "Level of education", "slug": "level"},
                 {"name": "Enrolment type", "slug": "enrolment_type"},
             ]
