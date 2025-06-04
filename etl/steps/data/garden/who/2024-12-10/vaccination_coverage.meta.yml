@@ -53,7 +53,7 @@ definitions:
     <%- endif %>
   antigen_title: |-
     <% if antigen == "BCG" %>
-    tuberculosis vaccine
+    a tuberculosis vaccine
     <%- elif antigen == "DTPCV1" %>
     one dose of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "DTPCV3" %>
