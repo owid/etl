@@ -42,7 +42,7 @@ dimensions:
         name: Both genders
       - slug: girls
         name: Girls
-      - slug: male
+      - slug: boys
         name: Boys
       - slug: "sex_side_by_side"
         name: Girls and boys
