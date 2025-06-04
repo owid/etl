@@ -83,7 +83,7 @@ definitions:
     <%- elif antigen == "YFV" %>
     one dose of the yellow fever vaccine
     <%- elif antigen == "MCV2X2" %>
-    their second dose of the measlesvaccine
+    their second dose of the measles vaccine
     <%- elif antigen == "MENA_C" %>
     their last dose of meningococcal A vaccine
   antigen_description: |-
