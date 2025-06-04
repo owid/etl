@@ -101,7 +101,8 @@ def run() -> None:
     #
     CHOICES_EDUCATION = c.get_choice_names("level")
     CHOICES_ENROLMENT_TYPE = c.get_choice_names("enrolment_type")
-    METRIC_SUBTITLES = {
+    CHOICES_SEX = c.get_choice_names("sex")
+    METRIC_SUBTITLES_ALL_GENDERS = {
         "Net enrolment": "Net enrolment includes only students of official school age.",
         "Gross enrolment": "Gross enrolment includes all students, regardless of age.",
     }
@@ -111,7 +112,7 @@ def run() -> None:
             {
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
-                "choices": ["female", "male"],
+                "choices": ["girls", "boys"],
                 "view_config": {
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
@@ -120,19 +121,36 @@ def run() -> None:
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
                     "title": "{metric} rates for {level} education among boys and girls",
-                    "subtitle": "{subtitle}",
+                    "subtitle": "{subtitle_all_genders}",
+                },
+            },
+            {
+                "dimension": "level",
+                "choice_new_slug": "level_side_by_side",
+                "view_config": {
+                    "originUrl": "ourworldindata.org/education",
+                    "hideAnnotationFieldsInTitle": {"time": True},
+                    "addCountryMode": "change-country",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "selectedFacetStrategy": "entity",
+                    "title": "{metric} rates among {sex} for all education levels",
                 },
             },
         ],
         params={
-            "level": lambda view: CHOICES_EDUCATION.get(view.dimensions["level"]).lower(),
-            "metric": lambda view: CHOICES_ENROLMENT_TYPE.get(view.dimensions["enrolment_type"]),
-            "subtitle": lambda view: METRIC_SUBTITLES.get(
-                CHOICES_ENROLMENT_TYPE.get(view.dimensions["enrolment_type"])
+            "level": lambda view: (
+                CHOICES_EDUCATION.get(view.dimensions.get("level"), "").lower() if view.dimensions.get("level") else ""
+            ),
+            "metric": lambda view: CHOICES_ENROLMENT_TYPE.get(view.dimensions.get("enrolment_type"), ""),
+            "subtitle_all_genders": lambda view: METRIC_SUBTITLES_ALL_GENDERS.get(
+                CHOICES_ENROLMENT_TYPE.get(view.dimensions.get("enrolment_type"))
+            ),
+            "sex": lambda view: (
+                CHOICES_SEX.get(view.dimensions.get("sex"), "").lower() if view.dimensions.get("sex") else ""
             ),
         },
     )
-
     #
     # Save garden dataset.
     #
@@ -155,7 +173,7 @@ def adjust_dimensions_enrolment(tb):
         "tertiary": "tertiary",
     }
 
-    sex_keywords = {"both_sexes": "both", "male": "male", "female": "female", "ma": "male", "fe": "female"}
+    sex_keywords = {"both_sexes": "both", "male": "boys", "female": "girls", "ma": "boys", "fe": "girls"}
 
     # Initialize mappings
     level_mapping = {}
