@@ -583,9 +583,9 @@ def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
         #     citation_full: {rawName}. Indicator AG.CON.FERT.PT.ZS ({url_main}), {title} ({date_published})
         #     attribution: None
         origin.producer = clean_source["name"]
-        origin.title = "World Development Indicators (World Bank)"
+        origin.title = "World Development Indicators"
         origin.url_main = f"https://data.worldbank.org/indicator/{var['indicator_code_original']}"
-        origin.citation_full = f"{source_raw_name.rstrip('.')}. Indicator {var['indicator_code_original']} ({origin.url_main}), {origin.title} ({origin.date_published})"
+        origin.citation_full = f"{source_raw_name.rstrip('.')}. Indicator {var['indicator_code_original']} ({origin.url_main}). World Development Indicators - World Bank ({origin.date_published.split('-')[0]}). Accessed on {origin.date_accessed}."
 
         # set description_from_producer
         tb[var_code].m.description_from_producer = create_description_from_producer(var)
