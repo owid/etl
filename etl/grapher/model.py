@@ -292,7 +292,7 @@ class Tag(Base):
         return tags
 
 
-class Dod(Base):
+class DoD(Base):
     __tablename__ = "dods"
     __table_args__ = (
         ForeignKeyConstraint(["lastUpdatedUserId"], ["users.id"], ondelete="SET NULL", name="dods_ibfk_1"),

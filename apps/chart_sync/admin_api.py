@@ -149,7 +149,7 @@ class AdminAPI(object):
         return js
 
     def create_dod(self, name: str, content: str, user_id: int | None = None) -> Dict[str, Any]:
-        """Create a new DOD (Details on Demand)."""
+        """Create a new DoD (Details on Demand)."""
         data = {
             "name": name,
             "content": content,
@@ -165,7 +165,7 @@ class AdminAPI(object):
         return js
 
     def update_dod(self, dod_id: int, content: str, user_id: int | None = None) -> Dict[str, Any]:
-        """Update an existing DOD."""
+        """Update an existing DoD."""
         data = {
             "content": content,
         }
@@ -175,7 +175,7 @@ class AdminAPI(object):
             json=data,
         )
         js = self._json_from_response(resp)
-        # NOTE: update DOD doesn't return `success`, but {dod: 1} (which is wrong, it should return DOD id)
+        # NOTE: update DoD doesn't return `success`, but {dod: 1} (which is wrong, it should return DoD id)
         # if not js["success"]:
         #     raise AdminAPIError({"error": js["error"], "dod_data": data})
         return js
