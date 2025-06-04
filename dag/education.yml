@@ -124,7 +124,7 @@ steps:
   # TODO: add step name (just something recognizable)
   #
   export://multidim/education/latest/enrolment_rates:
-    - data://grapher/unesco/2025-05-01/education_opri
     - data://grapher/unesco/2025-05-01/education_sdgs
     - data://grapher/worldbank_wdi/2025-01-24/wdi
+    - data://grapher/unesco/2025-05-01/education_opri
 
