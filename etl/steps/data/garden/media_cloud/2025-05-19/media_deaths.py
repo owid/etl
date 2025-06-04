@@ -26,6 +26,7 @@ import matplotlib.pyplot as plt
 import mediacloud.api
 import pandas as pd
 from dotenv import load_dotenv
+from media_deaths_queries import create_full_queries, create_queries
 
 load_dotenv()
 
@@ -55,8 +56,12 @@ END_2022 = dt.date(2022, 12, 31)
 START_2023 = dt.date(2023, 1, 1)
 END_2023 = dt.date(2023, 12, 31)
 
+QUERIES = create_queries()
+STR_QUERIES = create_full_queries
+
 # Initialize the Media Cloud API client
 search_api = mediacloud.api.SearchApi(MC_API_TOKEN)
+
 
 CAUSES_OF_DEATH = [
     "heart disease",
@@ -99,6 +104,26 @@ TERRORISM_DEATHS_2022 = 11  # from Global Terrorism Index
 HEALTH_QUERY = "health OR disease OR illness OR sick OR sickness OR injury OR injuries OR fatality OR fatalities OR mortality OR mortalities OR drug OR hospital OR clinic OR doctor OR physician OR nurse OR medical OR healthcare OR treatment OR therapy OR care OR patient OR patients OR prescription OR medication OR vaccine OR vaccination OR immunization OR outbreak OR epidemic OR pandemic"
 
 DEATH_QUERY = "death OR died OR dead OR fatality OR fatalities OR mortality OR mortalities OR dies OR dying OR die OR fatal OR deadliness OR lethality OR lethal OR kill OR killed OR killing OR killer OR kills"
+
+
+def test_queries(term):
+    query_hits_list = []
+    query_df = []
+    queries_list = QUERIES[term]["combinations"]
+    for query in queries_list:
+        hits = query_results(query, source_ids=[NYT_ID])
+        query_hits_list.append({"cause": term, "search_term": query, "results": hits})
+        print(f"{query}:{hits}")
+        results = query_stories(query, source_ids=[NYT_ID])
+        if not results.empty:
+            results["search_term"] = query
+            results["cause"] = term
+            query_df.append(results)
+
+        time.sleep(30)  # Sleep to avoid hitting API rate limits
+    if query_df:
+        query_df = pd.concat(query_df, ignore_index=True)
+    return pd.DataFrame(query_hits_list), query_df
 
 
 def create_death_df():
@@ -344,7 +369,7 @@ def run() -> None:
     else:
         death_df = create_death_df()
 
-        all_queries = create_queries()
+        all_queries = QUERIES
 
         nyt_mentions = get_mentions_from_source(
             source_ids=[NYT_ID], source_name="The New York Times", queries=all_queries, death_df=death_df, verbose=True
@@ -414,45 +439,3 @@ def run() -> None:
 
         # save to csv
         media_deaths_df.to_csv(MEDIA_MENTIONS_PATH)
-
-
-def create_queries():
-    query_heart = '"heart disease" OR "heart attack" OR "cardiac arrest" OR "myocardial infarction" OR "coronary artery disease" OR "arrhythmia" OR "heart failure" OR "congestive heart failure" OR "valvular heart disease" OR "pericarditis" OR "endocarditis" OR "cardiomyopathy"'
-    query_cancer = '"cancer" OR "malignant neoplasm" OR "tumor" OR "tumour" OR "carcinoma" OR "sarcoma" OR "leukemia" OR "lymphoma" OR "melanoma" OR "mass lesion" OR "oncology" OR "chemotherapy" OR "radiation therapy" OR "immunotherapy" OR "targeted therapy" OR "biopsy" OR "oncogene" OR "carcinogenesis" OR "metastasis" OR "remission" OR "carcogenesis" OR "carcinogenic" OR "carcinogen"'
-    query_accidents = '"road accident" OR "car crash" OR "vehicle accident" OR "traffic collision" OR "car accident" OR "motorcycle accident" OR "hit and run" OR "plane crash" OR "train accident" OR "boat accident" OR "airplane accident" OR "industrial accident" OR "workplace accident" OR "falling object" OR "electrocution" OR "burn injury" OR "drowning"'  # OR "drunk driving" OR "collision"
-    query_stroke = '"stroke" OR "cerebrovascular disease" OR "brain attack" OR "transient ischemic attack" OR "cerebral infarction" OR "brain hemorrhage" OR "subarachnoid hemorrhage" OR "intracerebral hemorrhage" OR "cerebral thrombosis" OR "cerebral embolism" OR "brain ischemia" OR "brain injury" OR "T.I.A."'
-    query_respiratory = '"chronic obstructive pulmonary disease" OR "COPD" OR "chronic bronchitis" OR "emphysema" OR "asthma" OR "respiratory failure" OR "lung disease" OR "pulmonary disease" OR "respiratory illness" OR "respiratory disease" OR "respiratory tract infection"'  # should we add smoking/ tobacco use?
-    query_alzheimers = '"Alzheimer" OR "dementia" OR "Alzheimer\'s disease"'
-    query_diabetes = '"diabetes" OR "insulin" OR "hyperglycemia" OR "diabetic"'
-    query_kidney = '"kidney disease" OR "renal failure" OR "chronic kidney disease" OR "end-stage renal disease" OR "nephropathy" OR "dialysis"'
-    query_liver = '"liver disease" OR "cirrhosis" OR "chronic liver disease" OR "hepatitis" OR "liver failure"'  # should we add alcoholism/ alcohol use
-    query_covid = '"COVID-19" OR "coronavirus" OR "SARS-CoV-2"'
-    query_suicide = '"suicide" OR "self-harm" OR "self-inflicted injury" OR "suicidal"'
-    query_influenza = (
-        '"influenza" OR " flu " OR "respiratory infection" OR "pneumonia" OR "lung infection" OR "bronchopneumonia"'
-    )
-    query_drug = '"drug use" OR "overdose" OR "drug-related" OR "substance use disorder" OR "substance abuse" OR "addiction" OR "opioid" OR "heroin" OR "fentanyl" OR "morphine" OR "cocaine" OR "drug abuse" OR "illicit drug"'
-    query_homocide = '"homicide" OR "assault" OR "shooting" OR "murder" OR "manslaughter" OR "violent crime" OR "domestic violence" OR "gang violence" OR "knife attack" OR "stabbing" OR "lynching" OR "execution"'  # OR "killer" OR "killing"
-    query_terrorism = '"terrorism" OR "terrorist" OR "extremism" OR "radicalization" OR "suicide bomb" OR "car bomb" OR "hostage" OR "terror attack" OR "terror plot" OR "terror cell" OR "terror network"'
-    query_war = '"war" OR "warfare" OR "armed conflict" OR "military operation" OR "combat" OR "invasion" OR "occupation" OR "insurgency" OR "guerrilla warfare" OR "airstrike" OR "bombing" OR "siege" OR "troops" OR "military intervention" OR "peacekeeping" OR "ceasefire" OR "truce" OR "hostilities" OR "genocide" OR "ethnic cleansing" NOT "trade war"'
-
-    all_queries = {
-        "heart disease": query_heart,
-        "cancer": query_cancer,
-        "accidents": query_accidents,
-        "stroke": query_stroke,
-        "respiratory": query_respiratory,
-        "alzheimers": query_alzheimers,
-        "diabetes": query_diabetes,
-        "kidney": query_kidney,
-        "liver": query_liver,
-        "covid": query_covid,
-        "suicide": query_suicide,
-        "influenza": query_influenza,
-        "drug overdose": query_drug,
-        "homicide": query_homocide,
-        "terrorism": query_terrorism,
-        "war": query_war,
-    }
-
-    return all_queries
