@@ -9,8 +9,10 @@ paths = PathFinder(__file__)
 MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
-    "chartTypes": ["DiscreteBar"],
     "originUrl": "ourworldindata.org/education",
+    "minTime": "earliest",
+    "maxTime": "latest",
+    "hideAnnotationFieldsInTitle": {"time": True},
 }
 
 
@@ -91,7 +93,7 @@ def run() -> None:
 
     c = combine_collections(
         collections=collections,
-        collection_name=paths.short_name,  # Optional: add option to force a certain short_name
+        collection_name=paths.short_name,
         config=config,
     )
 
@@ -117,11 +119,12 @@ def adjust_dimensions_enrolment(tb):
 
     # Helper maps for pattern matching
     level_keywords = {
-        "pre_primary": "Pre-Primary",
-        "primary": "Primary",
-        "lower_secondary": "Lower Secondary",
-        "upper_secondary": "Upper Secondary",
-        "tertiary": "Tertiary",
+        "pre_primary": "preprimary",
+        "pre_enrr": "preprimary",
+        "primary": "primary",
+        "lower_secondary": "lower_secondary",
+        "upper_secondary": "upper_secondary",
+        "tertiary": "tertiary",
     }
 
     sex_keywords = {"both_sexes": "Both", "male": "Male", "female": "Female", "ma": "Male", "fe": "Female"}
@@ -140,15 +143,15 @@ def adjust_dimensions_enrolment(tb):
             if key in var:
                 level = val
                 break
-        level_mapping[var] = level or "Unknown"
+        level_mapping[var] = level
 
         # --- Enrolment Type ---
         if "gross" in var:
-            enrolment_type_mapping[var] = "Gross"
+            enrolment_type_mapping[var] = "gross_enrolment"
         elif "net" in var:
-            enrolment_type_mapping[var] = "Net"
-        else:
-            enrolment_type_mapping[var] = "Gross"  # fallback for `se_pre_enrr`
+            enrolment_type_mapping[var] = "net_enrolment"
+        elif "pre_enrr" in var:
+            enrolment_type_mapping[var] = "gross_enrolment"
 
         # --- Sex ---
         sex = None
@@ -165,17 +168,17 @@ def adjust_dimensions_enrolment(tb):
         tb[col].metadata.dimensions = {}
 
         # Set dimensions
-        tb[col].metadata.dimensions["sex"] = sex_mapping[col]
-        tb[col].metadata.dimensions["level"] = level_mapping[col]
         tb[col].metadata.dimensions["enrolment_type"] = enrolment_type_mapping[col]
+        tb[col].metadata.dimensions["level"] = level_mapping[col]
+        tb[col].metadata.dimensions["sex"] = sex_mapping[col]
 
     # Add dimension definitions at table level
     if isinstance(tb.metadata.dimensions, list):
         tb.metadata.dimensions.extend(
             [
+                {"name": "Metric", "slug": "enrolment_type"},
+                {"name": "Education level", "slug": "level"},
                 {"name": "Gender", "slug": "sex"},
-                {"name": "Level of education", "slug": "level"},
-                {"name": "Enrolment type", "slug": "enrolment_type"},
             ]
         )
 

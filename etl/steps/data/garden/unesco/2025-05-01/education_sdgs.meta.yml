@@ -5,6 +5,14 @@ definitions:
     presentation:
       topic_tags:
         - Global Education
+      grapher_config:
+        hasMapTab: true
+        maxTime: 2024
+        map:
+          time: 2024
+          timeTolerance: 5
+    display:
+      tolerance: 5
 
   desc_key_ger: &desc_key_ger
     - Not all students enroll in school at the same age. This indicator shows how many students are attending a certain level of education, regardless of whether they are considered to be within the expected age range for that level.
@@ -16,6 +24,18 @@ definitions:
     - A gross enrolment ratio close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
     - This indicator is best understood when used together with the net enrolment rate, which focuses on age-appropriate participation.
     - One limitation is that the gross enrolment ratio can exceed 100%, which may require further data to understand the reasons — such as whether students are repeating grades or starting school late.
+
+  desc_key_net_enr: &desc_key_net_enr
+    - Not all children of the right age are enrolled in the level of education intended for them — the net enrolment rate indicator shows how many are.
+    - It captures the percentage of children in the official age group for a specific education level who are enrolled at that same level, such as primary or lower secondary.
+    - The indicator is calculated by dividing the number of students of the correct age enrolled in that level by the total number of children in that age group.
+    - For example, if primary education starts at age 7 and lasts six years, the official primary school age range would be 7 to 12 years.
+    - A high net enrolment rate means that most children are enrolled where they are expected to be. The highest possible value is 100%.
+    - The data comes from school administrative records, which track enrolment by single year of age, and from population estimates provided by national statistics offices or UN sources.
+    - This indicator is especially useful for monitoring progress toward universal primary and secondary education.
+    - However, it does not account for children who are enrolled in the correct level but are too young or too old, and it may miss students enrolled in the “wrong” grade for their age.
+    - Differences between enrolment and population data can lead to small errors. In some cases, the net enrolment rate may slightly exceed 100%.
+    - It's also not applied to tertiary education because of the wide range of entry ages and programme lengths at that level.
 
   desc_literacy: &desc_literacy
     - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
@@ -35,18 +55,6 @@ dataset:
 tables:
  education_sdgs:
     variables:
-      gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
-        title: Gross enrolment ratio in tertiary education
-        description_short: Number of people of any age group who are enrolled in [tertiary](#dod:tertiary-education) education expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
-        unit: "%"
-        short_unit: "%"
-        description_key: *desc_key_ger
-        presentation:
-          title_public: Gross enrolment ratio in tertiary education
-        display:
-          name: Tertiary education
-          numDecimalPlaces: 1
-
       adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99:
         title: Literacy rate among adults
         description_short: Share of the population aged 15 years and older who can read and write.
@@ -623,3 +631,142 @@ tables:
         display:
           numDecimalPlaces: 2
           name: Illiterate
+
+      gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
+        title: Gross enrolment ratio in tertiary education
+        description_short: Number of people of any age group who are enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment ratio in tertiary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: RdPu
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Tertiary education
+
+
+      gross_enrolment_ratio_for_tertiary_education__female__pct__ger_5t8_f:
+        title: Gross enrolment ratio in tertiary education among women
+        description_short: Number of women of any age group who are enrolled in [tertiary](#dod:tertiary-education) education expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment ratio in tertiary education among women
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: RdPu
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Women
+
+      gross_enrolment_ratio_for_tertiary_education__male__pct__ger_5t8_m:
+        title: Gross enrolment ratio in tertiary education among men
+        description_short: Number of men of any age group who are enrolled in [tertiary](#dod:tertiary-education) education expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment ratio in tertiary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: RdPu
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Men
+
+      net_enrolment_rate__pre_primary__both_sexes__pct__ner_02_cp:
+        title: Net enrolment rate in pre-primary education
+        description_short: Percentage of children of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public: Net enrolment rate in pre-primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: RdPu
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary education
+
+      net_enrolment_rate__pre_primary__female__pct__ner_02_f_cp:
+        title: Net enrolment rate in pre-primary education among girls
+        description_short: Percentage of girls of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public: Net enrolment rate in pre-primary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: RdPu
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      net_enrolment_rate__pre_primary__male__pct__ner_02_m_cp:
+        title: Net enrolment rate in pre-primary education among boys
+        description_short: Percentage of boys of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public: Net enrolment rate in pre-primary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: RdPu
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
