@@ -1,7 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-import owid.catalog.processing as pr
-
 from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
@@ -32,7 +30,6 @@ def run() -> None:
     ds_wdi = paths.load_dataset("wdi")
     tb_wdi = ds_wdi.read("wdi")
 
-    # List of columns to select from tb_opri
     cols_opri = [
         "total_net_enrolment_rate__primary__both_sexes__pct",
         "total_net_enrolment_rate__primary__male__pct",
