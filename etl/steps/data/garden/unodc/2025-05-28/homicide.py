@@ -38,6 +38,8 @@ def run() -> None:
     tb = calculate_united_kingdom(tb, ds_population)
     # Calculate rates for 2024 using counts from UNODC and medium population projections from UN WPP
     tb = calculate_rates_for_most_recent_year(tb, tb_pop_full)
+    # Clean up variable names.
+    tb = clean_up_variables(tb)
     tables = clean_data(tb)
     # Improve table format.
 
@@ -49,6 +51,20 @@ def run() -> None:
 
     # Save garden dataset.
     ds_garden.save()
+
+
+def clean_up_variables(tb: Table) -> Table:
+    """
+    Clean up the variable names in the table by making the names a bit more readable.
+    """
+    category_dict = {
+        "Firearms or explosives - firearms": "a firearm",
+        "sharp or blunt object, including motor vehicles": "a sharp or blunt object, including a motor vehicle",
+        "firearms or explosives": "a firearm or explosive",
+    }
+    tb["category"] = tb["category"].replace(category_dict)
+
+    return tb
 
 
 def format_pop_full(tb_pop_full: Table) -> Table:
