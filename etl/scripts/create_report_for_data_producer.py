@@ -133,7 +133,7 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
 
         # Add text for charts that have been featured on our homepage.
         if row["featured_on_homepage"]:
-            line += "\n    This chart has also been featured on our homepage."
+            line += "    This chart was also featured on our homepage.\n"
 
         # Insert line of text.
         edits.append({"insertText": {"location": {"index": end_index}, "text": line}})
