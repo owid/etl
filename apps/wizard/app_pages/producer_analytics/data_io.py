@@ -14,8 +14,6 @@ from apps.utils.google import read_gbq
 from apps.wizard.app_pages.producer_analytics.utils import GRAPHERS_BASE_URL, MIN_DATE, TODAY
 from apps.wizard.utils.components import st_cache_data
 from etl.analytics import get_visualizations_using_data_by_producer
-from etl.snapshot import Snapshot
-from etl.version_tracker import VersionTracker
 
 
 @st.cache_data(show_spinner=False)
