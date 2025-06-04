@@ -66,7 +66,7 @@ def run(tb: Table, country_mapping_path) -> Table:
     # %% Gender indicators (1)
     # Create variable identifying gender of chief executive
     tb = estimate_gender_hoe_indicator(tb)
-    # Estimate gender of HOG
+    # Estimate gender of HOG. Basically, when missing and HOS=HOG, then use the gender of HOS.
     tb.loc[(tb["wom_hos_vdem"].notna()) & (tb["v2exhoshog"] == 1), "wom_hog_vdem"] = tb["wom_hos_vdem"]
     tb = tb.drop(columns=["v2exhoshog"])
 
@@ -101,23 +101,28 @@ def initial_cleaning(tb: Table) -> Table:
 
 
 def clean_female_flag(tb: Table) -> Table:
-    """While the head-of-government indicators generally should refer to the one in office on December 31, v2exfemhog seems to (occasionally?) refer to other points during the year. For most purposes, it makes sense to consistently refer to December 31, so I am recoding here."""
+    """While the head-of-government indicators generally should refer to the one in office on December 31, v2exfemhog seems to (occasionally?) refer to other points during the year. For most purposes, it makes sense to consistently refer to December 31, so I am recoding here.
+
+    To make this distinction, we create two new indicators: v2exfemhog_31d and v2exfemhos_31d, with the corrections.
+    """
     ## HOG
-    tb.loc[tb["v2exnamhog"] == "Diango Cissoko", "v2exfemhog"] = 0
-    tb.loc[tb["v2exnamhog"] == "Ion Chicu", "v2exfemhog"] = 0
-    tb.loc[tb["v2exnamhog"] == "Joseph Jacques Jean Chrétien", "v2exfemhog"] = 0
-    tb.loc[tb["v2exnamhog"] == "KåreIsaachsen Willoch", "v2exfemhog"] = 0
-    tb.loc[tb["v2exnamhog"] == "YuriiIvanovych Yekhanurov", "v2exfemhog"] = 0
+    tb["v2exfemhog_31d"] = tb["v2exfemhog"].copy()
+    tb.loc[tb["v2exnamhog"] == "Diango Cissoko", "v2exfemhog_31d"] = 0
+    tb.loc[tb["v2exnamhog"] == "Ion Chicu", "v2exfemhog_31d"] = 0
+    tb.loc[tb["v2exnamhog"] == "Joseph Jacques Jean Chrétien", "v2exfemhog_31d"] = 0
+    tb.loc[tb["v2exnamhog"] == "KåreIsaachsen Willoch", "v2exfemhog_31d"] = 0
+    tb.loc[tb["v2exnamhog"] == "YuriiIvanovych Yekhanurov", "v2exfemhog_31d"] = 0
     ## HOS
-    tb.loc[tb["v2exnamhos"] == "Ali Ben Bongo Ondimba", "v2exfemhos"] = 0
-    tb.loc[tb["v2exnamhos"] == "Chulalongkorn (Rama V)", "v2exfemhos"] = 0
-    tb.loc[tb["v2exnamhos"] == "Dieudonné François Joseph Marie Reste", "v2exfemhos"] = 0
-    tb.loc[tb["v2exnamhos"] == "Letsie III", "v2exfemhos"] = 0
-    tb.loc[tb["v2exnamhos"] == 'Miguel I "o Rei Absoluto"', "v2exfemhos"] = 0
-    tb.loc[tb["v2exnamhos"] == "Moshoeshoe II", "v2exfemhos"] = 0
-    tb.loc[tb["v2exnamhos"] == "Prince Zaifeng", "v2exfemhos"] = 0
-    tb.loc[tb["v2exnamhos"] == "Rajkeswur Purryag", "v2exfemhos"] = 0
-    tb.loc[tb["v2exnamhos"] == "Shimon Peres", "v2exfemhos"] = 0
+    tb["v2exfemhos_31d"] = tb["v2exfemhos"].copy()
+    tb.loc[tb["v2exnamhos"] == "Ali Ben Bongo Ondimba", "v2exfemhos_31d"] = 0
+    tb.loc[tb["v2exnamhos"] == "Chulalongkorn (Rama V)", "v2exfemhos_31d"] = 0
+    tb.loc[tb["v2exnamhos"] == "Dieudonné François Joseph Marie Reste", "v2exfemhos_31d"] = 0
+    tb.loc[tb["v2exnamhos"] == "Letsie III", "v2exfemhos_31d"] = 0
+    tb.loc[tb["v2exnamhos"] == 'Miguel I "o Rei Absoluto"', "v2exfemhos_31d"] = 0
+    tb.loc[tb["v2exnamhos"] == "Moshoeshoe II", "v2exfemhos_31d"] = 0
+    tb.loc[tb["v2exnamhos"] == "Prince Zaifeng", "v2exfemhos_31d"] = 0
+    tb.loc[tb["v2exnamhos"] == "Rajkeswur Purryag", "v2exfemhos_31d"] = 0
+    tb.loc[tb["v2exnamhos"] == "Shimon Peres", "v2exfemhos_31d"] = 0
 
     return tb
 
@@ -966,8 +971,8 @@ def rename_columns(tb: Table) -> Table:
             "v2x_genpp_codehigh": "wom_pol_par_vdem_high",
             "v2x_genpp_codelow": "wom_pol_par_vdem_low",
             "v2lgfemleg": "wom_parl_vdem",
-            "v2exfemhos": "wom_hos_vdem",
-            "v2exfemhog": "wom_hog_vdem",
+            "v2exfemhos_31d": "wom_hos_vdem",
+            "v2exfemhog_31d": "wom_hog_vdem",
             "v2clsocgrp": "socgr_civ_libs_vdem",
             "v2clsocgrp_codehigh": "socgr_civ_libs_vdem_high",
             "v2clsocgrp_codelow": "socgr_civ_libs_vdem_low",
@@ -1050,17 +1055,25 @@ def standardise_country_names(tb: Table) -> Table:
 
 def estimate_gender_hoe_indicator(tb: Table) -> Table:
     """Create variable identifying gender of chief executive."""
-    tb["wom_hoe_vdem"] = np.nan
-    # If head of state is more powerful than head of government, and head of state is the head of the executive, then update wom_hoe_vdem accordingly
-    tb.loc[(tb["v2ex_hosw"] <= 1) & (tb["v2ex_hosw"] > 0.5) & (tb["wom_hos_vdem"].notna()), "wom_hoe_vdem"] = tb[
-        "wom_hos_vdem"
-    ]
-    # Update wom_hoe_vdem based on the power of head of state relative to head of government
-    tb.loc[(tb["v2ex_hosw"] <= 0.5) & (tb["wom_hog_vdem"].notna()), "wom_hoe_vdem"] = tb["wom_hog_vdem"]
-    # If head of state is also head of government, they are the head of the executive.
-    tb.loc[(tb["v2exhoshog"] == 1) & (tb["wom_hos_vdem"].notna()), "wom_hoe_vdem"] = tb["wom_hos_vdem"]
-    # If head of government is less powerful than head of state, head of state must be more powerful than head of government.
-    tb.loc[(tb["v2ex_hogw"] == 0) & (tb["wom_hos_vdem"].notna()), "wom_hoe_vdem"] = tb["wom_hos_vdem"]
+
+    def _estimate_indicator(tb, column_name, hos_col, hog_col):
+        tb[column_name] = np.nan
+        # If head of state is more powerful than head of government, and head of state is the head of the executive, then update `column_name` accordingly
+        tb.loc[(tb["v2ex_hosw"] <= 1) & (tb["v2ex_hosw"] > 0.5) & (tb[hos_col].notna()), column_name] = tb[hos_col]
+        # Update `column_name` based on the power of head of state relative to head of government
+        tb.loc[(tb["v2ex_hosw"] <= 0.5) & (tb[hog_col].notna()), column_name] = tb[hog_col]
+        # If head of state is also head of government, they are the head of the executive.
+        tb.loc[(tb["v2exhoshog"] == 1) & (tb[hos_col].notna()), column_name] = tb[hos_col]
+        # If head of government is less powerful than head of state, head of state must be more powerful than head of government.
+        tb.loc[(tb["v2ex_hogw"] == 0) & (tb[hos_col].notna()), column_name] = tb[hos_col]
+
+        return tb
+
+    # 1/ Gender of HOE by 31st December (then use corrected versions of gender flags)
+    tb = _estimate_indicator(tb, "wom_hoe_vdem", "wom_hos_vdem", "wom_hog_vdem")
+
+    # 2/ Was HOE female anytime of the year? (then use the original gender flags by V-Dem)
+    tb = _estimate_indicator(tb, "v2exfemhoe", "v2exfemhos", "v2exfemhog")
 
     # Drop columns
     tb = tb.drop(
@@ -1073,16 +1086,16 @@ def estimate_gender_hoe_indicator(tb: Table) -> Table:
 
 
 def estimate_hoe_ever_female(tb):
-    tb["wom_hoe_ever"] = tb["wom_hoe_vdem"].fillna(0.5)
-    tb["wom_hoe_ever"] = tb.groupby("country")["wom_hoe_ever"].cummax()
-    tb["wom_hoe_ever"] = tb["wom_hoe_ever"].replace(0.5, np.nan).astype("Int64")
+    tb["wom_hoe_ever"] = tb["v2exfemhoe"].fillna(0.5)
+    tb["wom_hoe_ever"] = tb.groupby("country")["v2exfemhoe"].cummax()
+    tb["wom_hoe_ever"] = tb["v2exfemhoe"].replace(0.5, np.nan).astype("Int64")
 
-    # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `wom_hoe_ever`
+    # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `v2exfemhoe`
     # Create masks for the conditions
     regime_is_democratic = tb["regime_row_owid"].isin([2, 3])  # Democratic regimes
     regime_is_not_democratic = tb["regime_row_owid"].isin([0, 1])  # Democratic regimes
-    mask_both_1 = (tb["wom_hoe_vdem"] == 1) & regime_is_democratic
-    mask_both_0 = regime_is_not_democratic | (tb["wom_hoe_ever"] == 0)
+    mask_both_1 = (tb["v2exfemhoe"] == 1) & regime_is_democratic
+    mask_both_0 = regime_is_not_democratic | (tb["v2exfemhoe"] == 0)
 
     # Initialize with NaN
     tb["wom_hoe_ever_dem"] = np.nan
