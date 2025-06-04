@@ -383,6 +383,3 @@ def estimate_share_countries(tb: Table, num_countries) -> Table:
     tb_share["share_countries_wom_hoe_ever_demelect"] /= num_countries * 0.01
 
     return tb_share
-
-
-# %%
