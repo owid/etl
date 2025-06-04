@@ -1,5 +1,6 @@
 """Load snapshot and create a garden dataset."""
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
@@ -12,6 +13,10 @@ def run(dest_dir: str) -> None:
     #
     snap = paths.load_snapshot()
     tb = snap.read(safe_types=False).set_index(["country", "year"])
+    # Harmonize country names.
+    tb = geo.harmonize_countries(
+        tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
+    )
 
     #
     # Save outputs.
