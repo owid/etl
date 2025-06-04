@@ -1087,8 +1087,8 @@ def estimate_gender_hoe_indicator(tb: Table) -> Table:
 
 def estimate_hoe_ever_female(tb):
     tb["wom_hoe_ever"] = tb["v2exfemhoe"].fillna(0.5)
-    tb["wom_hoe_ever"] = tb.groupby("country")["v2exfemhoe"].cummax()
-    tb["wom_hoe_ever"] = tb["v2exfemhoe"].replace(0.5, np.nan).astype("Int64")
+    tb["wom_hoe_ever"] = tb.groupby("country")["wom_hoe_ever"].cummax()
+    tb["wom_hoe_ever"] = tb["wom_hoe_ever"].replace(0.5, np.nan).astype("Int64")
 
     # Estimate if a country ever had a female HOE democratically elected: `regime_row_owid` is democracy AND `v2exfemhoe`
     # Create masks for the conditions
