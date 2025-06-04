@@ -20,6 +20,17 @@ definitions:
 
     We have also obtained [Our World in Data regional aggregations](https://ourworldindata.org/world-region-map-definitions) of these indicators by calculating a population-weighted average by region. You can see more information about the population data in [this dedicated article about sources](https://ourworldindata.org/population-sources).
 
+  desc_key_ger: &desc_key_ger
+    - Not all students enroll in school at the same age. This indicator shows how many students are attending a certain level of education, regardless of whether they are considered to be within the expected age range for that level.
+    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
+    - For example, if upper secondary school is designed for ages 15 to 17, the gross enrolment ratio compares total enrolment at that level to the population of 15- to 17-year-olds.
+    - A high value means many people are accessing education at that level, but it doesn’t necessarily mean that they are in the appropriate grade for their age.
+    - The gross enrolment ratio includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
+    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by UN or national sources.
+    - A gross enrolment ratio close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
+    - This indicator is best understood when used together with the net enrolment rate, which focuses on age-appropriate participation.
+    - One limitation is that the gross enrolment ratio can exceed 100%, which may require further data to understand the reasons — such as whether students are repeating grades or starting school late.
+
   description_short_clean_fuels: &description_short_clean_fuels |-
     Access to [clean fuels or technologies](#dod:clean-cooking-fuels) such as natural gas, electricity, and clean cookstoves reduces exposure to indoor air pollutants, a leading cause of death in low-income households.
   description_from_producer_clean_fuels: &description_from_producer_clean_fuels |-
@@ -924,3 +935,73 @@ tables:
         presentation:
           topic_tags:
             - Research & Development
+
+      se_pre_enrr:
+        title: Gross enrolment in pre-primary education
+        short_unit: '%'
+        unit: '%'
+        description_short:  Number of children of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment in pre-primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary education
+
+      se_pre_enrr_fe:
+        title: Gross enrolment in pre-primary education among girls
+        short_unit: '%'
+        unit: '%'
+        description_short: Number of girls of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of girls of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment rate in pre-primary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: GnBu
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      se_pre_enrr_ma:
+        title:  Gross enrolment in pre-primary education among boys
+        short_unit: '%'
+        unit: '%'
+        description_short: Number of boys of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of boys of the official pre-primary school age.
+        description_key: *desc_key_ger
+        presentation:
+          title_public: Gross enrolment rate in pre-primary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                baseColorScheme: PuBu
+
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
