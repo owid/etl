@@ -12,6 +12,7 @@ MULTIDIM_CONFIG = {
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
     "addCountryMode": "change-country",
+    "yAxis": {"min": 0, "max": 100},
 }
 
 
@@ -106,6 +107,7 @@ def run() -> None:
         "Net enrolment": "Net enrolment includes only students of official school age.",
         "Gross enrolment": "Gross enrolment includes all students, regardless of age.",
     }
+
     # Add grouped view
     c.group_views(
         groups=[
@@ -151,6 +153,8 @@ def run() -> None:
             ),
         },
     )
+    for view in c.views:
+        edit_indicator_displays(view)
     #
     # Save garden dataset.
     #
@@ -229,3 +233,31 @@ def adjust_dimensions_enrolment(tb):
         )
 
     return tb
+
+
+def edit_indicator_displays(view):
+    """Edit display names for the grouped views."""
+    if view.dimensions["level"] == "level_side_by_side":
+        assert view.indicators.y is not None
+        for indicator in view.indicators.y:
+            if "enrolment_rate__primary" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "Primary",
+                }
+            elif "enrolment_rate__pre_primary" in indicator.catalogPath or "pre_enrr" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "Pre-primary",
+                }
+            elif "lower_secondary" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "Lower secondary",
+                }
+
+            elif "upper_secondary" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "Upper secondary",
+                }
+            elif "tertiary" in indicator.catalogPath:
+                indicator.display = {
+                    "name": "Tertiary",
+                }
