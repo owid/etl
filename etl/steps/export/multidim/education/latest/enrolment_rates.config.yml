@@ -31,5 +31,17 @@ dimensions:
       - slug: tertiary
         name: Tertiary
         description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
+  - slug: sex
+    name: Gender
+    choices:
+      - slug: both
+        name: Both sexes
+      - slug: female
+        name: Female
+      - slug: male
+        name: Male
+      - slug: "sex_side_by_side"
+        name: Female and male
+        description: Compare genders
 
 views: []

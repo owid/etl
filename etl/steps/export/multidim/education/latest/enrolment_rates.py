@@ -10,9 +10,8 @@ MULTIDIM_CONFIG = {
     "hasMapTab": True,
     "tab": "map",
     "originUrl": "ourworldindata.org/education",
-    "minTime": "earliest",
-    "maxTime": "latest",
     "hideAnnotationFieldsInTitle": {"time": True},
+    "addCountryMode": "change-country",
 }
 
 
@@ -98,12 +97,41 @@ def run() -> None:
     )
 
     #
-    # (optional) Edit views
+    # Group by gender and education level.
     #
-    for view in c.views:
-        # if view.dimension["sex"] == "male":
-        #     view.config["title"] = "Something else"
-        pass
+    CHOICES_EDUCATION = c.get_choice_names("level")
+    CHOICES_ENROLMENT_TYPE = c.get_choice_names("enrolment_type")
+    METRIC_SUBTITLES = {
+        "Net enrolment": "Net enrolment includes only students of official school age.",
+        "Gross enrolment": "Gross enrolment includes all students, regardless of age.",
+    }
+    # Add grouped view
+    c.group_views(
+        groups=[
+            {
+                "dimension": "sex",
+                "choice_new_slug": "sex_side_by_side",
+                "choices": ["female", "male"],
+                "view_config": {
+                    "originUrl": "ourworldindata.org/education",
+                    "hideAnnotationFieldsInTitle": {"time": True},
+                    "addCountryMode": "change-country",
+                    "hasMapTab": False,
+                    "tab": "chart",
+                    "selectedFacetStrategy": "entity",
+                    "title": "{metric} rates for {level} education among boys and girls",
+                    "subtitle": "{subtitle}",
+                },
+            },
+        ],
+        params={
+            "level": lambda view: CHOICES_EDUCATION.get(view.dimensions["level"]).lower(),
+            "metric": lambda view: CHOICES_ENROLMENT_TYPE.get(view.dimensions["enrolment_type"]),
+            "subtitle": lambda view: METRIC_SUBTITLES.get(
+                CHOICES_ENROLMENT_TYPE.get(view.dimensions["enrolment_type"])
+            ),
+        },
+    )
 
     #
     # Save garden dataset.
@@ -127,7 +155,7 @@ def adjust_dimensions_enrolment(tb):
         "tertiary": "tertiary",
     }
 
-    sex_keywords = {"both_sexes": "Both", "male": "Male", "female": "Female", "ma": "Male", "fe": "Female"}
+    sex_keywords = {"both_sexes": "both", "male": "male", "female": "female", "ma": "male", "fe": "female"}
 
     # Initialize mappings
     level_mapping = {}
@@ -159,7 +187,7 @@ def adjust_dimensions_enrolment(tb):
             if f"__{key}__" in var or var.endswith(f"_{key}"):
                 sex = val
                 break
-        sex_mapping[var] = sex or "Both"  # fallback for non-disaggregated vars
+        sex_mapping[var] = sex or "both"  # fallback for non-disaggregated vars
 
     for col in tb.columns:
         if col in ["country", "year"]:
