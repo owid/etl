@@ -408,7 +408,7 @@ tables:
           numDecimalPlaces: 1
 
       total_net_enrolment_rate__lower_secondary__adjusted_gender_parity_index__gpia:
-        title: Net enrolment rates in lower secondary education
+        title: Net enrolment rates in lower secondary education, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
