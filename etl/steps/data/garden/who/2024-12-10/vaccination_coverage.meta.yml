@@ -67,7 +67,7 @@ definitions:
     <%- elif antigen == "HEPB3" %>
     three doses of the hepatitis B vaccine
     <%- elif antigen == "HIB3" %>
-    three doses of Haemophilus influenzae type b vaccine
+    three doses of the Haemophilus influenzae type b vaccine
     <%- elif antigen == "HEPB_BD" %>
     a hepatitis B vaccine dose within the first 24 hours of delivery
     <%- elif antigen == "MCV2" %>
