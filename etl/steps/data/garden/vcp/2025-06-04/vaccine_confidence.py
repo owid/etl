@@ -39,6 +39,7 @@ def run() -> None:
     tb = clean_data(tb)
     tb = weighted_mean_by_country(tb)
     tb = convert_to_percentages(tb)  # Convert to percentages
+    tb = combine_strongly_and_tend_to(tb)
     # Improve table format.
     tb = tb.format(["country", "year", "question"], short_name="vaccine_confidence")
 
