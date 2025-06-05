@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: World Health Organization
+    title: Global Health Observatory
+    description: |-
+      The GHO data repository is WHO's gateway to health-related statistics for its 194 Member States. It provides access to over 1000 indicators on priority health topics including mortality and burden of diseases, the Millennium Development Goals (child nutrition, child health, maternal and reproductive health, immunization, HIV/AIDS, tuberculosis, malaria, neglected diseases, water and sanitation), non communicable diseases and risk factors, epidemic-prone diseases, health systems, environmental health, violence and injuries, equity among others.
+    citation_full: |-
+      World Health Organization. 2025. Global Health Observatory data repository. http://www.who.int/gho/en/.
+    attribution: World Health Organization - Global Health Observatory (2025)
+    attribution_short: WHO
+    url_main: https://www.who.int/data/gho
+    date_accessed: '2025-05-19'
+    date_published: '2025-05-19'
+    license:
+      name: CC BY-NC-SA 4.0
+      url: https://www.who.int/about/policies/publishing/copyright
+outs:
+  - md5: 5d6e17f18a79d82363e0facbf2ac588c
+    size: 149764546
+    path: gho.zip
