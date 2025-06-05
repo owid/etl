@@ -6,13 +6,13 @@ definitions:
         - Vaccination
   question: |-
     <% if question == "ImpChildren" %>
-    vaccines are important for children.
+    vaccines are important for children
     <%- elif question == "Effective" %>
-    vaccines are effective.
+    vaccines are effective
     <%- elif question == "Safe" %>
-    vaccines are safe.
+    vaccines are safe
     <%- elif question == "Beliefs" %>
-    vaccines are compatible with my beliefs.
+    vaccines are compatible with my beliefs
     <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
