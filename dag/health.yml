@@ -1304,13 +1304,13 @@ steps:
     - data://meadow/cdc/2025-05-19/tuberculosis
   data://grapher/cdc/2025-05-19/tuberculosis:
     - data://garden/cdc/2025-05-19/tuberculosis
-  
-  #
-  # TODO: add step name (just something recognizable)
-  #
-  data://meadow/vcp/2025-06-04/vaccine_confidence:
-    - snapshot://vcp/2025-06-04/vaccine_confidence.xlsx
-  data://garden/vcp/2025-06-04/vaccine_confidence:
-    - data://meadow/vcp/2025-06-04/vaccine_confidence
-  data://grapher/vcp/2025-06-04/vaccine_confidence:
-    - data://garden/vcp/2025-06-04/vaccine_confidence
+
+  # Global Health Observatory (GHO) from WHO
+  data://meadow/who/2025-05-19/gho:
+    - snapshot://who/2025-05-19/gho.zip
+  data://garden/who/2025-05-19/gho:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-05-19/gho
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2025-05-19/gho:
+    - data://garden/who/2025-05-19/gho
