@@ -33,16 +33,16 @@ Y_AXIS_MIN = 0
 ####################################################################################################
 # WORLD BANK POVERTY AND INEQUALITY PLATFORM
 ####################################################################################################
-SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2024)"
+SOURCE_NAME_PIP = "World Bank Poverty and Inequality Platform (2025)"
 # TODO: Update the PIP versions here
-DATA_PUBLISHED_BY_PIP = "World Bank (2024). Poverty and Inequality Platform (version 20240627_2017 and 20240627_2011) [Data set]. World Bank Group. https://pip.worldbank.org/."
+DATA_PUBLISHED_BY_PIP = "World Bank (2025). Poverty and Inequality Platform (version 20240605_2021 and 20250605_2017) [Data set]. World Bank Group. https://pip.worldbank.org/."
 SOURCE_LINK_PIP = "https://pip.worldbank.org"
 CONSUMPTION_SPELLS_PIP = 7
 INCOME_SPELLS_PIP = 8
 
 # Define PPP versions
 # TODO: Update the PPP versions here
-PPP_VERSIONS_PIP = [2011, 2017]
+PPP_VERSIONS_PIP = [2017, 2021]
 
 # Define old and current PPP version
 PPP_VERSION_OLD_PIP = PPP_VERSIONS_PIP[0]
@@ -51,7 +51,7 @@ PPP_VERSION_CURRENT_PIP = PPP_VERSIONS_PIP[1]
 # Define PPP to use for comparisons with LIS
 # NOTE: Update the PPP version here
 # TODO: Update the PPP version here
-PPP_VERSION_COMPARISON_PIP = PPP_VERSION_CURRENT_PIP
+PPP_VERSION_COMPARISON_PIP = PPP_VERSION_OLD_PIP
 
 
 INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."

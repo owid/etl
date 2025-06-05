@@ -1,5 +1,4 @@
 # NOTE: Update lines in abs_dict if PPPs are updated
-# TODO: Change to 2021 prices
 """
 This file includes functions to get variables metadata in the `world_bank_pip` garden step
 If new poverty lines or indicators are included, they need to be addressed here
@@ -289,22 +288,22 @@ rel_dict = {40: "40% of the median", 50: "50% of the median", 60: "60% of the me
 
 # Details for each absolute poverty line
 abs_dict = {
-    2011: {
+    2017: {
         100: {"title": "$1 a day", "title_between": "$1", "description_key": ""},
-        190: {
-            "title": "$1.90 a day",
-            "title_between": "$1.90",
-            "description_key": "Extreme poverty here is defined as living below the International Poverty Line of $1.90 per day.",
+        215: {
+            "title": "$2.15 a day",
+            "title_between": "$2.15",
+            "description_key": "Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.",
         },
-        320: {
-            "title": "$3.20 a day",
-            "title_between": "$3.20",
-            "description_key": "A poverty line of $3.20 a day represents definitions of national poverty lines in lower-middle-income countries.",
+        365: {
+            "title": "$3.65 a day",
+            "title_between": "$3.65",
+            "description_key": "A poverty line of $3.65 a day represents definitions of national poverty lines in lower-middle-income countries.",
         },
-        550: {
-            "title": "$5.50 a day",
-            "title_between": "$5.50",
-            "description_key": "A poverty line of $5.50 a day represents definitions of national poverty lines in upper-middle-income countries.",
+        685: {
+            "title": "$6.85 a day",
+            "title_between": "$6.85",
+            "description_key": "A poverty line of $6.85 a day represents definitions of national poverty lines in upper-middle-income countries.",
         },
         1000: {
             "title": "$10 a day",
@@ -327,22 +326,22 @@ abs_dict = {
             "description_key": "",
         },
     },
-    2017: {
+    2021: {
         100: {"title": "$1 a day", "title_between": "$1", "description_key": ""},
-        215: {
-            "title": "$2.15 a day",
-            "title_between": "$2.15",
-            "description_key": "Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.",
+        300: {
+            "title": "$3 a day",
+            "title_between": "$3",
+            "description_key": "Extreme poverty here is defined as living below the International Poverty Line of $3 per day.",
         },
-        365: {
-            "title": "$3.65 a day",
-            "title_between": "$3.65",
-            "description_key": "A poverty line of $3.65 a day represents definitions of national poverty lines in lower-middle-income countries.",
+        420: {
+            "title": "$4.20 a day",
+            "title_between": "$4.20",
+            "description_key": "A poverty line of $4.20 a day represents definitions of national poverty lines in lower-middle-income countries.",
         },
-        685: {
-            "title": "$6.85 a day",
-            "title_between": "$6.85",
-            "description_key": "A poverty line of $6.85 a day represents definitions of national poverty lines in upper-middle-income countries.",
+        830: {
+            "title": "$8.30 a day",
+            "title_between": "$8.30",
+            "description_key": "A poverty line of $8.30 a day represents definitions of national poverty lines in upper-middle-income countries.",
         },
         1000: {
             "title": "$10 a day",
