@@ -140,6 +140,7 @@ def poverty_lines_regions():
     between_150_and_175_dollars = list(range(15000, 17500, 10))
     between_175_and_250_dollars = list(range(17500, 25000, 20))
     between_250_and_300_dollars = list(range(25000, 30000, 50))
+    between_300_and_320_dollars = list(range(30000, 32000, 100))
 
     # povlines is all these lists together
     povlines = (
@@ -155,6 +156,7 @@ def poverty_lines_regions():
         + between_150_and_175_dollars
         + between_175_and_250_dollars
         + between_250_and_300_dollars
+        + between_300_and_320_dollars
     )
 
     return povlines
