@@ -62,6 +62,52 @@ class Snapshot:
             raise ValueError(f"Invalid URI: {raw_uri}")
         return cls(snap_uri)
 
+    @classmethod
+    def from_script(cls, script_path: str, filename: Optional[str] = None) -> "Snapshot":
+        """Create a snapshot using the script's location to determine namespace, version, and optionally filename.
+
+        Args:
+            script_path: The __file__ path of the snapshot script.
+            filename: Optional filename for the snapshot. If not provided, will look for a .dvc file
+                     that matches the script name (e.g. unwto_gdp.py -> unwto_gdp.*.dvc).
+
+        Returns:
+            Snapshot object ready for use.
+
+        Usage:
+            # Automatically detect filename from matching .dvc file
+            snap = Snapshot.from_script(__file__)
+
+            # Or specify filename explicitly
+            snap = Snapshot.from_script(__file__, "unwto_gdp.xlsx")
+        """
+        script_file = Path(script_path)
+
+        # Get relative path from snapshots directory
+        relative_path = script_file.relative_to(paths.SNAPSHOTS_DIR)
+
+        # Extract namespace and version from relative path
+        namespace, version, script_name = relative_path.parts
+        script_basename = Path(script_name).stem  # Remove .py extension
+
+        if filename is None:
+            # Look for .dvc file that matches the script name
+            script_dir = script_file.parent
+            dvc_pattern = f"{script_basename}.*.dvc"
+            dvc_files = list(script_dir.glob(dvc_pattern))
+
+            if len(dvc_files) == 0:
+                raise ValueError(f"No .dvc file found matching pattern '{dvc_pattern}' in {script_dir}")
+            elif len(dvc_files) > 1:
+                raise ValueError(
+                    f"Multiple .dvc files found matching pattern '{dvc_pattern}' in {script_dir}: {[f.name for f in dvc_files]}. Please specify filename explicitly."
+                )
+
+            # Use the basename of the .dvc file (without .dvc extension)
+            filename = dvc_files[0].name[:-4]  # Remove .dvc extension
+
+        return cls(f"{namespace}/{version}/{filename}")
+
     @property
     def m(self) -> "SnapshotMeta":
         """Metadata alias to save typing."""

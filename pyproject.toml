@@ -152,6 +152,7 @@ wizard = [
 etl = 'apps.cli:cli'
 etlwiz = 'apps.wizard.cli:cli'
 etlr = 'etl.command:main_cli'
+etls = 'etl.snapshot_command:snapshot_cli'
 etlp = 'apps.pr.cli:cli'
 etl-wizard = 'apps.wizard.cli:cli'
 compare = 'etl.compare:cli'
