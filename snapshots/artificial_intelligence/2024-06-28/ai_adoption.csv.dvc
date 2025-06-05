@@ -21,12 +21,11 @@ meta:
     # Files
     url_main: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
     url_download: https://drive.google.com/uc?export=download&id=1AoGV9m9n7jyco5oWgBkVrJbokxD4KykD
-    date_accessed: 2024-06-28
+    date_accessed: '2024-06-28'
     # License
     license:
       name: CC BY-ND 4.0
       url: https://aiindex.stanford.edu/wp-content/uploads/2024/04/HAI_2024_AI-Index-Report.pdf
-
 outs:
   - md5: 9f87a29dec31a3d417270d6eb7e54584
     size: 463
