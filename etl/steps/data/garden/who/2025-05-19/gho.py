@@ -171,6 +171,12 @@ def run(dest_dir: str) -> None:
 
 def add_region_source_suffix(tb: Table) -> Table:
     """Add region source as suffix to region name, e.g. Africa (WHO)"""
+    # I think drop "WORLDBANKINCOMEGROUP" as we are trying to consistently call them 'High-income countries", "Low-income countries",
+    # so that they work with the fancy new grapher map.
+    tb = tb.copy()
+
+    tb = tb[tb.spatialdimtype != "WORLDBANKINCOMEGROUP"]
+
     for region_source in tb.spatialdimtype.unique():
         match region_source:
             case "COUNTRY" | "GLOBAL":
@@ -181,7 +187,7 @@ def add_region_source_suffix(tb: Table) -> Table:
                 suffix = "WHO"
             case "UNREGION":
                 suffix = "UN"
-            case "WORLDBANKINCOMEGROUP" | "WORLDBANKREGION":
+            case "WORLDBANKREGION":
                 suffix = "WB"
             case "UNSDGREGION":
                 suffix = "UN SDG"
@@ -233,7 +239,7 @@ def drop_excess_region_sources(tb: Table, priority_regions: list[str]) -> Table:
     in the order of preference given in `priority_regions`.
     Keep rows where `region_source` is NaN.
     """
-    regions_tb = tb[~tb.spatialdimtype.isin({"COUNTRY", "GLOBAL", "WORLDBANKINCOMEGROUP", "WHOINCOMEREGION"})]
+    regions_tb = tb[~tb.spatialdimtype.isin({"COUNTRY", "GLOBAL", "WHOINCOMEREGION"})]
 
     if regions_tb.empty:
         # If there are no regions, return the original table
