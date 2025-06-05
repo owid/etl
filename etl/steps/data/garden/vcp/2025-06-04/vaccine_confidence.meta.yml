@@ -1,0 +1,59 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+  question: |-
+    <% if question == "ImpChildren" %>
+    vaccines are important for children.
+    <%- elif question == "Effective" %>
+    vaccines are effective.
+    <%- elif question == "Safe" %>
+    vaccines are safe.
+    <%- elif question == "Beliefs" %>
+    vaccines are compatible with my beliefs.
+    <%- endif %>
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+tables:
+  vaccine_confidence:
+    variables:
+      strongly_agree:
+        title: "Share who strongly agree that {definitions.question}"
+        description_short: "Share of people who strongly agree with the statement that {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      tend_to_agree:
+        title: "Share who tend to agree that {definitions.question}"
+        description_short: "Share of people who strongly agree with the statement that {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      tend_to_disagree:
+        title: "Share who tend to disagree that {definitions.question}"
+        description_short: "Share of people who strongly agree with the statement that {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      strongly_disagree:
+        title: "Share who strongly disagree that {definitions.question}"
+        description_short: "Share of people who strongly agree with the statement that {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+      dont_know__prefer_not_to_say:
+        title: "Share who don't know or prefer not to say whether {definitions.question}"
+        description_short: "Share of people who don't know or prefer not to say whether {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
