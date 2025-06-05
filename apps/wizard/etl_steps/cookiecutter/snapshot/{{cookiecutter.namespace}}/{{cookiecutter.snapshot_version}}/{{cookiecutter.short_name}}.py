@@ -1,35 +1,32 @@
 """Script to create a snapshot of dataset."""
 
-from pathlib import Path
-
-import click
-
 from etl.snapshot import Snapshot
 
-# Version for current snapshot dataset.
-SNAPSHOT_VERSION = Path(__file__).parent.name
-
-@click.command()
-@click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 {% if cookiecutter.dataset_manual_import == True %}
-@click.option("--path-to-file", "-f", prompt=True, type=str, help="Path to local data file.")
-def run(path_to_file: str, upload: bool) -> None:
-    # Initialize a new snapshot.
-    snap = Snapshot(f"{{cookiecutter.namespace}}/{SNAPSHOT_VERSION}/{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}")
+def run(upload: bool = True, path_to_file: str = None) -> None:
+    """Create a new snapshot.
 
-    # Save snapshots.
+    Args:
+        upload: Whether to upload the snapshot to S3.
+        path_to_file: Path to local data file.
+    """
+    # Create a new snapshot using the script's location.
+    snap = Snapshot.from_script(__file__)
+
+    # Save snapshot from local file.
     snap.create_snapshot(filename=path_to_file, upload=upload)
 
 {% else %}
-def run(upload: bool) -> None:
-    # Initialize a new snapshot.
-    snap = Snapshot(f"{{cookiecutter.namespace}}/{SNAPSHOT_VERSION}/{{cookiecutter.short_name}}.{{cookiecutter.file_extension}}")
+def run(upload: bool = True) -> None:
+    """Create a new snapshot.
+
+    Args:
+        upload: Whether to upload the snapshot to S3.
+    """
+    # Create a new snapshot using the script's location.
+    snap = Snapshot.from_script(__file__)
 
     # Save snapshot.
     snap.create_snapshot(upload=upload)
 
 {% endif -%}
-
-
-if __name__ == "__main__":
-    run()

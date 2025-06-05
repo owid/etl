@@ -413,6 +413,7 @@ class SnapshotForm(StepForm):
     file_extension: str
     is_private: bool
     dataset_manual_import: bool
+    dvc_only: bool = False
 
     # origin
     title: str
@@ -439,6 +440,7 @@ class SnapshotForm(StepForm):
         data["license_url"] = data["origin.license.url"]
         data["origin_version"] = data["origin.version_producer"]
         data["dataset_manual_import"] = data["local_import"]
+        data["dvc_only"] = data.get("dvc_only", False)
 
         # Handle license
         data["license_name"] = data["origin.license.name"]
