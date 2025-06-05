@@ -116,7 +116,7 @@ tables:
         title: |-
           {definitions.metric_title} - sex: << sex >> - age: << age >>
         description_short: |-
-          {definitions.metric} {definitions.sex} {definitions.age}.
+          {definitions.metric}{definitions.sex}{definitions.age}.
         presentation:
           title_public: |-
             {definitions.metric_title} {definitions.sex} {definitions.age}
