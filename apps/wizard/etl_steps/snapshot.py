@@ -13,7 +13,7 @@ from apps.wizard.etl_steps.forms import SnapshotForm
 from apps.wizard.etl_steps.utils import COOKIE_SNAPSHOT, MD_SNAPSHOT, SCHEMA_ORIGIN
 from apps.wizard.utils.components import preview_file, st_wizard_page_link
 from etl.docs import examples_to_markdown, faqs_to_markdown, guidelines_to_markdown
-from etl.paths import BASE_DIR, SNAPSHOTS_DIR
+from etl.paths import SNAPSHOTS_DIR
 
 #########################################################
 # CONSTANTS #############################################
@@ -416,9 +416,9 @@ if submitted:
         meta_path = (
             SNAPSHOTS_DIR / form.namespace / form.snapshot_version / f"{form.short_name}.{form.file_extension}.dvc"
         )
-        
+
         # If DVC-only mode is enabled, remove the generated Python script
-        if getattr(form, 'dvc_only', False):
+        if getattr(form, "dvc_only", False):
             if ingest_path.exists():
                 ingest_path.unlink()
 
@@ -437,8 +437,10 @@ if submitted:
         with st.expander("⏭️ **Next steps**", expanded=True):
             # 1/ Verification
             st.markdown("#### 1. Verification")
-            if getattr(form, 'dvc_only', False):
-                st.markdown("Verify that the generated .dvc metadata file is correct and update it if necessary. No Python script was created since you selected DVC-only mode.")
+            if getattr(form, "dvc_only", False):
+                st.markdown(
+                    "Verify that the generated .dvc metadata file is correct and update it if necessary. No Python script was created since you selected DVC-only mode."
+                )
             else:
                 st.markdown("Verify that generated files are correct and update them if necessary.")
             # 2/ Run snapshot step
@@ -454,14 +456,14 @@ if submitted:
                 snapshot_path = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
                 command = f"etls {snapshot_path}"
                 if manual_import_instructions:
-                    command += f" --path-to-file **relative_path_of_file**"
+                    command += " --path-to-file **relative_path_of_file**"
             else:
                 # DVC-only mode - use etls with just the identifier
                 snapshot_path = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
                 command = f"etls {snapshot_path}"
                 if manual_import_instructions:
-                    command += f" --path-to-file **relative_path_of_file**"
-            
+                    command += " --path-to-file **relative_path_of_file**"
+
             st.markdown(
                 f"""
             You can also run the step from the command line:
@@ -492,7 +494,7 @@ if submitted:
 if st.session_state["run_step"]:
     # Get form
     form = cast(SnapshotForm, SnapshotForm.from_state())
-    
+
     # Build command using new etls command
     snapshot_identifier = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
     commands = ["uv", "run", "etls", snapshot_identifier]
