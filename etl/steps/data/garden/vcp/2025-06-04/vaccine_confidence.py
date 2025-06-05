@@ -52,6 +52,23 @@ def run() -> None:
     ds_garden.save()
 
 
+def combine_strongly_and_tend_to(tb: Table) -> Table:
+    """
+    Combine the 'strongly agree' and 'tend to agree' columns into a single 'agree' column.
+    Combine the 'strongly disagree' and 'tend to disagree' columns into a single 'disagree' column.
+
+    Args:
+        tb: Table with vaccine confidence data
+
+    Returns:
+        Table with combined agree/disagree columns
+    """
+    tb["agree"] = tb["strongly_agree"] + tb["tend_to_agree"]
+    tb["disagree"] = tb["strongly_disagree"] + tb["tend_to_disagree"]
+
+    return tb
+
+
 def convert_to_percentages(tb: Table) -> Table:
     """
     Convert proportions to percentages by multiplying all value columns by 100.

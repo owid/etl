@@ -36,6 +36,22 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+      agree:
+        title: "Share who agree that {definitions.question}"
+        description_short: "Share of people who strongly or tend to agree with the statement that {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: To calculate this value, we sum the shares of people who strongly agree and those who tend to agree with the statement that {definitions.question}.
+      disagree:
+        title: "Share who disagree that {definitions.question}"
+        description_short: "Share of people who strongly or tend to disagree with the statement that {definitions.question}."
+        unit: "%"
+        short_unit: "%"
+        display:
+          numDecimalPlaces: 1
+        description_processing: To calculate this value, we sum the shares of people who strongly disagree and those who tend to disagree with the statement that {definitions.question}.
       tend_to_disagree:
         title: "Share who tend to disagree that {definitions.question}"
         description_short: "Share of people who strongly agree with the statement that {definitions.question}."
