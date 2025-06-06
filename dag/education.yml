@@ -156,3 +156,8 @@ steps:
   data://grapher/education/2025-06-10/literacy_1900_1950:
     - data://garden/education/2025-06-10/literacy_1900_1950
 
+
+export://multidim/education/latest/expected_years_of_schooling:
+  - data://grapher/un/2025-05-07/undp_hdr
+  - data://grapher/unesco/2025-05-01/education_opri
+  - data://grapher/wb/2024-06-10/gender_statistics

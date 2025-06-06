@@ -221,7 +221,7 @@ tables:
           numDecimalPlaces: 1
 
       school_life_expectancy__primary__adjusted_gender_parity_index__gpia:
-        title: School life expectancy in primary education
+        title: School life expectancy in primary education, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equality in the expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
