@@ -23,22 +23,23 @@ def run() -> None:
     config = paths.load_collection_config()
 
     # Load datasets
-    ds_undp = paths.load_dataset("undp_hdr_sex")
+    ds_undp = paths.load_dataset("undp_hdr")
+
     tb_undp = ds_undp.read("undp_hdr_sex")
-    
+
     ds_opri = paths.load_dataset("education_opri")
     tb_opri = ds_opri.read("education_opri")
-    
+
     ds_gender_stats = paths.load_dataset("gender_statistics")
     tb_gender_stats = ds_gender_stats.read("gender_statistics")
 
     # UNDP expected years of schooling columns
     cols_undp = [
         "eys__sex_total",
-        "eys__sex_female", 
+        "eys__sex_female",
         "eys__sex_male",
         "mys__sex_female",
-        "mys__sex_male", 
+        "mys__sex_male",
         "mys__sex_total",
     ]
 
@@ -69,14 +70,14 @@ def run() -> None:
     tb_undp = tb_undp[["country", "year"] + cols_undp]
     tb_opri = tb_opri[["country", "year"] + cols_opri]
     tb_gender_stats = tb_gender_stats[["country", "year"] + cols_gender_stats]
-    
+
     #
     # Adjust dimensions
     #
     tb_undp = adjust_dimensions_schooling(tb_undp)
     tb_opri = adjust_dimensions_schooling(tb_opri)
     tb_gender_stats = adjust_dimensions_schooling(tb_gender_stats)
-    
+
     #
     # Create collection object
     #
@@ -101,7 +102,7 @@ def run() -> None:
     CHOICES_EDUCATION = c.get_choice_names("level")
     CHOICES_METRIC_TYPE = c.get_choice_names("metric_type")
     CHOICES_SEX = c.get_choice_names("sex")
-    
+
     METRIC_SUBTITLES_ALL_GENDERS = {
         "Expected years of schooling": "Expected years of schooling is the number of years a person is expected to spend in school or university, including years spent on repetition.",
         "Average years of schooling": "Average years of schooling is the average number of completed years of education of a population.",
@@ -153,10 +154,10 @@ def run() -> None:
             ),
         },
     )
-    
+
     for view in c.views:
         edit_indicator_displays(view)
-    
+
     #
     # Save garden dataset.
     #
@@ -171,23 +172,23 @@ def adjust_dimensions_schooling(tb):
     # Helper maps for pattern matching
     level_keywords = {
         "pre_primary": "preprimary",
-        "primary": "primary", 
+        "primary": "primary",
         "secondary": "secondary",
         "tertiary": "tertiary",
     }
 
     sex_keywords = {
         "both_sexes": "both",
-        "total": "both", 
+        "total": "both",
         "male": "boys",
         "female": "girls",
-        "ma": "boys", 
-        "fe": "girls"
+        "ma": "boys",
+        "fe": "girls",
     }
 
     metric_keywords = {
         "eys": "expected_years_schooling",
-        "mys": "average_years_schooling", 
+        "mys": "average_years_schooling",
         "school_life_expectancy": "school_life_expectancy",
         "hd_hci_lays": "average_years_schooling",
     }
@@ -266,7 +267,7 @@ def edit_indicator_displays(view):
                 }
             elif "secondary" in indicator.catalogPath:
                 indicator.display = {
-                    "name": "Secondary", 
+                    "name": "Secondary",
                 }
             elif "tertiary" in indicator.catalogPath:
                 indicator.display = {
