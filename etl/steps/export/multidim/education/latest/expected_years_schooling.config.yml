@@ -2,7 +2,11 @@ title:
   title: Expected years of schooling
   title_variant: by level of education and gender
 default_selection:
-  - World
+  - United States
+  - China
+  - India
+  - Brazil
+  - Chad
 dimensions:
   - slug: metric_type
     name: Metric
@@ -20,7 +24,7 @@ dimensions:
     name: Education level
     choices:
       - slug: all
-        name: All levels
+        name: Total
         description: Total years across all education levels.
       - slug: preprimary
         name: Pre-primary
@@ -35,7 +39,7 @@ dimensions:
         name: Tertiary
         description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
       - slug: level_side_by_side
-        name: All levels side by side
+        name: All levels
         description: Compare expected years across all education levels.
 
   - slug: sex

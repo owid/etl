@@ -129,12 +129,14 @@ def run() -> None:
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
+                "choices": {"preprimary", "primary", "secondary", "tertiary"},
                 "view_config": {
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "change-country",
                     "hasMapTab": False,
                     "tab": "chart",
+                    "chartTypes": ["StackedArea"],
                     "selectedFacetStrategy": "entity",
                     "title": "{metric} among {sex} for all education levels",
                 },
@@ -262,11 +264,11 @@ def edit_indicator_displays(view):
     if view.dimensions["level"] == "level_side_by_side":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
-            if "primary" in indicator.catalogPath:
+            if "expectancy__primary" in indicator.catalogPath:
                 indicator.display = {
                     "name": "Primary",
                 }
-            elif "pre_primary" in indicator.catalogPath:
+            elif "expectancy__pre_primary" in indicator.catalogPath:
                 indicator.display = {
                     "name": "Pre-primary",
                 }
