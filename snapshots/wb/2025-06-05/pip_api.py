@@ -22,10 +22,10 @@ To run this code from scratch,
     - (If needed) Delete the files in R2:
         rclone delete r2:owid-private/cache/ --fast-list --transfers 32 --checkers 32 --verbose
     - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`.
-        - Check the list of countries without percentile data. It will show up as a list in the output (These countries are available in a common query but not in the percentile file:)
+        - Check the list of countries without percentile data. It will show up as a list in the output (_These countries are available in a common query but not in the percentile file:_)
         - Open
             https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=150&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
-            https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=300&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
+            https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=320&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
