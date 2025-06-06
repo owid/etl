@@ -13,9 +13,9 @@ dimensions:
       - slug: average_years_schooling
         name: Average years of schooling
         description: The average number of completed years of education of a population.
-      - slug: school_life_expectancy
-        name: School life expectancy
-        description: The total number of years of schooling from primary to tertiary that a child can expect to receive.
+      - slug: learning_adjusted_years_schooling
+        name: Learning adjusted years of schooling
+        description: Learning-adjusted years of schooling is the expected years of schooling adjusted for quality of learning.
   - slug: level
     name: Education level
     choices:
@@ -35,7 +35,7 @@ dimensions:
         name: Tertiary
         description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
       - slug: level_side_by_side
-        name: All levels
+        name: All levels side by side
         description: Compare expected years across all education levels.
 
   - slug: sex
