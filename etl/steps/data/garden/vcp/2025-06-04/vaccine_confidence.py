@@ -107,7 +107,8 @@ def clean_data(tb: Table) -> Table:
     ]
     tb["sum_values"] = tb[value_columns].sum(axis=1)
     # remove rows where the sum is not equal to 1 +/- 1%
-    tb = tb[(tb["sum_values"] >= 0.99) & tb["sum_values"] <= 1.01]  # Allow for minor floating point errors
+    msk = (tb["sum_values"] > 0.99) & (tb["sum_values"] < 1.01)
+    tb = tb[msk]
 
     return tb.drop(columns=["sum_values"])
 
