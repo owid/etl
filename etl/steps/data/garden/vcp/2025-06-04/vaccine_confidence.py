@@ -2,12 +2,14 @@
 
 from owid.catalog import Table
 from owid.catalog import processing as pr
+from structlog import get_logger
 
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+logging = get_logger()
 
 
 def run() -> None:
@@ -106,10 +108,13 @@ def clean_data(tb: Table) -> Table:
         "dont_know__prefer_not_to_say",
     ]
     tb["sum_values"] = tb[value_columns].sum(axis=1)
+    nrows_before = tb.shape[0]
     # remove rows where the sum is not equal to 1 +/- 1%
     msk = (tb["sum_values"] > 0.99) & (tb["sum_values"] < 1.01)
     tb = tb[msk]
+    nrows_after = tb.shape[0]
 
+    logging.info(f"Removed {nrows_before - nrows_after} rows where the sum of values was not equal to 1 +/- 1%.")
     return tb.drop(columns=["sum_values"])
 
 
