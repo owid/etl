@@ -51,41 +51,77 @@ definitions:
     <%- elif antigen == "MENA_C" %>
     one-year-olds
     <%- endif %>
+  antigen_title: |-
+    <% if antigen == "BCG" %>
+    a tuberculosis vaccine
+    <%- elif antigen == "DTPCV1" %>
+    one dose of the diphtheria, tetanus and pertussis vaccine
+    <%- elif antigen == "DTPCV3" %>
+    three doses of the diphtheria, tetanus and pertussis vaccine
+    <%- elif antigen == "MCV1" %>
+    their first dose of the measles vaccine
+    <%- elif antigen == "POL3" %>
+    their third dose of the polio vaccine
+    <%- elif antigen == "RCV1" %>
+    one dose of the rubella vaccine
+    <%- elif antigen == "HEPB3" %>
+    three doses of the hepatitis B vaccine
+    <%- elif antigen == "HIB3" %>
+    three doses of the Haemophilus influenzae type b vaccine
+    <%- elif antigen == "HEPB_BD" %>
+    a hepatitis B vaccine dose within the first 24 hours of delivery
+    <%- elif antigen == "MCV2" %>
+    two doses of the measles vaccine
+    <%- elif antigen == "ROTAC" %>
+    their final dose of the rotavirus vaccine
+    <%- elif antigen == "PCV3" %>
+    their third dose of the pneumococcal conjugate vaccine
+    <%- elif antigen == "IPV1" %>
+    their first dose of the inactivated polio vaccine
+    <%- elif antigen == "IPV2" %>
+    their second dose of the inactivated polio vaccine
+    <%- elif antigen == "YFV" %>
+    one dose of the yellow fever vaccine
+    <%- elif antigen == "MCV2X2" %>
+    their second dose of the measles vaccine
+    <%- elif antigen == "MENA_C" %>
+    their last dose of the meningococcal A vaccine
+    <%- endif %>
   antigen_description: |-
     <% if antigen == "BCG" %>
-    one dose of the Bacille Calmette-Guérin (BCG) vaccine
+    one dose of the [tuberculosis (BCG) vaccine](#dod:bcg-vaccine)
     <%- elif antigen == "DTPCV1" %>
-    one dose of combined diphtheria, tetanus toxoid and pertussis-containing vaccine (DTP1)
+    one dose of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "DTPCV3" %>
-    three doses of combined diphtheria, tetanus toxoid and pertussis-containing vaccine (DTP3)
+    three doses of the combined diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "MCV1" %>
-    their first dose of measles-containing vaccine (MCV1)
+    their first dose of the measles vaccine
     <%- elif antigen == "POL3" %>
-    their third dose of either oral or inactivated polio vaccine (POL3)
+    their third dose of either the oral or inactivated polio vaccine
     <%- elif antigen == "RCV1" %>
-    one dose of rubella-containing vaccine (RCV1)
+    one dose of rubella vaccine
     <%- elif antigen == "HEPB3" %>
-    three doses of Hepatitis B containing vaccine (HEPB3)
+    three doses of the hepatitis B vaccine
     <%- elif antigen == "HIB3" %>
-    three doses of Haemophilus influenzae type b containing vaccine (HIB3)
+    three doses of Haemophilus influenzae type b vaccine
     <%- elif antigen == "HEPB_BD" %>
-    a hepatitis B vaccine dose within the first 24 hours of delivery (HEPB_BD)
+    a hepatitis B vaccine dose within the first 24 hours of delivery
     <%- elif antigen == "MCV2" %>
-    two doses of measles-containing vaccine as per the national schedule (MCV2)
+    two doses of the measles vaccine
     <%- elif antigen == "ROTAC" %>
-    their final recommended dose (2nd or 3rd) of rotavirus vaccine (ROTAC)
+    their final recommended dose (2nd or 3rd) of the rotavirus vaccine
     <%- elif antigen == "PCV3" %>
-    their pneumococcal conjugate vaccine 3rd dose (PCV3)
+    their third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
-    their first dose of inactivated polio containing vaccine (IPV1)
+    their first dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
-    their second dose of inactivated polio containing vaccine (IPV2)
+    their second dose of the inactivated polio vaccine
     <%- elif antigen == "YFV" %>
-    one dose of yellow fever vaccine (YFV)
+    one dose of the yellow fever vaccine (YFV)
     <%- elif antigen == "MCV2X2" %>
-    their second dose measles-containing vaccine (MCV2X2)
+    their second dose of the measles vaccine (MCV2X2)
     <%- elif antigen == "MENA_C" %>
-    their last dose of meningococcal A conjugate vaccine (MENA_C)
+    their last dose of the meningococcal A conjugate vaccine
     <%- endif %>
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
@@ -108,7 +144,7 @@ tables:
   vaccination_coverage:
     variables:
       coverage:
-        title: Share of {definitions.antigen_age_group} who have received {definitions.antigen_description}
+        title: Share of {definitions.antigen_age_group} who have received {definitions.antigen_title}
         description_short: The percentage of {definitions.antigen_age_group} who have received {definitions.antigen_description} in a given year.
         description_key:
           - "{definitions.description_key_standard_one}"
@@ -132,8 +168,8 @@ tables:
                   - 80
                   - 100
       vaccinated:
-        title: Number of {definitions.antigen_age_group} vaccinated with {definitions.antigen_description}
-        description_short: The number of {definitions.antigen_age_group} who recieved {definitions.antigen_description} in a given year.
+        title: Number of {definitions.antigen_age_group} vaccinated with {definitions.antigen_title}
+        description_short: The number of {definitions.antigen_age_group} who received {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
         description_key:
@@ -144,8 +180,8 @@ tables:
         display:
           numDecimalPlaces: 0
       unvaccinated:
-        title: Number of {definitions.antigen_age_group} who have not received {definitions.antigen_description}
-        description_short: The number of {definitions.antigen_age_group}who have not received {definitions.antigen_description} in a given year.
+        title: Number of {definitions.antigen_age_group} who have not received {definitions.antigen_title}
+        description_short: The number of {definitions.antigen_age_group} who have not received {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
         description_key:
