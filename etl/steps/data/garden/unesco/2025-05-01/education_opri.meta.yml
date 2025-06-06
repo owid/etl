@@ -573,7 +573,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -619,7 +619,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -642,7 +642,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -688,7 +688,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -711,7 +711,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -757,7 +757,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -781,7 +781,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -827,7 +827,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -850,7 +850,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -896,7 +896,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -919,7 +919,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -942,7 +942,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+                baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
