@@ -34,11 +34,13 @@ MC_API_TOKEN = os.getenv("MC_API_TOKEN")
 NYT_API_TOKEN = os.getenv("NYT_API_TOKEN")
 
 YEAR = 2023
+TODAY_STR = dt.date.today().strftime("%Y_%m_%d")
+SAVE_TOKEN = f"{TODAY_STR}_multiple_mentions"
 
 CAUSES_OF_DEATH_PATH = f"/Users/tunaacisu/Data/Media Deaths/Underlying Cause of Death_{YEAR}.csv"
 EXTERNAL_CAUSES_PATH = f"/Users/tunaacisu/Data/Media Deaths/Underlying Cause of Death_{YEAR}_external_factors.csv"
 
-MEDIA_MENTIONS_PATH = f"/Users/tunaacisu/Data/Media Deaths/media_mentions_{YEAR}.csv"
+MEDIA_MENTIONS_PATH = f"/Users/tunaacisu/Data/Media Deaths/media_mentions_{YEAR}_{SAVE_TOKEN}.csv"
 
 NYT_ID = 1
 WAPO_ID = 2
@@ -57,7 +59,7 @@ START_2023 = dt.date(2023, 1, 1)
 END_2023 = dt.date(2023, 12, 31)
 
 QUERIES = create_queries()
-STR_QUERIES = create_full_queries
+STR_QUERIES = create_full_queries()
 
 # Initialize the Media Cloud API client
 search_api = mediacloud.api.SearchApi(MC_API_TOKEN)
@@ -152,7 +154,7 @@ def create_death_df():
     ]
 
     df_causes_of_death = pd.read_csv(CAUSES_OF_DEATH_PATH)
-    for i, row in df_causes_of_death.head(12).iterrows():
+    for _, row in df_causes_of_death.head(12).iterrows():
         cause = row["15 Leading Causes of Death"]
         deaths.append({"cause": CAUSES_MAP[cause], "deaths": row["Deaths"]})
 
@@ -214,7 +216,7 @@ def stories_to_csv(queries: dict, timeout: int = 35, source_ids=[NYT_ID], source
         title = f"stories_{source_name}_{YEAR}"
     for name, query in queries.items():
         stories = query_all_stories(query, source_ids)
-        stories.to_csv(f"/Users/tunaacisu/Data/Media Deaths/{source_name}_articles/{name}_{title}.csv")
+        stories.to_csv(f"/Users/tunaacisu/Data/Media Deaths/{source_name}_articles/{name}_{title}_{SAVE_TOKEN}.csv")
         time.sleep(timeout)  # Sleep to avoid hitting API rate limits
 
 
@@ -289,6 +291,45 @@ def plot_media_deaths(media_deaths_df, columns=None, bar_labels=None, title=None
     plt.show()
 
 
+def test_query_terms(
+    queries: dict,
+    single_terms=True,
+    double_terms=True,
+    source_ids=[NYT_ID],
+    start_date=START_CURR_YEAR,
+    end_date=END_CURR_YEAR,
+):
+    """Test how many results each query term (in single terms) returns and plot the results."""
+    query_counts = []
+    for name, query in queries.items():
+        if single_terms:
+            single_terms = query["single_terms"]
+            for term in single_terms:
+                count = query_results(f'"{term}"', source_ids, start_date=start_date, end_date=end_date)
+                query_counts.append({"cause": name, "query": term, "count": count})
+                print(f"{term}: {count}")
+                # print example stories for the term
+                print_example_stories({name: term}, source_ids=source_ids, n_stories=5)
+        if double_terms:
+            double_terms = query["combinations"]
+            for term in double_terms:
+                count = query_results(f'"{term}"~1000', source_ids, start_date=start_date, end_date=end_date)
+                query_counts.append({"cause": name, "query": term, "count": count})
+                print(f"{term}: {count}")
+                # print example stories for the term
+                print_example_stories({name: term}, source_ids=source_ids, n_stories=5)
+
+    df_counts = pd.DataFrame(query_counts)
+    for cause, c_dict in QUERIES.items():
+        df_s_cause = df_counts[df_counts["cause"].isin(c_dict["combinations"])]
+        ax = df_s_cause.plot(
+            x="query", y="count", kind="bar", title=f"hit counts for terms for {cause}", figsize=(6, 4)
+        )
+        ax.figure.tight_layout()
+        ax.figure.savefig(f"/Users/tunaacisu/Data/Media Deaths/Outputs/{cause}_terms_analysis_combinations.png")
+    return df_counts
+
+
 def get_mentions_from_source(
     source_ids: list,
     source_name: str,
@@ -298,6 +339,7 @@ def get_mentions_from_source(
     end_date=None,
     verbose: bool = False,
     collection_ids=None,
+    incl_health: bool = False,
 ):
     causes_to_exclude = ["war"]
     query_count = []
@@ -311,27 +353,29 @@ def get_mentions_from_source(
             cnt = query_results(
                 query, source_ids, start_date=start_date, end_date=end_date, collection_ids=collection_ids
             )
-            cnt_incl_health = query_results(
-                f"({query}) AND ({HEALTH_QUERY} OR {DEATH_QUERY})",
-                source_ids,
-                start_date=start_date,
-                end_date=end_date,
-                collection_ids=collection_ids,
-            )
+            if incl_health:
+                _ = query_results(
+                    f"({query}) AND ({HEALTH_QUERY} OR {DEATH_QUERY})",
+                    source_ids,
+                    start_date=start_date,
+                    end_date=end_date,
+                    collection_ids=collection_ids,
+                )
         else:
             cnt = query_results(query, source_ids, collection_ids=collection_ids)
-            cnt_incl_health = query_results(
-                f"({query}) AND ({HEALTH_QUERY} OR {DEATH_QUERY})", source_ids, collection_ids=collection_ids
-            )
+            if incl_health:
+                _ = query_results(
+                    f"({query}) AND ({HEALTH_QUERY} OR {DEATH_QUERY})", source_ids, collection_ids=collection_ids
+                )
 
         n_deaths = death_df[death_df["cause"] == name]["deaths"].iloc[0]
         if verbose:
-            print(f"{name}: {cnt}, {cnt_incl_health}")
+            print(f"Q: {query}")
+            print(f"{name}: {cnt}")
         query_count.append(
             {
                 "cause": name,
                 "mentions": cnt,
-                "mentions_incl_health": cnt_incl_health,
                 "deaths": n_deaths,
                 "source": source_name,
             }
@@ -353,7 +397,8 @@ def pivot_media_mentions(media_deaths_df: pd.DataFrame):
 
 
 def run() -> None:
-    use_saved_data = True  # set to True to use saved data, False to query the API
+    use_saved_data = False  # set to True to use saved data, False to query the API
+    find_stories = True  # set to True to find stories, False to skip finding stories
 
     if use_saved_data:
         # Load saved data
@@ -369,7 +414,7 @@ def run() -> None:
     else:
         death_df = create_death_df()
 
-        all_queries = QUERIES
+        all_queries = STR_QUERIES
 
         nyt_mentions = get_mentions_from_source(
             source_ids=[NYT_ID], source_name="The New York Times", queries=all_queries, death_df=death_df, verbose=True
@@ -407,6 +452,16 @@ def run() -> None:
             death_df=death_df,
             verbose=True,
         )
+
+    if find_stories:
+        # Save stories to csv
+        stories_to_csv(QUERIES, source_ids=[NYT_ID], source_name="NYT")
+
+        # Find stories for each source
+        print_example_stories(QUERIES, source_ids=[NYT_ID], n_stories=5)
+        print_example_stories(QUERIES, source_ids=[GUARDIAN_ID], n_stories=5)
+        print_example_stories(QUERIES, source_ids=[WAPO_ID], n_stories=5)
+        print_example_stories(QUERIES, source_ids=[FOX_ID], n_stories=5)
 
     # plot media deaths:
 

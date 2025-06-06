@@ -17,35 +17,43 @@ def create_queries():
             "heart disease",
             "heart attack",
             "cardiac arrest",
-            "myocardial infarction",
-            "coronary artery disease",
-            "arrhythmia",
+            "infarct",
+            "coronary artery disease",  # 8
+            "arrhythmia",  # 13
             "heart failure",
-            "congestive heart failure",
-            "valvular heart disease",
-            "pericarditis",
-            "endocarditis",
-            "cardiomyopathy",
+            "pericarditis",  # 3
+            "endocarditis",  # 2
+            "cardiomyopathy",  # 6
+            "high blood pressure",
+            "hypertension",
+            "heart infection",
+            "cardiolog*",
         ],
         "combinations": [
             "heart disease heart",
             "heart attack heart",
             "heart cardiac",
-            "heart disease heart attack",
-            # "heart infarction", 0 results
-            # "heart coronary artery", 8 results
-            # "heart arrhythmia", 5 results
-            "heart disease heart failure",
-            # "heart endocarditis", 2 results
-            # "heart cardiomyopathy", 4 results
-            # additional terms: cardiac arrest, cardiac without heart
+            "cardiac cardiac",
+            "heart infarct artery",
+            "heart coronary artery",
+            "cardiac coronary artery",
+            "heart arrhythmia",
+            "arrhythmia cardiac",
+            "heart failure heart",
+            "heart failure cardiac",
+            "heart pericarditis",
+            "heart endocarditis",
+            "heart cardiomyopathy",
+            "heart hypotension",
+            "cardiac hypertension",
+            "heart infection heart",
+            "heart cardiolog*",
         ],
         "exclude_terms": [],
     }
     query_cancer_dict = {
         "single_terms": [
             "cancer",
-            "malignant neoplasm",
             "tumor",
             "tumour",
             "carcinoma",
@@ -53,7 +61,6 @@ def create_queries():
             "leukemia",
             "lymphoma",
             "melanoma",
-            "mass lesion",
             "oncology",
             "oncology",
             "chemotherapy",
@@ -70,7 +77,6 @@ def create_queries():
         ],
         "combinations": [
             "cancer cancer",
-            "cancer malignant neoplasm",
             "cancer tumor",
             "cancer tumour",
             "cancer carcinoma",
@@ -78,13 +84,14 @@ def create_queries():
             "cancer leukemia",
             "cancer lymphoma",
             "cancer melanoma",
-            "cancer mass lesion",
             "cancer oncology",
             "cancer chemotherapy",
             "cancer radiation therapy",
             "cancer immunotherapy",
             "cancer targeted therapy",
             "cancer biopsy",
+            "cancer remission",
+            "cancer carcinogen",
         ],
         "exclude_terms": [],
     }
@@ -108,23 +115,24 @@ def create_queries():
             "electrocution",
             "burn injury",
             "drowning",
+            "drowned",
         ],
         "combinations": [
-            "accident accident",
-            "crash accident",
+            "accident accident ",
+            "crash accident ",
+            "crash crash",
             "crash collision",
-            "traffic collision ",
+            "collision collision",
             "car accident car",
             "motorcycle accident motorcycle",
             "hit and run hit",
             "plane crash plane",
             "train accident train",
             "boat accident boat",
-            "workplace accident workplace",
             "falling object",
             "electrocution electric",
-            "burn burn",
-            "drowning drown",
+            "burn burn*",
+            "drowning drown*",
         ],
         "exclude_terms": [],
     }
@@ -132,34 +140,27 @@ def create_queries():
     query_stroke_dict = {
         "single_terms": [
             "stroke",
-            "cerebrovascular disease",
             "brain attack",
             "transient ischemic attack",
-            "cerebral infarction",
             "brain hemorrhage",
-            "subarachnoid hemorrhage",
-            "intracerebral hemorrhage",
-            "cerebral thrombosis",
-            "cerebral embolism",
-            "brain ischemia",
+            "embolism",
+            "ischemia",
             "brain injury",
-            "T.I.A.",
+            "neurology",
         ],
         "combinations": [
             "stroke stroke",
             "stroke cerebrovascular",
             "stroke brain attack",
             "stroke transient ischemic attack",
-            "stroke cerebral infarction",
-            "stroke brain hemorrhage",
-            "cerebral thrombosis brain",
-            "cerebral thrombosis stroke",
-            "cerebral embolism brain",
-            "cerebral embolism stroke",
-            "brain ischemia brain",
-            "brain ischemia stroke",
-            "T.I.A. stroke",
-            "T.I.A. brain",
+            "stroke cerebral",
+            "stroke hemorrhage",
+            "stroke neurolog*" "thrombosis brain",
+            "thrombosis stroke",
+            "embolism brain",
+            "embolism stroke",
+            "brain ischemia",
+            "stroke ischemia",
         ],
         "exclude_terms": [],
     }
@@ -168,6 +169,7 @@ def create_queries():
         "single_terms": [
             "chronic obstructive pulmonary disease",
             "COPD",
+            "C.O.P.D.",
             "chronic bronchitis",
             "emphysema",
             "asthma",
@@ -180,24 +182,58 @@ def create_queries():
         ],
         "combinations": [
             "chronic obstructive pulmonary disease COPD",
+            "chronic obstructive pulmonary disease C.O.P.D.",
+            "chronic obstructive pulmonary disease lung",
+            "chronic obstructive pulmonary disease respiratory",
+            "chronic obstructive pulmonary disease pulmonary",
+            "chronic obstructive pulmonary disease chronic bronchitis",
+            "chronic obstructive pulmonary disease emphysema",
+            "chronic obstructive pulmonary disease asthma",
+            "COPD COPD",
+            "COPD lung",
+            "COPD respiratory",
+            "COPD pulmonary",
             "COPD chronic bronchitis",
-            "COPD COPD" "COPD lung",
-            "COPD respiratory failure",
-            "COPD pulmonary disease",
-            "COPD respiratory illness",
-            "COPD respiratory disease",
-            "COPD respiratory tract infection",
-            "lung emphysema",
+            "COPD emphysema",
+            "COPD asthma",
+            "C.O.P.D. C.O.P.D.",
+            "C.O.P.D. lung",
+            "C.O.P.D. respiratory",
+            "C.O.P.D. pulmonary",
+            "C.O.P.D. chronic bronchitis",
+            "C.O.P.D. emphysema",
+            "C.O.P.D. asthma",
+            "chronic bronchitis bronchitis",
+            "chronic bronchitis lung",
+            "chronic bronchitis respiratory",
+            "chronic bronchitis pulmonary",
+            "chronic bronchitis emphysema",
+            "chronic bronchitis asthma",
+            "emphysema emphysema",
+            "emphysema lung",
+            "emphysema respiratory",
+            "emphysema pulmonary",
+            "emphysema asthma",
+            "asthma asthma",
             "asthma lung",
-            "lung disease pulmonary disease",
-            "respiratory illness respiratory disease",
+            "asthma respiratory",
+            "asthma pulmonary",
+            "respiratory respiratory",
+            "respiratory lung",
+            "respiratory pulmonary",
+            "pulmonary pulmonary",
+            "pulmonary lung",
+            "lung lung",
         ],
         "exclude_terms": [],
     }
 
     query_alzheimers_dict = {
-        "single_terms": ["Alzheimer", "dementia", "Alzheimer's disease"],
-        "combinations": ["Alzheimer Alzheimer", "dementia dementia", "Alzheimer's disease Alzheimer's"],
+        "single_terms": ["Alzheimer", "dementia"],
+        "combinations": [
+            "Alzheimer Alzheimer",
+            "dementia dementia",
+        ],
         "exclude_terms": [],
     }
 
@@ -209,35 +245,55 @@ def create_queries():
             "hyperglycemia hyperglycemia",
             "diabetic diabetic",
             "diabetes insulin",
-            "diabetes hyperglycemia",
             "diabetes diabetic",
-            "insulin hyperglycemia",
             "insulin diabetic",
-            "hyperglycemia diabetic",
         ],
         "exclude_terms": [],
     }
 
     query_kidney_dict = {
-        "single_terms": ["kidney disease", "renal failure", "chronic kidney disease", "nephropathy", "dialysis"],
+        "single_terms": [
+            "kidney disease",
+            "renal disease",
+            "renal failure",
+            "kidney failure",
+            "renal disease",
+            "dialysis",
+            "nephropathy",
+            "nephrolog*",
+        ],
         "combinations": [
             "kidney disease kidney",
             "kidney renal failure",
+            "renal renal",
             "kidney chronic kidney disease",
-            "kidney nephropathy",
             "kidney dialysis",
+            "renal dialysis",
+            "kidney nephrolog*",
         ],
         "exclude_terms": [],
     }
 
     query_liver_dict = {
-        "single_terms": ["liver disease", "cirrhosis", "chronic liver disease", "hepatitis", "liver failure"],
+        "single_terms": [
+            "liver disease",
+            "cirrhosis",
+            "chronic liver disease",
+            "hepatitis",
+            "liver failure",
+            "fatty liver",
+            "steatohepatitis",
+            "hepatolog*",
+        ],
         "combinations": [
             "liver disease liver",
             "liver cirrhosis",
             "liver chronic liver disease",
             "liver hepatitis",
             "liver liver failure",
+            "liver fatty liver",
+            "liver steatohepatitis",
+            "liver hepatolog*",
         ],
         "exclude_terms": [],
     }
@@ -279,19 +335,23 @@ def create_queries():
             "influenza",
             "flu",
             "respiratory infection",
-            "pneumonia",
+            "*pneumonia",
             "lung infection",
-            "bronchopneumonia",
         ],
         "combinations": [
             "influenza flu",
-            "influenza lung" "influenza influenza",
-            "flu flu" "flu lung" "influenza pneumonia",
-            "flu pneumonia",
-            "respiratory infection pneumonia",
-            "flu respiratory" "flu infection" "influenza infection" "lung infection pneumonia",
-            "bronchopneumonia lung",
-            "bronchopneumonia flu" "bronchopneumonia influenza",
+            "influenza lung",
+            "influenza influenza",
+            "influenza respiratory",
+            "influenza *pneumonia",
+            "flu flu",
+            "flu lung",
+            "flu respiratory" "flu *pneumonia",
+            "respiratory infection respiratory",
+            "respiratory infection *pneumonia",
+            "respiratory infection lung",
+            "*pneumonia *pneumonia",
+            "*pneumonia lung",
         ],
         "exclude_terms": [],
     }
@@ -452,16 +512,23 @@ def create_queries():
             "terror network",
         ],
         "combinations": [
-            "terror* terror",
-            "extremism violen*",
+            "terrorist terror*",
+            "terrorism terror*",
+            "extremism violence",
             "extremism kill",
             "extremism terror*",
-            "radicalization violen*",
+            "radicalization violence",
             "radicalization kill",
-            "radicalization terror*" "terror* violen*",
-            "terror* kill",
-            "terror* bomb",
-            "terror* hostage",
+            "radicalization terrorism",
+            "radicalization terrorist",
+            "terrorist violen*",
+            "terrorist kill",
+            "terrorist bomb",
+            "terrorist hostage",
+            "terrorism violen*",
+            "terrorism kill",
+            "terrorism bomb",
+            "terrorism hostage",
         ],
         "excluded_terms": [],
     }
@@ -549,7 +616,7 @@ def create_queries():
     return all_queries
 
 
-def create_query_str(query_dict, add_single_terms=False, proximity=1000):
+def create_query_str(query_dict, proximity=1000):
     """
     Create a query string from a dictionary of queries.
     If add_single_terms is True, single terms will be added to the query.
@@ -561,13 +628,16 @@ def create_query_str(query_dict, add_single_terms=False, proximity=1000):
         query_str += f'"{el}"~{proximity} OR '
     query_str += f'"{comb_ls[-1]}"~{proximity}'
 
-    if add_single_terms:
-        for term in query_dict["single_terms"]:
-            query_str += f' OR "{term}"'
+    query_str = f"({query_str}) AND ("
+
+    for term in query_dict["single_terms"][:-1]:
+        query_str += f'"{term}" OR '
+    query_str += f'"{query_dict["single_terms"][-1]})"'
     return query_str
 
 
 def create_string_queries(dict_queries):
     string_queries = {}
-    for term, query_dict in dict_queries:
+    for term, query_dict in dict_queries.items():
         string_queries[term] = create_query_str(query_dict)
+    return string_queries
