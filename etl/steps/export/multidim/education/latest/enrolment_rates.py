@@ -240,7 +240,10 @@ def edit_indicator_displays(view):
     if view.dimensions["level"] == "level_side_by_side":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
-            if "enrolment_rate__primary" in indicator.catalogPath:
+            if (
+                "enrolment_rate__primary" in indicator.catalogPath
+                or "enrolment_ratio__primary__male" in indicator.catalogPath
+            ):
                 indicator.display = {
                     "name": "Primary",
                 }
