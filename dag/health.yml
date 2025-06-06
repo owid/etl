@@ -1297,6 +1297,7 @@ steps:
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2025-05-19/gho:
     - data://garden/who/2025-05-19/gho
+
   # Tuberculosis burden estimates - WHO
   data://meadow/tuberculosis/2025-06-06/burden_estimates:
     - snapshot://tuberculosis/2025-06-06/burden_estimates.csv
