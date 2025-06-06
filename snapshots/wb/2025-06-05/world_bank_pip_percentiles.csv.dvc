@@ -8,7 +8,7 @@ meta:
       We modified the original files available in [World Bank's Databank](https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles) to include distributions from regions with data available in PIP's API.
     citation_full: |-
       - World Bank (2025). Poverty and Inequality Platform: percentiles [Data set]. World Bank Group. https://pip.worldbank.org/.
-      - World Bank (2025). Poverty and Inequality Platform (version 20250605_2021 and 20250605_2017) [Data set]. World Bank Group. https://pip.worldbank.org/.
+      - World Bank (2025). Poverty and Inequality Platform (version 20250401_2021 and 20250401_2017) [Data set]. World Bank Group. https://pip.worldbank.org/.
     version_producer: Version 12
     url_main: https://datacatalog.worldbank.org/search/dataset/0063646/_poverty_and_inequality_platform_pip_percentiles
     date_accessed: '2025-06-05'
