@@ -5,6 +5,9 @@ definitions:
       topic_tags:
         - Global Education
 
+  # Common color scale values for different types of indicators
+  enrolment_rate_bins: &enrolment_rate_bins [20,40,60,70,80,85,90,95,100]
+
   desc_key_net_enr: &desc_key_net_enr
     - Not all children of the right age are enrolled in the level of education intended for them — the net enrolment rate indicator shows how many are.
     - It captures the percentage of children in the official age group for a specific education level who are enrolled at that same level, such as primary or lower secondary.
@@ -569,8 +572,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -592,8 +595,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -615,8 +618,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -638,8 +641,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -661,8 +664,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -684,8 +687,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -707,8 +710,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -730,8 +733,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -753,8 +756,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -777,8 +780,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -800,8 +803,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -823,8 +826,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -846,8 +849,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -869,8 +872,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -892,8 +895,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -915,8 +918,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -938,8 +941,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -961,8 +964,8 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
-                baseColorScheme: RdPu
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
