@@ -128,3 +128,7 @@ steps:
     - data://grapher/worldbank_wdi/2025-01-24/wdi
     - data://grapher/unesco/2025-05-01/education_opri
 
+export://multidim/education/latest/expected_years_of_schooling:
+  - data://grapher/un/2025-05-07/undp_hdr
+  - data://grapher/unesco/2025-05-01/education_opri
+  - data://grapher/wb/2024-06-10/gender_statistics
