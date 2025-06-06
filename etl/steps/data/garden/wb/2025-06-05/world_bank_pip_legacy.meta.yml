@@ -22,11 +22,11 @@ dataset:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/tables/
 tables:
-  income_consumption_2017:
+  income_consumption_2021:
     # Learn more about the available fields:
     # http://docs.owid.io/projects/etl/architecture/metadata/reference/indicator/
     variables:
-      headcount_ratio_215:
+      headcount_ratio_300:
         presentation:
           topic_tags:
             - Poverty
@@ -43,11 +43,11 @@ tables:
             title: Share of population living in extreme poverty
             subtitle: >-
               Extreme poverty is defined as living below the International Poverty Line of
-              $2.15 per day. This data is adjusted for inflation and for differences in the
+              $3 per day. This data is adjusted for inflation and for differences in the
               cost of living between countries.
             note: >-
               This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
-              2017 prices. Depending on the country and year, it relates to income measured
+              2021 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
             tab: map
@@ -78,7 +78,7 @@ tables:
               - China
               - Ethiopia
 
-      headcount_ratio_365:
+      headcount_ratio_420:
         presentation:
           topic_tags:
             - Poverty
@@ -92,12 +92,12 @@ tables:
             - fragment_id: poverty-regional-estimates
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            title: "Poverty: Share of population living on less than $3.65 a day"
+            title: "Poverty: Share of population living on less than $4.20 a day"
             subtitle: >-
-              The poverty line of $3.65 per day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. This data is adjusted for inflation and for differences in the cost of living between countries.
+              The poverty line of $4.20 per day is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. This data is adjusted for inflation and for differences in the cost of living between countries.
             note: >-
               This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
-              2017 prices. Depending on the country and year, it relates to income measured
+              2021 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
             tab: map
@@ -127,7 +127,7 @@ tables:
               - China
               - Ethiopia
 
-      headcount_ratio_685:
+      headcount_ratio_830:
         presentation:
           topic_tags:
             - Poverty
@@ -141,12 +141,12 @@ tables:
             - fragment_id: poverty-regional-estimates
               gdoc_id: 1gGburArxglFdHXeTLotFW4TOOLoeRq5XW6UfAdKtaAw
           grapher_config:
-            title: "Poverty: Share of population living on less than $6.85 a day"
+            title: "Poverty: Share of population living on less than $8.30 a day"
             subtitle: >-
-              The poverty line of $6.85 per day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. This data is adjusted for inflation and for differences in the cost of living between countries.
+              The poverty line of $8.30 per day is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. This data is adjusted for inflation and for differences in the cost of living between countries.
             note: >-
               This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
-              2017 prices. Depending on the country and year, it relates to income measured
+              2021 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
             tab: map
@@ -349,7 +349,7 @@ tables:
               - China
               - Ethiopia
 
-      headcount_215:
+      headcount_300:
         presentation:
           topic_tags:
             - Poverty
@@ -366,11 +366,11 @@ tables:
             title: Number of people living in extreme poverty
             subtitle: >-
               Extreme poverty is defined as living below the International Poverty Line of
-              $2.15 per day. This data is adjusted for inflation and for differences in the
+              $3 per day. This data is adjusted for inflation and for differences in the
               cost of living between countries.
             note: >-
               This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
-              2017 prices. Depending on the country and year, it relates to income measured
+              2021 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             hasMapTab: true
             tab: map
@@ -399,7 +399,7 @@ tables:
               - Bangladesh
             originUrl: https://ourworldindata.org/poverty
 
-      poverty_gap_index_215:
+      poverty_gap_index_300:
         presentation:
           topic_tags:
             - Poverty
@@ -448,14 +448,14 @@ tables:
               - France
               - China
 
-      headcount_215_regions:
-        title: $2.15 a day - Number in poverty (Regional aggregates)
+      headcount_300_regions:
+        title: $3 a day - Number in poverty (Regional aggregates)
         unit: "people"
         short_unit: ""
-        description_short: Number of people in households with an income or consumption per person below $2.15 a day.
+        description_short: Number of people in households with an income or consumption per person below $3 a day.
         description_key:
-          - Extreme poverty here is defined as living below the International Poverty Line of $2.15 per day.
-          - The data is measured in international-$ at 2017 prices – this adjusts for inflation and for differences in the cost of living between countries.
+          - Extreme poverty here is defined as living below the International Poverty Line of $3 per day.
+          - The data is measured in international-$ at 2021 prices – this adjusts for inflation and for differences in the cost of living between countries.
           - Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the income of each household is attributed equally to each member of the household (including children).
           - Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
           - Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts).
@@ -481,11 +481,11 @@ tables:
             title: Total population living in extreme poverty by world region
             subtitle: >-
               Extreme poverty is defined as living below the International Poverty Line of
-              $2.15 per day. This data is adjusted for inflation and for differences in the
+              $3 per day. This data is adjusted for inflation and for differences in the
               cost of living between countries.
             note: >-
               This data is expressed in [international-$](#dod:int_dollar_abbreviation) at
-              2017 prices. Depending on the country and year, it relates to income measured
+              2021 prices. Depending on the country and year, it relates to income measured
               after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
             chartTypes: ["StackedArea"]
             addCountryMode: disabled

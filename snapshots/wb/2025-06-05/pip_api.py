@@ -22,10 +22,10 @@ To run this code from scratch,
     - (If needed) Delete the files in R2:
         rclone delete r2:owid-private/cache/ --fast-list --transfers 32 --checkers 32 --verbose
     - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`.
-        - Check the list of countries without percentile data. It will show up as a list in the output (These countries are available in a common query but not in the percentile file:)
+        - Check the list of countries without percentile data. It will show up as a list in the output (_These countries are available in a common query but not in the percentile file:_)
         - Open
             https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=150&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
-            https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=300&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
+            https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=320&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
@@ -140,6 +140,7 @@ def poverty_lines_regions():
     between_150_and_175_dollars = list(range(15000, 17500, 10))
     between_175_and_250_dollars = list(range(17500, 25000, 20))
     between_250_and_300_dollars = list(range(25000, 30000, 50))
+    between_300_and_320_dollars = list(range(30000, 32000, 100))
 
     # povlines is all these lists together
     povlines = (
@@ -155,6 +156,7 @@ def poverty_lines_regions():
         + between_150_and_175_dollars
         + between_175_and_250_dollars
         + between_250_and_300_dollars
+        + between_300_and_320_dollars
     )
 
     return povlines
@@ -165,14 +167,17 @@ def poverty_lines_regions():
 # NOTE: Define this dictionary to show the most recent PPP prices second
 POVLINES_DICT = {
     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
-    2021: [100, 215, 365, 685, 1000, 2000, 3000, 4000],  # TODO: add lines
+    2021: [100, 300, 420, 830, 1000, 2000, 3000, 4000],  # TODO: add lines
 }
 
-# Define current International Poverty Line (IPL) in the latest prices
-INTERNATIONAL_POVERTY_LINE_CURRENT = 2.15  # TODO: change to 2021 prices
+# Define international poverty lines as the second value in each list in POVLINES_DICT
+INTERNATIONAL_POVERTY_LINES = {ppp_year: poverty_lines[1] for ppp_year, poverty_lines in POVLINES_DICT.items()}
 
 # Define PPP versions from POVLINES_DICT
 PPP_VERSIONS = list(POVLINES_DICT.keys())
+
+# Define current International Poverty Line (IPL) in the latest prices
+INTERNATIONAL_POVERTY_LINE_CURRENT = INTERNATIONAL_POVERTY_LINES[PPP_VERSIONS[1]]
 
 # Define poverty lines to calculate percentiles
 POV_LINES_COUNTRIES = poverty_lines_countries()
