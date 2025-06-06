@@ -24,7 +24,6 @@ def run() -> None:
 
     # Load datasets
     ds_undp = paths.load_dataset("undp_hdr")
-
     tb_undp = ds_undp.read("undp_hdr_sex")
 
     ds_opri = paths.load_dataset("education_opri")
@@ -106,7 +105,7 @@ def run() -> None:
     METRIC_SUBTITLES_ALL_GENDERS = {
         "Expected years of schooling": "Expected years of schooling is the number of years a person is expected to spend in school or university, including years spent on repetition.",
         "Average years of schooling": "Average years of schooling is the average number of completed years of education of a population.",
-        "School life expectancy": "School life expectancy is the total number of years of schooling from primary to tertiary that a child can expect to receive.",
+        "Learning adjusted years of schooling": "Learning-adjusted years of schooling is the expected years of schooling adjusted for quality of learning.",
     }
 
     # Add grouped view
@@ -189,8 +188,8 @@ def adjust_dimensions_schooling(tb):
     metric_keywords = {
         "eys": "expected_years_schooling",
         "mys": "average_years_schooling",
-        "school_life_expectancy": "school_life_expectancy",
-        "hd_hci_lays": "average_years_schooling",
+        "school_life_expectancy": "expected_years_schooling",
+        "hd_hci_lays": "learning_adjusted_years_schooling",
     }
 
     # Initialize mappings
@@ -240,14 +239,20 @@ def adjust_dimensions_schooling(tb):
         tb[col].metadata.dimensions["sex"] = sex_mapping[col]
 
     # Add dimension definitions at table level
-    if isinstance(tb.metadata.dimensions, list):
-        tb.metadata.dimensions.extend(
-            [
-                {"name": "Metric", "slug": "metric_type"},
-                {"name": "Education level", "slug": "level"},
-                {"name": "Gender", "slug": "sex"},
-            ]
-        )
+    if not hasattr(tb.metadata, "dimensions") or tb.metadata.dimensions is None:
+        tb.metadata.dimensions = []
+
+    # Only add if not already present
+    existing_slugs = {dim.get("slug") for dim in tb.metadata.dimensions if isinstance(dim, dict)}
+    new_dimensions = [
+        {"name": "Metric", "slug": "metric_type"},
+        {"name": "Education level", "slug": "level"},
+        {"name": "Gender", "slug": "sex"},
+    ]
+
+    for dim in new_dimensions:
+        if dim["slug"] not in existing_slugs:
+            tb.metadata.dimensions.append(dim)
 
     return tb
 
