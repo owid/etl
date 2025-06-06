@@ -119,3 +119,12 @@ steps:
 
   data://grapher/wb/2024-11-04/edstats:
     - data://garden/wb/2024-11-04/edstats
+
+
+  #
+  # Mdim for expected years of schooling
+  #
+  export://multidim/education/latest/years_of_schooling:
+    - data://grapher/un/2025-05-07/undp_hdr
+    - data://grapher/unesco/2025-05-01/education_opri
+    - data://grapher/wb/2024-06-10/gender_statistics
