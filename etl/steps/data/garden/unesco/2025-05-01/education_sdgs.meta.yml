@@ -650,7 +650,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: YlOrBr
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -720,7 +720,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
-                baseColorScheme: YlGnBu
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
