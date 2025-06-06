@@ -984,7 +984,7 @@ steps:
     - data://garden/gavi/2025-02-11/eligibility
 
   #
-  # Vaccine confidence
+  # Vaccine confidence - to archive
   #
   data://meadow/health/2025-02-13/vaccine_confidence:
     - snapshot://health/2025-02-13/vaccine_confidence.csv
@@ -992,6 +992,14 @@ steps:
     - data://meadow/health/2025-02-13/vaccine_confidence
   data://grapher/health/2025-02-13/vaccine_confidence:
     - data://garden/health/2025-02-13/vaccine_confidence
+
+  # Vaccine confidence project
+  data://meadow/vcp/2025-06-04/vaccine_confidence:
+    - snapshot://vcp/2025-06-04/vaccine_confidence.xlsx
+  data://garden/vcp/2025-06-04/vaccine_confidence:
+    - data://meadow/vcp/2025-06-04/vaccine_confidence
+  data://grapher/vcp/2025-06-04/vaccine_confidence:
+    - data://garden/vcp/2025-06-04/vaccine_confidence
 
   # Historical measles data (1919-1984)
   #
