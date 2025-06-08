@@ -19,13 +19,11 @@ def run() -> None:
     # Load data from snapshot.
     tb = snap.read_in_archive(FILE_PATH)
 
-    print(tb)
-
     #
     # Process data.
     #
     # Improve tables format.
-    tables = [tb.format(["country_code", "year", "reporting_level", "welfare_type"])]
+    tables = [tb.format(["country_code", "year", "reporting_level", "welfare_type"], short_name=paths.short_name)]
 
     #
     # Save outputs.
