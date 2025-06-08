@@ -42,7 +42,6 @@ def run() -> None:
 
     # Drop reporting_level and welfare_type columns.
     tb = tb.drop(columns=["reporting_level", "welfare_type"], errors="raise")
-    print(tb)
 
     # Improve table format.
     tb = tb.format(["country", "year"])
