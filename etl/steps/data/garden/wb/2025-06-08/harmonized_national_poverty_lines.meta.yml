@@ -12,6 +12,7 @@ definitions:
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
+  title: Harmonized national poverty lines to construct global poverty lines
   update_period_days: 365
 
 
