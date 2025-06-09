@@ -42,24 +42,58 @@ def run() -> None:
     countries = []
 
     # Parse lines to extract country names and literacy rate data
-    for line in lines:
-        line = line.strip()
-        if line and not line.startswith("Allen") and not line.startswith("1500") and not line.startswith("1600"):
-            # Split by multiple spaces to separate country name from numerical data
-            parts = re.split(r"\s{2,}", line)
-            if len(parts) > 1:
-                country = parts[0].strip()
-                # Extract all numbers and dashes from the remaining parts
-                numbers = []
-                for part in parts[1:]:
-                    # Find all digits and dash characters
-                    nums = re.findall(r"\d+|-", part)
-                    numbers.extend(nums)
+    # Look for known country patterns and extract their data
+    country_patterns = [
+        r"Great Britain\s+(.+)",
+        r"Ireland\s+(.+)",
+        r"France\s+(.+)",
+        r"Belgium\s+(.+)",
+        r"Netherlands\s+(.+)",
+        r"Germany\s+(.+)",
+        r"Italy\s+(.+)",
+        r"Spain\s+(.+)",
+        r"Sweden\s+(.+)",
+        r"Poland\s+(.+)",
+        r"Western Europe\s+(.+)",
+    ]
 
-                # Only add rows that have both country name and data
-                if country and numbers:
-                    countries.append(country)
-                    table_data.append(numbers)
+    # Join all lines to handle potential line breaks
+    full_text = " ".join(lines)
+
+    for pattern in country_patterns:
+        match = re.search(pattern, full_text, re.IGNORECASE)
+        if match:
+            country = pattern.replace(r"\s+(.+)", "").replace("\\", "")
+            data_part = match.group(1)
+            # Extract numbers and dashes from the data part
+            numbers = re.findall(r"\d+|-", data_part)
+
+            if numbers and len(numbers) >= 6:  # Ensure we have at least 6 data points
+                countries.append(country)
+                table_data.append(numbers[:6])  # Take first 6 values
+
+    # Fallback: if pattern matching didn't work, try line-by-line parsing
+    if not countries:
+        for line in lines:
+            line = line.strip()
+            if line and not line.startswith("Allen") and not line.startswith("1500") and not line.startswith("1600"):
+                # Try different splitting approaches
+                parts = re.split(r"\s{2,}", line)
+                if len(parts) < 2:
+                    parts = line.split()
+
+                if len(parts) > 1:
+                    country = parts[0].strip()
+                    # Extract all numbers and dashes from the remaining parts
+                    numbers = []
+                    for part in parts[1:]:
+                        nums = re.findall(r"\d+|-", part)
+                        numbers.extend(nums)
+
+                    # Only add rows that have both country name and data
+                    if country and numbers and len(numbers) >= 6:
+                        countries.append(country)
+                        table_data.append(numbers[:6])
 
     # Ensure all data rows have the same number of columns
     max_cols = max(len(row) for row in table_data)
@@ -73,8 +107,8 @@ def run() -> None:
 
     # Create DataFrame with countries as index
     df = pd.DataFrame(table_data, columns=columns, index=countries)
-    # Remove first row (which might be header data) and reset index
-    df = df.iloc[1:].reset_index()
+    # Reset index
+    df = df.reset_index()
 
     # Rename the index column to 'country'
     df = df.rename(columns={"index": "country"})
