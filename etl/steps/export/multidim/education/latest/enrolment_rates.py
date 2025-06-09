@@ -179,10 +179,6 @@ def adjust_dimensions_enrolment(tb):
 
     sex_keywords = {"both_sexes": "both", "male": "boys", "female": "girls", "ma": "boys", "fe": "girls"}
 
-    # Initialize mappings
-    level_mapping = {}
-    enrolment_type_mapping = {}
-    sex_mapping = {}
     cols_to_add_dimensions = [col for col in tb.columns if col not in ["country", "year"]]
 
     # Iterate and set dimensions directly
