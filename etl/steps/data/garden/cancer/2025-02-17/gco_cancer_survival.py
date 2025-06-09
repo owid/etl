@@ -1,5 +1,6 @@
 """Load a meadow dataset and create a garden dataset."""
 
+import numpy as np
 import pandas as pd
 
 from etl.data_helpers import geo
@@ -25,7 +26,6 @@ def run() -> None:
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
 
     tb = tb[tb["survival_year"] == 5]
-
     tb = tb.drop("survival_year", axis=1)
     # Replace specific values in the "cancer" column
     tb["cancer"] = tb["cancer"].replace(
@@ -45,6 +45,14 @@ def run() -> None:
     tb = tb.replace("-", pd.NA)
 
     tb = tb.format(["country", "year", "gender", "cancer"])
+
+    ####################################################################################################################
+    # Fix indicators with mixed types.
+    # There are rows with "-".
+    for column in ["mortality__asr", "net_survival"]:
+        tb[column] = tb[column].mask(tb[column] == "-", np.nan).astype(float)
+    assert all(pd.api.types.is_numeric_dtype(tb[column]) for column in tb.columns)
+    ####################################################################################################################
 
     #
     # Save outputs.

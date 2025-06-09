@@ -527,7 +527,7 @@ class DataStep(Step):
             return [p.as_posix() for p in files.walk(self._search_path)]
 
         # if a dataset is a single file, use [dataset].py and shared* files
-        return glob(self._search_path.as_posix() + ".*") + glob((self._search_path.parent / "shared*").as_posix())
+        return glob(self._search_path.as_posix() + "*") + glob((self._search_path.parent / "shared*").as_posix())
 
     @property
     def _search_path(self) -> Path:
@@ -657,7 +657,7 @@ class DataStep(Step):
 
     def _download_dataset_from_catalog(self) -> bool:
         """Download the dataset from the catalog if the checksums match. Return True if successful."""
-        url = f"{OWID_CATALOG_URI}/{self.path}/index.json"
+        url = f"{OWID_CATALOG_URI}{self.path}/index.json"
         resp = requests.get(url, verify=TLS_VERIFY)
         if not resp.ok:
             return False
