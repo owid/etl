@@ -1,6 +1,6 @@
 """Load a snapshot and create a meadow dataset.
 
-This script extracts literacy rate data from Allen's historical dataset covering
+This script extracts literacy rate data from historical dataset covering
 the period 1451-1800, processing the table from page 51 of the PDF.
 """
 
@@ -17,7 +17,7 @@ paths = PathFinder(__file__)
 
 
 def run() -> None:
-    """Extract and process literacy rate data from Allen (1451-1800) PDF."""
+    """Extract and process literacy rate data the PDF."""
     #
     # Load inputs.
     #
@@ -42,7 +42,6 @@ def run() -> None:
     countries = []
 
     # Parse lines to extract country names and literacy rate data
-    # Skip header lines that start with "Allen", "1500", or "1600"
     for line in lines:
         line = line.strip()
         if line and not line.startswith("Allen") and not line.startswith("1500") and not line.startswith("1600"):
