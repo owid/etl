@@ -19,7 +19,7 @@ paths = PathFinder(__file__)
 
 
 def run() -> None:
-    """Extract and process literacy rate data the PDF."""
+    """Extract and process literacy rate data from the PDF."""
     #
     # Load inputs.
     #
