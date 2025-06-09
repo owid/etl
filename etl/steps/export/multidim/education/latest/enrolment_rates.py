@@ -25,12 +25,12 @@ def run() -> None:
 
     # Load grapher dataset.
     ds_sdgs = paths.load_dataset("education_sdgs")
-    tb_sdgs = ds_sdgs.read("education_sdgs")
+    tb_sdgs = ds_sdgs.read("education_sdgs", load_data=False)
     ds_opri = paths.load_dataset("education_opri")
-    tb_opri = ds_opri.read("education_opri")
+    tb_opri = ds_opri.read("education_opri", load_data=False)
 
     ds_wdi = paths.load_dataset("wdi")
-    tb_wdi = ds_wdi.read("wdi")
+    tb_wdi = ds_wdi.read("wdi", load_data=False)
 
     cols_opri = [
         "total_net_enrolment_rate__primary__both_sexes__pct",
@@ -185,42 +185,39 @@ def adjust_dimensions_enrolment(tb):
     sex_mapping = {}
     cols_to_add_dimensions = [col for col in tb.columns if col not in ["country", "year"]]
 
-    # Iterate and populate mappings
-    for var in cols_to_add_dimensions:
+    # Iterate and set dimensions directly
+    for col in cols_to_add_dimensions:
+        tb[col].metadata.original_short_name = "enrolment_rates"
+        tb[col].metadata.dimensions = {}
+
         # --- Level ---
         level = None
         for key, val in level_keywords.items():
-            if key in var:
+            if key in col:
                 level = val
                 break
-        level_mapping[var] = level
 
         # --- Enrolment Type ---
-        if "gross" in var:
-            enrolment_type_mapping[var] = "gross_enrolment"
-        elif "net" in var:
-            enrolment_type_mapping[var] = "net_enrolment"
-        elif "pre_enrr" in var:
-            enrolment_type_mapping[var] = "gross_enrolment"
+        if "gross" in col:
+            enrolment_type = "gross_enrolment"
+        elif "net" in col:
+            enrolment_type = "net_enrolment"
+        elif "pre_enrr" in col:
+            enrolment_type = "gross_enrolment"
+        else:
+            raise ValueError(f"Unrecognized enrolment type for column {col}")
 
         # --- Sex ---
         sex = None
         for key, val in sex_keywords.items():
-            if f"__{key}__" in var or var.endswith(f"_{key}"):
+            if f"__{key}__" in col or col.endswith(f"_{key}"):
                 sex = val
                 break
-        sex_mapping[var] = sex or "both"  # fallback for non-disaggregated vars
-
-    for col in tb.columns:
-        if col in ["country", "year"]:
-            continue
-        tb[col].metadata.original_short_name = "enrolment_rates"
-        tb[col].metadata.dimensions = {}
 
         # Set dimensions
-        tb[col].metadata.dimensions["enrolment_type"] = enrolment_type_mapping[col]
-        tb[col].metadata.dimensions["level"] = level_mapping[col]
-        tb[col].metadata.dimensions["sex"] = sex_mapping[col]
+        tb[col].metadata.dimensions["enrolment_type"] = enrolment_type
+        tb[col].metadata.dimensions["level"] = level
+        tb[col].metadata.dimensions["sex"] = sex or "both"
 
     # Add dimension definitions at table level
     if isinstance(tb.metadata.dimensions, list):
@@ -244,23 +241,16 @@ def edit_indicator_displays(view):
                 "enrolment_rate__primary" in indicator.catalogPath
                 or "enrolment_ratio__primary__male" in indicator.catalogPath
             ):
-                indicator.display = {
-                    "name": "Primary",
-                }
+                display_name = "Primary"
             elif "enrolment_rate__pre_primary" in indicator.catalogPath or "pre_enrr" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "Pre-primary",
-                }
+                display_name = "Pre-primary"
             elif "lower_secondary" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "Lower secondary",
-                }
-
+                display_name = "Lower secondary"
             elif "upper_secondary" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "Upper secondary",
-                }
+                display_name = "Upper secondary"
             elif "tertiary" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "Tertiary",
-                }
+                display_name = "Tertiary"
+
+            indicator.display = {
+                "name": display_name,
+            }
