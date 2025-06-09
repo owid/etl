@@ -158,3 +158,13 @@ steps:
     - data://meadow/wb/2025-01-15/poverty_projections
   data://grapher/wb/2025-01-15/poverty_projections:
     - data://garden/wb/2025-01-15/poverty_projections
+
+  #
+  # Harmonized national poverty lines (for 2021 PPPs poverty lines)
+  #
+  data://meadow/wb/2025-06-08/harmonized_national_poverty_lines:
+    - snapshot://wb/2025-06-08/global_poverty_revisited_2021_ppps.zip
+  data://garden/wb/2025-06-08/harmonized_national_poverty_lines:
+    - data://meadow/wb/2025-06-08/harmonized_national_poverty_lines
+  data://grapher/wb/2025-06-08/harmonized_national_poverty_lines:
+    - data://garden/wb/2025-06-08/harmonized_national_poverty_lines
