@@ -34,7 +34,30 @@ log = structlog.get_logger()
 SUBSET = os.environ.get("SUBSET")
 if SUBSET:
     # These are required by OOMs in the garden step
-    SUBSET += ",WHS3_45,PHE_HHAIR_POP_CLEAN_FUELS,WHS3_56,PHE_HHAIR_PROP_POP_CLEAN_FUELS,NTD_YAWSNUM"
+    subset_list = [
+        "WHS3_45",
+        "PHE_HHAIR_POP_CLEAN_FUELS",
+        "WHS3_56",
+        "PHE_HHAIR_PROP_POP_CLEAN_FUELS",
+        "NTD_YAWSNUM",
+        "carep",
+        "NTD_7",
+        "NTD_8",
+        "NTD_TRA5",
+        "NTD_ONCHEMO",
+        "NTD_ONCTREAT",
+        "NCD_BMI_25A",
+        "MDG_0000000026",
+        "MDG_0000000032",
+        "MORT_MATERNALNUM",
+        "NUTSTUNTINGPREV",
+        "R_Total_tax",
+        "O_Group",
+        "E_Group",
+        "P_count_places_sf",
+        "R_afford_gdp",
+    ]
+    SUBSET += "," + ",".join(subset_list)
 
 
 def run(dest_dir: str) -> None:
@@ -56,10 +79,19 @@ def run(dest_dir: str) -> None:
 
             label = zip_info.filename.removesuffix(".feather")
 
-            if SUBSET and underscore(label) not in underscore(SUBSET):
-                continue
-
             ind_meta = indicators[indicators.label == label].iloc[0]
+
+            if SUBSET:
+                if (
+                    "smoking" in ind_meta["display"].lower()
+                    or "tobacco" in ind_meta["display"].lower()
+                    or "tax" in ind_meta["display"].lower()
+                ) and "estimate" in ind_meta["display"].lower():
+                    pass
+                elif underscore(label) in underscore(SUBSET):
+                    pass
+                else:
+                    continue
 
             log.info("gho.run", label=label, display=ind_meta["display"])
 
@@ -196,7 +228,7 @@ def _fill_country_from_regions(tb: Table) -> Table:
             )
 
     # Concatenate all tables
-    tb = pr.concat(tbs)
+    tb = pr.concat([t.copy() for t in tbs])
 
     # Add origin to `region_source`
     if "region_source" in tb.columns:
