@@ -23,7 +23,7 @@ tables:
         title: Harmonized national poverty line
         unit: international-$ in 2021 prices
         short_unit: $
-        description_short: Short description of testing variable.
+        description_short: National poverty line used to construct global poverty lines representing low-income and middle-income countries. This data is adjusted for inflation and differences in living costs between countries.
         description_processing: We selected the most recent national poverty line for each country. The original dataset contained multiple poverty lines across different years, and, in the case of China, it also contained poverty lines for urban and rural regions.
         description_key:
           - This data is constructed from data available in World Bank datasets, and also from the European Statistical Office (Eurostat), the OECD, and some national statistical offices.
