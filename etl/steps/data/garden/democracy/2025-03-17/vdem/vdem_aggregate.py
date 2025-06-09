@@ -187,7 +187,11 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, 
     tb_countries_counts, tb_countries_avg = make_table_countries(tb_, ds_regions)
 
     # Create population-weighted aggregates (larger countries have more weight)
-    tb_population_counts, tb_population_avg = make_table_population(tb_, ds_regions, ds_population=ds_population)
+    tb_population_counts, tb_population_avg = make_table_population(
+        tb_,
+        ds_regions,
+        ds_population=ds_population,
+    )
 
     # Prepare main data and split into output tables by dimensionality
     tb_ = tb_.drop(columns=["regime_imputed_country", "regime_imputed", "histname"])
@@ -845,12 +849,27 @@ def add_regions_and_global_aggregates(
         Output: Regional data for Europe, World
     """
     # TODO: aggregations encodes the logic of: "estimate mean if >70% of 1900 countries are present in the region"
+    # Get list of countries in regions in 1900
+    tb_1900 = tb.loc[tb["year"] == 1900, ["country"]]
+    countries_to_continent = geo.countries_to_continent_mapping(
+        ds_regions=ds_regions,
+        regions=REGIONS,
+        exclude_historical_countries=False,
+        include_historical_regions_in_income_groups=True,
+    )
+    tb_1900["continent"] = tb_1900["country"].map(countries_to_continent)
+    countries_must_have_data = tb_1900.groupby("continent")["country"].agg(list).to_dict()
+    frac_must_have_data = {region: 0.7 for region in countries_must_have_data.keys()}
+
+    # Estimate region aggregates
     tb_regions = geo.add_regions_to_table(
         tb.copy(),
         ds_regions,
         regions=REGIONS,
         aggregations=aggregations,
         min_num_values_per_year=min_num_values_per_year,
+        countries_that_must_have_data=countries_must_have_data,
+        frac_countries_that_must_have_data=frac_must_have_data,
     )
     tb_regions = tb_regions.loc[tb_regions["country"].isin(REGIONS.keys())]
 
