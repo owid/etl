@@ -65,7 +65,7 @@ def process_gho_cholera(who_gh_dataset: Dataset) -> Table:
     ]
     cholera_bp = who_gh_dataset[tb_names[0]]
     for tb_name in tb_names[1:]:
-        cholera_bp = cholera_bp.join(who_gh_dataset[tb_name], how="outer")
+        cholera_bp = cholera_bp.join(who_gh_dataset[tb_name].drop(columns=['comments']), how="outer")
 
     return (
         cholera_bp.drop(columns=["comments"])

@@ -321,9 +321,6 @@ steps:
     - data://meadow/who/2024-01-03/gho
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-  data://grapher/who/2024-01-03/gho:
-    - data://garden/who/2024-01-03/gho
-
   # Suicides based on WHO Mortality Database
   data://meadow/who/2024-03-24/self_inflicted_injuries:
     - snapshot://who/2024-03-24/self_inflicted_injuries.csv
