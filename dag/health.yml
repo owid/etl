@@ -62,7 +62,7 @@ steps:
 
   # Registered vehicles per 1000 people
   data://garden/who/2024-05-20/vehicles:
-    - data://garden/who/2024-01-03/gho
+    - data://garden/who/2025-05-19/gho
     - data://garden/demography/2024-07-15/population
   data://grapher/who/2024-05-20/vehicles:
     - data://garden/who/2024-05-20/vehicles
@@ -104,7 +104,7 @@ steps:
 
   # Cholera
   data://garden/who/2023-06-01/cholera:
-    - data://garden/who/2024-01-03/gho
+    - data://garden/who/2025-05-19/gho
     - snapshot://fasttrack/2023-05-31/cholera.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
