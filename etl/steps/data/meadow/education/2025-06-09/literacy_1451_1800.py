@@ -1,7 +1,9 @@
 """Load a snapshot and create a meadow dataset.
 
-This script extracts literacy rate data from historical dataset covering
+
+This script extracts literacy rate data from Buringh and van Zanden's historical dataset covering
 the period 1451-1800, processing the table from page 51 of the PDF.
+
 """
 
 import re
