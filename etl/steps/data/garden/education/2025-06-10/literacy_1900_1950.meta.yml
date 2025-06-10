@@ -24,7 +24,12 @@ tables:
         description_short: Share of the population who can read and write a short, simple statement on their everyday life.
         description_processing: Literacy rates were not directly reported by the source. Instead, they were derived from illiteracy rates by subtracting estimated illiteracy rate from 100%.
 
-      lliteracy_rate:
+      illiteracy_rate:
         title: Illiteracy rate
         description_short: Share of the population who cannot read and write a short, simple statement on their everyday life.
 
+      age:
+        title: Age group
+        unit: "years"
+        short_unit: ""
+        description_short: Age group of the population for which the literacy rate is reported.

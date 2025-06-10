@@ -26,15 +26,14 @@ def run() -> None:
     )
     tb = tb[tb["sex"] == "MF"]
 
-    # Remove "*" from all string columns
-    for col in tb.select_dtypes(include=["object"]).columns:
-        tb[col] = tb[col].astype(str).str.replace("*", "", regex=False)
+    # Remove "*" from illiteracy_rate
+    tb["illiteracy_rate"] = tb["illiteracy_rate"].astype(str).str.replace("*", "", regex=False)
+    tb["illiteracy_rate"] = tb["illiteracy_rate"].astype(float)
 
     # Exclude specific data points
     tb = tb[~((tb["country"] == "Argentina") & (tb["year"] == 1914) & (tb["age"] == "7+"))]
     tb = tb[~((tb["country"] == "Canada") & (tb["year"] == 1921) & (tb["age"] == "5+"))]
     tb = tb.drop(columns=["sex"])
-
     tb["literacy_rate"] = 100 - tb["illiteracy_rate"]
 
     # Improve table format.
