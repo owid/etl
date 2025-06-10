@@ -61,7 +61,6 @@ VARIANTS_DETAILS = {
     "24A (Omicron)": {"rename": "Omicron (JN.1)", "relevant": True},
     "24B (Omicron)": {"rename": "Omicron (JN.1.11.1)", "relevant": True},
     "24C (Omicron)": {"rename": "Omicron (KP.3)", "relevant": True},
-    # New
     "24D (Omicron)": {"rename": "Omicron (XDV.1)", "relevant": True},
     "24E (Omicron)": {"rename": "Omicron (KP.3.1.1)", "relevant": True},
     "24F (Omicron)": {"rename": "Omicron (XEC)", "relevant": True},
@@ -69,7 +68,6 @@ VARIANTS_DETAILS = {
     "24H (Omicron)": {"rename": "Omicron (LF.7)", "relevant": True},
     "24I (Omicron)": {"rename": "Omicron (MV.1)", "relevant": True},
     "25A (Omicron)": {"rename": "Omicron (LP.8.1)", "relevant": True},
-    # -
     "S:677H.Robin1": {"rename": "S:677H.Robin1", "relevant": False},
     "S:677P.Pelican": {"rename": "S:677P.Pelican", "relevant": False},
     "recombinant": {"rename": "Recombinant", "relevant": False},
