@@ -144,17 +144,17 @@ definitions:
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia.
     <%- elif antigen == "HEPB3" %>
       Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease.
-    <- elif antigen == "HEPB_BD" %>
+    <%- elif antigen == "HEPB_BD" %>
       Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease. The hepatitis B birth dose is recommended to be administered within 24 hours of birth.
-    <- elif antigen == "HIB3" %>
+    <%- elif antigen == "HIB3" %>
       Haemophilus influenza type B is a bacteria responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
-    <% elif antigen == "PCV3" %>
+    <%- elif antigen == "PCV3" %>
       Streptococcus pneumoniae is a bacterium that causes a number of common diseases including meningitis, septicaemia and pneumonia. It is most common in young children and the elderly.
     <%- elif antigen == "IPV1" %>
       Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis.
     <%- elif antigen == "IPV2" %>
       Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis.
-    <% elif antigen == "POL3" %>
+    <%- elif antigen == "POL3" %>
       Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis. The third dose of polio vaccine is recommended to be administered at 14 weeks of age.
     <%- elif antigen == "RCV1" %>
       Rubella is a contagious viral infection that occurs most often in children and young adults. Rubella infection in pregnant women may cause fetal death or congenital defects known as congenital rubella syndrome.
