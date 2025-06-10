@@ -235,7 +235,7 @@ def edit_indicator_displays(view):
         for indicator in view.indicators.y:
             if (
                 "enrolment_rate__primary" in indicator.catalogPath
-                or "enrolment_ratio__primary__male" in indicator.catalogPath
+                or "enrolment_ratio__primary" in indicator.catalogPath
             ):
                 display_name = "Primary"
             elif "enrolment_rate__pre_primary" in indicator.catalogPath or "pre_enrr" in indicator.catalogPath:
