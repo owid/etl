@@ -10,6 +10,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.utils.google import GoogleDoc, GoogleDrive
+from apps.utils.notion import get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
     get_post_views_by_chart_id,
@@ -283,6 +284,22 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
         insert_list_with_links_in_gdoc(google_doc, df=df_top_insights, placeholder=r"{{data_insights}}")
 
 
+def print_impact_highlights(highlights: pd.DataFrame) -> None:
+    # TODO:
+    # * Consider creating another column in the highlights table, that contains the description to be shared with the data provider.
+    # * Then, here, filter for only those selected highlights where that column is not empty.
+    # * Adapt GDoc template to include those highlights, if any.
+    # * It might be useful to create a function that writes to GDoc with embedded hyperlinks.
+    if not highlights.empty:
+        print(
+            f"{len(highlights)} highlights found for this data producer. Manually check them and consider adding them to the producer GDoc."
+        )
+        for _, highlight in highlights.iterrows():
+            print(f"* {highlight['Highlight']}")
+            print(f"Source link: {highlight['Source link']}")
+            print(f"Notion highlight: {highlight['notion_url']}")
+
+
 @click.command(name="create_data_producer_report", cls=RichCommand, help=__doc__)
 @click.option(
     "--producer",
@@ -308,6 +325,13 @@ def run(producer, quarter, year):
 
     # Gather producer analytics.
     analytics = gather_producer_analytics(producer=producer, min_date=min_date, max_date=max_date)
+
+    ####################################################################################################################
+    # Get impact highlights, if any.
+    highlights = get_impact_highlights(producers=[producer], min_date=min_date, max_date=max_date)
+
+    # For now, print highlights here, and consider manually adding them to the document.
+    print_impact_highlights(highlights=highlights)
 
     ####################################################################################################################
     # Generate report.
