@@ -135,7 +135,7 @@ def list_countries_in_region(
         else:
             member_codes = json.loads(member_codes_str)
         # Get harmonized names of these countries.
-        members = countries_regions.loc[member_codes]["name"].tolist()  # type: List[str]
+        members = countries_regions.loc[member_codes]["name"].tolist()  # type: list[str]
     elif region in income_groups_names:
         members = income_groups[income_groups["income_group"] == region]["country"].unique().tolist()  # type: ignore
     else:
@@ -242,7 +242,7 @@ def list_countries_in_region_that_must_have_data(
             f" {selected['fraction'].sum() * 100: .2f}% of the population; otherwise"
             " aggregate data will be nan."
         )
-    countries = selected["country"].tolist()  # type: List[str]
+    countries = selected["country"].tolist()  # type: list[str]
 
     return countries
 
