@@ -60,13 +60,6 @@ steps:
   data://grapher/who/2023-04-03/flu_elderly:
     - data://garden/who/2023-04-03/flu_elderly
 
-  # Registered vehicles per 1000 people
-  data://garden/who/2024-05-20/vehicles:
-    - data://garden/who/2025-05-19/gho
-    - data://garden/demography/2024-07-15/population
-  data://grapher/who/2024-05-20/vehicles:
-    - data://garden/who/2024-05-20/vehicles
-
   # WGM 2020
   data://meadow/health/2023-04-18/wgm_mental_health:
     - snapshot://health/2023-04-18/wgm_mental_health.zip
