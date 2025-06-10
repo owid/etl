@@ -9,15 +9,18 @@ dimensions:
     choices:
       - slug: "coverage"
         name: "Share of children vaccinated"
+        description: "Share of children in the target age-group who have received the specified vaccine"
       - slug: "unvaccinated"
-        name: "UNumber of unvaccinated children"
+        name: "Number of unvaccinated children"
+        description: "Number of children in the target age-group who have not received the specified vaccine"
       - slug: "vaccinated"
         name: "Number of vaccinated children"
+        description: "Number of children in the target age-group who have received the specified vaccine"
   - name: Vaccination
     slug: antigen
     choices:
       - slug: "BCG"
-        name: "Tuberculosis vaccine - Bacille Calmette-Guérin (BCG)"
+        name: "Tuberculosis vaccine"
       - slug: "DTPCV1"
         name: "Diphtheria, tetanus, and pertussis vaccine (first dose)"
       - slug: "DTPCV3"
@@ -29,9 +32,9 @@ dimensions:
       - slug: "HIB3"
         name: "Haemophilus influenzae type b vaccine (third dose)"
       - slug: "IPV1"
-        name: "Inactivated polio vaccine (IPV) (first dose)"
+        name: "Inactivated polio vaccine (first dose)"
       - slug: "IPV2"
-        name: "Inactivated polio vaccine (IPV) (second dose)"
+        name: "Inactivated polio vaccine (second dose)"
       - slug: "MCV1"
         name: "Measles vaccine (first dose)"
       - slug: "MCV2"
