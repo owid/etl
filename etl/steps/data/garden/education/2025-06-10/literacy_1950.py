@@ -31,7 +31,8 @@ def run() -> None:
     tb["illiteracy_est"] = tb["illiteracy_est"].copy_metadata(tb["illiteracy_rate"])
 
     # Calculate literacy as 100 - illiteracy
-    tb["literacy_est"] = 100 - tb["illiteracy_est"].copy_metadata(tb["illiteracy_rate"])
+    tb["literacy_est"] = 100 - tb["illiteracy_est"]
+    tb["literacy_est"] = tb["literacy_est"].copy_metadata(tb["illiteracy_rate"])
     tb = tb.drop(columns=["illiteracy_rate", "ill_low", "ill_high"])
 
     # Improve table format.
