@@ -627,7 +627,7 @@ tables:
 
       gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
         title: Gross enrolment ratio in tertiary education
-        description_short: Number of people of any age group who are enrolled in [tertiary](#dod:tertiary-education) education, expressed as a percentage of the total population of the five-year age group following on from secondary school leaving.
+        description_short: The share of people who are enrolled in [tertiary](#dod:tertiary-education) education. This is shown as the [gross enrolment rates](#dod:gross-enrolment-ratio).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_ger
@@ -697,7 +697,7 @@ tables:
 
       net_enrolment_rate__pre_primary__both_sexes__pct__ner_02_cp:
         title: Net enrolment rate in pre-primary education
-        description_short: Percentage of children of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
+        description_short: The share of children who are enrolled in [pre-primary education](#dod:pre-primary-education) education. This is shown as the [net enrolment rates](#dod:net-enrolment-ratio).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -720,7 +720,7 @@ tables:
 
       net_enrolment_rate__pre_primary__female__pct__ner_02_f_cp:
         title: Net enrolment rate in pre-primary education among girls
-        description_short: Percentage of girls of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
+        description_short: The share of girls who are enrolled in [pre-primary education](#dod:pre-primary-education) education. This is shown as the [net enrolment rates](#dod:net-enrolment-ratio).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr
@@ -743,7 +743,7 @@ tables:
 
       net_enrolment_rate__pre_primary__male__pct__ner_02_m_cp:
         title: Net enrolment rate in pre-primary education among boys
-        description_short: Percentage of boys of official pre-primary school age who are enrolled in [pre-primary education](#dod:pre-primary-education).
+        description_short: The share of boys who are enrolled in [pre-primary education](#dod:pre-primary-education) education. This is shown as the [net enrolment rates](#dod:net-enrolment-ratio).
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_net_enr

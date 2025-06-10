@@ -936,7 +936,7 @@ tables:
         title: Gross enrolment in pre-primary education
         short_unit: '%'
         unit: '%'
-        description_short:  Number of children of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of the official pre-primary school age.
+        description_short: The share of children who are enrolled in [pre-primary education](#dod:pre-primary-education) education. This is shown as the [gross enrolment rates](#dod:gross-enrolment-ratio).
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment in pre-primary education
@@ -959,7 +959,7 @@ tables:
         title: Gross enrolment in pre-primary education among girls
         short_unit: '%'
         unit: '%'
-        description_short: Number of girls of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of girls of the official pre-primary school age.
+        description_short: The share of girls who are enrolled in [pre-primary education](#dod:pre-primary-education) education. This is shown as the [gross enrolment rates](#dod:gross-enrolment-ratio).
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment rate in pre-primary education among girls
@@ -982,7 +982,7 @@ tables:
         title:  Gross enrolment in pre-primary education among boys
         short_unit: '%'
         unit: '%'
-        description_short: Number of boys of any age group who are enrolled in [pre-primary education](#dod:pre-primary-education), expressed as a percentage of the total population of boys of the official pre-primary school age.
+        description_short: The share of boys who are enrolled in [pre-primary education](#dod:pre-primary-education) education. This is shown as the [gross enrolment rates](#dod:gross-enrolment-ratio).
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment rate in pre-primary education among boys
