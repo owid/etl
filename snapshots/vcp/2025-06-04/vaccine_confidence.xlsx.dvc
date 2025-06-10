@@ -23,6 +23,6 @@ meta:
       name: CC BY-SA 3.0.
       url: https://www.vaccineconfidence.org/vci/map/
 outs:
-  - md5: ec37002d08352d8fc0e80585e37e38e3
-    size: 147507
+  - md5: 1909da9812987ba46f4a1ea1c4afd388
+    size: 163924
     path: vaccine_confidence.xlsx
