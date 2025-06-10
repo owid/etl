@@ -10,11 +10,11 @@ definitions:
         hasMapTab: true
 
   description_key_standard_one: |-
-    This data includes estimates for all WHO Member States, including those that did not report 2023 data. For non-reporting countries, estimates were extrapolated from the last point informed by empirical data.
+    This data includes estimates for all WHO Member States, including those that did not report 2023 data. For non-reporting countries, estimates were extrapolated from the last point informed by reported data.
   description_key_standard_two: |-
     To calculate global and regional average, values are extrapolated from 2022 for non-reporting countries. Non-reporting countries represent approximately 5% of the 2023 cohort.
   description_key_standard_three: |-
-    These estimates are based on quantitative data: 1) Country reported coverage data (official and administrative coverage) and 2) Survey coverage (from survey final reports, and complying with minimum set of quality criteria), and are informed by contextual information (e.g., stock-outs, changes in schedule, and other relevant information where available and appropriate). These estimates are affected by the availability and quality of the underlying data.
+    These estimates are based on two types of quantitative data: 1) country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria). These estimates are also informed by contextual information (e.g., stock-outs, changes in vaccine schedule, and other relevant information where available). These estimates are affected by the availability and quality of the underlying data.
   antigen_age_group: |-
     <% if antigen == "BCG" %>
     newborns
