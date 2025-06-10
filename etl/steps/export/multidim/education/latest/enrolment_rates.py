@@ -147,6 +147,7 @@ def run() -> None:
             view.config["subtitle"] = generate_subtitle_by_level(level, sex, enrolment_type)
 
         edit_indicator_displays(view)
+
     #
     # Save garden dataset.
     #
@@ -223,22 +224,31 @@ def adjust_dimensions_enrolment(tb):
 def generate_title_by_gender_and_level(sex, level):
     """Generate title based on gender and education level."""
     # Map gender to appropriate term
-    gender_map = {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "boys and girls"}
+    gender_map = {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "children"}
 
     # Map level to appropriate term (for titles - simple text)
     level_map = {
-        "primary": "primary",
-        "preprimary": "pre-primary",
-        "lower_secondary": "lower secondary",
-        "upper_secondary": "upper secondary",
-        "tertiary": "tertiary",
-        "level_side_by_side": "in different stages of",
+        "primary": "primary school",
+        "preprimary": "pre-primary school",
+        "lower_secondary": "lower secondary school",
+        "upper_secondary": "upper secondary school",
+        "tertiary": "tertiary education",
+        "level_side_by_side": "school",
     }
 
     gender_term = gender_map.get(sex, "")
     level_term = level_map.get(level, "")
 
-    return f"The share of {gender_term} who are enrolled in {level_term} school"
+    if level == "level_side_by_side":
+        return f"Share of {gender_term} enrolled in school, by education level"
+    elif level == "tertiary" and sex == "both":
+        return "Share of people enrolled in tertiary education"
+    elif level == "tertiary" and sex == "girls":
+        return "Share of women enrolled in tertiary education"
+    elif level == "tertiary" and sex == "boys":
+        return "Share of men enrolled in tertiary education"
+    else:
+        return f"Share of {gender_term} enrolled in {level_term}"
 
 
 def generate_subtitle_by_level(level, sex, enrolment_type):
@@ -254,25 +264,30 @@ def generate_subtitle_by_level(level, sex, enrolment_type):
         "lower_secondary": "[lower secondary](#dod:lower-secondary-education)",
         "upper_secondary": "[upper secondary](#dod:upper-secondary-education)",
         "tertiary": "[tertiary](#dod:tertiary-education)",
-        "level_side_by_side": "all levels of education",
+        "level_side_by_side": "[pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [lower secondary](#dod:lower-secondary-education), [upper secondary](#dod:upper-secondary-education), and [tertiary](#dod:tertiary-education)",
     }
 
     # Map enrollment type to appropriate description with DOD links
     enrolment_type_map = {
-        "net_enrolment": "This is shown as the [net enrolment rates](#dod:net-enrolment-ratio)",
-        "gross_enrolment": "This is shown as the [gross enrolment rates](#dod:gross-enrolment-ratio)",
+        "net_enrolment": "This is shown as the [net enrolment rate](#dod:net-enrolment-ratio)",
+        "gross_enrolment": "This is shown as the [gross enrolment rate](#dod:gross-enrolment-ratio)",
     }
 
     level_term = level_map.get(level, "")
     gender_term = gender_map.get(sex, "")
-    enrolment_description = enrolment_type_map.get(enrolment_type, "This shows enrollment rates")
+    enrolment_description = enrolment_type_map.get(enrolment_type, "")
+
+    if level == "tertiary" and sex == "both":
+        gender_term = "people"
+    elif level == "tertiary" and sex == "girls":
+        gender_term = "women"
+    elif level == "tertiary" and sex == "boys":
+        gender_term = "men"
 
     if level_term and gender_term:
         return f"{enrolment_description} for {gender_term} in {level_term} education."
     elif level_term:
         return f"{enrolment_description} for {level_term} education."
-    else:
-        return f"{enrolment_description}."
 
 
 def edit_indicator_displays(view):
@@ -280,7 +295,6 @@ def edit_indicator_displays(view):
     if view.dimensions["level"] == "level_side_by_side":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
-            display_name = "Unknown"  # Default value
             if (
                 "enrolment_rate__primary" in indicator.catalogPath
                 or "enrolment_ratio__primary" in indicator.catalogPath
