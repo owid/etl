@@ -287,6 +287,15 @@ steps:
     - data://garden/demography/2023-03-31/population
   data://grapher/health/2023-08-16/deaths_karlinsky:
     - data://garden/health/2023-08-16/deaths_karlinsky
+  data://grapher/who/2024-01-03/gho:
+    - data://garden/who/2024-01-03/gho
+
+  # Registered vehicles per 1000 people
+  data://garden/who/2024-05-20/vehicles:
+    - data://garden/who/2025-05-19/gho
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2024-05-20/vehicles:
+    - data://garden/who/2024-05-20/vehicles
 
   # Tuberculosis treatment UN High-Level Meeting commitments - WHO
   data://meadow/tuberculosis/2023-12-12/unhlm_commitments:
