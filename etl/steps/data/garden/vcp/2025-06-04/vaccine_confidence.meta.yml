@@ -4,6 +4,8 @@ definitions:
     presentation:
       topic_tags:
         - Vaccination
+  description_processing: |-
+    Where multiple surveys were conducted in a country in a given year we calculated a weighted average of the each response category using the number of respondents as weights.
   question: |-
     <% if question == "ImpChildren" %>
     vaccines are important for children
@@ -29,6 +31,8 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
       tend_to_agree:
         title: "Share who tend to agree that {definitions.question}"
         description_short: "Share of people who tend to agree with the statement that {definitions.question}."
@@ -36,6 +40,8 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
       agree:
         title: "Share who agree that {definitions.question}"
         description_short: "Share of people who strongly or tend to agree with the statement that {definitions.question}."
@@ -43,7 +49,8 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-        description_processing: To calculate this value, we sum the shares of people who strongly agree and those who tend to agree with the statement that {definitions.question}.
+        description_processing: |-
+          To calculate this value, we sum the shares of people who strongly agree and those who tend to agree with the statement that {definitions.question}. {definitions.description_processing}
       disagree:
         title: "Share who disagree that {definitions.question}"
         description_short: "Share of people who strongly or tend to disagree with the statement that {definitions.question}."
@@ -51,7 +58,7 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
-        description_processing: To calculate this value, we sum the shares of people who strongly disagree and those who tend to disagree with the statement that {definitions.question}.
+        description_processing: To calculate this value, we sum the shares of people who strongly disagree and those who tend to disagree with the statement that {definitions.question}. {definitions.description_processing}
       tend_to_disagree:
         title: "Share who tend to disagree that {definitions.question}"
         description_short: "Share of people who tend to disagree with the statement that {definitions.question}."
@@ -59,6 +66,8 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
       strongly_disagree:
         title: "Share who strongly disagree that {definitions.question}"
         description_short: "Share of people who strongly disagree with the statement that {definitions.question}."
@@ -66,6 +75,8 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
       dont_know__prefer_not_to_say:
         title: "Share who don't know or prefer not to say whether {definitions.question}"
         description_short: "Share of people who don't know or prefer not to say whether {definitions.question}."
@@ -73,3 +84,5 @@ tables:
         short_unit: "%"
         display:
           numDecimalPlaces: 1
+        description_processing: |-
+          {definitions.description_processing}
