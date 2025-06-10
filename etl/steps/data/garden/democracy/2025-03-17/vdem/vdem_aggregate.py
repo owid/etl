@@ -501,11 +501,15 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
     tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
 
+    # Count population with data
+    tb_pop = tb_.copy()
+    cols_to_transform = [col for col in tb_.columns if col not in ["year", "country"]]
+    tb_pop[cols_to_transform] = tb_pop[cols_to_transform].notna().astype(int)
+
     # Add population in dummies (population value replaces 1, 0 otherwise)
-    tb_ = add_population_in_dummies(
-        tb_,
-        ds_population,
-        expected_countries_without_population=[
+    kwargs = {
+        "ds_population": ds_population,
+        "expected_countries_without_population": [
             # Germany
             "Baden",
             "Bavaria",
@@ -534,15 +538,25 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
             "Democratic Republic of Vietnam",
             "Republic of Vietnam",
         ],
-        drop_population=False,
-    )
+        "drop_population": False,
+    }
+    tb_ = add_population_in_dummies(tb_, **kwargs)
+    tb_pop = add_population_in_dummies(tb_pop, **kwargs)
 
     # Get region aggregates
+    kwargs = {
+        "ds_regions": ds_regions,
+        "min_num_values_per_year": 1,  # Ensure at least one country contributes to the average
+    }
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
-        ds_regions=ds_regions,
-        aggregations={k: "sum" for k in cols_indicators} | {"population": "sum"},  # type: ignore
-        min_num_values_per_year=1,
+        aggregations={k: "sum" for k in cols_indicators} | {"population": "sum"},
+        **kwargs,
+    )
+    tb_pop = add_regions_and_global_aggregates(
+        tb=tb_pop,
+        aggregations={k: "sum" for k in cols_indicators},
+        **kwargs,
     )
 
     # Normalize by region's population
