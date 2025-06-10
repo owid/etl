@@ -20,7 +20,7 @@ tables:
   literacy_1950:
     variables:
       illiteracy_est:
-        title: Literacy rate in 1950
+        title: Illiteracy rate in 1950
         description_short: Share of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
         description_processing: The source reports illiteracy data as ranges (e.g., 10–20%). These ranges were converted into point estimates by calculating their midpoint. For example, a range of 10–20% was converted to 15%.
       literacy_est:
