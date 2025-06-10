@@ -272,8 +272,8 @@ def generate_subtitle_by_level(level, sex, enrolment_type):
 
     # Map enrollment type to appropriate description with DOD links
     enrolment_type_map = {
-        "net_enrolment": "This is shown as the [net enrolment rate](#dod:net-enrolment-ratio)",
-        "gross_enrolment": "This is shown as the [gross enrolment rate](#dod:gross-enrolment-ratio)",
+        "net_enrolment": "This is shown as the [net enrolment ratio](#dod:net-enrolment-ratio)",
+        "gross_enrolment": "This is shown as the [gross enrolment ratio](#dod:gross-enrolment-ratio)",
     }
 
     level_term = level_map.get(level, "")
