@@ -1,1042 +1,1042 @@
 [
   {
     "rawName": "(UNISDR, 2009-2011 Progress Reports, http://www.preventionweb.net/english/hyogo).",
-    "name": "UNISDR Progress Reports (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UN International Strategy for Disaster Reduction"
   },
   {
     "rawName": "ASPIRE: The Atlas of Social Protection - Indicators of Resilience and Equity, The World Bank. Data are based on national representative household surveys. (datatopics.worldbank.org/aspire/)",
-    "name": "ASPIRE: The Atlas of Social Protection (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "The Atlas of Social Protection Indicators of Resilience and Equity - World Bank"
   },
   {
     "rawName": "Brauer, M. et al. 2017, for the Global Burden of Disease Study 2017.",
-    "name": "Brauer et al. (2017) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Brauer et al. (2017)"
   },
   {
     "rawName": "Center for International Earth Science Information Network (CIESIN)/Columbia University. 2013. Urban-Rural Population and Land Area Estimates Version 2. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). http://sedac.ciesin.columbia.edu/data/set/lecz-urban-rural-population-land-area-estimates-v2.",
-    "name": "CIESIN/Columbia University (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Urban-Rural Population and Land Area Estimates Version 2 - Center for International Earth Science Information Network (2013)"
   },
   {
     "rawName": "Data are from the World Health Organization, supplemented by country data.",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Health Organization, official national sources"
   },
   {
     "rawName": "Data collected by the Lancet Commission on Global Surgery (www.lancetglobalsurgery.org); Data collected by WHO Collaborating Centre for Surgery and Public Health at Lund University from various sources including Ministries of Health or equivalent national regulatory bodies, national official entities such as medical councils, Eurostat, OECD, WHO Euro Health For All Database, WHO EURO Technical resources for health Database; BMJ Glob Health.",
-    "name": "Lancet Commission on Global Surgery (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Lancet Commission on Global Surgery, World Health Organization Collaborating Centre for Surgery and Public Health at Lund University"
   },
   {
     "rawName": "Data from various sources compiled by the Lancet Commission on Global Surgery (www.lancetglobalsurgery.org) and the Center for Health Equity in Surgery and Anesthesia at UCSF Medical Center.",
-    "name": "Lancet Commission on Global Surgery and UCSF Medical Center (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Lancet Commission on Global Surgery, Center for Health Equity in Surgery and Anesthesia at UCSF Medical Center"
   },
   {
     "rawName": "Debt service is the sum of principle repayments and interest actually paid in currency, goods, or services. This series differs from the standard debt to exports series. It covers only long-term public and publicly guaranteed debt and repayments (repurchases and charges) to the IMF. Exports of goods and services include primary income, but do not include workers' remittances.",
-    "name": "World Bank Staff Calculations",
+    "name": "TODO",
     "dataPublisherSource": "International Debt Statistics - World Bank"
   },
   {
     "rawName": "Demographic and Health Surveys (DHS)",
-    "name": "Demographic and Health Surveys (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Demographic and Health Surveys"
   },
   {
     "rawName": "Demographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS), and other surveys",
-    "name": "Demographic and Health Surveys (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Demographic and Health Surveys, Multiple Indicator Cluster Surveys, other surveys"
   },
   {
     "rawName": "Demographic and Health Surveys (DHS).",
-    "name": "Demographic and Health Surveys (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Demographic and Health Surveys (DHS)"
   },
   {
     "rawName": "Demographic and Health Surveys, and UNAIDS.",
-    "name": "Demographic and Health Surveys (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Demographic and Health Surveys, UNAIDS"
   },
   {
     "rawName": "Demographic and Health Surveys.",
-    "name": "Demographic and Health Surveys (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Demographic and Health Surveys (DHS)"
   },
   {
     "rawName": "Derived based on the data from Global Health Estimates 2020: Deaths by Cause, Age, Sex, by Country and by Region, 2000-2019. Geneva, World Health Organization; 2020. Link: https://www.who.int/data/gho/data/themes/mortality-and-global-health-estimates/ghe-leading-causes-of-death",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Health Estimates - World Health Organization"
   },
   {
     "rawName": "Derived using World Bank national accounts data and OECD National Accounts data files, and employment data from International Labour Organization, ILOSTAT database.",
-    "name": "World Bank Staff Estimates",
+    "name": "TODO",
     "dataPublisherSource": "ILOSTAT database - International Labour Organization, National accounts data - World Bank / OECD"
   },
   {
     "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: www.oecd.org/dac/stats/idsonline. IMF central government expense estimates are used for the denominator.",
-    "name": "OECD Development Assistance Committee (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD Development Assistance Committee, Development Co-operation Report - OECD Development Assistance Committee, International Development Statistics Database - OECD, Central government expense estimates - International Monetary Fund"
   },
   {
     "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: www.oecd.org/dac/stats/idsonline. World Bank GNI estimates are used for the denominator.",
-    "name": "OECD Development Assistance Committee (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD Development Assistance Committee, Development Co-operation Report - OECD Development Assistance Committee, International Development Statistics Database - OECD, GNI estimates - World Bank"
   },
   {
     "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: www.oecd.org/dac/stats/idsonline. World Bank gross capital formation estimates are used for the denominator.",
-    "name": "Development Assistance Committee of the OECD (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD Development Assistance Committee, Development Co-operation Report - OECD Development Assistance Committee, International Development Statistics Database - OECD, Gross capital formation estimates - World Bank"
   },
   {
     "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: www.oecd.org/dac/stats/idsonline. World Bank imports of good and services estimates are used for the denominator.",
-    "name": "OECD Development Assistance Committee (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD Development Assistance Committee, Development Co-operation Report - OECD Development Assistance Committee, International Development Statistics Database - OECD, Imports estimates - World Bank"
   },
   {
     "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: www.oecd.org/dac/stats/idsonline. World Bank population estimates are used for the denominator.",
-    "name": "Organisation for Economic Co-operation and Development (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD Development Assistance Committee, Development Co-operation Report - OECD Development Assistance Committee, International Development Statistics Database - OECD, Population estimates - World Bank"
   },
   {
     "rawName": "EM-DAT: The OFDA/CRED International Disaster Database: www.emdat.be, Université Catholique de Louvain, Brussels (Belgium), World Bank.",
-    "name": "EM-DAT - Université Catholique de Louvain (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Emergency Events Database (EM-DAT) - Centre for Research on the Epidemiology of Disasters"
   },
   {
     "rawName": "Estimates developed by the UN Inter-agency Group for Child Mortality Estimation (UNICEF, WHO, World Bank, UN DESA Population Division) at www.childmortality.org.",
-    "name": "UN Inter-agency Group for Child Mortality Estimation (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UN Inter-agency Group for Child Mortality Estimation"
   },
   {
     "rawName": "Food and Agriculture Organization and World Bank population estimates.",
-    "name": "Food and Agriculture Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Food and Agriculture Organization of the United Nations, Population estimates - World Bank"
   },
   {
     "rawName": "Food and Agriculture Organization of the United Nations (FAO)",
-    "name": "Food and Agriculture Organization of the United Nations (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Food and Agriculture Organization of the United Nations"
   },
   {
     "rawName": "Food and Agriculture Organization, AQUASTAT data, and World Bank and OECD GDP estimates.",
-    "name": "Food and Agriculture Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "AQUASTAT Database - Food and Agriculture Organization of the United Nations, GDP estimates - World Bank / OECD"
   },
   {
     "rawName": "Food and Agriculture Organization, AQUASTAT data.",
-    "name": "Food and Agriculture Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "AQUASTAT Database - Food and Agriculture Organization of the United Nations"
   },
   {
     "rawName": "Food and Agriculture Organization, electronic files and web site.",
-    "name": "Food and Agriculture Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Food and Agriculture Organization of the United Nations"
   },
   {
     "rawName": "Food and Agriculture Organization.",
-    "name": "Food and Agriculture Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Food and Agriculture Organization of the United Nations"
   },
   {
     "rawName": "Froese, R. and Pauly, D. (eds). 2008. FishBase database, www.fishbase.org.",
-    "name": "Froese and Pauly (2008) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "FishBase Database - Froese and Pauly (2008)"
   },
   {
     "rawName": "Household surveys, including Demographic and Health Surveys and Multiple Indicator Cluster Surveys. Largely compiled by United Nations Population Division.",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Demographic and Health Surveys, Multiple Indicator Cluster Surveys, Household surveys, UN Population Division"
   },
   {
     "rawName": "Inter-Parliamentary Union (IPU) (www.ipu.org).  For the year of 1998, the data is as of August 10, 1998.",
-    "name": "Inter-Parliamentary Union (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Inter-Parliamentary Union"
   },
   {
     "rawName": "Internation Union of Railways (UIC)",
-    "name": "International Union of Railways (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Union of Railways"
   },
   {
     "rawName": "Internation Union of Railways (UIC), OECD Statistics",
-    "name": "International Union of Railways (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Union of Railways, OECD"
   },
   {
     "rawName": "International Civil Aviation Organization, Civil Aviation Statistics of the World and ICAO staff estimates.",
-    "name": "International Civil Aviation Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Civil Aviation Statistics of the World - International Civil Aviation Organization"
   },
   {
     "rawName": "International Comparison Program, World Bank | World Development Indicators database, World Bank | Eurostat-OECD PPP Programme.",
-    "name": "International Comparison Program - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "International Comparison Program - World Bank, World Development Indicators - World Bank, Eurostat-OECD PPP Programme"
   },
   {
     "rawName": "International Diabetes Federation, Diabetes Atlas.",
-    "name": "International Diabetes Federation (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Diabetes Atlas - International Diabetes Federation"
   },
   {
     "rawName": "International Institute for Strategic Studies, The Military Balance.",
-    "name": "International Institute for Strategic Studies (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "The Military Balance - International Institute for Strategic Studies"
   },
   {
     "rawName": "International Monetary Fund, Balance of Payments Statistics Yearbook and data files, and World Bank and OECD GDP estimates.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Balance of Payments Statistics - International Monetary Fund, GDP estimates - World Bank / OECD"
   },
   {
     "rawName": "International Monetary Fund, Balance of Payments Statistics Yearbook and data files.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Balance of Payments Statistics - International Monetary Fund"
   },
   {
     "rawName": "International Monetary Fund, Balance of Payments database, and World Bank, International Debt Statistics.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Balance of Payments Statistics - International Monetary Fund, International Debt Statistics - World Bank"
   },
   {
     "rawName": "International Monetary Fund, Balance of Payments database, supplemented by data from the United Nations Conference on Trade and Development and official national sources.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Balance of Payments Statistics - International Monetary Fund, UN Conference on Trade and Development, official national sources"
   },
   {
     "rawName": "International Monetary Fund, Financial Access Survey.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Financial Access Survey - International Monetary Fund"
   },
   {
     "rawName": "International Monetary Fund, Financial Soundness Indicators.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Financial Soundness Indicators - International Monetary Fund"
   },
   {
     "rawName": "International Monetary Fund, Government Finance Statistics Yearbook and data files, and World Bank and OECD GDP estimates.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Government Finance Statistics - International Monetary Fund, GDP estimates - World Bank / OECD"
   },
   {
     "rawName": "International Monetary Fund, Government Finance Statistics Yearbook and data files, and World Bank and OECD value added estimates.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Government Finance Statistics - International Monetary Fund, Value added estimates - World Bank / OECD"
   },
   {
     "rawName": "International Monetary Fund, Government Finance Statistics Yearbook and data files.",
-    "name": "International Monetary Fund Government Finance Statistics (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Government Finance Statistics - International Monetary Fund"
   },
   {
     "rawName": "International Monetary Fund, International Financial Statistics and Balance of Payments databases, World Bank, International Debt Statistics, and World Bank and OECD GDP estimates.",
-    "name": "International Financial Statistics and Balance of Payments - IMF (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Financial Statistics - International Monetary Fund, Balance of Payments Statistics - International Monetary Fund, International Debt Statistics - World Bank, GDP estimates - World Bank / OECD"
   },
   {
     "rawName": "International Monetary Fund, International Financial Statistics and data files using World Bank data on the GDP deflator.",
-    "name": "International Financial Statistics - IMF (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Financial Statistics - International Monetary Fund, World Bank"
   },
   {
     "rawName": "International Monetary Fund, International Financial Statistics and data files, and World Bank and OECD GDP estimates.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Financial Statistics - International Monetary Fund, GDP estimates - World Bank / OECD"
   },
   {
     "rawName": "International Monetary Fund, International Financial Statistics and data files.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Financial Statistics - International Monetary Fund"
   },
   {
     "rawName": "International Monetary Fund, International Financial Statistics database.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Financial Statistics - International Monetary Fund"
   },
   {
     "rawName": "International Monetary Fund, International Financial Statistics, supplemented by World Bank staff estimates.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Financial Statistics - International Monetary Fund, World Bank"
   },
   {
     "rawName": "International Monetary Fund, International Financial Statistics.",
-    "name": "International Monetary Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Financial Statistics - International Monetary Fund"
   },
   {
     "rawName": "International Telecommunication Union (ITU) World Telecommunication/ICT Indicators Database",
-    "name": "International Telecommunication Union (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Telecommunication / ICT Indicators Database - International Telecommunication Union"
   },
   {
     "rawName": "National Science Foundation, Science and Engineering Indicators.",
-    "name": "National Science Foundation (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Science and Engineering Indicators - National Science Foundation"
   },
   {
     "rawName": "Netcraft (http://www.netcraft.com/)",
-    "name": "Netcraft (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Netcraft"
   },
   {
     "rawName": "Netcraft (http://www.netcraft.com/) and World Bank population estimates.",
-    "name": "Netcraft (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Netcraft, Population estimates - World Bank"
   },
   {
     "rawName": "Public Expenditure and Financial Accountability (PEFA). Ministry of Finance (MoF).",
-    "name": "Public Expenditure and Financial Accountability (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Public Expenditure and Financial Accountability program"
   },
   {
     "rawName": "Standard & Poor's, Global Stock Markets Factbook and supplemental S&P data.",
-    "name": "Standard & Poor's (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Stock Markets Factbook - Standard & Poor's"
   },
   {
     "rawName": "Statistical Performance Indicators, The World Bank (https://datacatalog.worldbank.org/dataset/statistical-performance-indicators)",
-    "name": "Statistical Performance Indicators - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Statistical Performance Indicators - World Bank"
   },
   {
     "rawName": "Stockholm International Peace Research Institute (SIPRI), Arms Transfers Programme (http://portal.sipri.org/publications/pages/transfer/splash).",
-    "name": "Stockholm International Peace Research Institute (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Arms Transfers Database - Stockholm International Peace Research Institute"
   },
   {
     "rawName": "Stockholm International Peace Research Institute (SIPRI), Yearbook: Armaments, Disarmament and International Security.",
-    "name": "Stockholm International Peace Research Institute (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Armaments, Disarmament and International Security - Stockholm International Peace Research Institute"
   },
   {
     "rawName": "The Internal Displacement Monitoring Centre (http://www.internal-displacement.org/)",
-    "name": "Internal Displacement Monitoring Centre (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Internal Displacement Monitoring Centre"
   },
   {
     "rawName": "The Program in Global Surgery and Social Change (PGSSC) at Harvard Medical School (https://www.pgssc.org/)",
-    "name": "Program in Global Surgery and Social Change - Harvard Medical School (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Harvard Medical School Program in Global Surgery and Social Change"
   },
   {
     "rawName": "The country data compiled, adjusted and used in the estimation model by the Maternal Mortality Estimation Inter-Agency Group (MMEIG). The country data were compiled from the following sources:  civil registration and vital statistics; specialized studies on maternal mortality; population based surveys and censuses; other available data sources including data from surveillance sites.",
-    "name": "Maternal Mortality Estimation Inter-Agency Group (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UN Maternal Mortality Estimation Inter-Agency Group"
   },
   {
     "rawName": "UN Office on Drugs and Crime's International Homicide Statistics database.",
-    "name": "UN Office on Drugs and Crime (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Homicide Statistics Database - UN Office on Drugs and Crime"
   },
   {
     "rawName": "UNAIDS estimates.",
-    "name": "UNAIDS Estimates (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UNAIDS"
   },
   {
     "rawName": "UNCTAD (http://unctad.org/en/Pages/statistics.aspx)",
-    "name": "United Nations Conference on Trade and Development (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UN Conference on Trade and Development"
   },
   {
     "rawName": "UNESCO Institute for Statistics (http://uis.unesco.org/). Data as of February 2020.",
-    "name": "UNESCO Institute for Statistics (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UNESCO Institute for Statistics"
   },
   {
     "rawName": "UNICEF, State of the World's Children, Childinfo, and Demographic and Health Surveys.",
-    "name": "UNICEF (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "State of the World's Children - UNICEF, Demographic and Health Surveys"
   },
   {
     "rawName": "UNICEF-WHO Low birthweight estimates [data.unicef.org]",
-    "name": "UNICEF-WHO (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Low Birthweight Estimates - UNICEF / World Health Organization"
   },
   {
     "rawName": "Understanding Children's Work project based on data from ILO, UNICEF and the World Bank.",
-    "name": "Understanding Children's Work project (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Understanding Children's Work Project - International Labour Organization / UNICEF / World Bank"
   },
   {
     "rawName": "United Nations Children's Fund, Division of Data, Analysis, Planning and Monitoring (2019). UNICEF Global Databases on Iodized salt, New York, June 2019",
-    "name": "UNICEF (2019) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Database on Household Consumption of Iodized Salt - UNICEF"
   },
   {
     "rawName": "United Nations Conference on Trade and Development's UNCTADstat database at http://unctadstat.unctad.org/ReportFolders/reportFolders.aspx.",
-    "name": "United Nations Conference on Trade and Development (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UN Conference on Trade and Development"
   },
   {
     "rawName": "United Nations Conference on Trade and Development, Handbook of Statistics and data files. (http://unctadstat.unctad.org)",
-    "name": "United Nations Conference on Trade and Development (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Handbook of Statistics - UN Conference on Trade and Development"
   },
   {
     "rawName": "United Nations Conference on Trade and Development, Review of Maritime Transport 2010.",
-    "name": "United Nations Conference on Trade and Development (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Review of Maritime Transport - UN Conference on Trade and Development (2010)"
   },
   {
     "rawName": "United Nations Environmental Program and the World Conservation Monitoring Centre, and International Union for Conservation of Nature, Red List of Threatened Species.",
-    "name": "United Nations Environmental Program and IUCN (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Red List of Threatened Species - International Union for Conservation of Nature"
   },
   {
     "rawName": "United Nations High Commissioner for Refugees (UNHCR) and UNRWA through UNHCR's Refugee Data Finder at https://www.unhcr.org/refugee-statistics/.",
-    "name": "United Nations High Commissioner for Refugees (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Refugee Data Finder - UN High Commissioner for Refugees"
   },
   {
     "rawName": "United Nations High Commissioner for Refugees (UNHCR), Refugee Data Finder at https://www.unhcr.org/refugee-statistics/.",
-    "name": "United Nations High Commissioner for Refugees (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Refugee Data Finder - UN High Commissioner for Refugees"
   },
   {
     "rawName": "United Nations Human Settlements Programme (UN-HABITAT)",
-    "name": "United Nations Human Settlements Programme (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UN-HABITAT"
   },
   {
     "rawName": "United Nations Industrial Development Organization (UNIDO), Competitive Industrial Performance (CIP) database",
-    "name": "United Nations Industrial Development Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Competitive Industrial Performance Database - UN Industrial Development Organization"
   },
   {
     "rawName": "United Nations Industrial Development Organization, International Yearbook of Industrial Statistics.",
-    "name": "United Nations Industrial Development Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Yearbook of Industrial Statistics - UN Industrial Development Organization"
   },
   {
     "rawName": "United Nations Population Division, Trends in Total Migrant Stock: 2008 Revision.",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Trends in Total Migrant Stock - UN Population Division (2008)"
   },
   {
     "rawName": "United Nations Population Division, Trends in Total Migrant Stock: 2012 Revision.",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Trends in Total Migrant Stock - UN Population Division (2012)"
   },
   {
     "rawName": "United Nations Population Division, World Population Prospects.",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division"
   },
   {
     "rawName": "United Nations Population Division. World Urbanization Prospects: 2018 Revision.",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division (2018)"
   },
   {
     "rawName": "United Nations Statistics Division (UNSD)",
-    "name": "United Nations Statistics Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UN Statistics Division"
   },
   {
     "rawName": "United Nations, Comtrade database through the WITS platform.",
-    "name": "United Nations Comtrade (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "The World Integrated Trade Solution platform"
   },
   {
     "rawName": "United Nations, World Urbanization Prospects.",
-    "name": "United Nations World Urbanization Prospects (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Urbanization Prospects - UN Population Division"
   },
   {
     "rawName": "Uppsala Conflict Data Program, http://www.pcr.uu.se/research/ucdp/.",
-    "name": "Uppsala Conflict Data Program (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Uppsala Conflict Data Program"
   },
   {
     "rawName": "WHO and UNICEF (http://www.who.int/immunization/monitoring_surveillance/en/).",
-    "name": "WHO and UNICEF (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Health Organization, UNICEF"
   },
   {
     "rawName": "WHO/UNICEF Joint Monitoring Programme (JMP) for Water Supply, Sanitation and Hygiene (washdata.org).",
-    "name": "WHO/UNICEF Joint Monitoring Programme (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Health Organization / UNICEF Joint Monitoring Programme for Water Supply, Sanitation and Hygiene"
   },
   {
     "rawName": "World Bank Group, CPIA database (http://www.worldbank.org/ida).",
-    "name": "CPIA Database - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Country Policy and Institutional Assessment Database - World Bank"
   },
   {
     "rawName": "World Bank and Turku School of Economics, Logistic Performance Index Surveys. Data are available online at : http://www.worldbank.org/lpi. Summary results are published in Arvis and others' Connecting to Compete: Trade Logistics in the Global Economy, The Logistics Performance Index and Its Indicators report.",
-    "name": "Logistic Performance Index - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Logistic Performance Index Surveys - World Bank / Turku School of Economics"
   },
   {
     "rawName": "World Bank national accounts data files.",
-    "name": "World Bank National Accounts",
+    "name": "TODO",
     "dataPublisherSource": "National accounts data - World Bank"
   },
   {
     "rawName": "World Bank national accounts data, and OECD National Accounts data files.",
-    "name": "World Bank National Accounts Data",
+    "name": "TODO",
     "dataPublisherSource": "National accounts data - World Bank / OECD"
   },
   {
     "rawName": "World Bank staff calculations based on the methodology described in World Bank (2018). https://openknowledge.worldbank.org/handle/10986/30498",
-    "name": "World Bank Staff Calculations",
+    "name": "TODO",
     "dataPublisherSource": "World Bank"
   },
   {
     "rawName": "World Bank staff estimates based data from International Monetary Fund's Direction of Trade database.",
-    "name": "World Bank Staff Estimates",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on Direction of Trade database - International Monetary Fund"
   },
   {
     "rawName": "World Bank staff estimates based on IMF balance of payments data, and World Bank and OECD GDP estimates.",
-    "name": "World Bank Staff Estimates",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on Balance of Payments Statistics - International Monetary Fund, GDP estimates - World Bank / OECD"
   },
   {
     "rawName": "World Bank staff estimates based on IMF balance of payments data.",
-    "name": "World Bank Staff Estimates",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on Balance of Payments Statistics - International Monetary Fund"
   },
   {
     "rawName": "World Bank staff estimates based on World Bank national accounts data archives, OECD National Accounts, and the IMF WEO database.",
-    "name": "World Bank Staff Estimates",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on World Economic Outlook Database - International Monetary Fund, National accounts data - World Bank / OECD"
   },
   {
     "rawName": "World Bank staff estimates based on sources and methods described in the World Bank's The Changing Wealth of Nations.",
-    "name": "World Bank Staff Calculations",
+    "name": "TODO",
     "dataPublisherSource": "The Changing Wealth of Nations - World Bank"
   },
   {
     "rawName": "World Bank staff estimates based on sources and methods in World Bank's \"The Changing Wealth of Nations: Measuring Sustainable Development in the New Millennium\" (2011).",
-    "name": "World Bank Staff Estimates",
+    "name": "TODO",
     "dataPublisherSource": "The Changing Wealth of Nations - World Bank"
   },
   {
     "rawName": "World Bank staff estimates based on the United Nations Population Division's World Urbanization Prospects: 2018 Revision.",
-    "name": "World Bank Staff Estimates",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2018)"
   },
   {
     "rawName": "World Bank staff estimates through the WITS platform from the Comtrade database maintained by the United Nations Statistics Division.",
-    "name": "World Bank Staff Calculations",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on the World Integrated Trade Solution platform"
   },
   {
     "rawName": "World Bank staff estimates using the World Integrated Trade Solution system, based on data from United Nations Conference on Trade and Development's Trade Analysis and Information System (TRAINS) database.",
-    "name": "World Bank Staff Estimates (via UNCTAD)",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on the World Integrated Trade Solution platform"
   },
   {
     "rawName": "World Bank staff estimates using the World Integrated Trade Solution system, based on data from World Trade Organization.",
-    "name": "World Bank Staff Estimates",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on the World Integrated Trade Solution platform"
   },
   {
     "rawName": "World Bank's Entrepreneurship Database (https://www.worldbank.org/en/programs/entrepreneurship).",
-    "name": "Entrepreneurship Database - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Entrepreneurship Database - World Bank"
   },
   {
     "rawName": "World Bank, Enterprise Surveys (http://www.enterprisesurveys.org/).",
-    "name": "Enterprise Surveys - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Enterprise Surveys - World Bank"
   },
   {
     "rawName": "World Bank, Global Database of Shared Prosperity (GDSP) (http://www.worldbank.org/en/topic/poverty/brief/global-database-of-shared-prosperity).",
-    "name": "Global Database of Shared Prosperity - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Global Database of Shared Prosperity - World Bank"
   },
   {
     "rawName": "World Bank, International Debt Statistics, and OECD.",
-    "name": "World Bank International Debt Statistics (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "International Debt Statistics - World Bank, OECD"
   },
   {
     "rawName": "World Bank, International Debt Statistics.",
-    "name": "International Debt Statistics - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "International Debt Statistics - World Bank"
   },
   {
     "rawName": "World Bank, Private Participation in Infrastructure Project Database (http://ppi.worldbank.org).",
-    "name": "Private Participation in Infrastructure Project Database - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Private Participation in Infrastructure Project Database - World Bank"
   },
   {
     "rawName": "World Bank, Remittance Prices Worldwide, available at http://remittanceprices.worldbank.org",
-    "name": "Remittance Prices Worldwide - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Remittance Prices Worldwide - World Bank"
   },
   {
     "rawName": "World Bank.",
-    "name": "World Bank",
+    "name": "TODO",
     "dataPublisherSource": "World Bank"
   },
   {
     "rawName": "World Bank: Women, Business and the Law. https://wbl.worldbank.org/",
-    "name": "World Bank Women, Business and the Law (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Women, Business and the Law - World Bank"
   },
   {
     "rawName": "World Database on Protected Areas (WDPA) where the compilation and management is carried out by United Nations Environment World Conservation Monitoring Centre (UNEP-WCMC) in collaboration with governments, non-governmental organizations, academia and industry. The data is available online through the Protected Planet website (https://www.protectedplanet.net/).",
-    "name": "World Database on Protected Areas (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Database on Protected Areas - UN Environment Programme World Conservation Monitoring Centre"
   },
   {
     "rawName": "World Federation of Exchanges database.",
-    "name": "World Federation of Exchanges (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Federation of Exchanges database"
   },
   {
     "rawName": "World Health Organization's Global Health Workforce Statistics, OECD, supplemented by country data.",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Health Workforce Statistics - World Health Organization, OECD, official national sources"
   },
   {
     "rawName": "World Health Organization, Global Health Observatory Data Repository (http://apps.who.int/ghodata/).",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Health Observatory Data Repository - World Health Organization"
   },
   {
     "rawName": "World Health Organization, Global Health Observatory Data Repository/World Health Statistics (http://apps.who.int/gho/data/node.main.1?lang=en).",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Health Observatory Data Repository - World Health Organization"
   },
   {
     "rawName": "World Health Organization, Global Health Observatory Data Repository/World Health Statistics.",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Health Observatory Data Repository - World Health Organization"
   },
   {
     "rawName": "World Health Organization, Global Tuberculosis Report.",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Tuberculosis Report - World Health Organization"
   },
   {
     "rawName": "World Intellectual Property Organization (WIPO), Statistics Database at www.wipo.int/ipstats/. The International Bureau of WIPO assumes no responsibility with respect to the transformation of these data.",
-    "name": "World Intellectual Property Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Intellectual Property Organization"
   },
   {
     "rawName": "World Intellectual Property Organization (WIPO), WIPO Patent Report: Statistics on Worldwide Patent Activity. The International Bureau of WIPO assumes no responsibility with respect to the transformation of these data.",
-    "name": "World Intellectual Property Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Statistics on Worldwide Patent Activity - World Intellectual Property Organization"
   },
   {
     "rawName": "World Tourism Organization, Yearbook of Tourism Statistics, Compendium of Tourism Statistics and data files, and IMF and World Bank exports estimates.",
-    "name": "World Tourism Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Yearbook of Tourism Statistics - World Tourism Organization, Compendium of Tourism Statistics - World Tourism Organization, Exports estimates - International Monetary Fund / World Bank"
   },
   {
     "rawName": "World Tourism Organization, Yearbook of Tourism Statistics, Compendium of Tourism Statistics and data files, and IMF and World Bank imports estimates.",
-    "name": "World Tourism Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Yearbook of Tourism Statistics - World Tourism Organization, Compendium of Tourism Statistics - World Tourism Organization, Imports estimates - International Monetary Fund / World Bank"
   },
   {
     "rawName": "World Tourism Organization, Yearbook of Tourism Statistics, Compendium of Tourism Statistics and data files.",
-    "name": "World Tourism Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Yearbook of Tourism Statistics - World Tourism Organization, Compendium of Tourism Statistics - World Tourism Organization"
   },
   {
     "rawName": "World Trade Organization, and World Bank GDP estimates.",
-    "name": "World Trade Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Trade Organization, GDP estimates - World Bank"
   },
   {
     "rawName": "World Trade Organization.",
-    "name": "World Trade Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Trade Organization"
   },
   {
     "rawName": "Data on health impacts from exposure to ambient PM2.5 pollution and household air pollution are from the Global Burden of Disease 2013 study. Data are provided by the Institute for Health Metrics and Evaluation at the University of Washington.",
-    "name": "Institute for Health Metrics and Evaluation (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Institute for Health Metrics and Evaluation"
   },
   {
     "rawName": "UNICEF DATA (http://www.data.unicef.org/);  Demographic and Health Surveys (DHS); Multiple Indicator Cluster Surveys (MICS), and other surveys.",
-    "name": "UNICEF DATA (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UNICEF, Demographic and Health Surveys, Multiple Indicator Cluster Surveys, other surveys"
   },
   {
     "rawName": "World Bank staff estimates using data from the United Nations Statistics Division's National Accounts Statistics.",
-    "name": "World Bank Staff Calculations",
+    "name": "TODO",
     "dataPublisherSource": "National Accounts Statistics - UN Statistics Division"
   },
   {
     "rawName": "World Bank, Doing Business project (http://www.doingbusiness.org/). NOTE: Doing Business has been discontinued as of 9/16/2021. For more information: https://bit.ly/3CLCbme",
-    "name": "Doing Business - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Doing Business Project - World Bank"
   },
   {
     "rawName": "World Bank, Enterprise Surveys (http://www.enterprisesurveys.org/)",
-    "name": "Enterprise Surveys - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Enterprise Surveys - World Bank"
   },
   {
     "rawName": "Food and Agriculture Organization (http://www.fao.org/faostat/en/#home).",
-    "name": "Food and Agriculture Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Food and Agriculture Organization of the United Nations"
   },
   {
     "rawName": "UNICEF Data; Demographic and Health Surveys (DHS), Multiple Indicator Cluster Surveys (MICS), AIDS Indicator Surveys(AIS), Reproductive Health Survey(RHS), and other household surveys.",
-    "name": "UNICEF Data (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UNICEF, Demographic and Health Surveys, Multiple Indicator Cluster Surveys, AIDS Indicator Surveys, Reproductive Health Survey, other surveys"
   },
   {
     "rawName": "World Bank staff estimates using data from the United Nations Statistics Division's Statistical Yearbook, and the UNESCO Institute for Statistics online database.",
-    "name": "World Bank Staff Calculations",
+    "name": "TODO",
     "dataPublisherSource": "UN Statistics Division, UNESCO Institute for Statistics"
   },
   {
     "rawName": "World Bank, Poverty and Inequality Platform. Data are based on primary household survey data obtained from government statistical agencies and World Bank country departments. Data for high-income economies are mostly from the Luxembourg Income Study database. For more information and methodology, please see http://pip.worldbank.org.",
-    "name": "Poverty and Inequality Platform - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Poverty and Inequality Platform - World Bank"
   },
   {
     "rawName": "World Bank, Poverty and Inequality Platform. Data are compiled from official government sources or are computed by World Bank staff using national (i.e. country–specific) poverty lines.",
-    "name": "Poverty and Inequality Platform - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Poverty and Inequality Platform - World Bank"
   },
   {
     "rawName": "UNESCO Institute for Statistics (http://uis.unesco.org/). Data as of March 2021.",
-    "name": "UNESCO Institute for Statistics (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UNESCO Institute for Statistics"
   },
   {
     "rawName": "World Bank, World Development Indicators database. Estimates are based on data obtained from International Labour Organization, ILOSTAT at https://ilostat.ilo.org/data/.",
-    "name": "World Development Indicators - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "World Development Indicators - World Bank, ILOSTAT - International Labour Organization"
   },
   {
     "rawName": "World Bank, World Development Indicators database. Estimates are based on employment, population, GDP, and PPP data obtained from International Labour Organization, United Nations Population Division, Eurostat, OECD, and World Bank.",
-    "name": "World Development Indicators - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "World Development Indicators Database - World Bank"
   },
   {
     "rawName": "World Bank, World Development Indicators database. Estimates are based on data obtained from International Labour Organization and United Nations Population Division.",
-    "name": "World Development Indicators - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "World Development Indicators Database - World Bank"
   },
   {
     "rawName": "UNICEF global databases, based on administrative reports from countries (link: https://data.unicef.org/topic/nutrition/vitamin-a-deficiency/)",
-    "name": "UNICEF Global Databases (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UNICEF Global Databases"
   },
   {
     "rawName": "Center for International Earth Science Information Network - CIESIN - Columbia University, and CUNY Institute for Demographic Research - CIDR - City University of New York. 2021. Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates, Version 3. Palisades, NY: NASA Socioeconomic Data and Applications Center (SEDAC). https://doi.org/10.7927/d1x1-d702.",
-    "name": "CIESIN and CIDR (2021) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Low Elevation Coastal Zone (LECZ) Urban-Rural Population and Land Area Estimates - CIESIN / CIDR"
   },
   {
     "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed October 24, 2022. https://apiportal.uis.unesco.org/bdds.",
-    "name": "UNESCO Institute for Statistics (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UNESCO Institute for Statistics"
   },
   {
     "rawName": "Global Findex Database, World Bank (https://www.worldbank.org/en/publication/globalfindex).",
-    "name": "World Bank Global Findex Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Findex Database - World Bank"
   },
   {
     "rawName": "World Bank and UIS",
-    "name": "World Bank and UNESCO Institute for Statistics",
+    "name": "TODO",
     "dataPublisherSource": "World Bank and UNESCO Institute for Statistics"
   },
   {
     "rawName": "UNICEF, WHO, World Bank: Joint child Malnutrition Estimates (JME). Aggregation is based on UNICEF, WHO, and the World Bank harmonized dataset (adjusted, comparable data) and methodology.",
-    "name": "UNICEF, WHO, World Bank: Joint Child Malnutrition Estimates",
+    "name": "TODO",
     "dataPublisherSource": "Joint child Malnutrition Estimates - UNICEF, WHO, World Bank"
   },
   {
     "rawName": "IEA Statistics © OECD/IEA 2014 (https://www.iea.org/data-and-statistics), subject to https://www.iea.org/terms/",
-    "name": "International Energy Agency (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "IEA Statistics - International Energy Agency"
   },
   {
     "rawName": "UNICEF, WHO, World Bank: Joint child Malnutrition Estimates (JME).",
-    "name": "UNICEF, WHO, World Bank: Joint Child Malnutrition Estimates",
+    "name": "TODO",
     "dataPublisherSource": "Joint child Malnutrition Estimates - UNICEF, WHO, World Bank"
   },
   {
     "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision. (2) HMD. Human Mortality Database. Max Planck Institute for Demographic Research (Germany), University of California, Berkeley (USA), and French Institute for Demographic Studies (France). Available at www.mortality.org.",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division (2022), Human Mortality Database - Max Planck Institute for Demographic Research, University of California, Berkeley, French Institute for Demographic Studies"
   },
   {
     "rawName": "WHO, UNICEF, UNFPA, World Bank Group, and UNDESA/Population Division. Trends in Maternal Mortality 2000 to 2020. Geneva, World Health Organization, 2023",
-    "name": "WHO et al. (2023) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Trends in Maternal Mortality - WHO, UNICEF, UNFPA, World Bank Group, UNDESA/Population Division"
   },
   {
     "rawName": "Global Health Observatory. Geneva: World Health Organization; 2023. (https://www.who.int/data/gho/data/themes/topics/financial-protection)",
-    "name": "Global Health Observatory (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Health Observatory - World Health Organization"
   },
   {
     "rawName": "International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed February 07, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "ILO modelled estimates database - International Labour Organization"
   },
   {
     "rawName": "IEA Statistics © OECD/IEA 2018 (https://www.iea.org/data-and-statistics), subject to https://www.iea.org/terms/",
-    "name": "IEA Statistics (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "IEA Statistics - International Energy Agency"
   },
   {
     "rawName": "Household surveys such as Demographic and Health Surveys and Multiple Indicator Cluster Surveys.  Largely compiled by UNICEF.",
-    "name": "UNICEF (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Demographic and Health Surveys, Multiple Indicator Cluster Surveys - UNICEF"
   },
   {
     "rawName": "Internation Union of Railways (UIC Railisa Database), OECD Statistics",
-    "name": "International Union of Railways (UIC) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UIC Railisa Database - International Union of Railways, OECD Statistics"
   },
   {
     "rawName": "Global Health Observatory. Geneva: World Health Organization; 2023. (https://www.who.int/data/gho/data/themes/topics/service-coverage)",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Health Observatory - World Health Organization"
   },
   {
     "rawName": "Data are available online at: https://lpi.worldbank.org/. Summary results are published in World Bank (2023): Connecting to Compete: Trade Logistics in the Global Economy, The Logistics Performance Index and Its Indicators.",
-    "name": "Logistics Performance Index - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Logistics Performance Index - World Bank"
   },
   {
     "rawName": "Global Burden of Disease Collaborative Network. 2021. Global Burden of Disease Study 2019 (GBD 2019) Air Pollution Exposure Estimates 1990-2019. Seattle, United States of America: Institute for Health Metrics and Evaluation (IHME). https://doi.org/10.6069/70JS-NC54",
-    "name": "Global Burden of Disease Collaborative Network (2021) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Burden of Disease Study 2019 - Institute for Health Metrics and Evaluation"
   },
   {
     "rawName": "International Labour Organization. “ILO modelled estimates database” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "ILO modelled estimates database - International Labour Organization"
   },
   {
     "rawName": "United Nations Conference on Trade and Development",
-    "name": "United Nations Conference on Trade and Development (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "United Nations Conference on Trade and Development"
   },
   {
     "rawName": "Detailed documentation of the WGI, interactive tools for exploring the data, and full access to the underlying source data available at www.govindicators.org. The WGI are produced by Daniel Kaufmann (Natural Resource Governance Institute and Brookings Institution) and Aart Kraay (World Bank Development Research Group).  Please cite Kaufmann, Daniel, Aart Kraay and Massimo Mastruzzi (2010).  \"The Worldwide Governance Indicators:  Methodology and Analytical Issues\".  World Bank Policy Research Working Paper No. 5430 (http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1682130).  The WGI do not reflect the official views of the Natural Resource Governance Institute, the Brookings Institution, the World Bank, its Executive Directors, or the countries they represent.",
-    "name": "Kaufmann et al. (2010) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Worldwide Governance Indicators - World Bank"
   },
   {
     "rawName": "IEA, IRENA, UNSD, World Bank, WHO. 2023. Tracking SDG 7: The Energy Progress Report. World Bank, Washington DC. © World Bank. License: Creative Commons Attribution—NonCommercial 3.0 IGO (CC BY-NC 3.0 IGO).",
-    "name": "Tracking SDG 7: The Energy Progress Report - World Bank",
+    "name": "TODO",
     "dataPublisherSource": "Tracking SDG 7: The Energy Progress Report - World Bank, International Energy Agency, IRENA, UNSD, WHO"
   },
   {
     "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed February 06, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "ILO Modelled Estimates and Projections database (ILOEST) - International Labour Organization"
   },
   {
     "rawName": "Demographic and Health Surveys compiled by United Nations Population Fund. Retrieved on February 14, 2023, from the SDG Global database API (https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html).",
-    "name": "United Nations Population Fund (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Demographic and Health Surveys - United Nations Population Fund"
   },
   {
     "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database ( ILOEST )” ILOSTAT. Accessed September 06, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "ILO Modelled Estimates and Projections Database (ILOEST) - International Labour Organization"
   },
   {
     "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics.",
-    "name": "United Nations Population Division World Population Prospects (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division, National Statistical Offices, Eurostat"
   },
   {
     "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics; (4) United Nations Statistics Division. Population and Vital Statistics Reprot (various years).",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division, National Statistical Offices, Eurostat, UN Statistics Division"
   },
   {
     "rawName": "Alkire, S., Kanagaratnam, U., and Suppa, N. (2023). ‘The global Multidimensional Poverty Index (MPI) 2023 country results and methodological note’, OPHI MPI Methodological Note 55, Oxford Poverty and Human Development Initiative (OPHI), University of Oxford. (https://ophi.org.uk/mpi-methodological-note-55-2/)",
-    "name": "Alkire et al. (2023) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Multidimensional Poverty Index (MPI) - OPHI"
   },
   {
     "rawName": "(1) United Nations Population Division. World Population Prospects: 2022 Revision; or derived from male and female life expectancy at birth from sources such as: (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics.",
-    "name": "United Nations Population Division World Population Prospects (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division, National Statistical Offices, Eurostat"
   },
   {
     "rawName": "Development Assistance Committee of the Organisation for Economic Co-operation and Development, Geographical Distribution of Financial Flows to Developing Countries, Development Co-operation Report, and International Development Statistics database. Data are available online at: https://data-explorer.oecd.org/.",
-    "name": "Organisation for Economic Co-operation and Development (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Geographical Distribution of Financial Flows to Developing Countries - OECD"
   },
   {
     "rawName": "National statistical offices or national database and publications compiled by United Nations Statistics Division.  The data were downloaded on April 4, 2024, from the Global SDG  API: https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html",
-    "name": "United Nations Statistics Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global SDG API - UN Statistics Division"
   },
   {
     "rawName": "World Health Organization, World malaria report and Global Health Observatory Data Repository/World Health Statistics (http://apps.who.int/ghodata/).",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Malaria Report, Global Health Observatory Data Repository - World Health Organization"
   },
   {
     "rawName": "International Labour Organization. “ILO Modelled Estimates and Projections database (ILOEST)” ILOSTAT. Accessed June 18, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "ILO Modelled Estimates and Projections Database (ILOEST) - International Labour Organization"
   },
   {
     "rawName": "World Health Organization Global Health Expenditure database (http://apps.who.int/nha/database). The data was retrieved on April 15, 2024.",
-    "name": "World Health Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global Health Expenditure Database - World Health Organization"
   },
   {
     "rawName": "National statistical offices or national database and publications compiled by United Nations Statistics Division. The data were downloaded on April 4, 2024, from the Global SDG  API: https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html",
-    "name": "United Nations Statistics Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Global SDG API - UN Statistics Division"
   },
   {
     "rawName": "World Bank’s Poverty and Inequality Platform: http://pip.worldbank.org.",
-    "name": "World Bank Poverty and Inequality Platform (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Poverty and Inequality Platform - World Bank"
   },
   {
     "rawName": "Detailed documentation of the WGI, interactive tools for exploring the data, and full access to the underlying source data available at www.govindicators.org.The WGI are produced by Daniel Kaufmann (Natural Resource Governance Institute and Brookings Institution) and Aart Kraay (World Bank Development Research Group).  Please cite Kaufmann, Daniel, Aart Kraay and Massimo Mastruzzi (2010).  \"The Worldwide Governance Indicators:  Methodology and Analytical Issues\".  World Bank Policy Research Working Paper No. 5430 (http://papers.ssrn.com/sol3/papers.cfm?abstract_id=1682130).  The WGI do not reflect the official views of the Natural Resource Governance Institute, the Brookings Institution, the World Bank, its Executive Directors, or the countries they represent.",
-    "name": "Kaufmann et al. (2010) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Worldwide Governance Indicators - World Bank"
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg79",
-    "name": "EDGAR Community GHG Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, JRC, IEA"
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg77",
-    "name": "EDGAR Community GHG Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg72",
-    "name": "EDGAR Community GHG Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
   },
   {
     "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190605",
-    "name": "Grassi et al. (2022) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
   },
   {
     "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190602",
-    "name": "Grassi et al. (2022) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
   },
   {
     "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190603",
-    "name": "Grassi et al. (2022) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg74",
-    "name": "EDGAR Community GHG Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg80",
-    "name": "European Commission, Joint Research Centre (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg72; Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190601",
-    "name": "Grassi et al. (2022) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency; Carbon fluxes from land 2000–2020 - Grassi et al."
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg73",
-    "name": "EDGAR Community GHG Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg75",
-    "name": "EDGAR Community GHG Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg76",
-    "name": "EDGAR Community GHG Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
   },
   {
     "rawName": "EDGAR (Emissions Database for Global Atmospheric Research) Community GHG Database, a collaboration between the European Commission, Joint Research Centre (JRC), the International Energy Agency (IEA), and comprising IEA-EDGAR CO2, EDGAR CH4, EDGAR N2O, EDGAR F-GASES version 8.0, (2023) European Commission, JRC (Datasets). https://edgar.jrc.ec.europa.eu/dataset_ghg78",
-    "name": "EDGAR Community GHG Database (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "EDGAR Community GHG Database - European Commission, Joint Research Centre, International Energy Agency"
   },
   {
     "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190604",
-    "name": "Grassi et al. (2022) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
   },
   {
     "rawName": "Grassi, G., Conchedda, G., Federici, S., Abad Viñas, R., Korosuo, A., Melo, J., Rossi, S., Sandker, M., Somogyi, Z., and Tubiello, F. N.: Carbon fluxes from land 2000–2020: bringing clarity on countries’ reporting, Earth Syst. Sci. Data, 14, 4643–4666, 2022, doi:10.5194/essd-14-4643-2022. Data available from https://doi.org/10.5281/zenodo.7190601",
-    "name": "Grassi et al. (2022) (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Carbon fluxes from land 2000–2020 - Grassi et al."
   },
   {
     "rawName": "United Nations Population Division. World Population Prospects: 2024 Revision.",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division (2024)"
   },
   {
     "rawName": "World Bank staff estimates using the World Integrated Trade Solution system, based on tariff data from the United Nations Conference on Trade and Development's Trade and Development's Trade Analysis and Information System (TRAINS) database and global imports data from the United Nations Statistics Division's Comtrade database.",
-    "name": "World Bank Staff Estimates (via UNCTAD and UNSD)",
+    "name": "TODO",
     "dataPublisherSource": "World Integrated Trade Solution - World Bank, TRAINS Database - UNCTAD, Comtrade Database - UN Statistics Division"
   },
   {
     "rawName": "World Bank staff estimates based on age/sex distributions of United Nations Population Division's World Population Prospects: 2024 Revision.",
-    "name": "World Bank Staff Estimates (via UN Population Division)",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2024)"
   },
   {
     "rawName": "International Labour Organization. “Education and Mismatch Indicators database (EMI)” ILOSTAT. Accessed October 16, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Education and Mismatch Indicators Database (EMI) - International Labour Organization"
   },
   {
     "rawName": "International Labour Organization. “Labour Market-related SDG Indicators database (ILOSDG)” ILOSTAT. Accessed October 16, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Labour Market-related SDG Indicators Database (ILOSDG) - International Labour Organization"
   },
   {
     "rawName": "World Bank staff estimates using the World Bank's total population and age/sex distributions of the United Nations Population Division's World Population Prospects: 2024 Revision.",
-    "name": "World Bank Staff Calculations",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2024)"
   },
   {
     "rawName": "(1) United Nations Population Division. World Population Prospects: 2024 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics; (4) United Nations Statistics Division. Population and Vital Statistics Report (various years).",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division (2024), Demographic Statistics - Eurostat, Population and Vital Statistics Report - UN Statistics Division"
   },
   {
     "rawName": "International Labour Organization. “Labour Force Statistics database (LFS)” ILOSTAT. Accessed October 16, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Labour Force Statistics Database (LFS) - International Labour Organization"
   },
   {
     "rawName": "International Labour Organization. “Wages and Working Time Statistics database (COND)” ILOSTAT. Accessed October 16, 2024. https://ilostat.ilo.org/data/.",
-    "name": "International Labour Organization (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "Wages and Working Time Statistics Database (COND) - International Labour Organization"
   },
   {
     "rawName": "Derived from total population. Population source: (1) United Nations Population Division. World Population Prospects: 2024 Revision; (2) Statistical databases and publications from national statistical offices; (3) Eurostat: Demographic Statistics; (4) United Nations Statistics Division. Population and Vital Statistics Report (various years).",
-    "name": "United Nations Population Division (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "World Population Prospects - UN Population Division (2024), Demographic Statistics - Eurostat, Population and Vital Statistics Report - UN Statistics Division"
   },
   {
     "rawName": "UNESCO Institute for Statistics (UIS). UIS.Stat Bulk Data Download Service. Accessed September 30, 2024. https://apiportal.uis.unesco.org/bdds.",
-    "name": "UNESCO Institute for Statistics (via World Bank)",
+    "name": "TODO",
     "dataPublisherSource": "UIS.Stat Bulk Data Download Service - UNESCO Institute for Statistics"
   },
   {
     "rawName": "World Bank staff estimates based on age distributions of United Nations Population Division's World Population Prospects: 2024 Revision.",
-    "name": "World Bank Staff Calculations",
+    "name": "TODO",
     "dataPublisherSource": "World Bank based on World Population Prospects - UN Population Division (2024)"
   }
 ]
