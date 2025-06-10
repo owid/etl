@@ -7,6 +7,7 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 MULTIDIM_CONFIG = {
+    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
     "hasMapTab": True,
     "tab": "map",
     "originUrl": "ourworldindata.org/education",
@@ -109,6 +110,7 @@ def run() -> None:
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["girls", "boys"],
                 "view_config": {
+                    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "change-country",
@@ -121,6 +123,7 @@ def run() -> None:
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
                 "view_config": {
+                    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
                     "originUrl": "ourworldindata.org/education",
                     "hideAnnotationFieldsInTitle": {"time": True},
                     "addCountryMode": "change-country",
