@@ -16,7 +16,7 @@ The main workflow:
 """
 
 from itertools import chain
-from typing import Dict, Optional, Tuple, cast
+from typing import cast
 
 import pandas as pd
 from owid.catalog import Dataset, Table
@@ -71,6 +71,13 @@ REGIONS = {
     },
     "Oceania": {},
 }
+
+# THRESHOLDS to consider a region as having enough data for aggregation.
+## Share of countries in region required to estimate regional averages
+THRESHOLD_SHARE_COUNTRIES = 0.7
+## Share of people living regions required to estimate regional averages
+THRESHOLD_SHARE_POPULATION = 0.7
+
 
 # INDICATORS FOR REGIONAL AVERAGING
 # These V-Dem indicators will have regional averages calculated using both
@@ -157,7 +164,7 @@ INDICATORS_REGION_AVERAGES = list(chain.from_iterable(INDICATORS_REGION_AVERAGES
 N_EXPECTED = 196
 
 
-def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table, Table, Table, Table, Table]:
+def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table, Table, Table, Table, Table]:
     """Main aggregation pipeline for V-Dem democracy data.
 
     Processes raw V-Dem democracy indicators and creates multiple aggregated datasets
@@ -222,7 +229,7 @@ def run(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, 
 
 
 # %% NUM_COUNTRIES TABLES
-def make_table_countries(tb: Table, ds_regions: Dataset) -> Tuple[Table, Table]:
+def make_table_countries(tb: Table, ds_regions: Dataset) -> tuple[Table, Table]:
     """Create country-based regional aggregates using simple averages.
 
     Generates two types of regional aggregates:
@@ -334,12 +341,27 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
     tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
 
+    # TODO: aggregations encodes the logic of: "estimate mean if >70% of 1900 countries are present in the region"
+    # Get list of countries in regions in 1900
+    tb_1900 = tb.loc[tb["year"] == 1900, ["country"]]
+    countries_to_continent = geo.countries_to_continent_mapping(
+        ds_regions=ds_regions,
+        regions=REGIONS,
+        exclude_historical_countries=False,
+        include_historical_regions_in_income_groups=True,
+    )
+    tb_1900["continent"] = tb_1900["country"].map(countries_to_continent)
+    countries_must_have_data = tb_1900.groupby("continent")["country"].agg(list).to_dict()
+    frac_must_have_data = {region: THRESHOLD_SHARE_COUNTRIES for region in countries_must_have_data.keys()}
+
     # Estimate region aggregates
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
         ds_regions=ds_regions,
         aggregations={k: "mean" for k in cols_indicators},  # type: ignore
         aggregations_world={k: "mean" for k in cols_indicators},  # type: ignore
+        countries_must_have_data=countries_must_have_data,
+        frac_must_have_data=frac_must_have_data,
     )
 
     # Sanity check on output shape
@@ -349,7 +371,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
 
 
 # %% POPULATION TABLES
-def make_table_population(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> Tuple[Table, Table]:
+def make_table_population(tb: Table, ds_regions: Dataset, ds_population: Dataset) -> tuple[Table, Table]:
     """Create population-weighted regional aggregates.
 
     Generates two types of population-based aggregates:
@@ -501,13 +523,13 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     cols_indicators = [col for col in tb_.columns if col in INDICATORS_REGION_AVERAGES]
     tb_ = tb_.loc[:, ["year", "country"] + cols_indicators]
 
-    # Count population with data
+    # Initialize table to estimate (%) of population covered
     tb_pop = tb_.copy()
     cols_to_transform = [col for col in tb_.columns if col not in ["year", "country"]]
     tb_pop[cols_to_transform] = tb_pop[cols_to_transform].notna().astype(int)
 
     # Add population in dummies (population value replaces 1, 0 otherwise)
-    kwargs = {
+    kwargs_dummies = {
         "ds_population": ds_population,
         "expected_countries_without_population": [
             # Germany
@@ -540,23 +562,17 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
         ],
         "drop_population": False,
     }
-    tb_ = add_population_in_dummies(tb_, **kwargs)
-    tb_pop = add_population_in_dummies(tb_pop, **kwargs)
+    tb_ = add_population_in_dummies(tb_, **kwargs_dummies)
 
     # Get region aggregates
-    kwargs = {
+    kwargs_agg = {
         "ds_regions": ds_regions,
+        "aggregations": {k: "sum" for k in cols_indicators} | {"population": "sum"},
         "min_num_values_per_year": 1,  # Ensure at least one country contributes to the average
     }
     tb_ = add_regions_and_global_aggregates(
         tb=tb_,
-        aggregations={k: "sum" for k in cols_indicators} | {"population": "sum"},
-        **kwargs,
-    )
-    tb_pop = add_regions_and_global_aggregates(
-        tb=tb_pop,
-        aggregations={k: "sum" for k in cols_indicators},
-        **kwargs,
+        **kwargs_agg,
     )
 
     # Normalize by region's population
@@ -569,6 +585,24 @@ def make_table_population_avg(tb: Table, ds_regions: Dataset, ds_population: Dat
     # tb_ = tb_.rename(columns={col: f"popw_{col}" for col in INDICATORS_REGION_AVERAGES})
     # Sanity check on output shape
     assert tb_.shape[1] == N_EXPECTED, f"Unexpected number of columns. Expected {N_EXPECTED} but found {tb_.shape[1]}"
+
+    # Filter by coverage of people
+    ## Get dummy table
+    tb_pop = add_population_in_dummies(tb_pop, **kwargs_dummies)
+    # tb_pop = tb_pop.drop(columns=["population"])
+    ## Get population covered (absolute)
+    tb_pop = add_regions_and_global_aggregates(
+        tb=tb_pop,
+        **kwargs_agg,
+    )
+    ## Get population covered (%)
+    tb_pop.loc[:, columns_indicators] = tb_pop.loc[:, columns_indicators].div(tb_pop["population"], axis=0)
+    tb_pop = tb_pop.drop(columns="population")
+    ## Get flag if population coverage is above threshold
+    tb_pop[columns_indicators] = tb_pop[columns_indicators] >= THRESHOLD_SHARE_POPULATION
+
+    # Filter tb_ by population coverage
+    tb_[columns_indicators] = tb_[columns_indicators].where(tb_pop[columns_indicators])
 
     return tb_
 
@@ -641,7 +675,7 @@ def expand_observations_without_leading_to_duplicates(tb: Table) -> Table:
 
 
 # %% MAIN TABLES
-def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> Tuple[Table, Table, Table, Table]:
+def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Table) -> tuple[Table, Table, Table, Table]:
     """Create final tables combining country data with regional aggregates.
 
     Splits indicators into uni-dimensional vs multidimensional, then combines
@@ -754,7 +788,7 @@ def make_main_tables(tb: Table, tb_countries_avg: Table, tb_population_avg: Tabl
     return tb_uni_without_regions, tb_uni_with_regions, tb_multi_without_regions, tb_multi_with_regions
 
 
-def _split_into_uni_and_multi(tb: Table) -> Tuple[Table, Table]:
+def _split_into_uni_and_multi(tb: Table) -> tuple[Table, Table]:
     """Split indicators into unidimensional vs multidimensional tables.
 
     Separates democracy indicators based on whether they have confidence intervals.
@@ -839,9 +873,11 @@ def _add_note_on_region_averages(tb: Table) -> Table:
 def add_regions_and_global_aggregates(
     tb: Table,
     ds_regions: Dataset,
-    aggregations: Optional[Dict[str, str]] = None,
-    min_num_values_per_year: Optional[int] = None,
-    aggregations_world: Optional[Dict[str, str]] = None,
+    aggregations: dict[str, str] | None = None,
+    min_num_values_per_year: int | None = None,
+    aggregations_world: dict[str, str] | None = None,
+    countries_must_have_data: dict[str, list[str]] | None = None,
+    frac_must_have_data: dict[str, float] | None = None,
 ) -> Table:
     """Add regional and global aggregates to country-level data.
 
@@ -862,19 +898,6 @@ def add_regions_and_global_aggregates(
         Input: Country data for Germany, France, Italy...
         Output: Regional data for Europe, World
     """
-    # TODO: aggregations encodes the logic of: "estimate mean if >70% of 1900 countries are present in the region"
-    # Get list of countries in regions in 1900
-    tb_1900 = tb.loc[tb["year"] == 1900, ["country"]]
-    countries_to_continent = geo.countries_to_continent_mapping(
-        ds_regions=ds_regions,
-        regions=REGIONS,
-        exclude_historical_countries=False,
-        include_historical_regions_in_income_groups=True,
-    )
-    tb_1900["continent"] = tb_1900["country"].map(countries_to_continent)
-    countries_must_have_data = tb_1900.groupby("continent")["country"].agg(list).to_dict()
-    frac_must_have_data = {region: 0.7 for region in countries_must_have_data.keys()}
-
     # Estimate region aggregates
     tb_regions = geo.add_regions_to_table(
         tb.copy(),
