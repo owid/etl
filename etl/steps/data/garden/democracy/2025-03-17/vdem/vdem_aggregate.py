@@ -78,6 +78,8 @@ THRESHOLD_SHARE_COUNTRIES = 0.7
 ## Share of people living regions required to estimate regional averages
 THRESHOLD_SHARE_POPULATION = 0.7
 
+# Reference year for coverage of countries
+REFERENCE_YEAR = 1900
 
 # INDICATORS FOR REGIONAL AVERAGING
 # These V-Dem indicators will have regional averages calculated using both
@@ -314,7 +316,7 @@ def make_table_countries_counts(tb: Table, ds_regions: Dataset) -> Table:
     ] = float("nan")
 
     # Remove data pre-1900 for num_countries_wom_parl
-    tb_.loc[tb_["year"] < 1900, "num_countries_wom_parl"] = float("nan")
+    tb_.loc[tb_["year"] < REFERENCE_YEAR, "num_countries_wom_parl"] = float("nan")
 
     return tb_
 
@@ -343,7 +345,7 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
 
     # TODO: aggregations encodes the logic of: "estimate mean if >70% of 1900 countries are present in the region"
     # Get list of countries in regions in 1900
-    tb_1900 = tb.loc[tb["year"] == 1900, ["country"]]
+    tb_1900 = tb.loc[tb["year"] == REFERENCE_YEAR, ["country"]]
     countries_to_continent = geo.countries_to_continent_mapping(
         ds_regions=ds_regions,
         regions=REGIONS,
