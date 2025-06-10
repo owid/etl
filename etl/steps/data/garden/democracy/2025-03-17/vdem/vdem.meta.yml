@@ -60,7 +60,7 @@ tables:
     common:
       display:
         numDecimalPlaces: 0
-      description_processing: |-
+      description_processing: &processing_regions |-
         The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated when 70% of countries in region have data. We have used the list of countries in 1900 as reference.
 
         In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
@@ -573,10 +573,7 @@ tables:
   # TABLE: MULTI-DIMENSIONAL TABLES, WITH REGIONS
   vdem_multi_with_regions:
     common:
-      description_processing: |-
-        The default regional aggregates (including values for the World) have been estimated by averaging the country values.
-
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
+      description_processing: *processing_regions
       display:
         numDecimalPlaces: 2
       description_key:
@@ -1952,7 +1949,7 @@ tables:
       ## 5.9.3 Property rights
       v2xcl_prpty:
         title: |-
-          Property rights
+          Property rights ({definitions.auxiliary.estimate} estimate)
         description_short: |-
           Gauges the security of private-property rights—acquiring, possessing, inheriting, and selling assets—by averaging indicators for men and women.
         presentation:
