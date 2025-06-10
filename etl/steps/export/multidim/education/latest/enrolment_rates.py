@@ -96,6 +96,19 @@ def run() -> None:
         collection_name=paths.short_name,
         config=config,
     )
+    for view in c.views:
+        # Update title and subtitle based on view dimensions
+        sex = view.dimensions.get("sex")
+        level = view.dimensions.get("level")
+        enrolment_type = view.dimensions.get("enrolment_type")
+
+        # Generate dynamic title
+        if sex and level:
+            view.config["title"] = generate_title_by_gender_and_level(sex, level)
+
+        # Generate dynamic subtitle
+        if level and enrolment_type:
+            view.config["subtitle"] = generate_subtitle_by_level(level, enrolment_type)
 
     #
     # Group by gender and education level.
@@ -104,8 +117,8 @@ def run() -> None:
     CHOICES_ENROLMENT_TYPE = c.get_choice_names("enrolment_type")
     CHOICES_SEX = c.get_choice_names("sex")
     METRIC_SUBTITLES_ALL_GENDERS = {
-        "Net enrolment": "Net enrolment includes only students of official school age.",
-        "Gross enrolment": "Gross enrolment includes all students, regardless of age.",
+        "Net enrolment": "This is shown as the [net enrolment rates](#dod:net-enrolment-ratio).",
+        "Gross enrolment": "This is shown as the [gross enrolment rates](#dod:gross-enrolment-ratio).",
     }
 
     # Add grouped view
@@ -122,7 +135,7 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
-                    "title": "{metric} rates for {level} education among boys and girls",
+                    "title": "Share of children who are enroled in {level} education, by gender",
                     "subtitle": "{subtitle_all_genders}",
                 },
             },
@@ -136,7 +149,7 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
-                    "title": "{metric} rates among {sex} for all education levels",
+                    "title": "Share of {sex} who are enroled school, by education level",
                 },
             },
         ],
@@ -228,11 +241,55 @@ def adjust_dimensions_enrolment(tb):
     return tb
 
 
+def generate_title_by_gender_and_level(sex, level):
+    """Generate title based on gender and education level."""
+    # Map gender to appropriate term
+    gender_map = {"both": "children", "boys": "boys", "girls": "girls"}
+
+    # Map level to appropriate term (for titles - simple text)
+    level_map = {
+        "primary": "primary",
+        "preprimary": "pre-primary",
+        "lower_secondary": "lower secondary",
+        "upper_secondary": "upper secondary",
+        "tertiary": "tertiary",
+    }
+
+    gender_term = gender_map.get(sex, "children")
+    level_term = level_map.get(level, "")
+
+    return f"The share of {gender_term} who are enrolled in {level_term} school"
+
+
+def generate_subtitle_by_level(level, enrolment_type):
+    """Generate subtitle based on education level and enrollment type with links."""
+    # Map level to appropriate term with links (for subtitles)
+    level_map = {
+        "primary": "[primary](#dod:primary-education)",
+        "preprimary": "[pre-primary](#dod:pre-primary-education)",
+        "lower_secondary": "[lower secondary](#dod:lower-secondary-education)",
+        "upper_secondary": "[upper secondary](#dod:upper-secondary-education)",
+        "tertiary": "[tertiary](#dod:tertiary-education)",
+    }
+
+    # Map enrollment type to appropriate description with links
+    enrolment_type_map = {
+        "net_enrolment": "[net enrolment rates](#dod:net-enrolment-ratio)",
+        "gross_enrolment": "[gross enrolment rates](#dod:gross-enrolment-ratio)",
+    }
+
+    level_term = level_map.get(level, "")
+    enrolment_description = enrolment_type_map.get(enrolment_type, "This is shown as the")
+
+    return f"{enrolment_description} for {level_term} education."
+
+
 def edit_indicator_displays(view):
     """Edit display names for the grouped views."""
     if view.dimensions["level"] == "level_side_by_side":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
+            display_name = "Unknown"  # Default value
             if (
                 "enrolment_rate__primary" in indicator.catalogPath
                 or "enrolment_ratio__primary" in indicator.catalogPath
