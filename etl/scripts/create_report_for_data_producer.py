@@ -10,7 +10,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.utils.google import GoogleDoc, GoogleDrive
-from apps.utils.notion import get_impact_hightlights
+from apps.utils.notion import get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
     get_post_views_by_chart_id,
@@ -292,7 +292,7 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     # * It might be useful to create a function that writes to GDoc with embedded hyperlinks.
     if not highlights.empty:
         print(
-            f"{len(highlights)} found for this data producer. Manually check them and consider adding them to the producer GDoc."
+            f"{len(highlights)} highlights found for this data producer. Manually check them and consider adding them to the producer GDoc."
         )
         for _, highlight in highlights.iterrows():
             print(f"* {highlight['Highlight']}")
@@ -328,7 +328,7 @@ def run(producer, quarter, year):
 
     ####################################################################################################################
     # Get impact highlights, if any.
-    highlights = get_impact_hightlights(producers=[producer], min_date=min_date, max_date=max_date)
+    highlights = get_impact_highlights(producers=[producer], min_date=min_date, max_date=max_date)
 
     # For now, print highlights here, and consider manually adding them to the document.
     print_impact_highlights(highlights=highlights)

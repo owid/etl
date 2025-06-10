@@ -206,7 +206,7 @@ def get_table_from_notion_url(
     return df
 
 
-def get_impact_hightlights(
+def get_impact_highlights(
     producers: Optional[List[str]] = None,
     min_date: str = NOTION_IMPACT_HIGHLIGHTS_MIN_DATE,
     max_date: str = NOTION_IMPACT_HIGHLIGHTS_MAX_DATE,
