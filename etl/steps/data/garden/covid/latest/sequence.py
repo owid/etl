@@ -18,6 +18,7 @@ paths = PathFinder(__file__)
 CATEGORY_OTHERS = "Others"
 CATEGORY_NON_RELEVANT = "Non-relevant"
 CATEGORY_O_NON_RELEVANT = "Omicron (others)"
+# 'rename' field can be found in https://github.com/hodcroftlab/covariants/blob/master/scripts/clusters.py (field 'alt_display_name')
 VARIANTS_DETAILS = {
     "20A.EU2": {"rename": "B.1.160", "relevant": False},
     "20A/S:439K": {"rename": "B.1.258", "relevant": False},
