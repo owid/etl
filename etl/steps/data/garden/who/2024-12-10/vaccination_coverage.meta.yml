@@ -57,13 +57,13 @@ definitions:
     <%- elif antigen == "DTPCV1" %>
     who have received one dose of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "DTPCV3" %>
-    who have recieved three doses of the diphtheria, tetanus and pertussis vaccine
+    who have received three doses of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "MCV1" %>
     who have received their first dose of the measles vaccine
     <%- elif antigen == "POL3" %>
     who have had their third dose of the polio vaccine
     <%- elif antigen == "RCV1" %>
-    vaccinated rubella against rubella
+    vaccinated against rubella
     <%- elif antigen == "HEPB3" %>
     who have had three doses of the hepatitis B vaccine
     <%- elif antigen == "HIB3" %>
@@ -136,29 +136,29 @@ definitions:
     In countries utilizing an immunization schedule recommending either (i) a primary series of three doses of oral polio vaccine (OPV) plus at least one dose of IPV where OPV is included in routine immunization and/or campaign or (ii) a sequential schedule of IPV followed by OPV, WHO and UNICEF estimates for IPV1 reflect coverage with at least one routine dose of IPV among infants <1 year of age among countries. For countries utilizing IPV containing vaccine use only, i.e., no recommended dose of OPV, the WHO and UNICEF estimate for IPV1 corresponds to coverage for the 1st dose of IPV. Production of IPV coverage estimates, which begins in 2015, results in no change of the estimated coverage levels for the 3rd dose of polio (Pol3). For countries recommending routine immunization with a primary series of three doses of IPV alone, WHO and UNICEF estimated Pol3 coverage is equivalent to estimated coverage with three doses of IPV. For countries with a sequential schedule, estimated Pol3 coverage is based on that for the 3rd dose of polio vaccine regardless of vaccine type.
     <%- endif %>
   antigen_note: |-
-    <% if antigen == MCV2 %>
+    <% if antigen == "MCV2" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. Recommended child's age for MCV2 vaccination varies by country.
-    <%- elif antigen == MCV2X2 %>
+    <%- elif antigen == "MCV2X2" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. Recommended child's age for MCV2X2 vaccination varies by country.
-    <%- elif antigen == MCV1 %>
+    <%- elif antigen == "MCV1" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia.
-    <%- elif antigen == HEPB3 %>
+    <%- elif antigen == "HEPB3" %>
       Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease.
-    <- elif antigen == HEPB_BD %>
+    <- elif antigen == "HEPB_BD" %>
       Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease. The hepatitis B birth dose is recommended to be administered within 24 hours of birth.
-    <- elif antigen == HIB3 %>
+    <- elif antigen == "HIB3" %>
       Haemophilus influenza type B is a bacteria responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
-    <% elif antigen == PCV3 %>
+    <% elif antigen == "PCV3" %>
       Streptococcus pneumoniae is a bacterium that causes a number of common diseases including meningitis, septicaemia and pneumonia. It is most common in young children and the elderly.
-    <%- elif antigen == IPV1 %>
+    <%- elif antigen == "IPV1" %>
       Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis.
-    <%- elif antigen == IPV2 %>
+    <%- elif antigen == "IPV2" %>
       Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis.
-    <% elif antigen == POL3 %>
+    <% elif antigen == "POL3" %>
       Polio is a highly infectious viral disease. The polio virus invades the nervous system and can cause irreversible paralysis. The third dose of polio vaccine is recommended to be administered at 14 weeks of age.
-    <%- elif antigen == RCV1 %>
+    <%- elif antigen == "RCV1" %>
       Rubella is a contagious viral infection that occurs most often in children and young adults. Rubella infection in pregnant women may cause fetal death or congenital defects known as congenital rubella syndrome.
-    <%- elif antigen == ROTAC %>
+    <%- elif antigen == "ROTAC" %>
       Rotavirus vaccines became available for the first time in 2006.
     <%- endif %>
 # Learn more about the available fields:
