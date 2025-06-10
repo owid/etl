@@ -1,0 +1,30 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Global Education
+    unit: "%"
+    short_unit: "%"
+    display:
+        numDecimalPlaces: 1
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  literacy_1900_1950:
+    variables:
+      literacy_rate:
+        title: Literacy rate
+        description_short: Share of the population who can read and write a short, simple statement on their everyday life.
+        description_processing: Literacy rates were not directly reported by the source. Instead, they were derived from illiteracy rates by subtracting estimated illiteracy rate from 100%.
+
+      lliteracy_rate:
+        title: Illiteracy rate
+        description_short: Share of the population who cannot read and write a short, simple statement on their everyday life.
+
