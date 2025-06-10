@@ -80,9 +80,7 @@ VARIANTS_OMICRON_BA = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if
 VARIANTS_OMICRON_XBB = list(
     set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (XBB"))
 )
-VARIANTS_OMICRON_JN = list(
-    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JN"))
-)
+VARIANTS_OMICRON_JN = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JN")))
 VARIANTS_OMICRON_KP = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (KP")))
 
 COUNTRY_MAPPING = {
