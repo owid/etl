@@ -138,3 +138,11 @@ steps:
     - data://meadow/education/2025-06-09/literacy_1451_1800
   data://grapher/education/2025-06-09/literacy_1451_1800:
     - data://garden/education/2025-06-09/literacy_1451_1800
+  # World illiteracy at mid-century
+  #
+  data://meadow/education/2025-06-10/literacy_1950:
+    - snapshot://education/2025-06-10/literacy_1950.csv
+  data://garden/education/2025-06-10/literacy_1950:
+    - data://meadow/education/2025-06-10/literacy_1950
+  data://grapher/education/2025-06-10/literacy_1950:
+    - data://garden/education/2025-06-10/literacy_1950
