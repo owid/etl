@@ -6,8 +6,9 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# NOTE: Update lines when prices change
 DIMENSIONS_CONFIG = {
-    "poverty_line": ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
+    "poverty_line": ["100", "300", "420", "830", "1000", "2000", "3000", "4000"],
     "table": ["Income or consumption consolidated"],
     # "welfare_type": "*",
     # "decile": "*",
