@@ -468,15 +468,14 @@ def _get_dict_from_list_of_common_field_if_all_defined_and_identical(
     if None in list_of_objects:
         return None
 
-    # Find common fields where all values are identical across displays of all variables.
-    common_fields = {
-        field: values[0]
-        for field, values in {
-            field: [display.get(field) for display in list_of_objects]  # type: ignore
-            for field in set().union(*(display.keys() for display in list_of_objects))  # type: ignore
-        }.items()
-        if len(set(values)) == 1
-    }
+    # Extract all fields defined among all objects.
+    all_fields = set().union(*(obj.keys() for obj in list_of_objects if obj))
+    # Go field by field and keep it only if its value is identical for all objects.
+    common_fields = {}
+    for field in all_fields:
+        values = [obj.get(field) for obj in list_of_objects if obj]
+        if len(set(map(repr, values))) == 1:
+            common_fields[field] = values[0]
 
     # If no common fields were found, return None.
     combined_display = common_fields if common_fields else None
@@ -500,6 +499,11 @@ def combine_variables_display(variables: List[Variable]) -> Optional[dict[str, A
     return combined_display
 
 
+list_of_presentations = [
+    {"attribution": "HYDE (2023); Gapminder (2022); UN WPP (2024)", "topic_tags": ["Population Growth"]}
+]
+
+
 def combine_variables_presentation(variables: List[Variable]) -> Optional[VariablePresentationMeta]:
     # Apply the same logic as when combining displays (see documentation in combine_variables_display).
     list_of_presentations = [
@@ -511,6 +515,13 @@ def combine_variables_presentation(variables: List[Variable]) -> Optional[Variab
     )
 
     return combined_presentation
+
+
+# %%
+# pr.merge(df[["country", "year"]], population[["country", "year", "population"]])
+# combine_variables_presentation(df[])
+
+# %%
 
 
 def combine_variables_processing_level(variables: list[Variable]) -> PROCESSING_LEVELS | None:
