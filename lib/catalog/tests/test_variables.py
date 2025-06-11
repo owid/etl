@@ -11,6 +11,7 @@ from owid.catalog.meta import VariableMeta, VariablePresentationMeta
 from owid.catalog.variables import (
     License,
     Variable,
+    combine_variables_display,
     combine_variables_metadata,
     get_unique_licenses_from_variables,
     get_unique_origins_from_variables,
@@ -473,34 +474,83 @@ def test_divide_variables_where_only_denominator_has_metadata(
     assert variable.metadata.display == variable_1.metadata.display
 
 
-def test_display_propagation_on_divisions(variable_1, variable_2) -> None:
-    variable_1 = variable_1.copy()
-    variable_2 = variable_2.copy()
+def test_display_propagation() -> None:
+    # If none of the variables have a defined display, the combined display should be None.
+    assert combine_variables_display(
+        variables=[
+            Variable([], name="var1", metadata=VariableMeta()),
+            Variable([], name="var2", metadata=VariableMeta()),
+        ]
+    ) == None
+    assert combine_variables_display(
+        variables=[
+            Variable([], name="var1", metadata=VariableMeta(display=None)),
+            Variable([], name="var2", metadata=VariableMeta(display=None)),
+        ]
+    ) == None
 
-    # If the numerator has no display but the denominator has display, the result should have no display.
-    variable_1.metadata.display = None
-    variable_2.metadata.display = {"numDecimalPlaces": 0}
-    variable = variable_1 / variable_2
-    assert variable.metadata.display is None
+    # If all fields are identical, the combined display should be the same as that of all variables.
+    assert combine_variables_display(
+        variables=[
+            Variable([], name="var1", metadata=VariableMeta(display={"name": "Test"})),
+            Variable([], name="var2", metadata=VariableMeta(display={"name": "Test"})),
+        ]
+    ) == {"name": "Test"}
+    assert combine_variables_display(
+        variables=[
+            Variable([], name="var1", metadata=VariableMeta(display={"name": "Test", "numDecimalPlaces": 2})),
+            Variable([], name="var2", metadata=VariableMeta(display={"name": "Test", "numDecimalPlaces": 2})),
+        ]
+    ) == {"name": "Test", "numDecimalPlaces": 2}
 
-    # If the numerator has display but the denominator has no display, the result should have the numerator's display.
-    variable_1.metadata.display = {"numDecimalPlaces": 0}
-    variable_2.metadata.display = None
-    variable = variable_1 / variable_2
-    assert variable.metadata.display == {"numDecimalPlaces": 0}
+    # If any of the variables has display None, the combined display should be None.
+    assert (
+        combine_variables_display(
+            variables=[
+                Variable([], name="var1", metadata=VariableMeta(display={"name": "Test"})),
+                Variable([], name="var2", metadata=VariableMeta()),
+            ]
+        )
+        == None
+    )
+    assert (
+        combine_variables_display(
+            variables=[
+                Variable([], name="var1", metadata=VariableMeta(display={"name": "Test"})),
+                Variable([], name="var2", metadata=VariableMeta(display={"name": "Test"})),
+                Variable([], name="var3", metadata=VariableMeta()),
+            ]
+        )
+        == None
+    )
 
-    # If both numerator and denominator have the same display, the result should have that display.
-    variable_1.metadata.display = {"numDecimalPlaces": 0}
-    variable_2.metadata.display = {"numDecimalPlaces": 0}
-    variable = variable_1 / variable_2
-    assert variable.metadata.display == {"numDecimalPlaces": 0}
+    # If variables have a defined display, propagate only the fields that are identical in all variables.
+    assert combine_variables_display(
+        variables=[
+            Variable([], name="var1", metadata=VariableMeta(display={"name": "Test"})),
+            Variable([], name="var2", metadata=VariableMeta(display={"name": "Test", "numDecimalPlaces": 2})),
+        ]
+    ) == {"name": "Test"}
 
-    # If numerator and denominator have different displays, the result should have no display.
-    # NOTE: It is not clear if this is the best choice. Alternatively, we could keep the numerator's display.
-    variable_1.metadata.display = {"numDecimalPlaces": 0}
-    variable_2.metadata.display = {"numDecimalPlaces": 1}
-    variable = variable_1 / variable_2
-    assert variable.metadata.display is None
+    # If none of the fields coincide for all variables, the resulting display should be None.
+    assert (
+        combine_variables_display(
+            variables=[
+                Variable([], name="var1", metadata=VariableMeta(display={"name": "Test"})),
+                Variable([], name="var2", metadata=VariableMeta(display={"name": "Test 2", "numDecimalPlaces": 2})),
+            ]
+        )
+        == None
+    )
+    assert (
+        combine_variables_display(
+            variables=[
+                Variable([], name="var1", metadata=VariableMeta(display={"name": "Test"})),
+                Variable([], name="var2", metadata=VariableMeta(display={"name": "Test 2"})),
+            ]
+        )
+        == None
+    )
 
 
 def test_presentation_propagation_on_divisions(variable_1, variable_2) -> None:
