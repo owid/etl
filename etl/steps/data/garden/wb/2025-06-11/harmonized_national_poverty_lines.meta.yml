@@ -34,12 +34,20 @@ tables:
 
       income_group:
         title: World Bank's income classification
+        unit: ""
+        short_unit: ""
         description_short: Income classification based on the country's income.
         description_key:
           - The income group is based on the World Bank's classification of countries by income level.
           - This classification stays the same throughout the fiscal year (from July 1 to June 30) even if the income data for a country changes.
           - Countries are classified according to their gross national income (GNI) per capita (Atlas method) in current US dollars.
           - "Countries are grouped into four income categories: low income, lower-middle income, upper-middle income, and high income."
+        type: ordinal
+        sort:
+          - Low income
+          - Lower-middle income
+          - Upper-middle income
+          - High income
         display:
           name: Income group
           numDecimalPlaces: 0
