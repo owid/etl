@@ -128,3 +128,13 @@ steps:
     - data://grapher/worldbank_wdi/2025-01-24/wdi
     - data://grapher/unesco/2025-05-01/education_opri
 
+
+  #
+  # Buringh and van Zanden literacy rates between 1451 and 1800
+  #
+  data://meadow/education/2025-06-09/literacy_1451_1800:
+    - snapshot://education/2025-06-09/literacy_1451_1800.pdf
+  data://garden/education/2025-06-09/literacy_1451_1800:
+    - data://meadow/education/2025-06-09/literacy_1451_1800
+  data://grapher/education/2025-06-09/literacy_1451_1800:
+    - data://garden/education/2025-06-09/literacy_1451_1800
