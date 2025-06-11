@@ -27,7 +27,7 @@ def run() -> None:
             {
                 "dimension": "antigen",
                 "choice_new_slug": "comparison",
-                "choices": ["MCV1", "HEPB3", "DTP3", "YFV", "IPV1", "POL3", "HIB3", "RCV1", "PCV3", "ROTAC"],
+                "choices": ["MCV1", "HEPB3", "DTPCV3", "YFV", "IPV1", "POL3", "HIB3", "RCV1", "PCV3", "ROTAC"],
                 "view_config": {
                     "hasMapTab": False,
                     "addCountryMode": "change-country",
