@@ -192,7 +192,7 @@ def run() -> None:
 
     # Create standard line/map views
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
-    c1 = paths.create_collection(
+    c1 = paths.create_collection_v2(
         config=config,
         tb=tb_annual.loc[:, use_cols_annual],
         indicator_names=["price"],
@@ -200,7 +200,7 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
-    c2 = paths.create_collection(
+    c2 = paths.create_collection_v2(
         config=config,
         tb=tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
         indicator_names=["price"],

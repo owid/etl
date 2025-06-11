@@ -293,7 +293,7 @@ def test_explorer_legacy_1(tmp_path, monkeypatch):
     config = paths.load_config(path=config_path)
 
     # Create explorer
-    explorer = paths.create_collection(
+    explorer = paths.create_collection_v2(
         config=config,
         explorer=True,
     )
@@ -344,7 +344,7 @@ def test_explorer_legacy_2(tmp_path, monkeypatch):
     config = paths.load_config(path=config_path)
 
     # Create explorer
-    explorer = paths.create_collection(
+    explorer = paths.create_collection_v2(
         config=config,
         explorer=True,
     )
