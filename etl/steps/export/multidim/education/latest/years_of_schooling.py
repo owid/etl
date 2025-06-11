@@ -33,14 +33,8 @@ def run() -> None:
     tb_gender_stats = ds_gender_stats.read("gender_statistics")
 
     # UNDP expected years of schooling columns
-    cols_undp = [
-        "eys__sex_total",
-        "eys__sex_female",
-        "eys__sex_male",
-        "mys__sex_female",
-        "mys__sex_male",
-        "mys__sex_total",
-    ]
+    cols_undp = tb_undp.filter(regex=r"(eys|mys)__sex_").columns
+    assert len(cols_undp) == 6
 
     # OPRI school life expectancy columns
     cols_opri = [
@@ -66,9 +60,9 @@ def run() -> None:
     ]
 
     # Select only the relevant columns
-    tb_undp = tb_undp[["country", "year"] + cols_undp]
-    tb_opri = tb_opri[["country", "year"] + cols_opri]
-    tb_gender_stats = tb_gender_stats[["country", "year"] + cols_gender_stats]
+    tb_undp = tb_undp.loc[:, ["country", "year"] + list(cols_undp)]
+    tb_opri = tb_opri.loc[:, ["country", "year"] + list(cols_opri)]
+    tb_gender_stats = tb_gender_stats.loc[:, ["country", "year"] + cols_gender_stats]
 
     #
     # Adjust dimensions
@@ -193,52 +187,43 @@ def adjust_dimensions_schooling(tb):
         "school_life_expectancy": "expected_years_schooling",
         "hd_hci_lays": "learning_adjusted_years_schooling",
     }
-
-    # Initialize mappings
-    level_mapping = {}
-    metric_type_mapping = {}
-    sex_mapping = {}
     cols_to_add_dimensions = [col for col in tb.columns if col not in ["country", "year"]]
 
     # Iterate and populate mappings
-    for var in cols_to_add_dimensions:
+    for col in cols_to_add_dimensions:
         # --- Level ---
         level = None
         for key, val in level_keywords.items():
-            if key in var:
+            if key in col:
                 level = val
                 break
+
         # Default to "all" for aggregate measures
-        if level is None and any(x in var for x in ["eys", "mys", "hd_hci_lays"]):
+        if level is None and any(x in col for x in ["eys", "mys", "hd_hci_lays"]):
             level = "all"
-        level_mapping[var] = level
 
         # --- Metric Type ---
         metric_type = None
         for key, val in metric_keywords.items():
-            if key in var:
+            if key in col:
                 metric_type = val
                 break
-        metric_type_mapping[var] = metric_type
 
         # --- Sex ---
         sex = None
         for key, val in sex_keywords.items():
-            if f"__{key}__" in var or var.endswith(f"_{key}") or f"__{key}" in var:
+            if f"__{key}__" in col or col.endswith(f"_{key}") or f"__{key}" in col:
                 sex = val
                 break
-        sex_mapping[var] = sex or "both"  # fallback for non-disaggregated vars
 
-    for col in tb.columns:
-        if col in ["country", "year"]:
-            continue
+        # Set indicator name
         tb[col].metadata.original_short_name = "expected_years_schooling"
-        tb[col].metadata.dimensions = {}
-
         # Set dimensions
-        tb[col].metadata.dimensions["metric_type"] = metric_type_mapping[col]
-        tb[col].metadata.dimensions["level"] = level_mapping[col]
-        tb[col].metadata.dimensions["sex"] = sex_mapping[col]
+        tb[col].metadata.dimensions = {
+            "metric_type": metric_type,
+            "level": level,
+            "sex": sex or "both",  # fallback for non-disaggregated vars
+        }
 
     # Add dimension definitions at table level
     if not hasattr(tb.metadata, "dimensions") or tb.metadata.dimensions is None:
