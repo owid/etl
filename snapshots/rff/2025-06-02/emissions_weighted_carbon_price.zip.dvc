@@ -1,0 +1,24 @@
+meta:
+  origin:
+    producer: Resources for the Future
+    title: Emissions-weighted Carbon Price
+    description: |-
+      The Emissions-weighted Carbon Price (ECP) is an economy-wide average price on CO₂ emissions. It is calculated from sector-fuel level data, which is aggregated back to the economy level using the share of each sector-fuel CO₂ emissions in total GHG emissions as weights. The full methodology is described in the Resources for the Future Working Paper 22-6 [Emissions-weighted carbon price: Sources and Methods](https://www.rff.org/publications/working-papers/emissions-weighted-carbon-price-sources-and-methods/).
+    citation_full: |-
+      Dolphin, G., Merkle, M. Emissions-weighted carbon price: sources and methods. Sci Data 11, 1017 (2024). [https://doi.org/10.1038/s41597-024-03121-6](https://doi.org/10.1038/s41597-024-03121-6).
+
+      Supported by Resources for the Future.
+    attribution: Dolphin and Merkle (2024)
+    attribution_short: RFF
+    url_main: https://github.com/g-dolphin/ECP
+    url_download: https://github.com/g-dolphin/ECP/archive/refs/heads/master.zip
+    # We re-run the snapshot because a data issue was found and the data providers fixed it a few days after the update.
+    date_accessed: '2025-06-10'
+    date_published: '2025-06-10'
+    license:
+      name: CC BY-NC-ND 4.0
+      url: https://github.com/g-dolphin/ECP
+outs:
+  - md5: b25a0c2c3b9b8805f959c79812c2ad5b
+    size: 190410333
+    path: emissions_weighted_carbon_price.zip

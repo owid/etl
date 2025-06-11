@@ -4,7 +4,7 @@ import numpy as np
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers.geo import add_population_to_table
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -382,13 +382,13 @@ def prepare_output_table(primary_energy: Table) -> Table:
     return table
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load the Statistical Review dataset and read its main table.
     ds_review = paths.load_dataset("statistical_review_of_world_energy")
-    tb_review = ds_review["statistical_review_of_world_energy"]
+    tb_review = ds_review.read("statistical_review_of_world_energy", reset_index=False)
 
     # Load the population dataset.
     ds_population = paths.load_dataset("population")
@@ -419,5 +419,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[table], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[table])
     ds_garden.save()

@@ -243,17 +243,8 @@ steps:
   data://grapher/faostat/2025-03-17/additional_variables:
     - data://garden/faostat/2025-03-17/additional_variables
   #
-  # FAOSTAT food explorer step (to generate csv data files).
-  #
-  data://garden/faostat/latest/food_explorer:
-    - data://garden/demography/2024-07-15/population
-    - data://garden/faostat/2025-03-17/faostat_qcl
-    - data://garden/faostat/2025-03-17/faostat_fbsc
-    - data://garden/wb/2024-07-29/income_groups
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/faostat/2025-03-17/faostat_metadata
-  #
-  # Global food explorer (csv-based explorer).
+  # Global food explorer.
   #
   export://explorers/faostat/latest/global_food:
-    - data://garden/faostat/latest/food_explorer
+    - data://grapher/faostat/2025-03-17/faostat_qcl
+    - data://grapher/faostat/2025-03-17/faostat_fbsc

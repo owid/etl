@@ -46,7 +46,7 @@ def run(dest_dir: str) -> None:
     tb_countries_regions = ds_regions["regions"].reset_index()
 
     # Only keep the columns we need
-    tb_countries_regions = tb_countries_regions[["iso_alpha2", "name"]]
+    tb_countries_regions = tb_countries_regions.loc[:, ["iso_alpha2", "name"]]
 
     # Create a new meadow dataset with the same metadata as the snapshot.
     snap = paths.load_snapshot("lis_keyvars.csv")

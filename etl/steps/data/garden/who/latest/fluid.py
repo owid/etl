@@ -1,4 +1,7 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+Check out this issue with the refactoring plan on next update https://github.com/owid/etl/issues/4215#issue-2966045001
+"""
 
 from datetime import datetime
 
@@ -42,7 +45,7 @@ def run(dest_dir: str) -> None:
 
     # Subset the data
     df = subset_and_clean_data(df)
-    df = pivot_fluid(df)
+    df = rename_fluid(df)
     # Remove years with fewer than 10 datapoints
     df = remove_sparse_years(df, min_datapoints_per_year=MIN_DATA_POINTS_PER_YEAR)
 
@@ -67,11 +70,9 @@ def clean_sari_inpatient(df: pd.DataFrame) -> pd.DataFrame:
     """
     Removing rows where the number of SARI cases is below the number of inpatients, I don't think this should be possible.
     """
-    remove_inpatients = df["inpatients"][(df["case_info"] == "SARI") & (df["reported_cases"] > df["inpatients"])].shape[
-        0
-    ]
+    remove_inpatients = (df["sari_case"] > df["sari_inpatients"]).sum()
     log.info(f"Removing {remove_inpatients} rows where the number of inpatients is below the number of SARI cases...")
-    df["inpatients"][(df["case_info"] == "SARI") & (df["reported_cases"] > df["inpatients"])] = np.nan
+    df["sari_inpatients"][(df["sari_case"] > df["sari_inpatients"])] = np.nan
 
     return df
 
@@ -84,11 +85,8 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
     * Drop unwanted columns
     * Drop rows where reported cases = 0
     """
-
-    df = df.query("agegroup_code == 'ALL' & case_info.isin(['ILI', 'SARI', 'ARI','SARI_ICU' ,'SARI_DEATHS'])")
+    df = df[df["agegroup_code"] == "All"]
     df["date"] = pd.to_datetime(df["iso_weekstartdate"], format="%Y-%m-%d", utc=True).dt.date.astype(str)
-    # At time of creation the source type was not used in FluID, but it is used in FluNET to identify Sentinel sites
-    assert df.origin_source.unique() == ["NOTDEFINED"]
 
     df = df.drop(
         columns=[
@@ -103,76 +101,46 @@ def subset_and_clean_data(df: pd.DataFrame) -> pd.DataFrame:
             "mmwr_year",
             "mmwr_week",
             "agegroup_code",
-            "pop_cov",
-            "inf_tested",
-            "inf_pos",
-            "inf_neg",
-            "inf_a",
-            "inf_b",
-            "inf_mixed",
-            "ah1",
-            "ah1n12009",
-            "ah3",
-            "ah5",
-            "ah7",
-            "anotsubtyped",
-            "aothertypes",
-            "byamagata",
-            "bvictoria",
-            "bnotdetermined",
-            "other",
-            "rsv",
-            "adeno",
-            "parainfluenza",
-            "inf_risk",
             "geospread",
             "impact",
             "intensity",
             "trend",
-            "nb_sites",
-            "mortality_all",
-            "mortality_pni",
-            "iso2",
             "isoyw",
             "mmwryw",
-            "iso2",
-            "isoyw",
-            "mmwryw",
-            "origin_source",
+            ### adding these in APR 2025
+            "pneu_case",
+            "pneu_inpatients",
+            "pneu_pop_cov",
+            "ili_pop_cov",
+            "sari_pop_cov",
+            "ari_pop_cov",
+            "ili_nb_sites",
+            "sari_nb_sites",
+            "ari_nb_sites",
+            "pneu_nb_sites",
         ]
     )
 
-    df = df.dropna(subset=["reported_cases"])
+    # df = df.dropna(subset=["reported_cases"])
     df = clean_sari_inpatient(df)
     return df
 
 
-def pivot_fluid(df: pd.DataFrame) -> pd.DataFrame:
-    # drop spurious duplicates
-    df = df.drop_duplicates()
-    df_piv = df.pivot(
-        index=["country", "hemisphere", "date"],
-        columns=["case_info"],
-        values=["reported_cases", "outpatients", "inpatients"],
-    ).reset_index()
-
-    df_piv.columns = list(map("".join, df_piv.columns))
-
-    df_piv = df_piv.rename(
+def rename_fluid(df: pd.DataFrame) -> pd.DataFrame:
+    # Just to make life a bit easier
+    df = df.rename(
         columns={
-            "reported_casesSARI": "reported_sari_cases",
-            "reported_casesARI": "reported_ari_cases",
-            "reported_casesILI": "reported_ili_cases",
-            "reported_casesSARI_DEATHS": "reported_sari_deaths",
-            "reported_casesSARI_ICU": "reported_sari_icu",
-            "outpatientsARI": "outpatients_ari",
-            "outpatientsILI": "outpatients_ili",
-            "inpatientsSARI": "inpatients_sari",
-            "inpatientsSARI_ICU": "inpatients_sari_icu",
-        }
+            "sari_case": "reported_sari_cases",
+            "ari_case": "reported_ari_cases",
+            "ili_case": "reported_ili_cases",
+            "sari_deaths": "reported_sari_deaths",
+            "ari_outpatients": "outpatients_ari",
+            "ili_outpatients": "outpatients_ili",
+            "sari_inpatients": "inpatients_sari",
+        },
+        errors="raise",
     )
-
-    return df_piv
+    return df
 
 
 def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
@@ -185,8 +153,8 @@ def calculate_patient_rates(df: pd.DataFrame) -> pd.DataFrame:
     ].astype(float)
 
     # Replace 0s and NAs with NaNs
-    df.loc[:, ["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]] = df.loc[
-        :, ["outpatients_ari", "outpatients_ili", "inpatients_sari", "inpatients_sari_icu"]
+    df.loc[:, ["outpatients_ari", "outpatients_ili", "inpatients_sari"]] = df.loc[
+        :, ["outpatients_ari", "outpatients_ili", "inpatients_sari"]
     ].replace({0: np.nan, pd.NA: np.nan})
 
     df["ili_cases_per_thousand_outpatients"] = (df["reported_ili_cases"] / df["outpatients_ili"]) * 1000
@@ -277,14 +245,6 @@ def remove_sparse_years(df: pd.DataFrame, min_datapoints_per_year: int) -> pd.Da
         "date",
         "hemisphere",
         "year",
-        "ah5COMBINED",
-        "ah5NONSENTINEL",
-        "ah5NOTDEFINED",
-        "ah5SENTINEL",
-        "ah7n9COMBINED",
-        "ah7n9NONSENTINEL",
-        "ah7n9NOTDEFINED",
-        "ah7n9SENTINEL",
     ]
     cols = df.columns.difference(constant_cols)
     current_year = datetime.today().year

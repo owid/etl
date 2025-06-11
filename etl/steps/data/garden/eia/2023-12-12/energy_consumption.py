@@ -1,7 +1,7 @@
 """Garden step for EIA total energy consumption."""
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -76,13 +76,13 @@ KNOWN_OVERLAPS = [
 ]
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load EIA dataset and read its main table.
     ds_meadow = paths.load_dataset("energy_consumption")
-    tb_meadow = ds_meadow["energy_consumption"].reset_index()
+    tb_meadow = ds_meadow.read("energy_consumption")
 
     # Load regions dataset.
     ds_regions = paths.load_dataset("regions")
@@ -120,11 +120,11 @@ def run(dest_dir: str) -> None:
     )
 
     # Set an appropriate index and sort conveniently.
-    tb = tb.set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = tb.format(keys=["country", "year"])
 
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir=dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

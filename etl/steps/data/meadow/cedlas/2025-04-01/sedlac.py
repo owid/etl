@@ -10,7 +10,7 @@ from typing import Dict, List
 from owid.catalog import Table
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.snapshot import Snapshot
 
 # Get paths and naming conventions for current step.
@@ -157,7 +157,7 @@ AGGREGATION_LEVELS = ["NATIONAL", "URBAN", "RURAL"]
 SOURCE_TEXT = "Source: SEDLAC (CEDLAS and The World Bank) based on microdata from household surveys. "
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -183,8 +183,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(
-        dest_dir,
+    ds_meadow = paths.create_dataset(
         tables=inequality_deciles_indices_tables + inequality_gini_tables + poverty_tables,
         check_variables_metadata=True,
         default_metadata=snap_poverty.metadata,

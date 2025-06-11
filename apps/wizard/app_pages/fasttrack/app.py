@@ -11,6 +11,7 @@ from structlog import get_logger
 
 from apps.utils.files import generate_step_to_channel
 from apps.wizard import utils as wizard_utils
+from apps.wizard.app_pages.fasttrack.fast_import import FasttrackImport
 from apps.wizard.app_pages.fasttrack.load import load_existing_sheets_from_snapshots
 from apps.wizard.app_pages.fasttrack.process import processing_part_1, processing_part_2
 from apps.wizard.app_pages.fasttrack.utils import (
@@ -142,7 +143,8 @@ with st_horizontal(vertical_alignment="flex-end", justify_content="space-between
 if import_method is None:
     st.warning("Select an import method to proceed.")
 else:
-    with st.form("fasttrack-form"):
+    # with st.form("fasttrack-form"):
+    with st.container(border=True):
         existing_google_sheet = None
         placeholder_for_existing_google_sheet = None
         placeholder_for_private = None
@@ -176,7 +178,7 @@ else:
 
         placeholder_for_private = st.empty()
 
-        submitted = st.form_submit_button(
+        submitted = st.button(
             "Submit",
             type="primary",
             use_container_width=True,
@@ -323,7 +325,7 @@ else:
     if st.session_state.to_be_submitted_confirmed_2:
         if st.session_state.fast_import:
             with st.status("Uploading to Grapher...", expanded=True):
-                fast_import = st.session_state.fast_import
+                fast_import: FasttrackImport = st.session_state.fast_import
                 # add dataset to dag
                 st.write("Adding dataset to the DAG...")
                 dag_content = fast_import.add_to_dag()
@@ -335,7 +337,11 @@ else:
 
                 # Uploading snapshot
                 st.write("Uploading snapshot...")
-                snapshot_path = fast_import.upload_snapshot()
+                try:
+                    snapshot_path = fast_import.upload_snapshot()
+                except:
+                    fast_import.rollback()
+                    raise
                 st.success("Upload successful!")
 
                 # Running ETL and upserting to GrapherDB...

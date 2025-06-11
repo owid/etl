@@ -195,10 +195,7 @@ class Snapshot:
         assert self.metadata.is_public is not None
         s3_utils.upload(f"s3://{bucket}/{md5[:2]}/{md5[2:]}", str(self.path), public=self.metadata.is_public)
 
-        meta["outs"] = [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]
-
-        with open(self.metadata_path, "w") as f:
-            f.write(ruamel_dump(meta))
+        self.m._update_metadata_file({"outs": [{"md5": md5, "size": self.path.stat().st_size, "path": self.path.name}]})
 
     def create_snapshot(
         self,
@@ -227,9 +224,12 @@ class Snapshot:
         elif data is not None:
             # Copy dataframe to snapshots data folder.
             dataframes.to_file(data, file_path=self.path)
-        else:
+        elif self.metadata.origin and self.metadata.origin.url_download:
             # Create snapshot by downloading data from a URL.
             self.download_from_source()
+        else:
+            # Maybe file is already there
+            assert self.path.exists(), "File not found. Provide a filename, data or add url_download to metadata."
 
         # Upload data to R2
         self.dvc_add(upload=upload)
@@ -495,6 +495,28 @@ class SnapshotMeta(MetaBase):
 
         return yaml_dump({"meta": d})  # type: ignore
 
+    def _update_metadata_file(self, d: dict[str, Any]) -> None:
+        """Update metadata YAML file with given dictionary."""
+        with open(self.path, "r") as f:
+            meta = ruamel_load(f)
+
+        # Update everything from `meta`
+        update_meta = d.pop("meta", {})
+        for k, v in update_meta.items():
+            if k in meta["meta"]:
+                if isinstance(meta["meta"][k], dict):
+                    meta["meta"][k].update(v)
+                else:
+                    meta["meta"][k] = v
+            else:
+                meta["meta"][k] = v
+
+        # Update remaining fields
+        meta.update(d)
+
+        with open(self.path, "w") as f:
+            f.write(ruamel_dump(meta))
+
     def save(self) -> None:  # type: ignore
         """Save metadata to YAML file. This is useful if you're dynamically changing
         metadata (like dates) from the script and need to save them into YAML. This
@@ -506,7 +528,6 @@ class SnapshotMeta(MetaBase):
         if not self.path.exists():
             with open(self.path, "w") as f:
                 f.write(self.to_yaml())
-
         # Edit existing file, keep outs
         else:
             # Load outs from existing file
@@ -519,17 +540,16 @@ class SnapshotMeta(MetaBase):
             # NOTE: meta does not have `outs` field, it's reset when saving
             meta = self._meta_to_dict()
 
-            # No change, keep the file as is and don't break original formatting
+            # No change, keep the file as is
             if yaml["meta"] == meta:
                 return
 
-            # Otherwise re-save the file and format it
-            with open(self.path, "w") as f:
-                # set `outs` back
-                d = {"meta": meta}
-                if outs:
-                    d["outs"] = outs
-                f.write(yaml_dump(d))
+            # Otherwise update the file
+            # set `outs` back
+            d = {"meta": meta}
+            if outs:
+                d["outs"] = outs
+            self._update_metadata_file(d)
 
     @property
     def uri(self):

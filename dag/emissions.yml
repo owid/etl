@@ -12,26 +12,6 @@ steps:
   data://grapher/andrew/2019-12-03/co2_mitigation_curves_2celsius:
     - data://garden/andrew/2019-12-03/co2_mitigation_curves
   #
-  # RFF - World Carbon Pricing (2022-09-14).
-  #
-  data://meadow/rff/2023-10-19/world_carbon_pricing:
-    - snapshot://rff/2023-10-19/world_carbon_pricing.zip
-    # The following snapshot is just used to get the IPCC codes.
-    - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
-  data://garden/rff/2023-10-19/world_carbon_pricing:
-    - data://meadow/rff/2023-10-19/world_carbon_pricing
-  data://grapher/rff/2023-10-19/world_carbon_pricing:
-    - data://garden/rff/2023-10-19/world_carbon_pricing
-  #
-  # RFF - Emissions-weighted Carbon Price (2022-09-14).
-  #
-  data://meadow/rff/2023-10-19/emissions_weighted_carbon_price:
-    - snapshot://rff/2023-10-19/emissions_weighted_carbon_price.zip
-  data://garden/rff/2023-10-19/emissions_weighted_carbon_price:
-    - data://meadow/rff/2023-10-19/emissions_weighted_carbon_price
-  data://grapher/rff/2023-10-19/emissions_weighted_carbon_price:
-    - data://garden/rff/2023-10-19/emissions_weighted_carbon_price
-  #
   # IPCC - Emission Factor Database (2023-10-24).
   #
   data://meadow/emissions/2023-10-24/emission_factors:
@@ -172,3 +152,35 @@ steps:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
   export://multidim/emissions/latest/air_pollution:
     - data://grapher/emissions/2025-02-12/ceds_air_pollutants
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  data://meadow/rff/2025-06-02/emissions_weighted_carbon_price:
+    - snapshot://rff/2025-06-02/emissions_weighted_carbon_price.zip
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  data://garden/rff/2025-06-02/emissions_weighted_carbon_price:
+    - data://meadow/rff/2025-06-02/emissions_weighted_carbon_price
+  #
+  # RFF - Emissions-weighted Carbon Price.
+  #
+  data://grapher/rff/2025-06-02/emissions_weighted_carbon_price:
+    - data://garden/rff/2025-06-02/emissions_weighted_carbon_price
+  #
+  # RFF - World Carbon Pricing.
+  #
+  # The following step loads the EWC snapshot simply to get the IPCC codes.
+  data://meadow/rff/2025-06-02/world_carbon_pricing:
+    - snapshot://rff/2025-06-02/world_carbon_pricing.zip
+    - snapshot://rff/2025-06-02/emissions_weighted_carbon_price.zip
+  #
+  # RFF - World Carbon Pricing.
+  #
+  data://garden/rff/2025-06-02/world_carbon_pricing:
+    - data://meadow/rff/2025-06-02/world_carbon_pricing
+  #
+  # RFF - World Carbon Pricing.
+  #
+  data://grapher/rff/2025-06-02/world_carbon_pricing:
+    - data://garden/rff/2025-06-02/world_carbon_pricing

@@ -58,3 +58,8 @@ notebooks/
 zpop/
 node_modules/
 dist/
+
+.claude
+
+
+CLAUDE.md

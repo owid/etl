@@ -3,7 +3,7 @@ import hashlib
 import re
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, TextIO, Type, TypeVar, Union, get_args, get_origin, overload
+from typing import Any, TextIO, TypeVar, get_args, get_origin, overload
 
 import dynamic_yaml
 import structlog
@@ -47,7 +47,7 @@ def underscore(name: str, validate: bool = True, camel_to_snake: bool = False) -
 def underscore(name: None, validate: bool = True, camel_to_snake: bool = False) -> None: ...
 
 
-def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool = False) -> Optional[str]:
+def underscore(name: str | None, validate: bool = True, camel_to_snake: bool = False) -> str | None:
     """Convert arbitrary string to under_score. This was fine tuned on WDI bank column names.
     This function might evolve in the future, so make sure to have your use cases in tests
     or rather underscore your columns yourself.
@@ -176,18 +176,18 @@ def underscore_table(t, *args, **kwargs):
     return t.underscore(*args, **kwargs)
 
 
-def validate_underscore(name: Optional[str], object_name: str = "Name") -> None:
+def validate_underscore(name: str | None, object_name: str = "Name") -> None:
     """Raise error if name is not snake_case."""
     if name is not None and not re.match("^[a-z_][a-z0-9_]*$", name):
         raise NameError(f"{object_name} must be snake_case. Change `{name}` to `{underscore(name, validate=False)}`")
 
 
-def dynamic_yaml_load(source: Union[Path, str, TextIO], params: Dict = {}) -> dict:
+def dynamic_yaml_load(source: Path | str | TextIO, params: dict = {}) -> dict:
     """
     Loads a YAML file from a path, string, or StringIO-like object, and updates it with given parameters.
 
     Args:
-        source (Union[Path, str, TextIO]): File path, string, or a file-like object (e.g., StringIO).
+        source (Path | str | TextIO): File path, string, or a file-like object (e.g., StringIO).
         params (dict): Parameters to update in the loaded YAML.
 
     Returns:
@@ -276,7 +276,7 @@ def hash_any(x: Any) -> int:
         return hash(x)
 
 
-def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
+def dataclass_from_dict(cls: type[T] | None, d: dict[str, Any]) -> T:
     """Recursively create an instance of a dataclass from a dictionary. We've implemented custom
     method because original dataclasses_json.from_dict was too slow (this gives us more than 2x
     speedup). See https://github.com/owid/etl/pull/3517#issuecomment-2468084380 for more details.
@@ -301,13 +301,13 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
         origin = get_origin(field_type)
         args = get_args(field_type)
 
-        # unwrap Optional (e.g. Optional[License] -> License)
+        # unwrap  (e.g. License | None -> License)
         if type(None) in args:
             filtered_args = tuple(a for a in args if a is not type(None))
             if len(filtered_args) == 1:
-                # Save the original field_type for Optional[List[...]] case
+                # Save the original field_type for List[...] | None case
                 field_type = filtered_args[0]
-                # For Optional[List[...]] case, update the origin and args
+                # For List[...] | None case, update the origin and args
                 if get_origin(field_type) is list:
                     origin = list
                     args = get_args(field_type)
@@ -351,3 +351,17 @@ def remove_details_on_demand(text: str) -> str:
         text = re.sub(regex, "", text).replace("[", "").replace("]", "")
 
     return text
+
+
+def parse_numeric_list(val: list | str) -> list[float | int]:
+    """
+    Parse a string representation of a list of numbers into a Python list.
+    Example: "[10, 20, 30]" -> [10, 20, 30]
+    """
+    if isinstance(val, list):
+        return val
+    stripped = val.strip()
+    if stripped.startswith("[") and stripped.endswith("]"):
+        stripped = stripped[1:-1]
+
+    return [float(x) if "." in x else int(x) for x in stripped.split(",") if x.strip()]

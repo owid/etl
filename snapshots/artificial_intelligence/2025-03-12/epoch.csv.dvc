@@ -1,10 +1,12 @@
 # Learn more at:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/origin/
+autoupdate:
+  name: Epoch
 meta:
   origin:
     # Data product / Snapshot
     title: Parameter, Compute and Data Trends in Machine Learning
-    date_published: 2024-07-19
+    date_published: "2025"
     description_snapshot: |
       We update this chart with the latest available data from our source every month.
 
@@ -20,18 +22,21 @@ meta:
       — Deployed in a notable context
 
       The authors note that: "For new models (from 2020 onward) it is harder to assess these criteria, so we fall back to a subjective selection. We refer to models meeting our selection criteria as 'milestone models."
+
     # Citation
     producer: Epoch
     citation_full: "Epoch AI, ‘Parameter, Compute and Data Trends in Machine Learning’. Published online at epochai.org. Retrieved from: ‘https://epoch.ai/data/epochdb/visualization’ [online resource]"
+
     # Files
     url_main: https://epoch.ai/mlinputs/visualization
     url_download: https://epoch.ai/data/epochdb/notable_ai_models.csv
-    date_accessed: 2025-03-12
+    date_accessed: '2025-06-10'
+
     # License
     license:
       name: CC BY 4.0
       url: https://creativecommons.org/licenses/by/4.0/
 outs:
-  - md5: c677e5d558ddab7849f18b09c795af40
-    size: 1708894
+  - md5: 839a9dadf9faae45e98fc8c098acce81
+    size: 1825175
     path: epoch.csv

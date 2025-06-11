@@ -1,0 +1,247 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Economic Growth
+    display:
+      numDecimalPlaces: 1
+  cpi_desc: &cpi_desc |-
+    The Consumer Price Index (CPI) measures inflation — how the average prices of goods and services change over time.
+
+  cpi_base_1982_84: &cpi_base_1982_84 |-
+    The index uses a base period of 1982–84, which is set to 100. Later values show how much prices have changed since then.
+  cpi_base_dec_1997: &cpi_base_dec_1997 |-
+    The index uses a base period of December 1997, which is set to 100. Later values show how much prices have changed since then.
+dataset:
+  update_period_days: 365
+
+tables:
+  us_consumer_prices:
+    variables:
+      college_tuition_fees:
+        title: US consumer price index for college tuition & fees
+        description_from_producer: "College tuition and fees in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEB01)"
+        description_key:
+          - *cpi_desc
+          - This CPI item falls under “Tuition, other school fees, and childcare,” a subcategory of the broader Education index, and tracks out-of-pocket costs for tuition, school fees, and childcare.          - It's a subcategory of the broader "Tuition, other school fees, and childcare" which is part of the "Education" category.
+          - It subtracts scholarships and grants, so the reported cost reflects what people really pay after financial aid.
+          - Only degree-granting programs are included, such as associate’s, bachelor’s, master’s, and doctoral degrees.
+          - Changes in the quality of education — like more instruction time — are difficult to measure, so most tuition increases are treated as simple price increases unless the reason for the change is very clear.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: College tuition and fees (US consumer price index)
+        display:
+          name: College tuition and fees
+
+      education:
+        title: US consumer price index for education
+        description_from_producer: "Education in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAE1)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s education category captures consumer spending on tuition, school fees, childcare, and educational materials such as textbooks and school supplies.
+          - It excludes loans and fully subsidized tuition, focusing only on direct costs to households.
+          - The index covers degree-granting programs and early childhood education, but generally excludes non-degree or vocational courses.
+          - While quality adjustments are made when possible, most price changes are treated as inflation.
+          - Overall, the category reflects how the cost of accessing education — from preschool to higher education — evolves over time.
+          - *cpi_base_dec_1997
+        unit: ""
+        presentation:
+          title_public: Education (US consumer price index)
+        display:
+          name: Education
+
+      childcare:
+        title: US consumer price index for day care and preschool fees
+        description_from_producer: "Day care and preschool in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEB)"
+        description_key:
+          - *cpi_desc
+          - This CPI item tracks out-of-pocket costs for day care and preschool services.
+          - It includes charges for the care of pre-elementary school children, including pre-kindergarten educational programs.
+          - Individuals whose occupation is to regularly care for pre-elementary school children are included in the pricing.
+          - The item reflects changes over time in the cost of early childhood education and care.
+          - Separate charges for books, uniforms, transportation, or meals are not included.
+          - Short-term or occasional childcare (such as babysitting) and nanny services are excluded.
+          - Camp, kindergarten, and any programs for grade school students (including extended before- and after-school care) are also excluded.
+          - In families with more than three children, only the costs for up to three children are included; additional children are excluded from pricing.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Day care and preschool fees (US consumer price index)
+        display:
+          name: Day care and preschool
+
+      medical_care:
+        title: US consumer price index for medical care
+        description_from_producer: "Medical care in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAM)"
+        description_key:
+          - *cpi_desc
+          - The CPI's medical care category tracks out-of-pocket costs for health care services and products.
+          - It includes expenses like doctor visits, hospital stays, dental care, and prescription drugs.
+          - It does not include payments made by employers or the government.
+          - When tracking price changes, it uses the full cost of care — including what insurance pays.
+          - If a doctor visit costs $100 and the patient pays $20, the CPI still tracks the full $100.
+          - This makes health care look smaller in the CPI than in the overall economy, because the CPI only uses personal spending to decide importance.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Medical care (US consumer price index)
+        display:
+          name: Medical care
+
+      household_energy:
+        title: US consumer price index for household energy
+        description_from_producer: "Household energy in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAH21)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s household energy category tracks out-of-pocket costs for electricity, gas, and other residential fuels like heating oil, propane, and firewood.
+          - It reflects actual prices paid by consumers, excluding any subsidies, tax credits, or utility assistance programs.
+          - These costs are a key part of the broader housing category, as they cover essential energy use for heating, cooling, cooking, and electricity in the home.
+          - Most price changes are treated as direct inflation, with limited adjustments for changes in energy quality or efficiency.
+          - This category helps illustrate how energy price volatility impacts household budgets and is a critical driver of short-term inflation movements.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Household energy (US consumer price index)
+        display:
+          name: Household energy
+
+      housing:
+        title: US consumer price index for housing
+        description_from_producer: "Housing in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAH)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s housing category encompasses out-of-pocket expenses related to shelter and household operations, including rent, owners’ equivalent rent, utilities, and household furnishings.​
+          - It reflects the prices consumers actually pay, excluding mortgage interest, home purchase prices, or housing subsidies.​
+          - While adjustments are made for changes in housing quality (e.g., renovations or added amenities), most price changes are treated as direct inflation.​
+          - This category is a major driver of core inflation and provides insights into long-term cost-of-living trends.​
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Housing (US consumer price index)
+        display:
+          name: Housing
+
+      food_beverages:
+        title: US consumer price index for food & beverages
+        description_from_producer: "Food and beverages in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAF)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s food and beverages category tracks out-of-pocket expenses for a wide range of food items, alcoholic and nonalcoholic beverages.
+          - The category encompasses various subgroups, including cereals, meats, dairy products, fruits and vegetables, nonalcoholic beverages, and other food items.
+          - Food and non-alcholic beverages consumed away from home, such as meals at restaurants or cafeterias, are not included. But alcoholic beverages consumed away from home are included.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Food and beverages (US consumer price index)
+        display:
+          name: Food and beverages
+
+      public_transport:
+        title: US consumer price index for public transport
+        description_from_producer: "Public transportation in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SETG)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s public transportation category captures out-of-pocket expenses for mass transit services used by consumers.
+          - It includes services such as airline fares, intercity train travel (e.g., Amtrak), intercity bus services, and mass transit systems like subways, local buses, and commuter rail.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Public transport (US consumer price index)
+        display:
+          name: Public transport
+
+      new_cars:
+        title: US consumer price index for new cars
+        description_from_producer: "New cars in U.S. city average, all urban consumers, not seasonally adjusted (CUUS0000SS45011)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s new cars index measures prices paid by consumers for newly purchased passenger cars, excluding trucks, SUVs, and fleet vehicles.
+          - It includes categories like subcompact, compact, intermediate, full-size, sporty, and luxury cars, based on vehicle classifications defined by the Environmental Protection Agency (EPA).
+          - Prices are sourced from J.D. Power transaction data, reflecting actual dealership sales across the U.S.
+          - When models change between years, quality adjustments are made for added features like improved safety or fuel efficiency.
+          - The index helps capture how market trends and vehicle upgrades affect the cost of new cars for consumers.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: New cars (US consumer price index)
+        display:
+          name: New cars
+
+      clothing:
+        title: US consumer price index for clothing
+        description_from_producer: "Apparel in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SAA)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s clothing category tracks out-of-pocket expenses for apparel, footwear and accessories purchased by consumers.
+          - It includes a wide range of items such as shirts, pants, dresses, shoes, and accessories.
+          - The category covers clothing for men, women, children, and infants.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Clothing, footwear and accessories (US consumer price index)
+        display:
+          name: Clothing, footwear and accessories
+
+      software:
+        title: US consumer price index for computer software & accessories
+        description_from_producer: "Computer software and accessories in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SEEE02)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s computer software and accessories category tracks out-of-pocket expenses for software and accessories used with computers.
+          - It includes items like operating systems, productivity software, and accessories such as printers, scanners, and external drives.
+          - *cpi_base_dec_1997
+        unit: ""
+        presentation:
+          title_public: Computer software and accessories (US consumer price index)
+        display:
+          name: Computer software and accessories
+
+      toys:
+        title: US consumer price index for toys
+        description_from_producer: "Toys in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SERE01)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s toys category tracks out-of-pocket expenses for a wide range of toys purchased by consumers.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Toys (US consumer price index)
+        display:
+          name: Toys
+
+
+      televisions:
+        title: US consumer price index for televisions
+        description_from_producer: "Televisions in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SERA01)"
+        description_key:
+          - *cpi_desc
+          - The CPI’s television item tracks prices for non-portable TVs with built-in tuners, including models with DVD players, stands, or separate speakers.
+          - TVs are included only if individually priced, even when part of a component system.
+          - Portable TVs and computer monitors are excluded and tracked separately.
+          - Prices reflect actual consumer purchases, with adjustments for quality improvements like resolution and smart features.
+          - The item captures how technological changes and market trends impact TV prices over time.
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: Televisions (US consumer price index)
+        display:
+          name: Televisions
+
+      all_items:
+        title: US consumer price index for all items
+        description_from_producer: "All items in U.S. city average, all urban consumers, not seasonally adjusted (CUUR0000SA0)"
+        description_key:
+          - *cpi_desc
+          - The all items CPI provides a comprehensive measure of the average change over time in prices paid by urban consumers for a broad basket of goods and services.
+          - It encompasses categories such as food, housing, apparel, transportation, medical care, recreation, education, and communication.
+          - Prices are collected monthly from a wide array of retail and service establishments across the U.S.
+          - The index serves as a key indicator of inflation, reflecting the overall cost of living for consumers.
+          - It is widely used for economic analysis, policy-making, and adjusting income payments for inflation.​
+          - *cpi_base_1982_84
+        unit: ""
+        presentation:
+          title_public: All items (US consumer price index)
+        display:
+          name: All items
+

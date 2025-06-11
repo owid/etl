@@ -8,6 +8,9 @@
             "description": "Definitions with anchors that are reused in other parts of the metadata",
             "additionalProperties": true
         },
+        "catalog_path": {
+            "type": "string"
+        },
         "grapherConfigSchema": {
             "description": "URL of a JSON schema for the grapher config.",
             "type": "string"
@@ -34,6 +37,15 @@
                 "type": "string"
             }
         },
+        "default_dimensions": {
+            "type": "object",
+            "description": "The dimensions of the default view in the collection (shown by default on the site).",
+            "patternProperties": {
+                ".*": {
+                    "type": "string"
+                }
+            }
+        },
         "topic_tags": {
             "type": "array",
             "items": {
@@ -46,7 +58,7 @@
                 "type": "object",
                 "properties": {
                     "slug": {
-                        "type": "string"
+                        "$ref": "definitions.json#/slug_relaxed"
                     },
                     "name": {
                         "type": "string"
@@ -60,7 +72,7 @@
                             "type": "object",
                             "properties": {
                                 "slug": {
-                                    "type": "string"
+                                    "$ref": "definitions.json#/slug_relaxed"
                                 },
                                 "name": {
                                     "type": "string"

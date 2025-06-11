@@ -6,18 +6,24 @@ steps:
     - data://explorers/lis/latest/luxembourg_income_study
 
   # World Bank Poverty and Inequality Platform
-  data://meadow/wb/2024-10-07/world_bank_pip:
-    - snapshot://wb/2024-10-07/world_bank_pip.csv
-    - snapshot://wb/2024-10-07/world_bank_pip_percentiles.csv
-    - snapshot://wb/2024-10-07/world_bank_pip_regions.csv
-  data://garden/wb/2024-10-07/world_bank_pip:
-    - data://meadow/wb/2024-10-07/world_bank_pip
-  data://grapher/wb/2024-10-07/world_bank_pip_2011ppp:
-    - data://garden/wb/2024-10-07/world_bank_pip
-  data://grapher/wb/2024-10-07/world_bank_pip_2017ppp:
-    - data://garden/wb/2024-10-07/world_bank_pip
+  data://meadow/wb/2025-04-08/world_bank_pip:
+    - snapshot://wb/2025-04-08/world_bank_pip.csv
+    - snapshot://wb/2025-04-08/world_bank_pip_percentiles.csv
+    - snapshot://wb/2025-04-08/world_bank_pip_regions.csv
+
+  # Legacy PIP pipeline
+  data://garden/wb/2025-04-08/world_bank_pip_legacy:
+    - data://meadow/wb/2025-04-08/world_bank_pip
   data://explorers/wb/latest/world_bank_pip:
-    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wb/2025-04-08/world_bank_pip_legacy
+
+  # Dimensional PIP pipeline
+  data://garden/wb/2025-04-14/world_bank_pip:
+    - data://meadow/wb/2025-04-08/world_bank_pip
+  data://grapher/wb/2025-04-14/world_bank_pip:
+    - data://garden/wb/2025-04-14/world_bank_pip
+  export://multidim/wb/latest/world_bank_pip:
+    - data://grapher/wb/2025-04-14/world_bank_pip
 
   # World Inequality Database
   data://meadow/wid/2025-03-14/world_inequality_database:
@@ -54,7 +60,7 @@ steps:
 
   # Poverty and inequality file for inequality comparisons at OWID
   data://garden/poverty_inequality/2025-01-22/poverty_inequality_file:
-    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wb/2025-04-08/world_bank_pip_legacy
     - data://garden/wid/2025-03-14/world_inequality_database
     - data://garden/lis/2025-01-24/luxembourg_income_study
     - data://garden/wb/2025-03-10/thousand_bins_distribution
@@ -65,7 +71,7 @@ steps:
     - data://garden/poverty_inequality/2025-01-22/poverty_inequality_file
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-    - data://garden/wb/2024-10-07/world_bank_pip
+    - data://garden/wb/2025-04-08/world_bank_pip_legacy
     - data://garden/wid/2025-03-14/world_inequality_database
     - data://garden/lis/2025-01-24/luxembourg_income_study
   data://grapher/poverty_inequality/2025-01-22/inequality_comparison:
@@ -81,12 +87,12 @@ steps:
     - data://garden/ophi/2024-10-28/multidimensional_poverty_index
 
   # # OECD Income Distribution Database
-  data://meadow/oecd/2024-04-10/income_distribution_database:
-    - snapshot://oecd/2024-04-10/income_distribution_database.csv
-  data://garden/oecd/2024-04-10/income_distribution_database:
-    - data://meadow/oecd/2024-04-10/income_distribution_database
-  data://grapher/oecd/2024-04-10/income_distribution_database:
-    - data://garden/oecd/2024-04-10/income_distribution_database
+  data://meadow/oecd/2025-04-16/income_distribution_database:
+    - snapshot://oecd/2025-04-16/income_distribution_database.csv
+  data://garden/oecd/2025-04-16/income_distribution_database:
+    - data://meadow/oecd/2025-04-16/income_distribution_database
+  data://grapher/oecd/2025-04-16/income_distribution_database:
+    - data://garden/oecd/2025-04-16/income_distribution_database
 
   # Historical poverty data - Moatsos (2021)
   data://meadow/moatsos/2023-10-09/moatsos_historical_poverty:

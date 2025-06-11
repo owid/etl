@@ -61,7 +61,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, ProgrammingError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
     DeclarativeBase,
@@ -292,6 +292,22 @@ class Tag(Base):
         return tags
 
 
+class DoD(Base):
+    __tablename__ = "dods"
+    __table_args__ = (
+        ForeignKeyConstraint(["lastUpdatedUserId"], ["users.id"], ondelete="SET NULL", name="dods_ibfk_1"),
+        Index("lastUpdatedUserId", "lastUpdatedUserId"),
+        Index("name", "name", unique=True),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(512))
+    content: Mapped[str] = mapped_column(VARCHAR(4096))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
+    lastUpdatedUserId: Mapped[Optional[int]] = mapped_column(Integer)
+
+
 class User(Base):
     __tablename__ = "users"
     __table_args__ = (Index("email", "email", unique=True),)
@@ -402,6 +418,7 @@ class Chart(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
+    isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
@@ -423,7 +440,10 @@ class Chart(Base):
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
-        return self.chart_config.full
+        config = self.chart_config.full.copy()
+        # Add isInheritanceEnabled to config so it's included in comparisons
+        config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
+        return config
 
     @config.expression
     def config(cls):
@@ -1813,14 +1833,21 @@ class ChartDiffConflicts(Base):
 
 class MultiDimDataPage(Base):
     __tablename__ = "multi_dim_data_pages"
-
-    slug: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
-    config: Mapped[dict] = mapped_column(JSON)
-    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"), init=False)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
-    updatedAt: Mapped[datetime] = mapped_column(
-        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    __table_args__ = (
+        Index("idx_multi_dim_data_pages_catalog_path", "catalogPath", unique=True),
+        Index("idx_multi_dim_data_pages_slug", "slug", unique=True),
     )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    config: Mapped[dict] = mapped_column(JSON)
+    configMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(`config`))))", persisted=True))
+    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    )
+    catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767))
+    slug: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
 
     def upsert(self, session: Session) -> "MultiDimDataPage":
         cls = self.__class__
@@ -1831,6 +1858,21 @@ class MultiDimDataPage(Base):
         else:
             session.add(self)
             return self
+
+    @classmethod
+    def load_mdim(
+        cls, session: Session, catalogPath: Optional[str] = None, columns: Optional[List[str]] = None
+    ) -> Optional["MultiDimDataPage"]:
+        cond = cls.catalogPath == catalogPath
+        if columns:
+            return session.execute(_select_columns(cls, columns).where(cond)).one()  # type: ignore
+        else:
+            return session.scalars(select(cls).where(cond)).first()
+
+    @classmethod
+    def load_mdims(cls, session: Session, columns: Optional[List[str]] = None) -> List["MultiDimDataPage"]:
+        execute = session.execute if columns else session.scalars
+        return execute(_select_columns(cls, columns)).all()  # type: ignore
 
 
 class Anomaly(Base):
@@ -1904,7 +1946,14 @@ class Anomaly(Base):
 
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
-        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        try:
+            return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        except ProgrammingError as e:
+            # anomalies table does not exist (error code 1146), it gets created dynamically
+            # when the first anomaly is created
+            if "1146" in str(e):
+                return []
+            raise
 
 
 class Explorer(Base):
@@ -1985,6 +2034,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
     assert values.notnull().all(), "values must not contain nulls"
     assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
     if values.empty:
+        log.warning("_infer_variable_type.mixed_type_detected", reason="empty_values")
         return "mixed"
     try:
         values = pd.to_numeric(values)
@@ -1997,6 +2047,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
             raise NotImplementedError()
     except ValueError:
         if values.map(_is_float).any():
+            log.warning("_infer_variable_type.mixed_type_detected", reason="mixed_numeric_and_string")
             return "mixed"
         else:
             return "string"

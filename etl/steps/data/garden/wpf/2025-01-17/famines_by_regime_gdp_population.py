@@ -7,7 +7,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -49,7 +49,7 @@ CUSTOM_REGIMES = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     ds_gdp = paths.load_dataset("maddison_project_database")
     tb_gdp = ds_gdp.read("maddison_project_database")
 
-    tb_gdp = tb_gdp[["year", "country", "gdp_per_capita"]]
+    tb_gdp = tb_gdp.loc[:, ["year", "country", "gdp_per_capita"]]
 
     ds_population = paths.load_dataset("population")
 
@@ -100,9 +100,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_famines.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_famines.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -126,22 +124,22 @@ def add_regime(tb_famines: Table, ds_regime: Dataset) -> Table:
 
     Parameters:
     tb_famines (Table): Table containing famine data.
-    ds_regime (Dataset): Dataset containing regime data, expected to have a key "vdem" with a DataFrame value.
+    ds_regime (Dataset): Dataset containing regime data, expected to have a key "vdem_uni_without_regions" with a DataFrame value.
 
     Returns:
     Table: The updated Table with regime information added.
 
     The function performs the following steps:
-    1. Extracts the "vdem" DataFrame from the ds_regime dictionary and resets its index.
+    1. Extracts the "vdem_uni_without_regions" DataFrame from the ds_regime dictionary and resets its index.
     2. Reduces the regime DataFrame to only include the columns "country", "year", and "regime_redux_row_owid".
     3. Combines autocracies by setting the "regime_redux_row_owid" value to 3 for rows where it is 0 or 1.
     4. Merges the reduced regime DataFrame with the famines DataFrame on "country" and "year".
     5. Applies custom regime rules defined in the CUSTOM_REGIMES dictionary to assign regime values.
     6. Ensures there are no NaN values in the "regime_redux_row_owid" column.
     """
-    tb_regime = ds_regime["vdem"].reset_index()
+    tb_regime = ds_regime.read("vdem_uni_without_regions")
 
-    reduced_regime = tb_regime[["country", "year", "regime_redux_row_owid"]]
+    reduced_regime = tb_regime.loc[:, ["country", "year", "regime_redux_row_owid"]]
 
     # Combine autocracies
     reduced_regime.loc[reduced_regime["regime_redux_row_owid"].isin([0, 1]), "regime_redux_row_owid"] = 3

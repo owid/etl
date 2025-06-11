@@ -37,15 +37,6 @@ steps:
     - data://garden/worldbank_wdi/2024-05-20/wdi
     - data://garden/un/2024-07-12/un_wpp
 
-    # Homicide - UNODC - update
-  data://meadow/homicide/2024-10-30/unodc:
-    - snapshot://homicide/2024-10-30/unodc.xlsx
-  data://garden/homicide/2024-10-30/unodc:
-    - data://meadow/homicide/2024-10-30/unodc
-    - data://garden/demography/2023-03-31/population
-  data://grapher/homicide/2024-10-30/unodc:
-    - data://garden/homicide/2024-10-30/unodc
-
   #
   # UN
   # UN SDG - current
@@ -68,14 +59,14 @@ steps:
     - data://garden/technology/2024-12-23/internet
 
   # UNDP
-  data://meadow/un/2024-04-09/undp_hdr:
-    - snapshot://un/2024-04-09/undp_hdr.csv
-  data://garden/un/2024-04-09/undp_hdr:
-    - data://meadow/un/2024-04-09/undp_hdr
+  data://meadow/un/2025-05-07/undp_hdr:
+    - snapshot://un/2025-05-07/undp_hdr.csv
+  data://garden/un/2025-05-07/undp_hdr:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-07-29/income_groups
-  data://grapher/un/2024-04-09/undp_hdr:
-    - data://garden/un/2024-04-09/undp_hdr
+    - data://meadow/un/2025-05-07/undp_hdr
+  data://grapher/un/2025-05-07/undp_hdr:
+    - data://garden/un/2025-05-07/undp_hdr
 
   # Maddison Database 2010
   data://meadow/ggdc/2022-12-23/maddison_database:
@@ -113,12 +104,11 @@ steps:
     - data://garden/wvs/2023-06-25/longitudinal_wvs
 
   # USA consumer prices (US Bureau of Labor Statistics)
-  data://meadow/bls/2024-05-16/us_consumer_prices:
-    - snapshot://bls/2024-05-16/us_consumer_prices.csv
-  data://garden/bls/2024-05-16/us_consumer_prices:
-    - data://meadow/bls/2024-05-16/us_consumer_prices
-  data://grapher/bls/2024-05-16/us_consumer_prices:
-    - data://garden/bls/2024-05-16/us_consumer_prices
+
+  data://garden/bls/2025-04-12/us_consumer_prices:
+    - snapshot://bls/2025-04-12/us_consumer_prices.csv
+  data://grapher/bls/2025-04-12/us_consumer_prices:
+    - data://garden/bls/2025-04-12/us_consumer_prices
 
   # Historical Cross Country Technology Adoption Dataset (Comin & Hobijn, 2004)
   data://meadow/technology/2023-03-16/hcctad:
@@ -127,7 +117,6 @@ steps:
     - data://meadow/technology/2023-03-16/hcctad
   data://grapher/technology/2023-03-16/hcctad:
     - data://garden/technology/2023-03-16/hcctad
-
 
   # World Happiness report (2025)
   data://meadow/happiness/2025-03-28/happiness:
@@ -142,7 +131,6 @@ steps:
   data://grapher/happiness/2025-03-28/happiness:
     - data://garden/happiness/2025-03-28/happiness
 
-
   # Ethnic Power Relations Dataset
   data://meadow/eth/2023-03-15/growup:
     - snapshot://eth/2023-03-15/growup.csv
@@ -153,13 +141,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/eth/2023-03-15/ethnic_power_relations:
     - data://garden/eth/2023-03-15/ethnic_power_relations
-
-  # Patents & journal articles (World Bank, United Nations)
-  data://garden/research_development/2024-05-20/patents_articles:
-    - data://garden/worldbank_wdi/2024-05-20/wdi
-    - data://garden/demography/2023-03-31/population
-  data://grapher/research_development/2024-05-20/patents_wdi_unwpp:
-    - data://garden/research_development/2024-05-20/patents_articles
 
   # World Bank's Women, Business and the Law additional data
   data://meadow/wb/2023-05-12/women_business_law_additional:
@@ -270,7 +251,7 @@ steps:
     - snapshot://gapminder/2023-09-22/total_fertility_rate.xlsx
   data://garden/gapminder/2023-09-22/total_fertility_rate:
     - data://meadow/gapminder/2023-09-22/total_fertility_rate
-    - data://garden/un/2024-09-16/long_run_child_mortality
+    - data://garden/un/2025-04-25/long_run_child_mortality
     - data://garden/un/2022-07-11/un_wpp
   data://grapher/gapminder/2023-09-22/total_fertility_rate:
     - data://garden/gapminder/2023-09-22/total_fertility_rate
@@ -391,7 +372,6 @@ steps:
 
   data://grapher/growth/2024-05-16/gdp_historical:
     - data://garden/growth/2024-05-16/gdp_historical
-
 
   ######################################################################################################################
   # Map (Natural Earth)
@@ -536,7 +516,7 @@ steps:
   data-private://grapher/language/2024-07-17/ethnologue:
     - data-private://garden/language/2024-07-17/ethnologue
 
-  # Child Mortality Estimates - UN IGME
+  # Child Mortality Estimates - UN IGME - to archive
   data://meadow/un/2024-09-11/igme:
     - snapshot://un/2024-09-11/igme.zip
   data://garden/un/2024-09-11/igme:
@@ -547,13 +527,32 @@ steps:
   data://grapher/un/2024-09-11/igme:
     - data://garden/un/2024-09-11/igme
 
-  # Long-run child mortality, Gapminder + UN IGME
+  # Child Mortality Estimates - UN IGME
+  data://meadow/un/2025-03-25/igme:
+    - snapshot://un/2025-03-25/igme.zip
+  data://garden/un/2025-03-25/igme:
+    - data://meadow/un/2025-03-25/igme
+    - data://garden/un/2018/igme
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/demography/2024-07-15/population
+  data://grapher/un/2025-03-25/igme:
+    - data://garden/un/2025-03-25/igme
+
+  # Long-run child mortality, Gapminder + UN IGME - to archive
   data://garden/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-11/igme
     - data://garden/gapminder/2023-09-18/under_five_mortality
     - data://garden/gapminder/2023-09-21/under_five_mortality
   data://grapher/un/2024-09-16/long_run_child_mortality:
     - data://garden/un/2024-09-16/long_run_child_mortality
+
+    # Long-run child mortality, Gapminder + UN IGME - to update
+  data://garden/un/2025-04-25/long_run_child_mortality:
+    - data://garden/un/2025-03-25/igme
+    - data://garden/gapminder/2023-09-18/under_five_mortality
+    - data://garden/gapminder/2023-09-21/under_five_mortality
+  data://grapher/un/2025-04-25/long_run_child_mortality:
+    - data://garden/un/2025-04-25/long_run_child_mortality
 
   # UN SDG (2024)
   data://meadow/un/2024-08-27/un_sdg:
@@ -566,12 +565,12 @@ steps:
     - data://garden/un/2024-08-27/un_sdg
 
   # Oil Spills
-  data://meadow/itopf/2024-10-16/oil_spills:
-    - snapshot://itopf/2024-10-16/oil_spills.pdf
-  data://garden/itopf/2024-10-16/oil_spills:
-    - data://meadow/itopf/2024-10-16/oil_spills
-  data://grapher/itopf/2024-10-16/oil_spills:
-    - data://garden/itopf/2024-10-16/oil_spills
+  data://meadow/itopf/2025-05-05/oil_spills:
+    - snapshot://itopf/2025-05-05/oil_spills.pdf
+  data://garden/itopf/2025-05-05/oil_spills:
+    - data://meadow/itopf/2025-05-05/oil_spills
+  data://grapher/itopf/2025-05-05/oil_spills:
+    - data://garden/itopf/2025-05-05/oil_spills
 
   # UN SD census data
   data://meadow/un/2024-10-21/census_dates:
@@ -597,7 +596,7 @@ steps:
 
   data://garden/wpf/2025-01-17/famines_by_regime_gdp_population:
     - data://garden/wpf/2025-01-17/famines
-    - data://garden/democracy/2024-03-07/vdem
+    - data://garden/democracy/2025-03-17/vdem
     - data://garden/ggdc/2024-04-26/maddison_project_database
     - data://garden/demography/2024-07-15/population
   data://grapher/wpf/2025-01-17/famines_by_regime_gdp_population:
@@ -613,21 +612,20 @@ steps:
   data://grapher/wpf/2025-01-17/famines_by_trigger:
     - data://garden/wpf/2025-01-17/famines_by_trigger
 
+  # Global Flourishing Study
+  data-private://meadow/gfs/2024-11-11/gfs_wave_one:
+    - snapshot-private://gfs/2024-11-11/gfs_wave_one.csv
+  data-private://garden/gfs/2024-11-11/gfs_wave_one:
+    - data-private://meadow/gfs/2024-11-11/gfs_wave_one
+  data-private://grapher/gfs/2024-11-11/gfs_wave_one:
+    - data-private://garden/gfs/2024-11-11/gfs_wave_one
+
   data-private://meadow/owid/latest/ig_countries:
     - snapshot-private://owid/latest/ig_countries.csv
   data-private://garden/owid/latest/ig_countries:
     - data-private://meadow/owid/latest/ig_countries
   data-private://grapher/owid/latest/ig_countries:
     - data-private://garden/owid/latest/ig_countries
-
-
-  # IMF World Economic Outlook
-  data://meadow/imf/2024-11-25/world_economic_outlook:
-    - snapshot://imf/2024-11-25/world_economic_outlook.xls
-  data://garden/imf/2024-11-25/world_economic_outlook:
-    - data://meadow/imf/2024-11-25/world_economic_outlook
-  data://grapher/imf/2024-11-25/world_economic_outlook:
-    - data://garden/imf/2024-11-25/world_economic_outlook
 
   # GDP per capita vs. living conditions indicators
   data://garden/growth/2025-01-16/gdppc_vs_living_conditions:
@@ -639,7 +637,7 @@ steps:
     - data://garden/tourism/2024-08-17/unwto
     - data://garden/ggdc/2022-11-28/penn_world_table
     - data://garden/wb/2024-11-04/edstats
-    - data://garden/unesco/2024-06-25/education_sdgs
+    - data://garden/unesco/2025-05-01/education_sdgs
     - data://garden/happiness/2025-03-28/happiness
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
@@ -672,6 +670,56 @@ steps:
   data://grapher/atus/2025-01-06/atus_who:
     - data://garden/atus/2025-01-06/atus_who
 
+  # Happiness by age groups (World Happiness Report 2024)
+  data://meadow/happiness/2025-04-01/happiness_by_age:
+    - snapshot://happiness/2025-04-01/happiness_by_age.csv
+  data://garden/happiness/2025-04-01/happiness_by_age:
+    - data://meadow/happiness/2025-04-01/happiness_by_age
+  data://grapher/happiness/2025-04-01/happiness_by_age:
+    - data://garden/happiness/2025-04-01/happiness_by_age
+
+  # IMF World Economic Outlook
+  data://meadow/imf/2025-04-25/world_economic_outlook:
+    - snapshot://imf/2025-04-25/world_economic_outlook.xls
+  data://garden/imf/2025-04-25/world_economic_outlook:
+    - data://meadow/imf/2025-04-25/world_economic_outlook
+  data://grapher/imf/2025-04-25/world_economic_outlook:
+    - data://garden/imf/2025-04-25/world_economic_outlook
+
+  #
+  # World Airlines Traffic and Capacity
+  #
+  data://meadow/aviation/2025-04-01/air_traffic:
+    - snapshot://aviation/2025-04-01/air_traffic.csv
+  data://garden/aviation/2025-04-01/air_traffic:
+    - data://meadow/aviation/2025-04-01/air_traffic
+  data://grapher/aviation/2025-04-01/air_traffic:
+    - data://garden/aviation/2025-04-01/air_traffic
+
+  # United Nations members
+  data://meadow/un/2025-05-15/un_members:
+    - snapshot://un/2025-05-15/un_members.csv
+  # United Nations members
+  data://garden/un/2025-05-15/un_members:
+    - data://garden/wb/2021-07-01/wb_income
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/un/2025-05-15/un_members
+    - data://garden/regions/2023-01-01/regions
+  # United Nations members
+  data://grapher/un/2025-05-15/un_members:
+    - data://garden/un/2025-05-15/un_members
+
+  #
+  # UNODC Homicide Data
+  #
+  data://meadow/unodc/2025-05-28/homicide:
+    - snapshot://unodc/2025-05-28/homicide.xlsx
+  data://garden/unodc/2025-05-28/homicide:
+    - data://meadow/unodc/2025-05-28/homicide
+    - data://garden/demography/2024-07-15/population
+    - data://garden/un/2024-07-12/un_wpp
+  data://grapher/unodc/2025-05-28/homicide:
+    - data://garden/unodc/2025-05-28/homicide
 
 include:
   - dag/open_numbers.yml
@@ -712,3 +760,4 @@ include:
   - dag/families.yml
   - dag/technology.yml
   - dag/redistribution.yml
+  - dag/corruption.yml
