@@ -117,6 +117,7 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
+                    "yAxis": {"min": 0, "max": 100},
                 },
             },
             {
@@ -130,6 +131,7 @@ def run() -> None:
                     "hasMapTab": False,
                     "tab": "chart",
                     "selectedFacetStrategy": "entity",
+                    "yAxis": {"min": 0, "max": 100},
                 },
             },
         ]
@@ -148,6 +150,8 @@ def run() -> None:
         # Generate dynamic subtitle
         if level and enrolment_type:
             view.config["subtitle"] = generate_subtitle_by_level(level, sex, enrolment_type)
+
+        edit_indicator_displays(view)
 
     #
     # Save garden dataset.
@@ -258,7 +262,7 @@ def _get_gender_term(sex, level, context="title"):
     """Get appropriate gender term based on context and level."""
     if level == "tertiary" and sex in GENDER_MAPPINGS["tertiary"]:
         return GENDER_MAPPINGS["tertiary"][sex]
-    return GENDER_MAPPINGS[context].get(sex, "children")
+    return GENDER_MAPPINGS[context].get(sex, "")
 
 
 def generate_title_by_gender_and_level(sex, level):
