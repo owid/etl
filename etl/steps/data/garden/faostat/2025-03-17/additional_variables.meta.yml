@@ -599,6 +599,8 @@ tables:
         short_unit: "t"
         description_short: |
           Hypothetical global meat demand if everyone in the world ate the same quantity as the average citizen of a given country.
+        # For some reason, the description from population is leaked into this indicator.
+        description: ""
         description_key:
           - 'This is a hypothetical variable derived by Our World in Data which answers the question: "What would global meat demand have to be if everyone in the world consumed the average per capita amount of a given country?". For example: "How much meat would need to be provided if everyone in the world consumed as much meat as the average UK citizen?".'
           - We do not have data on actual individual consumption. Instead, this data reflects the amount of meat available for consumption. It may include food that is wasted at the consumer level and not eaten.
@@ -620,6 +622,8 @@ tables:
         short_unit: ""
       animals_global_hypothetical:
         title: Hypothetical number of land animals that would be slaughtered if all countries produced meat in the same way as a given country
+        # For some reason, the description from population is leaked into this indicator.
+        description: ""
         description_short: ""
         unit: "animals"
         short_unit: ""
