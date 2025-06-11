@@ -474,8 +474,10 @@ def _get_dict_from_list_of_common_field_if_all_defined_and_identical(
     common_fields = {}
     for field in all_fields:
         values = [obj.get(field) for obj in list_of_objects if obj]
-        if len(set(map(repr, values))) == 1:
-            common_fields[field] = values[0]
+        # Check if all values for this field are identical.
+        first_value = values[0]
+        if all(value == first_value for value in values):
+            common_fields[field] = first_value
 
     # If no common fields were found, return None.
     combined_display = common_fields if common_fields else None
