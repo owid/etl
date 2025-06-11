@@ -60,13 +60,6 @@ steps:
   data://grapher/who/2023-04-03/flu_elderly:
     - data://garden/who/2023-04-03/flu_elderly
 
-  # Registered vehicles per 1000 people
-  data://garden/who/2024-05-20/vehicles:
-    - data://garden/who/2024-01-03/gho
-    - data://garden/demography/2024-07-15/population
-  data://grapher/who/2024-05-20/vehicles:
-    - data://garden/who/2024-05-20/vehicles
-
   # WGM 2020
   data://meadow/health/2023-04-18/wgm_mental_health:
     - snapshot://health/2023-04-18/wgm_mental_health.zip
@@ -104,7 +97,7 @@ steps:
 
   # Cholera
   data://garden/who/2023-06-01/cholera:
-    - data://garden/who/2024-01-03/gho
+    - data://garden/who/2025-05-19/gho
     - snapshot://fasttrack/2023-05-31/cholera.csv
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2021-07-01/wb_income
@@ -268,14 +261,6 @@ steps:
   data://grapher/tuberculosis/2023-11-27/laboratories:
     - data://garden/tuberculosis/2023-11-27/laboratories
 
-  # Tuberculosis latent - WHO
-  data://meadow/tuberculosis/2023-12-06/latent:
-    - snapshot://tuberculosis/2023-12-06/latent.csv
-  data://garden/tuberculosis/2023-11-27/latent:
-    - data://meadow/tuberculosis/2023-12-06/latent
-  data://grapher/tuberculosis/2023-11-27/latent:
-    - data://garden/tuberculosis/2023-11-27/latent
-
   # Tuberculosis resistance surveillance - WHO
   data://meadow/tuberculosis/2023-12-04/drug_resistance_surveillance:
     - snapshot://tuberculosis/2023-12-04/drug_resistance_surveillance.csv
@@ -305,15 +290,6 @@ steps:
   data://grapher/tuberculosis/2023-11-27/expenditure:
     - data://garden/tuberculosis/2023-11-27/expenditure
 
-  # Tuberculosis treatment UN High-Level Meeting commitments - WHO
-  data://meadow/tuberculosis/2023-12-12/unhlm_commitments:
-    - snapshot://tuberculosis/2023-12-12/unhlm_commitments.csv
-  data://garden/tuberculosis/2023-11-27/unhlm_commitments:
-    - data://meadow/tuberculosis/2023-12-12/unhlm_commitments
-    - snapshot://tuberculosis/2023-11-27/data_dictionary.csv
-  data://grapher/tuberculosis/2023-11-27/unhlm_commitments:
-    - data://garden/tuberculosis/2023-11-27/unhlm_commitments
-
   # Global Health Observatory (GHO) from WHO
   data://meadow/who/2024-01-03/gho:
     - snapshot://who/2024-01-03/gho.zip
@@ -321,9 +297,6 @@ steps:
     - data://meadow/who/2024-01-03/gho
     - data://garden/demography/2023-03-31/population
     - data://garden/regions/2023-01-01/regions
-  data://grapher/who/2024-01-03/gho:
-    - data://garden/who/2024-01-03/gho
-
   # Suicides based on WHO Mortality Database
   data://meadow/who/2024-03-24/self_inflicted_injuries:
     - snapshot://who/2024-03-24/self_inflicted_injuries.csv
@@ -1304,3 +1277,25 @@ steps:
     - data://meadow/cdc/2025-05-19/tuberculosis
   data://grapher/cdc/2025-05-19/tuberculosis:
     - data://garden/cdc/2025-05-19/tuberculosis
+
+  # Global Health Observatory (GHO) from WHO
+  data://meadow/who/2025-05-19/gho:
+    - snapshot://who/2025-05-19/gho.zip
+  data://garden/who/2025-05-19/gho:
+    - data://garden/regions/2023-01-01/regions
+    - data://meadow/who/2025-05-19/gho
+    - data://garden/demography/2024-07-15/population
+  data://grapher/who/2025-05-19/gho:
+    - data://garden/who/2025-05-19/gho
+
+  # Tuberculosis burden estimates - WHO
+  data://meadow/tuberculosis/2025-06-06/burden_estimates:
+    - snapshot://tuberculosis/2025-06-06/burden_estimates.csv
+  data://garden/tuberculosis/2025-06-06/burden_estimates:
+    - data://meadow/tuberculosis/2025-06-06/burden_estimates
+    - data://garden/demography/2024-07-15/population
+    - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
+    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/tuberculosis/2025-06-06/burden_estimates:
+    - data://garden/tuberculosis/2025-06-06/burden_estimates

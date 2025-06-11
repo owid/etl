@@ -5,17 +5,16 @@ definitions:
       topic_tags:
         - Global Education
 
+  # Common color scale values for different types of indicators
+  enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
+
   desc_key_net_enr: &desc_key_net_enr
-    - Not all children of the right age are enrolled in the level of education intended for them — the net enrolment rate indicator shows how many are.
-    - It captures the percentage of children in the official age group for a specific education level who are enrolled at that same level, such as primary or lower secondary.
-    - The indicator is calculated by dividing the number of students of the correct age enrolled in that level by the total number of children in that age group.
-    - For example, if primary education starts at age 7 and lasts six years, the official primary school age range would be 7 to 12 years.
-    - A high net enrolment rate means that most children are enrolled where they are expected to be. The highest possible value is 100%.
-    - The data comes from school administrative records, which track enrolment by single year of age, and from population estimates provided by national statistics offices or UN sources.
-    - This indicator is especially useful for monitoring progress toward universal primary and secondary education.
-    - However, it does not account for children who are enrolled in the correct level but are too young or too old, and it may miss students enrolled in the “wrong” grade for their age.
-    - Differences between enrolment and population data can lead to small errors. In some cases, the net enrolment rate may slightly exceed 100%.
-    - It's also not applied to tertiary education because of the wide range of entry ages and programme lengths at that level.
+    - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age. Unlike gross enrolment, it only counts students who are within the official age range for that level.
+    - It compares children enrolled at the correct level for their age to the total population in that same age group. For example, if primary education is for ages 6 to 11, it measures how many 6- to 11-year-olds are actually enrolled in primary school.
+    - The highest possible value is 100%, which would mean all children of the right age are enrolled where they should be. High rates indicate that most children are progressing through school at the expected pace.
+    - Values cannot exceed 100% because it excludes over-age and under-age students. However, small discrepancies between enrolment records and population data can occasionally push rates slightly above 100%.
+    - A rate of 90% doesn't necessarily mean 10% of children are out of school entirely - some may be enrolled at different levels (either higher or lower) than expected for their age, but these students aren't counted in the net rate.
+    - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_mye: &desc_key_mye
     - Adults around the world have spent different amounts of time in school — this indicator shows the average number of years completed by people aged 25 and older.
@@ -26,15 +25,11 @@ definitions:
     - Cross-country comparisons can be challenging. Education systems differ in how long programmes last, and qualifications may not be classified in the same way.
 
   desc_key_ger: &desc_key_ger
-    - Not all students enroll in school at the same age. This indicator shows how many students are attending a certain level of education, regardless of whether they are considered to be within the expected age range for that level.
-    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level.
-    - For example, if upper secondary school is designed for ages 15 to 17, the gross enrolment ratio compares total enrolment at that level to the population of 15- to 17-year-olds.
-    - A high value means many people are accessing education at that level, but it doesn’t necessarily mean that they are in the appropriate grade for their age.
-    - The gross enrolment ratio includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
-    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by UN or national sources.
-    - A gross enrolment ratio close to or above 100% can indicate strong system capacity, but it doesn’t tell us whether every school-age child is enrolled.
-    - This indicator is best understood when used together with the net enrolment rate, which focuses on age-appropriate participation.
-    - One limitation is that the gross enrolment ratio can exceed 100%, which may require further data to understand the reasons — such as whether students are repeating grades or starting school late.
+    - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
+    - It captures the total number of students enrolled at a specific education level, expressed as a percentage of the population in the official age group for that level. For example, if the official age group for upper secondary school is 15 to 17-year olds, the gross enrolment ratio compares total enrolment at that level (of any age) to the population of 15- to 17-year-olds.
+    - Values can be greater than 100% if students repeat grades or start a particular level of schooling late. In the example above, some 18- or 19 year olds might be included in the total if they started upper secondary school late.
+    - Similarly, a value of 100% does not necessarily mean all children within a particular age group are enrolled in school; some children could be out-of-school, but gross enrolment rates are boosted by older students being included.
+    - The data comes from administrative records, such as school enrolment reports, and from population estimates, usually provided by the United Nations or national sources.
 
   desc_key_prim_out_school: &desc_key_prim_out_school
     - This indicator shows the share of children who are the right age for primary school but are not enrolled in primary or secondary education.
@@ -171,23 +166,6 @@ tables:
         display:
          numDecimalPlaces: 1
 
-      total_net_enrolment_rate__primary__both_sexes__pct:
-        title: Net enrolment rate in primary education
-        description_short: Percentage of children of official primary school age who are enrolled in [primary education](#dod:primary-education).
-        unit: "%"
-        short_unit: "%"
-        description_key: *desc_key_net_enr
-        display:
-          numDecimalPlaces: 1
-
-      gross_enrolment_ratio__primary__both_sexes__pct:
-        title: Gross enrolment ratio in primary education
-        description_short: Number of children of any age group who are enrolled in [primary](#dod:primary-education) education expressed as a percentage of the total population of the official primary school age.
-        unit: "%"
-        short_unit: "%"
-        description_key: *desc_key_ger
-        display:
-          numDecimalPlaces: 1
 
       gross_enrolment_ratio__secondary__both_sexes__pct:
         title: Gross enrolment ratio in secondary education
@@ -408,7 +386,7 @@ tables:
           numDecimalPlaces: 1
 
       total_net_enrolment_rate__lower_secondary__adjusted_gender_parity_index__gpia:
-        title: Net enrolment rates in lower secondary education
+        title: Net enrolment rates in lower secondary education, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal net enrollment rates in [lower secondary](#dod:lower-secondary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
@@ -569,3 +547,418 @@ tables:
           - Understanding the official entrance age to pre-primary education is essential for education planning and for identifying gaps in access to early learning opportunities that support school readiness and long-term development.
         display:
           numDecimalPlaces: 0
+
+      total_net_enrolment_rate__primary__both_sexes__pct:
+        title: Net enrolment rate in primary education
+        description_short: Percentage of children of official primary school age who are enrolled in [primary education](#dod:primary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Primary education
+
+      total_net_enrolment_rate__primary__male__pct:
+        title: Net enrolment rate in primary education among boys
+        description_short: Percentage of boys of official primary school age who are enrolled in [primary education](#dod:primary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in primary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      total_net_enrolment_rate__primary__female__pct:
+        title: Net enrolment rate in primary education among girls
+        description_short: Percentage of girls of official primary school age who are enrolled in [primary education](#dod:primary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in primary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      total_net_enrolment_rate__lower_secondary__both_sexes__pct:
+        title: Net enrolment rate in lower secondary education
+        description_short: Percentage of children of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in lower secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Lower secondary education
+
+      total_net_enrolment_rate__lower_secondary__male__pct:
+        title: Net enrolment rate in lower secondary education among boys
+        description_short: Percentage of boys of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in lower secondary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      total_net_enrolment_rate__lower_secondary__female__pct:
+        title: Net enrolment rate in lower secondary education among girls
+        description_short: Percentage of girls of official lower secondary school age who are enrolled in [lower secondary education](#dod:lower-secondary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in lower secondary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      total_net_enrolment_rate__upper_secondary__both_sexes__pct:
+        title: Net enrolment rate in upper secondary education
+        description_short: Percentage of children of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in upper secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Upper secondary education
+
+      total_net_enrolment_rate__upper_secondary__male__pct:
+        title: Net enrolment rate in upper secondary education among boys
+        description_short: Percentage of boys of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in upper secondary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      total_net_enrolment_rate__upper_secondary__female__pct:
+        title: Net enrolment rate in upper secondary education among girls
+        description_short: Percentage of girls of official upper secondary school age who are enrolled in [upper secondary education](#dod:upper-secondary-education).
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_net_enr
+        presentation:
+          title_public:  Net enrolment rate in upper secondary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+
+      gross_enrolment_ratio__primary__both_sexes__pct:
+        title: Gross enrolment ratio in primary education
+        description_short: Number of children of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of the official primary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Primary education
+
+      gross_enrolment_ratio__primary__male__pct:
+        title: Gross enrolment ratio in primary education among boys
+        description_short: Number of boys of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of boys of official primary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in primary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      gross_enrolment_ratio__primary__female__pct:
+        title: Gross enrolment ratio in primary education among girls
+        description_short: Number of girls of any age group who are enrolled in [primary](#dod:primary-education) education, expressed as a percentage of the total population of girls of official primary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in primary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      gross_enrolment_ratio__lower_secondary__both_sexes__pct:
+        title: Gross enrolment ratio in lower secondary education
+        description_short: Number of children of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of the official lower secondary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in lower secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Lower secondary education
+
+      gross_enrolment_ratio__lower_secondary__male__pct:
+        title: Gross enrolment ratio in lower secondary education among boys
+        description_short: Number of boys of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of boys of official lower secondary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in lower secondary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      gross_enrolment_ratio__lower_secondary__female__pct:
+        title: Gross enrolment ratio in lower secondary education among girls
+        description_short: Number of girls of any age group who are enrolled in [lower secondary](#dod:lower-secondary-education) education, expressed as a percentage of the total population of girls of official lower secondary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in lower secondary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      gross_enrolment_ratio__upper_secondary__both_sexes__pct:
+        title: Gross enrolment ratio in upper secondary education
+        description_short: Number of children of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of the official upper secondary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in upper secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name:  Upper secondary education
+
+      gross_enrolment_ratio__upper_secondary__female__pct:
+        title: Gross enrolment ratio in upper secondary education among girls
+        description_short: Number of girls of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of girls of official upper secondary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in upper secondary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      gross_enrolment_ratio__upper_secondary__male__pct:
+        title: Gross enrolment ratio in upper secondary education among boys
+        description_short: Number of boys of any age group who are enrolled in [upper secondary](#dod:upper-secondary-education) education, expressed as a percentage of the total population of boys of official upper secondary school age.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_ger
+        presentation:
+          title_public:  Gross enrolment ratio in upper secondary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: *enrolment_rate_bins
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
