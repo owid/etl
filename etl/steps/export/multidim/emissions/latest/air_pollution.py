@@ -27,7 +27,7 @@ def run() -> None:
     )
 
     # Create collection
-    c = paths.create_collection(
+    c = paths.create_collection_v2(
         config=config,
         tb=tb,
     )
