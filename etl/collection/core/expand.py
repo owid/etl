@@ -10,7 +10,7 @@ from etl.collection.utils import INDICATORS_SLUG
 def expand_config(
     tb: Table,
     indicator_names: Optional[Union[str, List[str]]] = None,
-    dimensions: Optional[Union[List[str], Dict[str, Union[List[str], str]]]] = None,
+    dimensions: list[str] | dict[str, list[str] | str] | None = None,
     common_view_config: Optional[Dict[str, Any]] = None,
     indicator_as_dimension: bool = False,
     indicators_slug: Optional[str] = None,
@@ -395,7 +395,7 @@ class CollectionConfigExpander:
 
         if len(records) == 0:
             raise MissingDimensionalIndicatorError(
-                "No indicators WITH dimensions found in the table. Please check that the table has columns with metadata.dimensions set."
+                "No indicators with dimensions found in the table. Please check that the table has columns with metadata.dimensions set."
             )
 
         # Build dataframe with dimensional information
