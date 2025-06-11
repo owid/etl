@@ -107,7 +107,7 @@ steps:
   data://grapher/moatsos/2023-10-09/moatsos_historical_poverty:
     - data://garden/moatsos/2023-10-09/moatsos_historical_poverty
 
-# 1000 Binned Global Distribution (World Bank PIP)
+  # 1000 Binned Global Distribution (World Bank PIP)
   data://meadow/wb/2025-06-11/thousand_bins_distribution:
     - snapshot://wb/2025-06-11/thousand_bins_distribution.dta
   data://garden/wb/2025-06-11/thousand_bins_distribution:
