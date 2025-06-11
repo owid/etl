@@ -153,7 +153,8 @@ definitions:
     <%- elif antigen == "ROTAC" %>
       Rotavirus vaccines became available for the first time in 2006.
     <%- endif %>
-  antigen_display_name: <% if antigen == "BCG" %>
+  antigen_display_name: |-
+    <% if antigen == "BCG" %>
     Tuberculosis  vaccine (BCG)
     <%- elif antigen == "DTPCV1" %>
     Diphtheria/tetanus/pertussis (DTP1)
