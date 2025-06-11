@@ -777,6 +777,7 @@ views:
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_2
@@ -811,6 +812,7 @@ views:
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_300__welfare_type_income__table_income_with_spells__survey_comparability_2
@@ -846,6 +848,7 @@ views:
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_420__welfare_type_income__table_income_with_spells__survey_comparability_2
@@ -881,6 +884,7 @@ views:
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_830__welfare_type_income__table_income_with_spells__survey_comparability_2
@@ -916,6 +920,7 @@ views:
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath:
@@ -951,6 +956,7 @@ views:
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath:
@@ -987,6 +993,7 @@ views:
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath:
@@ -1023,6 +1030,7 @@ views:
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount_ratio__ppp_version_2021__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath:
@@ -1060,6 +1068,7 @@ views:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_100__welfare_type_income__table_income_with_spells__survey_comparability_2
@@ -1094,6 +1103,7 @@ views:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_300__welfare_type_income__table_income_with_spells__survey_comparability_2
@@ -1129,6 +1139,7 @@ views:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_420__welfare_type_income__table_income_with_spells__survey_comparability_2
@@ -1164,6 +1175,7 @@ views:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_830__welfare_type_income__table_income_with_spells__survey_comparability_2
@@ -1199,6 +1211,7 @@ views:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_1000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_1000__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath:
@@ -1234,6 +1247,7 @@ views:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_2000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_2000__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath:
@@ -1270,6 +1284,7 @@ views:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_3000__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath:
@@ -1306,6 +1321,7 @@ views:
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_4
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_5
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_6
+        - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_4000__welfare_type_consumption__table_consumption_with_spells__survey_comparability_7
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_0
         - catalogPath: world_bank_pip#headcount__ppp_version_2021__poverty_line_4000__welfare_type_income__table_income_with_spells__survey_comparability_1
         - catalogPath:
