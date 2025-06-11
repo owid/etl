@@ -21,7 +21,7 @@ def run() -> None:
 
     # Load grapher dataset.
     ds = paths.load_dataset("enterprise_surveys")
-    tb = ds.read("enterprise_surveys")
+    tb = ds.read("enterprise_surveys", load_data=False)
 
     cols_to_drop = [
         "bribery_depth__pct_of_public_transactions_where_a_gift_or_informal_payment_was_requested",
@@ -32,7 +32,7 @@ def run() -> None:
     tb = adjust_dimensions_corruption(tb)
     # Create collection object
     #
-    c = paths.create_collection(
+    c = paths.create_collection_v2(
         config=config,
         tb=tb,
         common_view_config=MULTIDIM_CONFIG,
@@ -96,8 +96,8 @@ def adjust_dimensions_corruption(tb):
     desired_order = list(service_mapping.keys())
 
     # Reorder columns: keep only those in the mapping, and preserve others if needed
-    tb = tb[
-        [col for col in desired_order if col in tb.columns] + [col for col in tb.columns if col not in desired_order]
+    tb = tb.loc[
+        :, [col for col in desired_order if col in tb.columns] + [col for col in tb.columns if col not in desired_order]
     ]
 
     for col in tb.columns:

@@ -3,7 +3,6 @@ from typing import Any, Dict, List
 from owid.catalog.utils import underscore
 from pandas import DataFrame
 
-from etl.collection import combine_collections
 from etl.collection.model.view import View
 from etl.helpers import PathFinder
 
@@ -192,27 +191,15 @@ def run() -> None:
 
     # Create standard line/map views
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
-    c1 = paths.create_collection_v2(
+    c = paths.create_collection_v2(
         config=config,
-        tb=tb_annual.loc[:, use_cols_annual],
+        tb=[
+            tb_annual.loc[:, use_cols_annual],
+            tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
+        ],
         indicator_names=["price"],
         dimensions=dimensions,
         common_view_config=common_view_config,
-    )
-
-    c2 = paths.create_collection_v2(
-        config=config,
-        tb=tb_monthly.loc[:, ["monthly_electricity_all_wholesale_euro"]],
-        indicator_names=["price"],
-        dimensions=dimensions,
-        common_view_config=common_view_config,
-    )
-
-    # Combine MDIMs
-    c = combine_collections(
-        collections=[c1, c2],
-        collection_name="energy_prices",
-        config=paths.load_collection_config(),
     )
 
     # Add stacked views

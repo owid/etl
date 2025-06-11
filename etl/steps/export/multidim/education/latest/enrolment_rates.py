@@ -1,6 +1,5 @@
 """Load a meadow dataset and create a garden dataset."""
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -83,19 +82,10 @@ def run() -> None:
     # Create collection object
     #
 
-    collections = []
-    for tb in [tb_sdgs, tb_opri, tb_wdi]:
-        c_ = paths.create_collection(
-            config=config,
-            tb=tb,
-            common_view_config=MULTIDIM_CONFIG,
-        )
-        collections.append(c_)
-
-    c = combine_collections(
-        collections=collections,
-        collection_name=paths.short_name,
+    c = paths.create_collection_v2(
         config=config,
+        tb=[tb_sdgs, tb_opri, tb_wdi],
+        common_view_config=MULTIDIM_CONFIG,
     )
 
     #
