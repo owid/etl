@@ -499,11 +499,6 @@ def combine_variables_display(variables: List[Variable]) -> Optional[dict[str, A
     return combined_display
 
 
-list_of_presentations = [
-    {"attribution": "HYDE (2023); Gapminder (2022); UN WPP (2024)", "topic_tags": ["Population Growth"]}
-]
-
-
 def combine_variables_presentation(variables: List[Variable]) -> Optional[VariablePresentationMeta]:
     # Apply the same logic as when combining displays (see documentation in combine_variables_display).
     list_of_presentations = [
@@ -515,13 +510,6 @@ def combine_variables_presentation(variables: List[Variable]) -> Optional[Variab
     )
 
     return combined_presentation
-
-
-# %%
-# pr.merge(df[["country", "year"]], population[["country", "year", "population"]])
-# combine_variables_presentation(df[])
-
-# %%
 
 
 def combine_variables_processing_level(variables: list[Variable]) -> PROCESSING_LEVELS | None:
