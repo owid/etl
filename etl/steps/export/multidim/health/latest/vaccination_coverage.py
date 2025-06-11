@@ -13,6 +13,12 @@ def run() -> None:
     ds = paths.load_dataset("vaccination_coverage")
     tb = ds.read("vaccination_coverage", load_data=False)
 
+    common_view_config = {
+        "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
+        "chartTypes": ["LineChart", "SlopeChart"],
+        "hasMapTab": True,
+        "tab": "chart",
+    }
     # Create and save collection
     c = paths.create_collection(
         config=config,
@@ -20,6 +26,7 @@ def run() -> None:
         indicator_names=["coverage", "unvaccinated", "vaccinated"],
         dimensions=["antigen"],
         indicators_slug="metric",
+        common_view_config=common_view_config,
     )
 
     c.group_views(
@@ -32,6 +39,7 @@ def run() -> None:
                     "hasMapTab": False,
                     "addCountryMode": "change-country",
                     "tab": "chart",
+                    "chartTypes": ["SlopeChart", "LineChart"],
                     "selectedFacetStrategy": "entity",
                     "title": "Vaccination coverage",
                     "subtitle": "Share of one-year-olds who have been immunized against a disease or a pathogen.",

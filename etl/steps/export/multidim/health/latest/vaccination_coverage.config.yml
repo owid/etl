@@ -20,10 +20,11 @@ dimensions:
     slug: antigen
     choices:
       - slug: comparison
-        name: "Vaccination coverage comparison across vaccines"
+        name: "Comparison across vaccines"
         description: "Vaccination coverage of all vaccines for one-year-olds"
       - slug: "BCG"
         name: "Tuberculosis vaccine"
+        description: "Share of newborns receiving the Bacillus Calmette-Guérin (BCG) vaccine"
       - slug: "DTPCV1"
         name: "Diphtheria, tetanus, and pertussis vaccine (first dose)"
       - slug: "DTPCV3"
