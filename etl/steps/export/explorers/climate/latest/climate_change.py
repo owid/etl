@@ -14,7 +14,7 @@ def run() -> None:
     config = paths.load_collection_config()
 
     # Create explorer
-    c = paths.create_collection(
+    c = paths.create_collection_v2(
         config=config,
         short_name="climate-change",
         explorer=True,

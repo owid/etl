@@ -28,7 +28,7 @@ def run() -> None:
         "note": 'For most countries, immigrant means "born in another country". Someone who has gained citizenship in the country they live in is still counted as an immigrant if they were born elsewhere. For some countries, place of birth information is not available; in this case citizenship is used to define whether someone counts as an immigrant.',
     }
 
-    c = paths.create_collection(
+    c = paths.create_collection_v2(
         config=config,
         tb=tb,
         indicator_names=["migrants"],

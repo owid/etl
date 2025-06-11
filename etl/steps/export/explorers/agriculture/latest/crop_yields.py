@@ -17,7 +17,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new explorer.
-    c = paths.create_collection(
+    c = paths.create_collection_v2(
         config=config,
         short_name="crop-yields",
         explorer=True,
