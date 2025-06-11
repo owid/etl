@@ -1,0 +1,25 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    unit: "%"
+    short_unit: "%"
+    presentation:
+      topic_tags:
+        - Global Education
+
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+
+
+tables:
+  historic_literacy_omm:
+    variables:
+      literacy_rate:
+       title: Literacy rate (OMM)
+      illiteracy_rate:
+       title: Illiteracy rate (OMM)
+
