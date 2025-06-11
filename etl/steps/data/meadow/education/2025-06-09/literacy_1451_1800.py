@@ -74,29 +74,6 @@ def run() -> None:
                 countries.append(country)
                 table_data.append(numbers[:6])  # Take first 6 values
 
-    # Fallback: if pattern matching didn't work, try line-by-line parsing
-    if not countries:
-        for line in lines:
-            line = line.strip()
-            if line and not line.startswith("Allen") and not line.startswith("1500") and not line.startswith("1600"):
-                # Try different splitting approaches
-                parts = re.split(r"\s{2,}", line)
-                if len(parts) < 2:
-                    parts = line.split()
-
-                if len(parts) > 1:
-                    country = parts[0].strip()
-                    # Extract all numbers and dashes from the remaining parts
-                    numbers = []
-                    for part in parts[1:]:
-                        nums = re.findall(r"\d+|-", part)
-                        numbers.extend(nums)
-
-                    # Only add rows that have both country name and data
-                    if country and numbers and len(numbers) >= 6:
-                        countries.append(country)
-                        table_data.append(numbers[:6])
-
     # Ensure all data rows have the same number of columns
     max_cols = max(len(row) for row in table_data)
     # Pad shorter rows with None values
@@ -109,6 +86,8 @@ def run() -> None:
 
     # Create DataFrame with countries as index
     df = pd.DataFrame(table_data, columns=columns, index=countries)
+
+    df = df.drop(columns={"1500", "1800"})  # Drop the first and last columns as this data comes from a different source
     # Reset index
     df = df.reset_index()
 
