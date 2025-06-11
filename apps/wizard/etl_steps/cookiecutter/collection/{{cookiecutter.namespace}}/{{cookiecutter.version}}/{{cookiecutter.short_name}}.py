@@ -24,7 +24,7 @@ def run() -> None:
     #
     # Create collection object
     #
-    c = paths.create_collection_legacy(
+    c = paths.create_collection_v2(
         config=config,
         short_name="{{cookiecutter.short_name}}",
         tb=tb,
