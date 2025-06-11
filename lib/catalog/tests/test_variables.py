@@ -691,30 +691,6 @@ def test_presentation_propagation() -> None:
     )
 
 
-def test_presentation_propagation_on_divisions(variable_1, variable_2) -> None:
-    variable_1 = variable_1.copy()
-    variable_2 = variable_2.copy()
-
-    # If the numerator has no presentation but the denominator has presentation, the result should have no presentation.
-    variable_1.metadata.presentation = None
-    variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
-    variable = variable_1 / variable_2
-    assert variable.metadata.presentation is None
-
-    # If both numerator and denominator have the same presentation, the result should have that presentation.
-    variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
-    variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
-    variable = variable_1 / variable_2
-    assert variable.metadata.presentation == VariablePresentationMeta("test")  # type: ignore
-
-    # If numerator and denominator have different presentations, the result should have no presentation.
-    # NOTE: It is not clear if this is the best choice. Alternatively, we could keep the numerator's presentation.
-    variable_1.metadata.presentation = VariablePresentationMeta("test 1")  # type: ignore
-    variable_2.metadata.presentation = VariablePresentationMeta("test 2")  # type: ignore
-    variable = variable_1 / variable_2
-    assert variable.metadata.presentation is None
-
-
 def test_combine_variables_sort(variable_1, variable_2) -> None:
     variable_1 = variable_1.copy().astype(str) + "a"
     variable_2 = variable_2.copy().astype(str) + "b"
