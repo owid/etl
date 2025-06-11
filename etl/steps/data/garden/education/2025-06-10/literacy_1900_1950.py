@@ -30,7 +30,7 @@ def run() -> None:
     tb["illiteracy_rate"] = tb["illiteracy_rate"].astype(str).str.replace("*", "", regex=False)
     tb["illiteracy_rate"] = tb["illiteracy_rate"].astype(float)
 
-    # Exclude specific data points
+    # Exclude specific data points where we have age group data that better approximates 15+ for these countries and years.
     tb = tb[~((tb["country"] == "Argentina") & (tb["year"] == 1914) & (tb["age"] == "7+"))]
     tb = tb[~((tb["country"] == "Canada") & (tb["year"] == 1921) & (tb["age"] == "5+"))]
     tb = tb.drop(columns=["sex"])
