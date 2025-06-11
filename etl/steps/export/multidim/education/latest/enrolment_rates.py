@@ -144,7 +144,6 @@ def run() -> None:
         enrolment_type = view.dimensions["enrolment_type"]
 
         # Create a copy of the config to avoid shared references
-        view.config = view.config.copy()
 
         # Generate dynamic title
         if sex and level:
