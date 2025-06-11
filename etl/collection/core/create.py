@@ -2,7 +2,7 @@
 
 import inspect
 from copy import deepcopy
-from typing import Any, Callable, TypeVar, Union, cast
+from typing import Any, Callable, TypeAlias, TypeVar, Union, cast
 
 from owid.catalog import Table
 from structlog import get_logger
@@ -21,19 +21,20 @@ log = get_logger()
 # Define type variables for common patterns
 T = TypeVar("T")
 OptionalListable = Union[T, list[T], None]
+Listable: TypeAlias = T | list[T]
 
 
-def create_collection_v2(
+def create_collection(
     config_yaml: dict[str, Any],
     dependencies: set[str],
     catalog_path: str,
     tb: list[Table] | Table | None = None,
-    indicator_names: OptionalListable[str | list[str]] = None,
-    dimensions: OptionalListable[dict[str, list[str] | str]] = None,
-    common_view_config: OptionalListable[dict[str, Any]] = None,
+    indicator_names: Listable[list[str] | None] | str = None,
+    dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
+    common_view_config: Listable[dict[str, Any] | None] = None,
     indicators_slug: str | None = None,
     indicator_as_dimension: bool = False,
-    choice_renames: OptionalListable[dict[str, dict[str, str] | Callable]] = None,
+    choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
     catalog_path_full: bool = False,
     explorer: bool = False,
 ) -> Collection:
@@ -67,88 +68,41 @@ def create_collection_v2(
     if isinstance(tb, list):
         num_tables = len(tb)
 
-        # Distribute indicator_names parameter
-        if indicator_names is None:
-            distributed_indicator_names = [None] * num_tables
-        elif (
-            isinstance(indicator_names, list)
-            and len(indicator_names) > 0
-            and isinstance(indicator_names[0], (str, list))
-        ):
-            # This is a list of indicator_names (one per table)
-            if len(indicator_names) != num_tables:
-                raise ValueError(
-                    f"Parameter 'indicator_names' is a list of length {len(indicator_names)}, "
-                    f"but expected length {num_tables} to match number of tables"
-                )
-            distributed_indicator_names = indicator_names
-        else:
-            # Single value - replicate for all tables
-            distributed_indicator_names = [indicator_names] * num_tables
-
-        # Distribute dimensions parameter
-        if dimensions is None:
-            distributed_dimensions = [None] * num_tables
-        elif isinstance(dimensions, list) and len(dimensions) > 0 and isinstance(dimensions[0], dict):
-            # This is a list of dimensions (one per table)
-            if len(dimensions) != num_tables:
-                raise ValueError(
-                    f"Parameter 'dimensions' is a list of length {len(dimensions)}, "
-                    f"but expected length {num_tables} to match number of tables"
-                )
-            distributed_dimensions = dimensions
-        else:
-            # Single value - replicate for all tables
-            distributed_dimensions = [dimensions] * num_tables
-
-        # Distribute common_view_config parameter
-        if common_view_config is None:
-            distributed_common_view_config = [None] * num_tables
-        elif (
-            isinstance(common_view_config, list)
-            and len(common_view_config) > 0
-            and isinstance(common_view_config[0], dict)
-        ):
-            # This is a list of common_view_config (one per table)
-            if len(common_view_config) != num_tables:
-                raise ValueError(
-                    f"Parameter 'common_view_config' is a list of length {len(common_view_config)}, "
-                    f"but expected length {num_tables} to match number of tables"
-                )
-            distributed_common_view_config = common_view_config
-        else:
-            # Single value - replicate for all tables
-            distributed_common_view_config = [common_view_config] * num_tables
-
-        # Distribute choice_renames parameter
-        if choice_renames is None:
-            distributed_choice_renames = [None] * num_tables
-        elif isinstance(choice_renames, list) and len(choice_renames) > 0 and isinstance(choice_renames[0], dict):
-            # This is a list of choice_renames (one per table)
-            if len(choice_renames) != num_tables:
-                raise ValueError(
-                    f"Parameter 'choice_renames' is a list of length {len(choice_renames)}, "
-                    f"but expected length {num_tables} to match number of tables"
-                )
-            distributed_choice_renames = choice_renames
-        else:
-            # Single value - replicate for all tables
-            distributed_choice_renames = [choice_renames] * num_tables
+        # Build indicator_names_
+        indicator_names_ = _get_indicator_names(
+            indicator_names=indicator_names,
+            num_tables=num_tables,
+        )
+        # Build dimensions_
+        dimensions_ = _get_dimensions(
+            dimensions=dimensions,
+            num_tables=num_tables,
+        )
+        # Build common_view_config
+        common_view_config_ = _get_common_view_config(
+            common_view_config=common_view_config,
+            num_tables=num_tables,
+        )
+        # Build common_view_config
+        choice_renames_ = _get_choice_renames(
+            choice_renames=choice_renames,
+            num_tables=num_tables,
+        )
 
         # Create collections for each table
         collections = []
         for i in range(num_tables):
-            c = create_collection(
+            c = create_collection_single_table(
                 config_yaml=config_yaml,
                 dependencies=dependencies,
                 catalog_path=catalog_path,
                 tb=tb[i],
-                indicator_names=cast("str | list[str] | None", distributed_indicator_names[i]),
-                dimensions=cast("list[str] | dict[str, list[str] | str] | None", distributed_dimensions[i]),
-                common_view_config=cast("dict[str, Any] | None", distributed_common_view_config[i]),
+                indicator_names=indicator_names_[i],
+                dimensions=dimensions_[i],
+                common_view_config=common_view_config_[i],
                 indicators_slug=indicators_slug,
                 indicator_as_dimension=indicator_as_dimension,
-                choice_renames=cast("dict[str, dict[str, str] | Callable] | None", distributed_choice_renames[i]),
+                choice_renames=choice_renames_[i],
                 catalog_path_full=catalog_path_full,
                 explorer=explorer,
             )
@@ -159,15 +113,16 @@ def create_collection_v2(
             collections=collections,
             catalog_path=catalog_path,
             config=config_yaml,
+            is_explorer=explorer,
         )
     else:
         # Single table case - call original function directly
-        c = create_collection(
+        c = create_collection_single_table(
             config_yaml=config_yaml,
             dependencies=dependencies,
             catalog_path=catalog_path,
             tb=tb,
-            indicator_names=cast("str | list[str] | None", indicator_names),
+            indicator_names=cast("list[str] | None", indicator_names),
             dimensions=cast("list[str] | dict[str, list[str] | str] | None", dimensions),
             common_view_config=cast("dict[str, Any] | None", common_view_config),
             indicators_slug=indicators_slug,
@@ -180,7 +135,138 @@ def create_collection_v2(
     return c
 
 
-def create_collection(
+# Functions to handle listable parameters.
+## Given a list or single value, ensure it is actually a list!
+def _bake_listable(fct_single, obj, obj_name, num_tables):
+    if fct_single(obj):
+        # Single value - replicate for all tables
+        return [obj] * num_tables
+    # 2) list[list[str]] -> list[list[str]]
+    elif _is_multi(fct_single, obj, "indicator_names", num_tables):
+        return obj
+    else:
+        raise TypeError(
+            f"Parameter '{obj_name}' must be a list of lists or a single value, "
+            f"but got {type(obj)} with value {obj}"
+        )
+
+
+def _is_multi(fct, obj, obj_name, num_tables):
+    if isinstance(obj, list) and all(fct(i) for i in obj):
+        # This is a list of indicator_names (one per table)
+        if len(obj) != num_tables:
+            raise ValueError(
+                f"Parameter '{obj_name}' is a list of length {len(obj)}, "
+                f"but expected length {num_tables} to match number of tables"
+            )
+        return True
+    return False
+
+
+IndicatorTypeReturn = list[list[str]] | list[str] | list[None]
+
+
+def _get_indicator_names(
+    num_tables: int,
+    indicator_names: Listable[list[str] | None] | str = None,
+) -> IndicatorTypeReturn:
+    def _is_single(obj) -> bool:
+        return (
+            obj is None
+            or (isinstance(obj, str))
+            or (isinstance(obj, list) and len(obj) > 0 and all(isinstance(i, str) for i in obj))
+        )
+
+    return cast(
+        IndicatorTypeReturn,
+        _bake_listable(
+            fct_single=_is_single,
+            obj=indicator_names,
+            obj_name="indicator_names",
+            num_tables=num_tables,
+        ),
+    )
+
+
+DimensionTypeReturn = list[list[str]] | list[dict[str, list[str] | str]] | list[None]
+
+
+def _get_dimensions(
+    num_tables: int,
+    dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
+) -> DimensionTypeReturn:
+    # Distribute dimensions parameter
+    def _is_single(obj) -> bool:
+        return (
+            obj is None
+            or (isinstance(obj, list) and all(isinstance(x, str) for x in obj))
+            or (
+                isinstance(obj, dict)
+                and all(isinstance(k, str) for k in obj.keys())
+                and all(isinstance(v, (str, list)) for v in obj.values())
+                and all(all(isinstance(x, str) for x in v) if isinstance(v, list) else True for v in obj.values())
+            )
+        )
+
+    return cast(
+        DimensionTypeReturn,
+        _bake_listable(
+            fct_single=_is_single,
+            obj=dimensions,
+            obj_name="dimensions",
+            num_tables=num_tables,
+        ),
+    )
+
+
+CommonConfigTypeReturn = list[dict[str, Any]] | list[None]
+
+
+def _get_common_view_config(
+    num_tables: int,
+    common_view_config: Listable[dict[str, Any] | None] = None,
+) -> CommonConfigTypeReturn:
+    def _is_single(obj) -> bool:
+        return obj is None or (isinstance(obj, dict))
+
+    return cast(
+        CommonConfigTypeReturn,
+        _bake_listable(
+            fct_single=_is_single,
+            obj=common_view_config,
+            obj_name="common_view_config",
+            num_tables=num_tables,
+        ),
+    )
+
+
+ChoiceRenamesTypeReturn = list[dict[str, Any]] | list[None]
+
+
+def _get_choice_renames(
+    num_tables: int,
+    choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
+) -> ChoiceRenamesTypeReturn:
+    def _is_single(obj) -> bool:
+        return (
+            obj is None
+            or (isinstance(obj, dict))
+            and all(isinstance(k, str) and (isinstance(v, dict) or inspect.isfunction(v)) for k, v in obj.items())
+        )
+
+    return cast(
+        ChoiceRenamesTypeReturn,
+        _bake_listable(
+            fct_single=_is_single,
+            obj=choice_renames,
+            obj_name="choice_renames",
+            num_tables=num_tables,
+        ),
+    )
+
+
+# Create collection from a single table
+def create_collection_single_table(
     config_yaml: dict[str, Any],
     dependencies: set[str],
     catalog_path: str,
