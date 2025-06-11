@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: World illiteracy at mid-century
+    description: |-
+      This dataset contains UNESCO's systematic global survey of illiteracy rates, representing the organization's first comprehensive worldwide assessment of literacy levels. The data is compiled from census information and government sources across multiple countries, with primary focus on literacy statistics from approximately 1950, expanding upon earlier research that examined 26 countries using data from 1900 onward.
+    date_published: "1957"
+
+    # Citation
+    producer: UNESCO
+    citation_full: |-
+      UNESCO. (1957). World illiteracy at mid-century: A statistical study. United Nations Educational, Scientific and Cultural Organization.
+
+    # Files
+    url_main: https://unesdoc.unesco.org/ark:/48223/pf0000002930
+    date_accessed: '2025-06-10'
+
+    # License
+    license:
+      name: CC BY 3.0 IGO
+      url: https://databrowser.uis.unesco.org/terms-and-conditions
+outs:
+  - md5: 18ad3326e030b7b90fa943d297d59b8b
+    size: 8859
+    path: literacy_1950.csv
