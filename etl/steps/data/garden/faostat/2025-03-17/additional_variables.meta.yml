@@ -620,6 +620,7 @@ tables:
         short_unit: ""
       animals_global_hypothetical:
         title: Hypothetical number of land animals that would be slaughtered if all countries produced meat in the same way as a given country
+        description_short: ""
         unit: "animals"
         short_unit: ""
         description_key:
