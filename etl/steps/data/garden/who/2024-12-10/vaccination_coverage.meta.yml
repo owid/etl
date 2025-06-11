@@ -155,7 +155,7 @@ definitions:
     <%- endif %>
   antigen_display_name: |-
     <% if antigen == "BCG" %>
-    Tuberculosis  vaccine (BCG)
+    Tuberculosis vaccine (BCG)
     <%- elif antigen == "DTPCV1" %>
     Diphtheria/tetanus/pertussis (DTP1)
     <%- elif antigen == "DTPCV3" %>
@@ -173,11 +173,11 @@ definitions:
     <%- elif antigen == "HEPB_BD" %>
     Hepatitis B birth dose (HepB_BD)
     <%- elif antigen == "MCV2" %>
-    measles, second dose (MCV2)
+    Measles, second dose (MCV2)
     <%- elif antigen == "ROTAC" %>
     Rotavirus (RotAC)
     <%- elif antigen == "PCV3" %>
-    Pneumococcal conjugate v(PCV3)
+    Pneumococcal conjugate (PCV3)
     <%- elif antigen == "IPV1" %>
     Inactivated polio (IPV1)
     <%- elif antigen == "IPV2" %>
