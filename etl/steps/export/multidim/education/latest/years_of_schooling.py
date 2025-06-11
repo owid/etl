@@ -250,22 +250,16 @@ def edit_indicator_displays(view):
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
             if "expectancy__primary" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "Primary",
-                }
+                display_name = "Primary"
             elif "expectancy__pre_primary" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "Pre-primary",
-                }
+                display_name = "Pre-primary"
             elif "secondary" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "Secondary",
-                }
+                display_name = "Secondary"
             elif "tertiary" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "Tertiary",
-                }
+                display_name = "Tertiary"
             elif "all" in indicator.catalogPath or "eys" in indicator.catalogPath or "mys" in indicator.catalogPath:
-                indicator.display = {
-                    "name": "All levels",
-                }
+                display_name = "All levels"
+
+            indicator.display = {
+                "name": display_name,
+            }
