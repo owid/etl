@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Vaccination
   description_processing: |-
-    Where multiple surveys were conducted in a country in a given year we calculated a weighted average of the each response category using the number of respondents as weights.
+    Where multiple surveys were conducted in a country in a given year we calculated a weighted average of the each response category using the number of respondents as weights. We exclude rows where the sum of the shares of all response categories is less than 98% or greater than 102% of the total number of respondents, as these are occassions when a different set of survey responses were used.
   question: |-
     <% if question == "ImpChildren" %>
     vaccines are important for children
@@ -14,7 +14,7 @@ definitions:
     <%- elif question == "Safe" %>
     vaccines are safe
     <%- elif question == "Beliefs" %>
-    vaccines are compatible with my beliefs
+    vaccines are compatible with their beliefs
     <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -44,7 +44,7 @@ tables:
           {definitions.description_processing}
       agree:
         title: "Share who agree that {definitions.question}"
-        description_short: "Share of people who strongly or tend to agree with the statement that {definitions.question}."
+        description_short: "Share of people who strongly agree or tend to agree with the statement that {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
@@ -53,7 +53,7 @@ tables:
           To calculate this value, we sum the shares of people who strongly agree and those who tend to agree with the statement that {definitions.question}. {definitions.description_processing}
       disagree:
         title: "Share who disagree that {definitions.question}"
-        description_short: "Share of people who strongly or tend to disagree with the statement that {definitions.question}."
+        description_short: "Share of people who strongly disagree or tend to disagree with the statement that {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
