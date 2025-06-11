@@ -20,8 +20,8 @@ dimensions:
     slug: antigen
     choices:
       - slug: comparison
-        name: "Vaccination coverage of all vaccines"
-        description: "Vaccination coverage of all vaccines in the target age-group"
+        name: "Vaccination coverage comparison across vaccines"
+        description: "Vaccination coverage of all vaccines for one-year-olds"
       - slug: "BCG"
         name: "Tuberculosis vaccine"
       - slug: "DTPCV1"
