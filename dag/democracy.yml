@@ -19,6 +19,16 @@ steps:
   data://grapher/democracy/2025-05-05/ert:
     - data://garden/democracy/2025-05-05/ert
 
+  # Lexical Index (2025)
+  data://meadow/democracy/2025-05-29/lexical_index:
+    - snapshot://democracy/2025-05-29/lexical_index.xlsx
+  data://garden/democracy/2025-05-29/lexical_index:
+    - data://garden/demography/2024-07-15/population
+    - data://meadow/democracy/2025-05-29/lexical_index
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/democracy/2025-05-29/lexical_index:
+    - data://garden/democracy/2025-05-29/lexical_index
+
   # Freedom House (2025)
   data://meadow/democracy/2025-06-02/fh:
     - snapshot://democracy/2025-06-02/fh_ratings.xlsx
@@ -44,16 +54,6 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/democracy/2025-03-05/eiu:
     - data://garden/democracy/2025-03-05/eiu
-
-  # Lexical Index (2024)
-  data://meadow/democracy/2025-05-29/lexical_index:
-    - snapshot://democracy/2025-05-29/lexical_index.xlsx
-  data://garden/democracy/2025-05-29/lexical_index:
-    - data://garden/demography/2024-07-15/population
-    - data://meadow/democracy/2025-05-29/lexical_index
-    - data://garden/regions/2023-01-01/regions
-  data://grapher/democracy/2025-05-29/lexical_index:
-    - data://garden/democracy/2025-05-29/lexical_index
 
   # Bertelsmann Transformation Index (2024)
   data://meadow/democracy/2024-05-21/bti:
@@ -90,13 +90,3 @@ steps:
     - data://meadow/democracy/2024-05-22/claassen_satisfaction
   data://grapher/democracy/2024-05-22/claassen_satisfaction:
     - data://garden/democracy/2024-03-07/claassen_satisfaction
-
-  # TO ARCHIVE: Varieties of Democracy (2024)
-  data://meadow/democracy/2024-03-07/vdem:
-    - snapshot://democracy/2024-03-18/vdem.zip
-  data://garden/democracy/2024-03-07/vdem:
-    - data://meadow/democracy/2024-03-07/vdem
-    - data://garden/regions/2023-01-01/regions
-    - data://garden/demography/2023-03-31/population
-  data://grapher/democracy/2024-03-07/vdem:
-    - data://garden/democracy/2024-03-07/vdem

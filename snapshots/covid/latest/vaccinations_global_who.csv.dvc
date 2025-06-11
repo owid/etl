@@ -16,13 +16,12 @@ meta:
     attribution_short: WHO
     # Files
     url_main: https://covid19.who.int/
-    date_accessed: 2024-08-14
+    date_accessed: '2024-08-14'
 
     # License
     license:
       name: CC BY 4.0
       url: https://data.who.int/dashboards/covid19
-
 outs:
   - md5: d6fc63b32c53b43057d2eab6f31e0d76
     size: 24035

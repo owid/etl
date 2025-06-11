@@ -1,0 +1,51 @@
+title:
+  title: School enrolment rates
+  title_variant: by level of education and gender
+default_selection:
+  - World
+dimensions:
+  - slug: enrolment_type
+    name: Metric
+    choices:
+      - slug: gross_enrolment
+        name: Gross enrolment
+        description: Includes children of any age entering that level of education.
+      - slug: net_enrolment
+        name: Net enrolment
+        description: Only includes children within the official age group.
+  - slug: level
+    name: Education level
+    choices:
+      - slug: preprimary
+        name: Pre-primary
+        description: Often provided through kindergarten or nursery for children ages around 3 to 5.
+      - slug: primary
+        name: Primary
+        description: Marks the start of formal schooling, typically for children aged 5 to 7.
+      - slug: lower_secondary
+        name: Lower secondary
+        description: For students generally aged 11 to 14.
+      - slug: upper_secondary
+        name: Upper secondary
+        description: For students generally aged 15 to 18.
+      - slug: tertiary
+        name: Tertiary
+        description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
+      - slug: level_side_by_side
+        name: All levels
+        description: Compare enrolment rates across all education levels.
+
+  - slug: sex
+    name: Gender
+    choices:
+      - slug: both
+        name: Both genders
+      - slug: girls
+        name: Girls
+      - slug: boys
+        name: Boys
+      - slug: "sex_side_by_side"
+        name: Girls and boys
+        description: Compare genders
+
+views: []

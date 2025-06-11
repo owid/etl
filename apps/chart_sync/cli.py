@@ -1,8 +1,10 @@
 import copy
+import datetime as dt
 import re
 from typing import Any, Dict, Optional
 
 import click
+import pandas as pd
 import structlog
 from rich import print
 from rich_click.rich_command import RichCommand
@@ -343,6 +345,9 @@ def _sync_dods(
 ) -> int:
     """Sync DoDs from source to target."""
     dods_synced = 0
+
+    # DoDs were added on 2025-05-16
+    server_creation_time = max(server_creation_time, pd.to_datetime(dt.date(2025, 5, 18)))
 
     # Get DoDs from source with updatedAt timestamp higher than staging server creation time
     source_dods = source_session.query(gm.DoD).filter(gm.DoD.updatedAt > server_creation_time).all()

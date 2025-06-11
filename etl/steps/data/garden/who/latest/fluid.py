@@ -1,4 +1,7 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+Check out this issue with the refactoring plan on next update https://github.com/owid/etl/issues/4215#issue-2966045001
+"""
 
 from datetime import datetime
 

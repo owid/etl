@@ -65,10 +65,17 @@ def process_gho_cholera(who_gh_dataset: Dataset) -> Table:
     ]
     cholera_bp = who_gh_dataset[tb_names[0]]
     for tb_name in tb_names[1:]:
-        cholera_bp = cholera_bp.join(who_gh_dataset[tb_name], how="outer")
+        cholera_bp = cholera_bp.join(who_gh_dataset[tb_name].drop(columns=["comments"]), how="outer")
 
-    return (
-        cholera_bp.drop(columns=["comments"])
+    tb = (
+        cholera_bp.loc[
+            :,
+            [
+                "cholera_case_fatality_rate",
+                "number_of_reported_cases_of_cholera",
+                "number_of_reported_deaths_from_cholera",
+            ],
+        ]
         .rename(
             columns={
                 "cholera_case_fatality_rate": "cholera_case_fatality_rate",
@@ -79,6 +86,8 @@ def process_gho_cholera(who_gh_dataset: Dataset) -> Table:
         .dropna(how="all", axis=0)
         .astype(float)
     )
+
+    return tb
 
 
 def add_global_total(df: pd.DataFrame, regions: Table) -> pd.DataFrame:
