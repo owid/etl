@@ -34,7 +34,7 @@ class ExplorerCreator:
         return self.tbs["proj"][table_name]
 
     def create_manual(self, config: Dict[str, Any], **kwargs) -> Explorer:
-        explorer = self.paths.create_collection(
+        explorer = self.paths.create_collection_v2(
             config=config,
             indicator_as_dimension=True,
             explorer=True,
@@ -60,7 +60,7 @@ class ExplorerCreator:
         tb_proj = self.table_proj(table_name)
 
         # Explorer with estimates
-        explorer = self.paths.create_collection(
+        explorer = self.paths.create_collection_v2(
             tb=tb,
             dimensions=dimensions,
             indicator_as_dimension=True,
@@ -74,7 +74,7 @@ class ExplorerCreator:
         else:
             dimensions["variant"] = ["medium", "high", "low"]
 
-        explorer_proj = self.paths.create_collection(
+        explorer_proj = self.paths.create_collection_v2(
             tb=tb_proj,
             dimensions=dimensions,
             indicator_as_dimension=True,

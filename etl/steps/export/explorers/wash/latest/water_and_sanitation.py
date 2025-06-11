@@ -14,7 +14,7 @@ def run() -> None:
     config = paths.load_collection_config()
 
     # Create collection
-    c = paths.create_collection(
+    c = paths.create_collection_v2(
         config=config,
         short_name="water-and-sanitation",
         explorer=True,
