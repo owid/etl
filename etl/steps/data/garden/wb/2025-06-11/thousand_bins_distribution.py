@@ -93,6 +93,6 @@ def sanity_checks(tb: Table) -> Table:
         paths.log.info(f"There are {len(tb[mask])} values for avg that are not monotonically increasing.")
         paths.log.info("These values will be transformed to the previous value.")
 
-        tb.loc[mask, "avg"] = tb.loc[mask, "avg"].shift(1)
+        tb.loc[mask, "avg"] = tb.groupby(["country", "year"])["avg"].shift(1).loc[mask]
 
     return tb
