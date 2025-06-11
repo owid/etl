@@ -119,15 +119,15 @@ dimensions:
         description: Compare the distribution of incomes in different countries
         group: Visualize multiple poverty lines
       - slug: line_chart_more_lines
-        name: Line chart (additional poverty lines)
+        name: Line chart (more lines)
         description: See how poverty has changed over time using 8 different poverty lines
         group: Visualize multiple poverty lines (more lines)
       - slug: area_chart_more_lines
-        name: Area chart (additional poverty lines)
+        name: Area chart (more lines)
         description: A more fine-grained breakdown of the distribution of incomes over time
         group: Visualize multiple poverty lines (more lines)
       - slug: bar_chart_more_lines
-        name: Bar chart (additional poverty lines)
+        name: Bar chart (more lines)
         description: A more fine-grained comparison of the distribution of incomes in different countries
         group: Visualize multiple poverty lines (more lines)
   - name: Breaks in data
