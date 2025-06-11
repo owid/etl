@@ -1,6 +1,5 @@
 """I've implemented a simple version of create_collections with support for multiple tables. We should move this somewhere so others can use, or just replace the behavior of paths.create_collection."""
 
-from etl.collection import combine_collections
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
@@ -29,8 +28,8 @@ def run() -> None:
     tb_ucdp = adjust_dimensions_ucdp(tb_ucdp)
 
     # Create collections
-    c = create_collection_multiple_tables(
-        tbs=[tb_up, tb_ucdp],
+    c = paths.create_collection_v2(
+        tb=[tb_up, tb_ucdp],
         config=config,
         indicator_names=[
             ["deaths", "death_rate"],
@@ -106,43 +105,6 @@ def run() -> None:
 
     # Save & upload
     c.save()
-
-
-def create_collection_multiple_tables(tbs, config, indicator_names, dimensions, common_view_config):
-    """This function should be migrated somewhere for everyone to use.
-
-    It is trying to support creation of Collections based on multiple tables.
-
-    Ideas:
-        - tbs: List[Table]
-        - indicator_names:
-            List[List[str]]: Each element contains the indicator names for the corresponding table. Length of indicator_names should match the length of tbs.
-            List[str]: A single list of indicator names. It should be applicable to all tables (i.e. all tables should have these indicator names).
-        - config: ? unclear
-        - dimensions: Similar behavior as indicator_names.
-        - common_view_config: Similar behavior as indicator_names.
-
-        Possibly more arguments needed to match create_collection and combine_collections.
-    """
-    # Create collections
-    collections = []
-    for tb, names in zip(tbs, indicator_names):
-        c_ = paths.create_collection(
-            config=config,
-            tb=tb,
-            indicator_names=names,
-            dimensions=dimensions,
-            common_view_config=common_view_config,
-        )
-        collections.append(c_)
-
-    c = combine_collections(
-        collections=collections,
-        collection_name=paths.short_name,  # Optional: add option to force a certain short_name
-        config=config,
-    )
-
-    return c
 
 
 def adjust_dimensions_ucdp_prio(tb):
