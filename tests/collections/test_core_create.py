@@ -12,7 +12,7 @@ import pytest
 from owid.catalog import Table, Variable
 from owid.catalog.meta import VariableMeta
 
-from etl.collection.core.create import _get_expand_path_mode, _rename_choices, create_collection
+from etl.collection.core.create import _get_expand_path_mode, _rename_choices, create_collection_single_table
 from etl.collection.explorer import Explorer
 from etl.collection.model.core import Collection
 from etl.collection.model.dimension import Dimension, DimensionChoice
@@ -78,7 +78,9 @@ class TestCreateCollection:
             mock_collection = Mock(spec=Collection)
             mock_create.return_value = mock_collection
 
-            result = create_collection(config_yaml=config, dependencies=dependencies, catalog_path=catalog_path)
+            result = create_collection_single_table(
+                config_yaml=config, dependencies=dependencies, catalog_path=catalog_path
+            )
 
             # Verify the function was called correctly
             mock_create.assert_called_once_with(config=config, dependencies=dependencies, catalog_path=catalog_path)
@@ -123,7 +125,7 @@ class TestCreateCollection:
                         mock_collection = Mock(spec=Collection)
                         mock_create.return_value = mock_collection
 
-                        result = create_collection(
+                        result = create_collection_single_table(
                             config_yaml=config,
                             dependencies=dependencies,
                             catalog_path=catalog_path,
@@ -160,7 +162,7 @@ class TestCreateCollection:
             mock_explorer = Mock(spec=Explorer)
             mock_create.return_value = mock_explorer
 
-            result = create_collection(
+            result = create_collection_single_table(
                 config_yaml=config, dependencies=dependencies, catalog_path=catalog_path, explorer=True
             )
 
@@ -202,7 +204,7 @@ class TestCreateCollection:
             mock_collection.dimensions = [country_dim]
             mock_create.return_value = mock_collection
 
-            result = create_collection(
+            result = create_collection_single_table(
                 config_yaml=config, dependencies=dependencies, catalog_path=catalog_path, choice_renames=choice_renames
             )
 
@@ -242,7 +244,7 @@ class TestCreateCollection:
             mock_collection.dimensions = [country_dim]
             mock_create.return_value = mock_collection
 
-            result = create_collection(
+            result = create_collection_single_table(
                 config_yaml=config, dependencies=dependencies, catalog_path=catalog_path, choice_renames=choice_renames
             )
 
@@ -267,7 +269,7 @@ class TestCreateCollection:
                         mock_collection = Mock(spec=Collection)
                         mock_create.return_value = mock_collection
 
-                        result = create_collection(
+                        result = create_collection_single_table(
                             config_yaml=config,
                             dependencies=dependencies,
                             catalog_path=catalog_path,
@@ -527,7 +529,7 @@ class TestIntegration:
                         }
                         mock_combine.return_value = [{"slug": "sex", "name": "Sex", "choices": []}]
 
-                        result = create_collection(
+                        result = create_collection_single_table(
                             config_yaml=config,
                             dependencies=dependencies,
                             catalog_path=catalog_path,
