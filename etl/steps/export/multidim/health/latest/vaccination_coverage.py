@@ -14,7 +14,7 @@ def run() -> None:
     tb = ds.read("vaccination_coverage", load_data=False)
 
     # Create and save collection
-    c = paths.create_collection(
+    c = paths.create_collection_v2(
         config=config,
         tb=tb,
         indicator_names=["coverage", "unvaccinated", "vaccinated"],

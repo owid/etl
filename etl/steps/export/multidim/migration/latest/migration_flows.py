@@ -31,7 +31,7 @@ def run() -> None:
     tb = ds.read("migrant_stock_dest_origin", load_data=False)
 
     # Create collection
-    c = paths.create_collection(
+    c = paths.create_collection_v2(
         config=config,
         tb=tb,
         short_name="migration-flows",
