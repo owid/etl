@@ -168,3 +168,13 @@ steps:
     - data://meadow/wb/2025-06-08/harmonized_national_poverty_lines
   data://grapher/wb/2025-06-08/harmonized_national_poverty_lines:
     - data://garden/wb/2025-06-08/harmonized_national_poverty_lines
+
+  #
+  # Harmonized national poverty lines (for 2021 PPPs poverty lines)
+  #
+  data://meadow/wb/2025-06-11/harmonized_national_poverty_lines:
+    - snapshot://wb/2025-06-11/harmonized_national_poverty_lines.dta
+  data://garden/wb/2025-06-11/harmonized_national_poverty_lines:
+    - data://meadow/wb/2025-06-11/harmonized_national_poverty_lines
+  data://grapher/wb/2025-06-11/harmonized_national_poverty_lines:
+    - data://garden/wb/2025-06-11/harmonized_national_poverty_lines
