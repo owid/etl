@@ -301,7 +301,7 @@ def run() -> None:
     # Save outputs.
     #
     # Initialize a new explorer.
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         short_name="animal-welfare",
         explorer=True,

@@ -33,7 +33,7 @@ class ExplorerCreator:
         return self.tbs["proj"][table_name]
 
     def create_manual(self, config: Dict[str, Any], **kwargs) -> Explorer:
-        explorer = self.paths.create_collection_v2(
+        explorer = self.paths.create_collection(
             config=config,
             indicator_as_dimension=True,
             explorer=True,
@@ -61,7 +61,7 @@ class ExplorerCreator:
         # Explorer with projections
         dimensions_ = {**dimensions, **(dimensions_proj or {"variant": ["medium", "high", "low"]})}
 
-        explorer = self.paths.create_collection_v2(
+        explorer = self.paths.create_collection(
             tb=[tb, tb_proj],
             dimensions=[dimensions, dimensions_],
             indicator_as_dimension=True,

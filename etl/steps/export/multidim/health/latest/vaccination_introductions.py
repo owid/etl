@@ -34,7 +34,7 @@ def run() -> None:
     tb = ds.read("vaccination_introductions", load_data=False)
 
     # Create and save collection
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         tb=tb,
         indicator_names=["intro"],

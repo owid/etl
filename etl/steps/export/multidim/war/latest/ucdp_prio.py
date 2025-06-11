@@ -28,7 +28,7 @@ def run() -> None:
     tb_ucdp = adjust_dimensions_ucdp(tb_ucdp)
 
     # Create collections
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         tb=[tb_up, tb_ucdp],
         config=config,
         indicator_names=[

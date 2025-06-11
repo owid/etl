@@ -61,7 +61,7 @@ def run() -> None:
     config["views"] += config_new["views"]
 
     # Create mdim
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         short_name="poverty",
     )

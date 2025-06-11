@@ -28,7 +28,7 @@ def run() -> None:
     #
     # Create collection object
     #
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         short_name="ucdp",
         tb=tb,

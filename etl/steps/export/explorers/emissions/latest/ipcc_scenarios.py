@@ -22,7 +22,7 @@ def run() -> None:
             )
 
     # Create explorer
-    explorer = paths.create_collection_v2(
+    explorer = paths.create_collection(
         config=config,
         short_name="ipcc-scenarios",
         explorer=True,

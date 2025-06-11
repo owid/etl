@@ -26,7 +26,7 @@ from owid.datautils.common import ExceptionFromDocstring, ExceptionFromDocstring
 
 from etl import paths
 from etl.collection import Collection, CollectionSet
-from etl.collection.core.create import Listable, create_collection, create_collection_single_table
+from etl.collection.core.create import Listable, create_collection
 from etl.collection.explorer import Explorer, ExplorerLegacy, create_explorer_legacy
 from etl.dag_helpers import load_dag
 from etl.grapher.helpers import grapher_checks
@@ -643,71 +643,7 @@ class PathFinder:
         )
 
     @overload
-    def create_collection_legacy(
-        self,
-        config: dict[str, Any],
-        short_name: str | None = None,
-        tb: Table | None = None,
-        indicator_names: list[str] | None = None,
-        dimensions: list[str] | dict[str, list[str] | str] | None = None,
-        common_view_config: dict[str, Any] | None = None,
-        indicators_slug: str | None = None,
-        indicator_as_dimension: bool = False,
-        choice_renames: dict[str, dict[str, str] | Callable] | None = None,
-        catalog_path_full: bool = False,
-        *,  # Force keyword-only arguments after this
-        explorer: Literal[True],
-    ) -> Explorer: ...
-
-    @overload
-    def create_collection_legacy(
-        self,
-        config: dict[str, Any],
-        short_name: str | None = None,
-        tb: Table | None = None,
-        indicator_names: list[str] | None = None,
-        dimensions: list[str] | dict[str, list[str] | str] | None = None,
-        common_view_config: dict[str, Any] | None = None,
-        indicators_slug: str | None = None,
-        indicator_as_dimension: bool = False,
-        choice_renames: dict[str, dict[str, str] | Callable] | None = None,
-        catalog_path_full: bool = False,
-        *,  # Force keyword-only arguments after this
-        explorer: Literal[False] = False,
-    ) -> Collection: ...
-
-    def create_collection_legacy(
-        self,
-        config: dict[str, Any],
-        short_name: str | None = None,
-        tb: Table | None = None,
-        indicator_names: list[str] | None = None,
-        dimensions: list[str] | dict[str, list[str] | str] | None = None,
-        common_view_config: dict[str, Any] | None = None,
-        indicators_slug: str | None = None,
-        indicator_as_dimension: bool = False,
-        choice_renames: dict[str, dict[str, str] | Callable] | None = None,
-        catalog_path_full: bool = False,
-        explorer: bool = False,
-    ) -> Explorer | Collection:
-        """TO BE REMOVED"""
-        return create_collection_single_table(
-            config_yaml=config,
-            dependencies=self.dependencies,
-            catalog_path=f"{self.namespace}/{self.version}/{self.short_name}#{short_name or self.short_name}",
-            tb=tb,
-            indicator_names=indicator_names,
-            dimensions=dimensions,
-            common_view_config=common_view_config,
-            indicators_slug=indicators_slug,
-            indicator_as_dimension=indicator_as_dimension,
-            choice_renames=choice_renames,
-            catalog_path_full=catalog_path_full,
-            explorer=explorer,
-        )
-
-    @overload
-    def create_collection_v2(
+    def create_collection(
         self,
         config: dict[str, Any],
         short_name: str | None = None,
@@ -724,7 +660,7 @@ class PathFinder:
     ) -> Explorer: ...
 
     @overload
-    def create_collection_v2(
+    def create_collection(
         self,
         config: dict[str, Any],
         short_name: str | None = None,
@@ -740,7 +676,7 @@ class PathFinder:
         explorer: Literal[False] = False,
     ) -> Collection: ...
 
-    def create_collection_v2(
+    def create_collection(
         self,
         config: dict[str, Any],
         short_name: str | None = None,

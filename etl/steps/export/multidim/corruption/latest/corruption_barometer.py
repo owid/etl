@@ -25,7 +25,7 @@ def run() -> None:
     tb = ds.read("corruption_barometer")
 
     # Create collection
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         tb=tb,
         dimensions={

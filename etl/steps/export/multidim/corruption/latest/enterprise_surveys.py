@@ -32,7 +32,7 @@ def run() -> None:
     tb = adjust_dimensions_corruption(tb)
     # Create collection object
     #
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         tb=tb,
         common_view_config=MULTIDIM_CONFIG,

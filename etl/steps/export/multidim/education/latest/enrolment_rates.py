@@ -82,7 +82,7 @@ def run() -> None:
     # Create collection object
     #
 
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         tb=[tb_sdgs, tb_opri, tb_wdi],
         common_view_config=MULTIDIM_CONFIG,

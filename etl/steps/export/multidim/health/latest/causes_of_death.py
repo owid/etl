@@ -13,7 +13,7 @@ def run() -> None:
 
     # Create collection
     config = paths.load_collection_config()
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         tb=table,
     )

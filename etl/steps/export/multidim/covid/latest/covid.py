@@ -36,7 +36,7 @@ def run() -> None:
         config = paths.load_collection_config(fname)
 
         ## Create and save collection
-        c = paths.create_collection_v2(config=config, short_name=fname_to_short_name(fname))
+        c = paths.create_collection(config=config, short_name=fname_to_short_name(fname))
         c.save()
 
     # PART 2: Collection hybridly generated (YAML file + programmatic config)
@@ -46,7 +46,7 @@ def run() -> None:
 
     ## Create and save collection
     fname = "covid.mobility.yml"
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=paths.load_collection_config("covid.mobility.yml"),
         short_name=fname_to_short_name("covid.mobility.yml"),
         tb=tb,

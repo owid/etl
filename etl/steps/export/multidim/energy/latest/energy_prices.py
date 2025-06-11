@@ -191,7 +191,7 @@ def run() -> None:
 
     # Create standard line/map views
     dimensions = ["frequency", "source", "consumer", "price_component", "unit"]
-    c = paths.create_collection_v2(
+    c = paths.create_collection(
         config=config,
         tb=[
             tb_annual.loc[:, use_cols_annual],

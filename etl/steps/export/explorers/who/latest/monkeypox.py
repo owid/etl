@@ -17,7 +17,7 @@ def run() -> None:
     config = paths.load_collection_config()
 
     # Create explorer
-    explorer = paths.create_collection_v2(
+    explorer = paths.create_collection(
         config=config,
         explorer=True,
     )
