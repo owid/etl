@@ -8,7 +8,7 @@ import json
 import os
 from collections import defaultdict
 from collections.abc import Callable
-from typing import Any, Literal, cast, overload
+from typing import Any, List, Literal, Optional, cast, overload
 
 import pandas as pd
 import structlog
@@ -461,56 +461,19 @@ def combine_variables_processing_logs(variables: list[Variable]) -> ProcessingLo
     return ProcessingLog(processing_log)
 
 
-def _get_dict_from_list_if_all_identical(list_of_objects: list[dict[str, Any] | None]) -> dict[str, Any] | None:
-    # The argument list_of_objects can contain dictionaries or None, or be empty.
-    # If a list contains one dictionary (possibly repeated multiple times with identical content), return that
-    # dictionary. Otherwise, if not all dictionaries are identical, return None.
-
-    # List all dictionaries, ignoring Nones.
-    defined_dicts = [d for d in list_of_objects if d is not None]
-
-    if not defined_dicts:
-        # If there are no dictionaries, return None.
-        return None
-
-    # Take the first dictionary as a reference.
-    reference_dict = defined_dicts[0]
-
-    # Return a copy of the first dictionary if all dictionaries are identical, otherwise return None.
-    return reference_dict.copy() if all(d == reference_dict for d in defined_dicts) else None
-
-
-def _get_dict_from_list_if_all_identical_and_not_none(
-    list_of_objects: List[Optional[Dict[str, Any]]],
-) -> Optional[Dict[str, Any]]:
-    """Same as _get_dict_from_list_if_all_identical, but if any of the objects is None, return None."""
-    if any(obj is None for obj in list_of_objects):
-        return None
-
-    return _get_dict_from_list_if_all_identical(list_of_objects=list_of_objects)
-
-
-def combine_variables_display(variables: List[Variable]) -> Optional[Dict[str, Any]]:
-    # The logic for display propagation should be as follows:
-    # * If the display of any of the variables is None (e.g. not defined), the combined display should be None.
-    # * Else if display of all variables is defined (i.e. not None for any variable) then go field by field, and:
-    #   * If the field is identical for all variables, the combined field should be the same.
-    #   * In any other case (i.e. the field has different values for different variables, or is not defined for all variables), the combined value for that field should be None.
-    # * If, at the end of the combination, all display fields are None, make the resulting display None.
-
-    # Gather displays from all variables that are defined.
-    displays = [getattr(variable.metadata, "display") for variable in variables]
-
+def _get_dict_from_list_of_common_field_if_all_defined_and_identical(
+    list_of_objects: List[dict[str, Any] | None],
+) -> Optional[dict[str, Any]]:
     # If any display is None, return None.
-    if None in displays:
+    if None in list_of_objects:
         return None
 
     # Find common fields where all values are identical across displays of all variables.
     common_fields = {
         field: values[0]
         for field, values in {
-            field: [display.get(field) for display in displays]
-            for field in set().union(*(display.keys() for display in displays))
+            field: [display.get(field) for display in list_of_objects]  # type: ignore
+            for field in set().union(*(display.keys() for display in list_of_objects))  # type: ignore
         }.items()
         if len(set(values)) == 1
     }
@@ -521,14 +484,33 @@ def combine_variables_display(variables: List[Variable]) -> Optional[Dict[str, A
     return combined_display
 
 
+def combine_variables_display(variables: List[Variable]) -> Optional[dict[str, Any]]:
+    # The logic for display propagation should be as follows:
+    # * If the display of any of the variables is None (e.g. not defined), the combined display should be None.
+    # * Else if display of all variables is defined (i.e. not None for any variable) then go field by field, and:
+    #   * If the field is identical for all variables, the combined field should be the same.
+    #   * In any other case (i.e. the field has different values for different variables, or is not defined for all variables), the combined value for that field should be None.
+    # * If, at the end of the combination, all display fields are None, make the resulting display None.
+
+    # Gather displays from all variables that are defined.
+    displays = [getattr(variable.metadata, "display") for variable in variables]
+
+    combined_display = _get_dict_from_list_of_common_field_if_all_defined_and_identical(list_of_objects=displays)
+
+    return combined_display
+
+
 def combine_variables_presentation(variables: List[Variable]) -> Optional[VariablePresentationMeta]:
-    # Gather presentation from all variables that are defined.
-    list_of_displays = [getattr(variable.metadata, "presentation") for variable in variables]
-    # When two presentations are combined, they must be identical to preserve the result.
-    # NOTE: We changed this on 2025-04-09 from the same logic as `combine_variables_display`
-    #  the problem was that multiplication by population preserved presentation and charts
-    #  were showing presentation.attribution for population which overwrote the original source
-    return _get_dict_from_list_if_all_identical_and_not_none(list_of_objects=list_of_displays)  # type: ignore
+    # Apply the same logic as when combining displays (see documentation in combine_variables_display).
+    list_of_presentations = [
+        getattr(variable.metadata, "presentation").to_dict() if variable.metadata.presentation is not None else None
+        for variable in variables
+    ]
+    combined_presentation = VariablePresentationMeta.from_dict(
+        _get_dict_from_list_of_common_field_if_all_defined_and_identical(list_of_objects=list_of_presentations)  # type: ignore
+    )
+
+    return combined_presentation
 
 
 def combine_variables_processing_level(variables: list[Variable]) -> PROCESSING_LEVELS | None:

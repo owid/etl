@@ -13,6 +13,7 @@ from owid.catalog.variables import (
     Variable,
     combine_variables_display,
     combine_variables_metadata,
+    combine_variables_presentation,
     get_unique_licenses_from_variables,
     get_unique_origins_from_variables,
     get_unique_sources_from_variables,
@@ -476,18 +477,24 @@ def test_divide_variables_where_only_denominator_has_metadata(
 
 def test_display_propagation() -> None:
     # If none of the variables have a defined display, the combined display should be None.
-    assert combine_variables_display(
-        variables=[
-            Variable([], name="var1", metadata=VariableMeta()),
-            Variable([], name="var2", metadata=VariableMeta()),
-        ]
-    ) == None
-    assert combine_variables_display(
-        variables=[
-            Variable([], name="var1", metadata=VariableMeta(display=None)),
-            Variable([], name="var2", metadata=VariableMeta(display=None)),
-        ]
-    ) == None
+    assert (
+        combine_variables_display(
+            variables=[
+                Variable([], name="var1", metadata=VariableMeta()),
+                Variable([], name="var2", metadata=VariableMeta()),
+            ]
+        )
+        is None
+    )
+    assert (
+        combine_variables_display(
+            variables=[
+                Variable([], name="var1", metadata=VariableMeta(display=None)),
+                Variable([], name="var2", metadata=VariableMeta(display=None)),
+            ]
+        )
+        is None
+    )
 
     # If all fields are identical, the combined display should be the same as that of all variables.
     assert combine_variables_display(
@@ -511,7 +518,7 @@ def test_display_propagation() -> None:
                 Variable([], name="var2", metadata=VariableMeta()),
             ]
         )
-        == None
+        is None
     )
     assert (
         combine_variables_display(
@@ -521,7 +528,7 @@ def test_display_propagation() -> None:
                 Variable([], name="var3", metadata=VariableMeta()),
             ]
         )
-        == None
+        is None
     )
 
     # If variables have a defined display, propagate only the fields that are identical in all variables.
@@ -540,7 +547,7 @@ def test_display_propagation() -> None:
                 Variable([], name="var2", metadata=VariableMeta(display={"name": "Test 2", "numDecimalPlaces": 2})),
             ]
         )
-        == None
+        is None
     )
     assert (
         combine_variables_display(
@@ -549,7 +556,138 @@ def test_display_propagation() -> None:
                 Variable([], name="var2", metadata=VariableMeta(display={"name": "Test 2"})),
             ]
         )
-        == None
+        is None
+    )
+
+
+def test_presentation_propagation() -> None:
+    # If none of the variables have a defined presentation, the combined presentation should be None.
+    assert (
+        combine_variables_presentation(
+            variables=[
+                Variable([], name="var1", metadata=VariableMeta()),
+                Variable([], name="var2", metadata=VariableMeta()),
+            ]
+        )
+        is None
+    )
+    assert (
+        combine_variables_presentation(
+            variables=[
+                Variable([], name="var1", metadata=VariableMeta(presentation=None)),
+                Variable([], name="var2", metadata=VariableMeta(presentation=None)),
+            ]
+        )
+        is None
+    )
+
+    # If all fields are identical, the combined presentation should be the same as that of all variables.
+    assert combine_variables_presentation(
+        variables=[
+            Variable(
+                [],
+                name="var1",
+                metadata=VariableMeta(presentation=VariablePresentationMeta.from_dict({"title_public": "Test"})),
+            ),
+            Variable(
+                [],
+                name="var2",
+                metadata=VariableMeta(presentation=VariablePresentationMeta.from_dict({"title_public": "Test"})),
+            ),
+        ]
+    ) == VariablePresentationMeta(title_public="Test")
+    assert combine_variables_presentation(
+        variables=[
+            Variable(
+                [],
+                name="var1",
+                metadata=VariableMeta(
+                    presentation=VariablePresentationMeta(title_public="Test", title_variant="Title Variant")
+                ),
+            ),
+            Variable(
+                [],
+                name="var2",
+                metadata=VariableMeta(
+                    presentation=VariablePresentationMeta(title_public="Test", title_variant="Title Variant")
+                ),
+            ),
+        ]
+    ) == VariablePresentationMeta(title_public="Test", title_variant="Title Variant")
+
+    # If any of the variables has presentation None, the combined presentation should be None.
+    assert (
+        combine_variables_presentation(
+            variables=[
+                Variable(
+                    [], name="var1", metadata=VariableMeta(presentation=VariablePresentationMeta(title_public="Test"))
+                ),
+                Variable([], name="var2", metadata=VariableMeta()),
+            ]
+        )
+        is None
+    )
+    assert (
+        combine_variables_presentation(
+            variables=[
+                Variable(
+                    [], name="var1", metadata=VariableMeta(presentation=VariablePresentationMeta(title_public="Test"))
+                ),
+                Variable(
+                    [], name="var2", metadata=VariableMeta(presentation=VariablePresentationMeta(title_public="Test"))
+                ),
+                Variable([], name="var3", metadata=VariableMeta()),
+            ]
+        )
+        is None
+    )
+
+    # If variables have a defined presentation, propagate only the fields that are identical in all variables.
+    assert combine_variables_presentation(
+        variables=[
+            Variable(
+                [], name="var1", metadata=VariableMeta(presentation=VariablePresentationMeta(title_public="Test"))
+            ),
+            Variable(
+                [],
+                name="var2",
+                metadata=VariableMeta(
+                    presentation=VariablePresentationMeta(title_public="Test", title_variant="Title Variant")
+                ),
+            ),
+        ]
+    ) == VariablePresentationMeta(title_public="Test")
+
+    # If none of the fields coincide for all variables, the resulting presentation should be None.
+    assert (
+        combine_variables_presentation(
+            variables=[
+                Variable(
+                    [], name="var1", metadata=VariableMeta(presentation=VariablePresentationMeta(title_public="Test"))
+                ),
+                Variable(
+                    [],
+                    name="var2",
+                    metadata=VariableMeta(
+                        presentation=VariablePresentationMeta(title_public="Test 2", title_variant="Title Variant")
+                    ),
+                ),
+            ]
+        )
+        is None
+    )
+    assert (
+        combine_variables_presentation(
+            variables=[
+                Variable(
+                    [], name="var1", metadata=VariableMeta(presentation=VariablePresentationMeta(title_public="Test"))
+                ),
+                Variable(
+                    [], name="var2", metadata=VariableMeta(presentation=VariablePresentationMeta(title_public="Test 2"))
+                ),
+            ]
+        )
+        is None
     )
 
 
@@ -562,13 +700,6 @@ def test_presentation_propagation_on_divisions(variable_1, variable_2) -> None:
     variable_2.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
     variable = variable_1 / variable_2
     assert variable.metadata.presentation is None
-
-    # If the numerator has presentation but the denominator has no presentation,
-    # the result should have the numerator's presentation.
-    variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
-    variable_2.metadata.presentation = None
-    variable = variable_1 / variable_2
-    assert variable.metadata.presentation == VariablePresentationMeta("test")  # type: ignore
 
     # If both numerator and denominator have the same presentation, the result should have that presentation.
     variable_1.metadata.presentation = VariablePresentationMeta("test")  # type: ignore
