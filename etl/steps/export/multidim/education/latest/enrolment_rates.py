@@ -143,6 +143,9 @@ def run() -> None:
         level = view.dimensions["level"]
         enrolment_type = view.dimensions["enrolment_type"]
 
+        # Create a copy of the config to avoid shared references
+        view.config = view.config.copy()
+
         # Generate dynamic title
         if sex and level:
             view.config["title"] = generate_title_by_gender_and_level(sex, level)
@@ -230,7 +233,7 @@ def adjust_dimensions_enrolment(tb):
 GENDER_MAPPINGS = {
     "title": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "children"},
     "subtitle": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "boys and girls"},
-    "tertiary": {"both": "people", "boys": "men", "girls": "women"},
+    "tertiary": {"both": "people", "boys": "men", "girls": "women", "sex_side_by_side": "people"},
 }
 
 LEVEL_MAPPINGS = {
