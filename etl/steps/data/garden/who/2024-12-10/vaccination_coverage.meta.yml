@@ -153,6 +153,41 @@ definitions:
     <%- elif antigen == "ROTAC" %>
       Rotavirus vaccines became available for the first time in 2006.
     <%- endif %>
+  antigen_display_name: <% if antigen == "BCG" %>
+    Tuberculosis  vaccine (BCG)
+    <%- elif antigen == "DTPCV1" %>
+    Diphtheria/tetanus/pertussis (DTP1)
+    <%- elif antigen == "DTPCV3" %>
+    Diphtheria/tetanus/pertussis (DTP3)
+    <%- elif antigen == "MCV1" %>
+    Measles, first dose (MCV1)
+    <%- elif antigen == "POL3" %>
+    Polio (Pol3)
+    <%- elif antigen == "RCV1" %>
+    Rubella (RCV1)
+    <%- elif antigen == "HEPB3" %>
+    Hepatitis B (HepB3)
+    <%- elif antigen == "HIB3" %>
+    H. influenza type b (Hib3)
+    <%- elif antigen == "HEPB_BD" %>
+    Hepatitis B birth dose (HepB_BD)
+    <%- elif antigen == "MCV2" %>
+    measles, second dose (MCV2)
+    <%- elif antigen == "ROTAC" %>
+    Rotavirus (RotAC)
+    <%- elif antigen == "PCV3" %>
+    Pneumococcal conjugate v(PCV3)
+    <%- elif antigen == "IPV1" %>
+    Inactivated polio (IPV1)
+    <%- elif antigen == "IPV2" %>
+    Inactivated polio (IPV2)
+    <%- elif antigen == "YFV" %>
+    Yellow fever (YFV)
+    <%- elif antigen == "MCV2X2" %>
+    Measles, second dose (MCV2X2)
+    <%- elif antigen == "MENA_C" %>
+    Meningococcal A conjugate (MenaC)
+    <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -171,7 +206,11 @@ tables:
           - "{definitions.antigen_description_key}"
         unit: "%"
         short_unit: "%"
+        display:
+          name: "{definitions.antigen_display_name}"
+          numDecimalPlaces: 1
         presentation:
+          title_public: "{definitions.antigen_display_name}"
           grapher_config:
             originUrl: https://ourworldindata.org/vaccination
             map:
@@ -198,8 +237,10 @@ tables:
           - "{definitions.description_key_standard_three}"
           - "{definitions.antigen_description_key}"
         display:
+          name: "{definitions.antigen_display_name}"
           numDecimalPlaces: 0
         presentation:
+          title_public: "{definitions.antigen_display_name}"
           grapher_config:
             note: |-
               {definitions.antigen_note}
@@ -215,7 +256,9 @@ tables:
           - "{definitions.antigen_description_key}"
         display:
           numDecimalPlaces: 0
+          name: "{definitions.antigen_display_name}"
         presentation:
+          title_public: "{definitions.antigen_display_name}"
           grapher_config:
             note: |-
               {definitions.antigen_note}
