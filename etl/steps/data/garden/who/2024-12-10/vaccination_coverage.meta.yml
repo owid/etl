@@ -140,7 +140,7 @@ definitions:
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. Recommended child's age for MCV2 vaccination varies by country.
     <%- elif antigen == "MCV1" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia.
-    <%- elif antigen in ["HEPB3", "HEP_BD"] %>
+    <%- elif antigen in ["HEPB3", "HEPB_BD"] %>
       Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease.
     <%- elif antigen == "HIB3" %>
       Haemophilus influenza type B is a bacteria responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
