@@ -217,7 +217,7 @@ def adjust_dimensions_schooling(tb):
                 break
 
         # Set indicator name
-        tb[col].metadata.original_short_name = metric_type or "expected_years_schooling"
+        tb[col].metadata.original_short_name = "expected_years_schooling"
         # Set dimensions
         tb[col].metadata.dimensions = {
             "metric_type": metric_type,
