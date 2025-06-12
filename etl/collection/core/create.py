@@ -2,7 +2,7 @@
 
 import inspect
 from copy import deepcopy
-from typing import Any, Callable, TypeAlias, TypeVar, Union, cast
+from typing import Any, Callable, Mapping, Sequence, TypeAlias, TypeVar, cast
 
 from owid.catalog import Table
 from structlog import get_logger
@@ -19,9 +19,8 @@ log = get_logger()
 
 
 # Define type variables for common patterns
-T = TypeVar("T")
-OptionalListable = Union[T, list[T], None]
-Listable: TypeAlias = T | list[T]
+T = TypeVar("T", covariant=True)
+Listable: TypeAlias = T | Sequence[T]
 
 
 def create_collection(
@@ -30,11 +29,11 @@ def create_collection(
     catalog_path: str,
     tb: list[Table] | Table | None = None,
     indicator_names: Listable[list[str] | None] | str = None,
-    dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
+    dimensions: Listable[list[str] | Mapping[str, list[str] | str] | None] = None,
     common_view_config: Listable[dict[str, Any] | None] = None,
     indicators_slug: str | None = None,
     indicator_as_dimension: bool = False,
-    choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
+    choice_renames: Listable[Mapping[str, dict[str, str] | Callable] | None] = None,
     catalog_path_full: bool = False,
     explorer: bool = False,
 ) -> Collection:
@@ -193,7 +192,7 @@ DimensionTypeReturn = list[list[str]] | list[dict[str, list[str] | str]] | list[
 
 def _get_dimensions(
     num_tables: int,
-    dimensions: Listable[list[str] | dict[str, list[str] | str] | None] = None,
+    dimensions: Listable[list[str] | Mapping[str, list[str] | str] | None] = None,
 ) -> DimensionTypeReturn:
     # Distribute dimensions parameter
     def _is_single(obj) -> bool:
@@ -245,7 +244,7 @@ ChoiceRenamesTypeReturn = list[dict[str, Any]] | list[None]
 
 def _get_choice_renames(
     num_tables: int,
-    choice_renames: Listable[dict[str, dict[str, str] | Callable] | None] = None,
+    choice_renames: Listable[Mapping[str, dict[str, str] | Callable] | None] = None,
 ) -> ChoiceRenamesTypeReturn:
     def _is_single(obj) -> bool:
         return (
