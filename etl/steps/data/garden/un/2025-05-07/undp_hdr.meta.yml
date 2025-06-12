@@ -396,25 +396,62 @@ tables:
 
       ## Expected years of schooling
       eys:
-        title: Expected years of schooling<% if sex != "total" %> (<<sex>>)<% endif %>
+        title: Expected years of schooling<% if sex == "female" %> among girls<% elif sex == "male" %> among boys<% endif %>
         unit: years
         short_unit: years
         description_short: |-
-          Number of years a<% if sex != "total" %> <<sex>><% endif %> child of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child's years of schooling.
+          Number of years a<% if sex == "female" %> girl<% elif sex == "male" %> boy<% else %> child<% endif %> of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child's years of schooling.
         description_key:
+          - Expected years of schooling reflects the total number of years of schooling from primary to tertiary education that a child can expect to receive based on current enrollment patterns.
+          - This indicator assumes that current age-specific enrollment rates will persist throughout the child's years of schooling, providing a snapshot of educational access and opportunity.
+          - The calculation includes all levels of education and accounts for the likelihood of enrollment at each age based on current patterns.
           - "UNDP originally obtained this indicator from: ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2024) and United Nations Children's Fund (UNICEF) Multiple Indicator Cluster Surveys (various years)"
+        presentation:
+          title_public: Expected years of schooling<% if sex == "female" %> among girls<% elif sex == "male" %> among boys<% endif %>
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [4,6,8,10,12,14,16,18]
+                baseColorScheme: <% if sex == "female" %>Purples<% elif sex == "male" %>BuGn<% else %>Blues<% endif %>
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: <% if sex == "female" %>Girls<% elif sex == "male" %>Boys<% else %>Both genders<% endif %>
 
       ## Mean years of schooling
       mys:
-        title: Average years of schooling<% if sex != "total" %> (<<sex>>)<% endif %>
+        title: Average years of schooling<% if sex == "female" %> among women<% elif sex == "male" %> among men<% endif %>
         unit: years
         short_unit: years
         description_short: |-
-          Average number of years (excluding years spent repeating individual grades)<% if sex != "total" %> <<sex>><% endif %> adults over 25 years participated in formal education.
+          Average number of years (excluding years spent repeating individual grades)<% if sex == "female" %> women<% elif sex == "male" %> men<% else %> adults<% endif %> over 25 years participated in formal education.
         description_key:
+          - Average years of schooling measures the educational attainment of the adult population, reflecting the accumulated human capital in a country.
           - Formal education is primary/ISCED 1 or higher.
           - This indicator does not include years spent repeating grades.
+          - The measure is calculated based on educational attainment data from censuses and household surveys, where adults report their highest completed level of education.
           - "UNDP originally obtained this indicator from: Barro and Lee (2018), Eurostat (2024), ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2024) and UNICEF Multiple Indicator Cluster Surveys (various years)."
+        presentation:
+          title_public: Average years of schooling<% if sex == "female" %> among women<% elif sex == "male" %> among men<% endif %>
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [2,4,6,8,10,12,14,16]
+                baseColorScheme: <% if sex == "female" %>Purples<% elif sex == "male" %>BuGn<% else %>Blues<% endif %>
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: <% if sex == "female" %>Women<% elif sex == "male" %>Men<% else %>Both genders<% endif %>
 
       ## GNI per capita
       gni_pc:
