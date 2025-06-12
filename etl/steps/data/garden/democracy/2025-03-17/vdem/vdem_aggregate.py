@@ -74,9 +74,9 @@ REGIONS = {
 
 # THRESHOLDS to consider a region as having enough data for aggregation.
 ## Share of countries in region required to estimate regional averages
-THRESHOLD_SHARE_COUNTRIES = 0.7
+THRESHOLD_SHARE_COUNTRIES = 2 / 3
 ## Share of people living regions required to estimate regional averages
-THRESHOLD_SHARE_POPULATION = 0.7
+THRESHOLD_SHARE_POPULATION = 2 / 3
 
 # Reference year for coverage of countries
 REFERENCE_YEAR = 1900
