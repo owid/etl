@@ -8,14 +8,13 @@ definitions:
         selectedEntityNames:
           - World
         hasMapTab: true
-  description_key_standard_share: |-
-    The share of children vaccinated for regional and global aggregates is calculated using only countries where the vaccine is part of the national vaccination schedule.
   description_key_standard_one: |-
     This data includes estimates for all WHO Member States, including those that did not report 2023 data. For non-reporting countries, estimates were extrapolated from the last point informed by reported data.
   description_key_standard_two: |-
     To calculate global and regional average, values are extrapolated from 2022 for non-reporting countries. Non-reporting countries represent approximately 5% of the 2023 cohort.
   description_key_standard_three: |-
     These estimates are based on two types of quantitative data: 1) country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria). These estimates are also informed by contextual information (e.g., stock-outs, changes in vaccine schedule, and other relevant information where available). These estimates are affected by the availability and quality of the underlying data.
+
   antigen_age_group: |-
     <% if antigen == "BCG" %>
     newborns
@@ -45,12 +44,10 @@ definitions:
     one-year-olds
     <%- elif antigen == "IPV2" %>
     one-year-olds
-    <%- elif antigen == "YFV" %>
-    one-year-olds
+
     <%- elif antigen == "MCV2X2" %>
     two year olds
-    <%- elif antigen == "MENA_C" %>
-    one-year-olds
+
     <%- endif %>
   antigen_title: |-
     <% if antigen == "BCG" %>
@@ -81,12 +78,10 @@ definitions:
     who have had their first dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
     who have had their second dose of the inactivated polio vaccine
-    <%- elif antigen == "YFV" %>
-    vaccinated against yellow fever
+
     <%- elif antigen == "MCV2X2" %>
     who have had their second dose of the measles vaccine
-    <%- elif antigen == "MENA_C" %>
-    fully vaccinated against meningococcal A
+
     <%- endif %>
   antigen_description: |-
     <% if antigen == "BCG" %>
@@ -117,12 +112,10 @@ definitions:
     their first dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
     their second dose of the inactivated polio vaccine
-    <%- elif antigen == "YFV" %>
-    one dose of the yellow fever vaccine
+
     <%- elif antigen == "MCV2X2" %>
     their second dose of the measles vaccine
-    <%- elif antigen == "MENA_C" %>
-    their last dose of the meningococcal A conjugate vaccine
+
     <%- endif %>
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
@@ -183,12 +176,10 @@ definitions:
     Inactivated polio (IPV1)
     <%- elif antigen == "IPV2" %>
     Inactivated polio (IPV2)
-    <%- elif antigen == "YFV" %>
-    Yellow fever (YFV)
+
     <%- elif antigen == "MCV2X2" %>
     Measles, second dose (MCV2X2)
-    <%- elif antigen == "MENA_C" %>
-    Meningococcal A conjugate (MenaC)
+
     <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -202,7 +193,6 @@ tables:
         title: Share of {definitions.antigen_age_group} {definitions.antigen_title}
         description_short: The percentage of {definitions.antigen_age_group} who have had {definitions.antigen_description} in a given year.
         description_key:
-          - "{definitions.description_key_standard_share}"
           - "{definitions.description_key_standard_one}"
           - "{definitions.description_key_standard_two}"
           - "{definitions.description_key_standard_three}"
