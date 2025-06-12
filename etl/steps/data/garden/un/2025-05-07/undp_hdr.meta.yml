@@ -197,7 +197,7 @@ tables:
         description_key:
           - The Gender Inequality Index (GII) reflects gender-based disadvantage in three dimensions— reproductive health, empowerment and the labour market—for as many countries as data of reasonable quality allow. It shows the loss in potential human development due to inequality between female and male achievements in these dimensions.
           - It ranges from 0, where women and men fare equally, to 1, where one gender fares as poorly as possible in all measured dimensions.
-          - The GII Highlights how unequal opportunities for women and men translate into foregone national human‑development potential.
+          - The GII highlights how unequal opportunities for women and men translate into foregone national human‑development potential.
           - |-
             It combines five indicators: maternal mortality ratio, adolescent birth rate, women’s parliamentary seats, secondary‑education attainment, and labour‑force participation (all sex‑disaggregated).
           - Data is originally sourced from WHO/UNICEF/UNFPA/World Bank, UNDESA, IPU, UNESCO UIS, Barro-Lee, DHS/MICS and ILO datasets.
