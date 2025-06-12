@@ -8,23 +8,20 @@ definitions:
         - Global Education
     display:
       numDecimalPlaces: 1
-    description_key:
-      - "This dataset brings together literacy and illiteracy rates from a range of historical and contemporary sources to provide a long-term view of global literacy trends from 1451 to the present."
+    description_processing: |-
       - "**Historical data (1451–1800):** Estimates from Buringh and van Zanden (2009) based on book sales data. This method uses the relationship between book prices and sales volumes to estimate literate populations, assuming people primarily buy books they can read."
       - "**Early 20th century data (1900–1950):** UNESCO historical estimates from their 1953 report 'Progress of Literacy in Various Countries'. This covers the period when governments began systematic literacy measurement but methodologies varied significantly between countries."
       - "**Mid-20th century data (1950):** UNESCO estimates from their 1957 report 'World Illiteracy at Mid-Century', providing comprehensive global coverage for this benchmark year."
       - "**Global estimates (1820–1970):** OECD's 'How Was Life?' dataset covering the period when more standardized measurement approaches emerged."
       - "**Contemporary data (1970–present):** UNESCO Sustainable Development Goals education indicators, representing the current international standard for literacy measurement focused on population aged 15+."
-      - "**Important methodological notes:** Age groups vary across time periods and sources. Early historical data often measured literacy from age 10+, while modern standards focus on ages 15+. Users should consider these methodological differences when making comparisons across time periods."
       - "Where illiteracy rates were not directly available, they were calculated as 100 minus the literacy rate, and vice versa."
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   title: Historic literacy rates - Combined sources
   description: >
-    Combined dataset of literacy and illiteracy rates spanning from 1451 to present,
-    integrating multiple historical and contemporary sources to provide comprehensive
-    long-term global coverage of literacy development.
+    This dataset combines historical and contemporary literacy rates from various sources to provide a long-term view of global literacy trends from 1451 to the present.
+    It includes estimates based on book sales, UNESCO reports, and SDG indicators, covering different age groups and methodologies.
   update_period_days: 365
 
 tables:
@@ -33,17 +30,16 @@ tables:
       literacy_rate:
         title: Literacy rate
         description_short: Share of the population who can read and write a short, simple statement on their everyday life.
-        description_processing: >
-          Combined from multiple sources with different methodologies and age groups.
-          Historical data (1451-1800) estimated from book sales; early 20th century data from
-          UNESCO reports; mid-century from UNESCO global surveys; recent data from UNESCO SDG indicators.
-          Where not directly available, calculated as 100 minus illiteracy rate.
+        description_key:
+          - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
+          - This indicator shows what share of the population can read and write a short, simple sentence with understanding. Literacy unlocks access to education, employment, and civic participation."
+          - The literacy rate is calculated by dividing the number of literate individuals by the total population in the same age group, excluding those with unknown literacy status."
+          - A high literacy rate suggests that most people have acquired basic reading and writing skills, typically through primary education or literacy programs."
+          - Contemporary data typically come from population censuses or household surveys and are often self-reported. Historical estimates before 1800 are based on indirect evidence such as manuscript and book production."
+          - Age groups vary across time periods and sources. Early historical data often measured literacy from age 10+, while modern standards focus on ages 15+. Users should consider these methodological differences when making comparisons across time periods."
+          - Literacy should not be confused with functional literacy — this indicator reflects basic reading and writing skills, but not their practical application in daily life or work."
+
 
       illiteracy_rate:
         title: Illiteracy rate
         description_short: Share of the population who cannot read and write a short, simple statement on their everyday life.
-        description_processing: >
-          Combined from multiple sources with different methodologies and age groups.
-          Where not directly available, calculated as 100 minus literacy rate.
-          Historical sources often measured different age groups (10+ vs 15+), so comparisons
-          across time should consider these methodological differences.
