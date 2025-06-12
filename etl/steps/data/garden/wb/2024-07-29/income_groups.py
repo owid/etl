@@ -7,7 +7,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -35,7 +35,7 @@ REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceani
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -72,8 +72,11 @@ def run(dest_dir: str) -> None:
         missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE
     ), f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
 
+    # Find year of the latest available classification.
+    year_latest_classification = tb_latest["year"].max()
+
     # Extract data only for latest release (and remove column year).
-    tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])
+    tb_latest = tb_latest[tb_latest["year"] == year_latest_classification].drop(columns=["year"])
 
     tb = add_country_counts_and_population_by_status(
         tb=tb,
@@ -104,7 +107,11 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_latest], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_latest],
+        default_metadata=ds_meadow.metadata,
+        yaml_params={"year_latest_classification": str(year_latest_classification)},
+    )
     ds_garden.save()
 
 
