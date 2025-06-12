@@ -354,7 +354,9 @@ def make_table_countries_avg(tb: Table, ds_regions: Dataset) -> Table:
     )
     tb_1900["continent"] = tb_1900["country"].map(countries_to_continent)
     countries_must_have_data = tb_1900.groupby("continent")["country"].agg(list).to_dict()
-    frac_must_have_data = {region: THRESHOLD_SHARE_COUNTRIES for region in countries_must_have_data.keys()}
+    frac_must_have_data = {region: THRESHOLD_SHARE_COUNTRIES for region in countries_must_have_data.keys()} | {
+        "Europe": 0.1
+    }
 
     # Estimate region aggregates
     tb_ = add_regions_and_global_aggregates(
