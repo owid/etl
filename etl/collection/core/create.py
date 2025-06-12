@@ -247,9 +247,8 @@ def _get_choice_renames(
     choice_renames: Listable[Mapping[str, dict[str, str] | Callable] | None] = None,
 ) -> ChoiceRenamesTypeReturn:
     def _is_single(obj) -> bool:
-        return (
-            obj is None
-            or (isinstance(obj, dict))
+        return obj is None or (
+            isinstance(obj, dict)
             and all(isinstance(k, str) and (isinstance(v, dict) or inspect.isfunction(v)) for k, v in obj.items())
         )
 
