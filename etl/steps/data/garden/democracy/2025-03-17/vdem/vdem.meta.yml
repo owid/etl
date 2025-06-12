@@ -61,9 +61,9 @@ tables:
       display:
         numDecimalPlaces: 0
       description_processing: &processing_regions |-
-        The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated when 70% of countries in region have data. We have used the list of countries in 1900 as reference.
+        The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
 
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
+        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
       description_key:
         - *key_regions
       presentation: &ppt_uni_w_regions
