@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["country_code"], errors="raise")
 
     # Create an additional table for the classification of the latest year available.
-    tb_latest = tb.reset_index().drop_duplicates(subset=["country"], keep="last")
+    tb_latest = tb.reset_index(drop=True).drop_duplicates(subset=["country"], keep="last")
 
     # Rename new table.
     tb_latest.metadata.short_name = "income_groups_latest"
