@@ -32,6 +32,6 @@ meta:
       name: © WHO
       url: https://www.who.int/about/policies/terms-of-use
 outs:
-  - md5: 61073a4e3484001ac7b77d6e8b601840
-    size: 8388608
+  - md5: d33b9caf647be5f79c99292f77cf3ce6
+    size: 18434547
     path: vaccination_coverage.xlsx
