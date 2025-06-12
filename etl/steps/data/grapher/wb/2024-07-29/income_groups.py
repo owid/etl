@@ -22,22 +22,19 @@ def run() -> None:
     #
     # Process data.
     #
-    # Combine both tables.
-    tb = tb_dynamic.merge(tb_static, on=["country"], how="outer", suffixes=("", "_latest"))
+    # Prepare static table.
+    tb_static = tb_static.rename(columns={"classification": "classification_latest"}, errors="raise")
 
-    # Sanity check.
-    error = "Classification in the latest year of data should coincide with 'classification_latest'."
-    assert (
-        tb[tb["year"] == tb["year"].max()]["classification"]
-        == tb[tb["year"] == tb["year"].max()]["classification_latest"]
-    ).all(), error
+    # Add a year column (with the latest year from the dynamic table).
+    tb_static["year"] = tb_dynamic["year"].max()
 
-    # Improve table format.
-    tb = tb.format()
+    # Improve table formats.
+    tb_static = tb_static.format()
+    tb_dynamic = tb_dynamic.format()
 
     #
     # Save outputs.
     #
     # Create a new grapher dataset.
-    ds_grapher = paths.create_dataset(tables=[tb], default_metadata=ds_garden.metadata)
+    ds_grapher = paths.create_dataset(tables=[tb_static, tb_dynamic], default_metadata=ds_garden.metadata)
     ds_grapher.save()
