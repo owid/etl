@@ -370,6 +370,10 @@ def add_region_aggregates(
         countries_with_data = set(list(countries))
         if frac_countries_that_must_have_data is None:
             return set(countries_that_must_have_data).issubset(countries_with_data)
+        elif frac_countries_that_must_have_data > 1:
+            raise ValueError(
+                f"`frac_countries_that_must_have_data` must be between 0 and 1, got {frac_countries_that_must_have_data}."
+            )
         else:
             # If a fraction of countries that must have data is defined, check that the fraction of countries that
             # have data is larger than the defined fraction.
