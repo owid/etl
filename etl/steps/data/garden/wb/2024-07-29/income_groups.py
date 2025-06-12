@@ -72,11 +72,8 @@ def run() -> None:
         missing_countries == EXPECTED_MISSING_COUNTRIES_IN_LATEST_RELEASE
     ), f"Unexpected missing countries in latest release. All missing countries: {missing_countries}"
 
-    # Find year of the latest available classification.
-    year_latest_classification = tb_latest["year"].max()
-
     # Extract data only for latest release (and remove column year).
-    tb_latest = tb_latest[tb_latest["year"] == year_latest_classification].drop(columns=["year"])
+    tb_latest = tb_latest[tb_latest["year"] == tb_latest["year"].max()].drop(columns=["year"])
 
     tb = add_country_counts_and_population_by_status(
         tb=tb,
@@ -103,6 +100,11 @@ def run() -> None:
     # Set an appropriate index and sort conveniently.
     tb_latest = tb_latest.format(["country"])
 
+    # Find the version of the current World Bank's classification.
+    origin = tb_latest["classification"].metadata.origins[0]
+    assert origin.producer == "World Bank", "Unexpected list of origins."
+    year_world_bank_classification = origin.date_published.split("-")[0]
+
     #
     # Save outputs.
     #
@@ -110,7 +112,7 @@ def run() -> None:
     ds_garden = paths.create_dataset(
         tables=[tb, tb_latest],
         default_metadata=ds_meadow.metadata,
-        yaml_params={"year_latest_classification": str(year_latest_classification)},
+        yaml_params={"year_world_bank_classification": year_world_bank_classification},
     )
     ds_garden.save()
 

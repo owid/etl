@@ -133,7 +133,7 @@ tables:
     title: World Bank's latest income classification
     variables:
       classification:
-        title: World Bank's latest income classification (for {year_latest_classification})
+        title: World Bank's {year_world_bank_classification} income classification
         unit: ""
         description_short: Income classification based on the country's income for the latest year informed.
         type: ordinal
