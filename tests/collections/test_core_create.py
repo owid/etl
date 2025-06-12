@@ -12,7 +12,12 @@ import pytest
 from owid.catalog import Table, Variable
 from owid.catalog.meta import VariableMeta
 
-from etl.collection.core.create import _get_expand_path_mode, _rename_choices, create_collection_single_table
+from etl.collection.core.create import (
+    _get_expand_path_mode,
+    _rename_choices,
+    create_collection,
+    create_collection_single_table,
+)
 from etl.collection.explorer import Explorer
 from etl.collection.model.core import Collection
 from etl.collection.model.dimension import Dimension, DimensionChoice
@@ -63,6 +68,35 @@ def create_test_table():
         )
 
     return tb
+
+
+def create_test_table_2():
+    """Create a second test table with different dimensional indicators."""
+    data = {
+        "country": ["USA", "USA", "CAN", "CAN"],
+        "year": [2020, 2021, 2020, 2021],
+        "cases__age_young": [200, 220, 100, 110],
+        "cases__age_old": [150, 170, 75, 85],
+    }
+
+    tb = Table(data, short_name="test_table_2")
+
+    # Add metadata for dimensional indicators
+    for col in ["cases__age_young", "cases__age_old"]:
+        tb[col] = Variable(
+            tb[col],
+            name=col,
+            metadata=VariableMeta(
+                original_short_name="cases", dimensions={"age": "young" if "young" in col else "old"}
+            ),
+        )
+
+    return tb
+
+
+def create_multiple_test_tables():
+    """Create a list of test tables for multi-table testing."""
+    return [create_test_table(), create_test_table_2()]
 
 
 class TestCreateCollection:
@@ -548,3 +582,250 @@ class TestIntegration:
                         assert choice_female.name == "Female"
 
                         assert result == mock_collection
+
+
+class TestCreateCollectionMultipleTables:
+    """Test suite for create_collection function with multiple tables."""
+
+    def test_create_collection_multiple_tables_basic(self):
+        """Test collection creation with multiple tables."""
+        config = create_test_config()
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()
+
+        with patch("etl.collection.core.create.create_collection_single_table") as mock_single:
+            with patch("etl.collection.core.create.combine_collections") as mock_combine:
+                # Mock single table creation to return different collections
+                mock_collection_1 = Mock(spec=Collection)
+                mock_collection_2 = Mock(spec=Collection)
+                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+
+                # Mock combine_collections to return final collection
+                mock_final_collection = Mock(spec=Collection)
+                mock_combine.return_value = mock_final_collection
+
+                result = create_collection(
+                    config_yaml=config,
+                    dependencies=dependencies,
+                    catalog_path=catalog_path,
+                    tb=tables,
+                    indicator_names=[["deaths"], ["cases"]],
+                )
+
+                # Verify create_collection_single_table was called twice
+                assert mock_single.call_count == 2
+
+                # Verify first call arguments
+                first_call = mock_single.call_args_list[0]
+                assert first_call[1]["tb"] is tables[0]
+                assert first_call[1]["indicator_names"] == ["deaths"]
+
+                # Verify second call arguments
+                second_call = mock_single.call_args_list[1]
+                assert second_call[1]["tb"] is tables[1]
+                assert second_call[1]["indicator_names"] == ["cases"]
+
+                # Verify combine_collections was called
+                mock_combine.assert_called_once_with(
+                    collections=[mock_collection_1, mock_collection_2],
+                    catalog_path=catalog_path,
+                    config=config,
+                    is_explorer=False,
+                )
+
+                assert result == mock_final_collection
+
+    def test_create_collection_multiple_tables_with_list_parameters(self):
+        """Test collection creation with multiple tables and list parameters."""
+        config = create_test_config()
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()
+
+        # List parameters for each table
+        indicator_names = [["deaths"], ["cases"]]
+        dimensions = [{"sex": ["male", "female"]}, {"age": ["young", "old"]}]
+        common_view_configs = [{"chartType": "LineChart"}, {"chartType": "BarChart"}]
+        choice_renames = [
+            {"sex": {"male": "Male", "female": "Female"}},
+            {"age": {"young": "Young", "old": "Old"}},
+        ]
+
+        with patch("etl.collection.core.create.create_collection_single_table") as mock_single:
+            with patch("etl.collection.core.create.combine_collections") as mock_combine:
+                mock_collection_1 = Mock(spec=Collection)
+                mock_collection_2 = Mock(spec=Collection)
+                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+
+                mock_final_collection = Mock(spec=Collection)
+                mock_combine.return_value = mock_final_collection
+
+                result = create_collection(
+                    config_yaml=config,
+                    dependencies=dependencies,
+                    catalog_path=catalog_path,
+                    tb=tables,
+                    indicator_names=indicator_names,
+                    dimensions=dimensions,
+                    common_view_config=common_view_configs,
+                    choice_renames=choice_renames,
+                )
+
+                # Verify create_collection_single_table was called twice with correct parameters
+                assert mock_single.call_count == 2
+
+                first_call = mock_single.call_args_list[0]
+                assert first_call[1]["tb"] is tables[0]
+                assert first_call[1]["indicator_names"] == ["deaths"]
+                assert first_call[1]["dimensions"] == {"sex": ["male", "female"]}
+                assert first_call[1]["common_view_config"] == {"chartType": "LineChart"}
+                assert first_call[1]["choice_renames"] == {"sex": {"male": "Male", "female": "Female"}}
+
+                second_call = mock_single.call_args_list[1]
+                assert second_call[1]["tb"] is tables[1]
+                assert second_call[1]["indicator_names"] == ["cases"]
+                assert second_call[1]["dimensions"] == {"age": ["young", "old"]}
+                assert second_call[1]["common_view_config"] == {"chartType": "BarChart"}
+                assert second_call[1]["choice_renames"] == {"age": {"young": "Young", "old": "Old"}}
+
+                assert result == mock_final_collection
+
+    def test_create_collection_multiple_tables_single_parameters(self):
+        """Test collection creation with multiple tables and single parameters applied to all."""
+        config = create_test_config()
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()
+
+        # Single parameters that should be applied to all tables
+        single_indicator_name = "metric"
+        single_dimensions = {"country": ["USA", "CAN"]}
+        single_common_view_config = {"chartType": "ScatterPlot"}
+
+        with patch("etl.collection.core.create.create_collection_single_table") as mock_single:
+            with patch("etl.collection.core.create.combine_collections") as mock_combine:
+                mock_collection_1 = Mock(spec=Collection)
+                mock_collection_2 = Mock(spec=Collection)
+                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+
+                mock_final_collection = Mock(spec=Collection)
+                mock_combine.return_value = mock_final_collection
+
+                result = create_collection(
+                    config_yaml=config,
+                    dependencies=dependencies,
+                    catalog_path=catalog_path,
+                    tb=tables,
+                    indicator_names=single_indicator_name,
+                    dimensions=single_dimensions,
+                    common_view_config=single_common_view_config,
+                )
+
+                # Verify both calls received the same single parameters
+                assert mock_single.call_count == 2
+
+                for call in mock_single.call_args_list:
+                    assert call[1]["indicator_names"] == single_indicator_name
+                    assert call[1]["dimensions"] == single_dimensions
+                    assert call[1]["common_view_config"] == single_common_view_config
+
+                assert result == mock_final_collection
+
+    def test_create_collection_multiple_tables_explorer_mode(self):
+        """Test collection creation with multiple tables in explorer mode."""
+        config = create_test_explorer_config()
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()
+
+        with patch("etl.collection.core.create.create_collection_single_table") as mock_single:
+            with patch("etl.collection.core.create.combine_collections") as mock_combine:
+                mock_explorer_1 = Mock(spec=Explorer)
+                mock_explorer_2 = Mock(spec=Explorer)
+                mock_single.side_effect = [mock_explorer_1, mock_explorer_2]
+
+                mock_final_explorer = Mock(spec=Explorer)
+                mock_combine.return_value = mock_final_explorer
+
+                result = create_collection(
+                    config_yaml=config,
+                    dependencies=dependencies,
+                    catalog_path=catalog_path,
+                    tb=tables,
+                    explorer=True,
+                )
+
+                # Verify explorer flag was passed to all calls
+                assert mock_single.call_count == 2
+                for call in mock_single.call_args_list:
+                    assert call[1]["explorer"] is True
+
+                # Verify combine_collections was called with explorer flag
+                mock_combine.assert_called_once_with(
+                    collections=[mock_explorer_1, mock_explorer_2],
+                    catalog_path=catalog_path,
+                    config=config,
+                    is_explorer=True,
+                )
+
+                assert result == mock_final_explorer
+
+    def test_create_collection_multiple_tables_mismatched_list_length(self):
+        """Test that mismatched list lengths raise ValueError."""
+        config = create_test_config()
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()  # 2 tables
+
+        # Provide list of indicator names with wrong length (3 for 2 tables)
+        indicator_names = [["deaths"], ["cases"], ["extra"]]
+
+        with pytest.raises(ValueError, match="Parameter 'indicator_names' is a list of length 3"):
+            create_collection(
+                config_yaml=config,
+                dependencies=dependencies,
+                catalog_path=catalog_path,
+                tb=tables,
+                indicator_names=indicator_names,
+            )
+
+    def test_create_collection_multiple_tables_mixed_none_parameters(self):
+        """Test collection creation with multiple tables where some list parameters contain None."""
+        config = create_test_config()
+        dependencies = {"test#indicator1", "test#indicator2"}
+        catalog_path = "test/latest/data#table"
+        tables = create_multiple_test_tables()
+
+        # Mixed parameters with None values
+        indicator_names = [None, "cases"]  # First table uses all indicators, second uses specific
+        dimensions = [None, {"age": ["young"]}]  # First table uses all dimensions, second uses specific
+
+        with patch("etl.collection.core.create.create_collection_single_table") as mock_single:
+            with patch("etl.collection.core.create.combine_collections") as mock_combine:
+                mock_collection_1 = Mock(spec=Collection)
+                mock_collection_2 = Mock(spec=Collection)
+                mock_single.side_effect = [mock_collection_1, mock_collection_2]
+
+                mock_final_collection = Mock(spec=Collection)
+                mock_combine.return_value = mock_final_collection
+
+                result = create_collection(
+                    config_yaml=config,
+                    dependencies=dependencies,
+                    catalog_path=catalog_path,
+                    tb=tables,
+                    indicator_names=indicator_names,
+                    dimensions=dimensions,
+                )
+
+                # Verify parameters were passed correctly
+                first_call = mock_single.call_args_list[0]
+                assert first_call[1]["indicator_names"] is None
+                assert first_call[1]["dimensions"] is None
+
+                second_call = mock_single.call_args_list[1]
+                assert second_call[1]["indicator_names"] == "cases"
+                assert second_call[1]["dimensions"] == {"age": ["young"]}
+
+                assert result == mock_final_collection
