@@ -57,7 +57,7 @@ def run() -> None:
         view.config = view.config.copy()
 
         if (antigen == "comparison") & (metric == "vaccinated"):
-            view.config["title"] = "Number of one-year-olds who have received different vaccinations"
+            view.config["title"] = "Number of one-year-olds who have had each vaccination"
             view.config["subtitle"] = (
                 "Estimated number of one-year-olds who have received vaccinations for different diseases."
             )
@@ -68,7 +68,7 @@ def run() -> None:
                 "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
             )
         elif (antigen == "comparison") & (metric == "unvaccinated"):
-            view.config["title"] = "Number of one-year-olds who have not received different vaccinations"
+            view.config["title"] = "Number of one-year-olds who have not had each vaccination"
             view.config["subtitle"] = (
                 "Estimated number of one-year-olds who have not received vaccinations for different diseases."
             )

@@ -10,12 +10,13 @@ dimensions:
       - slug: "coverage"
         name: "Share of children vaccinated"
         description: "Share of children in the target age-group who have received the specified vaccine"
-      - slug: "unvaccinated"
-        name: "Number of unvaccinated children"
-        description: "Number of children in the target age-group who have not received the specified vaccine"
       - slug: "vaccinated"
         name: "Number of vaccinated children"
         description: "Number of children in the target age-group who have received the specified vaccine"
+      - slug: "unvaccinated"
+        name: "Number of unvaccinated children"
+        description: "Number of children in the target age-group who have not received the specified vaccine"
+
   - name: Vaccination
     slug: antigen
     choices:
