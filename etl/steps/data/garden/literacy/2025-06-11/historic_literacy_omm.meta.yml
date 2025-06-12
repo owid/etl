@@ -35,9 +35,9 @@ tables:
           - This indicator shows what share of the population can read and write a short, simple sentence with understanding.
           - The literacy rate is calculated by dividing the number of literate individuals by the total population in the same age group, excluding those with unknown literacy status.
           - A high literacy rate suggests that most people have acquired basic reading and writing skills, typically through primary education or literacy programs.
-          - Contemporary data typically come from population censuses or household surveys and are often self-reported. Historical estimates before 1800 are based on indirect evidence such as manuscript and book production."
-          - Age groups vary across time periods and sources. Early historical data often measured literacy from age 10+, while modern standards focus on ages 15+. Users should consider these methodological differences when making comparisons across time periods."
-          - Literacy should not be confused with functional literacy — this indicator reflects basic reading and writing skills, but not their practical application in daily life or work."
+          - Contemporary data typically come from population censuses or household surveys and are often self-reported. Historical estimates before 1800 are based on indirect evidence such as manuscript and book production.
+          - Age groups vary across time periods and sources. Early historical data often measured literacy from age 10+, while modern standards focus on ages 15+. Users should consider these methodological differences when making comparisons across time periods.
+          - Literacy should not be confused with functional literacy — this indicator reflects basic reading and writing skills, but not their practical application in daily life or work.
 
 
       illiteracy_rate:
