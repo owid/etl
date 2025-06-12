@@ -211,6 +211,8 @@ tables:
           name: "{definitions.antigen_display_name}"
           numDecimalPlaces: 1
         presentation:
+          title_public: |-
+            Share of {definitions.antigen_age_group} {definitions.antigen_title}
           grapher_config:
             originUrl: https://ourworldindata.org/vaccination
             map:
@@ -240,6 +242,8 @@ tables:
           name: "{definitions.antigen_display_name}"
           numDecimalPlaces: 0
         presentation:
+          title_public: |-
+            Number of {definitions.antigen_age_group} vaccinated with {definitions.antigen_title}
           grapher_config:
             note: |-
               {definitions.antigen_note}
@@ -257,6 +261,8 @@ tables:
           numDecimalPlaces: 0
           name: "{definitions.antigen_display_name}"
         presentation:
+          title_public: |-
+            Number of {definitions.antigen_age_group} who have not had {definitions.antigen_title}
           grapher_config:
             note: |-
               {definitions.antigen_note}
