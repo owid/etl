@@ -1,5 +1,8 @@
+import io
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Literal
+
+import yaml
 
 from owid.catalog.meta import SOURCE_EXISTS_OPTIONS
 
@@ -10,9 +13,9 @@ from .utils import dynamic_yaml_load, dynamic_yaml_to_dict
 
 def update_metadata_from_yaml(
     tb: Table,
-    path: Union[Path, str],
+    path: Path | str,
     table_name: str,
-    yaml_params: Optional[Dict[str, Any]] = None,
+    yaml_params: dict[str, Any] | None = None,
     extra_variables: Literal["raise", "ignore"] = "raise",
     if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
 ) -> None:
@@ -34,9 +37,12 @@ def update_metadata_from_yaml(
     params = DatasetMeta._params_yaml(tb.metadata.dataset or DatasetMeta())
     params.update(yaml_params or {})
 
+    # Add definitions from shared.meta.yml if it exists
+    path_or_io = merge_with_shared_meta(Path(path))
+
     # load YAML file as dictionary
     # TODO: tb.metadata.dataset reference shouldn't exist
-    annot = dynamic_yaml_to_dict(dynamic_yaml_load(path, params))
+    annot = dynamic_yaml_to_dict(dynamic_yaml_load(path_or_io, params))
 
     tb.metadata.short_name = table_name
 
@@ -79,11 +85,55 @@ def update_metadata_from_yaml(
     tb.metadata = TableMeta.from_dict(tb_meta_dict)
 
 
+def merge_with_shared_meta(path: Path) -> io.StringIO | Path:
+    """Merge metadata with shared.meta.yml if it exists."""
+    shared_meta_path = path.parent / "shared.meta.yml"
+    if shared_meta_path.exists():
+        # Load shared.meta.yml
+        with open(shared_meta_path) as f:
+            shared = yaml.safe_load(f)
+
+        # Load the original meta file
+        with open(path) as f:
+            meta = yaml.safe_load(f)
+
+        if "definitions" not in meta and "definitions" in shared:
+            meta["definitions"] = {}
+
+        if "macros" not in meta and "macros" in shared:
+            meta["macros"] = ""
+
+        # Combine definitions
+        for k, v in shared.items():
+            # Append macros
+            if k == "macros":
+                meta["macros"] = v + meta["macros"]
+
+            # Combine definitions
+            elif k == "definitions":
+                for kk, vv in v.items():
+                    meta["definitions"].setdefault(kk, vv)
+
+            # Other fields are not supported yet
+            else:
+                raise NotImplementedError(f"Cannot merge {k} from shared.meta.yml")
+
+        # Create a new file with combined definitions
+        s = io.StringIO()
+        yaml.dump(meta, s, default_flow_style=False)
+
+        s.seek(0)
+
+        return s
+    else:
+        return path
+
+
 def _merge_variable_metadata(
     md: dict,
     new: dict,
     if_origins_exist: SOURCE_EXISTS_OPTIONS,
-    merge_fields: List[str] = ["presentation", "grapher_config"],
+    merge_fields: list[str] = ["presentation", "grapher_config"],
 ) -> dict:
     """Merge VariableMeta in a dictionary with another dictionary. It modifies the original object."""
     # NOTE: when this gets stable, consider removing flag `if_origins_exist`
@@ -123,13 +173,19 @@ def _merge_table_metadata(meta: dict, new: dict) -> dict:
 
 
 def _validate_variables(t_annot: dict, tb: Table) -> None:
-    yaml_variable_names = (t_annot.get("variables") or {}).keys()
-    table_variable_names = tb.columns
-    extra_variable_names = yaml_variable_names - table_variable_names
-    if extra_variable_names:
-        raise ValueError(f"Table {tb.metadata.short_name} has extra variables: {sorted(list(extra_variable_names))}")
+    yaml_variable_names = set((t_annot.get("variables") or {}).keys())
+    table_variable_names = set(tb.columns)
+    extra_yaml_variable_names = yaml_variable_names - table_variable_names
+    extra_table_variable_names = table_variable_names - yaml_variable_names
+    if extra_yaml_variable_names:
+        msg = (
+            f"Table {tb.metadata.short_name} has extra variables in YAML file {sorted(list(extra_yaml_variable_names))}"
+        )
+        if extra_table_variable_names:
+            msg += f" and extra variables in table {sorted(list(extra_table_variable_names))}"
+        raise ValueError(msg)
 
 
-def _flatten(lst: List[Any]) -> List[str]:
+def _flatten(lst: list[Any]) -> list[str]:
     """Flatten list that contains either strings or lists."""
     return [item for sublist in lst for item in ([sublist] if isinstance(sublist, str) else sublist)]

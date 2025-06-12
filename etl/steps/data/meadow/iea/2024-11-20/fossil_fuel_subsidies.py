@@ -3,7 +3,7 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -89,7 +89,7 @@ def prepare_transport_oil_table(tb_transport: Table) -> Table:
     return tb_transport
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -116,13 +116,8 @@ def run(dest_dir: str) -> None:
     #
     # Save outputs.
     #
-    # Create a new meadow dataset.
-    ds_meadow = create_dataset(
-        dest_dir,
-        tables=[tb_subsidies, tb_indicators, tb_transport],
-        check_variables_metadata=True,
-        default_metadata=snap.metadata,
-    )
+    # Initialize a new meadow dataset.
+    ds_meadow = paths.create_dataset(tables=[tb_subsidies, tb_indicators, tb_transport], default_metadata=snap.metadata)
 
-    # Save changes in the new meadow dataset.
+    # Save meadow dataset.
     ds_meadow.save()

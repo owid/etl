@@ -1,0 +1,27 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: History of the NASA Budget
+    date_published: "2022-09-01"
+
+    # Citation
+    producer: CSIS Aerospace Security Project
+    citation_full: |-
+      Center for Strategic and International Studies (CSIS), The Aerospace Security Project - History of the NASA Budget (2022).
+    attribution_short: CSIS
+
+    # Files
+    url_main: https://aerospace.csis.org/data/history-nasa-budget-csis/
+    url_download: "https://docs.google.com/spreadsheets/d/1TNgeonCjrQQKIc8keK4pGSHaZ70bH620RuCCwKW0V80/gviz/tq?tqx=out:csv&sheet=Sheet1"
+    date_accessed: 2025-03-04
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://aerospace.csis.org/data/history-nasa-budget-csis/
+outs:
+  - md5: b9c9d6024104a37ebeb6a648475a596c
+    size: 91218
+    path: nasa_budget.csv

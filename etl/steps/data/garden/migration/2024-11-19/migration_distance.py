@@ -19,6 +19,19 @@ paths = PathFinder(__file__)
 LOG = structlog.get_logger()
 
 
+# countries not included in nat geo data set, just for reference
+COUNTRY_NOT_IN_NAT_GEO = [
+    "Tokelau",
+    "Bonaire Sint Eustatius and Saba",
+    "French Guiana",
+    "Guadeloupe",
+    "Martinique",
+    "Reunion",
+    "Channel Islands",
+    "Mayotte",
+]
+
+
 def run(dest_dir: str) -> None:
     #
     # Load inputs.
@@ -51,21 +64,9 @@ def run(dest_dir: str) -> None:
         warnings.simplefilter("ignore", category=RuntimeWarning)
         distance_matrix = calculate_distance_matrix(world)
 
-    ## Add distances to migration flows table
-    # Remove countries not included in nat earth data and "Other" from country destination or country origin columns
-    cty_no_data = [
-        "Other",
-        "Tokelau",
-        "Bonaire Sint Eustatius and Saba",
-        "French Guiana",
-        "Guadeloupe",
-        "Martinique",
-        "Reunion",
-        "Channel Islands",
-        "Mayotte",
-    ]
+    # Remove countries and regions not in nat earth data and "Other" from country destination or country origin columns
 
-    cty_data = [cty for cty in tb["country_origin"].unique() if cty not in cty_no_data]
+    cty_data = list(world["name"].unique())
     tb = tb[(tb["country_destination"].isin(cty_data)) & (tb["country_origin"].isin(cty_data))]
 
     # Add distance to the table

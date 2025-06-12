@@ -1,0 +1,38 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Cost of space launches
+    description: |-
+      This dataset published by the Center for Strategic and International Studies compares costs between space launch vehicles by incorporating many vehicle characteristics into a single figure: the cost to launch one kilogram of payload mass to low Earth orbit (LEO) as part of a dedicated launch.
+
+      Many of the cited sources directly provide cost-per-kilogram estimates for launches to LEO. Others require a simple calculation: dividing the total cost of a dedicated launch by the vehicle's payload capacity to LEO. In those cases, the reported cost-per-kilogram figure is calculated by the median total launch cost and the maximum payload capacity.
+
+      Launch costs "include all direct and indirect manufacturing costs and their associated overhead plus recurring engineering, sustaining tooling, and quality control".
+
+      Cost estimates are inflated by the source to their dollar values in the fiscal year 2021.
+
+      Although space launch vehicles are often described by their payload mass class (most often "Small", "Medium", and "Heavy") there is no universally accepted definition for the boundaries between these classes. In this dataset, small-lift vehicles carry up to 2,000 kg to LEO, medium-lift vehicles carry between 2,000 and 20,000 kg to LEO, and heavy-lift vehicles carry more than 20,000 kg to LEO.
+    date_published: "2022-09-01"
+
+    # Citation
+    producer: CSIS Aerospace Security Project
+    citation_full: |-
+      Center for Strategic and International Studies, The Aerospace Security Project - Space Launch to Low Earth Orbit: How Much Does It Cost? (2022).
+    attribution_short: CSIS
+
+    # Files
+    url_main: https://aerospace.csis.org/data/space-launch-to-low-earth-orbit-how-much-does-it-cost/
+    url_download: https://docs.google.com/spreadsheets/d/1FGdaphIbRjDpXsOdU3omWGRpH5DTImmzWW-H43lLOms/gviz/tq?tqx=out:csv&sheet=Values%20Only
+    date_accessed: 2025-03-04
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://aerospace.csis.org/data/space-launch-to-low-earth-orbit-how-much-does-it-cost/
+
+outs:
+  - md5: 864b2e32cac0ccea01107b070b52e33c
+    size: 8339
+    path: cost_of_space_launches.csv

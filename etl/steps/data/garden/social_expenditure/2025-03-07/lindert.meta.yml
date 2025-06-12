@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Government Spending
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+
+tables:
+  lindert:
+    variables:
+      share_gdp:
+        title: Public social expenditure as a share of GDP
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: Public social expenditure divided bt gross domestic product, expressed as a percentage.
+        description_from_producer: "Social transfers, 1880–1930, as percentages of national product at current prices: all four kinds of government social spending (welfare–unemployment, pensions, health, and housing)."
+        processing_level: minor
+        presentation:
+          attribution_short: Lindert
+          title_public: Public social expenditure as a share of GDP
+          title_variant: Data between 1880-1930
+        display:
+          name: Public social expenditure as a share of GDP
+          numDecimalPlaces: 1
+          tolerance: 5
+

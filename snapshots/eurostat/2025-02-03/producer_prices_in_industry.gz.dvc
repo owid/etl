@@ -1,0 +1,28 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Producer prices in industry
+    # NOTE: The date_published is specified in "last update" on the top of url_main.
+    # But it seems that it's regularly updated, so it could be replaced by date_accessed.
+    date_published: "2025-02-06"
+
+    # Citation
+    producer: Eurostat
+    citation_full: |-
+      Eurostat - Producer prices in industry, total (2025).
+
+    # Files
+    url_main: https://ec.europa.eu/eurostat/databrowser/view/sts_inpp_m__custom_15280604/default/table?lang=en
+    url_download: https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/sts_inpp_m?format=TSV&compressed=true
+    date_accessed: 2025-02-06
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://ec.europa.eu/eurostat/web/main/help/copyright-notice
+outs:
+  - md5: b40faa9205c9c8de978898f8a45c3c43
+    size: 7835009
+    path: producer_prices_in_industry.gz

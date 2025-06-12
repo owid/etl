@@ -1,0 +1,17 @@
+dataset:
+  title: DRAFT deflated housing prices - Sheet1
+  description: ''
+tables:
+  deflated_housing_prices__sheet1:
+    variables:
+      annual_average_house_price_index__2015_100:
+        title: Annual average house price index, 2015=100
+        unit: ''
+      annual_average_house_price_rate_of_change:
+        title: Annual average house price rate of change
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

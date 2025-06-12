@@ -1,0 +1,22 @@
+meta:
+  origin:
+    producer: OECD Health Expenditure and Financing Database
+    title: OECD Health Expenditure and Financing Database
+    description: |-
+      A System of Health Accounts 2011 provides an updated and systematic description of the financial flows related to the consumption of health care goods and services. As demands for information increase and more countries implement and institutionalise health accounts according to the system, the data produced are expected to be more comparable, more detailed and more policy relevant.
+
+      It builds on the original OECD Manual, published in 2000 to create a single global framework for producing health expenditure accounts that can help track resource flows from sources to uses.
+
+      It is the result of a collaborative effort between the OECD, WHO and the European Commission, and sets out in more detail the boundaries, the definitions and the concepts – responding to health care systems around the globe – from the simplest to the more complicated. The accounting framework is organised around a tri-axial system for the recording of health care expenditure, namely classifications of the functions of health care (ICHA-HC), health care provision (ICHA-HP), and financing schemes (ICHA-HF).
+    citation_full: OECD (2024), Health Expenditure and Financing Database, https://data-explorer.oecd.org/
+    attribution_short: OECD
+    url_main: https://data-explorer.oecd.org/
+    date_accessed: '2025-02-25'
+    date_published: '2024-11-26'
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/termsandconditions/
+outs:
+  - md5: d27a781d2d7e6a4803663c4d34d2251f
+    size: 21101715
+    path: health_expenditure.csv

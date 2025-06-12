@@ -3,7 +3,7 @@
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -40,7 +40,7 @@ CUSTOM_REGION_DICT = {
 }
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -57,6 +57,8 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb = geo.harmonize_countries(df=tb, countries_file=paths.country_mapping_path)
+    # Exclude famines with less than 100,000 deaths (error in the spreadhsheet and should be excluded)
+    tb = tb[tb["wpf_authoritative_mortality_estimate"] >= 100000]
 
     # Add regions to the table.
     tb = add_regions(tb, ds_regions)
@@ -93,9 +95,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata
-    )
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()

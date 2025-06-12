@@ -1,5 +1,13 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  common_total_vax: &common_total_vax
+    - Vaccination data reflects the total number of doses administered—covering both primary series and booster doses—and are now sourced exclusively from WHO.
+    - Rapid vaccine development and ongoing updates for emerging variants underline the dynamic nature of COVID-19 vaccination efforts globally.
+    - Coverage statistics can exceed 100% if population estimates do not keep pace with migration or demographic changes, leading to inaccuracies in denominators. Also, we rely on population estimates in 2022 by UN WPP.
+  common_booster_vax: &common_booster_vax
+    - These data focus on the administration of booster doses, which are crucial for maintaining immunity as the SARS-CoV-2 virus continues to evolve.
+    - Rapid vaccine development and ongoing updates for emerging variants underline the dynamic nature of COVID-19 vaccination efforts globally.
+    - Ongoing updates to vaccine formulations and recommendations emphasize the dynamic nature of COVID-19 booster efforts globally.
   others:
     zero_day: &zero_day
       zeroDay: 2020-01-21
@@ -37,6 +45,7 @@ tables:
           numDecimalPlaces: 0
           tolerance: 9999
           <<: *zero_day
+        description_key: *common_total_vax
         presentation:
           grapher_config:
             title: COVID-19 vaccine doses administered
@@ -61,6 +70,7 @@ tables:
       total_vaccinations_per_hundred:
         title: COVID-19 doses (cumulative, per hundred)
         description_short: Total number of COVID-19 vaccination doses administered per 100 people in the total population.
+        description_key: *common_total_vax
         unit: "doses per hundred people"
         description_processing: *per_capita
         display:
@@ -437,6 +447,7 @@ tables:
         description_short: |-
           Total number of COVID-19 vaccination booster doses administered (doses administered beyond the number prescribed by the vaccination protocol).
         unit: "doses"
+        description_key: *common_booster_vax
         display:
           numDecimalPlaces: 0
           tolerance: 9999
@@ -470,6 +481,7 @@ tables:
         title: Booster doses (cumulative, per hundred)
         description_short: Total number of COVID-19 vaccination booster doses administered per 100 people in the total population.
         unit: "doses per hundred people"
+        description_key: *common_booster_vax
         description_processing: *per_capita
         display:
           numDecimalPlaces: 2

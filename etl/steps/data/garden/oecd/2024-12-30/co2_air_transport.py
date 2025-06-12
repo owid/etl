@@ -58,7 +58,7 @@ def run(dest_dir: str) -> None:
 
     tb = pr.merge(tb_annual, tb_monthly, on=["year", "country"], how="outer")
 
-    tb = tb[tb["year"] != 2024]
+    tb = tb[tb["year"] != 2025]
     tb = tb.drop(["population"], axis=1)
     tb["total_monthly_emissions"] = tb["TER_INT_m"] + tb["TER_DOM_m"]
 

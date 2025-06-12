@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Growing Public: Social Spending and Economic Growth since the Eighteenth Century"
+    description: |-
+      Growing Public examines the question of whether social policies that redistribute income impose constraints on economic growth. Taxes and transfers have been debated for centuries, but only now can we get a clear view of the whole evolution of social spending. What kept prospering nations from using taxes for social programs until the end of the nineteenth century? Why did taxes and spending then grow so much, and what are the prospects for social spending in this century? Why did North America become a leader in public education in some ways and not others? Lindert finds answers in the economic history and logic of political voice, population aging, and income growth. Contrary to traditional beliefs, the net national costs of government social programs are virtually zero. This book not only shows that no Darwinian mechanism has punished the welfare states, but uses history to explain why this surprising result makes sense. Contrary to the intuition of many economists and the ideology of many politicians, social spending has contributed to, rather than inhibited, economic growth.
+    date_published: "2004"
+    title_snapshot: "Growing Public: Social Spending and Economic Growth since the Eighteenth Century - Table 1.2"
+    description_snapshot: |-
+      Social Transfers in OECD Countries, 1880–1995, as Percentages of Gross Domestic Product at Current Prices.
+
+    # Citation
+    producer: Lindert
+    citation_full: |-
+      Lindert, P. H. (2004). Growing Public: Social Spending and Economic Growth since the Eighteenth Century. Table 1.2. Cambridge University Press. https://doi.org/10.1017/CBO9780511510717
+    attribution_short: Lindert
+
+    # Files
+    url_main: https://www.cambridge.org/core/books/growing-public/EAF17EB3BDFB5A6568930DBEC2CD1218
+    date_accessed: 2025-03-07
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://www.cambridge.org/core/books/growing-public/EAF17EB3BDFB5A6568930DBEC2CD1218
+
+outs:
+  - md5: 78b4f9341ac773ece655caa2de53f579
+    size: 651
+    path: lindert.csv

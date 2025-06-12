@@ -3,7 +3,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Antibiotics
+        - Antibiotics & Antibiotic Resistance
     unit: "%"
     short_unit: "%"
     display:

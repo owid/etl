@@ -1,0 +1,41 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # File-specific
+    title_snapshot: Excess Deaths Model - World data (per 100k)
+    url_download: https://raw.githubusercontent.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/refs/heads/main/output-data/export_world_per_100k.csv
+
+    # Data product / Snapshot
+    title: Excess Deaths Model
+    description: |-
+      The Economist built a statistical/machine-learning model to estimate the true toll of COVID-19 by measuring “excess deaths” worldwide. It draws on all-cause mortality data from places with reliable death registrations, then relates these data to a range of demographic and socioeconomic indicators. This allows them to predict excess deaths for regions without robust reporting systems.
+
+      The model finds that official COVID-19 counts underestimate actual fatalities, often by a substantial margin. It highlights how discrepancies in reporting and limited testing can fail to capture the real impact of the pandemic. The Economist regularly updates its predictions and releases them through a public GitHub repository.
+
+      It comes with certain limitations due to data gaps and reliance on approximate indicators where reliable records are scarce.
+
+      **Interpreting estimates** (from their GitHub repository):
+
+      Estimating excess deaths for every country every day since the pandemic began is a complex and difficult task. Rather than being overly confident in a single number, limited data means that we can often only give a very very wide range of plausible values. Focusing on central estimates in such cases would be misleading: unless ranges are very narrow, the 95% range should be reported when possible. The ranges assume that the conditions for bootstrap confidence intervals are met. Please see [our tracker page](https://www.economist.com/graphic-detail/coronavirus-excess-deaths-estimates) and [methodology](https://www.economist.com/graphic-detail/2021/05/13/how-we-estimated-the-true-death-toll-of-the-pandemic) for more information.
+
+    date_published: "2024"
+    # Citation
+    producer: The Economist
+    citation_full: |-
+      The Economist and Solstad, S. (corresponding author), 2021. The pandemic's true death toll. [online] The Economist. Available at: https://www.economist.com/graphic-detail/coronavirus-excess-deaths-estimates [Accessed 2025-02-12]. First published in the article "Counting the dead", The Economist, issue 20, 2021.
+
+      Complete citation: https://github.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/blob/main/citation.cff
+
+    # Files
+    url_main: https://github.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/tree/main
+    date_accessed: 2025-02-12
+
+    # License
+    license:
+      name: MIT License
+      url: https://github.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model/tree/main?tab=MIT-1-ov-file#readme
+outs:
+  - md5: a07332901337873781665cd67aefaf0f
+    size: 53022
+    path: xm_econ_world_100k.csv

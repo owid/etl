@@ -1,5 +1,13 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  twins: &twins
+    - |-
+      Twin births have risen dramatically since the 1980s. One reason is the use of reproductive technologies such as in vitro fertilization (IVF), which have made it possible for many more couples to conceive. During procedures like IVF, multiple eggs can be used at the same time to maximize the chances of a successful pregnancy, which can lead to twin births.
+    - |-
+      Another reason for the rise in twin births is that the [average age of women at childbirth has risen](https://ourworldindata.org/grapher/period-average-age-of-mothers-birth-order). Older women are [more likely to have twin births](https://doi.org/10.1111/j.1728-4457.2015.00088.x), even without using reproductive technologies.
+    - |-
+      In some countries, twin birth rates have dropped in recent decades, as reproductive technologies have shifted to using single-embryo transfers instead of multiple.
+
   common:
     presentation:
       topic_tags:
@@ -53,41 +61,92 @@ dataset:
 tables:
   multiple_births:
     variables:
+      # Absolute  (deliveries)
       singletons:
         title: Singleton deliveries
         unit: "deliveries"
         description_short: |-
           Number of single deliveries.
-      twin_deliveries:
-        title: Twin deliveries
-        unit: "deliveries"
-        description_short: |-
-          Number of twin deliveries.
       multiple_deliveries:
         title: Multiple deliveries
         unit: "deliveries"
         description_short: |-
           Total number of multiple deliveries (i.e. the sum of twin, triplet, and quadruplet+ deliveries).
+      twin_deliveries:
+        title: Twin deliveries
+        unit: "deliveries"
+        description_short: |-
+          Number of twin deliveries.
+        description_key: *twins
+      triplets_plus_deliveries:
+        title: Triplet (or more) deliveries
+        unit: "deliveries"
+        description_short: |-
+          Total number of deliveries with triplets or more children.
       total_deliveries:
         title: Total deliveries
         unit: "deliveries"
         description_short: |-
           Total number of deliveries (i.e., single and multiple deliveries combined)
+
+      # Absolute (children)
+      multiple_children:
+        title: "Multiple children"
+        unit: "children"
+        description_short: |-
+          Number of children born from multiple deliveries (twin babies, triplet babies, etc.)
+
+      # Rates (per 1,000 deliveries)
       singleton_rate:
         title: Singleton rate
-        unit: "twin deliveries per total deliveries"
+        unit: "deliveries per 1,000 deliveries"
         description_short: |-
-          The rate of deliveries that are single deliveries, per 1,000 deliveries.
-      twinning_rate:
-        title: Twinning delivery rate
-        unit: "twin deliveries per 1,000 deliveries"
-        description_short: |-
-          The rate of twin deliveries, per 1,000 deliveries.
+          Number of deliveries that are single deliveries, per 1,000 deliveries.
       multiple_rate:
         title: Multiple delivery rate
         unit: "multiple deliveries per 1,000 deliveries"
         description_short: |-
-          The rate of deliveries that are multiple deliveries, per 1,000 deliveries.
+          Number of deliveries that are multiple deliveries (2 or more), per 1,000 deliveries.
+      twinning_rate:
+        title: Twinning delivery rate
+        unit: "twin deliveries per 1,000 deliveries"
+        description_short: |-
+          Number of twin deliveries, per 1,000 deliveries.
+        description_key: *twins
+      triplets_plus_rate:
+        title: Triplet+ delivery rate
+        unit: "deliveries per 1,000 deliveries"
+        description_short: |-
+          Number of deliveries of triplets or more children, per 1,000 deliveries.
+
+      # Share (%)
+      singleton_share:
+        title: Singleton share
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The number of deliveries that are single deliveries per 100 deliveries.
+      multiple_share:
+        title: Multiple delivery share
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The number of deliveries that are multiple deliveries (2 or more) per 100 deliveries.
+      twinning_share:
+        title: Twinning delivery share
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The number of twin deliveries per 100 deliveries.
+        description_key: *twins
+      triplets_plus_share:
+        title: Triplets+ delivery share
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          The number of deliveries of triplets or more children per 100 deliveries.
+
+      # Ratios
       children_delivery_ratio:
         title: "Children per delivery"
         unit: "children per 1,000 deliveries"
@@ -103,8 +162,3 @@ tables:
         unit: "multiple deliveries per 1,000 single delivery"
         description_short: |-
           Number of multiple deliveries per 1,000 single deliveries.
-      multiple_children:
-        title: "Multiple children"
-        unit: "children"
-        description_short: |-
-          Number of children born from multiple deliveries (twin babies, triplet babies, etc.)

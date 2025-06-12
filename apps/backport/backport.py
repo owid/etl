@@ -295,7 +295,7 @@ def _upload_data_metadata(lg: Any, backport_short_name: str, dry_run: bool) -> N
 
 
 def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> SnapshotMeta:
-    """Create walden dataset for grapher dataset values.
+    """Create a dataset for grapher dataset values.
     These datasets are not meant for direct consumption from the catalog, but rather
     for postprocessing in etl.
     :param short_name: short name of the dataset in catalog
@@ -319,7 +319,7 @@ def _snapshot_values_metadata(ds: gm.Dataset, short_name: str, public: bool) -> 
 
 
 def _snapshot_config_metadata(ds: gm.Dataset, short_name: str, public: bool) -> SnapshotMeta:
-    """Create walden dataset for grapher dataset variables and metadata."""
+    """Create a dataset for grapher dataset variables and metadata."""
     config = _snapshot_values_metadata(ds, short_name, public)
     config.short_name = short_name + "_config"
     config.name = f"Grapher metadata for {short_name}"

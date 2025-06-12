@@ -1,0 +1,25 @@
+meta:
+  origin:
+    producer: YouGov
+    title: Dietary choices of Brits
+    description: |-
+      This dataset contains the result of YouGov surveys asking the question: "Which of these best describes your diet?". The available responses were:
+      - Meat eater: eat meat and/or poultry.
+      - Flexitarian: mainly vegetarian, but occasionally eat meat or fish.
+      - Pescetarian: eat fish but do not eat meat or poultry.
+      - Vegetarian: do not eat any meat, poultry, game, fish, or shellfish.
+      - Plant-based / Vegan: do not eat dairy products, eggs, or any other animal product.
+      - None of these.
+    citation_full: YouGov (2024) - Dietary choices of Brits (e.g. vegeterian, flexitarian, meat-eater etc)?
+    attribution_short: YouGov
+    url_main: https://yougov.co.uk/topics/society/trackers/dietery-choices-of-brits-eg-vegeterian-flexitarian-meat-eater-etc
+    url_download: https://yougov.co.uk/_pubapis/v5/uk/trackers/dietery-choices-of-brits-eg-vegeterian-flexitarian-meat-eater-etc/download/
+    date_accessed: '2025-03-04'
+    date_published: '2025-01-01'
+    license:
+      name: Copyright © 2024 YouGov PLC
+      url: https://yougov.co.uk/about/terms
+outs:
+  - md5: 94e71e7772be4b5230c58d76c0e46646
+    size: 24693
+    path: dietary_choices_uk.xlsx

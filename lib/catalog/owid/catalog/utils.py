@@ -1,13 +1,11 @@
 import dataclasses
-import datetime as dt
 import hashlib
 import re
 from dataclasses import fields, is_dataclass
 from pathlib import Path
-from typing import Any, Dict, Optional, Type, TypeVar, Union, get_args, get_origin, overload
+from typing import Any, TextIO, TypeVar, get_args, get_origin, overload
 
 import dynamic_yaml
-import pytz
 import structlog
 import yaml
 from unidecode import unidecode
@@ -49,7 +47,7 @@ def underscore(name: str, validate: bool = True, camel_to_snake: bool = False) -
 def underscore(name: None, validate: bool = True, camel_to_snake: bool = False) -> None: ...
 
 
-def underscore(name: Optional[str], validate: bool = True, camel_to_snake: bool = False) -> Optional[str]:
+def underscore(name: str | None, validate: bool = True, camel_to_snake: bool = False) -> str | None:
     """Convert arbitrary string to under_score. This was fine tuned on WDI bank column names.
     This function might evolve in the future, so make sure to have your use cases in tests
     or rather underscore your columns yourself.
@@ -178,24 +176,30 @@ def underscore_table(t, *args, **kwargs):
     return t.underscore(*args, **kwargs)
 
 
-def validate_underscore(name: Optional[str], object_name: str = "Name") -> None:
+def validate_underscore(name: str | None, object_name: str = "Name") -> None:
     """Raise error if name is not snake_case."""
     if name is not None and not re.match("^[a-z_][a-z0-9_]*$", name):
         raise NameError(f"{object_name} must be snake_case. Change `{name}` to `{underscore(name, validate=False)}`")
 
 
-def dynamic_yaml_load(path: Union[Path, str], params: dict = {}) -> dict:
-    with open(path) as istream:
-        yd = dynamic_yaml.load(istream)
+def dynamic_yaml_load(source: Path | str | TextIO, params: dict = {}) -> dict:
+    """
+    Loads a YAML file from a path, string, or StringIO-like object, and updates it with given parameters.
+
+    Args:
+        source (Path | str | TextIO): File path, string, or a file-like object (e.g., StringIO).
+        params (dict): Parameters to update in the loaded YAML.
+
+    Returns:
+        dict: The parsed YAML data with updated parameters.
+    """
+    if isinstance(source, (str, Path)):
+        with open(source) as istream:
+            yd = dynamic_yaml.load(istream)
+    else:  # Assume it's a file-like object (StringIO, BytesIO, etc.)
+        yd = dynamic_yaml.load(source)
 
     yd.update(params)
-
-    # additional parameters
-    # NOTE: TODAY is dynamic and can depend on the time of creation. This goes against our
-    #   philosophy of having deterministic outputs from snapshots and its use is therefore
-    #   discouraged. You should use origin.date_accessed instead if possible.
-    #   We only keep it here because of its convenience for COVID and AI automatic updates.
-    yd["TODAY"] = dt.datetime.now().astimezone(pytz.timezone("Europe/London")).strftime("%-d %B %Y")
 
     return yd
 
@@ -272,7 +276,7 @@ def hash_any(x: Any) -> int:
         return hash(x)
 
 
-def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
+def dataclass_from_dict(cls: type[T] | None, d: dict[str, Any]) -> T:
     """Recursively create an instance of a dataclass from a dictionary. We've implemented custom
     method because original dataclasses_json.from_dict was too slow (this gives us more than 2x
     speedup). See https://github.com/owid/etl/pull/3517#issuecomment-2468084380 for more details.
@@ -297,20 +301,30 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
         origin = get_origin(field_type)
         args = get_args(field_type)
 
-        # unwrap Optional (e.g. Optional[License] -> License)
+        # unwrap  (e.g. License | None -> License)
         if type(None) in args:
             filtered_args = tuple(a for a in args if a is not type(None))
             if len(filtered_args) == 1:
+                # Save the original field_type for List[...] | None case
                 field_type = filtered_args[0]
+                # For List[...] | None case, update the origin and args
+                if get_origin(field_type) is list:
+                    origin = list
+                    args = get_args(field_type)
 
         if origin is list:
-            item_type = args[0]
-            init_args[field_name] = [dataclass_from_dict(item_type, item) for item in v]
+            # Check if we have type arguments (e.g. List[str])
+            if args:
+                item_type = args[0]
+                init_args[field_name] = [dataclass_from_dict(item_type, item) for item in v]
+            else:
+                # No type arguments, just use the values as-is
+                init_args[field_name] = v
         elif origin is dict:
             key_type, value_type = args
             init_args[field_name] = {k: dataclass_from_dict(value_type, item) for k, item in v.items()}
         elif dataclasses.is_dataclass(field_type):
-            init_args[field_name] = dataclass_from_dict(field_type, v)  # type: ignore
+            init_args[field_name] = field_type.from_dict(v)  # type: ignore
         elif isinstance(field_type, type) and field_type not in (Any,):
             try:
                 init_args[field_name] = field_type(v)
@@ -327,3 +341,27 @@ def dataclass_from_dict(cls: Optional[Type[T]], d: Dict[str, Any]) -> T:
             init_args[field_name] = v
 
     return cls(**init_args)
+
+
+def remove_details_on_demand(text: str) -> str:
+    # Remove references to details on demand from a text.
+    # Example: "This is a [description](#dod:something)." -> "This is a description."
+    regex = r"\(\#dod\:.*\)"
+    if "(#dod:" in text:
+        text = re.sub(regex, "", text).replace("[", "").replace("]", "")
+
+    return text
+
+
+def parse_numeric_list(val: list | str) -> list[float | int]:
+    """
+    Parse a string representation of a list of numbers into a Python list.
+    Example: "[10, 20, 30]" -> [10, 20, 30]
+    """
+    if isinstance(val, list):
+        return val
+    stripped = val.strip()
+    if stripped.startswith("[") and stripped.endswith("]"):
+        stripped = stripped[1:-1]
+
+    return [float(x) if "." in x else int(x) for x in stripped.split(",") if x.strip()]

@@ -64,7 +64,8 @@ CHART_LABELS = get_args(gm.RELATED_CHART_LABEL)
 
 @st.cache_data(show_spinner=False, ttl="1h")
 def get_charts() -> list[data.Chart]:
-    with st.spinner("Loading charts..."):
+    with st.spinner("Loading charts...", show_time=True):
+        # Get charts from the database..
         df = data.get_raw_charts()
 
         if len(df) == 0:
@@ -135,7 +136,7 @@ def split_input_string(input_string: str) -> tuple[str, list[str], list[str]]:
     hash_funcs={list[data.Chart]: lambda charts: len(charts)},
 )
 def get_and_fit_model(charts: list[data.Chart]) -> scoring.ScoringModel:
-    with st.spinner("Loading model..."):
+    with st.spinner("Loading model...", show_time=True):
         scoring_model = scoring.ScoringModel(emb.get_model())
     with st.spinner("Fitting model..."):
         scoring_model.fit(charts)
@@ -453,6 +454,12 @@ top_100_charts: list[data.Chart] = sorted(charts, key=lambda x: x.views_365d, re
 ########################################################################################################################
 
 st.title(":material/search: Similar charts")
+
+st.warning(
+    "This app has been deprecated by the simplified Related charts app.",
+    icon="⚠️",
+)
+
 
 col1, col2 = st.columns(2)
 with col2:

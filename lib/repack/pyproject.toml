@@ -1,24 +1,24 @@
 [project]
 name = "owid-repack"
-version = "0.1.4"
+version = "0.1.5"
 description = "Pack Pandas data frames into smaller, more memory-efficient data types."
 authors = [
     {name = "Our World in Data", email = "tech@ourworldindata.org"},
 ]
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "numpy>=1.24.0",
     "pandas>=2.2.3",
     # there are problems with installing 18.0.0, but we should undo this once it's fixed
-    "pyarrow>=10.0.1,<18.0.0",
+    "pyarrow>=18.0.0",
 ]
 
 [tool.uv]
 dev-dependencies = [
     "pytest>=7.2.0",
     "pyright==1.1.373",
-    "ruff==0.8.2",
+    "ruff==0.8.6",
     "ipdb>=0.13.13",
 ]
 

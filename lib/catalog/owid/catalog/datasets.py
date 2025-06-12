@@ -1,18 +1,19 @@
 #
 #  datasets.py
 #
+from __future__ import annotations
 
 import hashlib
 import json
 import shutil
 import warnings
-from _hashlib import HASH
+from collections.abc import Iterator
 from dataclasses import dataclass
 from glob import glob
 from os import environ
 from os.path import join
 from pathlib import Path
-from typing import Any, Dict, Iterator, List, Literal, Optional, Union, cast
+from typing import Any, Literal, cast
 
 import numpy as np
 import pandas as pd
@@ -29,10 +30,10 @@ FileFormat = Literal["csv", "feather", "parquet"]
 
 # the formats we can serialise and deserialise; in some cases they
 # will be tried in this order if we don't specify one explicitly
-SUPPORTED_FORMATS: List[FileFormat] = ["feather", "parquet", "csv"]
+SUPPORTED_FORMATS: list[FileFormat] = ["feather", "parquet", "csv"]
 
 # the formats we generate by default
-DEFAULT_FORMATS: List[FileFormat] = environ.get("DEFAULT_FORMATS", "feather").split(",")  # type: ignore
+DEFAULT_FORMATS: list[FileFormat] = environ.get("DEFAULT_FORMATS", "feather").split(",")  # type: ignore
 
 # the format we use by default if we only need one
 PREFERRED_FORMAT: FileFormat = "feather"
@@ -52,6 +53,7 @@ CHANNEL = Literal[
     "examples",
     "explorers",
     "external",
+    "multidim",
 ]
 
 # all pandas nullable dtypes
@@ -67,7 +69,7 @@ class Dataset:
     path: str
     metadata: "DatasetMeta"
 
-    def __init__(self, path: Union[str, Path]) -> None:
+    def __init__(self, path: str | Path) -> None:
         # for convenience, accept Path objects directly
         if isinstance(path, Path):
             self.path = path.as_posix()
@@ -82,7 +84,7 @@ class Dataset:
         return self.metadata
 
     @classmethod
-    def create_empty(cls, path: Union[str, Path], metadata: Optional["DatasetMeta"] = None) -> "Dataset":
+    def create_empty(cls, path: str | Path, metadata: DatasetMeta | None = None) -> Dataset:
         path = Path(path)
 
         if path.is_dir():
@@ -102,7 +104,7 @@ class Dataset:
     def add(
         self,
         table: tables.Table,
-        formats: List[FileFormat] = DEFAULT_FORMATS,
+        formats: list[FileFormat] = DEFAULT_FORMATS,
         repack: bool = True,
     ) -> None:
         """
@@ -157,10 +159,11 @@ class Dataset:
 
     def read(
         self,
-        name: str,
+        name: str | None = None,
         reset_index: bool = True,
         safe_types: bool = True,
         reset_metadata: Literal["keep", "keep_origins", "reset"] = "keep",
+        load_data: bool = True,
     ) -> tables.Table:
         """Read dataset's table from disk. Alternative to ds[table_name], but
         with more options to optimize the reading.
@@ -173,15 +176,22 @@ class Dataset:
             - "keep": Leave metadata unchanged (default).
             - "keep_origins": Reset variable metadata but retain the 'origins' attribute.
             - "reset": Reset all variable metadata.
+        :param load_data: If false, only load metadata and not the actual data. This can be useful
+            when you only need to read metadata from a large dataset.
         """
+        if name is None:
+            if len(self.table_names) == 1:
+                name = self.table_names[0]
+            else:
+                raise ValueError("Multiple tables exist. Please specify the table name.")
         stem = self.path / Path(name)
 
         for format in SUPPORTED_FORMATS:
             path = stem.with_suffix(f".{format}")
             if path.exists():
-                t = tables.Table.read(path, primary_key=[] if reset_index else None)
+                t = tables.Table.read(path, primary_key=[] if reset_index else None, load_data=load_data)
                 t.metadata.dataset = self.metadata
-                if safe_types:
+                if safe_types and load_data:
                     t = cast(tables.Table, to_safe_types(t))
                 if reset_metadata in ["keep_origins", "reset"]:  # Handles "keep_origins" and "reset"
                     t.metadata = TableMeta()
@@ -227,7 +237,7 @@ class Dataset:
             # NOTE: don't load the table here, that could be slow. Just update the metadata file.
             table_meta_path = Path(self.path) / f"{table_name}.meta.json"
 
-            with open(table_meta_path, "r") as f:
+            with open(table_meta_path) as f:
                 table_meta = json.load(f)
                 table_meta["dataset"] = self.metadata.to_dict()
 
@@ -237,7 +247,7 @@ class Dataset:
     def update_metadata(
         self,
         metadata_path: Path,
-        yaml_params: Optional[Dict[str, Any]] = None,
+        yaml_params: dict[str, Any] | None = None,
         if_source_exists: SOURCE_EXISTS_OPTIONS = "replace",
         if_origins_exist: SOURCE_EXISTS_OPTIONS = "replace",
         errors: Literal["ignore", "warn", "raise"] = "raise",
@@ -335,7 +345,7 @@ class Dataset:
             yield self[name]
 
     @property
-    def _data_files(self) -> List[str]:
+    def _data_files(self) -> list[str]:
         files = []
         for format in SUPPORTED_FORMATS:
             pattern = join(self.path, f"*.{format}")
@@ -344,11 +354,11 @@ class Dataset:
         return sorted(files)
 
     @property
-    def table_names(self) -> List[str]:
-        return sorted(set(Path(f).stem for f in self._data_files))
+    def table_names(self) -> list[str]:
+        return sorted({Path(f).stem for f in self._data_files})
 
     @property
-    def _metadata_files(self) -> List[str]:
+    def _metadata_files(self) -> list[str]:
         return sorted(glob(join(self.path, "*.meta.json")))
 
     def checksum(self) -> str:
@@ -372,7 +382,7 @@ for k in DatasetMeta.__dataclass_fields__:
     setattr(Dataset, k, metadata_property(k))
 
 
-def checksum_file(filename: str) -> HASH:
+def checksum_file(filename: str) -> Any:
     "Return the MD5 checksum of a given file."
     chunk_size = 2**20  # 1MB
     checksum = hashlib.md5()

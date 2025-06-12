@@ -1,0 +1,26 @@
+title:
+  title: Causes of death
+  title_variant: by cause and age group
+default_selection:
+  - World
+  - Europe
+  - Asia
+dimensions:
+  - name: Cause of death
+    slug: cause
+    choices:
+      - description: See all causes side by side
+        name: Side-by-side comparison of causes
+        slug: Side-by-side comparison of causes
+      - description: Aggregate of all causes
+        name: All causes
+        slug: All causes
+      # Additional causes will be added programmatically.
+  - name: Age group
+    slug: age
+    # Choices will be added programmatically.
+  - name: Metric
+    slug: metric
+    # Choices will be added programmatically.
+
+views: []

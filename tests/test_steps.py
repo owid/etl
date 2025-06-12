@@ -10,11 +10,13 @@ import json
 import random
 import shutil
 import string
+import sys
 from contextlib import contextmanager
 from typing import Iterator
 from unittest.mock import patch
 
 import pandas as pd
+import pytest
 import requests
 from owid.catalog import Dataset
 
@@ -27,6 +29,7 @@ from etl.steps import (
     compile_steps,
     filter_to_subgraph,
     get_etag,
+    isolated_env,
     select_dirty_steps,
     to_dependency_order,
 )
@@ -190,3 +193,20 @@ def test_SnapshotStep_checksum_output(tmp_path):
             json.dump(meta, f)
 
         assert step.checksum_output() == "a43b0c67d958884a0bc6487dcf5f4bca"
+
+
+def test_isolated_env(tmp_path):
+    (tmp_path / "shared.py").write_text("A = 1; import test_abc")
+    (tmp_path / "test_abc.py").write_text("B = 1")
+
+    with isolated_env(tmp_path):
+        import shared  # type: ignore
+
+        assert shared.A == 1
+        assert shared.test_abc.B == 1
+        assert "test_abc" in sys.modules.keys()
+
+    with pytest.raises(ModuleNotFoundError):
+        import shared  # type: ignore
+
+    assert "test_abc" not in sys.modules.keys()

@@ -1,5 +1,15 @@
 tables:
   wgm_2018:
+    dimensions:
+      - name: Question
+        slug: question
+      - name: Age group
+        slug: age_group
+      - name: Answer
+        slug: answer
+      - name: Gender
+        slug: gender
+
     variables:
       share:
         title: "Share"

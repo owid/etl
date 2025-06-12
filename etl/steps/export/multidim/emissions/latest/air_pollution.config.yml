@@ -1,0 +1,12 @@
+title:
+  title: Air Pollution
+  title_variant: by sector
+default_selection:
+  - World
+  - United States
+  - United Kingdom
+  - China
+  - India
+# Both will be filled programmatically.
+dimensions: []
+views: []

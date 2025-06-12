@@ -104,6 +104,12 @@ tables:
         unit: |-
           {definitions.unit_of_measure.unit}
         short_unit: <% if 'rate' in indicator | default('') %>%<% else %><%- endif -%>
+        description_key:
+          - |-
+            <% if indicator == "Stillbirth rate" %>
+            - **Definition threshold varies**: A stillbirth generally refers to the birth of a baby showing no signs of life after a certain number of weeks of gestation, with the [ICD-11](https://icd.who.int/en) setting the cutoff at 22 weeks.
+            - **Subcategories exist**: ICD-11 distinguishes between “early gestation stillbirth” (22–27 weeks) and “late gestation stillbirth” (28+ weeks).
+            <% endif %>
         display:
           name: |-
             {definitions.indicator.display_name}

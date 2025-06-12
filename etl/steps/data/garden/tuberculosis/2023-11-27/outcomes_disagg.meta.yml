@@ -16,6 +16,7 @@ definitions:
     new and relapse drug-susceptible tuberculosis treatment
 dataset:
   update_period_days: 365
+  title: Global Tuberculosis Report - Treatment Outcomes (Disaggregated)
 tables:
   outcomes_disagg:
     variables:

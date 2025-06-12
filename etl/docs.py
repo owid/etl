@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
-from etl.helpers import read_json_schema
+from etl.files import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
 SNAPSHOT_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "snapshot-schema.json")

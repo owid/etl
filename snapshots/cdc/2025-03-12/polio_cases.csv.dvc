@@ -1,0 +1,73 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical polio cases in the United States - Centers for Disease Control and Prevention
+    description: |-
+      Data on historical polio cases in the United States, compiled from a selection of sources from the US CDC.
+
+      Sources for each year are as follows:
+
+      * 1950-1960: [Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.](https://www.globalhealthchronicles.org/items/show/6303)
+
+      * 1961-1993: [Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993](https://www.cdc.gov/mmwr/preview/mmwrhtml/00035381.htm)
+
+      * 1994-2001: [PART 3: Historical Summaries of Notifiable Diseases in the United States, 1969–2000; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2000](https://www.jstor.org/stable/23310295?seq=2)
+
+      * 2002: [Summary of Notifiable Diseases --- United States, 2002](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5153a1.htm)
+
+      * 2003: [Summary of Notifiable Diseases --- United States, 2003](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5254a1.htm)
+
+      * 2004: [Summary of Notifiable Diseases --- United States, 2004](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5353a1.htm)
+
+      * 2005: [Summary of Notifiable Diseases --- United States, 2005](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5453a1.htm)
+
+      * 2006: [Summary of Notifiable Diseases --- United States, 2006](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5553a1.htm)
+
+      * 2007: [Summary of Notifiable Diseases --- United States, 2007](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5653a1.htm)
+
+      * 2008: [Summary of Notifiable Diseases --- United States, 2008](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5754a1.htm)
+
+      * 2009: [Summary of Notifiable Diseases --- United States, 2009](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5853a1.htm)
+
+      * 2010: [Summary of Notifiable Diseases --- United States, 2010](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm5953a1.htm)
+
+      * 2011: [Summary of Notifiable Diseases --- United States, 2011](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6053a1.htm)
+
+      * 2012: [Summary of Notifiable Diseases --- United States, 2012](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6153a1.htm)
+
+      * 2013: [Summary of Notifiable Diseases --- United States, 2013](https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6253a1.htm)
+
+      * 2014: [Summary of Notifiable Diseases --- United States, 2014](https://www.cdc.gov/mmwr/volumes/63/wr/mm6354a1.htm)
+
+      * 2015: [Summary of Notifiable Diseases --- United States, 2015](https://www.cdc.gov/mmwr/volumes/64/wr/mm6453a1.htm)
+
+      * 2016-2022: [National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC)](https://wonder.cdc.gov/nndss-annual-summary.html)
+
+    date_published: "2023"
+
+    # Citation
+    producer: Centers for Disease Control and Prevention
+    citation_full: |-
+      Morbidity and Mortality Weekly Report Annual Supplement Summary 1993 Vol. 9, No. 53 by the Communicable Disease Center, Public Health Service, U.S. Department of Health Education and Welfare.
+
+      Morbidity and Mortality Weekly Report Summary of Notifiable Diseases, United States, 1993
+
+      Historical Summaries of Notifiable Diseases in the United States, 1969–2000; Morbidity and Mortality Weekly Report, Vol. 49, No. 53, Summary of Notifiable Diseases — United States, 2000
+
+      Summary of Notifiable Diseases --- United States, 2002-2015
+
+      National Notifiable Diseases Surveillance System (NNDSS) - Centers for Disease Control and Prevention (CDC)
+
+    # Files
+    url_main: https://wonder.cdc.gov/nndss-annual-summary.html
+    date_accessed: 2025-03-12
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 7d3e3d9d18f77f8ba3c8d991bb0b5c1a
+    size: 5290
+    path: polio_cases.csv

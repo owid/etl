@@ -1,4 +1,5 @@
 #
+
 dataset:
   update_period_days: 365
 tables:
@@ -1690,6 +1691,8 @@ tables:
         unit: 1=low to 6=high
       iq_spi_ovrl:
         title: 'Statistical performance indicators (SPI): Overall score (scale 0-100)'
+        display:
+          numDecimalPlaces: 1
       iq_spi_pil1:
         title: 'Statistical performance indicators (SPI): Pillar 1 data use score (scale 0-100)'
       iq_spi_pil2:
@@ -5300,3 +5303,23 @@ tables:
         title: Carbon intensity of GDP (kg CO2e per constant 2021 US$ of GDP)
       en_ghg_fgas_ip_mt_ce_ar5:
         title: Fluorinated greenhouse gases (F-gases) emissions from Industrial Processes (Mt CO2e)
+      eg_elc_accs_zs_without:
+       title:  Access to electricity (% of population with no access)
+      eg_cft_accs_zs_without:
+        title: Access to clean fuels and technologies for cooking (% of population with no access)
+      eg_elc_accs_zs_number:
+       title: Access to electricity (number of people with access)
+      eg_elc_accs_zs_without_number:
+       title: Access to electricity (number of people with no access)
+      eg_cft_accs_zs_number:
+       title: Access to clean fuels and technologies for cooking (number with access)
+      eg_cft_accs_zs_without_number:
+       title: Access to clean fuels and technologies for cooking (number with no access)
+      patents_per_million_people:
+        title: Patents granted per million people
+        unit: patents per million people
+      articles_per_million_people:
+        title: Scientific and technical journal articles per million people
+        unit: articles per million people
+
+

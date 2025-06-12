@@ -1,42 +1,60 @@
-from etl import multidim
-from etl.db import get_engine
 from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Default config for GOOGLE MOBILITY
+MOBILITY_CONFIG_DEFAULT = {
+    "subtitle": "This data shows how community movement in specific locations has changed relative to the period before the pandemic.",
+    "note": "It's not recommended to compare levels across countries; local differences in categories could be misleading.",
+    "originUrl": "ourworldindata.org/coronavirus",
+    "minTime": "earliest",
+    "maxTime": "latest",
+    "hideAnnotationFieldsInTitle": {"time": True},
+    "addCountryMode": "change-country",
+}
 
-def run(dest_dir: str) -> None:
-    engine = get_engine()
 
+def run() -> None:
+    # PART 1: Collections entirely from YAML files (no programmatic config extracted from table)
     filenames = [
         "covid.cases.yml",
         "covid.deaths.yml",
         "covid.hospital.yml",
-        "covid.boosters.yml",
-        "covid.vax_breakdowns.yml",
+        "covid.vax.yml",
         "covid.xm.yml",
-        "covid.cases_tests.yml",
         "covid.covax.yml",
         "covid.models.yml",
         "covid.xm_models.yml",
+        "covid.cases_tests.yml",
+        # "covid.vax_breakdowns.yml",
     ]
-    # Load YAML file
+
     for fname in filenames:
-        config = paths.load_mdim_config(fname)
-        slug = fname_to_slug(fname)
-        multidim.upsert_multidim_data_page(slug, config, engine)
+        ## Load config
+        paths.log.info(fname)
+        config = paths.load_collection_config(fname)
 
-    # Automatic ones (they have dimensions in the tables)
+        ## Create and save collection
+        c = paths.create_collection(config=config, short_name=fname_to_short_name(fname))
+        c.save()
+
+    # PART 2: Collection hybridly generated (YAML file + programmatic config)
+    ## Load data
+    ds = paths.load_dataset("google_mobility")
+    tb = ds.read("google_mobility", load_data=False)
+
+    ## Create and save collection
     fname = "covid.mobility.yml"
-    config = paths.load_mdim_config(fname)
-    slug = fname_to_slug(fname)
-    table = "grapher/covid/latest/google_mobility/google_mobility"
-    config["views"] += multidim.expand_views(config, {"place": "*"}, table, engine)  # type: ignore
-    multidim.upsert_multidim_data_page(slug, config, engine)
+    c = paths.create_collection(
+        config=paths.load_collection_config("covid.mobility.yml"),
+        short_name=fname_to_short_name("covid.mobility.yml"),
+        tb=tb,
+        common_view_config=MOBILITY_CONFIG_DEFAULT,
+    )
+    c.save()
 
-    print(1)
 
-
-def fname_to_slug(fname: str) -> str:
-    return f"mdd-{fname.replace('.yml', '').replace('.', '-').replace('_', '-')}"
+def fname_to_short_name(fname: str) -> str:
+    """Custom MDIM name generator."""
+    return f"{fname.replace('.yml', '').replace('.', '_')}"

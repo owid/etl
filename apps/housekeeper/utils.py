@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from typing import List
 
 from sqlalchemy.orm import Session
@@ -9,7 +9,7 @@ from etl.db import read_sql
 from etl.grapher import model as gm
 
 # System prompt to summarize chart information
-MODEL = "gpt-4o"
+MODEL = "gpt-4.1"
 SYSTEM_PROMPT = f"""We are reviewing a chart that was created some time ago. We want to understand if we can remove it from the site, in order to reduce the amount of charts that we have (and hence helping with the maintenance). Your job is to briefly summarize what the chart is about, and to provide some context about the variables used in the chart. You can also check the chart's history to see if it has been edited recently, and the number of views in the last year that it gets (consider that the median of the chart views in last year is ~1300 views; i.e. half of the charts get less than 1300 views).
 
 In your response, consider today's date {date.today().strftime("%Y-%m-%d")}, and provide three blocks:
@@ -37,10 +37,20 @@ This chart has been mostly edited by 'Max Roser' and 'Esteban Ortiz-Ospina'. The
 ...
 """
 
+# Today and one year ago
+TODAY = datetime.today()
+YEAR_AGO = TODAY.replace(year=TODAY.year - 1)
+
 
 def get_reviews_id(object_type: str):
     with Session(OWID_ENV.engine) as session:
         return gm.HousekeeperReview.load_reviews_object_id(session, object_type=object_type)
+
+
+def get_charts_with_slug_rename_last_year():
+    query = f"""SELECT chart_id FROM chart_slug_redirects WHERE createdAt >= '{YEAR_AGO.strftime('%Y-%m-%d')}'"""
+    df = OWID_ENV.read_sql(query)
+    return df["chart_id"].tolist()
 
 
 def add_reviews(object_type: str, object_id: int):

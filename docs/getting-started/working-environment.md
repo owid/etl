@@ -24,7 +24,7 @@ You will need Python 3.10+, basic build tools, and MySQL client libraries.
     xcode-select --install
     ```
 
-    Then install Python 3.9+ and MySQL client and [UV](https://docs.astral.sh/uv/). UV is our preferred python packaging and dependency management tool.
+    Then install Python 3.10+ and MySQL client and [UV](https://docs.astral.sh/uv/). UV is our preferred python packaging and dependency management tool.
 
     ```bash
     brew install python mysql-client uv pkg-config
@@ -160,19 +160,19 @@ Verify that pyenv is installed properly:
 pyenv --version
 ```
 
-Now, you can use pyenv to install and manage multiple Python versions on your Mac. For example, to install Python 3.11.3, run:
+Now, you can use pyenv to install and manage multiple Python versions on your Mac. For example, to install Python 3.12.0, run:
 
 ```
-pyenv install 3.11.3
+pyenv install 3.12.0
 ```
 
 To set the newly installed Python version as the global default, run:
 
 ```
-pyenv global 3.11.3
+pyenv global 3.12.0
 ```
 
-Now check that `which python3` prints path `.../.pyenv/shims/python3` and `python --version` prints `Python 3.11.3`.
+Now check that `which python3` prints path `.../.pyenv/shims/python3` and `python --version` prints `Python 3.12.0`.
 
 
 ## Clone the project
@@ -182,7 +182,7 @@ First of all, you need to have the [ETL project](https://github.com/owid/etl) in
 git clone https://github.com/owid/etl.git
 ```
 
-Along with various directories and files, the project also has sub-packages in the `lib/` folder: `catalog`, `walden` (deprecated), `repack` and `datautils`. These redistributable in-house libraries simplify access to data.
+Along with various directories and files, the project also has sub-packages in the `lib/` folder: `catalog`, `repack` and `datautils`. These redistributable in-house libraries simplify access to data.
 
 ## Check your environment
 

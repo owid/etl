@@ -1,0 +1,1986 @@
+definitions:
+  art_description: |-
+    Antiretroviral therapy (ART) has proven effective in lowering HIV-related illness and death rates among people living with HIV, as well as preventing the virus's transmission. Research indicates that starting treatment early, irrespective of an individual's CD4 cell count, maximizes benefits and saves lives. The World Health Organization (WHO) now advises ART for everyone diagnosed with HIV.
+
+  people_dimension: |-
+    <<sex+' ' if sex != 'total' else ''>>people<<' aged ' + age if age != 'total' else ''>>
+  people_term: |-
+    <% if age == 'total' %>
+    People
+    <%- elif age == '0-14' %>
+    Children
+    <%- else %>
+    Adults
+    <%- endif %>
+  people_term_lower: |-
+    <% if age == 'total' %>
+    people
+    <%- elif age == '0-14' %>
+    children
+    <%- else %>
+    adults
+    <%- endif %>
+
+  gam_groups:
+    msm: "men<<' aged ' + age if age != 'total'>> who have sex with men"
+    pwid: "<<sex + 's' if sex != 'total' else 'people'>> who inject drugs<<' aged ' + age if age != 'total'>>"
+    sw: "<<sex + ' ' if sex != 'total'>>sex workers<<' aged ' + age if age != 'total'>>"
+    trans: |-
+      <<group>><<" people" if group == "transgender">><<" aged " + age if age != "total">>
+    other: <<sex + ' ' if sex not in ['total', 'other']>><<group>><<" aged " + age if age != "total">>
+    variable: |-
+      <% if group == "men who have sex with men" %>
+      {definitions.gam_groups.msm}
+      <%- elif group == "people who inject drugs" %>
+      {definitions.gam_groups.pwid}
+      <%- elif group == "sex workers" %>
+      {definitions.gam_groups.sw}
+      <%- elif group == "transgender" %>
+      {definitions.gam_groups.trans}
+      <%- else %>
+      {definitions.gam_groups.other}
+      <%- endif %>
+
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - HIV/AIDS
+
+tables:
+  epi:
+    common:
+      presentation:
+        title_variant: |-
+          <<sex+'s, ' if sex != 'total'>><<"aged " + age + ", " if age != "total">><<estimate.lower()>> estimate
+        grapher_config:
+          hasMapTab: true
+          tab: map
+    variables:
+      #
+      # DEATHS
+      #
+      aids_deaths:
+        title: "AIDS-related deaths - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: deaths
+        description_short: |-
+          <% if (sex == 'total') and (age == 'total') %>
+          Total number of people dying from AIDS-related causes, <<estimate>> estimate.
+          <%- else %>
+          Number of <<sex+' ' if sex != 'total' else ''>>people <<'aged ' + age + ' ' if age != 'total' else ''>>dying from AIDS-related causes, <<estimate>> estimate.
+          <%- endif %>
+        description_from_producer: |-
+          The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum. Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
+
+          The source of the estimate is requested. Countries providing the number of people dying from AIDS-related causes derived from a source other than Spectrum should provide any accompanying estimates of uncertainty around this number and upload an electronic copy of the report describing how the number was calculated.
+
+          Countries should preferably report a modelled estimate rather than one derived from their vital registration system unless this system has been recently evaluated as one of high quality. Users can now opt to use their Spectrum estimate or enter nationally representative population-level data. If Spectrum estimates are chosen, the values will be pulled directly from the software once the national file is finalized.
+        description_key:
+          - AIDS-related deaths are estimated using multiple methods, including vital registration systems, surveys with verbal autopsies, and mathematical modeling tools like Spectrum.
+          - Mathematical models integrate various data sources, such as demographic data, HIV prevalence, antiretroviral therapy coverage, and survival assumptions, sometimes incorporating adjustments for misreporting.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "AIDS-related deaths"
+
+      aids_mortality_1000_pop:
+        title: "AIDS mortality - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "deaths per 100,000 people"
+        description_short: |-
+          Total number of <<sex+' ' if sex != 'total' else ''>>people <<'aged ' + age + ' ' if age != 'total' else ''>>who have died from AIDS-related causes, per 100 000 people. This is the <<estimate.lower() >> estimate.
+        description_from_producer: |-
+          The number of people dying from AIDS-related causes can be obtained using a variety of measures, including through a vital registration system adjusted for misreporting, as part of a facility- or population-based survey that may include verbal autopsy and through mathematical modelling using such tools as Spectrum. Modelling tools typically use demographic data, HIV prevalence from survey and surveillance, the number of people receiving antiretroviral therapy, HIV incidence and assumptions around survival patterns to estimate the number of people dying. In some instances, data from vital reporting systems and estimates of underreporting and misclassification also may be incorporated into these models to derive estimates of the number of AIDS-related deaths.
+
+          More details:
+          - Consolidated guidelines on person-centred HIV strategic information: strengthening routine data for impact. Geneva: World Health Organization; 2022 (https://web.archive.org/web/20250201130605/https://www.who.int/publications/i/item/9789240055315)
+          - Spectrum software. Glastonbury (CT): Avenir Health; 2024 (http://www.avenirhealth.org/software-spectrum.php).
+        presentation:
+          title_public: "AIDS mortality per 100,000 people"
+
+      aids_orphans:
+        title: "Children (0-17) orphaned due to AIDS deaths - <<estimate.title()>> estimate"
+        unit: "children"
+        description_short: |-
+          Number of children, aged 17 and under, who have been orphaned by the death of one or both parents from AIDS at any point in their lives. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - |-
+            An orphan is defined as a child under 18 years old who has lost at least one parent:
+              - A child who has lost their mother is called a maternal orphan, while a child who has lost their father is referred to as a paternal orphan.
+              - A child who has lost both parents is known as a double orphan.
+          - "**Scale of the crisis:** Sub-Saharan Africa faces the gravest orphan crisis, with an estimate of 10 million children (0-17) losing one or both parents due to AIDS by 2023."
+          - "**Vulnerability and impact:** Orphaned children often experience extreme poverty, disruption in schooling, and psychosocial distress, exposing them to heightened risks of exploitation and abuse."
+          - "**Preferred family-based care:** Emphasis is placed on keeping these children within a family environment—often headed by surviving parents, grandparents, or relatives—rather than resorting to institutional orphanages."
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "Children orphaned due to AIDS"
+
+      deaths_plhiv_all_causes:
+        title: "Deaths among people living with HIV (all causes) - <<estimate.title()>> estimate"
+        unit: "deaths"
+        description_short: |-
+          Deaths occurring among individuals diagnosed with HIV, regardless of the direct cause. It encompasses all-cause mortality within the HIV-positive population, providing a comprehensive view of the mortality burden in this group. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - Reflects the overall mortality burden within the HIV-positive population.
+          - Includes deaths from all causes, not limited to AIDS-related illnesses.
+          - Helps in assessing the effectiveness of comprehensive care and treatment programs for people living with HIV.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "Deaths among people living with HIV"
+
+      #
+      # ART
+      #
+      ## Pregnancy (full), no ART
+      art_none_preg_child_inf_preg:
+        title: "Number of children infected with HIV during pregnancy, when mother did not receive ART during pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother did not receive ART during pregnancy
+
+      ## Pregnancy (full), dropped ART
+      art_drop_preg_child_inf:
+        title: Number of children infected with HIV during pregnancy, when mother dropped off ART during pregnancy
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother dropped off ART during pregnancy
+
+      ## Pregnancy (full), ART late
+      art_start_late_preg_child_inf_preg:
+        title: "Number of children infected with HIV during pregnancy, when mother started ART late in pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother started ART late in pregnancy
+
+      ## Pregnancy (full), ART during
+      art_start_child_inf_during_preg:
+        title: "Number of children infected with HIV during pregnancy, when mother started ART during in pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother started ART during in pregnancy
+
+      ## Pregnancy (full), ART before
+      art_start_before_preg_child_inf_preg:
+        title: "Number of children infected with HIV during pregnancy, when mother started ART before the pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy
+          title_variant: Mother started ART before the pregnancy
+
+      ## Pregnancy (full), both infected
+      mother_child_inf_preg:
+        title: Number of children infected with HIV during pregnancy, along with their mothers
+        unit: "infections"
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during pregnancy, along with their mothers
+          title_variant: ""
+
+      ## Breastfeeding (full), no ART
+      art_none_bf:
+        title: "Number of children infected with HIV during breastfeeding, when mother did not receive ART during breastfeeding"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother did not receive ART during breastfeeding
+
+      ## Breastfeeding (full), dropped ART
+      art_drop_bf_child_inf:
+        title: Number of children infected with HIV during breastfeeding, when mother dropped off ART during breastfeeding
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother dropped off ART during breastfeeding
+
+      ## Breastfeeding, ART late
+      art_start_late_preg_child_inf_bf:
+        title: "Number of children infected with HIV during breastfeeding, when mother started ART late in pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother started ART late in pregnancy
+
+      ## Breastfeeding, ART during
+      art_start_during_preg_child_inf_bf:
+        title: "Number of children infected with HIV during breastfeeding, when mother started ART during in pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother started ART during in pregnancy
+
+      ## Breastfeeding, ART before
+      art_start_before_preg_child_inf_bf:
+        title: "Number of children infected with HIV during breastfeeding, when mother started ART before the pregnancy"
+        unit: "children"
+        description_short: ""
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding
+          title_variant: Mother started ART before the pregnancy
+
+      ## Breastfeeding (full), both
+      mother_child_inf_bf:
+        title: Number of children infected with HIV during breastfeeding, along with their mothers
+        unit: "infections"
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Number of children infected with HIV during breastfeeding, along with their mothers
+          title_variant: ""
+
+      ## Others
+      deaths_averted_art:
+        title: "Deaths averted due to antiretroviral therapy - <<estimate.title()>> estimate"
+        unit: deaths
+        description_short: |-
+          The number of deaths prevented as a direct result of Antiretroviral Therapy (ART) among people living with HIV. It is calculated by comparing the observed mortality rates in individuals receiving ART to the estimated mortality rates in the absence of such treatment. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - "{definitions.art_description}"
+          - Antiretroviral therapy (ART) has significantly reduced the number of AIDS-related deaths since its introduction in 1996.
+          - By suppressing HIV replication, ART improves the health and longevity of people living with HIV, thereby preventing deaths that would have occurred in its absence.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "Lives saved due to ART"
+
+      people_receiving_art:
+        title: "People living with HIV receiving ART - Age: <<age>> - Sex: <<sex>>"
+        unit: "people"
+        description_short: |-
+          Number of {definitions.people_dimension} living with HIV on antiretroviral therapy. This is the <<estimate.lower() >> estimate.
+        description_from_producer: |-
+          The number of adults and children who are on antiretroviral therapy at the end of the reporting period. It should include people on antiretroviral therapy in the private sector (if these data are available). The count should include pregnant women living with HIV who are receiving lifelong antiretroviral therapy.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-living-hiv-antiretroviral-therapy
+        display:
+          numDecimalPlaces: 0
+        description_key:
+          - "{definitions.art_description}"
+
+        presentation:
+          title_public: "{definitions.people_term} living with HIV receiving antiretroviral therapy"
+
+      percent_plwh:
+        title: "Share of people living with HIV receiving ART - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          Percentage of individuals diagnosed with HIV who are currently receiving antiretroviral therapy. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: "Coverage of {definitions.people_term_lower} living with HIV receiving ART"
+
+      #
+      # PMTCT / MTCT
+      #
+      infections_averted_pmtct:
+        title: "New HIV Infections averted due to PMTCT - <<estimate.title()>> estimate"
+        unit: "infections"
+        description_short: |-
+          New HIV infections among children (aged 0-14 years) prevented through the implementation of Prevention of Mother-to-Child Transmission (PMTCT) programs. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - PMTCT programs include the provision of antiretroviral therapy to pregnant and breastfeeding women living with HIV, which significantly reduces the risk of HIV transmission to their infants.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "Infections averted due to PMTCT"
+          title_variant: ""
+
+      mothers_needing_arv_for_pmtct:
+        title: "Pregnant women needing ARV for preventing MTCT - <<estimate.title()>> estimate"
+        unit: "women"
+        description_short: |-
+          Number of HIV-positive pregnant women who require antiretroviral (ARV) treatments to prevent mother-to-child transmission (MTCT) of HIV during pregnancy, childbirth, and breastfeeding.
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Pregnant women needing ARV for preventing mother-to-child transmission of HIV
+          title_variant: ""
+
+      mothers_receiving_arv_for_pmtct:
+        title: "Pregnant women who received ARV for preventing MTCT"
+        unit: "women"
+        description_short: |-
+          Number of HIV-positive pregnant women who delivered and received antiretroviral (ARV) treatments to reduce the risk of mother-to-child transmission during pregnancy, childbirth, and breastfeeding.
+        description_from_producer: |-
+          The source of this information is national program records aggregated from program monitoring tools, such as patient registers and summary reporting forms. The numerator can be generated by counting the number of HIV-positive pregnant women who received antiretrovirals to reduce MTCT in the reporting period, by regimen.
+        description_key:
+          - "{definitions.art_description}"
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Pregnant women who received ARV for preventing mother-to-child transmission of HIV
+          title_variant: ""
+
+      coverage_mothers_receiving_arv:
+        title: "Coverage of pregnant women who receive ARV for preventing MTCT - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          Share of pregnant women who received antiretroviral for preventing mother-to-child transmission. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - "{definitions.art_description}"
+        presentation:
+          title_public: "Women (%) receiving ARV for preventing mother-to-child transmission"
+
+      mtct_rate:
+        title: "Mother-to-child HIV transmission rate - <<estimate.title()>> estimate"
+        unit: "infected children per 1,000 children"
+        description_short: |-
+          The number of children born to HIV-positive mothers who acquire HIV during pregnancy, labor, delivery, or breastfeeding, per 1,000 children. This is the <<estimate.lower() >> estimate.
+        description_from_producer: |-
+          The mother-to-child transmission probability differs with the antiretroviral drug regimen received and infant-feeding practices. The transmission can be calculated by using the Spectrum model.
+
+          The Spectrum computer programme uses the information on:
+
+          a. the distribution of HIV-positive pregnant women receiving different antiretroviral regimens prior to and during delivery (peripartum) by CD4 category of the mother
+          b. the distribution of women and children receiving antiretrovirals after delivery (postpartum) by CD4 category of the mother.
+          c. the percent of infants who are not breastfeeding in PMTCT programmes by age of the child
+          d. mother-to-child transmission of HIV probabilities based on various categories of antiretroviral drug regimen and infant feeding practices
+
+          The estimated national transmission rate is reported in the PMTCT summary display in Spectrum. This variable can also be calculated using the variables in Spectrum on “New HIV infections” for children 0-14 years and dividing this by the variable “Women in need of PMTCT”
+
+          There is not enough information available about other HIV transmission routes for children to include such infections in the model. In addition other modes of transmission are believed to be a small fraction of the overall infections among children. The Spectrum output variable “New HIV infections for children 0-1 years” is not used because some infections due to breastfeeding will take place after age 1 year
+        presentation:
+          title_public: "Mother-to-child HIV transmission rate"
+          title_variant: ""
+
+      #
+      # CHILDREN
+      #
+      children_exposed_uninfected:
+        title: "HIV-exposed children (0-14) who are uninfected - <<estimate.title()>> estimate"
+        unit: "children"
+        description_short: |-
+          Number of children, aged 14 and under, who have been exposed to HIV but haven't been infected. This is the <<estimate.lower() >> estimate.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "HIV-exposed children who are uninfected"
+
+      #
+      # HIV infections
+      #
+      hiv_incidence:
+        title: "HIV Incidence per 1,000 population - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "infections per 1,000 people"
+        description_short: |-
+          Number of {definitions.people_dimension} newly infected with HIV in the last year per 1,000 uninfected people. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - HIV incidence measures progress towards ending the AIDS epidemic and is a crucial metric in the [WHO 2022 Consolidated guidelines](https://web.archive.org/web/20250201130605/https://www.who.int/publications/i/item/9789240055315) on person-centered HIV strategic information.
+          - According to the WHO 2022 Consolidated guidelines, the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
+        description_from_producer: |-
+          Method of measurement:
+          Methods for monitoring incidence can vary depending on the epidemic setting and are typically categorized either as direct or indirect measures. Direct measurement at a population level is preferred but can often be difficult to obtain. As a result, most if not all countries rely on indirect measures or triangulate direct and indirect methods.
+
+          Strategies for directly measuring HIV incidence include longitudinal follow-up and repeat testing among individuals who do not have HIV infection and estimation using a laboratory test for recent HIV infection and clinical data in the population. Longitudinal monitoring is often costly and difficult to perform at a population level. Laboratory testing of individuals to determine the recency of infection also raises cost and complexity challenges since a nationally representative population-based survey is typically required to obtain estimates.
+
+          Indirect methods most frequently rely on estimates constructed from mathematical modelling tools, such as Spectrum or the AIDS Epidemic Model. These models may incorporate geographical and population-specific HIV surveys, surveillance, case reporting, mortality, programme and clinical data and, in some instances, assumptions about risk behavior and HIV transmission. In some instances, countries may wish to triangulate these data with other sources of estimates of the number of people newly infected, including from serial population-based HIV prevalence estimates or estimates of HIV prevalence in young, recently exposed populations.
+
+          Note that case-based surveillance systems capturing newly reported people acquiring HIV infection should not be used as a direct source of estimating the number of people newly infected with HIV in the reporting year. Because of reporting delays and under-diagnosis, newly reported cases may not reflect the actual rate of people becoming newly infected. This information may be useful, however, for triangulation or validation purposes, especially when combined with tests for the recency of HIV infection.
+
+          Disaggregated data reported for the numerator should be used to monitor progress towards eliminating new child infections and reducing the number of new HIV infections among adolescent girls and young women to below 100,000 per year.
+
+        presentation:
+          title_public: "New infections of HIV per 1,000 people"
+
+      hiv_prevalence:
+        title: "HIV prevalence - Sex: <<sex>> - Age: <<age>> - <<estimate.title()>> estimate"
+        unit: "%"
+        short_unit: "%"
+        description_short: |-
+          Share of {definitions.people_dimension} who test positive for HIV at a given time. This is the << estimate >> estimate.
+        description_key:
+          - Known as "HIV prevalence", it is estimated by dividing the number of people in a given group who tested positive for HIV by all the people that were tested.
+        presentation:
+          title_public: "Share of the population living with HIV"
+
+      new_infections:
+        title: "New HIV Infections - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "infections"
+        description_short: |-
+          The number of {definitions.people_dimension} newly infected with HIV in the last 12 months. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - Also known as "HIV incidence", help health organizations assess whether prevention efforts are successfully reducing HIV transmission rates or if emerging challenges are creating new infection pathways.
+          - According to the [WHO 2022 Consolidated guidelines](https://web.archive.org/web/20250201130605/https://www.who.int/publications/i/item/9789240055315), the main goal of the global AIDS response is to reduce new HIV infections to below 200,000 by 2030. Monitoring the rate of new infections over time is essential to assess progress towards this target.
+        display:
+          numDecimalPlaces: 0
+          numSignificantFigures: 3
+          roundingMode: "significantFigures"
+        presentation:
+          title_public: "New HIV infections"
+
+      plwh:
+        title: "People living with HIV - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "people"
+        description_short: |-
+          Number of {definitions.people_dimension} living with HIV at the end of the reporting period. This is the <<estimate.lower() >> estimate.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: People living with HIV
+
+      #
+      # HIV incidence-to-X ratios
+      #
+      imr:
+        title: "HIV incidence-to-mortality ratio - <<estimate.title()>> estimate"
+        unit: ""
+        description_short: |-
+          The ratio of new HIV infections to AIDS-related deaths within a specific time frame. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - An Incidence-to-Mortality Ratio (IMR) below 1.0 indicates that the number of new HIV infections is less than the number of deaths among people living with HIV, suggesting a declining epidemic.
+          - The IMR is used to assess the progress towards controlling the HIV epidemic and is considered alongside other metrics such as the incidence-prevalence ratio.
+        presentation:
+          title_public: "HIV incidence-to-mortality ratio"
+          title_variant: ""
+
+      ipr:
+        title: "HIV incidence-to-prevalence ratio - <<estimate.title()>> estimate"
+        unit: ""
+        description_short: |-
+          The ratio of new HIV infections (incidence) to the total number of people living with HIV (prevalence) within a specific time frame. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - A declining incidence-to-prevalence ratio indicates progress in controlling the HIV epidemic, as it reflects a decrease in new infections relative to the existing number of people living with HIV.
+        presentation:
+          title_public: HIV incidence-to-prevalence ratio
+          title_variant: ""
+
+      # KNOW THEIR STATUS
+      number_plhiv_knowledge_of_status:
+        title: "People living with HIV who know their status - Age: <<age>> - Sex: <<sex>>"
+        unit: "people"
+        description_short: |-
+          Number of {definitions.people_dimension} living with HIV who know their HIV status at the end of the reporting period.
+        description_from_producer: |-
+          People living with HIV who know their HIV status will be able to access the HIV care and treatment services required to live healthy, productive lives and to reduce the potential of transmitting HIV to other people. The most effective way to ensure that people living with HIV are aware of their HIV status is to offer HIV testing services at locations and among populations with the highest HIV burden.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-living-hiv-who-know-their-status
+        description_key:
+          - "This measure is the first 95 of the UNAIDS 95-95-95 target: that 95% of the people living with HIV know their HIV status by 2025."
+          - This indicator is pivotal in the HIV response strategy. Knowing one's HIV status is more than just a medical statistic—it's a transformative moment that opens doors to comprehensive care and personal health management.
+          - "The gap between total HIV infections and diagnosed cases represents a significant challenge in global health. Many individuals may be unaware of their status due to various barriers, including: Limited access to testing facilities, stigma and discrimination, lack of awareness, financial constraints, cultural or personal hesitation about testing, etc."
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "{definitions.people_term} living with HIV who know their status"
+
+      plhiv_knowledge_of_status:
+        title: "Share of people living with HIV who know their status - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          Share of {definitions.people_dimension} living with HIV who know their HIV status at the end of the reporting period.
+        presentation:
+          title_public: "{definitions.people_term} (%) living with HIV who know their status"
+
+      percent_know_status_on_art:
+        title: "Share of people living with HIV and on ART who know their status - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          Share of {definitions.people_dimension} living with HIV and on ART who know their HIV status at the end of the reporting period.
+        presentation:
+          title_public: "{definitions.people_term} (%) living with HIV and on ART who know their status"
+
+      # VIRAL LOAD
+      number_viral_suppression:
+        title: "People living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>>"
+        unit: "people"
+        description_short: |-
+          Number of {definitions.people_dimension} living with HIV who have suppressed viral loads at the end of the reporting period.
+        description_from_producer: |-
+          Individual-level viral load is the recommended measure of antiretroviral therapy efficacy and indicates treatment adherence and the risk of transmitting HIV. A viral load threshold of <1000 copies/mL defines treatment success according to the 2016 World Health Organization (WHO) Consolidated guidelines on the use of antiretroviral drugs for treating and preventing HIV infection. People with viral load test results below the threshold should be considered as having suppressed viral loads.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-living-hiv-who-have-suppressed-viral-loads
+        description_key:
+          - Viral load suppression is a key medical achievement that transforms HIV from a life-threatening condition to a manageable chronic illness. It shows that the virus is under control and the risk of transmission is low.
+          - According to WHO guidelines, a viral load below 1,000 copies/mL is considered suppressed, indicating effective treatment and adherence.
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "{definitions.people_term} living with HIV who have suppressed viral loads"
+
+      people_unsupp_vl:
+        title: "Share of adults (15+) with unsuppressed viral load - Sex: <<sex>>"
+        unit: "%"
+        description_short: |-
+          The share of {definitions.people_dimension} living with HIV whose viral load remains detectable above the suppression threshold, indicating ongoing challenges in maintaining effective HIV treatment and potential risks of disease progression and transmission. This is the <<estimate.lower() >> estimate.
+        presentation:
+          title_public: "Share of adults with unsuppressed viral load"
+
+      viral_load_suppression:
+        title: "Share of people living with HIV who have suppressed viral loads - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          The share of {definitions.people_dimension} living with HIV who have achieved viral suppression, representing the proportion of patients successfully managing their HIV through effective antiretroviral therapy. This is the <<estimate.lower() >> estimate.
+        description_key:
+          - Viral suppression represents the third and final 90 of the global target, aiming to ensure that patients on ART achieve and maintain viral suppression. This minimizes their risk of disease progression and HIV transmission. Achieving viral suppression is crucial for service quality, as an unsuppressed viral load may indicate suboptimal treatment adherence and the potential for developing and spreading drug resistance.
+        presentation:
+          title_public: "Share of {definitions.people_term} living with HIV who have suppressed viral loads"
+
+      percent_art_vl_suppressed:
+        title: "Share of people on ART who achieve viral suppression - Age: <<age>> - Sex: <<sex>> - <<estimate.title()>> estimate"
+        unit: "%"
+        description_short: |-
+          The share of {definitions.people_dimension} receiving antiretroviral therapy (ART) who successfully achieve viral suppression, measuring the clinical efficacy of HIV treatment at the individual patient level. This is the <<estimate.lower() >> estimate.
+        presentation:
+          title_public: "Share of {definitions.people_term} on ART who achieve viral suppression"
+
+      # COMPARISON WITH 2010
+      pct_change_aids_deaths_2010:
+        title: Change (%) in AIDS-related deaths since 2010
+        unit: "%"
+        description_short: |-
+          A comparative measurement of the change in the number of AIDS-related deaths between the current reporting period and the baseline year of 2010, expressed as a percentage.
+        presentation:
+          title_public: "Change (%) in AIDS-related deaths since 2010"
+          title_variant: ""
+
+      pct_change_new_infections_2010:
+        title: Change (%) in new HIV infections since 2010
+        unit: "%"
+        description_short: |-
+          A comparative measurement of the change in the number of AIDS-related infections between the current reporting period and the baseline year of 2010, expressed as a percentage.
+        presentation:
+          title_public: "Change (%) in AIDS-related infections since 2010"
+          title_variant: ""
+
+  gam:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          map:
+            timeTolerance: 1
+    variables:
+      # low quality
+      expenditure_tb_hiv_activities:
+        title: Expenditure on collaborative TB/HIV activities
+        unit: US$
+        short_unit: $
+        description_short: |-
+          Financial resources allocated to integrated services aimed at reducing the dual burden of tuberculosis (TB) and HIV. This includes funding for prevention, diagnosis, treatment, and care for individuals affected by or at risk of both diseases.
+
+      # Newly enrolled to HIV treatment
+      hiv_care:
+        title: People newly enrolled in HIV treatment
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      hiv_tb_diagnosis:
+        title: People newly enrolled in HIV treatment diagnosed as having TB during the reporting period
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      hiv_tb_patients_under_ipt:
+        title: People living with HIV newly enrolled in HIV treatment started on isoniazid preventive therapy (IPT)
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      newly_enrolled_care:
+        title: Adults and children newly enrolled in HIV treatment during the year (10.3 denominator)
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      plhiv_in_care_with_active_tb:
+        title: Proportion of people living with HIV newly enrolled in HIV treatment with active tuberculosis (TB) disease
+        unit: people
+        description_short: |-
+          https://indicatorregistry.unaids.org/indicator/proportion-people-living-hiv-newly-enrolled-hiv-care-active-tb-disease
+        display:
+          numDecimalPlaces: 0
+      plhiv_receiving_tb_preventive_therapy:
+        title: Proportion of people living with HIV newly enrolled in HIV treatment started on TB preventive therapy
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+
+      # Currently enrolled to HIV treatment
+      plhiv_current_enrolled:
+        title: People currently enrolled in HIV treatment
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      plhiv_current_tb_preventative:
+        title: Proportion of people living with HIV currently enrolled in HIV treatment receiving TB preventive therapy
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+      plhiv_current_treatment_tb:
+        title: People living with HIV currently enrolled in HIV treatment who start treatment for latent TB infection during the reporting period
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+
+      # Condoms distributed to prisoners
+      prisoners_condoms_distributed:
+        title: Number of condoms distributed to prisoners
+        unit: condoms
+        description_short: Number of condoms distributed to prisoners in the last year.
+        display:
+          numDecimalPlaces: 0
+
+      hiv_tb_patients_receiving_art:
+        title: TB patients living with HIV receiving ART
+        unit: patients
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      hiv_tb_patients_receiving_cpt:
+        title: TB patients living with HIV receiving CPT
+        unit: patients
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+
+      new_relapse_tb_cases:
+        title: Total new and relapse TB cases
+        unit: cases
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+
+      notified_tb_cases:
+        title: Total notified TB cases
+        unit: cases
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+
+      # TPT, ART
+      people_art_elig_tpt:
+        title: People on ART who were eligible for TB preventive treatment (TPT)
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      people_art_elig_tpt_strt:
+        title: People on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      people_new_art_elig_tpt_strt:
+        title: People newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      num_art_complt_tpt:
+        title: People on ART who completed TPT among those who initiated any course of TPT during the previous year
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      num_art_init_tpt:
+        title: People on ART who initiated any course of TPT during the previous year
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+      prop_art_tpt_start:
+        title: Proportion of people on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+      prop_new_art_tpt_strt:
+        title: Proportion of people newly on ART who were eligible for TB preventive treatment (TPT) that started TPT
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+
+      # Others
+      resource_needs_ft:
+        title: Estimated resource needs
+        short_unit: "$"
+        unit: "constant 2019 US$"
+        description_short: "Estimated resource needs for HIV in low- and middle-income countries in constant 2019 USD."
+        description_processing: Source data is given in millions.
+        display:
+          name: Estimated resource needs to meet HIV targets
+          numDecimalPlaces: 0
+        presentation:
+          grapher_config:
+            hasMapTab: false
+            tab: chart
+
+      tb_expenditure:
+        title: Total TB expenditure
+        unit: constant 2019 US$
+        short_unit: "$"
+        description_short: "Expenditure in TB prevention and care."
+        description_from_producer: ""
+
+      #######################3
+      # DONE
+      #######################3
+
+      # Prisoners
+      prisoners_ost:
+        title: Prisoners receiving opioid substitution therapy
+        unit: people
+        description_short: Number of people in prisons and other closed settings receiving opioid agonist maintenance therapy.
+        description_from_producer: |-
+          People in prisons and other closed settings are often at risk for acquiring HIV when they are released and living in the community. This is especially true for people involved with illicit drug use or where selling sex is illegal. Offering HIV prevention and treatment services in prisons can reduce HIV transmission risk both within the prison and in the community on release. A strong national HIV response will include such services to people in prisons and other closed settings.
+        display:
+          numDecimalPlaces: 0
+      prisoners_tb:
+        title: Tuberculosis (TB) infection among prisoners
+        unit: people
+        description_short: ""
+        display:
+          numDecimalPlaces: 0
+
+      people_on_prep:
+        title: People receiving pre-exposure prophylaxis (PrEP)
+        unit: people
+        description_short: Number of people who received pre-exposure prophylaxis (PrEP) at least once during the reporting period.
+        description_from_producer: |-
+          This indicator is key to assessing the availability and uptake of pre-exposure prophylaxis (PrEP), especially among people at substantial risk of HIV infection. Through data disaggregation, this indicator will also attempt to monitor the availability and use by population (based on age, gender and key population). The use of antiretroviral medicines by people who are HIV-negative before they are exposed to HIV can prevent HIV infection. In 2015, the World Health Organization (WHO) recommended that oral PrEP containing tenofovir (TDF) be offered as an additional prevention choice for people at substantial risk of HIV infection as part of combination HIV prevention approaches. In 2021, WHO recommended the dapivirine vaginal ring (DVR) as an additional PrEP option to be offered to cisgender women at substantial risk of HIV. In 2022, WHO recommended that long-acting injectable cabotegravir (CAB-LA) may be offered as an additional PrEP option to people at substantial risk of HIV.
+
+          In 2024, WHO updated the guidance on oral PrEP dosing regimens, which are determined by a combination of factors based on a person’scharacteristics, circumstances and route of exposure. The guidance no longer uses the term “event-driven PrEP” (ED-PrEP), given the variation possible within oral PrEP dosing.
+
+          Implementation of PrEP should be informed by several contextual factors. These include national and subnational epidemiological trends; programmatic feasibility and demand; and consideration of the social environment for people living with HIV and people from key populations and their access to services. PrEP implementation criteria may vary by country.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-receiving-pre-exposure-prophylaxis-prep
+        display:
+          numDecimalPlaces: 0
+
+      per_tpt_art_cmplt:
+        title: Percentage of people living with HIV initiating TB preventive treatment (TPT) and on antiretroviral therapy who completed a course of TPT
+        unit: "%"
+        description_short: |-
+          Percentage of people living with HIV currently on antiretroviral therapy initiating tuberculosis (TB) preventive treatment and who completed a course of TB preventive treatment.
+
+      # Needles
+      pwid_needles:
+        title: Needles and syringes distributed per person who inject drugs
+        unit: needles per person
+        description_short: |-
+          Number of needles and syringes distributed per person who injects drugs per year by needle-syringe programmes.
+        description_key: &pwdi_needles
+          - Injecting drug use is a significant route of HIV transmission globally. Addressing HIV transmission through injecting drug use is crucial in reducing the overall HIV burden.
+          - Needle-syringe programs are a key health sector intervention recommended by the World Health Organization (WHO) for HIV and hepatitis C prevention and treatment among key populations, as outlined in the [2022 Consolidated guidelines on HIV prevention](https://www.who.int/publications/i/item/9789240052390), diagnosis, treatment, and care for key populations.
+          - These programs are highly effective in preventing HIV transmission among people who inject drugs, supported by extensive scientific evidence.
+        presentation:
+          title_public: Needles and Syringes per person who injects drugs
+        display:
+          numDecimalPlaces: 0
+      pwid_needles_distributed:
+        title: Needles and syringes distributed to people who inject drugs
+        unit: needles
+        description_short: |-
+          Number of needles and syringes distributed to people who injects drugs per year by needle-syringe programmes.
+        description_key: *pwdi_needles
+        presentation:
+          title_public: "Needles and Syringes distributed to people who inject drugs"
+        display:
+          numDecimalPlaces: 0
+
+      # TB patients with HIV documented status
+      tb_patients_documented_hiv_status:
+        title: Proportion of registered new and relapse TB patients with documented HIV status
+        unit: "%"
+        description_short: |-
+          Percentage of new and relapse TB cases with documented HIV status.
+        description_from_producer: |-
+          This indicator measures the performance of the TB program in ensuring that TB cases know their HIV status.
+
+          Numerator: Number of new and relapsed TB cases with documented HIV status, during the reporting period
+
+          Denominator: Total number of new and relapsed TB cases, during the reporting period
+
+          The numerator and denominator can be obtained from basic management unit TB registers as well as additional data collection sources (i.e., HIV testing registers) that may contain relevant information (i.e., HIV test results, enrollment in HIV care programs). Programs should modify the register as needed to easily capture this information (<1 F, <1 M, 1-4 F, 1-4 M, 5-9 F, 5-9 M, 10-14 F, 10-14 M, 15-19 F, 15-19 M, 20-24 F, 20-24 M, 25-29 F, 25-29 M, 30-34 F, 30-34 M, 35-39 F, 35-39 M, 40-44 F, 40-44 M, 45-49 F, 45-49 M, 50+ F, 50+ M, Unknown age F, Unknown age M) and (Known HIV-positive at service entry).
+
+          The data source is the TB register. There is a risk of double counting as TB patients could be tested multiple times during their TB treatment, therefore partners should ensure a data collection and reporting system is in place to minimize double counting. There is also a risk of undercounting if those patients who already knew their HIV status prior to attending TB clinic are not documented, therefore the TB register at a minimum should document “Known HIV-positive at service entry; Newly tested HIV-positive; Tested HIV negative.”
+
+          More details:
+          https://indicatorregistry.unaids.org/indicator/tbstat-includes-tbstatpospercentage-new-and-relapse-tb-cases-documented-hiv-status
+        presentation:
+          title_public: Percentage of new and relapse TB cases with documented HIV status
+      tb_patients_documented_hiv_positive_status:
+        title: Proportion of registered new and relapse TB patients with documented HIV-positive status
+        unit: "%"
+        description_short: |-
+          Percentage of new and relapse TB cases with documented HIV-positive status.
+        description_from_producer: |-
+          More details:
+          https://indicatorregistry.unaids.org/indicator/tbstat-includes-tbstatpospercentage-new-and-relapse-tb-cases-documented-hiv-status
+        presentation:
+          title_public: Percentage of new and relapse TB cases with documented HIV-positive status
+
+      # possible source: https://media.psi.org/wp-content/uploads/2020/06/31001419/who-consolidated-strategic-information-guidelines-for-hiv-in-the-health-sector.pdf
+      # Annex 1, code "HTS.6", page 255
+      tb_patients_tested_positive_hiv:
+        title: TB patients tested positive for HIV
+        unit: patients
+        description_short: "Estimated number of tuberculosis (new and relapsed) patients that tested positive for HIV."
+        description_key:
+          - "People with tuberculosis (TB) are strongly advised to be tested for HIV because HIV weakens the immune system, increasing vulnerability to TB and complicating treatment outcomes."
+          - "The proportion of TB patients testing positive for HIV reflects how well HIV-TB coinfection is being identified in clinical settings, guiding coordinated treatment and prevention."
+          - "Early detection of HIV in TB patients enables timely antiretroviral therapy and TB treatment, which can significantly lower the risk of severe illness and death."
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: "Tuberculosis patients who tested positive for HIV"
+
+  gam_sex:
+    variables:
+      knowledge_in_young_people:
+        title: Knowledge about HIV prevention in young people (15-24)
+        unit: "%"
+        description_short: |-
+          <% if sex == 'total' %>
+          Percentage of young people aged 15-24 who correctly identify both methods of preventing the sexual transmission of HIV and reject major misconceptions about HIV transmission.
+          <%- else %>
+          Percentage of young <<sex>>s aged 15-24 who correctly identify both ways of preventing the sexual transmission of HIV and reject major misconceptions about HIV transmission.
+          <%- endif %>
+        description_from_producer: |-
+          This indicator measures the percentage of respondents that answered "YES" to all the responses below:
+
+          1. Can the risk of HIV transmission be reduced by having sex with only one uninfected partner who has no other partners?
+          2. Can a person reduce the risk of getting HIV by using a condom every time they have sex?
+          3. Can a healthy-looking person have HIV?
+          4. Can a person get HIV from mosquito bites?
+          5. Can a person get HIV by sharing food with someone who is infected?
+
+          The first three questions should not be altered. Questions 4 and 5 ask about local misconceptions and may be replaced by the most common misconceptions in your country. Examples include: “Can a person get HIV by hugging or shaking hands with a person who is infected?” and “Can a person get HIV through supernatural means?”
+
+          Those who have never heard of HIV and AIDS should be excluded from the numerator but included in the denominator. An answer of “don't know” should be recorded as an incorrect answer.
+
+          Scores for each of the individual questions (based on the same denominator) are required as well as the score for the composite indicator.
+
+        description_key:
+          - The ongoing spread of HIV is largely driven by sexual transmission among young people. Comprehensive knowledge about HIV and AIDS is essential for adopting behaviors that reduce the risk of transmission.
+        presentation:
+          title_public: Knowledge about HIV prevention<<" by young " + sex + "s" if sex != 'total' else ' in young people'>>
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
+
+  gam_age:
+    variables:
+      male_circumcisions_performed:
+        title: Annual number of males voluntarily circumcised
+        description_short: |-
+          <% if age == "total" %>
+          Number of male circumcisions performed according to national standards during the past 12 months.
+          <%- else %>
+          Number of male circumcisions (aged <<age>>) performed according to national standards during the past 12 months.
+          <%- endif %>
+        unit: people
+        description_from_producer: |-
+          Three randomized controlled trials - plus post-trial studies - have shown that male circumcision provided by well-trained health professionals in properly equipped settings is safe and can reduce the risk of acquiring HIV. Other benefits of medical male circumcision include the reduced risk of some other STIs, including human papillomavirus, the cause of cervical cancer. The World Health Organization (WHO) and UNAIDS recommendations emphasize that voluntary medical male circumcision should be provided as part of a package of prevention interventions including safer sex education, condom education and provision, HIV testing and linkages to care and treatment, and management of sexually transmitted infections.
+
+          WHO recommends that voluntary medical male circumcision should continue to be provided as an additional efficacious HIV prevention option within combination prevention for adolescents 15 years and older and adult men in settings with generalized epidemics. Decisions on offering voluntary medical male circumcision to younger adolescents 10-14 years must consider several factors based on new evidence, human rights and national and local context.
+
+          More details: https://indicatorregistry.unaids.org/indicator/annual-number-men-voluntarily-circumcised
+        presentation:
+          title_public: Annual number of males voluntarily circumcised
+          title_variant: |-
+            <% if age == "total" %>
+            total population
+            <%- else %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: Annual number of males<<" aged " + age if age != "total" else " ">> voluntarily circumcised
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
+
+  gam_group:
+    variables:
+      discrimination_hc_settings:
+        title: "Experience of HIV-related discrimination in healthcare settings - Health service: <<group>>"
+        description_short: |-
+          <% if group == "total" %>
+          Percentage of people living with HIV who report experiences of HIV-related discrimination in healthcare settings.
+          <%- elif group == "hiv-related" %>
+          Percentage of people living with HIV (and receiving a HIV-related health service) who report experiences of HIV-related discrimination in healthcare settings.
+          <%- else %>
+          Percentage of people living with HIV (and receiving a non-HIV-related health service) who report experiences of HIV-related discrimination in healthcare settings.
+          <% endif %>
+        unit: "%"
+        description_from_producer: |-
+          Discrimination is a human rights violation and is prohibited by international human rights law and most national constitutions. In the context of HIV, discrimination refers to unfair or unjust treatment of an individual (either through actions or by failure to act) based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, thus fueling the HIV epidemic.
+
+          Stigma is the attribution of undesirable characteristics to an individual or group that reduces their status in the eyes of society. It frequently drives experiences of discrimination. The indicator measures HIV-related discrimination experienced in health-care settings. HIV is often associated with a range of behaviours that are viewed as socially deviant or immoral, such as injecting drug use and sexual promiscuity. Because of these underlying societal beliefs, people living with HIV often are viewed as shameful and are thought to be responsible for having contracted HIV. This shaming process has repercussions beyond the individual because it greatly reduces incentives to be tested for HIV or, in the event the test result is positive, to disclose HIV status to sexual partners or family members.
+
+          The health sector is one of the main settings where people living with HIV—and those perceived to be living with HIV—experience discrimination. This indicator directly measures discrimination experienced by people living with HIV when seeking services in health-care settings.
+
+          The composite indicator can be monitored as a measure of the prevalence of HIV-related discrimination experienced in the health sector by people living with HIV. This indicator could provide further understanding of HIV-related health outcomes and improve interventions to reduce and mitigate HIV-related stigma and discrimination experienced along the treatment and care cascade by (a) showing change over time in the percentage of people living with HIV who experience discrimination in health-care settings and (b) indicating priority areas for action.
+
+          More details: https://indicatorregistry.unaids.org/indicator/experience-hiv-related-discrimination-health-care-settings-0
+        presentation:
+          title_public: |-
+            Experience of HIV-related discrimination in healthcare settings
+          title_variant: |-
+            <% if group == "total" %>
+            all health services
+            <%- elif group == "hiv-related" %>
+            HIV-related health service
+            <%- else %>
+            non-HIV-related health service
+            <% endif %>
+          grapher_config:
+            title: |-
+              <% if group == "total" %>
+              Experience of HIV-related discrimination in healthcare settings
+              <%- elif group == "hiv-related" %>
+              Experience of HIV-related discrimination in healthcare settings for a HIV-related health service
+              <%- else %>
+              Experience of HIV-related discrimination in healthcare settings for a non-HIV-related health service
+              <% endif %>
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 2
+
+      domestic_spending_fund_source:
+        title: "HIV expenditure by origin of resources - Origin: <<group>>"
+        #  The reported HIV expenditures by program or service should align with the number of individuals who received these services, as documented in other sections of Global AIDS Monitoring.
+        description_short: |-
+          <% if group == "total" %>
+          Total in-country spending on HIV programs and services.
+          <%- else %>
+          In-country spending on HIV programs and services categorized, from source '<<group>>'.
+          <% endif %>
+        unit: constant 2019 US$
+        short_unit: "$"
+        description_key:
+          - "This indicator captures in-country HIV programme expenditures from various financing sources (e.g., domestic, international, etc.), ensuring standardized tracking of how much is spent and where."
+        description_from_producer: |-
+          The indicator to be reported is total and subtotal HIV expenditures by services or programme categories and by financing sources. There are eight core sub-indicators that map to this reporting. These are outlined under Annex 3.
+
+          By the end of 2020, the international and domestic resource availability for the HIV response reached an estimated US$ 21.5 billion (in constant 2019 dollars) in low- and middle-income countries. Achieving country and global targets requires increased focus, resources, programme effectiveness and efficiency to provide the HIV care, treatment and prevention to reduce HIV incidence and extend life.
+
+          It is critical to identify long-term, sustainable financing sources, including domestic resource mobilization, to maintain and build upon the success achieved. However, filling the financing gap and pursuing efficient resource allocation can only be achieved by assessing and managing the resources available and their use.
+
+          The quantification of financing flows and expenditures helps to examine the questions of who benefits from HIV programmes and to determine the current state of allocations for HIV programmes and services that focus on key or other specific populations.
+
+          The vast majority of the AIDS Spending Categories (or ASCs, per National AIDS Spending Assessment [NASA] classifications) or the sub-indicators are drawn from existing frameworks and are now structured around the 2021 Political Declaration on Ending AIDS. The resource needs for low- and middle-income countries resulted in a target to mobilize at least US$ 29 billion (in constant 2019 US dollars) by 2025.
+
+          More details: https://indicatorregistry.unaids.org/indicator/aids-spending
+        presentation:
+          title_public: Expenditure on HIV prevention and treatment
+          title_variant: <<"sourced from " + group if group != "total">>
+          grapher_config:
+            title: |-
+              HIV expenditure of resources<<" from " + group if group != "total">>
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
+
+      resource_avail_constant:
+        title: "Availability of HIV resources for low- and middle-income countries - Origin: <<group>>"
+        description_short: |-
+          <% if group == "total" %>
+          Volume of financial resources from domestic and international sources allocated to HIV programs in low- and middle-income countries for a specified period.
+          <%- else %>
+          Volume of financial resources from <<group>> sources allocated to HIV programs in low- and middle-income countries for a specified period.
+          <%- endif %>
+        unit: constant 2019 US$
+        short_unit: "$"
+        description_processing: Source data is given in millions.
+        presentation:
+          title_public: Availability HIV resources for low- and middle-income countries
+          title_variant: |-
+            <<"origin: " + group if group != "total">>
+          grapher_config:
+            title: |-
+              <% if group == "total" %>
+              Availability of HIV resources for low- and middle-income countries
+              <%- else %>
+              Availability of HIV resources from <<group>> sources for low- and middle-income countries
+              <%- endif %>
+
+      condoms_distributed_pp:
+        title: Condoms distributed per person in prevention programmes for <<group>>
+        # title: Condoms distributed per person in prevention programmes for men who have sex with men
+        # title: Condoms distributed per person in prevention programmes for sex workers
+        unit: condoms per person
+        description_short: Number of condoms distributed per person in prevention programmes for <<group>>.
+        presentation:
+          title_public: Condoms distributed per person in prevention programmes
+          title_variant: << group >>
+          grapher_config:
+            title: Condoms distributed in prevention programmes for <<group>>
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
+
+      population:
+        title: Population of <<group>>
+        unit: people
+        description_short: "Estimates of the size of the population of <<group>>"
+        description_from_producer: |-
+          Programme planning for key populations can be more efficient if the size of these populations can be accurately estimated. The figures enable national AIDS programmes, health ministries, donors and not-for-profit and multilateral organizations to efficiently allocate resources to adequately meet the prevention needs of specific populations at higher risk. Size estimates are also important for modelling the HIV epidemic.
+
+          To better understand the size estimates submitted, we request that the following additional information be included in the comment box:
+
+          - Definition used for the population, and inclusion criteria used in the study/survey, as applicable.
+          - Method to derive the size estimate.
+          - Site-specific estimates for all available estimates.
+
+          In keeping with efforts to provide more granular data presentations, the latter will offer the opportunity for mapping denominator data with programme data if they are collected in the same survey areas.
+
+          If there are subnational data available, please provide the disaggregation by administrative area, city, or site in the space provided. You may also upload an Excel spreadsheet of these data instead of entering them in the online tool. Submit the digital version of any available size estimation reports using the upload tool.
+
+          More details: https://indicatorregistry.unaids.org/indicator/size-estimations-key-populations
+        presentation:
+          title_public: Population of <<group>>
+          grapher_config:
+            hasMapTab: true
+            tab: map
+            map:
+              timeTolerance: 1
+
+  gam_estimates:
+    common:
+      presentation:
+        title_variant: <<estimate.lower()>> estimate
+        grapher_config:
+          hasMapTab: true
+          tab: map
+    variables:
+      comanagement_tb_hiv:
+        title: Co-management of tuberculosis and HIV treatment - <<estimate.title()>> estimate
+        unit: "%"
+        description_short: |-
+          <<estimate.title()>> estimate of the percentage of people living with HIV estimated to have incident tuberculosis (TB) that received treatment for both TB and HIV.
+        description_from_producer: |-
+          TB is a leading cause of morbidity and mortality among people living with HIV, including those receiving antiretroviral therapy. Prompt TB treatment and early antiretroviral therapy are critical for reducing the mortality due to HIV-associated TB and must be the highest-priority activity for both the AIDS Programme and National TB Programme. A measure of the percentage of HIV-positive TB patients that access appropriate treatment for their TB and HIV is therefore very important.
+
+          Calculated as `Numerator/denominator`, where:
+
+          Numerator: Number of people living with HIV with new or relapse TB started on TB treatment during the reporting period who were already on antiretroviral therapy or started on antiretroviral therapy during TB treatment within the reporting year
+
+          Denominator: Estimated number of people living with HIV with incident TB cases
+
+          For the numerator: Facility antiretroviral therapy registers and reports; programme monitoring tools. Count the total number of HIV-positive new and relapse TB patients who were started on TB treatment (as recorded in the TB register) and antiretroviral therapy, or those already on antiretroviral therapy (as recorded in the antiretroviral therapy register). The information should be reconciled quarterly and annually with the TB registers in the relevant basic management units before consolidation and reporting.
+
+          For the denominator: Programme data and estimates of the number of people living with HIV with incident TB. WHO calculates annual estimates of the number of people living with HIV with incident TB. The denominator become available only in August of the reporting year and do not need to be provided at the time of reporting. The estimates for 2023 are available at https://www.who.int/teams/global-tuberculosis-programme/data
+
+          More details: https://indicatorregistry.unaids.org/indicator/co-management-of-tuberculosis-and-hiv-treatment
+        description_key:
+          - Prompt initiation of TB treatment alongside early antiretroviral therapy is critical to reduce HIV-associated TB mortality. Tracking the percentage of HIV-positive TB patients who receive appropriate treatment for both conditions is therefore essential for improving overall patient outcomes.
+        presentation:
+          title_public: Co-management of tuberculosis and HIV treatment
+
+      hiv_new_tb_cases:
+        title: Estimated HIV in new TB cases - <<estimate.title()>> estimate
+        unit: "%"
+        description_short: "<<estimate.title()>> estimate."
+        presentation:
+          title_public: Estimated HIV in new TB cases
+      incident_tb_cases:
+        title: Incident TB cases in people living with HIV - <<estimate.title()>> estimate
+        unit: cases
+        description_short: "<<estimate.title()>> estimate."
+        display:
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Incident TB cases in people living with HIV
+      tb_related_deaths:
+        title: Tuberculosis-related deaths among people living with HIV - <<estimate.title()>> estimate
+        unit: deaths
+        description_short: <<estimate.title()>> estimate of the number of deaths from people living with HIV that are related to tuberculosis.
+        display:
+          numDecimalPlaces: 0
+        # ([GLOBAL AIDS STRATEGY 2021-2026](https://www.unaids.org/en/resources/documents/2021/2021-2026-global-AIDS-strategy))
+        description_key:
+          - Tuberculosis (TB) is the top cause of death among people living with HIV despite being preventable and treatable. Lack of integrated TB-HIV services and low uptake of preventive treatments contribute to these avoidable deaths.
+          - "People with TB are strongly advised to be tested for HIV because HIV weakens the immune system, increasing vulnerability to TB and complicating treatment outcomes."
+          - Improved screening, diagnosis, and treatment can significantly reduce TB-related deaths among people living with HIV.
+          # - "People-centred approaches that combine TB and HIV screening, diagnosis, and treatment—as well as address other comorbidities—can significantly reduce TB-related deaths among people living with HIV."
+          # - "Inequalities undermine care: Key and vulnerable groups, including children and young people, often face barriers to holistic HIV-TB services, underscoring the need for community-based support and targeted strategies to bridge these gaps."
+        presentation:
+          title_public: Tuberculosis-related deaths among people living with HIV
+
+  gam_hepatitis:
+    variables:
+      viral_hepatitis:
+        title: "Prevalence of hepatitis <<hepatitis>> and HIV - Key population: <<group>> - Sex: <<sex>> - Age: <<age>>"
+        description_short: |-
+          Share of tested people with hepatitis <<hepatitis>> and HIV coinfection among <<group>><<", " + sex + "s" if sex not in ["total", "both"] else "">><<", aged " + age if age != "total" else "">>.
+        unit: "%"
+        description_from_producer: |-
+          Appreciation of hepatitis and HIV coinfection has improved recently. Many people living with HIV receiving antiretroviral therapy are dying from liver disease resulting from untreated viral hepatitis. HIV treatment regimens can be adjusted to treat chronic hepatitis B infection as well. New, highly effective hepatitis C treatment is available and has a high rate of virus clearance regardless of hepatitis C virus subtype. Measuring the hepatitis burden among key populations living with HIV can help national planners determine the resources needed to address the syndemic.
+
+          Calculation: Numerator / Denominator, where:
+
+          Numerator: Number of people in a key population who test positive for both HIV and hepatitis <<"C virus" if hepatitis == "C" else "B surface antigen">>
+
+          Denominator: Number of respondents tested for both HIV and one or both hepatitis B and C
+
+          Strengths and weaknesses:
+          Probability-based estimates of coinfection with HIV and hepatitis C virus or HIV and hepatitis B virus among key populations are generally unavailable, although several biobehavioural surveys have conducted hepatitis antibody testing. Improving knowledge about coinfection will help to improve treatment programmes and help to maximize the survival of the affected populations. The numbers of people coinfected are likely to be small, with the possible exception of people who inject drugs, so the confidence intervals will be large.
+
+          More details: https://indicatorregistry.unaids.org/indicator/viral-hepatitis-among-key-populations
+        presentation:
+          title_public: "Prevalence of hepatitis <<hepatitis>> and HIV"
+          title_variant: <<group>><<", " + sex + "s" if sex not in ["total", "other"] else "">><<", aged " + age if age != "total" else "">>
+          grapher_config:
+            title: Prevalence of hepatitis <<hepatitis>> and HIV in <<group>><<", " + sex + "s" if sex not in ["total", "other"] else "">><<", aged " + age if age != "total" else "">>
+            hasMapTab: true
+            tab: map
+
+  gam_age_group:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          map:
+            timeTolerance: 1
+    variables:
+      prevalence_male_circumcision:
+        title: "Prevalence of male circumcision - Age: <<age>> - Procedure: <<group>>"
+        description_short: |-
+          Percentage of men <<"15-49" if age == "total" else age>> that are circumcised.
+        unit: "%"
+        description_from_producer: |-
+          Three randomized controlled trials have shown that male circumcision provided by well-trained health professionals in properly equipped settings is safe and can reduce the risk of acquiring HIV. Other benefits of medical male circumcision include the reduced risk of some other STIs, including human papillomavirus, the cause of cervical cancer. The World Health Organization (WHO) and UNAIDS recommendations emphasize that voluntary medical male circumcision should continue to be provided as an additional efficacious HIV prevention option within combination prevention for adolescents 15 years and older and adult men in settings with generalized epidemics to reduce the risk of heterosexually acquired HIV infection. Voluntary medical male circumcision services should be provided as part of a package of prevention interventions including safer sex education, condom education and provision, HIV testing and linkages to care and treatment, and management of sexually transmitted infections.
+
+          Strengths and weaknesses:
+          A programme may or may not change the rate of male circumcision. For example, changing societal norms not caused by a programme may lead to changing rates of male circumcision. This indicator measures the total change in the population, regardless of the reasons.
+
+          Existing population-based surveys (such as Demographic and Health Surveys) may not accurately measure true male circumcision status because people may lack knowledge of what male circumcision is, be confused about their circumcision status or perceive the social desirability of circumcision status. Other approaches to determining circumcision status might be used: for example, using photographs or drawings (drawings may be more culturally appropriate), prompts or even direct examination. Modelling how changing rates of male circumcision can potential affect HIV incidence requires accurate knowledge of male circumcision status over time.
+
+          More details: https://indicatorregistry.unaids.org/indicator/male-circumcision-prevalence
+        presentation:
+          title_public: "Prevalence of male circumcision"
+          title_variant: |-
+            <% if age != "total" %>aged <<age>><% if group != "total" %>, <% endif %><% endif %><% if group != "total" %><<group>> procedure<% endif %>
+          grapher_config:
+            title: Prevalence of male circumcision<<", aged " + age if age != "total">><<", " + group + " procedure" if group != "total">>
+            map:
+              timeTolerance: 5
+
+      hiv_self_tests:
+        title: HIV self-tests - <<group>>
+        description_short: |-
+          The number of HIV tests <<group>> in the calendar year.
+          <%- if group == "procured" %>
+           Procured self-test kits represent the total number of self-test kits purchased within a year by the national government, including those funded by donors. Kits procured through other channels, such as the private sector, are excluded.
+          <%- else %>
+           Self-test kits distributed refers to the total number of individual self-test kits handed out in a year. This figure does not represent the total number of people who self-tested or the total number of people who received a self-test, as individuals may obtain more than one kit within a year.
+          <%- endif %>
+        unit: "self-tests kits"
+        presentation:
+          title_public: "Number of <<group>> HIV self-tests"
+        display:
+          numDecimalPlaces: 0
+
+  gam_sex_group:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          map:
+            timeTolerance: 3
+    variables:
+      condoms_distributed:
+        title: "Annual number of <<sex>> condoms distributed - Provider: <<group>>"
+        unit: condoms
+        description_short: |-
+          <% if group == "total" %>
+          Number of condoms distributed during the past 12 months.
+          <%- elif group == "NGO" %>
+          Number of condoms sold at subsidized rates through social marketing (nongovernmental organizations as providers) during the past 12 months.
+          <%- elif group == "private" %>
+          Number of condoms sold through the commercial sector (private sector providers).
+          <%- elif group == "public" %>
+          Number of condoms distributed for free by the public sector during the last 12 months.
+          <%- endif %>
+        description_from_producer: |-
+          Condoms have been shown to be one of the most effective methods in preventing the sexual transmission of HIV, other sexually transmitted infections (STIs) and unintended pregnancy, with effectiveness that increases with consistent and correct use. The World Health Organization (WHO) and UNAIDS recommendations emphasize that condom distribution and promotion is an efficacious intervention and a critical component of combination HIV prevention.
+
+          Count of the number of male and female condoms that left the central or regional warehouses for onward distribution in the previous calendar year. Data should include condoms distributed for free (public providers), condoms sold at subsidized rates through social marketing (nongovernmental organizations as providers) and condoms sold through the commercial sector (private sector providers). There should be no double-counting of condoms in case of overlap. If condoms from public sector warehouses are given to nongovernmental organizations or community workers for distribution, condoms should be accounted for in the public sector.
+        description_key:
+          - |-
+            <% if group == "total" %>
+            Measures the total quantity of <<sex>> condoms distributed from central/regional warehouses during the previous year, regardless of distribution channel or price point.
+            <%- endif %>
+          - |-
+            <% if group == "total" %>
+            Tracks three distinct distribution channels: free condoms through public providers, subsidized condoms via social marketing/NGOs, and commercial sales through private sector.
+            <%- endif %>
+          - |-
+            <% if group == "total" %>
+            Requires careful accounting to avoid double-counting when condoms move between distribution channels (e.g., from public sector to NGOs).
+            <%- endif %>
+          - |-
+            <% if group == "total" %>
+            For condoms provided to NGOs or community workers from public sector warehouses, attribution should remain with the public sector to maintain accurate tracking.
+            <%- endif %>
+        presentation:
+          title_public: Annual number of <<sex>> condoms distributed
+          title_variant: <<"by " + group + " providers" if group != "total" else "">>
+          grapher_config:
+            title: Annual number of <<sex>> condoms distributed<<" by " + group + " providers" if group != "total" else "">>
+        display:
+          numDecimalPlaces: 0
+
+      experience_violence:
+        title: "Physical and/or sexual violence experienced by <<group>> (%) - Sex: <<sex>>"
+        unit: "%"
+        description_short: |-
+          <% if group == "people who inject drugs" %>
+          Percentage of <<sex + "s" if sex != "total" else "people">> who inject drugs that report having experienced physical and/or sexual violence in the last 12 months.
+          <%- else %>
+          Percentage of <<sex if sex != "total" else "">> <<group>> who report having experienced physical and/or sexual violence in the last 12 months.
+          <% endif %>
+        description_from_producer: |-
+          Globally, high rates of HIV infection among key populations - including sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people - have brought into sharp focus the problem of gender-based violence. There is growing recognition that deep-rooted, pervasive gender inequalities, reflected in gender-based violence, shape their risk of and vulnerability to HIV infection.
+
+          Violence and HIV have been linked through direct and indirect pathways, and studies in a range of countries indicate that many sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people have experienced violence in some form or another at some point in their lives. Violence has also been demonstrated to impede HIV prevention, care and treatment services among key populations.
+
+          Calculation: Numerator / Denominator
+
+          Numerator: Number of people in a key population group (sex workers, gay men and other men who have sex with men, people who inject drugs or transgender people) who reported that either of the incidents happened to them at least once in the last 12 months.
+
+          Denominator: Total number of respondents from a key population group.
+
+          Method of measurement:
+          Behavioural surveillance or other special surveys. Indicators A-D are constructed from responses to the following questions among respondents who report belonging to a key population group (i.e., sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people).
+
+          (1) In the last 12 months, how many times has anyone physically hurt you, such as hit or choked you or threatened you with a knife or other weapon (this has not happened in the last 12 months, once, 2-5 times, 6-10 times, 10 or more times, don't know, refuse to answer)?
+
+          and/or
+
+          (2) In the last 12 months, how many times has someone tricked you, lied to you or threatened you in order to make you have sex when you didn't want to (this has not happened in the last 12 months, once, 2-5 times, 6-10 times, 10 or more times, don't know, refuse to answer)?
+
+          More details: https://indicatorregistry.unaids.org/indicator/experience-physical-andor-sexual-violence-among-key-populations
+        presentation:
+          title_public: |-
+            <% if group == "people who inject drugs" %>
+            Share of <<sex + "s" if sex != "total" else "people">> who inject drugs who experienced physical and/or sexual violence
+            <%- else %>
+            Share of <<sex + " " if sex != "total" else "">>sex workers who experienced physical and/or sexual violence
+            <% endif %>
+
+      syphilis_prevalence:
+        title: "Prevalence of syphilis among <<group>> - Sex: <<sex>>"
+        unit: "%"
+        description_short: |-
+          <% if group == "transgender, sex workers" %>
+          Share of sex workers who are transgender with syphilis.
+          <% else %>
+          Share of <<sex + " " if ((sex not in ["total", "other"]) and (group != "men who have sex with men"))>><<group>> with syphilis.
+          <% endif %>
+        description_from_producer: |-
+          The prevalence of syphilis is typically much higher in key populations than in the general population. Reducing the prevalence of syphilis among key populations is important for the health of the population and also a critical measure of the national-level response to syphilis.
+
+          The increasing use of rapid tests for testing (screening) individuals for syphilis has increased access to syphilis testing in settings that were previously without capacity. As a result, this indicator has been expanded to syphilis prevalence rather than focusing solely on active syphilis.
+
+          Testing for syphilis in key populations is a component of second-generation HIV surveillance.
+
+          Calculated as: Numerator / Denominator, where
+
+          Numerator: Number of people in a key population who test positive for syphilis
+
+          Denominator: Number of people in a key population tested for syphilis
+
+          Method of measurement:
+          This indicator is calculated using data from syphilis tests conducted among respondents in sentinel site(s) or participants in biobehavioural surveys or regular sexually transmitted infection screening services. The sentinel surveillance sites used for calculating this indicator should remain constant to allow for tracking changes over time.
+
+          Screening may be done with either a nontreponemal test (e.g., venereal disease research laboratory [VDRL] or rapid plasma reagin [RPR]) or a treponemal test (e.g., Treponema pallidum haemagglutination assay [TPHA], Treponema pallidum particle agglutination assay [TPPA], enzyme immunoassay or rapid treponemal test). While nontreponemal serologic tests are sensitive, they lack specificity and can result in false positive cases. Treponemal tests are more specific but cannot differentiate between current and past infection or treated and untreated infection. For the purpose of this indicator (intended to measure seropositivity), reporting positivity based on a single test result is acceptable. However, if both treponemal and nontreponemal test results for an individual person are available, then syphilis positivity should be defined as having positive results on both tests. Countries are required to report the testing algorithm used to determine positivity so prevalence estimates can be adjusted to look at trends over time and generate regional and global estimates.
+
+          More details: https://indicatorregistry.unaids.org/indicator/syphilis-prevalence-among-key-populations-b-d
+        presentation:
+          title_public: Prevalence of syphilis among <<sex + " " if ((sex not in ["total", "other"]) and (group != "men who have sex with men"))>><<group>>
+
+  gam_age_sex:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+          map:
+            timeTolerance: 3
+    variables:
+      att_tow_wife_beating:
+        title: "Attitudes towards violence against women - Age: <<age>> - Sex: <<sex>>"
+        unit: "%"
+        description_short: |-
+          Percentage of << "women" if sex == "female" else "men" if sex == "male" else "men and women" >> aged <<age if age != "total" else "15-49">> years who believe that a husband is justified in hitting or beating his wife for
+        description_from_producer: |-
+          Gender inequality continues to stand in the way of global goals to end AIDS by 2030. Inequitable gender norms that confine women and men to specific roles in society - together with gender disparities in education and employment - greatly limit HIV prevention strategies among women, girls, and gender and sexual minorities. Fear, experiences of violence and power imbalances in relationships also increase vulnerability to HIV among these groups, limiting their access to HIV services and reducing their adherence to HIV prevention or treatment technologies. This leaves them disproportionately affected by HIV. Scaling up programmes to increase gender equity and intensifying efforts to achieve gender equality is therefore critical for ending AIDS as a global public health threat by 2030.
+
+          Calculation: Numerator / Denominator, where
+
+          Numerator: Number of respondents who agree with at least one of the statements
+
+          Denominator: Total number of respondents
+
+          Method of measurement:
+          Population-based surveys. This indicator is constructed from responses to the following question among respondents:
+
+          In your opinion, is a husband justified in hitting or beating his wife in the following situations?
+
+          a. If she goes out without telling him? (yes, no, don't know)
+          b. If she neglects the children? (yes, no, don't know)
+          c. If she argues with him? (yes, no, don't know)
+          d. If she refuses to have sex with him? (yes, no, don't know)
+          e. If she burns the food? (yes, no, don't know)
+
+          The numerator included respondents who expressed agreement with one or more of the situations.
+        presentation:
+          title_public: Attitudes towards violence against women
+          title_variant: <<"from " + sex + "s, " if sex != "total">>aged << age if age != "total" else "15-49">>
+          grapher_config:
+            title: Attitudes <<"from " + sex + "s " if sex != "total">>towards violence against women, aged << age if age != "total" else "15-49">>
+
+      demand_family_planning:
+        title: "Demand for family planning satisfied by modern methods - Women aged: <<age>>"
+        unit: "%"
+        description_short: |-
+          <% if age == "15-49" %>
+          Percentage of women of reproductive age (15-49) who have their demand for family planning satisfied with modern methods.
+          <%- else %>
+          Percentage of women of aged <<age>> years old who have their demand for family planning satisfied with modern methods.
+          <%- endif %>
+        description_from_producer: |-
+          This indicator assesses progress towards increasing the capacity of women and adolescent girls to access sexual and reproductive health services and being able to exercise their right to control and freely decide on matters related to their sexuality and sexual and reproductive health. It reflects the right of women and adolescent girls to decide whether and when to have children and having the methods to implement this decision.
+
+          This indicator is also used to measure progress towards Sustainable Development Goals target 3.7, which aims to ensure universal access to sexual and reproductive health-care services, including for family planning, information and education, and integrating reproductive health into national strategies and programmes by 2030.
+
+          Sexual and reproductive health services are also an entry point for HIV prevention, treatment, care and support services, and their integration will be key to ensuring the sustainability of HIV-related services.
+
+          More details: https://indicatorregistry.unaids.org/indicator/demand-family-planning-satisfied-modern-methods
+        description_key:
+          - Estimated as the number of women aged <<age>> who are using modern contraceptive methods from all those with a demand for family planning.
+          - Women are considered to have a demand for family planning if they want to delay, space or limit childbearing.
+          - "The following are considered modern contraceptive methods: The pill (oral contraceptives), Intrauterine device (IUD), Injectables, Female sterilization, Male sterilization, Female condoms, Male condoms, Implants, Emergency contraception, Standard days method, Lactational amenorrhoea method (LAM), The diaphragm, Foam or jelly."
+        presentation:
+          title_public: Share of women with satisfied demand for family planning by modern methods
+          title_variant: aged <<age>>
+
+      prevalence_ipv:
+        title: "Prevalence of recent intimate partner violence - Women aged: <<age>>"
+        unit: "%"
+        description_short: |-
+          Proportion of ever-married or partnered women <<age>> years old who experienced physical or sexual violence from a male intimate partner in the past 12 months.
+        description_from_producer: |-
+          Globally, high rates of HIV infection among women have brought into sharp focus the problem of violence against women. There is growing recognition that deep-rooted, pervasive gender inequalities, especially violence against women and girls, shape their risk of and vulnerability to HIV infection. Violence and HIV have been linked through direct and indirect pathways. Studies in many countries indicate that many women have experienced violence in some form or another at some point in their life. WHO estimates that one in three women globally has experienced intimate partner violence and/or non-partner sexual violence.
+
+          Calculated as: Numerator / Denominator, where
+
+          Numerator: Women <<age>> years old who have or have ever had an intimate partner and report experiencing physical or sexual violence from at least one of these partners in the past 12 months.
+
+          Denominator: Total number of women <<age>> years old surveyed who currently have or have had an intimate partner
+
+          Method of measurement:
+          Population-based surveys already being used within countries, such as WHO multicountry surveys, Demographic and Health Surveys or AIDS Indicator Surveys (domestic violence module) and the International Violence against Women Surveys.
+
+          Collecting data on violence against women requires special methods ensuring that information is gathered in a manner adhering to ethical and safety standards, that does not pose a risk to study participants and maximizes data validity and reliability.
+        description_key:
+          - Share of women aged <<age>> years old who have or have ever had an intimate partner and report experiencing physical or sexual violence from at least one of these partners in the past 12 months.
+          - "Method: Ever-married or -partnered women aged <<age>> include those who have ever been married or have had an intimate partner. Women are asked whether they have experienced physical or sexual violence from a male intimate partner in the past 12 months."
+          - "Physical or sexual violence is determined by reporting that their partner did any of the following: Slapped her or threw something that could hurt her; Pushed or shoved her; Hit her with a fist or something else that could hurt her; Kicked, dragged or beat her up; Choked or burned her; Threatened or used a gun, knife or other weapon against her; Physically forced her to have sexual intercourse against her will; Forced her to do something sexual she found degrading or humiliating; Made her afraid of what would happen if she did not have sexual intercourse."
+
+        presentation:
+          title_public: Share of women aged <<age>> who experienced physical or sexual violence
+
+      pwid_ost_coverage:
+        title: "Coverage of opioid substitution therapy - Age: <<age>> - Sex: <<sex>>"
+        unit: "%"
+        description_short: |-
+          Percentage of <<sex + " " if sex != "total">>people <<"aged " + age + " " if age != "total">>who inject drugs receiving opioid agonist maintenance therapy.
+        description_from_producer: |-
+          Opioid agonist maintenance therapy represents a commitment to treat opioid dependence and reduce the frequency of injecting, preferably to zero. It is the most effective, evidence-based public health tool for reducing use among the people who inject opioids. Opioid agonist maintenance therapy provides crucial support for treating other health conditions, including HIV, tuberculosis and viral hepatitis.
+        description_key:
+          - Opioid agonist maintenance therapy is an effective, evidence-based treatment for opioid dependence, aiming to reduce injecting and improve public health outcomes.
+          - It also supports the treatment of other health conditions, such as HIV, tuberculosis, and viral hepatitis.
+        presentation:
+          title_public: |-
+            Share of <<sex + " " if sex != "total">>people who inject drugs receiving opioid agonist therapy
+          title_variant: <<"aged " + age if age != "total">>
+          grapher_config:
+            title: |-
+              Share of <<sex + " " if sex != "total">>people <<"aged " + age + " " if age != "total">>who inject drugs receiving opioid agonist therapy
+
+      hiv_pos_rate:
+        title: "HIV positivity rate - Sex: <<sex>> - Age: <<age>>"
+        unit: "%"
+        description_short: ""
+        description_from_producer: ""
+        presentation:
+          title_public: HIV positivity rate
+          title_variant: <<sex + "s, " if sex != "total">>aged <<age>>
+          grapher_config:
+            title: HIV positivity rate, <<sex + "s, " if sex != "total">>aged <<age>>
+
+  gam_age_sex_group:
+    common:
+      presentation:
+        grapher_config:
+          hasMapTab: true
+          tab: map
+    variables:
+      art_coverage:
+        title: "Antiretroviral therapy coverage (%) among people living with HIV - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
+        unit: "%"
+        description_short: |-
+          <% if group == "men who have sex with men" %>
+          Percentage of {definitions.gam_groups.msm} living with HIV receiving antiretroviral therapy in the past 12 months.
+          <%- elif group == "people who inject drugs" %>
+          Percentage of {definitions.gam_groups.pwid} living with HIV receiving antiretroviral therapy in the past 12 months.
+          <%- else %>
+          Percentage of {definitions.gam_groups.other} living with HIV receiving antiretroviral therapy in the past 12 months.
+          <%- endif %>
+        description_from_producer: |-
+          Antiretroviral therapy has been shown to reduce HIV-related morbidity and mortality among people living with HIV and to reduce the transmission of HIV. People living with HIV in key populations should be able to access mainstream services that provide antiretroviral therapy without fear of facing stigma or discrimination and to be able to receive care from health-care workers who have the clinical knowledge to meet their specific needs. Ideally, all of these mainstream services should meet the standards for becoming sensitized to the needs of key populations. Accordingly, antiretroviral therapy coverage is a crucial way of assessing access to mainstream services.
+
+          Calculated as: Numerator / Denominator, where
+
+          Numerator: Number of respondents living with HIV who report receiving antiretroviral therapy in the past 12 months
+
+          Denominator: Number of respondents living with HIV
+
+          Method of measurement: Behavioural surveillance or other special surveys.
+
+          More details: https://indicatorregistry.unaids.org/indicator/antiretroviral-therapy-coverage-among-people-living-hiv-key-populations-e
+        presentation:
+          title_public: Share of people living with HIV receiving antiretroviral therapy
+          title_variant: <<group>><<", " + sex if sex not in ["total", "other"]>><<", aged " + age if age != "total" >>
+          grapher_config:
+            title: |-
+              Share of people living with HIV receiving antiretroviral therapy, <<group>>
+              <%- if sex not in ["other", "total"] %>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
+
+      avoidance_care:
+        title: "Avoidance of health care because of stigma and discrimination"
+        unit: "%"
+        description_short: |-
+          <% if group == "men who have sex with men" %>
+          Avoidance of health care among {definitions.gam_groups.msm} because of stigma and discrimination.
+          <%- elif group == "people who inject drugs" %>
+          Avoidance of health care among {definitions.gam_groups.pwid} because of stigma and discrimination.
+          <%- else %>
+          Avoidance of health care among {definitions.gam_groups.other} because of stigma and discrimination.
+          <% endif %>
+        description_from_producer: |-
+          Discrimination is a human rights violation and is prohibited by international human rights law and most national constitutions. In the context of HIV, discrimination refers to unfair or unjust treatment of an individual (either through actions or by failure to act) based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, thus fueling the HIV epidemic. HIV-related stigma refers to negative beliefs, feelings and attitudes towards people living with HIV, groups associated with people living with HIV (e.g., the families of people living with HIV) and other key populations at higher risk of HIV infection, such as people who inject drugs, sex workers, gay men and other men who have sex with men and transgender people. In addition to HIV-related stigma, people from key populations experience further discrimination because of the stigma relating to same-sex attraction and sexual behaviour, engagement in sex work, drug use and non-conforming or diverse gender expression.
+
+          This indicator is important for providing a measure of the proportion of members of key populations who have avoided accessing general healthcare services, due to fear of stigma and discrimination. Related reasons for avoiding such services may include (but are not limited to) the following: a lack (or perceived lack of) confidentiality within health-care settings; negative attitudes and behaviours among health-care providers; and fears of disclosing or hinting at individual behaviours and sexual preference/orientation.
+
+          Data related to the avoidance of health-care services are important in measuring the proportion of key populations who are not fulfilling their basic health-care needs (such as routine medical check-ups) and thus may be less likely to attend health-care settings for more specialized services and care (such as HIV testing, treatment and medical care). This indicator is important for understanding and addressing the barriers to achieving the 95-95-95 targets among members of key populations. Data from this indicator directly measure fear of stigma or discrimination.
+
+          This indicator could provide further understanding and improve interventions in reducing HIV stigma and discrimination by (1) showing change over time in the percentage of people who fear experiencing stigma, (2) enabling comparisons between national, provincial, state and more local administrations, and (3) indicating priority areas for action
+
+
+          More details: https://indicatorregistry.unaids.org/indicator/avoidance-hiv-services-because-stigma-and-discrimination-among-key-populations-d
+        presentation:
+          title_public: Share of <<group>> avoiding health care due to stigma and discrimination
+          title_variant: |-
+            <%- if sex not in ["other", "total"] %>
+            <<sex>>s<<", " if age != "total">>
+            <%- endif %>
+            <%- if age != "total" %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of <<group>> avoiding health care due to stigma and discrimination
+              <%- if sex not in ["other", "total"] %>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
+
+      condom_use:
+        title: "Condom use among - Group: <<group>> - Sex: <<sex>> - Age: <<age>>"
+        unit: "%"
+        description_short: |-
+          <% if group == "men who have sex with men" %>
+          Share of {definitions.gam_groups.msm} reporting using a condom the last time they had anal sex with a male partner.
+          <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+          Share of {definitions.gam_groups.trans} reporting using a condom during their most recent sexual intercourse or anal sex.
+          <%- elif group == "people who inject drugs" %>
+          Share of {definitions.gam_groups.pwid} reporting using a condom the last time they had sexual intercourse.
+          <%- elif group == "sex workers" %>
+          Share of {definitions.gam_groups.sw} reporting using a condom with their most recent client.
+          <%- elif group == "high-risk sex" %>
+          Share of respondents who say they used a condom the last time they had sex with a non-marital, non-cohabiting partner, of those who have had sex with such a partner in the last 12 months.
+          <%- endif %>
+        description_key:
+          - |-
+            <% if group == "men who have sex with men" %>
+            Consistent and correct condom use is critical for men who have sex with men, as it significantly reduces HIV transmission risk—particularly for anal intercourse, which carries a high transmission probability.
+            <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+            Regular and proper condom use is critical for transgender individuals (especially trans women) to lower HIV transmission risks, particularly during anal sex.
+            <%- elif group == "people who inject drugs" %>
+            People who inject drugs can transmit HIV both through shared injecting equipment and through unprotected sex, making safer injecting and consistent condom use essential.
+            <%- elif group == "sex workers" %>
+            Sex workers face increased HIV transmission risk due to multiple non-regular partners and frequent sexual encounters; however, consistent and correct condom use significantly reduces this risk.
+            <%- elif group == "high-risk sex" %>
+            Individuals with non-marital, non-cohabiting sexual partners face increased HIV exposure risk, making consistent condom use critical.
+            <%- endif %>
+          - |-
+            <% if group == "men who have sex with men" %>
+            Some men who have sex with men may also have female partners, so regular condom use helps prevent potential HIV spread to them as well.
+            <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+            Condom use with one's most recent partner (whether vaginal or anal penetration) provides a practical proxy for assessing longer-term protective practices.
+            <%- elif group == "people who inject drugs" %>
+            Respondents who have injected in the past month and had sex in the same timeframe are asked about condom use during their last sexual encounter to gauge protective behavior.
+            <%- elif group == "sex workers" %>
+            Condom use with the most recent client is a practical proxy for assessing broader protective practices and provides valuable data on HIV prevention gaps.
+            <%- elif group == "high-risk sex" %>
+            Representative surveys (e.g., DHS, AIS, MICS) help identify those with higher-risk sexual behavior (non-regular partner in the past year) and measure condom use with the last partner.
+            <%- endif %>
+          - |-
+            <% if group == "men who have sex with men" %>
+            Reporting condom use during last anal sex is often used as a proxy measure for habitual condom use, and data collection should be done confidentially, preferably in collaboration with trusted community organizations.
+            <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+            Surveys and data collection should involve trusted civil society partners and ensure that respondent identity and information remain confidential.
+            <%- elif group == "people who inject drugs" %>
+            Gathering information should involve civil society partners, ensuring confidentiality and trust within this high-risk population.
+            <%- elif group == "sex workers" %>
+            Collaborations with trusted civil society organizations, plus strict confidentiality measures, are critical for safe and accurate data gathering among sex workers.
+            <%- elif group == "high-risk sex" %>
+            Asking about condom use during the most recent high-risk encounter provides a straightforward snapshot of protective practices and helps detect gaps in prevention strategies.
+            <%- endif %>
+
+        description_from_producer: |-
+          <% if group == "men who have sex with men" %>
+          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for men who have sex with men because of the high risk of HIV transmission during unprotected anal sex. In addition, men who have anal sex with other men may also have female partners, who could become infected as well. Condom use with the most recent male partner is considered a reliable indicator of longer-term behaviour.
+
+          Note: countries with generalized epidemics may also have a concentrated subepidemic among gay men and other men who have sex with men. If so, calculating and reporting on this indicator for this population would be valuable.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          In a behavioural survey of a sample of gay men and other men who have sex with men, respondents are asked about sexual partnerships in the past six months, about anal sex within these partnerships and about condom use when they last had anal sex. Condom use applies whether the respondent is the receptive and insertive partner.
+
+          Whenever possible, data for gay men and other men who have sex with men should be collected with civil society organizations that have worked closely with this population in the field.
+
+          Access to gay men and other men who have sex with men and the data collected from them must remain confidential and secure.
+
+          More details: https://indicatorregistry.unaids.org/indicator/men-who-have-sex-men-condom-use
+          <%- elif (("transgender" in group) or ("transwoman" in group) or ("transman" in group)) %>
+          Condoms can substantially reduce the risk of sexually transmitting HIV. Consistently and correctly using condoms is therefore important for transgender people, particularly trans-women, because of the high risk of HIV transmission during unprotected anal sex. Condom use with the most recent penetrative sex partner is considered a reliable indicator of longer-term behaviour.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          Respondents are asked the following question: "Did you use a condom during your most recent sexual intercourse or anal sex?"
+
+          Whenever possible, data for transgender people should be collected with civil society organizations that have worked closely with this population in the field. Access to transgender people and the data collected from them must remain confidential and secure.
+
+          More details: https://indicatorregistry.unaids.org/indicator/condom-use-among-transgender-people
+
+          <%- elif group == "people who inject drugs" %>
+          Safer injecting and sexual practices among people who inject drugs are essential, even in countries in which other modes of HIV transmission predominate, because the risk of HIV transmission from contaminated injecting equipment is extremely high, and people who inject drugs can spread HIV (such as through sexual transmission) to the wider population.
+
+          Note: countries with generalized epidemics may also have a concentrated subepidemic among people who inject drugs. If so, calculating and reporting on this indicator for this population would be valuable.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          People who inject drugs are asked the following sequence of questions:
+
+          1. "Have you injected drugs at any time in the past month?"
+          2. "If yes, have you had sexual intercourse in the past month?"
+
+          If they answer yes to both 1 and 2:
+          3. "Did you use a condom when you last had sexual intercourse?"
+
+          Whenever possible, data for people who inject drugs should be collected with civil society organizations that have worked closely with this population in the field.
+
+          Access to survey respondents and the data collected from them must remain confidential and secure.
+
+          More details: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-condom-use
+          <%- elif group == "sex workers" %>
+          Various factors increase the risk of exposure to HIV among sex workers, including multiple, non-regular partners and more frequent sexual intercourse. However, sex workers can substantially reduce the risk of HIV transmission, both from clients and to clients, by consistently and correctly using condoms.
+
+          Note: countries with generalized epidemics may also have a concentrated subepidemic among sex workers. If so, calculating and reporting on this indicator for this population would be valuable.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          Respondents are asked the following question: "Did you use a condom with your most recent client with whom you had sexual intercourse?"
+
+          Whenever possible, data for sex workers should be collected through or with civil society organizations that have worked closely with this population in the field. Access to sex workers and the data collected from them must remain confidential and secure.
+
+          More details: https://indicatorregistry.unaids.org/indicator/sex-workers-condom-use
+          <%- elif group == "high-risk sex" %>
+          Condom use is an important way of protecting against HIV, especially among people with non-regular sexual partners.
+
+          Method of measurement: Population-based surveys (Demographic Health Survey, AIDS Indicator Survey, Multiple Indicator Cluster Survey or other representative survey)
+
+          Respondents' sexual histories are obtained. Analysis of sexual history is used to determine whether the respondent had sex with a non-marital, non-cohabiting partner in the past 12 months and, if so, whether the respondent used a condom the last time the respondent had sexual intercourse with such a partner.
+
+          More details: https://indicatorregistry.unaids.org/indicator/condom-use-last-high-risk-sex
+          <%- endif %>
+        presentation:
+          title_public: |-
+            <% if group == "high-risk sex" %>
+            Share of people using a condom at last high-risk sex
+            <%- else %>
+            Condom use among <<group>>
+            <%- endif %>
+          title_variant: |-
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men") %>
+            <<sex>>s<<", " if age != "total">>
+            <%- endif %>
+            <%- if age != "total" %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              <% if group == "high-risk sex" %>
+              Share of people using a condom at last high-risk sex
+              <%- else %>
+              Share of <<group>> using a condom
+              <%- endif %>
+              <%- if sex not in ["other", "total"] %>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
+
+      discriminatory_attitudes:
+        title: |-
+          Discriminatory attitudes towards people living with HIV - Sex: <<sex>> - Age: <<age>> -
+          <%- if group == "question 1" %>
+           Wouldn't buy vegetables if vendor with HIV
+          <%- elif group == "question 2" %>
+           Children with HIV no school
+          <%- elif group == "all questions" %>
+           Wouldn't buy vegetables if vendor with HIV OR Children with HIV no school
+          <%- endif %>
+        unit: "%"
+        description_short: |-
+          Percentage of <<"people" if sex == "total" else "men" if sex == "male" else "women">><<" aged " + age if age != "total">> who responded NO to
+          <%- if group == "question 1" %>
+           "Would you buy fresh vegetables from a shopkeeper or vendor if you knew that this person had HIV?"
+          <%- elif group == "question 2" %>
+           "Do you think that children living with HIV should be able to attend school with children who are HIV negative?"
+          <%- elif group == "all questions" %>
+           either "Would you buy fresh vegetables from a shopkeeper or vendor if you knew that this person had HIV?" AND/OR "Do you think that children living with HIV should be able to attend school with children who are HIV negative?"
+          <%- endif %>
+        description_from_producer: |-
+          Discrimination is a human rights violation prohibited by international human rights law and most national constitutions. Discrimination in the context of HIV refers to unfair or unjust treatment (an act or an omission) of an individual based on his or her real or perceived HIV status. Discrimination exacerbates risks and deprives people of their rights and entitlements, fuelling the HIV epidemic. This indicator does not directly measure discrimination but rather measures discriminatory attitudes that may result in discriminatory acts (or omissions). One item in the indicator measures the potential support by respondents for discrimination that takes place at an institution and the other measures social distancing or behavioural expressions of prejudice. The composite indicator can be monitored as a measure of a key manifestation of HIV-related stigma and the potential for HIV-related discrimination within the general population. This indicator could provide further understanding and improve interventions in HIV discrimination by: showing change over time in the percentage of people with discriminatory attitudes; allowing comparisons between national, provincial, state and more local administrations; and indicating priority areas for action.
+
+          Method of measurement: Population-based surveys (Demographic and Health Survey, AIDS Indicator Survey, Multiple Indicator Cluster Survey or other representative survey). This indicator is constructed from responses to the following questions in a general population survey from respondents who have heard of HIV.
+
+          - Would you buy fresh vegetables from a shopkeeper or vendor if you knew that this person had HIV? (yes, no, don't know/not sure/it depends)
+
+          - Do you think that children living with HIV should be able to attend school with children who are HIV negative? (yes, no, don't know/not sure/it depends)
+
+          The respondents who have never heard of HIV and AIDS should be excluded from the estimation. Participants who respond don't know/not sure/it depends and those who refuse to answer should also be excluded.
+
+          Yes and no responses to each question may not add up to 100% if any participants respond “don't know” or values are missing. Calculating the percentage of people responding no to this question by subtracting the percentage of yes responses from 100% would therefore be inaccurate.
+
+
+          More details: https://indicatorregistry.unaids.org/indicator/discriminatory-attitudes-towards-people-living-hiv
+        presentation:
+          title_public: Discriminatory attitudes towards people living with HIV
+          title_variant: |-
+            <%- if sex not in ["other", "total"] %>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of people using a condom at last high-risk sex
+              <%- if sex not in ["other", "total"] %>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
+
+      experience_stigma:
+        title: "Experience of stigma and discrimination - Group: <<group>> - Sex: <<sex>> - Age: <<age>>"
+        unit: "%"
+        description_short: |-
+          Percentage of {definitions.gam_groups.variable} who report having experienced stigma and discrimination in the last six months.
+        description_from_producer: |-
+          Key population stigma is a negative stereotype based on an individual belonging to a key population group. Stigma is a well-documented barrier to the HIV care continuum, creating gaps across the prevention and treatment cascades, particularly for key populations (including sex workers, gay men and other men who have sex with men, people who inject drugs and transgender people). Key population stigma results from a range of drivers and facilitators, including: negative and judgmental attitudes towards key populations; shame related to an individual's ooccupation, drug use, or sexual and gender identity; and social, cultural and gender norms. These manifest in a range of stigmatizing practices and experiences, including discrimination, that deny key populations full social acceptance, consequently reducing their life chances, deterring them from accessing essential services and fuelling social inequalities.
+
+          Reducing HIV stigma and discrimination experienced by key populations is critical for increasing HIV testing, uptake of and adherence to antiretroviral therapy, and viral suppression, all of which will improve their health outcomes.
+
+          Method of measurement: Behavioural surveillance or other special surveys. This indicator is constructed based on the number of people who report that one or more of three experiences has happened to them in the last six months because of their key population status:
+
+          - Have you ever felt excluded from family activities because you [sell sex; have sex with men; inject drugs; are transgender]? (no; yes, in the last six months; yes, but not in the last six months; don't know).
+
+          - Has someone ever scolded you because you [sell sex; have sex with men; inject drugs; are transgender]? (no; yes, in the last six months; yes, but not in the last six months; don't know).
+
+          - Has someone ever blackmailed you because you [sell sex; have sex with men; inject drugs; are transgender]? (no; yes, in the last six months; yes, but not in the last six months; don't know).
+
+
+          More details: https://indicatorregistry.unaids.org/indicator/stigma-and-discrimination-experienced-key-populations
+        description_key:
+          - Key population stigma acts as a significant barrier to HIV care, manifesting through negative stereotypes and discrimination against specific groups like sex workers, men who have sex with men, people who inject drugs, and transgender individuals.
+          - Multiple factors drive this stigma, including societal attitudes, personal shame, and established social/cultural norms, which together create obstacles for accessing healthcare services and lead to social inequalities
+          - The impact of stigma directly affects HIV treatment outcomes by deterring individuals from seeking testing, reducing adherence to antiretroviral therapy, and hampering viral suppression efforts
+
+        presentation:
+          title_public: Experience of stigma and discrimination
+          title_variant: |-
+            <<group>>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+
+      hiv_prevalence:
+        title: "HIV prevalence - Age: <<age>> - Sex: <<sex>> - Group: <<group>>"
+        unit: "%"
+        description_short: |-
+          Share of {definitions.gam_groups.variable} living with HIV.
+        description_from_producer: |-
+          Sex workers, gay men and other men who have sex with men, people who inject drugs, transgender people and people in prisons and other closed settings typically have higher HIV prevalence than the general population in all  epidemic contexts. Addressing HIV among these populations is an important component of the national response.
+
+          <% if group == "prisoners" %>
+          This indicator is calculated using data from HIV tests conducted by prisons and other closed settings. HIV testing programme data are acceptable. Conducting surveys can be challenging and should therefore not be relied on. Testing should be conducted only with the consent of the people in prisons and other closed settings.
+          <% else %>
+          A-D.This indicator is calculated using data from HIV tests conducted among respondents in the sentinel site(s) or participants in biobehavioural surveys. The sentinel surveillance sites used for calculating this indicator should remain constant to allow for tracking changes over time.
+          <% endif %>
+
+          More details: https://indicatorregistry.unaids.org/indicator/hiv-prevalence-among-key-populations-e
+        presentation:
+          title_public: "Share of the population living with HIV"
+          title_variant: |-
+            <<group>>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              HIV Prevalence, <<group>>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
+
+      hiv_programmes_coverage:
+        title: "Coverage (%) of HIV prevention programmes - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
+        unit: "%"
+        description_short: |-
+          Percentage of {definitions.gam_groups.variable} reporting having received a combined set (at least two) of HIV prevention interventions in the past three months.
+        description_from_producer: |-
+          Successfully confronting the HIV epidemic requires combining preventive behaviour and antiretroviral therapy. Coverage with evidence-informed prevention programming is a critical component of the response, the importance of which is reflected in the UNAIDS Strategy.
+
+          Calculated as: Numerator/denominator
+
+          Numerator: Number of people in a key population who report receiving two or more of the prevention interventions listed in the past three months
+
+          Denominator: Number of people in a key population responding to the survey
+
+          Method of measurement: Percentage of respondents who report receiving at least two of the following HIV prevention services from a non-governmental organization, health-care provider or other sources.
+
+          - In the past three months, have you been given condoms and lubricant (for example, through an outreach service, drop-in centre or sexual health clinic)?
+
+          - In the past three months, have you received counselling on condom use and safe sex (for example, through an outreach service, drop-in centre or sexual health clinic)?
+
+          - Have you been tested for sexually transmitted infections in the past three months (sex workers, transgender people and gay men and other men who have sex with men)?
+
+          - Have you received new, clean needles or syringes in the past three months (people who inject drugs)?
+
+          More details: https://indicatorregistry.unaids.org/indicator/coverage-hiv-prevention-programmes-among-key-populations-d
+        presentation:
+          title_public: Share of people in HIV prevention programmes
+          title_variant: |-
+            <<group>>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of people in HIV prevention programmes, <<group>>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
+
+      hiv_status_awareness:
+        title: "HIV testing and status awareness - Sex: <<sex>> - Age: <<age>> - Group: <<group>>"
+        unit: "%"
+        description_short: |-
+          Percentage of {definitions.gam_groups.variable} who report having tested negative for HIV in the past 12 months, or who know that they are living with HIV.
+        description_from_producer: |-
+          Ensuring that people living with HIV receive the care and treatment required to live healthy, productive lives and reduce the chance of transmitting HIV, requires that they know their HIV status. In many countries, targeting testing and counselling for locations and populations with the highest HIV burden is the most efficient way to reach people living with HIV and ensure that they know their HIV status. This indicator captures the effectiveness of HIV testing interventions in reaching populations at higher risk of HIV infection.
+
+          Method of measurement: Behavioural surveillance or other special surveys
+
+          Respondents are asked the following questions:
+
+          1. Do you know your HIV status from an HIV test? a. No, I have never been tested; b. Yes, I have been tested
+
+          2. If yes, when were you last tested? a. In the last 6 months; b. In the last 6–12 months; c. More than 12 months ago
+
+          3. Was the result of your last test: a. Positive; b. Negative
+
+          Calculated as ((1b->2a->* + 1b->2b->* + 1b->2c->3a) / 1b)
+
+          More details: https://indicatorregistry.unaids.org/indicator/knowledge-hiv-status-among-key-populations-d
+        presentation:
+          title_public: Share of people that tested for HIV who know their status
+          title_variant: |-
+            <<group>>
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            , <<sex>>s
+            <%- endif %>
+            <%- if age != "total" %>
+            , aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of people that tested for HIV who know their status, <<group>>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
+
+      hiv_tests:
+        title: HIV tests
+        # title: HIV testing among TB patients
+        # title: Safe injecting practices among people who inject drugs
+        unit: tests
+        description_short: |-
+          The number of HIV tests conducted (testing volume) to
+          <%- if group == "TB-patients" %>
+           <<sex if sex != "total">>TB patients
+          <%- else %>
+           <<"people" if sex == "total" else sex + "s">>
+          <%- endif %><<" aged " + age if age != "total">> in the last 12 months.
+        description_from_producer: |-
+          More details: https://indicatorregistry.unaids.org/indicator/hiv-testing-volume-and-positivity-0
+        presentation:
+          title_public: Number of HIV tests conducted<<" in " + group if group != "total">>
+          title_variant: |-
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            <<sex>>s<<", " if age != "total">>
+            <%- endif %>
+            <%- if age != "total" %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Number of HIV tests conducted<<", " + group if group != "total">>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>
+
+      pwid_safety:
+        title: "Safe injecting practices among people who inject drugs"
+        unit: "%"
+        description_short: |-
+          Percentage of <<group + " " if group != "total">>people<<" aged " + age if age != "total">> who inject drugs reporting using sterile injecting equipment the last time they injected.
+        description_from_producer: |-
+          More details: https://indicatorregistry.unaids.org/indicator/people-who-inject-drugs-safe-injecting-practices
+        presentation:
+          title_public: Share of <<group + " " if group != "total">>people who inject drugs using sterile equipment
+          title_variant: |-
+            <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+            <<sex>>s<<"," if age != "total">>
+            <%- endif %>
+            <%- if age != "total" %>
+            aged <<age>>
+            <%- endif %>
+          grapher_config:
+            title: |-
+              Share of people who inject drugs using sterile equipment<<", " + group if group != "total">>
+              <%- if (sex not in ["other", "total"]) and (group != "men who have sex with men")%>
+              , <<sex>>s
+              <%- endif %>
+              <%- if age != "total" %>
+              , aged <<age>>
+              <%- endif %>

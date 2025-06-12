@@ -2,15 +2,21 @@
 definitions:
   others:
     description_delivered: |-
-      Number of COVID-19 doses that were donated by countries to COVAX and have been delivered by COVAX to a recipient country.
+      Number of COVID-19 doses that have been donated by countries to COVAX and have then been to a recipient country
     description_donated: |-
-      Number of COVID-19 doses that have been donated by countries to COVAX. These doses have not yet been delivered by COVAX to a recipient country.
+      Number of COVID-19 doses that have been donated by countries to COVAX. These doses have not yet been delivered to a recipient country
     description_announced: |-
-      Number of COVID-19 doses that have been announced as donations by countries to COVAX. These doses have not yet been donated to COVAX.
+      Number of COVID-19 doses that have been announced as donations by countries to COVAX. These doses have not yet been donated to COVAX
   common:
     presentation:
       topic_tags:
         - COVID-19
+    description_key:
+      - COVAX is an international initiative led by Gavi, CEPI, and WHO to ensure equitable access to COVID-19 vaccines, regardless of a country's wealth.
+      - Through the COVAX Facility, self-financing countries pool funds to procure vaccines, while 92 lower-income countries receive free doses supported by donor funding through the Gavi COVAX AMC.
+      - Donations to COVAX help scale up vaccine manufacturing capacity early, preventing significant delays or shortages once vaccines receive approval.
+      - Ensuring widespread vaccine access underpins the 'no one is safe until everyone is safe' principle, aiming to end the pandemic by reducing disparities in vaccination.
+      - Learn more on COVAX in [GAVI's website](https://www.gavi.org/covax-facility).
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
@@ -24,60 +30,61 @@ tables:
       delivered:
         title: "COVID-19 doses shipped by COVAX"
         description_short: |-
-          {definitions.others.description_delivered}
+          {definitions.others.description_delivered}.
         unit: "doses"
+      only_donated:
+        title: "COVID-19 doses donated to COVAX"
+        description_short: |-
+          {definitions.others.description_donated}.
+        unit: "doses"
+      only_announced:
+        title: "COVID-19 doses donations to COVAX announced"
+        description_short: |-
+          {definitions.others.description_announced}.
+        unit: "doses"
+
       delivered_per_gdp:
         title: "COVID-19 doses shipped by COVAX, per GDP"
         description_short: |-
           {definitions.others.description_delivered}, per million dollars of GDP of the donating country.
         unit: "doses per million dollars of GDP"
-      delivered_per_used:
-        title: "COVID-19 doses shipped by COVAX, per doses used"
-        description_short: |-
-          {definitions.others.description_delivered}, per dose administered domestically.
-        unit: ""
-      delivered_per_capita:
-        title: "COVID-19 doses shipped by COVAX, per capita"
-        description_short: |-
-          {definitions.others.description_delivered}, per person living in the donating country.
-        unit: "doses per capita"
-
-      only_donated:
-        title: "COVID-19 doses donated to COVAX"
-        description_short: |-
-          {definitions.others.description_donated}
-        unit: "doses"
       only_donated_per_gdp:
         title: "COVID-19 doses donated to COVAX, per GDP"
         description_short: |-
           {definitions.others.description_donated}, per million dollars of GDP of the donating country.
         unit: "doses per million dollars of GDP"
-      only_donated_per_used:
-        title: "COVID-19 doses donated to COVAX, per doses used"
-        description_short: |-
-          {definitions.others.description_donated}, per dose administered domestically.
-        unit: ""
-      only_donated_per_capita:
-        title: "COVID-19 doses donated to COVAX, per capita"
-        description_short: |-
-          {definitions.others.description_donated}, per person living in the donating country.
-        unit: "doses per capita"
-
-      only_announced:
-        title: "COVID-19 doses donations to COVAX announced"
-        description_short: |-
-          {definitions.others.description_announced}
-        unit: "doses"
       only_announced_per_gdp:
         title: "COVID-19 doses donations to COVAX announced, per GDP"
         description_short: |-
           {definitions.others.description_announced}, per million dollars of GDP of the donating country.
         unit: "doses per million dollars of GDP"
+
+      delivered_per_used:
+        title: "COVID-19 doses shipped by COVAX, per doses used"
+        description_short: |-
+          {definitions.others.description_delivered}, per dose administered domestically.
+        unit: ""
+      only_donated_per_used:
+        title: "COVID-19 doses donated to COVAX, per doses used"
+        description_short: |-
+          {definitions.others.description_donated}, per dose administered domestically.
+        unit: ""
       only_announced_per_used:
         title: "COVID-19 doses donations to COVAX announced, per doses used"
         description_short: |-
           {definitions.others.description_announced}, per dose administered domestically.
         unit: ""
+
+      delivered_per_capita:
+        title: "COVID-19 doses shipped by COVAX, per capita"
+        description_short: |-
+          {definitions.others.description_delivered}, per person living in the donating country.
+        unit: "doses per capita"
+      only_donated_per_capita:
+        title: "COVID-19 doses donated to COVAX, per capita"
+        description_short: |-
+          {definitions.others.description_donated}, per person living in the donating country.
+        unit: "doses per capita"
       only_announced_per_capita:
         title: "COVID-19 doses donations to COVAX announced, per capita"
         description_short: |-

@@ -1,0 +1,27 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  producer_prices_in_industry:
+    variables:
+      ppi:
+        title: Index value
+        unit: ""
+        short_unit: ""
+        # The short description is set at the meadow step, where the choice of base year is made.
+        # description_short: |-
+        #   Index value of the producer prices in industry, assuming a base value of 100 for 2021.
+      flag:
+        title: Data flag
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Flag assigned by Eurostat for a given value in the data.

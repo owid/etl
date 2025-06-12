@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: OECD Health Systems
+    description: |-
+      Data on health systems published by the OECD in 1993.
+    date_published: "1993"
+    title_snapshot: OECD Health Systems - Public expenditure on health and GDP
+    description_snapshot: |-
+      Data in millions of national currency units, between 1960 and 1991.
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      Poullier, J. P. (1993). OECD Health Systems (No. 3). Organisation for Economic Co-operation and Development.
+    attribution_short: OECD
+
+    # Files
+    url_main: https://search.worldcat.org/title/868237125
+    date_accessed: 2025-03-04
+
+    # License
+    license:
+      name: CC BY 4.0
+      url: https://search.worldcat.org/title/868237125
+
+outs:
+  - md5: fb8791f9145193daebe88c87563e3f19
+    size: 46890
+    path: health_expenditure_1993.xlsx

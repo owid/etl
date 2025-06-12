@@ -1,0 +1,47 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Historical pertussis deaths in the United States Census Bureau
+    description: |-
+      Data on historical pertussis deaths in the United States, compiled from a selection of sources from the US Census Bureau.
+
+      Sources for each year are as follows:
+
+      * 1944: [US Census Bureau “Statistical Abstract of the United States: 1946”](https://www.census.gov/library/publications/1946/compendia/statab/67ed.html)
+
+      * 1945: [US Census Bureau “Statistical Abstract of the United States: 1947”](https://www.census.gov/library/publications/1947/compendia/statab/68ed.html)
+
+      * 1946: [US Census Bureau “Statistical Abstract of the United States: 1948”](https://www.census.gov/library/publications/1948/compendia/statab/69ed.html)
+
+      * 1947: [US Census Bureau “Statistical Abstract of the United States: 1949”](https://www.census.gov/library/publications/1949/compendia/statab/70ed.html)
+
+      * 1948: [US Census Bureau “Statistical Abstract of the United States: 1950”](https://www.census.gov/library/publications/1950/compendia/statab/71ed.html)
+
+    date_published: "1948"
+
+    # Citation
+    producer: Centers for Disease Control and Prevention
+    citation_full: |-
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1946.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1947.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1948.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1949.
+
+      US Census Bureau. Part 2 - Vital Statistics, Statistical Abstract of the United States: 1950.
+
+    # Files
+    url_main: https://www.census.gov/library/publications/1950/compendia/statab/71ed.html
+    date_accessed: 2025-02-25
+
+    # License
+    license:
+      name: Public domain
+outs:
+  - md5: 159cd99b6e84469e8b2da84736dade47
+    size: 527
+    path: pertussis_deaths.csv

@@ -1,16 +1,19 @@
-from datetime import datetime
-
 import pandas as pd
 from structlog import get_logger
 
 from apps.chart_sync.admin_api import AdminAPI
-from apps.housekeeper.utils import add_reviews, get_chart_summary, get_reviews_id
+from apps.housekeeper.utils import (
+    TODAY,
+    YEAR_AGO,
+    add_reviews,
+    get_chart_summary,
+    get_charts_with_slug_rename_last_year,
+    get_reviews_id,
+)
 from apps.wizard.app_pages.similar_charts.data import get_raw_charts
 from etl.config import OWID_ENV, SLACK_API_TOKEN
 from etl.slack_helpers import send_slack_message
 
-CHANNEL_NAME = "#lucas-playground"
-SLACK_USERNAME = "housekeeper"
 log = get_logger()
 
 
@@ -29,7 +32,8 @@ def send_slack_chart_review(channel_name: str, slack_username: str, icon_emoji: 
     # DEBUGGING:
     # 2582 (wordpress link), 1609 (no references), 5689 (explorer, no post), 4288 (explorer, wp post), 2093 (no explorer, post), 3475 (explorer, post), (explorer, post + wp)
     # chart = df[df.chart_id == 3475].iloc[0]
-    chart = df.iloc[0]
+    # chart = df.iloc[0]
+    log.info(f"Selected chart: {chart['chart_id']}, {chart['slug']}")
 
     # Get references
     refs = get_references(chart["chart_id"])
@@ -132,11 +136,10 @@ def get_charts_to_review():
         df["num_posts"] = df["num_posts"].fillna(0)
         return df
 
+    # Get all charts
     df = get_raw_charts()
 
     # Keep only older-than-a-year charts
-    TODAY = datetime.today()
-    YEAR_AGO = TODAY.replace(year=TODAY.year - 1)
     df = df.loc[df["created_at"] < YEAR_AGO]
 
     # The following code gets all references from explorers and posts for all charts. This is currently commented because we use AdminAPI instead to *just* get this information for the selected daily chart.
@@ -146,9 +149,13 @@ def get_charts_to_review():
     df = _add_explorer_references(df, df_exp)
     df = _add_post_references(df, df_links)
 
-    # Discard charts already presented in the chat
+    # Ignore some charts (reviewed, recently slug-renamed)
+    ## Discard charts already presented in the chat
     reviews_id = get_reviews_id(object_type="chart")
-    df = df.loc[~df["chart_id"].isin(reviews_id)]
+    ## Keep only charts whose slug hasn't been changed in the last year
+    rename_id = get_charts_with_slug_rename_last_year()
+    ## Combine & ignore
+    df = df.loc[~df["chart_id"].isin(reviews_id + rename_id)]
 
     return df
 
@@ -177,7 +184,7 @@ def get_references(chart_id: int):
 
 def build_main_message(chart, refs):
     message_usage = _get_main_message_usage(chart, refs)
-    DATE = datetime.today().date().strftime("%d %b, %Y")
+    DATE = TODAY.date().strftime("%d %b, %Y")
     message = (
         f"{DATE}: *Daily chart:* "
         f"<{OWID_ENV.chart_site(chart['slug'])}|{chart['title']}>\n"
@@ -193,7 +200,7 @@ def _get_main_message_usage(chart, refs):
 
     This includes chart views, and references to chart (from explorers and posts).
     """
-    msg_chart_views = f"{chart['views_365d']} views last year"
+    msg_chart_views = f"{chart['views_365d']:.0f} views last year"
 
     num_posts = len(refs.get("postsGdocs", [])) + len(refs.get("postsWordpress", []))
     num_explorers = len(refs.get("explorers", []))

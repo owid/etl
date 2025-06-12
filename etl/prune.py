@@ -15,7 +15,7 @@ config.enable_sentry()
 log = structlog.get_logger()
 
 
-EXCLUDE_STEP_TYPES = ("grapher", "walden", "walden-private", "github")
+EXCLUDE_STEP_TYPES = ("grapher", "snapshot", "snapshot-private", "github")
 
 
 @click.command(name="prune")

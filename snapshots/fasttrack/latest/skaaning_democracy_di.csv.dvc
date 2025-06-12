@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: Unknown
+    title: Unknown
+    citation_full: Unknown
+    version_producer: Local CSV
+    url_main: https://unknown.com
+    url_download: skaaning_democracy_DI.csv
+    date_accessed: '2025-02-20'
+    date_published: '2025-02-20'
+  name: DRAFT skaaning_democracy_DI
+  description: ''
+outs:
+  - md5: de2b35af9c8c7e5b0dd9d15107588287
+    size: 173
+    path: skaaning_democracy_di.csv

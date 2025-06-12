@@ -1,6 +1,5 @@
 import json
 import re
-import zipfile
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -13,7 +12,7 @@ from owid.catalog import Dataset, Table, VariableMeta
 from owid.catalog.utils import underscore
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 from etl.paths import CACHE_DIR
 
 log = structlog.get_logger()
@@ -23,8 +22,28 @@ memory = Memory(CACHE_DIR, verbose=0)
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+# Define GDP/GDP per capita indicators in current US$ and their counterpart in constant LCU
+GDP_INDICATORS = {"ny_gdp_mktp_cd": "ny_gdp_mktp_kn", "ny_gdp_pcap_cd": "ny_gdp_pcap_kn"}
 
-def run(dest_dir: str) -> None:
+# Define base year to calculate constant 2021 US$ GDPs to compare with constant 2021 int-$ GDPs
+BASE_YEAR_FOR_CONSTANT_USD_GDP = 2021
+
+# Define regions for population weighted aggregations of GDP
+REGIONS = [
+    "Asia",
+    "Europe",
+    "Africa",
+    "North America",
+    "South America",
+    "Oceania",
+    "World",
+]
+
+# Define the fraction of allowed NaNs per year for the population weighted aggregations
+FRAC_ALLOWED_NANS_PER_YEAR = 0.2
+
+
+def run() -> None:
     log.info("wdi.start")
 
     #
@@ -40,6 +59,7 @@ def run(dest_dir: str) -> None:
     # Process data.
     #
     tb_meadow = ds_meadow.read("wdi", safe_types=False)
+    tb_metadata = ds_meadow.read("wdi_metadata", safe_types=False)
 
     tb = geo.harmonize_countries(
         df=tb_meadow,
@@ -54,7 +74,7 @@ def run(dest_dir: str) -> None:
     tb_garden = tb
 
     log.info("wdi.add_variable_metadata")
-    tb_garden = add_variable_metadata(tb_garden)
+    tb_garden = add_variable_metadata(tb_garden, tb_metadata)
 
     tb_omm = mk_omms(tb_garden)
     tb_garden = tb_garden.join(tb_omm, how="outer")
@@ -74,13 +94,28 @@ def run(dest_dir: str) -> None:
     # add regions to remittance data
     tb_garden = add_regions_to_remittance_data(tb_garden, ds_regions, ds_income_groups)
 
+    # Adjust GDP indicators in current US$ to constant US$ using the growth of the same indicator in LCU
+    for gdp_current_usd, gdp_constant_lcu in GDP_INDICATORS.items():
+        tb_garden = adjust_current_to_constant_usd(
+            tb=tb_garden,
+            indicator_current_usd=gdp_current_usd,
+            indicator_constant_lcu=gdp_constant_lcu,
+            base_year=BASE_YEAR_FOR_CONSTANT_USD_GDP,
+            ds_regions=ds_regions,
+            ds_population=ds_population,
+        )
+
+    tb_garden = add_energy_access_variables(tb_garden)
+
+    tb_garden = add_patents_articles_per_million_people(tb_garden)
+
     ####################################################################################################################
 
     #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb_garden], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(tables=[tb_garden], default_metadata=ds_meadow.metadata)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -460,13 +495,8 @@ def _fetch_metadata_for_indicator(indicator_code: str) -> Dict[str, str]:
     }
 
 
-def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
-    snap = paths.load_snapshot()
-    zf = zipfile.ZipFile(snap.path)
-    df_vars = pd.read_csv(zf.open("WDISeries.csv"))
-
+def load_variable_metadata(df_vars: Table, indicator_codes: list[str]) -> pd.DataFrame:
     df_vars.dropna(how="all", axis=1, inplace=True)
-    df_vars.columns = df_vars.columns.map(underscore)
     df_vars.rename(columns={"series_code": "indicator_code"}, inplace=True)
 
     # Fetch missing indicator metadata
@@ -479,6 +509,8 @@ def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
     indicators_without_meta |= set(df_vars.loc[df_vars.indicator_name.isnull(), "indicator_code"])
 
     # Fetch metadata for missing indicators
+    # NOTE: this should be ideally in the snapshot, but there are only a few indicators like this so it's
+    #   not worth it
     log.info("wdi.missing_metadata", n_indicators=len(indicators_without_meta))
     df_missing = pd.DataFrame([_fetch_metadata_for_indicator(code) for code in indicators_without_meta])
 
@@ -499,6 +531,7 @@ def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
         raise RuntimeError(f"Missing sources for indicators:\n{missing_sources}")
 
     # Underscore indicator codes
+    df_vars["indicator_code_original"] = df_vars["indicator_code"].copy()
     df_vars["indicator_code"] = df_vars["indicator_code"].apply(underscore)
     df_vars["indicator_name"] = df_vars["indicator_name"].str.replace(r"\s+", " ", regex=True)
 
@@ -508,11 +541,11 @@ def load_variable_metadata(indicator_codes: list[str]) -> pd.DataFrame:
     return df_vars.set_index("indicator_code")
 
 
-def add_variable_metadata(table: Table) -> Table:
-    var_codes = table.columns.tolist()
-    indicator_codes = [table[col].m.title for col in table.columns]
+def add_variable_metadata(tb: Table, tb_metadata: Table) -> Table:
+    var_codes = tb.columns.tolist()
+    indicator_codes = [tb[col].m.title for col in tb.columns]
 
-    df_vars = load_variable_metadata(indicator_codes)
+    df_vars = load_variable_metadata(tb_metadata, indicator_codes)
 
     missing_var_codes = set(var_codes) - set(df_vars.index)
     if missing_var_codes:
@@ -520,7 +553,7 @@ def add_variable_metadata(table: Table) -> Table:
 
     clean_source_mapping = load_clean_source_mapping()
 
-    table.update_metadata_from_yaml(paths.metadata_path, "wdi", extra_variables="ignore")
+    tb.update_metadata_from_yaml(paths.metadata_path, "wdi", extra_variables="ignore")
 
     # construct metadata for each variable
     for var_code in var_codes:
@@ -533,20 +566,39 @@ def add_variable_metadata(table: Table) -> Table:
         clean_source = clean_source_mapping.get(source_raw_name)
         assert clean_source, f'`rawName` "{source_raw_name}" not found in wdi.sources.json. Run update_metadata.ipynb or check non-breaking spaces.'
 
-        # create an origin with WDI source name as producer
-        table[var_code].m.origins[0].producer = clean_source["name"]
+        # create an origin with WDI
+        assert len(tb[var_code].m.origins) == 1
+        origin = tb[var_code].m.origins[0]
 
-        table[var_code].m.description_from_producer = create_description(var)
+        # Check out this issue for details on the origin: https://github.com/owid/etl/issues/3971#issuecomment-2921855209
+        #
+        # Example:
+        #
+        # origin:
+        #     producer: Food and Agriculture Organization of the United Nations
+        #     title: World Development Indicators (World Bank)
+        #     description: |-
+        #         The World Development Indicators (WDI) is the primary World Bank collection of development indicators, compiled from officially-recognized international sources. It presents the most current and accurate global development data available, and includes national, regional and global estimates.
+        #     url_main: https://data.worldbank.org/indicator/AG.CON.FERT.PT.ZS
+        #     citation_full: {rawName}. Indicator AG.CON.FERT.PT.ZS ({url_main}), {title} ({date_published})
+        #     attribution: None
+        origin.producer = clean_source["name"]
+        origin.title = "World Development Indicators"
+        origin.url_main = f"https://data.worldbank.org/indicator/{var['indicator_code_original']}"
+        origin.citation_full = f"{source_raw_name.rstrip('.')}. Indicator {var['indicator_code_original']} ({origin.url_main}). World Development Indicators - World Bank ({origin.date_published.split('-')[0]}). Accessed on {origin.date_accessed}."
 
-    if not all([len(table[var_code].origins) == 1 for var_code in var_codes]):
-        missing = [var_code for var_code in var_codes if len(table[var_code].origins) != 1]
+        # set description_from_producer
+        tb[var_code].m.description_from_producer = create_description_from_producer(var)
+
+    if not all([len(tb[var_code].origins) == 1 for var_code in var_codes]):
+        missing = [var_code for var_code in var_codes if len(tb[var_code].origins) != 1]
         raise RuntimeError(
             "Expected each variable code to have one origin, but the following variables "
             f"do not: {missing}. Are the source names for these variables "
             "missing from `wdi.sources.json`?"
         )
 
-    return table
+    return tb
 
 
 def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
@@ -558,7 +610,7 @@ def load_clean_source_mapping() -> Dict[str, Dict[str, str]]:
     return source_mapping
 
 
-def create_description(var: Dict[str, Any]) -> Optional[str]:
+def create_description_from_producer(var: Dict[str, Any]) -> Optional[str]:
     desc = ""
     if pd.notnull(var["long_definition"]) and len(var["long_definition"].strip()) > 0:
         desc += var["long_definition"]
@@ -605,4 +657,173 @@ def add_armed_personnel_as_share_of_population(tb: Table, ds_population: Dataset
     # Set index again
     tb = tb.format(["country", "year"])
 
+    return tb
+
+
+def adjust_current_to_constant_usd(
+    tb: Table,
+    indicator_current_usd: str,
+    indicator_constant_lcu: str,
+    base_year: int,
+    ds_regions: Dataset,
+    ds_population: Dataset,
+) -> Table:
+    """
+    Adjust current LCU indicators to constant US$/int-$ using a deflator indicator and the base year.
+    The indicators to use have to be in local currency units for this to work.
+    The function works equally if the deflator is CPI or a GDP deflator, or any other deflator.
+
+    Available deflator indicators in WDI:
+
+    GDP deflators
+        ny_gdp_defl_zs_ad, GDP deflator: linked series (base year varies by country)
+        ny_gdp_defl_zs, GDP deflator (base year varies by country)
+
+    CPI deflators
+        fp_cpi_totl, Consumer price index (2010 = 100)
+
+    Available conversion indicators in WDI:
+
+    Exchange rates
+        pa_nus_fcrf, Official exchange rate (LCU per US$, period average)
+        pa_nus_atls, DEC alternative conversion factor (LCU per US$)
+
+    PPP conversion factors
+        pa_nus_ppp, PPP conversion factor, GDP (LCU per international $)
+        pa_nus_prvt_pp, PPP conversion factor, private consumption (LCU per international $)
+    """
+
+    tb = tb.reset_index()
+
+    tb_adjusted = tb[["country", "year"] + [indicator_current_usd] + [indicator_constant_lcu]].copy()
+
+    # Create a new table with the data only for the base year
+    tb_base_year = tb_adjusted[tb_adjusted["year"] == base_year].reset_index(drop=True)
+
+    # Merge the two tables
+    tb_adjusted = pr.merge(
+        tb_adjusted,
+        tb_base_year[["country", indicator_current_usd, indicator_constant_lcu]],
+        on="country",
+        how="left",
+        suffixes=("", "_base_year"),
+    )
+
+    # Divide the indicator in constant LCU by the indicator in constant LCU in the base year
+    tb_adjusted[f"{indicator_constant_lcu}_ratio"] = (
+        tb_adjusted[indicator_constant_lcu] / tb_adjusted[f"{indicator_constant_lcu}_base_year"]
+    )
+
+    # Adjust the indicator to constant US$
+    tb_adjusted[f"{indicator_current_usd}_adjusted"] = (
+        tb_adjusted[f"{indicator_current_usd}_base_year"] * tb_adjusted[f"{indicator_constant_lcu}_ratio"]
+    )
+
+    tb_adjusted = add_population_weighted_aggregations(
+        tb=tb_adjusted,
+        indicator=f"{indicator_current_usd}_adjusted",
+        ds_regions=ds_regions,
+        ds_population=ds_population,
+    )
+
+    # Merge the adjusted indicators back to the original table
+    tb = pr.merge(
+        tb,
+        tb_adjusted[["country", "year"] + [f"{indicator_current_usd}_adjusted"]],
+        on=["country", "year"],
+        how="outer",
+    )
+
+    # Reformat again
+    tb = tb.format()
+
+    return tb
+
+
+def add_population_weighted_aggregations(
+    tb: Table, indicator: str, ds_regions: Dataset, ds_population: Dataset
+) -> Table:
+    """
+    Add population weighted aggregations for the given indicator.
+    This is used together with the adjust_current_to_constant_usd function to calculate constant US$ indicators.
+    """
+    tb = tb.copy()
+
+    # Remove regions from table
+    tb = tb[~tb["country"].isin(REGIONS)].reset_index(drop=True)
+
+    # Add population to the table
+    tb = geo.add_population_to_table(tb=tb, ds_population=ds_population, warn_on_missing_countries=False)
+
+    # Multiply the indicator by the population to get the weighted value
+    tb[f"{indicator}_weighted"] = tb[indicator] * tb["population"]
+
+    # Add regional aggregates for these indicators
+    tb_regions = geo.add_regions_to_table(
+        tb=tb,
+        aggregations={
+            f"{indicator}_weighted": "sum",
+            "population": "sum",
+        },
+        regions=REGIONS,
+        ds_regions=ds_regions,
+        frac_allowed_nans_per_year=FRAC_ALLOWED_NANS_PER_YEAR,
+    )
+
+    # Filter only by regions
+    tb_regions = tb_regions[tb_regions["country"].isin(REGIONS)].reset_index(drop=True)
+
+    # Divide the weighted indicator by the population to get the weighted average
+    tb_regions[indicator] = tb_regions[f"{indicator}_weighted"] / tb_regions["population"]
+
+    # Keep only the columns we need
+    tb_regions = tb_regions[["country", "year", indicator]]
+
+    # Merge the regional data back to the original table
+    tb = pr.concat([tb, tb_regions], ignore_index=True)
+
+    return tb
+
+
+def add_energy_access_variables(tb: Table) -> Table:
+    """
+    Calculate the following energy related variables:
+
+    1. Share of the population without access to electricity
+    2. Number of people with access to electricity
+    3. Number of people without access to electricity
+    4. Share of the population without access to clean cooking fuels
+    5. Number of people with access to clean cooking fuels
+    6. Number of people without access to clean cooking fuels
+
+    """
+
+    # Add energy access variables
+    tb = tb.reset_index()
+
+    tb["eg_elc_accs_zs_without"] = 100 - tb["eg_elc_accs_zs"]
+    tb["eg_cft_accs_zs_without"] = 100 - tb["eg_cft_accs_zs"]
+
+    # Calculate number of people with and without access to electricity
+    tb["eg_elc_accs_zs_number"] = tb["eg_elc_accs_zs"] / 100 * tb["sp_pop_totl"]
+    tb["eg_elc_accs_zs_without_number"] = tb["eg_elc_accs_zs_without"] / 100 * tb["sp_pop_totl"]
+
+    # Calculate number of people with and without access to clean cooking fuels
+    tb["eg_cft_accs_zs_number"] = tb["eg_cft_accs_zs"] / 100 * tb["sp_pop_totl"]
+    tb["eg_cft_accs_zs_without_number"] = tb["eg_cft_accs_zs_without"] / 100 * tb["sp_pop_totl"]
+    tb = tb.format(["country", "year"])
+    return tb
+
+
+def add_patents_articles_per_million_people(tb: Table) -> Table:
+    """
+    Add patents and articles per million people.
+    """
+    tb = tb.reset_index()
+
+    # Calculate patents and articles per million people
+    tb["patents_per_million_people"] = tb["ip_pat_resd"] / tb["sp_pop_totl"] * 1000000
+    tb["articles_per_million_people"] = tb["ip_jrn_artc_sc"] / tb["sp_pop_totl"] * 1000000
+
+    tb = tb.format(["country", "year"])
     return tb

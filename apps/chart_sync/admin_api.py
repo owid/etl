@@ -5,6 +5,7 @@ import random
 import string
 from functools import cache
 from typing import Any, Dict, List, Optional
+from urllib.parse import quote
 
 import requests
 import structlog
@@ -62,10 +63,21 @@ class AdminAPI(object):
         return js
 
     def create_chart(self, chart_config: dict, user_id: Optional[int] = None) -> dict:
+        # Extract isInheritanceEnabled from config and prepare request params
+        config = chart_config.copy()
+        is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
+
+        # Build request parameters
+        params = {}
+        if is_inheritance_enabled is not None:
+            inheritance_param = "enable" if is_inheritance_enabled else "disable"
+            params["inheritance"] = inheritance_param
+
         resp = requests.post(
             self.owid_env.admin_api + "/charts",
             cookies={"sessionid": self._get_session_id(user_id)},
-            json=chart_config,
+            json=config,
+            params=params,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -73,10 +85,21 @@ class AdminAPI(object):
         return js
 
     def update_chart(self, chart_id: int, chart_config: dict, user_id: Optional[int] = None) -> dict:
+        # Extract isInheritanceEnabled from config and prepare request params
+        config = chart_config.copy()
+        is_inheritance_enabled = config.pop("isInheritanceEnabled", None)
+
+        # Build request parameters
+        params = {}
+        if is_inheritance_enabled is not None:
+            inheritance_param = "enable" if is_inheritance_enabled else "disable"
+            params["inheritance"] = inheritance_param
+
         resp = requests.put(
             f"{self.owid_env.admin_api}/charts/{chart_id}",
             cookies={"sessionid": self._get_session_id(user_id)},
-            json=chart_config,
+            json=config,
+            params=params,
         )
         js = self._json_from_response(resp)
         if not js["success"]:
@@ -119,16 +142,64 @@ class AdminAPI(object):
             raise AdminAPIError({"error": js["error"], "variable_id": variable_id})
         return js
 
-    def put_mdim_config(self, slug: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
+    def put_mdim_config(self, mdim_catalog_path: str, mdim_config: dict, user_id: Optional[int] = None) -> dict:
         # Retry in case we're restarting Admin on staging server
+        url = self.owid_env.admin_api + f"/multi-dims/{quote(mdim_catalog_path, safe='')}"
         resp = requests_with_retry().put(
-            self.owid_env.admin_api + f"/multi-dim/{slug}",
+            url,
             cookies={"sessionid": self._get_session_id(user_id)},
-            json=mdim_config,
+            json={"config": mdim_config},
         )
         js = self._json_from_response(resp)
         if not js["success"]:
-            raise AdminAPIError({"error": js["error"], "slug": slug, "mdim_config": mdim_config})
+            raise AdminAPIError(
+                {"error": js["error"], "mdim_catalog_path": mdim_catalog_path, "mdim_config": mdim_config}
+            )
+        return js
+
+    def put_explorer_config(self, slug: str, tsv: str, user_id: Optional[int] = None) -> dict:
+        # Retry in case we're restarting Admin on staging server
+        url = self.owid_env.admin_api + f"/explorers/{slug}"
+        resp = requests_with_retry().put(
+            url,
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json={"tsv": tsv, "commitMessage": "Update explorer from ETL"},
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "slug": slug, "tsv": tsv[:1000]})
+        return js
+
+    def create_dod(self, name: str, content: str, user_id: int | None = None) -> Dict[str, Any]:
+        """Create a new DoD (Details on Demand)."""
+        data = {
+            "name": name,
+            "content": content,
+        }
+        resp = requests.post(
+            f"{self.owid_env.admin_api}/dods",
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json=data,
+        )
+        js = self._json_from_response(resp)
+        if not js["success"]:
+            raise AdminAPIError({"error": js["error"], "dod_data": data})
+        return js
+
+    def update_dod(self, dod_id: int, content: str, user_id: int | None = None) -> Dict[str, Any]:
+        """Update an existing DoD."""
+        data = {
+            "content": content,
+        }
+        resp = requests.patch(
+            f"{self.owid_env.admin_api}/dods/{dod_id}",
+            cookies={"sessionid": self._get_session_id(user_id)},
+            json=data,
+        )
+        js = self._json_from_response(resp)
+        # NOTE: update DoD doesn't return `success`, but {dod: 1} (which is wrong, it should return DoD id)
+        # if not js["success"]:
+        #     raise AdminAPIError({"error": js["error"], "dod_data": data})
         return js
 
 

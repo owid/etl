@@ -12,7 +12,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 
 @click.command()
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
-def main(upload: bool) -> None:
+def run(upload: bool) -> None:
     # Create a new snapshot.
     snap = Snapshot(f"climate/{SNAPSHOT_VERSION}/global_sea_level.csv")
 
@@ -21,4 +21,4 @@ def main(upload: bool) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    run()

@@ -25,13 +25,13 @@ import structlog
 from ipdb import launch_ipdb_on_exception
 
 from etl import config, files, paths
+from etl.dag_helpers import load_dag
 from etl.steps import (
     DAG,
     DataStep,
     GrapherStep,
     Step,
     compile_steps,
-    load_dag,
     parse_step,
     select_dirty_steps,
 )
@@ -69,6 +69,11 @@ log = structlog.get_logger()
     help="Run private steps.",
 )
 @click.option(
+    "--instant",
+    is_flag=True,
+    help="Only apply YAML metadata in the garden step.",
+)
+@click.option(
     "--grapher/--no-grapher",
     "-g/-ng",
     default=False,
@@ -79,7 +84,7 @@ log = structlog.get_logger()
     "--export/--no-export",
     default=False,
     type=bool,
-    help="Run export steps like writing explorer TSV file to owid-content repository _(OWID staff only, access required)_",
+    help="Run export steps like saving explorer _(OWID staff only, access required)_",
 )
 @click.option(
     "--ipdb",
@@ -138,7 +143,6 @@ log = structlog.get_logger()
 )
 @click.option(
     "--watch",
-    "-w",
     is_flag=True,
     help="Run ETL infinitely and update changed files.",
 )
@@ -152,6 +156,7 @@ def main_cli(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
+    instant: bool = False,
     grapher: bool = False,
     export: bool = False,
     ipdb: bool = False,
@@ -198,6 +203,9 @@ def main_cli(
     # GRAPHER_INSERT_WORKERS should be split among workers
     if workers > 1:
         config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
+
+    # Set INSTANT mode from CLI flag
+    config.INSTANT = instant
 
     kwargs = dict(
         steps=steps,
@@ -292,8 +300,29 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    # if export is not set, remove all steps
-    if not export:
+    if export:
+        # If there were any "export://multidim" or "export://explorers" steps, keep them in the dag, to be executed.
+        for step in list(dag.keys()):
+            if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
+                # If private is false and any of the dependencies are private, continue
+                if not private and any(_is_private_step(dep) for dep in dag[step]):
+                    continue
+
+                # We want to execute export steps after any grapher://grapher steps,
+                # to ensure that any indicators required by the collection step are already pushed to DB.
+                # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
+                dag[step] = {
+                    re.sub(r"^(data|data-private)://", "grapher://", dep)
+                    if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)
+                    else dep
+                    for dep in dag[step]
+                }
+
+        # Finally, ensure that the added grapher://grapher steps will be executed,
+        # by activating the "grapher" flag.
+        grapher = True
+    else:
+        # If there were any "export://" steps in the dag, remove them.
         dag = {step: deps for step, deps in dag.items() if not step.startswith("export://")}
 
     # If --grapher is set, add all steps for upserting to DB
@@ -395,7 +424,16 @@ def run_dag(
 
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
     execution_times = {}
+    failing_steps: List[Step] = []
+    skipped_steps: List[Step] = []
+    exceptions: List[Exception] = []
+
     for i, step in enumerate(steps, 1):
+        if config.CONTINUE_ON_FAILURE and {s.path for s in step.dependencies} & {s.path for s in skipped_steps}:
+            print(f"--- {i}. {step} (skipped)")
+            skipped_steps.append(step)
+            continue
+
         print(f"--- {i}. {step}{_create_expected_time_message(_get_execution_time(step_name=str(step)))}")
 
         # Determine strictness level for the current step
@@ -405,11 +443,18 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
             # Execute the step and measure the time taken
             try:
                 time_taken = timed_run(lambda: step.run())
-            except Exception:
+            except Exception as e:
                 # log which step failed and re-raise the exception, otherwise it gets lost
                 # in logs and we don't know which step failed
                 log.error("step_failed", step=str(step))
-                raise
+                if config.CONTINUE_ON_FAILURE:
+                    failing_steps.append(step)
+                    exceptions.append(e)
+                    skipped_steps.append(step)
+                    click.echo(click.style("FAILED", fg="red"))
+                    continue
+                else:
+                    raise e
             execution_times[str(step)] = time_taken
 
             click.echo(f"{click.style('OK', fg='blue')}{_create_expected_time_message(time_taken)}")
@@ -417,6 +462,12 @@ def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
 
         # Write the recorded execution times to the file after all steps have been executed
         _write_execution_times(execution_times)
+
+    if config.CONTINUE_ON_FAILURE and exceptions:
+        for step, exception in zip(failing_steps, exceptions):
+            log.error("step_exception", step=str(step), exception=str(exception))
+        # Raise the first exception
+        raise exceptions[0]
 
 
 def _steps_sort_key(step: Step) -> int:
@@ -680,10 +731,10 @@ def _check_dag_completeness(dag: DAG) -> None:
     """Make sure the DAG is complete, i.e. all dependencies are there."""
     for step, deps in dag.items():
         for dep in deps:
-            if re.match(r"^(snapshot|walden|snapshot-private|walden-private|github|etag)://", dep):
+            if re.match(r"^(snapshot|snapshot-private|github|etag)://", dep):
                 pass
             elif dep not in dag:
-                raise ValueError(f"Step {step} depends {dep} which is not in the DAG.")
+                raise ValueError(f"Step {step} depends on {dep} which is not in the DAG.")
 
 
 if __name__ == "__main__":

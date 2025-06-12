@@ -217,15 +217,16 @@ def run(dest_dir: str) -> None:
     # Set index and sort
     # Define index cols
     index_cols = ["country", "year"]
+    index_cols_unsmoothed = ["country", "year", "reporting_level", "welfare_type"]
     index_cols_percentiles = ["country", "year", "reporting_level", "welfare_type", "percentile"]
     tb_inc_2011 = tb_inc_2011.format(keys=index_cols)
     tb_cons_2011 = tb_cons_2011.format(keys=index_cols)
-    tb_inc_or_cons_2011_unsmoothed = tb_inc_or_cons_2011_unsmoothed.format(keys=index_cols)
+    tb_inc_or_cons_2011_unsmoothed = tb_inc_or_cons_2011_unsmoothed.format(keys=index_cols_unsmoothed)
     tb_inc_or_cons_2011 = tb_inc_or_cons_2011.format(keys=index_cols)
 
     tb_inc_2017 = tb_inc_2017.format(keys=index_cols)
     tb_cons_2017 = tb_cons_2017.format(keys=index_cols)
-    tb_inc_or_cons_2017_unsmoothed = tb_inc_or_cons_2017_unsmoothed.format(keys=index_cols)
+    tb_inc_or_cons_2017_unsmoothed = tb_inc_or_cons_2017_unsmoothed.format(keys=index_cols_unsmoothed)
     tb_inc_or_cons_2017 = tb_inc_or_cons_2017.format(keys=index_cols)
 
     tb_percentiles_2011 = tb_percentiles_2011.format(keys=index_cols_percentiles)
@@ -857,9 +858,6 @@ def inc_or_cons_data(tb: Table) -> Tuple[Table, Table, Table, Table]:
 
     tb_inc_or_cons = check_jumps_in_grapher_dataset(tb_inc_or_cons)
 
-    # If both inc and cons are available in a given year, drop inc (legacy)
-    tb_inc_or_cons_unsmoothed = remove_duplicates_inc_cons(tb_inc_or_cons_unsmoothed)
-
     return tb_inc, tb_cons, tb_inc_or_cons_unsmoothed, tb_inc_or_cons
 
 
@@ -1035,23 +1033,6 @@ def check_jumps_in_grapher_dataset(tb: Table) -> Table:
             "check_diff_welfare_type",
         ]
     )
-
-    return tb
-
-
-def remove_duplicates_inc_cons(tb: Table) -> Table:
-    """
-    Remove duplicates in the income and consumption data
-    This is only for legacy purposes, because we don't use this for OWID, but we do for Joe's PhD
-    """
-    # Flag duplicates – indicating multiple welfare_types
-    # Sort values to ensure the welfare_type consumption is marked as False when there are multiple welfare types
-    tb = tb.sort_values(by=["ppp_version", "country", "year", "reporting_level", "welfare_type"], ignore_index=True)
-    tb["duplicate_flag"] = tb.duplicated(subset=["ppp_version", "country", "year", "reporting_level"])
-
-    # Drop income where income and consumption are available
-    tb = tb[(~tb["duplicate_flag"]) | (tb["welfare_type"] == "consumption")]
-    tb.drop(columns=["duplicate_flag"], inplace=True)
 
     return tb
 

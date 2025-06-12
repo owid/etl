@@ -1,0 +1,41 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Happiness & Life Satisfaction
+
+dataset:
+  update_period_days: 0 # This dataset will probably not get updated
+
+
+tables:
+  happiness_by_age:
+    variables:
+      cantril_ladder_score:
+        title: Cantril ladder score for people aged << age_group >>
+        unit: ""
+        short_unit: ""
+        description_short: Average of survey responses for people aged << age_group >>. The survey question asks respondents their current position on a hypothetical [ladder](#dod:cantril-ladder), where the best possible life for them is a 10, and the worst possible life is a 0.
+        description_processing: Average of regions is calculated by taking a population-weighted average over all countries within that region.
+        description_key:
+          - The Cantril ladder asks respondents to think of a ladder, with the best possible life for them being a 10 and the worst possible life being a 0. They are then asked to rate their own current lives on that 0 to 10 scale.
+          - The rankings are three-year averages, calculated by the World Happiness report based on nationally representative samples collected by the Gallup World Poll. This data is averaged over the resposes from 2021 to 2023.
+          - The number of people and countries surveyed varies year to year, but typically more than 100,000 people in 130 countries participate in the Gallup World Poll each year.
+          - The rankings are based entirely on the survey scores, using the Gallup weights to make the estimates representative.
+        presentation:
+          title_public: Self-reported life satisfaction (<< age_group >>)
+        display:
+          numDecimalPlaces: 2
+      rank:
+        title: Life satisfaction rank for people aged << age_group >>
+        unit: ""
+        short_unit: ""
+        description_short: Rank of the country based on their average life satisfaction score for people aged << age_group >>.
+        description_key:
+          - The rank is based on the self-reported life satisfaction of each country, with 1 being the country with the highest score.
+          - The amount of countries surveyed can vary between the years, which might affect the rank, especially in the lower half of the ranking.
+        display:
+          numDecimalPlaces: 0
+
+

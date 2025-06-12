@@ -3,12 +3,13 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Antibiotics
+        - Antibiotics & Antibiotic Resistance
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
+  non_redistributable: true
 
 tables:
   microbe_total_deaths_by_syndrome:

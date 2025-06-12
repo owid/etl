@@ -1,0 +1,34 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Space Exploration & Satellites
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+tables:
+  near_earth_asteroids:
+    variables:
+      larger_than_1km:
+        title: Near-Earth asteroids larger than 1 kilometer
+        unit: asteroids
+        short_unit: ""
+        description_short: "Cumulative number of discovered asteroids with an orbit that brings them into proximity with Earth and a size larger than 1 kilometer."
+        display:
+          numDecimalPlaces: 0
+      between_140m_and_1km:
+        title: Near-Earth asteroids between 140 meters and 1 kilometer
+        unit: asteroids
+        short_unit: ""
+        description_short: "Cumulative number of discovered asteroids with an orbit that brings them into proximity with Earth and a size between 140 meters and 1 kilometer."
+        display:
+          numDecimalPlaces: 0
+      smaller_than_140m:
+        title: Near-Earth asteroids smaller than 140 meters
+        unit: asteroids
+        short_unit: ""
+        description_short: "Cumulative number of discovered asteroids with an orbit that brings them into proximity with Earth and a size smaller than 140 meters."
+        display:
+          numDecimalPlaces: 0

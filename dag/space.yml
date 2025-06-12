@@ -1,29 +1,127 @@
 steps:
+  #
   # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
-  data://meadow/space/2024-01-03/near_earth_asteroids:
-    - snapshot://space/2024-01-03/near_earth_asteroids.csv
-  data://garden/space/2024-01-03/near_earth_asteroids:
-    - data://meadow/space/2024-01-03/near_earth_asteroids
-  data://grapher/space/2024-01-03/near_earth_asteroids:
-    - data://garden/space/2024-01-03/near_earth_asteroids
-  # Online Index of Objects Launched into Outer Space
-  data://meadow/space/2024-01-04/object_launches:
-    - snapshot://space/2024-01-04/object_launches.csv
-  data://garden/space/2024-01-04/object_launches:
-    - data://meadow/space/2024-01-04/object_launches
-  data://grapher/space/2024-01-04/object_launches:
-    - data://garden/space/2024-01-04/object_launches
-  # Exoplanets (NASA)
-  data://meadow/space/2024-08-16/exoplanets:
-    - snapshot://space/2024-08-16/exoplanets.csv
-  data://garden/space/2024-08-16/exoplanets:
-    - data://meadow/space/2024-08-16/exoplanets
-  data://grapher/space/2024-08-16/exoplanets:
-    - data://garden/space/2024-08-16/exoplanets
-  # Number of objects in space (United States Space Force)
-  data://meadow/space/2024-08-16/space_track:
-    - snapshot://space/2024-08-16/space_track.csv
-  data://garden/space/2024-08-16/space_track:
-    - data://meadow/space/2024-08-16/space_track
-  data://grapher/space/2024-08-16/space_track:
-    - data://garden/space/2024-08-16/space_track
+  #
+  data://meadow/space/2025-03-04/near_earth_asteroids:
+    - snapshot://space/2025-03-04/near_earth_asteroids.csv
+  #
+  # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
+  #
+  data://garden/space/2025-03-04/near_earth_asteroids:
+    - data://meadow/space/2025-03-04/near_earth_asteroids
+  #
+  # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
+  #
+  data://grapher/space/2025-03-04/near_earth_asteroids:
+    - data://garden/space/2025-03-04/near_earth_asteroids
+  #
+  # UNOOSA - Online Index of Objects Launched into Outer Space
+  #
+  data://meadow/space/2025-03-04/object_launches:
+    - snapshot://space/2025-03-04/object_launches.csv
+  #
+  # UNOOSA - Online Index of Objects Launched into Outer Space
+  #
+  data://garden/space/2025-03-04/object_launches:
+    - data://meadow/space/2025-03-04/object_launches
+  #
+  # UNOOSA - Online Index of Objects Launched into Outer Space
+  #
+  data://grapher/space/2025-03-04/object_launches:
+    - data://garden/space/2025-03-04/object_launches
+  #
+  # NASA - Exoplanets
+  #
+  data://meadow/space/2025-03-04/exoplanets:
+    - snapshot://space/2025-03-04/exoplanets.csv
+  #
+  # NASA - Exoplanets
+  #
+  data://garden/space/2025-03-04/exoplanets:
+    - data://meadow/space/2025-03-04/exoplanets
+  #
+  # NASA - Exoplanets
+  #
+  data://grapher/space/2025-03-04/exoplanets:
+    - data://garden/space/2025-03-04/exoplanets
+  #
+  # United States Space Force - Number of objects in space
+  #
+  data://meadow/space/2025-03-04/objects_in_space:
+    - snapshot://space/2025-03-04/objects_in_space.csv
+  #
+  # United States Space Force - Number of objects in space
+  #
+  data://garden/space/2025-03-04/objects_in_space:
+    - data://meadow/space/2025-03-04/objects_in_space
+  #
+  # United States Space Force - Number of lower Earth objects in space by type
+  #
+  data://grapher/space/2025-03-04/lower_earth_objects_by_type:
+    - data://garden/space/2025-03-04/objects_in_space
+  #
+  # United States Space Force - Number of non-debris objects in space by orbit
+  #
+  data://grapher/space/2025-03-04/non_debris_objects_by_orbit:
+    - data://garden/space/2025-03-04/objects_in_space
+  #
+  # Gravitational Wave Open Science Center - Gravitational wave events
+  #
+  data://meadow/space/2025-03-04/gravitational_wave_events:
+    - snapshot://space/2025-03-04/gravitational_wave_events.csv
+  #
+  # Gravitational Wave Open Science Center - Gravitational wave events
+  #
+  data://garden/space/2025-03-04/gravitational_wave_events:
+    - data://meadow/space/2025-03-04/gravitational_wave_events
+  #
+  # Gravitational Wave Open Science Center - Gravitational wave events
+  #
+  data://grapher/space/2025-03-04/gravitational_wave_events:
+    - data://garden/space/2025-03-04/gravitational_wave_events
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
+  #
+  data://meadow/space/2025-03-04/international_astronaut_database:
+    - snapshot://space/2025-03-04/international_astronaut_database.csv
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
+  #
+  data://garden/space/2025-03-04/international_astronaut_database:
+    - data://meadow/space/2025-03-04/international_astronaut_database
+    - data://garden/regions/2023-01-01/regions
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - International Astronaut Database
+  #
+  data://grapher/space/2025-03-04/international_astronaut_database:
+    - data://garden/space/2025-03-04/international_astronaut_database
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
+  #
+  data://meadow/space/2025-03-04/cost_of_space_launches:
+    - snapshot://space/2025-03-04/cost_of_space_launches.csv
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
+  #
+  data://garden/space/2025-03-04/cost_of_space_launches:
+    - data://meadow/space/2025-03-04/cost_of_space_launches
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - Cost of space launches
+  #
+  data://grapher/space/2025-03-04/cost_of_space_launches:
+    - data://garden/space/2025-03-04/cost_of_space_launches
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
+  #
+  data://meadow/space/2025-03-04/nasa_budget:
+    - snapshot://space/2025-03-04/nasa_budget.csv
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
+  #
+  data://garden/space/2025-03-04/nasa_budget:
+    - data://meadow/space/2025-03-04/nasa_budget
+  #
+  # Center for Strategic and International Studies, Aerospace Security Project - History of the NASA Budget
+  #
+  data://grapher/space/2025-03-04/nasa_budget:
+    - data://garden/space/2025-03-04/nasa_budget

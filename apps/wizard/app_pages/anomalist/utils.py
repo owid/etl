@@ -45,7 +45,7 @@ def infer_variable_mapping(dataset_id_new: int, dataset_id_old: int) -> Dict[int
 
 
 @st.cache_data(show_spinner=False)
-@st.spinner("Retrieving datasets...")
+@st.spinner("Retrieving datasets...", show_time=True)
 def get_datasets_and_mapping_inputs() -> Tuple[Dict[int, str], Dict[int, str], Dict[int, int]]:
     t = time.time()
     # Get all datasets from DB.
@@ -129,7 +129,7 @@ def get_scores(anomalies: List[gm.Anomaly]) -> pd.DataFrame:
     """Combine and reduce scores dataframe."""
     df = combine_and_reduce_scores_df(anomalies)
 
-    # Add a population score, an analytics score, and a weighted score.
+    # Add a population score, an analytics (views last 14 days) score, and a weighted score.
     df = add_auxiliary_scores(df=df)
 
     return df

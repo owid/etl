@@ -90,7 +90,7 @@ def render_indicator_mapping(search_form) -> Dict[int, int]:
     return indicator_mapping
 
 
-@st.cache_data
+@st.cache_data(ttl=30 * 60)
 def _get_params_cached(
     dataset_old_id,
     dataset_new_id,
@@ -494,7 +494,8 @@ def get_indicator_id_to_display(old_indicators, new_indicators):
 @st.cache_data(show_spinner=False)
 def get_indicator_data_cached(indicator_ids: List[int]):
     with st.spinner(
-        "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section."
+        "Retrieving data values from S3. This might take some time... If you don't need this, disable the 'Explore' option from the 'parameters' section.",
+        show_time=True,
     ):
         df = variable_data_df_from_s3(
             get_engine(),

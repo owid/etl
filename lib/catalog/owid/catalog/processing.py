@@ -22,12 +22,16 @@ from .tables import (
     read_rda_multiple,
     read_rds,
     read_stata,
+    to_datetime,
     to_numeric,
 )
+from .warnings import ignore_warnings
 
 __all__ = [
     "ExcelFile",
     "concat",
+    "ignore_warnings",
+    "keep_metadata",
     "melt",
     "merge",
     "multi_merge",
@@ -46,6 +50,6 @@ __all__ = [
     "read_rds",
     "read_df",
     "read_parquet",
+    "to_datetime",
     "to_numeric",
-    "keep_metadata",
 ]

@@ -1,0 +1,37 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+      grapher_config:
+        note: |-
+          This data is expressed in constant {EUROS_YEAR} euros, deflated using the Producer Price Index for energy.
+    processing_level: minor
+    description_key:
+      - Wholesale electricity prices are the average spot prices in the day-ahead market, where electricity is traded for delivery to consumers the following day. These prices fluctuate based on supply and demand and are typically set on an hourly basis.
+      - Prices are measured in euros per [megawatt-hour](#dod:watt-hours).
+      - These are the prices paid to electricity producers and do not represent the final cost for households or businesses, which also includes additional costs like distribution, transmission, and taxes.
+      - To account for inflation, prices have been adjusted using the Producer Price Index (PPI) for energy, with {EUROS_YEAR} as the reference year.
+    description_processing: |-
+      - To account for inflation, prices have been divided by the Producer Price Index (PPI) for energy (and multiplied by 100), using {EUROS_YEAR} as the reference year. This adjusts for changes in producer costs over time, providing a more consistent measure of price trends.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  european_wholesale_electricity_prices_monthly:
+    variables:
+      price:
+        title: Electricity wholesale monthly price
+        unit: 'constant {EUROS_YEAR} euros per megawatt-hour'
+        short_unit: "€/MWh"
+        description_short: |-
+          Monthly average wholesale price of electricity sold, in euros per [megawatt-hour](#dod:watt-hours). Prices have been adjusted for inflation but not for differences in living costs between countries.
+  european_wholesale_electricity_prices_annual:
+    variables:
+      price:
+        title: Electricity wholesale annual price
+        unit: "constant {EUROS_YEAR} euros per megawatt-hour"
+        short_unit: "€/MWh"
+        description_short: |-
+          Annual average wholesale price of electricity sold, in euros per [megawatt-hour](#dod:watt-hours). Prices have been adjusted for inflation but not for differences in living costs between countries.

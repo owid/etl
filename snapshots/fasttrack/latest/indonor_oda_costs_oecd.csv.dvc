@@ -1,0 +1,16 @@
+meta:
+  origin:
+    producer: OECD (2025)
+    title: indonor_oda_costs_oecd
+    citation_full: OECD (2025)
+    url_main: https://www.oecd.org/en/topics/policy-issues/official-development-assistance-oda.html
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vRKTFRPDX1wdQjwFtxL3pIE5TXUWVsENniHL69QcPsbD3g4H2KLbcZ7jRYvPmkEYZc4CcnUJiDhKPF8/pub?output=csv
+    date_accessed: '2025-03-07'
+  name: Indonor foreign aid costs (OECD)
+  description: ''
+  license: {}
+outs:
+  - md5: a1c93f9cfbbd42fbee43af308864ce28
+    size: 47019
+    path: indonor_oda_costs_oecd.csv

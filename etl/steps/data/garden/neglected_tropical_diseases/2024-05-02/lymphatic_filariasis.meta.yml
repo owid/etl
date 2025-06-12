@@ -10,8 +10,7 @@ definitions:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
   update_period_days: 365
-
-  title: Preventive Chemotherapy (PC) Data Portal
+  title: Preventive Chemotherapy (PC) Data Portal - Lymphatic Filariasis
 tables:
   lymphatic_filariasis:
     variables:

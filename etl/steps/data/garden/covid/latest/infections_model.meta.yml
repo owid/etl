@@ -29,7 +29,6 @@ definitions:
         Median estimate
         <%- endif -%>
 
-
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -43,29 +42,56 @@ tables:
         title: Daily new estimated COVID-19 infections (ICL, <<estimate.title()>> estimate)
         presentation:
           title_public: Daily new estimated COVID-19 infections (ICL, <<estimate.title()>> estimate)
-        description: |-
+        description_short: |-
           <% set model_name = "ICL" %>
           {definitions.others.description}
+        description_key:
+          - The ICL model is a stochastic SEIR variant that “back-calculates" likely infections by linking reported deaths to an estimated infection fatality rate (IFR) and mobility trends.
+          - Since the model relies on confirmed deaths and assumed IFR values, any under-reporting or mismatches in demographic factors can introduce uncertainties and potentially underestimate the true infection burden.
+          - Designed initially for low- and middle-income countries, the model's projections (including Rt, hospital demand, and ICU needs) hinge on accurate input data, making real-world reporting gaps a key limitation.
+          - Like all models, this one makes many assumptions, for a full list see the [model methods description](https://mrc-ide.github.io/global-lmic-reports/parameters.html).
 
       ihme_infections:
         title: Daily new estimated COVID-19 infections (IHME, <<estimate.title()>> estimate)
         presentation:
           title_public: Daily new estimated COVID-19 infections (IHME, <<estimate.title()>> estimate)
-        description: |-
+        description_short: |-
           <% set model_name = "IHME" %>
           {definitions.others.description}
+        description_key:
+          - IHME's hybrid model combines a statistical "death model" with an SEIR component, fitting infection estimates by using confirmed deaths and an assumed infection fatality rate (IFR).
+          - The IFR is partly derived from data on the Diamond Princess cruise ship and New Zealand, meaning any inaccuracies in these sources may affect the overall infection estimates.
+          - The model accounts for a wide range of factors (e.g., mobility data, policy changes, and population density) to gauge how interventions and behavior impact transmission rates.
+          - Underestimation or overestimation can occur if critical assumptions—such as how testing levels reduce the case fatality rate—do not align with real-world dynamics.
+          - IHME paused its routine COVID-19 modeling after December 16, 2022, so estimates beyond this point are no longer updated.
+          - More details are discussed in the [model FAQs](http://www.healthdata.org/covid/faqs) and in different [estimation update reports](http://www.healthdata.org/covid/updates).
 
       lshtm_infections:
         title: Daily new estimated COVID-19 infections (LSHTM, <<estimate.title()>> estimate)
         presentation:
           title_public: Daily new estimated COVID-19 infections (LSHTM, <<estimate.title()>> estimate)
-        description: |-
+        description_short: |-
           <% set model_name = "LSHTM" %>
           {definitions.others.description}
+        description_key:
+          - LSHTM uses a delay-adjusted CFR comparison to estimate how many symptomatic infections go undetected, then adds an assumed 10-70% asymptomatic share to estimate total infections.
+          - A baseline CFR of 1.4% - derived from early data in China - underpins the model, potentially leading to overestimation or underestimation of infections in populations with different age structures.
+          - By assuming confirmed deaths reflect true deaths, the model may underestimate the actual health burden in places where fatalities are underreported or reported with delays.
+          - Retroactive revisions in death data can introduce discrepancies, affecting the model's calculations of under-ascertainment rates.
+          - While it highlights under-detection of infections, the model's accuracy depends heavily on its baseline CFR assumptions and the completeness of reported deaths data.
+          - More assumptions and limitations are discussed in [the full report](https://cmmid.github.io/topics/covid19/reports/UnderReporting.pdf).
+
       yyg_infections:
         title: Daily new estimated COVID-19 infections (Youyang Gu, <<estimate.title()>> estimate)
         presentation:
           title_public: Daily new estimated COVID-19 infections (Youyang Gu, <<estimate.title()>> estimate)
-        description: |-
+        description_short: |-
           <% set model_name = "Youyang Gu" %>
           {definitions.others.description}
+        description_key:
+          - The model combines a standard SEIR framework with a machine-learning layer that adjusts parameters to align with observed data, aiming for forecast accuracy.
+          - Using reported deaths and an estimated infection fatality rate (IFR) to back-calculate infections can introduce uncertainty, especially if actual deaths are underreported.
+          - The model assumes that IFR decreases over time (e.g., to 30% of its initial value) to reflect changing demographics of infection and improvements in treatment.
+          - Although designed primarily for the United States, the model also provides estimates for other countries, where it may have reduced accuracy due to differing data quality and health-system factors.
+          - Updates to the model ceased on 5 October 2020, so any emerging trends or subsequent changes in testing, transmission, or IFR are not reflected in its latest estimates.
+          - For a full list of assumptions and limitations see [the model "About" page](https://covid19-projections.com/about/#assumptions).

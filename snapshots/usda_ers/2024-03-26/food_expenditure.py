@@ -19,7 +19,7 @@ SNAPSHOT_VERSION = Path(__file__).parent.name
 )
 def main(upload: bool) -> None:
     # Create a new snapshot.
-    snap = Snapshot(f"usda_ers/{SNAPSHOT_VERSION}/food_expenditure.xlsx")
+    snap = Snapshot(f"usda_ers/{SNAPSHOT_VERSION}/food_expenditure_since_2018.xlsx")
     snap.create_snapshot(upload=upload)
 
 

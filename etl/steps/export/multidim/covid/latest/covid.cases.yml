@@ -1,26 +1,26 @@
 definitions:
-  table: grapher/covid/latest/cases_deaths/cases_deaths
-  config: &config
-    tab: map
-    originUrl: ourworldindata.org/coronavirus
-    hideAnnotationFieldsInTitle:
-      entity: true
-      time: true
-      changeInPrefix: true
+  common_views:
+    - config:
+        tab: map
+        originUrl: ourworldindata.org/coronavirus
+        hideAnnotationFieldsInTitle:
+          entity: true
+          time: true
+          changeInPrefix: true
 
 title:
   title: COVID-19 confirmed cases
-  titleVariant: by interval
-defaultSelection:
+  title_variant: ""
+default_selection:
   - World
   - Europe
   - Asia
-topicTags:
+topic_tags:
   - COVID-19
 
 dimensions:
-  - slug: interval
-    name: Interval
+  - slug: period
+    name: Period
     choices:
       - slug: weekly
         name: Weekly
@@ -30,53 +30,47 @@ dimensions:
         description: null
 
   - slug: metric
-    name: Metric
+    name: Indicator
     choices:
       - slug: absolute
-        name: Absolute
+        name: Absolute number
         description: null
       - slug: per_capita
         name: Per million people
-        description: null
+        description: Normalized by million people living in the country or region
       - slug: change
-        name: Change from previous interval
-        description: null
+        name: Relative change (%)
+        description: Growth rate compared to the previous period
 
 views:
   - dimensions:
-      interval: weekly
+      period: weekly
       metric: absolute
     indicators:
-      y: "{definitions.table}#weekly_cases"
-    config: *config
+      y: "cases_deaths#weekly_cases"
   - dimensions:
-      interval: weekly
+      period: weekly
       metric: per_capita
     indicators:
-      y: "{definitions.table}#weekly_cases_per_million"
-    config: *config
+      y: "cases_deaths#weekly_cases_per_million"
   - dimensions:
-      interval: weekly
+      period: weekly
       metric: change
     indicators:
-      y: "{definitions.table}#weekly_pct_growth_cases"
-    config: *config
+      y: "cases_deaths#weekly_pct_growth_cases"
 
   - dimensions:
-      interval: biweekly
+      period: biweekly
       metric: absolute
     indicators:
-      y: "{definitions.table}#biweekly_cases"
-    config: *config
+      y: "cases_deaths#biweekly_cases"
   - dimensions:
-      interval: biweekly
+      period: biweekly
       metric: per_capita
     indicators:
-      y: "{definitions.table}#biweekly_cases_per_million"
-    config: *config
+      y: "cases_deaths#biweekly_cases_per_million"
   - dimensions:
-      interval: biweekly
+      period: biweekly
       metric: change
     indicators:
-      y: "{definitions.table}#biweekly_pct_growth_cases"
-    config: *config
+      y: "cases_deaths#biweekly_pct_growth_cases"

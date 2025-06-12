@@ -1,0 +1,23 @@
+dataset:
+  title: Measles cases by state (CDC)
+  description: Reported measles cases by state from CDC reports. Used to supplement Project Tycho dataset.
+  licenses:
+    - url: Public resource
+tables:
+  measles_cases:
+    variables:
+      cases:
+        title: cases
+        unit: cases
+        display:
+          numDecimalPlaces: 0.0
+        description: Reported measles cases
+      source:
+        title: source
+        unit: ''
+        description: Source of data
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year

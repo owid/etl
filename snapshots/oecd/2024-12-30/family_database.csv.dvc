@@ -2,7 +2,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: OECD Family Dabatabse
+    title: OECD Family Database
     description: |-
       The OECD Family Database provides cross-national indicators on family outcomes and family policies across the OECD countries, its enhanced engagement partners and EU member states. It includes 70 indicators under four main dimensions: (i) structure of families, (ii) labour market position of families, (iii) public policies for families and children and (iv) child outcomes.
     date_published: 2024-03-27

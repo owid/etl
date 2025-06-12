@@ -3,10 +3,13 @@
 import owid.catalog.processing as pr
 from owid.catalog import Table
 
+from etl.data_helpers import geo
 from etl.helpers import PathFinder, create_dataset
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+REGIONS = geo.REGIONS
 
 
 def run(dest_dir: str) -> None:
@@ -40,11 +43,14 @@ def run(dest_dir: str) -> None:
     tb_gap_full = tb_gap_full.rename(columns={"child_mortality": "under_five_mortality"})
     tb_gap_full["source"] = "gapminder"
     tb_gap_full["under_five_mortality"] = tb_gap_full["under_five_mortality"].div(10)
+
     # Load Gapminder data v7 - has the source of the data (unlike v11)
     # We've removed some years from the v7 data, for years where the source was 'Guesstimate' or 'Model based on Life Expectancy'
     tb_gap_sel = ds_gapminder_v7["under_five_mortality_selected"].reset_index()
     tb_gap_sel["source"] = "gapminder"
     tb_gap_sel["under_five_mortality"] = tb_gap_sel["under_five_mortality"].div(10)
+    # Remove the early years for Austria - there is a signicant jump in the data in 1830 which suggests an incongruency in method or data availability
+    tb_gap_sel = remove_early_years_austria(tb_gap_sel)
 
     # Combine IGME and Gapminder data with two versions
 
@@ -76,6 +82,17 @@ def combine_datasets(tb_igme: Table, tb_gap: Table, table_name: str) -> Table:
     tb_combined = remove_duplicates(tb_combined, preferred_source="igme")
 
     return tb_combined
+
+
+def remove_early_years_austria(tb: Table) -> Table:
+    """
+    Remove years prior to 1830 for Austria - there is a signicant jump in the data in 1830 which suggests an incongruency in method or data availability
+    """
+    # Remove years prior to 1830 for Austria
+    msk = (tb["country"] == "Austria") & (tb["year"] < 1830)
+    tb = tb[~msk]
+
+    return tb
 
 
 def remove_duplicates(tb: Table, preferred_source: str) -> Table:

@@ -13,9 +13,10 @@ from rich_click.rich_command import RichCommand
 
 from etl import paths
 from etl.config import ADMIN_HOST
+from etl.dag_helpers import load_dag
 from etl.db import can_connect
 from etl.grapher.io import get_info_for_etl_datasets
-from etl.steps import extract_step_attributes, load_dag, reverse_graph
+from etl.steps import extract_step_attributes, reverse_graph
 
 log = structlog.get_logger()
 
@@ -309,7 +310,6 @@ class VersionTracker:
         "data://examples/examples/latest/notebook_example",
         "data://examples/examples/latest/script_example",
         "data://examples/examples/latest/vs_code_cells_example",
-        "data-private://examples/examples/latest/private_example",
     ]
 
     # List of metrics to fetch related to analytics.
@@ -350,6 +350,8 @@ class VersionTracker:
         self.dag_archive = {step: self.dag_all[step] for step in self.dag_all if step not in self.dag_active}
         # List all unique steps that exist in the dag.
         self.all_steps = list_all_steps_in_dag(self.dag_all)
+        # Remove walden steps (TODO: remove this when walden is fully deprecated).
+        self.all_steps = [step for step in self.all_steps if not step.startswith("walden")]
         # List all unique active steps.
         self.all_active_steps = list_all_steps_in_dag(self.dag_active)
         # List all active steps usages (i.e. list of steps in the dag that should be executable by ETL).
@@ -492,8 +494,6 @@ class VersionTracker:
             path_to_script = paths.SNAPSHOTS_DIR / namespace / version / name  # type: ignore
         elif channel in ["meadow", "garden", "grapher", "explorers", "open_numbers", "examples", "external"]:
             path_to_script = paths.STEP_DIR / "data" / channel / namespace / version / name  # type: ignore
-        elif channel == "walden":
-            path_to_script = paths.BASE_DIR / "lib" / "walden" / "ingests" / namespace / version / name  # type: ignore
         elif channel in ["backport", "etag"]:
             # Ignore these channels, for which there is never a script.
             return None
@@ -1010,7 +1010,7 @@ class VersionTracker:
         missing_steps = set(self.all_active_dependencies) - set(self.all_active_usages)
 
         # Remove those special steps that are expected to not appear in the dag as executable steps (e.g. snapshots).
-        channels_to_ignore = ("snapshot", "etag", "github", "walden")
+        channels_to_ignore = ("snapshot", "etag", "github")
         missing_steps = set([step for step in missing_steps if not step.startswith(channels_to_ignore)])
 
         if len(missing_steps) > 0:

@@ -15,7 +15,7 @@ from apps.wizard.utils.cached import get_grapher_user
 from apps.wizard.utils.components import st_toast_error, st_wizard_page_link
 from apps.wizard.utils.db import WizardDB
 from etl.config import OWID_ENV
-from etl.helpers import get_schema_from_url
+from etl.files import get_schema_from_url
 from etl.indicator_upgrade.indicator_update import find_charts_from_variable_ids, update_chart_config
 
 # Logger
@@ -37,7 +37,7 @@ def get_affected_charts_and_preview(indicator_mapping: Dict[int, int]) -> List[g
     # 1/ Get affected charts
     ########################################################
     # If user submitted variable mapping (i.e. clicked on "Next (2/3)"), then get charts and update them accordingly.
-    with st.spinner("Retrieving charts to be updated. This can take up to 1 minute..."):
+    with st.spinner("Retrieving charts to be updated. This can take up to 1 minute...", show_time=True):
         try:
             log.info("building updaters and getting charts!")
             st.session_state.indicator_mapping = indicator_mapping
@@ -132,6 +132,7 @@ def push_new_charts(charts: List[gm.Chart]) -> None:
         st.success(
             "The charts were successfully updated! If indicators from other datasets also need to be upgraded, simply refresh this page, otherwise move on to `chart diff` to review all changes."
         )
+        st_wizard_page_link("anomalist")
         st_wizard_page_link("chart-diff")
 
 

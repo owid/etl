@@ -3,7 +3,7 @@ definitions:
   common:
     presentation:
       topic_tags:
-        - Antibiotics
+        - Antibiotics & Antibiotic Resistance
   description_key_ast_bloodstream: &description_key_ast_bloodstream
       - Acinetobacter spp. infections are tested for their susceptibility to carbapanem antibiotics.
       - Salmonella spp. infections are tested for their susceptibility to fluoroquinolone antibiotics.

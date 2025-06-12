@@ -1,0 +1,27 @@
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Energy
+    processing_level: minor
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  harmonised_index_of_consumer_prices:
+    variables:
+      hicp:
+        title: Index value
+        unit: ""
+        short_unit: ""
+        # The short description is set at the meadow step, where the choice of base year is made.
+        # description_short: |-
+        #   Harmonized index of consumer price, assuming a base value of 100 for 2015.
+      flag:
+        title: Data flag
+        unit: ""
+        short_unit: ""
+        description_short: |-
+          Flag assigned by Eurostat for a given value in the data.

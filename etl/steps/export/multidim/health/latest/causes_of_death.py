@@ -1,31 +1,55 @@
-from pathlib import Path
+import structlog
 
-import yaml
-
-from etl import multidim
-from etl.db import get_engine
+from etl.collection.model.view import View
+from etl.collection.utils import group_views_legacy
 from etl.helpers import PathFinder
+
+log = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-CURRENT_DIR = Path(__file__).parent
 
-
-def run(dest_dir: str) -> None:
-    engine = get_engine()
-
-    # Load YAML file
-    with open(CURRENT_DIR / "causes_of_death.yml") as istream:
-        config = yaml.safe_load(istream)
-
+def run() -> None:
     # Add views for all dimensions
-    table = "grapher/ihme_gbd/2024-05-20/gbd_cause/gbd_cause_deaths"
-    # Individual causes
-    config["views"] += multidim.expand_views(config, {"metric": "*", "age": "*", "cause": "*"}, table, engine)
-    # Show all causes in a single view
-    config["views"] += multidim.expand_views(
-        config, {"metric": "*", "age": "*", "cause": "Side-by-side comparison of causes"}, table, engine
+    # NOTE: using load_data=False which only loads metadata significantly speeds this up
+    table = paths.load_dataset("gbd_cause").read("gbd_cause_deaths", load_data=False)
+
+    # Create collection
+    config = paths.load_collection_config()
+    c = paths.create_collection(
+        config=config,
+        tb=table,
     )
 
-    multidim.upsert_multidim_data_page("mdd-causes-of-death", config, engine)
+    # Add views for all dimensions
+    grouped_views = group_views_legacy(c.to_dict()["views"], by=["age", "metric"])
+    grouped_views = [View.from_dict(view) for view in grouped_views]
+    for view in grouped_views:
+        view.dimensions["cause"] = "Side-by-side comparison of causes"
+    c.views.extend(grouped_views)
+
+    # Sort choices
+    c.sort_choices(
+        {
+            "age": [
+                "All ages",
+                "Age-standardized",
+                "<5 years",
+                "5-14 years",
+                "15-49 years",
+                "50-69 years",
+                "70+ years",
+            ]
+        }
+    )
+
+    # Limit views to something manageable. This will ahve to improved before publishing.
+    MAX_INDICATORS = 10
+    for view in c.views:
+        if len(view.indicators.y) > MAX_INDICATORS:
+            log.warning(f"Limiting view with dimensions {view.dimensions} to {MAX_INDICATORS} indicators.")
+            view.indicators.y = view.indicators.y[:MAX_INDICATORS]
+
+    # Save the collection
+    c.save()

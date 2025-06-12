@@ -24,20 +24,6 @@ definitions:
       - Data from The Economist estimating the number of excess deaths, from all causes, during the COVID-19 pandemic for 223 countries & regions. The Economist publishes new estimates each day. We update our charts with the latest available data each week.
       - Excess deaths measure the difference between how many people died during the pandemic, from any cause, and how many deaths would have been expected had there been no pandemic.
       - Many countries have not reported any all-cause mortality data during the pandemic, which means their entire data series is estimated. Other countries report data regularly, but it is not always up-to-date due to delays in reporting; for these, only recent weeks are estimated. These delays, as well as incomplete reporting coverage, mean the reported number of deaths might not count all deaths that occurred.
-    origins:
-      - producer: The Economist
-        title: Excess Deaths Model
-        description: >-
-          The Living Planet Database contains tens of thousands of vertebrate population time-series from around the world. It is the largest collection of its kind, and is publicly available, making it an invaluable tool for both research and conservation.
-
-          This dataset contains time-series of population abundance data for vertebrate species spanning years between 1970 and 2021. This is the public version of the database as confidential records that cannot be shared have been removed. The open-source code used to calculate the Living Planet Index using this data set can be found here: [https://github.com/Zoological-Society-of-London/rlpi](https://github.com/Zoological-Society-of-London/rlpi).
-
-          [Text from [Living Planet Index website](https://www.livingplanetindex.org/data_portal)]
-        citation_full: |-
-          The Economist and Solstad, S. (corresponding author), 2021. The pandemic's true death toll. [online] The Economist. Available at: https://www.economist.com/graphic-detail/coronavirus-excess-deaths-estimates [Accessed {TODAY}]. First published in the article "Counting the dead", The Economist, issue 20, 2021.
-        url_main: https://github.com/TheEconomist/covid-19-the-economist-global-excess-deaths-model
-        date_accessed: "2024-08-20"
-        date_published: "2024"
 
 dataset:
   title: COVID-19, Excess Mortality

@@ -1,0 +1,20 @@
+dataset:
+  title: Replacement rate of fertility - Gietel-Basten and Scherbov (2019)
+  description: ''
+  licenses:
+    - {}
+tables:
+  replacement_fertility_basten_scherbov:
+    variables:
+      replacement_fertility_rate:
+        title: Replacement fertility rate
+        unit: ''
+        display:
+          numDecimalPlaces: 1.0
+        description: Estimated total fertility rate required to retain the same population size, after accounting for early
+          life mortality.
+      replacement_fertility_rate_projection:
+        title: Replacement fertility rate (projection)
+        unit: ''
+        description: |-
+          Estimated total fertility rate required to retain the same population size, after accounting for early life mortality, using UN projections of fertility rates and lifetables up to 2100.

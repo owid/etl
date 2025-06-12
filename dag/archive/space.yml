@@ -1,0 +1,29 @@
+steps:
+  # NASA Center for Near-Earth Object Studies - Near-Earth Asteroids
+  data://meadow/space/2024-01-03/near_earth_asteroids:
+    - snapshot://space/2024-01-03/near_earth_asteroids.csv
+  data://garden/space/2024-01-03/near_earth_asteroids:
+    - data://meadow/space/2024-01-03/near_earth_asteroids
+  data://grapher/space/2024-01-03/near_earth_asteroids:
+    - data://garden/space/2024-01-03/near_earth_asteroids
+  # Online Index of Objects Launched into Outer Space
+  data://meadow/space/2024-01-04/object_launches:
+    - snapshot://space/2024-01-04/object_launches.csv
+  data://garden/space/2024-01-04/object_launches:
+    - data://meadow/space/2024-01-04/object_launches
+  data://grapher/space/2024-01-04/object_launches:
+    - data://garden/space/2024-01-04/object_launches
+  # Exoplanets (NASA)
+  data://meadow/space/2024-08-16/exoplanets:
+    - snapshot://space/2024-08-16/exoplanets.csv
+  data://garden/space/2024-08-16/exoplanets:
+    - data://meadow/space/2024-08-16/exoplanets
+  data://grapher/space/2024-08-16/exoplanets:
+    - data://garden/space/2024-08-16/exoplanets
+  # Number of objects in space (United States Space Force)
+  data://meadow/space/2024-08-16/space_track:
+    - snapshot://space/2024-08-16/space_track.csv
+  data://garden/space/2024-08-16/space_track:
+    - data://meadow/space/2024-08-16/space_track
+  data://grapher/space/2024-08-16/space_track:
+    - data://garden/space/2024-08-16/space_track

@@ -1,0 +1,37 @@
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: Air transport CO2 emissions (experimental)
+    description: |-
+      This database provides annual, quarterly and monthly estimates for carbon dioxide (CO2) emissions from commercial passenger, freight and general aviation flights. The emissions are estimated for 186 countries by the OECD, based on a consistent methodology across countries. From 2019, the estimates are compiled using Automatic Dependent Surveillance-Broadcast (ADS-B) flight data from the International Civil Aviation Organisation (ICAO).
+
+      The database provides measures of CO2 emissions on a territory basis, which is used for reporting in the UN Framework Convention on Climate Change (UNFCCC) inventories; and also on a residence basis, which is used to estimate the emissions of air transport (H51 in the International Standard Industrial Classification of All Economic Activities, or ISIC) in the Air Emission Accounts (AEAs).
+
+      Seven components of these CO2 emissions measures can be selected from the ‘Emissions ’ filter. In the tables, these are also shown with the letters A, B, C, D, E, F and G. The UNFCCC inventories and AEA air transport (ISIC H51) measures of CO2 emissions are calculated as:
+      Inventories: domestic aviation = A + C
+      Inventories: international aviation (memo item) = D + G
+      Air emissions accounts: air transport (ISIC H51) = A + B + D + E + F
+      Three categories of flight are shown on the database: total flights, passenger flights, and freight flights. General aviation (non-freight flights with fewer than 19 passengers such as agricultural planes and private jets) is included with passenger flights.
+
+      The estimation methodology is described in the OECD Working Paper CO2 Emissions from Air Transport - A Near-Real-Time Global Database for Policy Analysis. and in the note Air transport CO2 emissions methodology update.
+    date_published: 2025-02-25
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2025). OECD Data Explorer. Air transport CO2 emissions (experimental).
+
+    # Files
+    url_main: https://data-explorer.oecd.org/vis?df[ds]=DisseminateFinalDMZ&df[id]=DSD_AIR_TRANSPORT%40DF_AIR_TRANSPORT&df[ag]=OECD.SDD.NAD.SEEA&dq=W%2BZWE%2BZMB%2BYEM%2BVNM%2BVEN%2BVUT%2BUZB%2BURY%2BARE%2BUKR%2BUGA%2BTUV%2BTKM%2BTUN%2BTTO%2BTON%2BTGO%2BTLS%2BTHA%2BTZA%2BTJK%2BSYR%2BTWN%2BSUR%2BSDN%2BLKA%2BSSD%2BZAF%2BSOM%2BSLB%2BSXM%2BSLE%2BSGP%2BSYC%2BSRB%2BSEN%2BSAU%2BSTP%2BSMR%2BWSM%2BVCT%2BLCA%2BKNA%2BRWA%2BRUS%2BROU%2BQAT%2BPHL%2BPER%2BPRY%2BPNG%2BPAN%2BPLW%2BPAK%2BOMN%2BMKD%2BNGA%2BNIU%2BNIC%2BNER%2BNRU%2BNPL%2BNAM%2BMMR%2BMOZ%2BMAR%2BMNE%2BMNG%2BMCO%2BMDA%2BFSM%2BMUS%2BMRT%2BMHL%2BMLT%2BMLI%2BMDV%2BMYS%2BMWI%2BMDG%2BMAC%2BLBY%2BLBR%2BLSO%2BLBN%2BLAO%2BKWT%2BKGZ%2BXKV%2BKIR%2BKEN%2BKAZ%2BJOR%2BJEY%2BJAM%2BIRQ%2BIDN%2BIRN%2BIND%2BHKG%2BHND%2BHTI%2BGUY%2BGNB%2BGIN%2BGTM%2BGRD%2BGHA%2BGEO%2BGMB%2BGAB%2BFJI%2BETH%2BSWZ%2BERI%2BGNQ%2BSLV%2BEGY%2BECU%2BDOM%2BDMA%2BCOD%2BDJI%2BPRK%2BCYP%2BCUB%2BHRV%2BCIV%2BCOK%2BCOG%2BCCK%2BCOM%2BCXR%2BCHN%2BTCD%2BCAF%2BCMR%2BKHM%2BCPV%2BBDI%2BBFA%2BBGR%2BBRN%2BBRA%2BBWA%2BBIH%2BBOL%2BBTN%2BBEN%2BBLZ%2BBLR%2BBRB%2BBGD%2BBHR%2BBHS%2BAZE%2BARM%2BARG%2BATG%2BAGO%2BDZA%2BALB%2BAFG%2BWXOECD%2BOECD%2BUSA%2BGBR%2BTUR%2BCHE%2BSWE%2BESP%2BSVN%2BSVK%2BPRT%2BPOL%2BNOR%2BNZL%2BNLD%2BMEX%2BLUX%2BLTU%2BLVA%2BKOR%2BJPN%2BITA%2BISR%2BIRL%2BISL%2BGRC%2BHUN%2BDEU%2BFIN%2BEST%2BDNK%2BCZE%2BCRI%2BCOL%2BCHL%2BBEL%2BCAN%2BAUT%2BAUS%2BFRA.M.....P.RES_TOTAL%2BTER_INT%2BTER_DOM%2BRES_ABROAD%2BNRES_TERR%2BNRES_INT_FROM%2BRES_INT_OUT%2BRES_INT_TO%2BRES_INT_FROM%2BNRES_DOM_IN%2BRES_DOM_OUT%2BRES_DOM_IN.&pd=2013-01%2C2024-12&to[TIME_PERIOD]=false&ly[cl]=TIME_PERIOD&ly[rw]=EMISSIONS_SOURCE%2CCOMBINED_UNIT_MEASURE%2CREF_AREA&vw=tb&format=csvfilewithlabels
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.SDD.NAD.SEEA,DSD_AIR_TRANSPORT@DF_AIR_TRANSPORT,/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: 2025-03-11
+
+    # License
+    license:
+      name: OECD Terms of Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: d6410b4e93abb1dce5f005d020f94dbb
+    size: 164112415
+    path: co2_air_transport.csv

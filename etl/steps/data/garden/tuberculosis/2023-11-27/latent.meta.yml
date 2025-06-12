@@ -1,3 +1,5 @@
+dataset:
+  title: Global Tuberculosis Report - Latent Tuberculosis (Household Contacts)
 tables:
   latent:
     variables:

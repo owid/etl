@@ -1,12 +1,12 @@
 """Load a snapshot and create a meadow dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -44,26 +44,19 @@ def run(dest_dir: str) -> None:
     tb_ch4["year"] = tb_ch4["year"].astype(float)
     tb_n2o["year"] = tb_n2o["year"].astype(float)
 
-    # Set an appropriate name to each table.
-    tb_co2.metadata.short_name = "co2_concentration"
-    tb_ch4.metadata.short_name = "ch4_concentration"
-    tb_n2o.metadata.short_name = "n2o_concentration"
-
     # Remove spurious empty row (with a repeated year 1988) in co2 concentration.
     tb_co2 = tb_co2.dropna(subset=[column for column in tb_co2.columns if column != "year"], how="all").reset_index(
         drop=True
     )
 
-    # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb_co2 = tb_co2.underscore().format(["year"])
-    tb_ch4 = tb_ch4.underscore().format(["year"])
-    tb_n2o = tb_n2o.underscore().format(["year"])
+    # Improve tables format.
+    tb_co2 = tb_co2.format(["year"], short_name="co2_concentration")
+    tb_ch4 = tb_ch4.format(["year"], short_name="ch4_concentration")
+    tb_n2o = tb_n2o.format(["year"], short_name="n2o_concentration")
 
     #
     # Save outputs.
     #
     # Create a new meadow dataset.
-    ds_meadow = create_dataset(
-        dest_dir, tables=[tb_co2, tb_ch4, tb_n2o], check_variables_metadata=True, default_metadata=snap_co2.metadata
-    )
+    ds_meadow = paths.create_dataset(tables=[tb_co2, tb_ch4, tb_n2o], default_metadata=snap_co2.metadata)
     ds_meadow.save()

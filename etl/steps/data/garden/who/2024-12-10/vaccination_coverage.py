@@ -55,18 +55,18 @@ def run(dest_dir: str) -> None:
     # Calculate the number of one-year-olds vaccinated for each antigen.
     tb_one_year_olds = calculate_one_year_olds_vaccinated(tb, ds_population)
     tb_newborns = calculate_newborns_vaccinated(tb, ds_population)
-
+    tb_number = pr.concat([tb_one_year_olds, tb_newborns], short_name="numbers")
     tb = tb.drop(columns=["denominator"])
+
+    tb = pr.merge(tb, tb_number, on=["country", "year", "antigen"], how="left")
+
     tb = tb.format(["country", "year", "antigen"], short_name="vaccination_coverage")
-    tb_one_year_olds = tb_one_year_olds.format(["country", "year", "antigen"], short_name="number_of_one_year_olds")
-    tb_newborns = tb_newborns.format(["country", "year", "antigen"], short_name="number_of_newborns")
-    #
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
     ds_garden = create_dataset(
         dest_dir,
-        tables=[tb, tb_one_year_olds, tb_newborns],
+        tables=[tb],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
     )
@@ -92,10 +92,10 @@ def calculate_one_year_olds_vaccinated(tb: Table, ds_population: Dataset) -> Tab
 
     tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left")
     tb = tb.assign(
-        vaccinated_one_year_olds=tb["coverage"] / 100 * tb["population"],
-        unvaccinated_one_year_olds=(100 - tb["coverage"]) / 100 * tb["population"],
+        vaccinated=tb["coverage"] / 100 * tb["population"],
+        unvaccinated=(100 - tb["coverage"]) / 100 * tb["population"],
     )
-    tb = tb[["country", "year", "antigen", "vaccinated_one_year_olds", "unvaccinated_one_year_olds"]]
+    tb = tb[["country", "year", "antigen", "vaccinated", "unvaccinated"]]
     return tb
 
 
@@ -109,10 +109,10 @@ def calculate_newborns_vaccinated(tb: Table, ds_population: Dataset) -> Table:
 
     tb = pr.merge(tb, tb_pop, on=["country", "year"], how="left")
     tb = tb.assign(
-        vaccinated_newborns=tb["coverage"] / 100 * tb["population"],
-        unvaccinated_newborns=(100 - tb["coverage"]) / 100 * tb["population"],
+        vaccinated=tb["coverage"] / 100 * tb["population"],
+        unvaccinated=(100 - tb["coverage"]) / 100 * tb["population"],
     )
-    tb = tb[["country", "year", "antigen", "vaccinated_newborns", "unvaccinated_newborns"]]
+    tb = tb[["country", "year", "antigen", "vaccinated", "unvaccinated"]]
     return tb
 
 

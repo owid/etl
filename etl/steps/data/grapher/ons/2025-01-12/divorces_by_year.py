@@ -1,12 +1,12 @@
 """Load a garden dataset and create a grapher dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -23,12 +23,12 @@ def run(dest_dir: str) -> None:
     # Rename anniversary_year values
     tb["anniversary_year"] = tb["anniversary_year"].replace(
         {
-            "5": "After 5 years",
-            "10": "After 10 years",
-            "20": "After 20 years",
-            "30": "After 30 years",
-            "40": "After 40 years",
-            "50": "After 50 years",
+            "5": "< 5 years",
+            "10": "< 10 years",
+            "20": "< 20 years",
+            "30": "< 30 years",
+            "40": "< 40 years",
+            "50": "< 50 years",
         }
     )
     tb = tb.rename(columns={"anniversary_year": "country"})
@@ -39,9 +39,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new grapher dataset with the same metadata as the garden dataset.
-    ds_grapher = create_dataset(
-        dest_dir, tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata
-    )
+    ds_grapher = paths.create_dataset(tables=[tb], check_variables_metadata=True, default_metadata=ds_garden.metadata)
 
     # Save changes in the new grapher dataset.
     ds_grapher.save()

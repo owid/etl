@@ -1,10 +1,10 @@
 """This schema was generated using https://github.com/agronholm/sqlacodegen library with the following command:
 ```
-sqlacodegen --generator dataclasses --options use_inflect mysql://root:owid@localhost:3306/owid
+sqlacodegen --generator dataclasses --options use_inflect mysql+pymysql://root:owid@localhost:3306/owid
 ```
 or
 ```
-sqlacodegen --generator dataclasses --options use_inflect mysql://owid:@staging-site-branch:3306/owid
+sqlacodegen --generator dataclasses --options use_inflect mysql+pymysql://owid:@staging-site-branch:3306/owid
 ```
 
 If you want to add a new table to ORM, add --tables mytable to the command above.
@@ -22,7 +22,7 @@ import json
 from datetime import date, datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Union, get_args, overload
+from typing import Any, Dict, List, Literal, Optional, Set, Union, get_args, overload
 
 import humps
 import numpy as np
@@ -62,7 +62,7 @@ from sqlalchemy.dialects.mysql import (
     VARCHAR,
 )
 from sqlalchemy.engine import Engine
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy.exc import NoResultFound, ProgrammingError
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import (  # type: ignore
     DeclarativeBase,
@@ -293,6 +293,22 @@ class Tag(Base):
         return tags
 
 
+class DoD(Base):
+    __tablename__ = "dods"
+    __table_args__ = (
+        ForeignKeyConstraint(["lastUpdatedUserId"], ["users.id"], ondelete="SET NULL", name="dods_ibfk_1"),
+        Index("lastUpdatedUserId", "lastUpdatedUserId"),
+        Index("name", "name", unique=True),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(VARCHAR(512))
+    content: Mapped[str] = mapped_column(VARCHAR(4096))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
+    updatedAt: Mapped[datetime] = mapped_column(DateTime, init=False)
+    lastUpdatedUserId: Mapped[Optional[int]] = mapped_column(Integer)
+
+
 class User(Base):
     __tablename__ = "users"
     __table_args__ = (Index("email", "email", unique=True),)
@@ -335,6 +351,21 @@ class ChartRevisions(Base):
     userId: Mapped[Optional[int]] = mapped_column(Integer)
     config: Mapped[Optional[dict]] = mapped_column(JSON)
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
+
+    @classmethod
+    def get_latest(cls, session: Session, chart_id: int, updatedAt=None) -> "ChartRevisions":
+        """query should be: SELECT * FROM chart_revisions WHERE chartId = {self.chart_id} AND updatedAt <= '{timestamp}' ORDER BY updatedAt DESC LIMIT 1 if timestamp is given!"""
+        revision = session.scalars(
+            select(cls)
+            .where(and_(cls.chartId == chart_id, cls.updatedAt <= updatedAt) if updatedAt else cls.chartId == chart_id)
+            .order_by(cls.updatedAt.desc())
+            .limit(1)
+        ).one_or_none()
+
+        if revision is None:
+            raise NoResultFound()
+
+        return revision
 
 
 class ChartConfig(Base):
@@ -388,6 +419,7 @@ class Chart(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, init=False)
     configId: Mapped[bytes] = mapped_column(CHAR(36))
+    isInheritanceEnabled: Mapped[int] = mapped_column(TINYINT(1), server_default=text("'1'"))
     createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
     lastEditedAt: Mapped[datetime] = mapped_column(DateTime)
     lastEditedByUserId: Mapped[int] = mapped_column(Integer)
@@ -409,7 +441,10 @@ class Chart(Base):
 
     @hybrid_property
     def config(self) -> dict[str, Any]:  # type: ignore
-        return self.chart_config.full
+        config = self.chart_config.full.copy()
+        # Add isInheritanceEnabled to config so it's included in comparisons
+        config["isInheritanceEnabled"] = bool(self.isInheritanceEnabled)
+        return config
 
     @config.expression
     def config(cls):
@@ -1357,7 +1392,11 @@ class Variable(Base):
         cls, session: Session, catalog_path: str | List[str], columns: Optional[List[str]] = None
     ) -> "Variable" | List["Variable"]:
         """Load a variable from the DB by its catalog path."""
-        assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        if isinstance(catalog_path, str):
+            assert "#" in catalog_path, "catalog_path should end with #indicator_short_name"
+        elif isinstance(catalog_path, list):
+            assert all("#" in path for path in catalog_path), "catalog_path should end with #indicator_short_name"
+
         # Return Variable if columns is None and return Row object if columns is provided
         execute = session.execute if columns else session.scalars
         if isinstance(catalog_path, str):
@@ -1407,14 +1446,13 @@ class Variable(Base):
         """
         assert self.id
 
-        # establish relationships between variables and origins
+        # Establish relationships between variables and origins.
         OriginsVariablesLink.link_with_variable(session, self.id, [origin.id for origin in db_origins])
 
-        # establish relationships between variables and posts
+        # Establish relationships between variables and posts.
         required_gdoc_ids = {faq.gdoc_id for faq in faqs}
-        query = select(PostsGdocs).where(PostsGdocs.id.in_(required_gdoc_ids))
-        gdoc_posts = session.scalars(query).all()
-        existing_gdoc_ids = {gdoc_post.id for gdoc_post in gdoc_posts}
+        query = select(PostsGdocs.id).where(PostsGdocs.id.in_(required_gdoc_ids))
+        existing_gdoc_ids = set(session.scalars(query).all())
         missing_gdoc_ids = required_gdoc_ids - existing_gdoc_ids
         if missing_gdoc_ids:
             log.warning("create_links.missing_faqs", missing_gdoc_ids=missing_gdoc_ids)
@@ -1422,9 +1460,8 @@ class Variable(Base):
             session, self.id, [faq for faq in faqs if faq.gdoc_id in existing_gdoc_ids]
         )
 
-        # establish relationships between variables and tags
+        # Establish relationships between variables and tags.
         tags = Tag.load_tags_by_names(session, tag_names)
-
         TagsVariablesTopicTagsLink.link_with_variable(session, self.id, [tag.id for tag in tags])
 
     def s3_data_path(self, typ: S3_PATH_TYP = "s3") -> str:
@@ -1515,16 +1552,22 @@ class ChartDimensions(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def chart_ids_with_indicators(cls, session: Session, indicator_ids: list[int]) -> list[int]:
+    def chart_ids_with_indicators(cls, session: Session, indicator_ids: List[int]) -> List[int]:
         """Return a list of chart IDs that have any of the given indicators."""
         query = select(cls.chartId).where(cls.variableId.in_(indicator_ids))
         return list(session.scalars(query).all())
 
     @classmethod
-    def indicators_in_charts(cls, session: Session, chart_ids: list[int]) -> set[int]:
+    def indicators_in_charts(cls, session: Session, chart_ids: List[int]) -> Set[int]:
         """Return a list of indicator IDs that are in any of the given charts."""
         query = select(cls.variableId).where(cls.chartId.in_(chart_ids))
         return set(session.scalars(query).all())
+
+    @classmethod
+    def filter_indicators_used_in_charts(cls, session: Session, indicator_ids: List[int]) -> List[int]:
+        """Reduce the input list of indicator IDs to only those used in charts."""
+        query = select(cls.variableId).where(cls.variableId.in_(indicator_ids))
+        return list(set(session.scalars(query).all()))
 
 
 class Origin(Base):
@@ -1853,14 +1896,21 @@ class RelatedChart(Base):
 
 class MultiDimDataPage(Base):
     __tablename__ = "multi_dim_data_pages"
-
-    slug: Mapped[str] = mapped_column(VARCHAR(255), primary_key=True)
-    config: Mapped[dict] = mapped_column(JSON)
-    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"), init=False)
-    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"), init=False)
-    updatedAt: Mapped[datetime] = mapped_column(
-        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"), init=False
+    __table_args__ = (
+        Index("idx_multi_dim_data_pages_catalog_path", "catalogPath", unique=True),
+        Index("idx_multi_dim_data_pages_slug", "slug", unique=True),
     )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    config: Mapped[dict] = mapped_column(JSON)
+    configMd5: Mapped[str] = mapped_column(CHAR(24), Computed("(to_base64(unhex(md5(`config`))))", persisted=True))
+    published: Mapped[int] = mapped_column(TINYINT, server_default=text("'0'"))
+    createdAt: Mapped[datetime] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[datetime] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    )
+    catalogPath: Mapped[Optional[str]] = mapped_column(VARCHAR(767))
+    slug: Mapped[Optional[str]] = mapped_column(VARCHAR(255))
 
     def upsert(self, session: Session) -> "MultiDimDataPage":
         cls = self.__class__
@@ -1871,6 +1921,21 @@ class MultiDimDataPage(Base):
         else:
             session.add(self)
             return self
+
+    @classmethod
+    def load_mdim(
+        cls, session: Session, catalogPath: Optional[str] = None, columns: Optional[List[str]] = None
+    ) -> Optional["MultiDimDataPage"]:
+        cond = cls.catalogPath == catalogPath
+        if columns:
+            return session.execute(_select_columns(cls, columns).where(cond)).one()  # type: ignore
+        else:
+            return session.scalars(select(cls).where(cond)).first()
+
+    @classmethod
+    def load_mdims(cls, session: Session, columns: Optional[List[str]] = None) -> List["MultiDimDataPage"]:
+        execute = session.execute if columns else session.scalars
+        return execute(_select_columns(cls, columns)).all()  # type: ignore
 
 
 class Anomaly(Base):
@@ -1944,7 +2009,51 @@ class Anomaly(Base):
 
     @classmethod
     def load_anomalies(cls, session: Session, dataset_id: List[int]) -> List["Anomaly"]:
-        return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        try:
+            return session.scalars(select(cls).where(cls.datasetId.in_(dataset_id))).all()  # type: ignore
+        except ProgrammingError as e:
+            # anomalies table does not exist (error code 1146), it gets created dynamically
+            # when the first anomaly is created
+            if "1146" in str(e):
+                return []
+            raise
+
+
+class Explorer(Base):
+    __tablename__ = "explorers"
+
+    slug: Mapped[str] = mapped_column(VARCHAR(150), primary_key=True)
+    tsv: Mapped[str] = mapped_column(LONGTEXT)
+    lastEditedByUserId: Mapped[Optional[int]] = mapped_column(Integer)
+    lastEditedAt: Mapped[Optional[datetime]] = mapped_column(DateTime)
+    commitMessage: Mapped[Optional[str]] = mapped_column(String(255, "utf8mb4_0900_as_cs"))
+    createdAt: Mapped[Optional[datetime]] = mapped_column(DateTime, server_default=text("CURRENT_TIMESTAMP"))
+    updatedAt: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, server_default=text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    )
+
+    # isPublished is a virtual column and depends `isPublished\tTrue` string in TSV, it'll be soon treated
+    #   as a real column
+    isPublished: Mapped[Optional[int]] = mapped_column(
+        TINYINT(1), Computed("((`tsv` like _utf8mb4'%isPublished\ttrue%'))", persisted=False)
+    )
+    # TODO: this field is set by the mirror_explorers.py in automation, it'll be soon moved elsewhere
+    config: Mapped[dict] = mapped_column(JSON)
+
+    @classmethod
+    def load_explorer(
+        cls, session: Session, slug: Optional[str] = None, columns: Optional[List[str]] = None
+    ) -> Optional["Explorer"]:
+        cond = cls.slug == slug
+        if columns:
+            return session.execute(_select_columns(cls, columns).where(cond)).one()  # type: ignore
+        else:
+            return session.scalars(select(cls).where(cond)).first()
+
+    @classmethod
+    def load_explorers(cls, session: Session, columns: Optional[List[str]] = None) -> List["Explorer"]:
+        execute = session.execute if columns else session.scalars
+        return execute(_select_columns(cls, columns)).all()  # type: ignore
 
 
 def _json_is(json_field: Any, key: str, val: Any) -> Any:
@@ -1988,6 +2097,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
     assert values.notnull().all(), "values must not contain nulls"
     assert values.map(lambda x: isinstance(x, str)).all(), "only works for strings"
     if values.empty:
+        log.warning("_infer_variable_type.mixed_type_detected", reason="empty_values")
         return "mixed"
     try:
         values = pd.to_numeric(values)
@@ -2000,6 +2110,7 @@ def _infer_variable_type(values: pd.Series) -> VARIABLE_TYPE:
             raise NotImplementedError()
     except ValueError:
         if values.map(_is_float).any():
+            log.warning("_infer_variable_type.mixed_type_detected", reason="mixed_numeric_and_string")
             return "mixed"
         else:
             return "string"

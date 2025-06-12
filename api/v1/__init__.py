@@ -16,9 +16,8 @@ from apps.backport.datasync.datasync import upload_gzip_dict
 from etl import config, paths
 from etl.command import main as etl_main
 from etl.db import get_engine
-from etl.files import yaml_dump
+from etl.files import read_json_schema, yaml_dump
 from etl.grapher import model as gm
-from etl.helpers import read_json_schema
 from etl.metadata_export import merge_or_create_yaml, reorder_fields
 from etl.paths import SCHEMAS_DIR
 
@@ -159,7 +158,7 @@ def _commit_and_push(file_path: Path, commit_message: str) -> None:
 
 
 def _trigger_etl(db_indicator: gm.Variable, dry_run: bool) -> None:
-    config.GRAPHER_FILTER = f"^{db_indicator.shortName}$"
+    config.SUBSET = f"^{db_indicator.shortName}$"
     etl_main(
         steps=[str(db_indicator.catalogPath).rsplit("/", 1)[0]],
         grapher=True,

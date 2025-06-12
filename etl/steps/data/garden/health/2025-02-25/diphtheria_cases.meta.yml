@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Reported diphtheria cases in the United States
+
+tables:
+  diphtheria_cases:
+    variables:
+      cases:
+        title: Diphtheria cases
+        unit: cases
+        description_short: Reported diphtheria cases in the United States.
+        display:
+          numDecimalPlaces: 0
+      case_rate:
+        title: Diphtheria cases per million people
+        unit: cases per million people
+        description_short: Reported diphtheria cases per million people in the United States.
+        display:
+          numDecimalPlaces: 1

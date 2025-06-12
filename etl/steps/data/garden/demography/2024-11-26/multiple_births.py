@@ -98,8 +98,17 @@ def run(dest_dir: str) -> None:
     # Adapt flags
     tb = adapt_stillbirths_flags(tb)
 
+    # Add triplets or more category
+    tb["triplets_plus_deliveries"] = tb["multiple_deliveries"] - tb["twin_deliveries"]
+    tb["triplets_plus_rate"] = (1_000 * tb["triplets_plus_deliveries"] / tb["total_deliveries"]).round(2)
+
     # Estimate singleton_rate
     tb["singleton_rate"] = (1_000 * tb["singletons"] / tb["total_deliveries"]).round(2)
+
+    # Estimate share
+    columns = ["singleton", "twinning", "triplets_plus", "multiple"]
+    for col in columns:
+        tb[f"{col}_share"] = 0.1 * tb[f"{col}_rate"]
 
     # Estimate ratios
     tb["children_delivery_ratio"] = (
@@ -109,16 +118,7 @@ def run(dest_dir: str) -> None:
     tb["multiple_to_singleton_ratio"] = (1_000 * tb["multiple_deliveries"] / tb["singletons"]).round(3)
 
     # Remove outliers
-    flag = (tb["country"] == "England and Wales") & (tb["year"] == 1938)
-    assert (
-        tb.loc[flag, "children_multiple_delivery_ratio"] >= 4000
-    ).all(), "Unexpected outlier for England and Wales in 1938"
-    tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio", "children_delivery_ratio"]] = pd.NA
-    flag = (tb["country"] == "England and Wales") & (tb["year"] == 1939)
-    assert (
-        tb.loc[flag, "children_multiple_delivery_ratio"] <= 1500
-    ).all(), "Unexpected outlier for England and Wales in 1938"
-    tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio", "children_delivery_ratio"]] = pd.NA
+    tb = remove_outliers(tb)
 
     # Keep relevant columns
     tb = tb[
@@ -128,13 +128,20 @@ def run(dest_dir: str) -> None:
             "year",
             # Absolute numbers
             "singletons",
-            "twin_deliveries",
             "multiple_deliveries",
+            "twin_deliveries",
+            "triplets_plus_deliveries",
             "total_deliveries",
-            # Relative numbers
+            # Rates
             "singleton_rate",
-            "twinning_rate",
             "multiple_rate",
+            "twinning_rate",
+            "triplets_plus_rate",
+            # Shares
+            "singleton_share",
+            "multiple_share",
+            "twinning_share",
+            "triplets_plus_share",
             # Ratios
             "children_delivery_ratio",
             "children_multiple_delivery_ratio",
@@ -161,7 +168,7 @@ def run(dest_dir: str) -> None:
 def check_stillbirths(tb):
     """Datapoints (country-year) are given using different methodologies.
 
-    This is communciated in the 'stillbirths' column, which can vary from country to country (and year to year):
+    This is communicated in the 'stillbirths' column, which can vary from country to country (and year to year):
 
     0: Stillbirths not included
     1: Stillbirths included
@@ -223,3 +230,18 @@ def get_summary_methodology_sb(tb):
     tbx2 = tbx.loc[tbx["nunique"] > 1]
     countries_mult = set(tbx2["country"].unique())
     tb[tb["country"].isin(countries_mult)].groupby(["country", "stillbirths"]).agg({"year": ("min", "max")})
+
+
+def remove_outliers(tb):
+    flag = (tb["country"] == "England and Wales") & (tb["year"] == 1938)
+    assert (
+        tb.loc[flag, "children_multiple_delivery_ratio"] >= 4000
+    ).all(), "Unexpected outlier for England and Wales in 1938"
+    tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio", "children_delivery_ratio"]] = pd.NA
+    flag = (tb["country"] == "England and Wales") & (tb["year"] == 1939)
+    assert (
+        tb.loc[flag, "children_multiple_delivery_ratio"] <= 1500
+    ).all(), "Unexpected outlier for England and Wales in 1938"
+    tb.loc[flag, ["multiple_children", "children_multiple_delivery_ratio", "children_delivery_ratio"]] = pd.NA
+
+    return tb

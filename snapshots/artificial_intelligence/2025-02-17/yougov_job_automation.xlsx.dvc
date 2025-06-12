@@ -1,0 +1,18 @@
+meta:
+  origin:
+    title: How worried are Americans about being automated out of a job?
+    description: |
+      Biannual tracker of Americans' level of concern regarding job automation replacing their employment. The provided results are weighted to ensure they are representative of the United States population across various demographic factors. The weighting is based on factors such as age, gender, race, education, region, political party affiliation, and income level. This weighting process helps to account for the diversity within the population and ensures that the results reflect a broader representation of the United States as a whole. Each wave comprises responses from 460 - 533 US Adults.
+    producer: YouGov
+    citation_full: How worried are Americans about being automated out of a job?. YouGov (2025)
+    url_main: https://today.yougov.com/topics/politics/trackers/worry-about-automation
+    url_download: https://today.yougov.com/_pubapis/v5/us/trackers/worry-about-automation/download
+    date_accessed: 2025-02-17
+    date_published: 2025-01-09
+    license:
+      name: Copyright © 2024 YouGov PLC
+      url: https://today.yougov.com/about/terms
+outs:
+  - md5: 3fb551f60aaeda956064de1bfa437260
+    size: 27464
+    path: yougov_job_automation.xlsx

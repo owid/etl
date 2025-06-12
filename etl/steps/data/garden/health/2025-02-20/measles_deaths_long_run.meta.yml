@@ -1,0 +1,28 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Long-run deaths from measles in the United States
+
+tables:
+  measles_deaths_long_run:
+    variables:
+      deaths:
+        title: Measles deaths
+        unit: deaths
+        description_short: Reported number of measles deaths in the United States.
+        display:
+          numDecimalPlaces: 0
+      death_rate:
+        title: Measles death rate
+        unit: deaths per 100,000 people
+        description_short: Reported number of measles deaths in the United States per 100,000 people.
+        display:
+          numDecimalPlaces: 1

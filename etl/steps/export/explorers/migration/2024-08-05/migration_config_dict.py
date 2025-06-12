@@ -1,5 +1,4 @@
 P_TOTAL = "Total number"
-P_CHANGE = "Five-year change"
 P_NEW = "Annual change"
 
 SM_TOTAL = "Total"
@@ -321,17 +320,10 @@ CONFIG_DICT = {
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
-    # UNDESA values (TODO: 5 year change??)
+    # UNDESA values
     "immigrants_all": {
         "metric": METRICS["immigrants"],
         "period_radio": P_TOTAL,
-        "sub_metric_radio": SM_TOTAL,
-        "age_radio": A_TOTAL,
-        "processing_radio": PR_RAW,
-    },
-    "immigrants_change_5_years": {
-        "metric": METRICS["immigrants"],
-        "period_radio": P_CHANGE,
         "sub_metric_radio": SM_TOTAL,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
@@ -343,13 +335,6 @@ CONFIG_DICT = {
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
-    "emigrants_change_5_years": {
-        "metric": METRICS["emigrants"],
-        "period_radio": P_CHANGE,
-        "sub_metric_radio": SM_TOTAL,
-        "age_radio": A_TOTAL,
-        "processing_radio": PR_RAW,
-    },
     "immigrant_share_of_dest_population_all": {
         "metric": METRICS["immigrants"],
         "period_radio": P_TOTAL,
@@ -357,23 +342,9 @@ CONFIG_DICT = {
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
     },
-    "immigrants_change_5_years_per_1000": {
-        "metric": METRICS["immigrants"],
-        "period_radio": P_CHANGE,
-        "sub_metric_radio": SM_SHARE,
-        "age_radio": A_TOTAL,
-        "processing_radio": PR_RAW,
-    },
     "emigrants_share_of_total_population": {
         "metric": METRICS["emigrants"],
         "period_radio": P_TOTAL,
-        "sub_metric_radio": SM_SHARE,
-        "age_radio": A_TOTAL,
-        "processing_radio": PR_RAW,
-    },
-    "emigrants_change_5_years_per_1000": {
-        "metric": METRICS["emigrants"],
-        "period_radio": P_CHANGE,
         "sub_metric_radio": SM_SHARE,
         "age_radio": A_TOTAL,
         "processing_radio": PR_RAW,
@@ -750,35 +721,6 @@ MAP_BRACKETS = {
     "emigrants_all": {
         "colorScaleScheme": "YlGnBu",
         "colorScaleNumericBins": [100000.0, 200000.0, 500000.0, 1000000.0, 2000000.0, 5000000.0, 10000000, 0],
-    },
-    "immigrants_change_5_years": {
-        "colorScaleScheme": "RdYlBu",
-        "colorScaleNumericBins": [-100000, -30000.0, -10000.0, -0.0, 10000.0, 30000.0, 100000.0, 300000, 1000000.0, 0],
-    },
-    "immigrants_change_5_years_per_1000": {
-        "colorScaleScheme": "RdYlBu",
-        "colorScaleNumericBins": [-10.0, -5.0, -2.0, -1.0, -0.0, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 0],
-    },
-    "emigrants_change_5_years": {
-        "colorScaleScheme": "RdYlBu",
-        "colorScaleNumericBins": [
-            -50000.0,
-            -20000.0,
-            -10000.0,
-            -0.0,
-            10000.0,
-            20000.0,
-            50000.0,
-            100000.0,
-            200000.0,
-            500000.0,
-            1000000.0,
-            0,
-        ],
-    },
-    "emigrants_change_5_years_per_1000": {
-        "colorScaleScheme": "RdYlBu",
-        "colorScaleNumericBins": [-10.0, -5.0, -2.0, -1.0, -0.0, 1.0, 2.0, 5.0, 10.0, 20.0, 50.0, 0],
     },
     "emigrants_share_of_total_population": {
         "colorScaleScheme": "YlGnBu",

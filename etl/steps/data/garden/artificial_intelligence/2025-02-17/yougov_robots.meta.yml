@@ -1,0 +1,48 @@
+
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    processing_level: minor
+    presentation:
+      topic_tags:
+        - Artificial Intelligence
+      grapher_config:
+        note: Number of respondents ranges between n = 1001 and n = 1085 US adults per survey wave.
+
+    description_key:
+    - "Respondents were asked, 'Which ONE, if any, of the following statements do you  MOST agree with?'"
+    - "Possible answers were: 'Most robots have already developed higher levels of intelligence than humans', 'Robots will be able to develop higher levels of intelligence than humans in the future', 'Robots will never be able to develop higher levels of intelligence than humans', 'None of these', and 'Don't know'"
+    description_short: Survey respondents were asked, "Which ONE, if any, of the following statements do you MOST agree with?"
+    unit: '%'
+    short_unit: '%'
+    display:
+      numDecimalPlaces: 1
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/
+dataset:
+  update_period_days: 180
+
+tables:
+  yougov_robots:
+    variables:
+      most_robots_have_already_developed_higher_levels_of_intelligence_than_humans:
+        title: Most robots have already developed higher levels of intelligence than humans
+        presentation:
+          title_public: "Robots smarter than humans now"
+
+      robots_will_be_able_to_develop_higher_levels_of_intelligence_than_humans_in_the_future:
+        title: Robots will be able to develop higher levels of intelligence than humans in the future
+        presentation:
+          title_public: "Robots will surpass human intelligence in the future"
+
+      robots_will_never_be_able_to_develop_higher_levels_of_intelligence_than_humans:
+        title: Robots will never be able to develop higher levels of intelligence than humans
+        presentation:
+          title_public: "Robots will never surpass human intelligence"
+
+      dont_know:
+        title: Don't know
+
+      none_of_these:
+        title: None of these

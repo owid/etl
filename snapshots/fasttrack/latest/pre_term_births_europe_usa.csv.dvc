@@ -1,0 +1,17 @@
+meta:
+  origin:
+    producer: Euro Peristat and US CDC
+    title: pre_term_births_europe_usa
+    citation_full: Euro Peristat, European Perinatal Health Report and US CDC Linked Birth and Infant Death Data
+    url_main: |-
+      https://www.europeristat.com/wp-content/uploads/2022/11/Euro-Peristat_Fact_sheets_2022_for_upload.pdf; https://www.cdc.gov/nchs/nvss/linked-birth.htm
+    url_download: |-
+      https://docs.google.com/spreadsheets/d/e/2PACX-1vSQ5Y05UqkL0WakmcShB7LkqLOB7iyVYY8r86Xpzm1Rv6UdrOBb3lNQhFL6bO0UVsWCuOsuwVxfs6HC/pub?output=csv
+    date_accessed: '2025-03-03'
+  name: Pre-term births (Eurostat and US CDC)
+  description: ''
+  license: {}
+outs:
+  - md5: dff222e2f477c6b07d8e954f131f57c7
+    size: 546
+    path: pre_term_births_europe_usa.csv

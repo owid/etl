@@ -1,0 +1,29 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Vaccination
+    description_key:
+      - "Data on reported deaths from acute polio have been compiled from historical Public Health Reports for the United States and from the Centers for Disease Control and Prevention's Morbidity and Mortality Weekly Report."
+      - "Acute polio deaths are defined as deaths from an acute polio infection, and not post-polio syndrome."
+      - "The first polio vaccine was created by Jonas Salk, it was licensed and began to be administered in 1955."
+      - "A second polio vaccine was created by Albert Sabin in 1960."
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 365
+  title: Long-run reported polio deaths in the United States
+
+tables:
+  polio_deaths:
+    variables:
+      deaths:
+        title: Polio deaths
+        description_short: Reported deaths from acute polio in a given year. The reported figures include both [wild-](#dod:wild-poliovirus) and [vaccine-derived poliovirus](#dod:vaccine-derived-poliovirus) infections that occurred indigenously and as imported cases.
+        unit: cases
+      death_rate:
+        title: Polio deaths per 100,000 people
+        description_short: Reported deaths from acute polio per 100,000 people in a given year. The reported figures include both [wild-](#dod:wild-poliovirus) and [vaccine-derived poliovirus](#dod:vaccine-derived-poliovirus) infections that occurred indigenously and as imported cases.
+        unit: deaths per 100,000 people

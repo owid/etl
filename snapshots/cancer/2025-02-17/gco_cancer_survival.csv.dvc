@@ -1,0 +1,32 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: ICBP SURVMARK-2 - Cancer Survival Rates
+    description: |-
+      ICBP SURVMARK-2 provides data on cancer survival, incidence, and mortality within the second phase of the International Cancer Benchmarking Partnership (ICBP).
+
+      ICBP is a unique and innovative global collaboration that brings together clinicians, policy-makers, researchers, and cancer data experts. It aims to measure international differences in cancer survival and, crucially, to identify factors that might be driving these differences.
+
+      The ICBP SURVMARK-2 project was launched in July 2016 and is due to be completed in early 2020.
+
+      The data presented are derived from 21 population-based cancer registries in seven countries (Australia, Canada, Denmark, Ireland, New Zealand, Norway, and the United Kingdom) and cover the period 1995–2014, with follow-up until 31 December 2015.
+    date_published: "2019"
+
+    # Citation
+    producer: Global Cancer Observatory
+    citation_full: |-
+      Arnold M, Rutherford M, Lam F, Bray F, Ervik M, Soerjomataram I (2019). ICBP SURVMARK-2 online tool: International Cancer Survival Benchmarking. Lyon, France: International Agency for Research on Cancer. Available from: http://gco.iarc.fr/survival/survmark, accessed [17 February 2025].
+    # Files
+    url_main: https://gco.iarc.fr/survival/survmark/visualizations/viz2/?cancer_site=%22Colon%22&country=%22Australia%22&agegroup=%22All%22&gender=%22All%22&interval=%221%22&survival_year=%221%22&measures=%5B%22Incidence+%28ASR%29%22%2C%22Mortality+%28ASR%29%22%2C%22Net+Survival%22%5D
+    date_accessed: 2025-02-17
+
+    # License
+    license:
+      name: Protocol 2 of the Universal Copyright Convention
+      url: https://gco.iarc.fr/overtime/en/about#web-reference
+outs:
+  - md5: 4725e39fe0afc42e5fbda79a768b4c45
+    size: 157949
+    path: gco_cancer_survival.csv

@@ -6,6 +6,8 @@ definitions:
     display:
       numDecimalPlaces: 0
     processing_level: minor
+dataset:
+  title: Global Tuberculosis Report - Laboratory Diagnostic Services
 tables:
   laboratories:
     variables:

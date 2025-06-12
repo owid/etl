@@ -30,7 +30,6 @@ NON_UPDATEABLE_IDENTIFIERS = [
     # Old WB income groups.
     "garden/wb/wb_income",
     "meadow/wb/wb_income",
-    "walden/wb/wb_income",
     # New WB income groups.
     "garden/wb/income_groups",
     "meadow/wb/income_groups",

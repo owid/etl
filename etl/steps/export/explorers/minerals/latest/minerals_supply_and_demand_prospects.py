@@ -3,7 +3,7 @@
 import pandas as pd
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_explorer
+from etl.helpers import PathFinder
 
 # Initialize log.
 log = get_logger()
@@ -86,7 +86,7 @@ def run(dest_dir: str) -> None:
     df_graphers["yAxisMin"] = 0
 
     # Make all views stacked area charts.
-    df_graphers["chartTypes"] = ["StackedArea"]
+    df_graphers["chartTypes"] = [["StackedArea"]] * len(df_graphers)
 
     # Sanity check.
     error = "Duplicated rows in explorer."
@@ -155,5 +155,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new explorers dataset and tsv file.
-    ds_explorer = create_explorer(dest_dir=dest_dir, config=config, df_graphers=df_graphers)
+    ds_explorer = paths.create_explorer_legacy(config=config, df_graphers=df_graphers)
     ds_explorer.save()

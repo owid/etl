@@ -17,7 +17,7 @@ git commit -m ":robot: update: monkeypox" || true
 git push origin master -q || true
 
 echo '--- Commit dataset to https://github.com/owid/monkeypox'
-MONKEYPOX_COMMIT=1 uv run etlr github/who/latest/monkeypox --export
+MONKEYPOX_COMMIT=1 uv run etlr github/who/latest/monkeypox --export --private
 
 end_time=$(date +%s)
 

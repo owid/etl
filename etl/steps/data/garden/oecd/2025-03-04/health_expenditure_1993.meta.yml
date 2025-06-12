@@ -1,0 +1,33 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Healthcare Spending
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 0
+
+
+tables:
+  health_expenditure_1993:
+    variables:
+      share_gdp:
+        title: Public health expenditure as a share of GDP
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: Public health expenditure divided by gross domestic product, expressed as a percentage.
+        processing_level: major
+        description_processing: We calculated this indicator by dividing estimates of public expenditure on health by GDP, expressed as a percentage.
+        presentation:
+          attribution_short: OECD
+          title_public: Public health expenditure as a share of GDP
+          title_variant: Data between 1960-1991
+        display:
+          name: Public health expenditure as a share of GDP
+          numDecimalPlaces: 1
+          tolerance: 5
+

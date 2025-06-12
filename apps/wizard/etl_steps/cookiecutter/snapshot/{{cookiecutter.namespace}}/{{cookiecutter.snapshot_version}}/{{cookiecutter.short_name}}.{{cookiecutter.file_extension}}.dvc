@@ -3,7 +3,7 @@
 meta:
   origin:
     # Data product / Snapshot
-    title: {{cookiecutter.title}}
+    title: "{{cookiecutter.title}}"
     {%- if cookiecutter.description %}
     description: |-
       {{cookiecutter.description.replace("\n", "\n      ")}}

@@ -2,11 +2,14 @@
 
 from typing import cast
 
-from owid.catalog import Dataset
+from owid.catalog import Dataset, DatasetMeta
+from owid.catalog.datasets import DEFAULT_FORMATS
 from owid.datautils.dataframes import combine_two_overlapping_dataframes
 from structlog import get_logger
 
-from etl.helpers import PathFinder, create_dataset_with_combined_metadata
+from etl.helpers import PathFinder, create_dataset
+from etl.snapshot import SnapshotMeta
+from etl.steps.data.converters import convert_snapshot_metadata
 
 log = get_logger()
 
@@ -43,6 +46,103 @@ LATEST_DATA_COLUMNS = {
     "all_purchasers__constant_u_s__dollar_expenditures_per_capita__1988_100__fafh": "Food expenditure away from home (constant 1988 prices)",
     "all_purchasers__constant_u_s__dollar_expenditures_per_capita__1988_100__all_food": "Food expenditure total (constant 1988 prices)",
 }
+
+
+def create_dataset_with_combined_metadata(
+    dest_dir,
+    datasets,
+    tables,
+    default_metadata=None,  # type: ignore
+    underscore_table=True,
+    formats=DEFAULT_FORMATS,
+):
+    """Create a new catalog Dataset with the combination of sources and licenses of a list of datasets.
+
+    This function will:
+    * Gather all sources and licenses of a list of datasets (`datasets`).
+    * Assign the combined sources and licenses to all variables in a list of tables (`tables`).
+    * Create a new dataset (using the function `create_dataset`) with the combined sources and licenses.
+
+    NOTES:
+      * The sources and licenses of the default_metadata will be ignored (and the combined sources and licenses of all
+        `datasets` will be used instead).
+      * If a metadata yaml file exists and contains sources and licenses, the content of the metadata file will
+        override the combined sources and licenses.
+
+    Parameters
+    ----------
+    dest_dir : Union[str, Path]
+        Destination directory for the dataset, usually argument of `run` function.
+    datasets : List[catalog.Dataset]
+        Datasets whose sources and licenses will be gathered and passed on to the new dataset.
+    tables : List[catalog.Table]
+        Tables to add to the new dataset.
+    default_metadata : Optional[Union[SnapshotMeta, catalog.DatasetMeta]]
+        Default metadata for the new dataset. If it contains sources and licenses, they will be ignored (and the
+        combined sources of the list of datasets passed will be used).
+    underscore_table : bool
+        Whether to underscore the table name before adding it to the dataset.
+
+    Returns
+    -------
+    catalog.Dataset
+        New dataset with combined metadata.
+
+    """
+
+    # Gather unique sources from the original datasets.
+    sources = []
+    licenses = []
+    for dataset_i in datasets:
+        # Get metadata from this dataset or snapshot.
+        if isinstance(dataset_i.metadata, SnapshotMeta):
+            metadata = convert_snapshot_metadata(dataset_i.metadata)
+        else:
+            metadata = dataset_i.metadata
+
+        # Gather sources and licenses from this dataset or snapshot.
+        for source in metadata.sources:
+            if source.name not in [known_source.name for known_source in sources]:
+                sources.append(source)
+        for license in metadata.licenses:
+            if license.name not in [known_license.name for known_license in licenses]:
+                licenses.append(license)
+
+    # Assign combined sources and licenses to each of the variables in each of the tables.
+    for table in tables:
+        index_columns = table.metadata.primary_key
+        # If the table has an index, reset it, so that sources and licenses can also be assigned to index columns.
+        if len(index_columns) > 0:
+            table = table.reset_index()
+        # Assign sources and licenses to the metadata of each variable in the table.
+        for variable in table.columns:
+            table[variable].metadata.sources = sources
+            table[variable].metadata.licenses = licenses
+        # Bring original index back.
+        if len(index_columns) > 0:
+            table = table.set_index(index_columns)
+
+    if default_metadata is None:
+        # If no default metadata is passed, create new empty dataset metadata.
+        default_metadata = DatasetMeta()
+    elif isinstance(default_metadata, SnapshotMeta):
+        # If a snapshot metadata is passed as default metadata, convert it to a dataset metadata.
+        default_metadata: DatasetMeta = convert_snapshot_metadata(default_metadata)
+
+    # Assign combined sources and licenses to the new dataset metadata.
+    default_metadata.sources = sources
+    default_metadata.licenses = licenses
+
+    # Create a new dataset.
+    ds = create_dataset(
+        dest_dir=dest_dir,
+        tables=tables,
+        default_metadata=default_metadata,
+        underscore_table=underscore_table,
+        formats=formats,
+    )
+
+    return ds
 
 
 def run(dest_dir: str) -> None:

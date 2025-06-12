@@ -32,9 +32,10 @@ tables:
           - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
 
           - 2024-2100: Projections based on Medium variant by the UN World Population Prospects (2024 revision).
-        presentation:
-          title_public: Fertility rate
+        presentation: &fertility_rate
+          title_public: "Fertility rate: births per woman"
           title_variant: period tables
+          attribution_short: HFD, UN WPP
 
       fertility_rate_hist:
         title: Fertility rate (period), historical
@@ -50,9 +51,7 @@ tables:
           - Before 1950: Historical estimates by Human Fertility Database (2024).
 
           - 1950-2023: Population records by the UN World Population Prospects (2024 revision).
-        presentation:
-          title_public: Fertility rate
-          title_variant: period tables
+        presentation: *fertility_rate
 
   fertility_rate_by_age:
     variables:

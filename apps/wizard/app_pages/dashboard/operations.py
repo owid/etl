@@ -50,7 +50,7 @@ def render_action_update():
         with st.popover("More settings", icon=":material/settings:"):
             dry_run_update = st.toggle(
                 "Dry run",
-                True,
+                False,
                 help="If checked, the update command will not write anything to the DAG or create any files.",
             )
             version_new = st.text_input("New version", value=TODAY, help="Version of the new steps to be created.")
@@ -68,7 +68,7 @@ def render_action_update():
             st.error("The update command is not available in production. Update steps locally or in staging.")
             st.stop()
         else:
-            with st.spinner("Executing step updater..."):
+            with st.spinner("Executing step updater...", show_time=True):
                 # TODO: It would be better to directly use StepUpdater instead of a subprocess.
                 command = (
                     "etl update "
@@ -99,7 +99,7 @@ def render_action_execute(steps_df: pd.DataFrame):
         with st.popover("More settings", icon=":material/settings:"):
             dry_run_etl = st.toggle(
                 "Dry run",
-                True,
+                False,
                 help="If checked, no snapshots will be executed, and ETL will be executed in dry-run mode.",
             )
             force_only = st.toggle(
@@ -132,7 +132,7 @@ def render_action_execute(steps_df: pd.DataFrame):
                 st.error("Running the ETL is not available in production. Run them locally or in staging.")
                 st.stop()
             else:
-                with st.spinner("Executing ETL..."):
+                with st.spinner("Executing ETL...", show_time=True):
                     command = _define_command_to_execute_snapshots_and_etl_steps(
                         steps_df=steps_df,
                         dry_run=dry_run_etl,
@@ -158,7 +158,7 @@ def render_action_archive():
         with st.popover("More settings", icon=":material/settings:"):
             dry_run_archive = st.toggle(
                 "Dry run",
-                True,
+                False,
                 help="If checked, nothing will be written to the dag.",
             )
             include_usages_archive = st.toggle(
@@ -181,7 +181,7 @@ def render_action_archive():
             st.error("Archiving is not available in production. Run them locally or in staging.")
             st.stop()
         else:
-            with st.spinner("Archiving steps..."):
+            with st.spinner("Archiving steps...", show_time=True):
                 command = "etl archive " + " ".join(st.session_state.selected_steps) + " --non-interactive"
                 if dry_run_archive:
                     command += " --dry-run"

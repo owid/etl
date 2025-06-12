@@ -4,6 +4,8 @@ definitions:
       topic_tags:
         - Global Health
     processing_level: minor
+dataset:
+  title: WHO Mortality Database - Homicides
 
 tables:
   who_mort_db:
@@ -21,4 +23,3 @@ tables:
       death_rate_per_100_000_population:
         title: Homicide rate in << sex.lower() >> in << age_group.lower() >> per 100,000 population
         unit: deaths per 100,000 people
-

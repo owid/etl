@@ -19,7 +19,6 @@ def run(dest_dir: str) -> None:
     #
     # Load meadow dataset.
     ds_meadow = paths.load_dataset("ethnologue")
-    ds_population = paths.load_dataset("population")
     ds_regions = paths.load_dataset("regions")
     # Read table from meadow dataset.
     tb_country_codes = ds_meadow["country_codes"].reset_index()
@@ -42,12 +41,8 @@ def run(dest_dir: str) -> None:
     tb_lang_by_status["year"] = YEAR_OF_UPDATE
     # The total number of languages
     tb_lang_by_status["total"] = tb_lang_by_status["living"] + tb_lang_by_status["extinct"]
-    # Calculate languages per million
-    tb_lang_by_status = geo.add_population_to_table(tb_lang_by_status, ds_population)
-    tb_lang_by_status["living_per_million"] = tb_lang_by_status["living"] / tb_lang_by_status["population"] * 1_000_000
     # Tidy up and add origins back in
     tb_lang_by_status = tb_lang_by_status.format(["country", "year"], short_name="languages_by_status")
-    tb_lang_by_status = tb_lang_by_status.drop(columns=["population"])
     for col in tb_lang_by_status.columns:
         tb_lang_by_status[col].metadata.origins = origins
     # Save outputs.

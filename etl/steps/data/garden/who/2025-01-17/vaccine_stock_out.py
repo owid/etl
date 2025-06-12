@@ -5,13 +5,13 @@ from owid.catalog import Origin, Table
 from owid.catalog import processing as pr
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -39,8 +39,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
+    ds_garden = paths.create_dataset(
         tables=[tb, tb_agg, tb_cause, tb_global, tb_global_cause],
         check_variables_metadata=True,
         default_metadata=ds_meadow.metadata,
@@ -60,6 +59,8 @@ def clean_data(tb: Table) -> Table:
     tb = tb.drop(columns=["iso_3_code", "who_region", "indcode", "indcatcode", "indcat_description", "indsort"])
     tb = tb.replace({"value": {"ND": pd.NA, "NR": pd.NA}})
     tb["description"] = tb["description"].str.replace("YF (Yellow fever)", "Yellow fever")
+    # Drop data for years before 2011 as it is very sparse
+    tb = tb[tb["year"] >= 2011]
 
     return tb
 

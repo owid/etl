@@ -7,7 +7,7 @@ from jsonschema import (
 from jsonschema.exceptions import ValidationError
 from yaml.loader import SafeLoader
 
-from etl.helpers import read_json_schema
+from etl.files import read_json_schema
 from etl.paths import SCHEMAS_DIR, SNAPSHOTS_DIR, STEPS_DATA_DIR
 
 DATASET_SCHEMA = read_json_schema(path=SCHEMAS_DIR / "dataset-schema.json")

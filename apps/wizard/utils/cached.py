@@ -1,3 +1,10 @@
+"""Cached functions.
+
+For DB-related ones, the pattern can be a bit confusing:
+- apps.wizard.utils.cached makes use of etl.grapher.io
+- etl.grapher.io makes use of etl.grapher.model
+"""
+
 import json
 import logging
 import subprocess
@@ -81,6 +88,11 @@ def load_dataset_uris_new_in_server() -> List[str]:
 @st.cache_data
 def load_dataset_uris() -> List[str]:
     return gio.load_dataset_uris()
+
+
+@st.cache_data
+def indicators_used_in_charts(indicator_ids: List[int]) -> List[int]:
+    return gio.filter_indicators_used_in_charts(indicator_ids)
 
 
 @st.cache_data
@@ -214,6 +226,9 @@ def get_tailscale_ip_to_user_map():
     return ip_to_user
 
 
+########################################################################
+# TODO: Functions below do not use CACHE, and should be moved elsewhere
+########################################################################
 def get_grapher_user_from_ip(user_ip: Optional[str] = None) -> gm.User:
     """Get the Grapher user associated with the given Tailscale IP address.
 

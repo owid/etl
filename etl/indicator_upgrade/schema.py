@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional
 from jsonschema import Draft202012Validator, validate, validators
 from structlog import get_logger
 
-from etl.helpers import get_schema_from_url
+from etl.files import get_schema_from_url
 
 # Logger
 log = get_logger()
@@ -61,8 +61,13 @@ def validate_chart_config_and_set_defaults(
     # Get schema
     if schema is None:
         schema = get_schema_from_url(config["$schema"])
+
     # Validate and update config with defaults
     config_new = copy.deepcopy(config)
+    # Remove isInheritanceEnabled if present as it's not part of the schema
+    if "isInheritanceEnabled" in config_new:
+        del config_new["isInheritanceEnabled"]
+
     try:
         DefaultSetterValidatingValidator(schema).validate(config_new)
     except Exception as e:

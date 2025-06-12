@@ -8,7 +8,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers.geo import add_gdp_to_table, add_population_to_table
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -235,17 +235,17 @@ def remove_outliers(tb: Table) -> Table:
     return tb
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load data.
     #
     # Load Statistical Review dataset and read its main table.
     ds_review = paths.load_dataset("statistical_review_of_world_energy")
-    tb_review = ds_review["statistical_review_of_world_energy"]
+    tb_review = ds_review.read("statistical_review_of_world_energy", reset_index=False)
 
     # Load EIA dataset on energy consumption and read its main table.
     ds_eia = paths.load_dataset("energy_consumption")
-    tb_eia = ds_eia["energy_consumption"]
+    tb_eia = ds_eia.read("energy_consumption", reset_index=False)
 
     # Load GDP dataset.
     ds_gdp = paths.load_dataset("maddison_project_database")
@@ -284,5 +284,5 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb], check_variables_metadata=True)
+    ds_garden = paths.create_dataset(tables=[tb])
     ds_garden.save()

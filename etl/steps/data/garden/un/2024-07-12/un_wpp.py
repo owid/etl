@@ -27,22 +27,22 @@ def run(dest_dir: str) -> None:
     ds_meadow = paths.load_dataset("un_wpp")
 
     # Load tables
-    tb_population = ds_meadow["population"].reset_index()
-    tb_population_density = ds_meadow["population_density"].reset_index()
-    tb_growth_rate = ds_meadow["growth_rate"].reset_index()
-    tb_nat_change = ds_meadow["natural_change_rate"].reset_index()
-    tb_fertility = ds_meadow["fertility_rate"].reset_index()
+    tb_population = ds_meadow.read("population")
+    tb_population_density = ds_meadow.read("population_density")
+    tb_growth_rate = ds_meadow.read("growth_rate")
+    tb_nat_change = ds_meadow.read("natural_change_rate")
+    tb_fertility = ds_meadow.read("fertility_rate")
     tb_fertility_births_single = ds_meadow.read("fertility_births_single")
-    tb_migration = ds_meadow["net_migration"].reset_index()
-    tb_migration_rate = ds_meadow["net_migration_rate"].reset_index()
-    tb_deaths = ds_meadow["deaths"].reset_index()
-    tb_death_rate = ds_meadow["death_rate"].reset_index()
-    tb_births = ds_meadow["births"].reset_index()
-    tb_birth_rate = ds_meadow["birth_rate"].reset_index()
-    tb_median_age = ds_meadow["median_age"].reset_index()
-    tb_le = ds_meadow["life_expectancy"].reset_index()
-    tb_mortality = ds_meadow["mortality_rate"].reset_index()
-    tb_childbearing_age = ds_meadow["mean_age_childbearing"].reset_index()
+    tb_migration = ds_meadow.read("net_migration")
+    tb_migration_rate = ds_meadow.read("net_migration_rate")
+    tb_deaths = ds_meadow.read("deaths")
+    tb_death_rate = ds_meadow.read("death_rate")
+    tb_births = ds_meadow.read("births")
+    tb_birth_rate = ds_meadow.read("birth_rate")
+    tb_median_age = ds_meadow.read("median_age")
+    tb_le = ds_meadow.read("life_expectancy")
+    tb_mortality = ds_meadow.read("mortality_rate")
+    tb_childbearing_age = ds_meadow.read("mean_age_childbearing")
 
     #
     # Process data.
@@ -298,6 +298,9 @@ def process_migration(tb_mig: Table, tb_mig_rate: Table) -> Table:
 
     # Age as string
     tb["age"] = tb["age"].astype("string")
+
+    # Zero value for "World"
+    tb.loc[tb["country"] == "World", ["net_migration", "net_migration_rate"]] = 0
 
     return tb
 

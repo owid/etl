@@ -1,0 +1,101 @@
+definitions:
+  pollutant_name: |-
+    <% if pollutant == "BC" %>Black carbon <% elif pollutant == "CH₄" %>Methane <% elif pollutant == "CO" %>Carbon monoxide <% elif pollutant == "N₂O" %>Nitrous oxide <% elif pollutant == "NH₃" %>Ammonia <% elif pollutant == "NMVOC" %>Non-methane volatile organic compounds <% elif pollutant == "NOₓ" %>Nitrogen oxides <% elif pollutant == "OC" %>Organic carbon <% elif pollutant == "SO₂" %>Sulfur dioxide <% endif -%>
+  pollutant_name_lower: |-
+    <% if pollutant == "BC" %>black carbon <% elif pollutant == "CH₄" %>methane <% elif pollutant == "CO" %>carbon monoxide <% elif pollutant == "N₂O" %>nitrous oxide <% elif pollutant == "NH₃" %>ammonia <% elif pollutant == "NMVOC" %>non-methane volatile organic compounds <% elif pollutant == "NOₓ" %>nitrogen oxides <% elif pollutant == "OC" %>organic carbon <% elif pollutant == "SO₂" %>sulfur dioxide <% endif -%>
+  pollutant_description_short: |-
+    <% if pollutant == "BC" %>Black carbon (BC) is a soot-like pollutant formed from the burning of biomass and fossil fuels. It is a major contributor to particulate matter pollution, and contributes to climate change by absorbing sunlight.
+    <% elif pollutant == "CH₄" %>Methane (CH₄) is a greenhouse gas that contributes to the formation of ground-level ozone, a harmful air pollutant. Key sources of methane include agriculture, landfills, and fossil fuel extraction.
+    <% elif pollutant == "CO" %>Carbon monoxide (CO) is a pollutant produced from the incomplete combustion of carbon-based fuels such as oil, gas, wood, and coal. CO is a harmful gas that contributes to both outdoor and indoor air pollution.
+    <% elif pollutant == "N₂O" %>Nitrous oxide (N₂O) is a greenhouse gas that contributes to air pollution by depleting the stratospheric ozone layer and influencing atmospheric chemistry. Major sources include agriculture, industrial processes, and fossil fuel combustion.
+    <% elif pollutant == "NH₃" %>Ammonia (NH₃) is a gas which can mix with other gases – such as nitrogen oxides and sulphur dioxide – to form particulate matter. Its main sources are the use of manure and fertilizers in agriculture, and emissions from industry.
+    <% elif pollutant == "NMVOC" %>Non-methane volatile organic compounds (NMVOCs) are pollutants formed from the burning of biomass and fossil fuels. NMVOCs can lead to the formation of other local air pollutants, such as ozone.
+    <% elif pollutant == "NOₓ" %>Nitrogen oxides (NOₓ) are gases that are mainly formed during the burning of fossil fuels. Exposure to NOₓ gases can have negative impacts on respiratory health. NOₓ gases can also lead to the formation of ozone – another air pollutant.
+    <% elif pollutant == "OC" %>Organic carbon molecules are formed from the incomplete burning of organic materials, including fossil fuels and biomass. They can also be suspended in the air from sources such as vehicle tyres and roads. Organic carbon adds to particulate matter pollution, with negative impacts on human health.
+    <% elif pollutant == "SO₂" %>Sulphur dioxide (SO₂) is an air pollutant formed from the burning of fuels that contain sulphur, such as coal. SO₂ is one of the main chemicals that forms acid rain.
+    <%- endif -%>
+  description_key_agriculture: |-
+    "Agriculture" includes air pollutant emissions from biological processes such as manure management, rice cultivation, soil processes, and livestock digestive processes. It also covers indirect N₂O emissions from non-agricultural nitrogen sources and fuel combustion in agricultural machinery, forestry, and fishing.
+  description_key_buildings: |-
+    "Buildings" includes air pollutant emissions from fuel combustion in residential, commercial, and institutional buildings. Key sources include heating, cooking, and other energy use in homes, offices, and public facilities.
+  description_key_domestic_aviation: |-
+    "Domestic aviation" includes air pollutant emissions from fuel combustion in aircraft operating on domestic routes.
+  description_key_energy: |-
+    "Energy" includes air pollutant emissions from fuel combustion in electricity and heat production, as well as fugitive emissions from solid fuels, petroleum, and natural gas extraction. This sector also includes emissions from fossil fuel fires.
+  description_key_industry: |-
+    "Industry" includes air pollutant emissions from fuel combustion and chemical processes in manufacturing sectors, such as iron and steel production, cement and lime manufacturing, mining, and non-metallic mineral processing.
+  description_key_international_aviation: |-
+    "International aviation" includes air pollutant emissions from fuel combustion in aircraft operating on international routes.
+  description_key_international_shipping: |-
+    "International shipping" includes air pollutant emissions from fuel combustion in ships engaged in international transport. It also covers emissions from oil tanker loading, the transfer of crude oil or petroleum products between storage facilities and transport systems such as tankers.
+  description_key_transport: |-
+    "Transport" includes air pollutant emissions from fuel combustion in road, rail, and domestic navigation.
+  description_key_solvents: |-
+    "Solvents" includes air pollutant emissions from industrial and consumer applications such as degreasing, painting, and chemical manufacturing.
+  description_key_waste: |-
+    "Waste" includes air pollutant emissions from solid waste disposal, waste combustion, wastewater handling, and other waste management processes.
+  description_key_combined: &description_key_combined
+    - <% if sector == "All sectors" or sector == "Agriculture" %> {definitions.description_key_agriculture} <% elif sector == "Buildings" %> {definitions.description_key_buildings} <% elif sector == "Domestic aviation" %> {definitions.description_key_domestic_aviation} <% elif sector == "Energy" %> {definitions.description_key_energy} <% elif sector == "Industry" %> {definitions.description_key_industry} <% elif sector == "International aviation" %> {definitions.description_key_international_aviation} <% elif sector == "International shipping" %> {definitions.description_key_international_shipping} <% elif sector == "Transport" %> {definitions.description_key_transport} <% elif sector == "Solvents" %> {definitions.description_key_solvents} <% elif sector == "Waste" %> {definitions.description_key_waste} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_buildings} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_domestic_aviation} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_energy} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_industry} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_international_aviation} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_international_shipping} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_transport} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_solvents} <% endif %>
+    - <% if sector == "All sectors" %> {definitions.description_key_waste} <% endif %>
+    - Emissions assigned to "Other" are those that are included in the global total, but cannot be allocated to any specific countries.
+  common:
+    presentation:
+      topic_tags:
+        - Air Pollution
+    processing_level: major
+  # NOTE: Processing description will be added programmatically, based on the sectorial mapping.
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  ceds_air_pollutants:
+    dimensions:
+      - slug: pollutant
+        name: Pollutant
+      - slug: sector
+        name: Sector
+
+    variables:
+      emissions:
+        title: |-
+          {definitions.pollutant_name} emissions from << sector.lower() >>
+        description_short: |-
+          {definitions.pollutant_description_short}
+        unit: |-
+          tonnes
+        short_unit: t
+        description_key: *description_key_combined
+        display:
+          name: |-
+            <% if sector == "All sectors" %>{definitions.pollutant_name}<% else %><< sector >><% endif %>
+          shortUnit: t
+          numDecimalPlaces: 0
+        presentation:
+          title_public: |-
+            {definitions.pollutant_name} emissions from << sector.lower() >>
+      emissions_per_capita:
+        title: |-
+          Per capita {definitions.pollutant_name_lower} emissions from << sector.lower() >>
+        description_short: |-
+          {definitions.pollutant_description_short}
+        unit: kilograms per person
+        short_unit: kg/person
+        description_key: *description_key_combined
+        display:
+          name: |-
+            <% if sector == "All sectors" %>{definitions.pollutant_name}<% else %><< sector >><% endif %>
+          shortUnit: kg
+          numDecimalPlaces: 0
+        presentation:
+          title_public: |-
+            Per capita {definitions.pollutant_name_lower} emissions from << sector.lower() >>

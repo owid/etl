@@ -76,9 +76,7 @@ def run(dest_dir: str) -> None:
     tb = add_population_2022(
         tb,
         ds_population,
-        missing_countries={
-            "International",
-        },
+        missing_countries={"International", "Côte d’Ivoire"},
     )
     ## Add regions
     tb = add_regions(tb, ds_regions, ds_income)
