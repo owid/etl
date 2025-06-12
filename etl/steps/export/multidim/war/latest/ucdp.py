@@ -5,6 +5,23 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+COMMON_CONFIG = {
+    "hasMapTab": True,
+    "originUrl": "ourworldindata.org/ucdp",
+    "relatedQuestions": [
+        {
+            "text": "How do different approaches measure armed conflicts and their deaths?",
+            "url": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+        }
+    ],
+    "map": {
+        "colorScale": {"baseColorScheme": "OrRd"},
+    },
+    "hideAnnotationFieldsInTitle": {
+        "time": True,
+    },
+}
+
 
 def run() -> None:
     #
@@ -37,11 +54,7 @@ def run() -> None:
             "death_rate",
             "num_conflicts",
         ],
-        common_view_config={
-            "hideAnnotationFieldsInTitle": {
-                "time": True,
-            },
-        },
+        common_view_config=COMMON_CONFIG,
     )
 
     # Edit indicator-level display settings
@@ -66,10 +79,8 @@ def run() -> None:
                 "choice_new_slug": "all_stacked",
                 "view_config": {
                     "chartTypes": ["StackedBar"],
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
-                },
+                }
+                | COMMON_CONFIG,
             },
             {
                 "dimension": "estimate",
@@ -77,10 +88,8 @@ def run() -> None:
                 "choice_new_slug": "best_ci",
                 "view_config": {
                     "selectedFacetStrategy": "entity",
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
-                },
+                }
+                | COMMON_CONFIG,
             },
             {
                 "dimension": "people",
@@ -89,11 +98,9 @@ def run() -> None:
                 "view_config": {
                     "chartTypes": ["StackedBar"],
                     "selectedFacetStrategy": "entity",
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
                     "sortBy": "custom",
-                },
+                }
+                | COMMON_CONFIG,
             },
         ]
     )
@@ -130,9 +137,13 @@ def run() -> None:
                 "facetDomain": True,
             },
             "title": "{title}",
+            "subtitle": "{subtitle}",
+            "note": "{note}",
         },
         params={
             "title": lambda view: _set_title(view, choice_names),
+            "subtitle": lambda view: _set_subtitle(view, choice_names),
+            "note": lambda view: _set_note(view, choice_names),
         },
     )
 
@@ -222,11 +233,35 @@ def adjust_dimensions(tb):
 def _set_title(view, choice_names):
     conflict_name = _get_conflict_name(view, choice_names)
     if view.dimensions["indicator"] == "deaths":
-        return f"Deaths in {conflict_name}"
+        title = f"Deaths in {conflict_name} based on where they occurred"
+        if view.dimensions["people"] == "all_stacked":
+            title = f"Civilian and combatant {title.lower()}"
     elif view.dimensions["indicator"] == "death_rate":
-        return f"Death rate in {conflict_name}"
+        title = f"Death rate in {conflict_name} based on where they occurred"
+        if view.dimensions["people"] == "all_stacked":
+            title = f"Civilian and combatant {title.lower()}"
     else:
-        return f"Number of {conflict_name}"
+        title = f"Number of {conflict_name}"
+    return title
+
+
+def _set_subtitle(view, choice_names):
+    """Set subtitle based on view dimensions."""
+    # conflict_name = _get_conflict_name(view, choice_names)
+    subtitle = ""
+    if view.dimensions["indicator"] == "deaths":
+        if view.dimensions["conflict_type"] == "all":
+            subtitle = "Reported deaths of combatants and civilians due to fighting in [armed conflicts](#dod:armed-conflict-ucdp) that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+    return subtitle
+
+
+def _set_note(view, choice_names):
+    """Set subtitle based on view dimensions."""
+    # conflict_name = _get_conflict_name(view, choice_names)
+    note = ""
+    if view.dimensions["estimate"] == "best_ci":
+        note = "'Best' estimates as identified by UCDP."
+    return note
 
 
 def _get_conflict_name(view, choice_names):
