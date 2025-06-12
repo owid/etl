@@ -13,7 +13,6 @@ tables:
   faostat_cisp_flat:
     variables:
       agriculture__forestry__fishing__general_government__00023131__agriculture_orientation_index_usd__006159:
-        title: "Agriculture orientation index for government spending on agriculture, forestry and fishing"
         display:
           name: "Agriculture orientation index for government spending"
           numDecimalPlaces: 2
