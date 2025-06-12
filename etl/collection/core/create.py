@@ -141,7 +141,7 @@ def _bake_listable(fct_single, obj, obj_name, num_tables):
         # Single value - replicate for all tables
         return [obj] * num_tables
     # 2) list[list[str]] -> list[list[str]]
-    elif _is_multi(fct_single, obj, "indicator_names", num_tables):
+    elif _is_multi(fct_single, obj, obj_name, num_tables):
         return obj
     else:
         raise TypeError(
