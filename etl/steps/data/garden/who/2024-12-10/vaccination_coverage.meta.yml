@@ -136,7 +136,7 @@ definitions:
     In countries utilizing an immunization schedule recommending either (i) a primary series of three doses of oral polio vaccine (OPV) plus at least one dose of IPV where OPV is included in routine immunization and/or campaign or (ii) a sequential schedule of IPV followed by OPV, WHO and UNICEF estimates for IPV1 reflect coverage with at least one routine dose of IPV among infants <1 year of age among countries. For countries utilizing IPV containing vaccine use only, i.e., no recommended dose of OPV, the WHO and UNICEF estimate for IPV1 corresponds to coverage for the 1st dose of IPV. Production of IPV coverage estimates, which begins in 2015, results in no change of the estimated coverage levels for the 3rd dose of polio (Pol3). For countries recommending routine immunization with a primary series of three doses of IPV alone, WHO and UNICEF estimated Pol3 coverage is equivalent to estimated coverage with three doses of IPV. For countries with a sequential schedule, estimated Pol3 coverage is based on that for the 3rd dose of polio vaccine regardless of vaccine type.
     <%- endif %>
   antigen_note: |-
-    <% if antigen in ["MCV2", "MCVX2"] %>
+    <% if antigen in ["MCV2", "MCV2X2"] %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia. Recommended child's age for MCV2 vaccination varies by country.
     <%- elif antigen == "MCV1" %>
       Measles is a highly contagious viral disease, most common in young children. Its effects include blindness, inflammation of the brain, severe diarrhea, and severe respiratory infections such as pneumonia.
