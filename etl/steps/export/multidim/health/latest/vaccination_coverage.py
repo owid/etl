@@ -33,7 +33,6 @@ def run() -> None:
         groups=[
             {
                 "dimension": "antigen",
-                "indicator_names": ["coverage"],
                 "choice_new_slug": "comparison",
                 "choices": ["MCV1", "HEPB3", "DTPCV3", "IPV1", "POL3", "HIB3", "RCV1", "PCV3", "ROTAC"],
                 "view_config": {
@@ -50,4 +49,33 @@ def run() -> None:
         ]
     )
 
+    for view in c.views:
+        metric = view.dimensions["metric"]
+        antigen = view.dimensions["antigen"]
+        # print(f"Creating view for {antigen} - {metric}")
+
+        view.config = view.config.copy()
+
+        if (antigen == "comparison") & (metric == "vaccinated"):
+            view.config["title"] = "Number of one-year-olds who have received different vaccinations"
+            view.config["subtitle"] = (
+                "Estimated number of one-year-olds who have received vaccinations for different diseases."
+            )
+            view.config["note"] = (
+                "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) "
+                "(3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), "
+                "[polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), "
+                "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
+            )
+        elif (antigen == "comparison") & (metric == "unvaccinated"):
+            view.config["title"] = "Number of one-year-olds who have not received different vaccinations"
+            view.config["subtitle"] = (
+                "Estimated number of one-year-olds who have not received vaccinations for different diseases."
+            )
+            view.config["note"] = (
+                "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) "
+                "(3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), "
+                "[polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), "
+                "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
+            )
     c.save()
