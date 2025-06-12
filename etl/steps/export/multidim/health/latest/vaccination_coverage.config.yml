@@ -21,7 +21,7 @@ dimensions:
     choices:
       - slug: comparison
         name: "Comparison across vaccines"
-        description: "Vaccination coverage of all vaccines for one-year-olds"
+        description: "Coverage of multiple vaccines for one-year-olds"
       - slug: "BCG"
         name: "Tuberculosis vaccine"
         description: "Share of newborns receiving the Bacillus Calmette-Guérin (BCG) vaccine"
