@@ -211,7 +211,6 @@ tables:
           name: "{definitions.antigen_display_name}"
           numDecimalPlaces: 1
         presentation:
-          title_public: "{definitions.antigen_display_name}"
           grapher_config:
             originUrl: https://ourworldindata.org/vaccination
             map:
@@ -241,7 +240,6 @@ tables:
           name: "{definitions.antigen_display_name}"
           numDecimalPlaces: 0
         presentation:
-          title_public: "{definitions.antigen_display_name}"
           grapher_config:
             note: |-
               {definitions.antigen_note}
@@ -259,7 +257,6 @@ tables:
           numDecimalPlaces: 0
           name: "{definitions.antigen_display_name}"
         presentation:
-          title_public: "{definitions.antigen_display_name}"
           grapher_config:
             note: |-
               {definitions.antigen_note}
