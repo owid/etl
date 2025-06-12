@@ -42,8 +42,6 @@ dimensions:
       - slug: "MCV1"
         name: "Measles vaccine (first dose)"
       - slug: "MCV2"
-        name: "Measles vaccine (second dose)"
-      - slug: "MCV2X2"
         name: "Measles vaccine (second dose; two-year-olds)"
       - slug: "MENA_C"
         name: "Meningococcal conjugate vaccine (last dose)"
