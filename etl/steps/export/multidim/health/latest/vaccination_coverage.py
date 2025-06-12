@@ -33,6 +33,7 @@ def run() -> None:
         groups=[
             {
                 "dimension": "antigen",
+                "indicator_names": ["coverage"],
                 "choice_new_slug": "comparison",
                 "choices": ["MCV1", "HEPB3", "DTPCV3", "YFV", "IPV1", "POL3", "HIB3", "RCV1", "PCV3", "ROTAC"],
                 "view_config": {
