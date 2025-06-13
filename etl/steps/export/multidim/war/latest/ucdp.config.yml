@@ -55,7 +55,7 @@ dimensions:
         description: Between a state and another armed group
       - slug: "intrastate"
         name: "Civil conflicts"
-        description: Between states
+        description: Between a state and another armed group
       - slug: "non-state conflict"
         name: "Non-state conflicts"
         description: Between non-state armed groups
