@@ -221,7 +221,7 @@ tables:
             note: |-
               {definitions.antigen_note}
       vaccinated:
-        title: Number of {definitions.antigen_age_group} vaccinated with {definitions.antigen_title}
+        title: Number of {definitions.antigen_age_group} {definitions.antigen_title}
         description_short: The number of {definitions.antigen_age_group} who had {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
@@ -239,8 +239,22 @@ tables:
           grapher_config:
             note: |-
               {definitions.antigen_note}
+              grapher_config:
+            originUrl: https://ourworldindata.org/vaccination
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: "YlGnBu"
+                binningStrategy: "manual"
+                customNumericValues:
+                  - 100000
+                  - 300000
+                  - 1000000
+                  - 3000000
+                  - 10000000
+                  - 30000000
       unvaccinated:
-        title: Number of {definitions.antigen_age_group} who have not had {definitions.antigen_title}
+        title: Number of {definitions.antigen_age_group} who have not been {definitions.antigen_title}
         description_short: The number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
@@ -258,3 +272,15 @@ tables:
           grapher_config:
             note: |-
               {definitions.antigen_note}
+            map:
+              time: latest
+              colorScale:
+                baseColorScheme: "OrRd"
+                binningStrategy: "manual"
+                customNumericValues:
+                  - 10000
+                  - 30000
+                  - 100000
+                  - 300000
+                  - 1000000
+                  - 3000000
