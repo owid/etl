@@ -83,14 +83,14 @@ def run() -> None:
     tb_conflict = ds_meadow.read("ucdp_battle_related_conflict")
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
-    tb_codes = ds_gw["gleditsch_countries"]
+    tb_codes = ds_gw.read("gleditsch_countries")
     tb_maps = ds_maps.read("nat_earth_110")
 
     #
     # Adapt for with CED data
     #
     ## Extend codes to have data for latest years
-    tb_codes = extend_latest_years(tb_codes, LAST_YEAR, LAST_YEAR_PREVIEW)
+    tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR_PREVIEW].set_index(["id", "year"])
     ## Add CED data
     tb_ged = add_ced_data(tb_ged, LAST_YEAR, LAST_YEAR_PREVIEW)
 
