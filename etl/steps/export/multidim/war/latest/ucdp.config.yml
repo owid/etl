@@ -3,6 +3,9 @@ definitions:
     - config:
         hasMapTab: true
         originUrl: ourworldindata.org/ucdp
+        relatedQuestions:
+          text: "How do different approaches measure armed conflicts and their deaths?"
+          url: "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths"
         map:
           colorScale:
             baseColorScheme: "OrRd"
@@ -12,8 +15,12 @@ title:
   title: Data on conflict since 1989
   title_variant: "from UCDP"
 default_selection:
+  - World
   - Afghanistan
   - Ethiopia
+  - Eritrea
+  - Democratic Republic of Congo
+  - Mexico
   - Rwanda
   - Syria
   - Ukraine
@@ -41,12 +48,12 @@ dimensions:
       - slug: "all"
         name: "All armed conflicts"
       - slug: all_stacked
-        name: "All armed conflicts (breakdown)"
+        name: "All armed conflicts (by type)"
         description: Breakdown by conflict type
-      - slug: "intrastate"
+      - slug: "interstate"
         name: "Interstate conflicts"
         description: Between states
-      - slug: "interstate"
+      - slug: "intrastate"
         name: "Civil conflicts"
         description: Between a state and another armed group
       - slug: "non-state conflict"
@@ -62,7 +69,7 @@ dimensions:
         name: "All deaths"
         description: All deaths in armed conflicts
       - slug: "all_stacked"
-        name: "All deaths (breakdown)"
+        name: "All deaths (by type)"
         description: Breakdown by death type
       - slug: na
         name: "Not applicable"
@@ -71,9 +78,9 @@ dimensions:
     name: "Estimate"
     choices:
       - slug: "best"
-        name: "Best estimate"
+        name: "Best estimate only"
       - slug: best_ci
-        name: Best estimate (with CI)
+        name: Show high and low estimates
       - slug: "high"
         name: "High estimate"
       - slug: "low"
