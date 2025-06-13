@@ -1,12 +1,12 @@
 """Load a snapshot and create a meadow dataset."""
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     paths.log.info("start")
 
     #
@@ -17,13 +17,13 @@ def run(dest_dir: str) -> None:
     short_names = {
         "one_sided": {
             "index": ["conflict_id", "dyad_id", "year"],
-            "filename": "OneSided_v24_1.csv",
+            "filename": "OneSided_v25_1.csv",
         },
         "non_state": {
             "index": ["conflict_id", "dyad_id", "year"],
         },
         "battle_related_conflict": {
-            "index": ["conflict_id", "dyad_id", "year"],
+            "index": ["conflict_id", "year"],
         },
         "battle_related_dyadic": {
             "index": ["conflict_id", "dyad_id", "year"],
@@ -64,7 +64,7 @@ def run(dest_dir: str) -> None:
     # Save outputs.
     #
     # Create a new meadow dataset with the same metadata as the snapshot.
-    ds_meadow = create_dataset(dest_dir, tables=tables, default_metadata=snap.metadata, check_variables_metadata=True)  # type: ignore
+    ds_meadow = paths.create_dataset(tables=tables, default_metadata=snap.metadata, check_variables_metadata=True)  # type: ignore
 
     # Save changes in the new garden dataset.
     ds_meadow.save()
