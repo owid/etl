@@ -1771,7 +1771,7 @@ def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
     df_regional_definitions["year"] = MAX_YEAR
 
     # Save to csv
-    df_regional_definitions.to_csv(f"{CACHE_DIR}/world_bank_pip_percentiles.csv", index=False)
+    df_regional_definitions.to_csv(f"{CACHE_DIR}/world_bank_pip_regions.csv", index=False)
 
     log.info("Regional definitions generated from API.")
 
