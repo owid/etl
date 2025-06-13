@@ -90,11 +90,14 @@ def to_dependency_order(
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    subgraph = (
-        filter_to_subgraph(dag, includes, downstream=downstream, only=only, exact_match=exact_match, excludes=excludes)
-        if includes
-        else dag
-    )
+    # Always filter if we have includes OR excludes
+    if includes or excludes:
+        subgraph = filter_to_subgraph(
+            dag, includes, downstream=downstream, only=only, exact_match=exact_match, excludes=excludes
+        )
+    else:
+        subgraph = dag
+
     in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
     return in_order
@@ -118,6 +121,7 @@ def filter_to_subgraph(
     dependent on B).
     """
     all_steps = graph_nodes(graph)
+    includes_list = list(includes)
 
     # Handle exclusions first - find all steps that should be excluded
     excluded_steps = set()
@@ -135,10 +139,13 @@ def filter_to_subgraph(
     # Remove excluded steps from consideration
     available_steps = all_steps - excluded_steps
 
-    if exact_match:
-        included = set(includes) & available_steps
+    # If includes is empty, include all available steps
+    if not includes_list:
+        included = available_steps
+    elif exact_match:
+        included = set(includes_list) & available_steps
     else:
-        compiled_includes = [re.compile(p) for p in includes]
+        compiled_includes = [re.compile(p) for p in includes_list]
         included = {s for s in available_steps if any(p.search(s) for p in compiled_includes)}
 
     if only:

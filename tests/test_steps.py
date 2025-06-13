@@ -157,6 +157,33 @@ def test_dependency_filtering_with_excludes():
     expected = {}
     assert result == expected
 
+    # Test excludes with empty includes (should include all except excluded and their downstream)
+    result = filter_to_subgraph(dag, [], excludes=["c"])
+    expected = {
+        "a": set(),
+        "b": {"a"},
+        "g": {"a"},
+    }
+    assert result == expected
+
+
+def test_dependency_filtering_empty_includes_with_excludes():
+    """Test that excludes work properly when includes is empty."""
+    dag = {
+        "step1": set(),
+        "step2": {"step1"},
+        "step3": {"step2"},
+        "step4": set(),
+    }
+
+    # When includes is empty but excludes has values, should exclude specified steps and their downstream
+    result = filter_to_subgraph(dag, [], excludes=["step2"])
+    expected = {
+        "step1": set(),
+        "step4": set(),
+    }
+    assert result == expected
+
 
 @patch("etl.steps.parse_step")
 def test_selection_selects_parents(parse_step):
