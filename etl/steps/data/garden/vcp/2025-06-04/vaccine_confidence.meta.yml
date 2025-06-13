@@ -5,7 +5,7 @@ definitions:
       topic_tags:
         - Vaccination
   description_processing: |-
-    Where multiple surveys were conducted in a country in a given year we calculated a weighted average of the each response category using the number of respondents as weights. We exclude rows where the sum of the shares of all response categories is less than 98% or greater than 102% of the total number of respondents, as these are occassions when a different set of survey responses were used.
+    Where multiple surveys were conducted in a country in a given year we calculated a weighted average of the each response category using the number of respondents as weights. We exclude rows where the sum of the shares of all response categories is less than 98% or greater than 102% of the total number of respondents, as these are occasions when a different set of survey responses were used.
   question: |-
     <% if question == "ImpChildren" %>
     vaccines are important for children
