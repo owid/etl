@@ -53,8 +53,6 @@ dimensions:
         name: Blueberries
       - slug: broad_beans
         name: Broad beans
-      - slug: broad_beans_and_horse_beans__green
-        name: Green broad beans
       - slug: buckwheat
         name: Buckwheat
       - slug: cabbages
@@ -62,7 +60,7 @@ dimensions:
       - slug: carrots_and_turnips
         name: Carrots and turnips
       - slug: cashew_nuts
-        name: Cashew nuts
+        name: Cashews
       - slug: cassava
         name: Cassava
       - slug: cauliflowers_and_broccoli
@@ -113,8 +111,6 @@ dimensions:
         name: Garlic
       - slug: ginger__raw
         name: Ginger
-      - slug: gooseberries
-        name: Gooseberries
       - slug: grapefruit
         name: Grapefruit
       - slug: grapes
@@ -149,8 +145,6 @@ dimensions:
         name: Linseed
       - slug: mangoes
         name: Mangoes
-      - slug: mate_leaves
-        name: Mate leaves
       - slug: melon
         name: Melon
       - slug: millet
@@ -181,8 +175,6 @@ dimensions:
         name: Pepper
       - slug: persimmons
         name: Persimmons
-      - slug: pigeon_peas
-        name: Pigeon peas
       - slug: pineapples
         name: Pineapples
       - slug: pistachios
@@ -197,8 +189,6 @@ dimensions:
         name: Potato
       - slug: pulses
         name: Pulses
-      - slug: pumpkins__squash_and_gourds
-        name: Pumpkins squash and gourds
       - slug: quinces
         name: Quinces
       - slug: quinoa
@@ -219,16 +209,12 @@ dimensions:
         name: Sesame seed
       - slug: sorghum
         name: Sorghum
-      - slug: sour_cherries
-        name: Sour cherries
       - slug: soybean
         name: Soybean
       - slug: spinach
         name: Spinach
       - slug: strawberries
         name: Strawberries
-      - slug: string_beans
-        name: String beans
       - slug: sugar_beet
         name: Sugar beet
       - slug: sugar_cane
@@ -999,6 +985,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#chickpeas_yield
+          display:
+            name: Chickpea yield
   - dimensions:
       crop: kiwi
       metric: actual_yield
@@ -1017,6 +1005,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#leeks_yield
+          display:
+            name: Leek yield
   - dimensions:
       crop: tangerines
       metric: actual_yield
@@ -1029,12 +1019,16 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#avocados_yield
+          display:
+            name: Avocado yield
   - dimensions:
       crop: papayas
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#papayas_yield
+          display:
+            name: Papaya yield
   - dimensions:
       crop: hempseed
       metric: actual_yield
@@ -1047,24 +1041,32 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#cow_peas_yield
+          display:
+            name: Cow pea yield
   - dimensions:
       crop: cinnamon_and_cinnamon_tree_flowers__raw
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#cinnamon_and_cinnamon_tree_flowers__raw_yield
+          display:
+            name: Cinnamon yield
   - dimensions:
       crop: chillies_and_peppers
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#chillies_and_peppers_yield
+          display:
+            name: Chillies and peppers yield
   - dimensions:
       crop: lemons_and_limes
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#lemons_and_limes_yield
+          display:
+            name: Lemon and lime yield
   - dimensions:
       crop: pepper
       metric: actual_yield
@@ -1083,6 +1085,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#carrots_and_turnips_yield
+          display:
+            name: Carrot and turnip yield
   - dimensions:
       crop: garlic
       metric: actual_yield
@@ -1095,12 +1099,16 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#eggplants_yield
+          display:
+            name: Eggplant yield
   - dimensions:
       crop: raspberries
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#raspberries_yield
+          display:
+            name: Raspberry yield
   - dimensions:
       crop: cherries
       metric: actual_yield
@@ -1119,18 +1127,14 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#plums_yield
+          display:
+            name: Plum yield
   - dimensions:
       crop: triticale
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#triticale_yield
-  - dimensions:
-      crop: gooseberries
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#gooseberries_yield
   - dimensions:
       crop: sweet_potatoes
       metric: actual_yield
@@ -1143,6 +1147,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#beans__green_yield
+          display:
+            name: Green bean yield
   - dimensions:
       crop: chestnut
       metric: actual_yield
@@ -1155,6 +1161,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#lentils_yield
+          display:
+            name: Lentil yield
   - dimensions:
       crop: citrus_fruit
       metric: actual_yield
@@ -1167,24 +1175,32 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#peas__green_yield
+          display:
+            name: Green pea yield
   - dimensions:
       crop: mangoes
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#mangoes_yield
+          display:
+            name: Mango yield
   - dimensions:
       crop: pineapples
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#pineapples_yield
+          display:
+            name: Pineapple yield
   - dimensions:
       crop: quinces
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#quinces_yield
+          display:
+            name: Quince yield
   - dimensions:
       crop: vanilla__raw
       metric: actual_yield
@@ -1197,24 +1213,22 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#strawberries_yield
+          display:
+            name: Strawberry yield
   - dimensions:
       crop: poppy_seeds
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#poppy_seeds_yield
+          display:
+            name: Poppy seed yield
   - dimensions:
       crop: vegetables
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#vegetables_yield
-  - dimensions:
-      crop: mate_leaves
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#mate_leaves_yield
   - dimensions:
       crop: buckwheat
       metric: actual_yield
@@ -1227,48 +1241,48 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#cashew_nuts_yield
+          display:
+            name: Cashew yield
   - dimensions:
       crop: apricots
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#apricots_yield
+          display:
+            name: Apricot yield
   - dimensions:
       crop: olives
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#olives_yield
-  - dimensions:
-      crop: pumpkins__squash_and_gourds
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#pumpkins__squash_and_gourds_yield
+          display:
+            name: Olive yield
   - dimensions:
       crop: cloves__whole_stems__raw
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#cloves__whole_stems__raw_yield
+          display:
+            name: Clove yield
   - dimensions:
       crop: artichokes
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#artichokes_yield
-  - dimensions:
-      crop: pigeon_peas
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#pigeon_peas_yield
+          display:
+            name: Artichoke yield
   - dimensions:
       crop: persimmons
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#persimmons_yield
+          display:
+            name: Persimmon yield
   - dimensions:
       crop: okra
       metric: actual_yield
@@ -1281,48 +1295,56 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#cranberries_yield
+          display:
+            name: Cranberry yield
   - dimensions:
       crop: onions_and_shallots__green
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#onions_and_shallots__green_yield
+          display:
+            name: Green onions and shallots yield
   - dimensions:
       crop: figs
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#figs_yield
+          display:
+            name: Fig yield
   - dimensions:
       crop: hazelnuts
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#hazelnuts_yield
+          display:
+            name: Hazelnut yield
   - dimensions:
       crop: pistachios
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#pistachios_yield
-  - dimensions:
-      crop: string_beans
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#string_beans_yield
+          display:
+            name: Pistachio yield
   - dimensions:
       crop: grapes
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#grapes_yield
+          display:
+            name: Grape yield
   - dimensions:
       crop: onions
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#onions_yield
+          display:
+            name: Onion yield
   - dimensions:
       crop: safflower_seed
       metric: actual_yield
@@ -1335,6 +1357,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#cucumbers_and_gherkins_yield
+          display:
+            name: Cucumber and gherkin yield
   - dimensions:
       crop: sesame_seed
       metric: actual_yield
@@ -1365,6 +1389,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#plantains_yield
+          display:
+            name: Plantain yield
   - dimensions:
       crop: watermelons
       metric: actual_yield
@@ -1377,6 +1403,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#cauliflowers_and_broccoli_yield
+          display:
+            name: Cauliflower and broccoli yield
   - dimensions:
       crop: spinach
       metric: actual_yield
@@ -1389,24 +1417,16 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#currants_yield
-  - dimensions:
-      crop: sour_cherries
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#sour_cherries_yield
+          display:
+            name: Currant yield
   - dimensions:
       crop: chillies_and_peppers__green__capsicum_spp__and_pimenta_spp_
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#chillies_and_peppers__green__capsicum_spp__and_pimenta_spp__yield
-  - dimensions:
-      crop: broad_beans_and_horse_beans__green
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#broad_beans_and_horse_beans__green_yield
+          display:
+            name: Green chillies and peppers yield
   - dimensions:
       crop: quinoa
       metric: actual_yield
@@ -1419,18 +1439,24 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#coconuts_yield
+          display:
+            name: Coconut yield
   - dimensions:
       crop: blueberries
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#blueberries_yield
+          display:
+            name: Blueberry yield
   - dimensions:
       crop: pulses
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#pulses_yield
+          display:
+            name: Pulse yield
   - dimensions:
       crop: melon
       metric: actual_yield
@@ -1449,6 +1475,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#apples_yield
+          display:
+            name: Apple yield
   - dimensions:
       crop: grapefruit
       metric: actual_yield
@@ -1467,18 +1495,24 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#broad_beans_yield
+          display:
+            name: Broad bean yield
   - dimensions:
       crop: cabbages
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#cabbages_yield
+          display:
+            name: Cabbage yield
   - dimensions:
       crop: peaches_and_nectarines
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#peaches_and_nectarines_yield
+          display:
+            name: Peach and nectarine yield
   - dimensions:
       crop: mustard_seed
       metric: actual_yield
@@ -1491,12 +1525,16 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#roots_and_tubers_yield
+          display:
+            name: Roots and tubers yield
   - dimensions:
       crop: pears
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#pears_yield
+          display:
+            name: Pear yield
   - dimensions:
       crop: sugar_crops
       metric: actual_yield
@@ -1509,9 +1547,13 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#ginger__raw_yield
+          display:
+            name: Ginger yield
   - dimensions:
       crop: dates
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#dates_yield
+          display:
+            name: Date yield
