@@ -58,7 +58,7 @@ dimensions:
       - slug: high
         name: High estimate
       - slug: na
-        name: " "
+        name: "Not applicable"
         description: "Not applicable"
       - slug: low_high
         name: "Low and high estimates"

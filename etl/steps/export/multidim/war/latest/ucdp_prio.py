@@ -6,6 +6,21 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
+COMMON_CONFIG = {
+    "originUrl": "ourworldindata.org/war-and-peace",
+    "relatedQuestions": [
+        {
+            "text": "How do different approaches measure armed conflicts and their deaths?",
+            "url": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+        }
+    ],
+    "hideAnnotationFieldsInTitle": {
+        "time": True,
+        "entity": True,
+    },
+}
+
+
 def run() -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_collection_config()
@@ -45,11 +60,7 @@ def run() -> None:
             ],
             "estimate": "*",
         },
-        common_view_config={
-            "hideAnnotationFieldsInTitle": {
-                "time": True,
-            },
-        },
+        common_view_config=COMMON_CONFIG,
     )
 
     # Edit indicator-level display settings
@@ -72,22 +83,18 @@ def run() -> None:
                     "extrasystemic",
                 ],
                 "choice_new_slug": "state_based_stacked",
-                "view_config": {
+                "view_config": COMMON_CONFIG
+                | {
                     "chartTypes": ["StackedBar"],
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
                 },
             },
             {
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "view_config": {
+                "view_config": COMMON_CONFIG
+                | {
                     "selectedFacetStrategy": "entity",
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
                 },
             },
         ]
