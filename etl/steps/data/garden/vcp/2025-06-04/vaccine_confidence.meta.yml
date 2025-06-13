@@ -25,8 +25,8 @@ tables:
   vaccine_confidence:
     variables:
       strongly_agree:
-        title: "Share who strongly agree that {definitions.question}"
-        description_short: "Share of people who strongly agree with the statement that {definitions.question}."
+        title: "Share that strongly agrees {definitions.question}"
+        description_short: "The share of respondents who said they 'strongly agree' with the statement {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
@@ -34,8 +34,8 @@ tables:
         description_processing: |-
           {definitions.description_processing}
       tend_to_agree:
-        title: "Share who tend to agree that {definitions.question}"
-        description_short: "Share of people who tend to agree with the statement that {definitions.question}."
+        title: "Share that tends to agree that {definitions.question}"
+        description_short: The share of respondents who said they "tend to agree" with the statement {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
@@ -43,8 +43,8 @@ tables:
         description_processing: |-
           {definitions.description_processing}
       agree:
-        title: "Share who agree that {definitions.question}"
-        description_short: "Share of people who strongly agree or tend to agree with the statement that {definitions.question}."
+        title: "Share that agrees {definitions.question}"
+        description_short: "The share of respondents who said they 'strongly agree' or 'tend to agree' with the statement {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
@@ -52,16 +52,16 @@ tables:
         description_processing: |-
           To calculate this value, we sum the shares of people who strongly agree and those who tend to agree with the statement that {definitions.question}. {definitions.description_processing}
       disagree:
-        title: "Share who disagree that {definitions.question}"
-        description_short: "Share of people who strongly disagree or tend to disagree with the statement that {definitions.question}."
+        title: "Share that disagrees {definitions.question}"
+        description_short: "The share of respondents who said they 'strongly disagree' or 'tend to disagree' with the statement {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
           numDecimalPlaces: 1
         description_processing: To calculate this value, we sum the shares of people who strongly disagree and those who tend to disagree with the statement that {definitions.question}. {definitions.description_processing}
       tend_to_disagree:
-        title: "Share who tend to disagree that {definitions.question}"
-        description_short: "Share of people who tend to disagree with the statement that {definitions.question}."
+        title: "Share that tends to disagree that {definitions.question}"
+        description_short: "The share of respondents who said they 'tend to disagree' with the statement {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
@@ -69,8 +69,8 @@ tables:
         description_processing: |-
           {definitions.description_processing}
       strongly_disagree:
-        title: "Share who strongly disagree that {definitions.question}"
-        description_short: "Share of people who strongly disagree with the statement that {definitions.question}."
+        title: "Share that strongly disagrees {definitions.question}"
+        description_short: "The share of respondents who said they 'strongly disagree' with the statement {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
@@ -79,7 +79,7 @@ tables:
           {definitions.description_processing}
       dont_know__prefer_not_to_say:
         title: "Share who don't know or prefer not to say whether {definitions.question}"
-        description_short: "Share of people who don't know or prefer not to say whether {definitions.question}."
+        description_short: "The share of respondents who said they 'don't know' or 'prefer not to say' whether {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
