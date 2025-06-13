@@ -1314,7 +1314,7 @@ views:
       y:
         - catalogPath: attainable_yields#onions_and_shallots__green_yield
           display:
-            name: Green onions and shallots yield
+            name: Green onion and shallot yield
   - dimensions:
       crop: figs
       metric: actual_yield
