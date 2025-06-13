@@ -52,7 +52,7 @@ dimensions:
         description: Breakdown by conflict type
       - slug: "interstate"
         name: "Interstate conflicts"
-        description: Between a state and another armed group
+        description: Between states
       - slug: "intrastate"
         name: "Civil conflicts"
         description: Between a state and another armed group

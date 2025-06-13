@@ -284,7 +284,7 @@ def _set_subtitle(view):
     if view.dimensions["conflict_type"] == "one-sided violence":
         if view.dimensions["indicator"] == "num_conflicts":
             return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp) that were ongoing that year."
-        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp) that was ongoing that year{', per 100,000 people' if view.dimensions["indicator"]=="death_rate" else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
+        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp) that was ongoing that year{', per 100,000 people' if view.dimensions['indicator']=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
 
     # DoD
     if view.dimensions["conflict_type"] == "all":
