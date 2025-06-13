@@ -70,11 +70,11 @@ dimensions:
       - slug: cherries
         name: Cherries
       - slug: chestnut
-        name: Chestnut
+        name: Chestnuts
       - slug: chickpeas
         name: Chickpeas
       - slug: chillies_and_peppers
-        name: Chillies and peppers
+        name: Chilies and peppers
       - slug: cinnamon_and_cinnamon_tree_flowers__raw
         name: Cinnamon
       - slug: citrus_fruit
@@ -92,7 +92,7 @@ dimensions:
       - slug: cotton
         name: Cotton
       - slug: cow_peas
-        name: Cow peas
+        name: Cowpeas
       - slug: cranberries
         name: Cranberries
       - slug: cucumbers_and_gherkins
@@ -118,7 +118,7 @@ dimensions:
       - slug: beans__green
         name: Green beans
       - slug: chillies_and_peppers__green__capsicum_spp__and_pimenta_spp_
-        name: Green chillies and peppers
+        name: Green chilies and peppers
       - slug: onions_and_shallots__green
         name: Green onions and shallots
       - slug: peas__green
@@ -172,7 +172,7 @@ dimensions:
       - slug: peas
         name: Peas
       - slug: pepper
-        name: Pepper
+        name: Pepper (spice)
       - slug: persimmons
         name: Persimmons
       - slug: pineapples
@@ -183,8 +183,6 @@ dimensions:
         name: Plantains
       - slug: plums
         name: Plums
-      - slug: poppy_seeds
-        name: Poppy seeds
       - slug: potato
         name: Potato
       - slug: pulses
@@ -1045,7 +1043,7 @@ views:
       y:
         - catalogPath: attainable_yields#cow_peas_yield
           display:
-            name: Cow pea yield
+            name: Cowpea yield
   - dimensions:
       crop: cinnamon_and_cinnamon_tree_flowers__raw
       metric: actual_yield
@@ -1061,7 +1059,7 @@ views:
       y:
         - catalogPath: attainable_yields#chillies_and_peppers_yield
           display:
-            name: Chillies and peppers yield
+            name: Chilies and peppers yield
   - dimensions:
       crop: lemons_and_limes
       metric: actual_yield
@@ -1076,6 +1074,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#pepper_yield
+          display:
+            name: Pepper yield (spice)
   - dimensions:
       crop: tobacco
       metric: actual_yield
@@ -1226,14 +1226,6 @@ views:
         - catalogPath: attainable_yields#strawberries_yield
           display:
             name: Strawberry yield
-  - dimensions:
-      crop: poppy_seeds
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#poppy_seeds_yield
-          display:
-            name: Poppy seed yield
   - dimensions:
       crop: vegetables
       metric: actual_yield
@@ -1398,6 +1390,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#herbs_yield
+          display:
+            name: Herb yield
   - dimensions:
       crop: plantains
       metric: actual_yield
@@ -1443,7 +1437,7 @@ views:
       y:
         - catalogPath: attainable_yields#chillies_and_peppers__green__capsicum_spp__and_pimenta_spp__yield
           display:
-            name: Green chillies and peppers yield
+            name: Green chilies and peppers yield
   - dimensions:
       crop: quinoa
       metric: actual_yield
