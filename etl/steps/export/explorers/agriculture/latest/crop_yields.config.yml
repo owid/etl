@@ -1013,6 +1013,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#tangerines_yield
+          display:
+            name: Tangerine yield
   - dimensions:
       crop: avocados
       metric: actual_yield
@@ -1135,12 +1137,16 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#triticale_yield
+          display:
+            name: Triticale yield
   - dimensions:
       crop: sweet_potatoes
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#sweet_potatoes_yield
+          display:
+            name: Sweet potato yield
   - dimensions:
       crop: beans__green
       metric: actual_yield
@@ -1207,6 +1213,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#vanilla__raw_yield
+          display:
+            name: Vanilla yield
   - dimensions:
       crop: strawberries
       metric: actual_yield
@@ -1229,6 +1237,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#vegetables_yield
+          display:
+            name: Vegetable yield
   - dimensions:
       crop: buckwheat
       metric: actual_yield
@@ -1377,6 +1387,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#yams_yield
+          display:
+            name: Yam yield
   - dimensions:
       crop: herbs
       metric: actual_yield
@@ -1397,6 +1409,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#watermelons_yield
+          display:
+            name: Watermelon yield
   - dimensions:
       crop: cauliflowers_and_broccoli
       metric: actual_yield
@@ -1469,6 +1483,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#treenuts_yield
+          display:
+            name: Treenut yield
   - dimensions:
       crop: apples
       metric: actual_yield
@@ -1489,6 +1505,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#walnuts_yield
+          display:
+            name: Walnut yield
   - dimensions:
       crop: broad_beans
       metric: actual_yield
@@ -1541,6 +1559,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#sugar_crops_yield
+          display:
+            name: Sugar crop yield
   - dimensions:
       crop: ginger__raw
       metric: actual_yield
