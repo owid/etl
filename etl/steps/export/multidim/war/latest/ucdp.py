@@ -265,7 +265,7 @@ def _set_title(view, choice_names):
             title = "Deaths"
 
         # Condition by conflict type: "in" vs "from", add conflict_name
-        title += f" {'from' if view.dimensions["conflict_type"] == "one-sided violence" else 'in'} {conflict_name} based on where they occurred"
+        title += f" {'from' if view.dimensions['conflict_type'] == 'one-sided violence' else 'in'} {conflict_name} based on where they occurred"
 
         # Condition by people: "Civilian and combatant" breakdown or aggregate
         if view.dimensions["people"] == "all_stacked":
