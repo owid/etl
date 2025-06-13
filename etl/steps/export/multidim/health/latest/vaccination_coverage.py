@@ -58,6 +58,7 @@ def run() -> None:
                     "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
                 },
                 "view_metadata": {
+                    "title": "{title}",
                     "description_short": "{subtitle}",
                 },
             }
