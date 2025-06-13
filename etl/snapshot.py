@@ -2,6 +2,7 @@ import datetime as dt
 import json
 import re
 import tempfile
+import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -27,6 +28,7 @@ from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
 
 from etl import config, download_helpers, paths
+from etl.download_helpers import DownloadCorrupted
 from etl.files import checksum_file, ruamel_dump, ruamel_load, yaml_dump, yaml_load
 
 log = structlog.get_logger()
@@ -202,6 +204,7 @@ class Snapshot:
         filename: Optional[Union[str, Path]] = None,
         data: Optional[Union[Table, pd.DataFrame]] = None,
         upload: bool = False,
+        download_retries: int = 1,
     ) -> None:
         """Create a new snapshot from a local file, or from data in memory, or from a download link.
         Then upload it to S3. This is the recommended way to create a snapshot.
@@ -212,6 +215,7 @@ class Snapshot:
             filename (str or None): Path to local data file (if dataframe is not given).
             data (Table or pd.DataFrame or None): Data to upload (if filename is not given).
             upload (bool): True to upload data to bucket.
+            download_retries (int): Number of retries for downloading from source (default: 1, no retries).
         """
         assert not (filename is not None and data is not None), "Pass either a filename or data, but not both."
 
@@ -225,8 +229,24 @@ class Snapshot:
             # Copy dataframe to snapshots data folder.
             dataframes.to_file(data, file_path=self.path)
         elif self.metadata.origin and self.metadata.origin.url_download:
-            # Create snapshot by downloading data from a URL.
-            self.download_from_source()
+            # Create snapshot by downloading data from a URL with retry logic.
+            for attempt in range(1, download_retries + 1):
+                try:
+                    self.download_from_source()
+                    break
+                except DownloadCorrupted as e:
+                    log.warning(
+                        str(e),
+                        attempt=attempt,
+                        max_attempts=download_retries,
+                    )
+                    if attempt == download_retries:
+                        # Re-raise the exception on final attempt
+                        raise
+                    else:
+                        # Wait before retrying (exponential backoff)
+                        wait_time = min(4 * (2 ** (attempt - 1)), 10)
+                        time.sleep(wait_time)
         else:
             # Maybe file is already there
             assert self.path.exists(), "File not found. Provide a filename, data or add url_download to metadata."

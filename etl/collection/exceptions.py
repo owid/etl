@@ -33,3 +33,9 @@ class ExtraIndicatorsInUseError(Exception):
     """Raised when "extra" indicators are used in some of the dimension fields."""
 
     pass
+
+
+class MissingDimensionalIndicatorError(Exception):
+    """Raised when a dimension is missing an indicator that is required for its configuration."""
+
+    pass

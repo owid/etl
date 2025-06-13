@@ -14,6 +14,6 @@ meta:
     license:
       name: CC BY 4.0
 outs:
-  - md5: 4aeebb1507dee8e5e16ea5ac26db6106
+  - md5: 401b18d7b6329354959fd88a743f77d1
     size: 739095
     path: monkeypox.csv
