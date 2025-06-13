@@ -2,6 +2,7 @@ import datetime as dt
 import json
 import re
 import tempfile
+import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -25,9 +26,6 @@ from owid.catalog.meta import (
 from owid.datautils import dataframes
 from owid.datautils.io import decompress_file
 from owid.repack import to_safe_types
-from tenacity import Retrying
-from tenacity.retry import retry_if_exception_type
-from tenacity.stop import stop_after_attempt
 
 from etl import config, download_helpers, paths
 from etl.download_helpers import DownloadCorrupted
@@ -232,12 +230,23 @@ class Snapshot:
             dataframes.to_file(data, file_path=self.path)
         elif self.metadata.origin and self.metadata.origin.url_download:
             # Create snapshot by downloading data from a URL with retry logic.
-            for attempt in Retrying(
-                stop=stop_after_attempt(download_retries),
-                retry=retry_if_exception_type((DownloadCorrupted,)),
-            ):
-                with attempt:
+            for attempt in range(1, download_retries + 1):
+                try:
                     self.download_from_source()
+                    break
+                except DownloadCorrupted as e:
+                    log.warning(
+                        str(e),
+                        attempt=attempt,
+                        max_attempts=download_retries,
+                    )
+                    if attempt == download_retries:
+                        # Re-raise the exception on final attempt
+                        raise
+                    else:
+                        # Wait before retrying (exponential backoff)
+                        wait_time = min(4 * (2 ** (attempt - 1)), 10)
+                        time.sleep(wait_time)
         else:
             # Maybe file is already there
             assert self.path.exists(), "File not found. Provide a filename, data or add url_download to metadata."

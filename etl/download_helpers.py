@@ -77,8 +77,11 @@ def _stream_to_file(
     if display_progress:
         progress.stop()  # type: ignore
 
-    # Verify content length if provided by server
-    if total_length > 0 and bytes_downloaded != total_length:
+    # Verify content length if provided by server and content is not compressed
+    # When content is gzipped, requests decompresses it automatically, so bytes_downloaded
+    # will be larger than the compressed content-length header
+    is_compressed = r.headers.get("content-encoding") in ("gzip", "deflate", "br")
+    if total_length > 0 and not is_compressed and bytes_downloaded != total_length:
         raise DownloadCorrupted(
             f"Download corrupted: expected {total_length} bytes but received {bytes_downloaded} bytes"
         )
