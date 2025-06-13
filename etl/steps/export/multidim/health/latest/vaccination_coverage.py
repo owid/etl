@@ -70,8 +70,8 @@ def run() -> None:
                 "[polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), "
                 "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
             )
-            view.config["viewMetadata"] = {
-                "description_short": "Estimated number of one-year-olds who have received vaccinations for different diseases.",
+            view.metadata = {
+                "description_short": "Estimated number of one-year-olds who have had vaccinations for different diseases.",
             }
         elif (antigen == "comparison") & (metric == "unvaccinated"):
             view.config["title"] = "Number of one-year-olds who have not had each vaccination"
@@ -84,7 +84,8 @@ def run() -> None:
                 "[polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), "
                 "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
             )
-            view.config["viewMetadata"] = {
+
+            view.metadata = {
                 "description_short": "Estimated number of one-year-olds who have not received vaccinations for different diseases.",
             }
     c.save()
