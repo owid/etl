@@ -222,7 +222,7 @@ def edit_faust(c):
             },
         ],
         params={
-            "conflict_name": lambda view: _get_conflict_type(view, choice_names),
+            "conflict_name": lambda view: _set_title_ending(view, choice_names),
         },
     )
 
@@ -249,8 +249,11 @@ def edit_indicator_displays(view):
                 }
 
 
-def _get_conflict_type(view, choice_names):
-    conflict_name = "state-based conflicts"
+def _set_title_ending(view, choice_names):
+    title = "all conflicts involving states"
     if view.dimensions["conflict_type"] not in {"state-based", "state_based_stacked"}:
-        conflict_name = choice_names.get(view.dimensions["conflict_type"]).lower()
-    return conflict_name
+        title = choice_names.get(view.dimensions["conflict_type"]).lower()
+
+    if view.dimensions["conflict_type"] == "state_based_stacked":
+        title += " by type"
+    return title
