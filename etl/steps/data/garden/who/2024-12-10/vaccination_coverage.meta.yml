@@ -239,7 +239,6 @@ tables:
           grapher_config:
             note: |-
               {definitions.antigen_note}
-              grapher_config:
             originUrl: https://ourworldindata.org/vaccination
             map:
               time: latest
