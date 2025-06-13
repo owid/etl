@@ -33,306 +33,234 @@ dimensions:
     choices:
       - slug: almonds
         name: Almonds
+      - slug: apples
+        name: Apples
+      - slug: apricots
+        name: Apricots
+      - slug: artichokes
+        name: Artichokes
+      - slug: asparagus
+        name: Asparagus
+      - slug: avocados
+        name: Avocados
       - slug: bananas
         name: Bananas
       - slug: barley
         name: Barley
       - slug: beans
         name: Beans
+      - slug: blueberries
+        name: Blueberries
+      - slug: broad_beans
+        name: Broad beans
+      - slug: broad_beans_and_horse_beans__green
+        name: Green broad beans
+      - slug: buckwheat
+        name: Buckwheat
+      - slug: cabbages
+        name: Cabbages
+      - slug: carrots_and_turnips
+        name: Carrots and turnips
+      - slug: cashew_nuts
+        name: Cashew nuts
       - slug: cassava
         name: Cassava
+      - slug: cauliflowers_and_broccoli
+        name: Cauliflowers and broccoli
       - slug: cereals
         name: Cereals
+      - slug: cherries
+        name: Cherries
+      - slug: chestnut
+        name: Chestnut
+      - slug: chickpeas
+        name: Chickpeas
+      - slug: chillies_and_peppers
+        name: Chillies and peppers
+      - slug: cinnamon_and_cinnamon_tree_flowers__raw
+        name: Cinnamon
+      - slug: citrus_fruit
+        name: Citrus fruit
+      - slug: cloves__whole_stems__raw
+        name: Cloves
       - slug: cocoa_beans
         name: Cocoa beans
+      - slug: coconuts
+        name: Coconuts
       - slug: coffee_beans
         name: Coffee beans
       - slug: corn__maize
         name: Corn (maize)
       - slug: cotton
         name: Cotton
+      - slug: cow_peas
+        name: Cow peas
+      - slug: cranberries
+        name: Cranberries
+      - slug: cucumbers_and_gherkins
+        name: Cucumbers and gherkins
+      - slug: currants
+        name: Currants
+      - slug: dates
+        name: Dates
+      - slug: eggplants
+        name: Eggplants
+      - slug: figs
+        name: Figs
+      - slug: fruit
+        name: Fruit
+      - slug: garlic
+        name: Garlic
+      - slug: ginger__raw
+        name: Ginger
+      - slug: gooseberries
+        name: Gooseberries
+      - slug: grapefruit
+        name: Grapefruit
+      - slug: grapes
+        name: Grapes
+      - slug: beans__green
+        name: Green beans
+      - slug: chillies_and_peppers__green__capsicum_spp__and_pimenta_spp_
+        name: Green chillies and peppers
+      - slug: onions_and_shallots__green
+        name: Green onions and shallots
+      - slug: peas__green
+        name: Green peas
       - slug: groundnut
         name: Groundnut
+      - slug: hazelnuts
+        name: Hazelnuts
+      - slug: hempseed
+        name: Hempseed
+      - slug: herbs
+        name: Herbs
+      - slug: kiwi
+        name: Kiwi
+      - slug: leeks
+        name: Leeks
+      - slug: lemons_and_limes
+        name: Lemons and limes
+      - slug: lentils
+        name: Lentils
       - slug: lettuce
         name: Lettuce
+      - slug: linseed
+        name: Linseed
+      - slug: mangoes
+        name: Mangoes
+      - slug: mate_leaves
+        name: Mate leaves
+      - slug: melon
+        name: Melon
       - slug: millet
         name: Millet
+      - slug: mustard_seed
+        name: Mustard seed
       - slug: oats
         name: Oats
       - slug: oil_palm
         name: Oil palm
+      - slug: okra
+        name: Okra
+      - slug: olives
+        name: Olives
+      - slug: onions
+        name: Onions
       - slug: oranges
         name: Oranges
+      - slug: papayas
+        name: Papayas
+      - slug: peaches_and_nectarines
+        name: Peaches and nectarines
+      - slug: pears
+        name: Pears
       - slug: peas
         name: Peas
+      - slug: pepper
+        name: Pepper
+      - slug: persimmons
+        name: Persimmons
+      - slug: pigeon_peas
+        name: Pigeon peas
+      - slug: pineapples
+        name: Pineapples
+      - slug: pistachios
+        name: Pistachios
+      - slug: plantains
+        name: Plantains
+      - slug: plums
+        name: Plums
+      - slug: poppy_seeds
+        name: Poppy seeds
       - slug: potato
         name: Potato
+      - slug: pulses
+        name: Pulses
+      - slug: pumpkins__squash_and_gourds
+        name: Pumpkins squash and gourds
+      - slug: quinces
+        name: Quinces
+      - slug: quinoa
+        name: Quinoa
       - slug: rapeseed
         name: Rapeseed
+      - slug: raspberries
+        name: Raspberries
       - slug: rice
         name: Rice
+      - slug: roots_and_tubers
+        name: Roots and tubers
       - slug: rye
         name: Rye
+      - slug: safflower_seed
+        name: Safflower seed
+      - slug: sesame_seed
+        name: Sesame seed
       - slug: sorghum
         name: Sorghum
+      - slug: sour_cherries
+        name: Sour cherries
       - slug: soybean
         name: Soybean
+      - slug: spinach
+        name: Spinach
+      - slug: strawberries
+        name: Strawberries
+      - slug: string_beans
+        name: String beans
       - slug: sugar_beet
         name: Sugar beet
       - slug: sugar_cane
         name: Sugar cane
-      - slug: sunflower_seed
-        name: Sunflower seed
-      - slug: tomato
-        name: Tomato
-      - slug: wheat
-        name: Wheat
-      - slug: chickpeas
-        name: Chickpeas
-      - slug: kiwi
-        name: Kiwi
-      - slug: linseed
-        name: Linseed
-      - slug: leeks
-        name: Leeks
-      - slug: fibre_crops__fibre_equivalent
-        name: Fibre crops fibre equivalent
-      - slug: tangerines
-        name: Tangerines
-      - slug: avocados
-        name: Avocados
-      - slug: papayas
-        name: Papayas
-      - slug: hempseed
-        name: Hempseed
-      - slug: cow_peas
-        name: Cow peas
-      - slug: cinnamon_and_cinnamon_tree_flowers__raw
-        name: Cinnamon and cinnamon tree flowers raw
-      - slug: oilcrops__oil_equivalent
-        name: Oilcrops oil equivalent
-      - slug: chillies_and_peppers
-        name: Chillies and peppers
-      - slug: lemons_and_limes
-        name: Lemons and limes
-      - slug: pepper
-        name: Pepper
-      - slug: tobacco
-        name: Tobacco
-      - slug: carrots_and_turnips
-        name: Carrots and turnips
-      - slug: garlic
-        name: Garlic
-      - slug: eggplants
-        name: Eggplants
-      - slug: fonio
-        name: Fonio
-      - slug: raspberries
-        name: Raspberries
-      - slug: cherries
-        name: Cherries
-      - slug: nutmeg__mace__cardamoms__raw
-        name: Raw nutmeg mace cardamoms
-      - slug: fruit
-        name: Fruit
-      - slug: plums
-        name: Plums
-      - slug: triticale
-        name: Triticale
-      - slug: gooseberries
-        name: Gooseberries
-      - slug: melonseed
-        name: Melonseed
-      - slug: tallowtree_seeds
-        name: Tallowtree seeds
-      - slug: sweet_potatoes
-        name: Sweet potatoes
-      - slug: beans__green
-        name: Beans green
-      - slug: bambara_beans__dry
-        name: Bambara beans dry
-      - slug: chestnut
-        name: Chestnut
-      - slug: lupins
-        name: Lupins
-      - slug: lentils
-        name: Lentils
-      - slug: flax__raw_or_retted
-        name: Flax raw or retted
-      - slug: citrus_fruit
-        name: Citrus fruit
-      - slug: peas__green
-        name: Peas green
-      - slug: mangoes
-        name: Mangoes
-      - slug: chicory_roots
-        name: Chicory roots
-      - slug: pineapples
-        name: Pineapples
-      - slug: oilcrops__cake_equivalent
-        name: Oilcrops cake equivalent
-      - slug: quinces
-        name: Quinces
-      - slug: vanilla__raw
-        name: Vanilla raw
-      - slug: mixed_grains
-        name: Mixed grains
-      - slug: strawberries
-        name: Strawberries
-      - slug: tea
-        name: Tea
-      - slug: kola_nuts
-        name: Kola nuts
-      - slug: cereals_n_e_c_
-        name: Other cereals
-      - slug: poppy_seeds
-        name: Poppy seeds
-      - slug: vegetables
-        name: Vegetables
-      - slug: tung_nuts
-        name: Tung nuts
-      - slug: mate_leaves
-        name: Mate leaves
-      - slug: peppermint__spearmint
-        name: Peppermint spearmint
-      - slug: buckwheat
-        name: Buckwheat
-      - slug: vetches
-        name: Vetches
-      - slug: agave_fibres__raw__n_e_c_
-        name: Raw agave fibres
-      - slug: areca_nuts
-        name: Areca nuts
-      - slug: cashew_nuts
-        name: Cashew nuts
-      - slug: apricots
-        name: Apricots
-      - slug: olives
-        name: Olives
-      - slug: pumpkins__squash_and_gourds
-        name: Pumpkins squash and gourds
-      - slug: cloves__whole_stems__raw
-        name: Cloves whole stems raw
-      - slug: artichokes
-        name: Artichokes
-      - slug: edible_roots_and_tubers_with_high_starch_or_inulin_content__n_e_c__fresh
-        name: Edible roots and tubers with high starch or inulin content fresh
-      - slug: karite_nuts
-        name: Karite nuts
-      - slug: pigeon_peas
-        name: Pigeon peas
-      - slug: yautia
-        name: Yautia
-      - slug: persimmons
-        name: Persimmons
-      - slug: okra
-        name: Okra
-      - slug: locust_beans__carobs_
-        name: Locust beans carobs
-      - slug: cranberries
-        name: Cranberries
-      - slug: onions_and_shallots__green
-        name: Onions and shallots green
-      - slug: figs
-        name: Figs
-      - slug: hazelnuts
-        name: Hazelnuts
-      - slug: pistachios
-        name: Pistachios
-      - slug: cassava_leaves
-        name: Cassava leaves
-      - slug: string_beans
-        name: String beans
-      - slug: hop_cones
-        name: Hop cones
-      - slug: green_maize
-        name: Green maize
-      - slug: jute
-        name: Jute
-      - slug: grapes
-        name: Grapes
-      - slug: onions
-        name: Onions
-      - slug: canary_seed
-        name: Canary seed
-      - slug: safflower_seed
-        name: Safflower seed
-      - slug: jojoba_seeds
-        name: Jojoba seeds
-      - slug: cucumbers_and_gherkins
-        name: Cucumbers and gherkins
-      - slug: sesame_seed
-        name: Sesame seed
-      - slug: asparagus
-        name: Asparagus
-      - slug: yams
-        name: Yams
-      - slug: herbs
-        name: Herbs
-      - slug: plantains
-        name: Plantains
-      - slug: watermelons
-        name: Watermelons
-      - slug: chillies_and_peppers__green__capsicum_spp__and_pimenta_spp_
-        name: Chillies and peppers green capsicum spp and pimenta spp
-      - slug: broad_beans_and_horse_beans__green
-        name: Broad beans and horse beans green
-      - slug: fibre_crops
-        name: Fibre crops
-      - slug: quinoa
-        name: Quinoa
-      - slug: coconuts
-        name: Coconuts
-      - slug: castor_oil_seed
-        name: Castor oil seed
-      - slug: melon
-        name: Melon
-      - slug: cashewapple
-        name: Cashewapple
-      - slug: walnuts
-        name: Walnuts
-      - slug: broad_beans
-        name: Broad beans
-      - slug: cabbages
-        name: Cabbages
-      - slug: peaches_and_nectarines
-        name: Peaches and nectarines
-      - slug: mustard_seed
-        name: Mustard seed
-      - slug: roots_and_tubers
-        name: Roots and tubers
-      - slug: pears
-        name: Pears
       - slug: sugar_crops
         name: Sugar crops
-      - slug: ginger__raw
-        name: Raw ginger
-      - slug: dates
-        name: Dates raw or retted
-      - slug: cauliflowers_and_broccoli
-        name: Cauliflowers and broccoli
-      - slug: spinach
-        name: Spinach
-      - slug: currants
-        name: Currants
-      - slug: sour_cherries
-        name: Sour cherries
-      - slug: taro
-        name: Taro
-      - slug: blueberries
-        name: Blueberries
-      - slug: sisal__raw
-        name: Raw sisal
-      - slug: pulses
-        name: Pulses
+      - slug: sunflower_seed
+        name: Sunflower seed
+      - slug: sweet_potatoes
+        name: Sweet potatoes
+      - slug: tangerines
+        name: Tangerines
+      - slug: tobacco
+        name: Tobacco
+      - slug: tomato
+        name: Tomato
       - slug: treenuts
         name: Treenuts
-      - slug: other_oil_seeds__n_e_c_
-        name: Other oil seeds
-      - slug: apples
-        name: Apples
-      - slug: grapefruit
-        name: Grapefruit
+      - slug: triticale
+        name: Triticale
+      - slug: vanilla__raw
+        name: Vanilla
+      - slug: vegetables
+        name: Vegetables
+      - slug: walnuts
+        name: Walnuts
+      - slug: watermelons
+        name: Watermelons
+      - slug: wheat
+        name: Wheat
+      - slug: yams
+        name: Yams
     presentation:
       type: dropdown
   - slug: metric
@@ -1090,12 +1018,6 @@ views:
       y:
         - catalogPath: attainable_yields#leeks_yield
   - dimensions:
-      crop: fibre_crops__fibre_equivalent
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#fibre_crops__fibre_equivalent_yield
-  - dimensions:
       crop: tangerines
       metric: actual_yield
     indicators:
@@ -1131,12 +1053,6 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#cinnamon_and_cinnamon_tree_flowers__raw_yield
-  - dimensions:
-      crop: oilcrops__oil_equivalent
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#oilcrops__oil_equivalent_yield
   - dimensions:
       crop: chillies_and_peppers
       metric: actual_yield
@@ -1180,12 +1096,6 @@ views:
       y:
         - catalogPath: attainable_yields#eggplants_yield
   - dimensions:
-      crop: fonio
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#fonio_yield
-  - dimensions:
       crop: raspberries
       metric: actual_yield
     indicators:
@@ -1197,12 +1107,6 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#cherries_yield
-  - dimensions:
-      crop: nutmeg__mace__cardamoms__raw
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#nutmeg__mace__cardamoms__raw_yield
   - dimensions:
       crop: fruit
       metric: actual_yield
@@ -1228,18 +1132,6 @@ views:
       y:
         - catalogPath: attainable_yields#gooseberries_yield
   - dimensions:
-      crop: melonseed
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#melonseed_yield
-  - dimensions:
-      crop: tallowtree_seeds
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#tallowtree_seeds_yield
-  - dimensions:
       crop: sweet_potatoes
       metric: actual_yield
     indicators:
@@ -1252,35 +1144,17 @@ views:
       y:
         - catalogPath: attainable_yields#beans__green_yield
   - dimensions:
-      crop: bambara_beans__dry
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#bambara_beans__dry_yield
-  - dimensions:
       crop: chestnut
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#chestnut_yield
   - dimensions:
-      crop: lupins
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#lupins_yield
-  - dimensions:
       crop: lentils
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#lentils_yield
-  - dimensions:
-      crop: flax__raw_or_retted
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#flax__raw_or_retted_yield
   - dimensions:
       crop: citrus_fruit
       metric: actual_yield
@@ -1300,23 +1174,11 @@ views:
       y:
         - catalogPath: attainable_yields#mangoes_yield
   - dimensions:
-      crop: chicory_roots
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#chicory_roots_yield
-  - dimensions:
       crop: pineapples
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#pineapples_yield
-  - dimensions:
-      crop: oilcrops__cake_equivalent
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#oilcrops__cake_equivalent_yield
   - dimensions:
       crop: quinces
       metric: actual_yield
@@ -1330,35 +1192,11 @@ views:
       y:
         - catalogPath: attainable_yields#vanilla__raw_yield
   - dimensions:
-      crop: mixed_grains
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#mixed_grains_yield
-  - dimensions:
       crop: strawberries
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#strawberries_yield
-  - dimensions:
-      crop: tea
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#tea_yield
-  - dimensions:
-      crop: kola_nuts
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#kola_nuts_yield
-  - dimensions:
-      crop: cereals_n_e_c_
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#cereals_n_e_c__yield
   - dimensions:
       crop: poppy_seeds
       metric: actual_yield
@@ -1372,47 +1210,17 @@ views:
       y:
         - catalogPath: attainable_yields#vegetables_yield
   - dimensions:
-      crop: tung_nuts
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#tung_nuts_yield
-  - dimensions:
       crop: mate_leaves
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#mate_leaves_yield
   - dimensions:
-      crop: peppermint__spearmint
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#peppermint__spearmint_yield
-  - dimensions:
       crop: buckwheat
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#buckwheat_yield
-  - dimensions:
-      crop: vetches
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#vetches_yield
-  - dimensions:
-      crop: agave_fibres__raw__n_e_c_
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#agave_fibres__raw__n_e_c__yield
-  - dimensions:
-      crop: areca_nuts
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#areca_nuts_yield
   - dimensions:
       crop: cashew_nuts
       metric: actual_yield
@@ -1450,29 +1258,11 @@ views:
       y:
         - catalogPath: attainable_yields#artichokes_yield
   - dimensions:
-      crop: edible_roots_and_tubers_with_high_starch_or_inulin_content__n_e_c__fresh
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#edible_roots_and_tubers_with_high_starch_or_inulin_content__n_e_c__fresh_yield
-  - dimensions:
-      crop: karite_nuts
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#karite_nuts_yield
-  - dimensions:
       crop: pigeon_peas
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#pigeon_peas_yield
-  - dimensions:
-      crop: yautia
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#yautia_yield
   - dimensions:
       crop: persimmons
       metric: actual_yield
@@ -1485,12 +1275,6 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#okra_yield
-  - dimensions:
-      crop: locust_beans__carobs_
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#locust_beans__carobs__yield
   - dimensions:
       crop: cranberries
       metric: actual_yield
@@ -1522,35 +1306,11 @@ views:
       y:
         - catalogPath: attainable_yields#pistachios_yield
   - dimensions:
-      crop: cassava_leaves
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#cassava_leaves_yield
-  - dimensions:
       crop: string_beans
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#string_beans_yield
-  - dimensions:
-      crop: hop_cones
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#hop_cones_yield
-  - dimensions:
-      crop: green_maize
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#green_maize_yield
-  - dimensions:
-      crop: jute
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#jute_yield
   - dimensions:
       crop: grapes
       metric: actual_yield
@@ -1564,23 +1324,11 @@ views:
       y:
         - catalogPath: attainable_yields#onions_yield
   - dimensions:
-      crop: canary_seed
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#canary_seed_yield
-  - dimensions:
       crop: safflower_seed
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#safflower_seed_yield
-  - dimensions:
-      crop: jojoba_seeds
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#jojoba_seeds_yield
   - dimensions:
       crop: cucumbers_and_gherkins
       metric: actual_yield
@@ -1648,12 +1396,6 @@ views:
       y:
         - catalogPath: attainable_yields#sour_cherries_yield
   - dimensions:
-      crop: taro
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#taro_yield
-  - dimensions:
       crop: chillies_and_peppers__green__capsicum_spp__and_pimenta_spp_
       metric: actual_yield
     indicators:
@@ -1665,12 +1407,6 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#broad_beans_and_horse_beans__green_yield
-  - dimensions:
-      crop: fibre_crops
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#fibre_crops_yield
   - dimensions:
       crop: quinoa
       metric: actual_yield
@@ -1690,23 +1426,11 @@ views:
       y:
         - catalogPath: attainable_yields#blueberries_yield
   - dimensions:
-      crop: sisal__raw
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#sisal__raw_yield
-  - dimensions:
       crop: pulses
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#pulses_yield
-  - dimensions:
-      crop: castor_oil_seed
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#castor_oil_seed_yield
   - dimensions:
       crop: melon
       metric: actual_yield
@@ -1714,23 +1438,11 @@ views:
       y:
         - catalogPath: attainable_yields#melon_yield
   - dimensions:
-      crop: cashewapple
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#cashewapple_yield
-  - dimensions:
       crop: treenuts
       metric: actual_yield
     indicators:
       y:
         - catalogPath: attainable_yields#treenuts_yield
-  - dimensions:
-      crop: other_oil_seeds__n_e_c_
-      metric: actual_yield
-    indicators:
-      y:
-        - catalogPath: attainable_yields#other_oil_seeds__n_e_c__yield
   - dimensions:
       crop: apples
       metric: actual_yield
