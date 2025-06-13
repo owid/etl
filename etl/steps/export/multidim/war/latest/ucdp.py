@@ -118,6 +118,7 @@ def run() -> None:
             },
             {"estimate": ["low", "high"]},
             {"people": ["combatants", "civilians", "unknown"]},
+            {"conflict_type": "one-sided violence", "people": "all_stacked"},
         ]
     )
 
@@ -138,12 +139,13 @@ def run() -> None:
             },
             "title": "{title}",
             "subtitle": "{subtitle}",
-            "note": "{note}",
+            "note": lambda view: _set_note(view, choice_names),
+            "hideRelativeToggle": lambda view: view.dimensions["people"] != "all_stacked",
         },
         params={
             "title": lambda view: _set_title(view, choice_names),
             "subtitle": lambda view: _set_subtitle(view, choice_names),
-            "note": lambda view: _set_note(view, choice_names),
+            # "note": lambda view: _set_note(view, choice_names),
         },
     )
 
@@ -242,6 +244,9 @@ def _set_title(view, choice_names):
             title = f"Civilian and combatant {title.lower()}"
     else:
         title = f"Number of {conflict_name}"
+
+    if view.dimensions["conflict_type"] == "all_stacked":
+        title += " by type"
     return title
 
 
