@@ -9,12 +9,11 @@ definitions:
           - World
         hasMapTab: true
   description_key_standard_one: |-
-    This data includes estimates for all WHO Member States, including those that did not report 2023 data. For non-reporting countries, estimates were extrapolated from the last point informed by reported data.
+    This data represents official WHO/UNICEF estimates of national immunization coverage (WUENIC). The estimates include all WHO Member States, even those that did not report 2023 data. For non-reporting countries, WHO uses statistical methods to extrapolate from previously reported data, ensuring global coverage can be assessed.
   description_key_standard_two: |-
-    To calculate global and regional average, values are extrapolated from 2022 for non-reporting countries. Non-reporting countries represent approximately 5% of the 2023 cohort.
+    Global and regional vaccination coverage is calculated using population-weighted averages. In 2023, approximately 5% of countries did not report data, requiring extrapolation from their 2022 data to maintain complete global estimates.
   description_key_standard_three: |-
-    These estimates are based on two types of quantitative data: 1) country reported coverage data (official and administrative coverage) and 2) survey coverage (from survey final reports, and complying with minimum set of quality criteria). These estimates are also informed by contextual information (e.g., stock-outs, changes in vaccine schedule, and other relevant information where available). These estimates are affected by the availability and quality of the underlying data.
-
+    These estimates synthesize multiple data sources: officially reported administrative data (based on health facility reports), coverage surveys that meet WHO quality criteria, and contextual information about vaccine supply disruptions or schedule changes. The quality and reliability of these estimates depend on the completeness and accuracy of country reporting systems.
   antigen_age_group: |-
     <% if antigen == "BCG" %>
     newborns
@@ -119,15 +118,15 @@ definitions:
     <%- endif %>
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
-    In countries where the national schedule recommends their first dose measles vaccine at 12 months or later based on the epidemiology of disease in the country, these estimates reflect the percentage of children who have had their first dose of measles vaccine as recommended.
+    Measles is one of the most contagious diseases. The first dose of measles vaccine is critical for building immunity. In countries where the national schedule recommends the first dose at 12 months or later based on local epidemiology, these estimates reflect the percentage of children who received their first dose as recommended.
     <%- elif antigen == "RCV1" %>
-    Coverage estimates are based on WHO and UNICEF estimates of coverage for the dose of measles containing vaccine that corresponds to the first measles-rubella combination vaccine.
+    Coverage estimates are based on WHO and UNICEF data for the first dose of the measles-rubella vaccine. These are taken from measles vaccine data, so country-reported rubella coverage is not used.
     <%- elif antigen == "HEPB_BD" %>
     Estimates of hepatitis B birth dose coverage are produced only for countries with a universal birth dose policy. Estimates are not produced for countries that recommend a birth dose to infants born to HepB virus-infected mothers only or where there is insufficient information to determine whether vaccination is within 24 hours of birth.
     <%- elif antigen == "PCV3" %>
-    In countries where the national schedule recommends two doses during infancy and a booster dose at 12 months or later based on the epidemiology of disease in the country, coverage estimates may reflect the percentage of surviving infants who have had two doses of pneumococcal conjugate vaccine prior to their 1st birthday.
+    In some countries, coverage may show the percentage of infants who received two doses of pneumococcal vaccine before their first birthday, based on national schedules and disease patterns.
     <%- elif antigen == "IPV1" %>
-    In countries utilizing an immunization schedule recommending either (i) a primary series of three doses of oral polio vaccine (OPV) plus at least one dose of IPV where OPV is included in routine immunization and/or campaign or (ii) a sequential schedule of IPV followed by OPV, WHO and UNICEF estimates for IPV1 reflect coverage with at least one routine dose of IPV among infants <1 year of age among countries. For countries utilizing IPV containing vaccine use only, i.e., no recommended dose of OPV, the WHO and UNICEF estimate for IPV1 corresponds to coverage for the 1st dose of IPV. Production of IPV coverage estimates, which begins in 2015, results in no change of the estimated coverage levels for the 3rd dose of polio (Pol3). For countries recommending routine immunization with a primary series of three doses of IPV alone, WHO and UNICEF estimated Pol3 coverage is equivalent to estimated coverage with three doses of IPV. For countries with a sequential schedule, estimated Pol3 coverage is based on that for the 3rd dose of polio vaccine regardless of vaccine type.
+    In countries using both IPV and OPV in their immunization schedules, WHO and UNICEF count any infant under 1 year who received at least one routine dose of IPV in their IPV1 estimates. In countries using only IPV, IPV1 refers to the first IPV dose. These estimates began in 2015 and do not affect the reported coverage for the third polio dose (Pol3). For countries using three doses of IPV, Pol3 coverage equals coverage with three IPV doses. In countries using a mix of IPV and OPV, Pol3 reflects coverage with any third polio vaccine dose, regardless of type.
     <%- endif %>
   antigen_note: |-
     <% if antigen in ["MCV2", "MCV2X2"] %>
