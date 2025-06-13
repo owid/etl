@@ -40,7 +40,7 @@ tables:
           <%- endif -%>
         description_processing:
          <%- if category == "Corruption" or category == "Other acts of corruption" %>
-         Sweden revised its classification methodology in 2019 for the UN Crime Trends Survey (UN-CTS), with retroactive adjustments applied back to 2015. The revised figures from 2015 onwards include additional offense types such as "misuse of office/misconduct and unlawful disposal" that were not captured in earlier data collection periods. To ensure data consistency and comparability, pre-2015 data points from Sweden have been excluded
+         Sweden revised its classification methodology in 2019 for the UN Crime Trends Survey (UN-CTS), with retroactive adjustments applied back to 2015. The revised figures from 2015 onwards include additional offense types such as "misuse of office/misconduct and unlawful disposal" that were not captured in earlier data collection periods. To ensure data consistency and comparability, pre-2015 data points from Sweden have been excluded.
          <%- endif -%>
         unit: |-
           <%- if unit_of_measurement.lower() == "counts" %>
