@@ -555,6 +555,7 @@ views:
       y:
         - catalogPath: attainable_yields#oats_yield
           display:
+            name: Oat yield
             colorScaleNumericBins: 1;2;3;4;5;6;7
             colorScaleScheme: PuBu
     config:
@@ -1117,6 +1118,8 @@ views:
     indicators:
       y:
         - catalogPath: attainable_yields#cherries_yield
+          display:
+            name: Cherry yield
   - dimensions:
       crop: fruit
       metric: actual_yield
