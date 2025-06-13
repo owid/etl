@@ -29,6 +29,18 @@ def run() -> None:
         common_view_config=common_view_config,
     )
 
+    CONFIG_GROUP = {
+        "title": {
+            "coverage": "Vaccination coverage",
+            "vaccinated": "Number of one-year-olds who have had each vaccination",
+            "unvaccinated": "Number of one-year-olds who have not had each vaccination",
+        },
+        "subtitle": {
+            "coverage": "Share of one-year-olds who have been immunized against a disease or a pathogen.",
+            "vaccinated": "Estimated number of one-year-olds who have received vaccinations for different diseases.",
+            "unvaccinated": "Estimated number of one-year-olds who have not received vaccinations for different diseases.",
+        },
+    }
     c.group_views(
         groups=[
             {
@@ -41,52 +53,19 @@ def run() -> None:
                     "tab": "chart",
                     "chartTypes": ["SlopeChart", "LineChart"],
                     "selectedFacetStrategy": "entity",
-                    "title": "Vaccination coverage",
-                    "subtitle": "Share of one-year-olds who have been immunized against a disease or a pathogen.",
+                    "title": "{title}",
+                    "subtitle": "{subtitle}",
                     "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
                 },
                 "view_metadata": {
-                    "description_short": "Share of one-year-olds who have been immunized against a disease or a pathogen.",
+                    "description_short": "{subtitle}",
                 },
             }
-        ]
+        ],
+        params={
+            "title": lambda view: CONFIG_GROUP["title"][view.dimensions["metric"]],
+            "subtitle": lambda view: CONFIG_GROUP["subtitle"][view.dimensions["metric"]],
+        },
     )
-    # Altering the metadata for the other two grouped views
-    for view in c.views:
-        metric = view.dimensions["metric"]
-        antigen = view.dimensions["antigen"]
 
-        view.config = view.config.copy()
-
-        if (antigen == "comparison") & (metric == "vaccinated"):
-            view.config["title"] = "Number of one-year-olds who have had each vaccination"
-            view.config["subtitle"] = (
-                "Estimated number of one-year-olds who have received vaccinations for different diseases."
-            )
-            view.config["note"] = (
-                "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) "
-                "(3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), "
-                "[polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), "
-                "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
-            )
-            view.metadata = {
-                "title": "Number of one-year-olds who have had each vaccination",
-                "description_short": "Estimated number of one-year-olds who have had vaccinations for different diseases.",
-            }
-        elif (antigen == "comparison") & (metric == "unvaccinated"):
-            view.config["title"] = "Number of one-year-olds who have not had each vaccination"
-            view.config["subtitle"] = (
-                "Estimated number of one-year-olds who have not received vaccinations for different diseases."
-            )
-            view.config["note"] = (
-                "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) "
-                "(3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), "
-                "[polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), "
-                "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
-            )
-
-            view.metadata = {
-                "title": "Number of one-year-olds who have not had each vaccination",
-                "description_short": "Estimated number of one-year-olds who have not received vaccinations for different diseases.",
-            }
     c.save()
