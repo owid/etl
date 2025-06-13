@@ -125,14 +125,14 @@ def test_dependency_filtering_with_excludes():
     """Test that excludes properly remove steps and their downstream dependencies."""
     dag = {
         "f": {"e"},  # f depends on e
-        "e": {"d"},  # e depends on d  
+        "e": {"d"},  # e depends on d
         "d": {"c"},  # d depends on c
         "c": {"b"},  # c depends on b
         "b": {"a"},  # b depends on a
-        "a": set(), # a has no dependencies
+        "a": set(),  # a has no dependencies
         "g": {"a"},  # g also depends on a (parallel branch)
     }
-    
+
     # Test excluding step "c" - should also exclude "d", "e", "f" (downstream dependencies)
     # but keep "a", "b", "g" (not dependent on c)
     result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["c"])
@@ -142,7 +142,7 @@ def test_dependency_filtering_with_excludes():
         "g": {"a"},
     }
     assert result == expected
-    
+
     # Test excluding with regex pattern
     result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["[cd]"])
     expected = {
@@ -151,7 +151,7 @@ def test_dependency_filtering_with_excludes():
         "g": {"a"},
     }
     assert result == expected
-    
+
     # Test excluding step "a" - should exclude everything since all depend on "a"
     result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["a"])
     expected = {}
