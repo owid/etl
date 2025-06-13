@@ -45,6 +45,9 @@ def run() -> None:
                     "subtitle": "Share of one-year-olds who have been immunized against a disease or a pathogen.",
                     "note": "This includes [diphtheria](#dod:diphtheria), [pertussis](#dod:pertussis) and [tetanus](#dod:tetanus) (3rd dose), [measles](#dod:measles) (1st dose), [hepatitis B](#dod:hepatitis-virus) (3rd dose), [polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), [rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose).",
                 },
+                "view_metadata": {
+                    "description_short": "Share of one-year-olds who have been immunized against a disease or a pathogen.",
+                },
             }
         ]
     )
@@ -67,6 +70,9 @@ def run() -> None:
                 "[polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), "
                 "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
             )
+            view.config["viewMetadata"] = {
+                "description_short": "Estimated number of one-year-olds who have received vaccinations for different diseases.",
+            }
         elif (antigen == "comparison") & (metric == "unvaccinated"):
             view.config["title"] = "Number of one-year-olds who have not had each vaccination"
             view.config["subtitle"] = (
@@ -78,4 +84,7 @@ def run() -> None:
                 "[polio](#dod:polio) (3rd dose), Haemophilus influenzae b (3rd dose), [rubella](#dod:rubella) (1st dose), "
                 "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
             )
+            view.config["viewMetadata"] = {
+                "description_short": "Estimated number of one-year-olds who have not received vaccinations for different diseases.",
+            }
     c.save()
