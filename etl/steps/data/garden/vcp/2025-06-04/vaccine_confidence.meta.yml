@@ -35,7 +35,7 @@ tables:
           {definitions.description_processing}
       tend_to_agree:
         title: "Share that tends to agree that {definitions.question}"
-        description_short: The share of respondents who said they "tend to agree" with the statement {definitions.question}."
+        description_short: "The share of respondents who said they 'tend to agree' with the statement {definitions.question}."
         unit: "%"
         short_unit: "%"
         display:
