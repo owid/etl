@@ -51,11 +51,10 @@ def run() -> None:
             }
         ]
     )
-
+    # Altering the metadata for the other two grouped views
     for view in c.views:
         metric = view.dimensions["metric"]
         antigen = view.dimensions["antigen"]
-        # print(f"Creating view for {antigen} - {metric}")
 
         view.config = view.config.copy()
 
