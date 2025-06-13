@@ -256,6 +256,25 @@ def edit_indicator_displays(view):
                 }
 
 
+def _set_subtitle(view):
+    # DoD
+    if view.dimensions["conflict_type"] in ("state-based", "state_based_stacked"):
+        dod = "[armed conflicts](#dod:armed-conflict-ucdp)"
+    elif view.dimensions["conflict_type"] == "interstate":
+        dod = "[interstate conflicts](#dod:interstate-ucdp)"
+    elif view.dimensions["conflict_type"] == "intrastate":
+        dod = "[civil conflicts](#dod:intrastate-ucdp)"
+    elif view.dimensions["conflict_type"] == "non-state conflict":
+        dod = "[non-state conflicts](#dod:nonstate-ucdp)"
+    elif view.dimensions["conflict_type"] == "all_stacked":
+        dod = "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [violence against civilians](#dod:onesided-ucdp)"
+    else:
+        raise ValueError(f"Unknown conflict type: {view.dimensions['conflict_type']}")
+
+    if view.dimensions["indicator"] == "deaths":
+        t = "Reported deaths of combatants and civilians due to fighting in {dod} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+
+
 def _set_title_ending(view, choice_names):
     title = "all conflicts involving states"
     if view.dimensions["conflict_type"] not in {"state-based", "state_based_stacked"}:
