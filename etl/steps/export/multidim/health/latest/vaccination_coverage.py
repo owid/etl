@@ -70,6 +70,7 @@ def run() -> None:
                 "[rotavirus](#dod:rotavirus) (final dose), and [inactivated polio](#dod:inactivated-polio-vaccine) (first dose)."
             )
             view.metadata = {
+                "title": "Number of one-year-olds who have had each vaccination",
                 "description_short": "Estimated number of one-year-olds who have had vaccinations for different diseases.",
             }
         elif (antigen == "comparison") & (metric == "unvaccinated"):
@@ -85,6 +86,7 @@ def run() -> None:
             )
 
             view.metadata = {
+                "title": "Number of one-year-olds who have not had each vaccination",
                 "description_short": "Estimated number of one-year-olds who have not received vaccinations for different diseases.",
             }
     c.save()
