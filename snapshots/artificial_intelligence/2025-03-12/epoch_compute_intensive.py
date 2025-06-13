@@ -17,7 +17,7 @@ def main(upload: bool) -> None:
     snap = Snapshot(f"artificial_intelligence/{SNAPSHOT_VERSION}/epoch_compute_intensive.csv")
 
     # Download data from source, add file to DVC and upload to S3.
-    snap.create_snapshot(upload=upload)
+    snap.create_snapshot(upload=upload, download_retries=3)
 
 
 if __name__ == "__main__":
