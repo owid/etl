@@ -14,12 +14,12 @@ paths = PathFinder(__file__)
 
 # Define PPP versions
 # NOTE: Change this in case of new PPP versions in the future
-PPP_VERSIONS = [2011, 2017]
+PPP_VERSIONS = [2017, 2021]
 
 # Define International Poverty Line (in cents)
 # NOTE: Change this in case of new IPL in the future
 # TODO: Change to 2021 prices
-INTERNATIONAL_POVERTY_LINE = 215
+INTERNATIONAL_POVERTY_LINE = 300
 
 # Define PPP years
 PPP_YEAR_OLD = PPP_VERSIONS[0]
@@ -137,7 +137,7 @@ def create_inequality_table(tb: Table, short_name: str) -> Table:
         "decile10_share",
         "bottom50_share",
         "palma_ratio",
-        "headcount_ratio_50_median",
+        # "headcount_ratio_50_median",
     ]
 
     tb_pip_inequality = tb_pip_inequality[inequality_vars]

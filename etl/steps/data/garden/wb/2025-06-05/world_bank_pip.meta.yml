@@ -1,5 +1,9 @@
 # NOTE: To learn more about the fields, hover over their names.
 definitions:
+  poverty_line_ipl: ["215", "300"]
+  poverty_line_lmic: ["365", "420"]
+  poverty_line_umic: ["685", "830"]
+
   common:
     processing_level: major
     presentation:
@@ -9,7 +13,7 @@ definitions:
         - Economic Inequality
         - Economic Growth
       faqs:
-        - fragment_id: <% if poverty_line in ["190", "215"] %>poverty-international-poverty-line<%- endif %>
+        - fragment_id: <% if poverty_line in ["215", "300"] %>poverty-international-poverty-line<%- endif %>
           gdoc_id: "{definitions.gdoc_id}"
         - fragment_id: poverty-international-dollars
           gdoc_id: "{definitions.gdoc_id}"
@@ -30,25 +34,7 @@ definitions:
     <%- endif %>
 
   poverty_line: |-
-    <% if poverty_line == "190" %>
-    $1.90
-    <%- elif poverty_line == "320" %>
-    $3.20
-    <%- elif poverty_line == "550" %>
-    $5.50
-    <%- elif poverty_line == "100 and 190" %>
-    $1 and $1.90
-    <%- elif poverty_line == "190 and 320" %>
-    $1.90 and $3.20
-    <%- elif poverty_line == "320 and 550" %>
-    $3.20 and $5.50
-    <%- elif poverty_line == "550 and 1000" %>
-    $5.50 and $10
-    <%- elif poverty_line == "190 and 1000" %>
-    $1.90 and $10
-    <%- elif poverty_line == "550 and 1000" %>
-    $5.50 and $10
-    <%- elif poverty_line == "215" %>
+    <% if poverty_line == "215" %>
     $2.15
     <%- elif poverty_line == "365" %>
     $3.65
@@ -64,6 +50,24 @@ definitions:
     $2.15 and $10
     <%- elif poverty_line == "685 and 1000" %>
     $6.85 and $10
+    <%- elif poverty_line == "300" %>
+    $3
+    <%- elif poverty_line == "420" %>
+    $4.20
+    <%- elif poverty_line == "830" %>
+    $8.30
+    <%- elif poverty_line == "100 and 300" %>
+    $1 and $3
+    <%- elif poverty_line == "300 and 420" %>
+    $3 and $4.20
+    <%- elif poverty_line == "420 and 830" %>
+    $4.20 and $8.30
+    <%- elif poverty_line == "300 and 1000" %>
+    $3 and $10
+    <%- elif poverty_line == "420 and 1000" %>
+    $4.20 and $10
+    <%- elif poverty_line == "830 and 1000" %>
+    $8.30 and $10
     <%- elif poverty_line == "100" %>
     $1
     <%- elif poverty_line == "1000" %>
@@ -87,18 +91,19 @@ definitions:
     <%- endif %>
 
   poverty_line_a_day: |-
-    <% if poverty_line != ["40% of the median", "50% of the median", "60% of the median"] %>
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
     {definitions.poverty_line} a day
     <%- else %>
     {definitions.poverty_line}
     <%- endif %>
 
   poverty_line_per_day: |-
-    <% if poverty_line != ["40% of the median", "50% of the median", "60% of the median"] %>
+    <% if poverty_line not in ["40% of the median", "50% of the median", "60% of the median"] %>
     {definitions.poverty_line} per day
     <%- else %>
     {definitions.poverty_line}
     <%- endif %>
+
 
   table: |-
     <% if table == "Income or consumption" %>
@@ -106,7 +111,6 @@ definitions:
     <%- else %>
     <<table>>
     <%- endif %>
-
 
   percentiles_avg_share: |-
     <% if decile == 1 %>
@@ -140,11 +144,11 @@ definitions:
     <%- endif %>
 
   description_key_poverty_line: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
-    <%- elif poverty_line in ["320", "365"] %>
+    <%- elif poverty_line in ["365", "420"] %>
     A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in lower-middle-income countries.
-    <%- elif poverty_line in ["550", "685"] %>
+    <%- elif poverty_line in ["685", "830"] %>
     A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in upper-middle-income countries.
     <%- elif poverty_line == "3000" %>
     A poverty line of {definitions.poverty_line_per_day} represents definitions of national poverty lines in high-income countries.
@@ -180,6 +184,13 @@ definitions:
     $28
     <%- endif %>
   description_key_prosperity_gap : The _prosperity gap_ indicator measures how much income would need to be multiplied to ensure everyone reaches a standard of prosperity, which is defined as {definitions.prosperity_gap_threshold} per person per day. This gives a sense of how far global incomes are from a basic prosperity standard.
+
+  societal_poverty_line_intercept: |-
+    <% if ppp_version == 2017 %>
+    1.15
+    <%- elif ppp_version == 2021 %>
+    1.30
+    <%- endif %>
 
   description_processing_main: |-
     <% if welfare_type in ["income", "consumption"] %>
@@ -240,7 +251,7 @@ definitions:
   # For Grapher configuration
 
   headcount_ratio_title: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     Share of population living in extreme poverty
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Share of population below <<poverty_line>>
@@ -249,7 +260,7 @@ definitions:
     <%- endif %>
 
   headcount_title: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     Number of people living in extreme poverty
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty: Number of people below <<poverty_line>>
@@ -258,7 +269,7 @@ definitions:
     <%- endif %>
 
   total_shortfall_title: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     Total shortfall from extreme poverty
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Total shortfall from a poverty line of <<poverty_line>> <<welfare_type>>
@@ -267,7 +278,7 @@ definitions:
     <%- endif %>
 
   avg_shortfall_title: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     Average shortfall from extreme poverty
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Average shortfall from a poverty line of <<poverty_line>> <<welfare_type>>
@@ -276,7 +287,7 @@ definitions:
     <%- endif %>
 
   income_gap_ratio_title: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     Average shortfall from extreme poverty (as a share of the poverty line)
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Average shortfall from a poverty line of <<poverty_line>> <<welfare_type>> (as a share of the poverty line)
@@ -299,11 +310,11 @@ definitions:
     <%- endif %>
 
   poverty_line_subtitle: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     Extreme poverty is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
-    <%- elif poverty_line in ["320", "365"] %>
+    <%- elif poverty_line in ["365", "420"] %>
     The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. {definitions.ppp_adjustment_subtitle}
-    <%- elif poverty_line in ["550", "685"] %>
+    <%- elif poverty_line in ["685", "830"] %>
     The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in upper-middle-income countries. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     Relative poverty is measured in terms of a poverty line that rises and falls over time with average incomes – in this case set at {definitions.relative_poverty_percentage} of the median <<welfare_type>>.
@@ -312,11 +323,11 @@ definitions:
     <%- endif %>
 
   total_shortfall_subtitle: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
-    <%- elif poverty_line in ["320", "365"] %>
+    <%- elif poverty_line in ["365", "420"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
-    <%- elif poverty_line in ["550", "685"] %>
+    <%- elif poverty_line in ["685", "830"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to <<poverty_line>> <<welfare_type>>. {definitions.ppp_adjustment_subtitle}
@@ -325,11 +336,11 @@ definitions:
     <%- endif %>
 
   avg_shortfall_subtitle: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
-    <%- elif poverty_line in ["320", "365"] %>
+    <%- elif poverty_line in ["365", "420"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the lower-middle income poverty line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
-    <%- elif poverty_line in ["550", "685"] %>
+    <%- elif poverty_line in ["685", "830"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to the upper-middle income poverty line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in poverty up to <<poverty_line>> <<welfare_type>>, averaged across the population in poverty.
@@ -341,11 +352,11 @@ definitions:
     This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_.
 
   income_gap_ratio_subtitle: |-
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the International Poverty Line ({definitions.poverty_line_per_day}).
-    <%- elif poverty_line in ["320", "365"] %>
+    <%- elif poverty_line in ["365", "420"] %>
     {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the lower-middle income poverty line ({definitions.poverty_line_per_day}).
-    <%- elif poverty_line in ["550", "685"] %>
+    <%- elif poverty_line in ["685", "830"] %>
     {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the upper-middle income poverty line ({definitions.poverty_line_per_day}).
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than <<poverty_line>> <<welfare_type>>.
@@ -435,7 +446,7 @@ definitions:
     <%- endif %>
 
   map_brackets_headcount_ratio: &map_brackets_headcount_ratio
-    <% if poverty_line in ["190", "215"] %>
+    <% if poverty_line in ["215", "300"] %>
     [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- elif poverty_line in ["40% of the median"] %>
     [2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
@@ -459,11 +470,11 @@ definitions:
     [100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1]
     <%- elif poverty_line in ["100"] %>
     [1000000,3000000,10000000,30000000,100000000,300000000,1]
-    <%- elif poverty_line in ["190", "215"] %>
+    <%- elif poverty_line in ["215", "300"] %>
     [1000000,3000000,10000000,30000000,100000000,300000000,1000000000,3000000000,1]
-    <%- elif poverty_line in ["320", "365"] %>
+    <%- elif poverty_line in ["365", "420"] %>
     [10000000,30000000,100000000,300000000,1000000000,3000000000,10000000000,1]
-    <%- elif poverty_line in ["550", "685"] %>
+    <%- elif poverty_line in ["685", "830"] %>
     [100000000,300000000,1000000000,3000000000,10000000000,30000000000,100000000000,1]
     <%- elif poverty_line in ["1000"] %>
     [1000000000,3000000000,10000000000,30000000000,100000000000,300000000000,1000000000000]
@@ -484,12 +495,12 @@ definitions:
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
     <%- elif poverty_line in ["100"] %>
     [0.2, 0.4, 0.6, 0.8, 1]
-    <%- elif poverty_line in ["190", "215"] %>
-    [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, <<poverty_line|float/100>>]
-    <%- elif poverty_line in ["320", "365"] %>
-    [0.5, 1, 1.5, 2, 2.5, 3, <<poverty_line|float/100>>]
-    <%- elif poverty_line in ["550", "685"] %>
-    [1, 2, 3, 4, 5, <<poverty_line|float/100>>]
+    <%- elif poverty_line in ["215", "300"] %>
+    [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4, 2.7, <<poverty_line|float/100>>]
+    <%- elif poverty_line in ["365", "420"] %>
+    [0.5, 1, 1.5, 2, 2.5, 3, 3.5, <<poverty_line|float/100>>]
+    <%- elif poverty_line in ["685", "830"] %>
+    [1, 2, 3, 4, 5, 6, 7, <<poverty_line|float/100>>]
     <%- elif poverty_line in ["1000"] %>
     [2, 4 ,6, 8, 10]
     <%- elif poverty_line in ["2000"] %>
@@ -509,11 +520,11 @@ definitions:
     [2, 4, 6, 8, 10, 12, 1]
     <%- elif poverty_line in ["100"] %>
     [1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
-    <%- elif poverty_line in ["190", "215"] %>
+    <%- elif poverty_line in ["215", "300"] %>
     [5, 10, 15, 20, 25, 30, 35, 1]
-    <%- elif poverty_line in ["320", "365"] %>
+    <%- elif poverty_line in ["365", "420"] %>
     [5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
-    <%- elif poverty_line in ["550", "685"] %>
+    <%- elif poverty_line in ["685", "830"] %>
     [10, 20, 30, 40, 50, 60, 70, 1]
     <%- elif poverty_line in ["1000"] %>
     [10, 20, 30, 40, 50, 60, 70, 80, 1]
@@ -1057,7 +1068,7 @@ tables:
         description_processing: |-
           {definitions.description_processing_main}
         description_from_producer: |-
-          The poverty headcount ratio at societal poverty line is the percentage of a population living in poverty according to the World Bank's Societal Poverty Line. The Societal Poverty Line is expressed in purchasing power adjusted <<ppp_version>> U.S. dollars and defined as max({definitions.poverty_line}, $1.15 + 0.5*Median). This means that when the national median is sufficiently low, the Societal Poverty line is equivalent to the extreme poverty line, {definitions.poverty_line}. For countries with a sufficiently high national median, the Societal Poverty Line grows as countries’ median income grows.
+          The poverty headcount ratio at societal poverty line is the percentage of a population living in poverty according to the World Bank's Societal Poverty Line. The Societal Poverty Line is expressed in purchasing power adjusted <<ppp_version>> U.S. dollars and defined as max({definitions.poverty_line}, {definitions.societal_poverty_line_intercept} + 0.5*Median). This means that when the national median is sufficiently low, the Societal Poverty line is equivalent to the extreme poverty line, {definitions.poverty_line}. For countries with a sufficiently high national median, the Societal Poverty Line grows as countries’ median income grows.
         display:
           name: |-
             <% if survey_comparability == "No spells" %>
@@ -1484,7 +1495,7 @@ tables:
         presentation:
           grapher_config:
             title: <<welfare_type.capitalize()>> share of the {definitions.percentiles_avg_share}.lower()
-            subtitle: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population).
+            subtitle: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share}.lower() (tenth of the population).
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
