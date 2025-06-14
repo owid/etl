@@ -1063,8 +1063,10 @@ df_graphers["relatedQuestionUrl"] = (
 
 # Select one default view
 df_graphers.loc[
-    (df_graphers["ySlugs"] == f"headcount_ratio_190_ppp{ppp_year_old} headcount_ratio_215_ppp{ppp_year_current}")
-    & (df_graphers["tableSlug"] == f"income_consumption_{ppp_year_old}_{ppp_year_current}"),
+    (df_graphers["Indicator Dropdown"] == "Share in poverty")
+    & (df_graphers["International-$ Dropdown"] == f"Compare {ppp_year_current} and {ppp_year_old} prices")
+    & (df_graphers["Poverty line Dropdown"] == "International Poverty Line")
+    & (df_graphers["Household survey data type Dropdown"] == "Show data from both income and consumption surveys"),
     ["defaultView"],
 ] = "true"
 
