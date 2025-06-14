@@ -71,6 +71,7 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Haiti",
     "Hungary",
     "Kazakhstan",
+    "Kosovo",
     "Kyrgyzstan",
     "Latvia",
     "Lithuania",
@@ -91,6 +92,7 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Slovenia",
     "Turkey",
     "Ukraine",
+    "Uzbekistan",
 ]
 
 # Set debug mode
@@ -272,19 +274,19 @@ def create_new_indicators_and_format(tb: Table) -> Table:
     # Make total_shortfall by year
     tb["total_shortfall"] *= 365
 
-    # Same for relative poverty
-    for pct in [40, 50, 60]:
-        tb[f"headcount_{pct}_median"] = tb[f"headcount_ratio_{pct}_median"] * tb["reporting_pop"]
-        tb[f"headcount_{pct}_median"] = tb[f"headcount_{pct}_median"].round(0)
-        tb[f"total_shortfall_{pct}_median"] = (
-            tb[f"poverty_gap_index_{pct}_median"] * tb["median"] * pct / 100 * tb["reporting_pop"]
-        )
-        tb[f"avg_shortfall_{pct}_median"] = tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]
-        tb[f"income_gap_ratio_{pct}_median"] = (tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]) / (
-            tb["median"] * pct / 100
-        )
-        # Make total_shortfall by year
-        tb[f"total_shortfall_{pct}_median"] *= 365
+    # # Same for relative poverty
+    # for pct in [40, 50, 60]:
+    #     tb[f"headcount_{pct}_median"] = tb[f"headcount_ratio_{pct}_median"] * tb["reporting_pop"]
+    #     tb[f"headcount_{pct}_median"] = tb[f"headcount_{pct}_median"].round(0)
+    #     tb[f"total_shortfall_{pct}_median"] = (
+    #         tb[f"poverty_gap_index_{pct}_median"] * tb["median"] * pct / 100 * tb["reporting_pop"]
+    #     )
+    #     tb[f"avg_shortfall_{pct}_median"] = tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]
+    #     tb[f"income_gap_ratio_{pct}_median"] = (tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]) / (
+    #         tb["median"] * pct / 100
+    #     )
+    #     # Make total_shortfall by year
+    #     tb[f"total_shortfall_{pct}_median"] *= 365
 
     # Shares to percentages
     # executing the function over list of vars
@@ -292,15 +294,15 @@ def create_new_indicators_and_format(tb: Table) -> Table:
         "headcount_ratio",
         "income_gap_ratio",
         "poverty_gap_index",
-        "headcount_ratio_40_median",
-        "headcount_ratio_50_median",
-        "headcount_ratio_60_median",
-        "income_gap_ratio_40_median",
-        "income_gap_ratio_50_median",
-        "income_gap_ratio_60_median",
-        "poverty_gap_index_40_median",
-        "poverty_gap_index_50_median",
-        "poverty_gap_index_60_median",
+        #     "headcount_ratio_40_median",
+        #     "headcount_ratio_50_median",
+        #     "headcount_ratio_60_median",
+        #     "income_gap_ratio_40_median",
+        #     "income_gap_ratio_50_median",
+        #     "income_gap_ratio_60_median",
+        #     "poverty_gap_index_40_median",
+        #     "poverty_gap_index_50_median",
+        #     "poverty_gap_index_60_median",
     ]
     tb.loc[:, pct_indicators] = tb[pct_indicators] * 100
 
@@ -1002,19 +1004,18 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
         # If there are only two welfare series, use both, except for countries where we have to choose one
         if number_of_welfare_series == 2:
             # assert if last_welfare type values are expected
-            if country in ["Armenia", "Belarus", "Kyrgyzstan", "North Macedonia", "Peru"]:
-                if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
-                    welfare_expected = ["consumption"]
-                    assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
-                    )
+            if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
+                welfare_expected = ["consumption"]
+                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                )
 
-                elif country in ["North Macedonia", "Peru"]:
-                    assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
-                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
-                    )
+            elif country in ["Kosovo", "North Macedonia", "Peru"]:
+                assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
+                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
+                )
 
-                tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
+            tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
         # With Turkey I also want to keep both series, but there are duplicates for some years
         elif country in ["Turkey"]:
@@ -1037,7 +1038,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
             tb_country = tb_country[tb_country["welfare_type"].isin(welfare_expected)].reset_index(drop=True)
 
         # These are countries with both income and consumption as the last welfare type, so I decide case by case
-        elif country in ["Haiti", "Philippines", "Romania", "Saint Lucia"]:
+        elif country in ["Haiti", "Philippines", "Saint Lucia"]:
             welfare_expected = ["consumption", "income"]
             assert len(last_welfare_type) == 2 and last_welfare_type == welfare_expected, log.fatal(
                 f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
@@ -1049,12 +1050,26 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
 
         else:
             # Here I keep the most recent welfare type
-            if country in ["Albania", "Ukraine"]:
+            if country in ["Albania", "Belize", "Ukraine"]:
                 welfare_expected = ["consumption"]
                 assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
                     f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
                 )
-            else:
+            elif country in [
+                "Bulgaria",
+                "Croatia",
+                "Estonia",
+                "Hungary",
+                "Latvia",
+                "Lithuania",
+                "Montenegro",
+                "Nicaragua",
+                "Poland",
+                "Romania",
+                "Serbia",
+                "Slovakia",
+                "Slovenia",
+            ]:
                 welfare_expected = ["income"]
                 assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
                     f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
