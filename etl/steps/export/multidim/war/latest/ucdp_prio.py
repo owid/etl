@@ -6,6 +6,21 @@ from etl.helpers import PathFinder
 paths = PathFinder(__file__)
 
 
+COMMON_CONFIG = {
+    "originUrl": "ourworldindata.org/war-and-peace",
+    "relatedQuestions": [
+        {
+            "text": "How do different approaches measure armed conflicts and their deaths?",
+            "url": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+        }
+    ],
+    "hideAnnotationFieldsInTitle": {
+        "time": True,
+        "entity": True,
+    },
+}
+
+
 def run() -> None:
     # Load configuration from adjacent yaml file.
     config = paths.load_collection_config()
@@ -45,11 +60,7 @@ def run() -> None:
             ],
             "estimate": "*",
         },
-        common_view_config={
-            "hideAnnotationFieldsInTitle": {
-                "time": True,
-            },
-        },
+        common_view_config=COMMON_CONFIG,
     )
 
     # Edit indicator-level display settings
@@ -72,22 +83,18 @@ def run() -> None:
                     "extrasystemic",
                 ],
                 "choice_new_slug": "state_based_stacked",
-                "view_config": {
+                "view_config": COMMON_CONFIG
+                | {
                     "chartTypes": ["StackedBar"],
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
                 },
             },
             {
                 "dimension": "estimate",
                 "choices": ["low", "high", "best"],
                 "choice_new_slug": "best_ci",
-                "view_config": {
+                "view_config": COMMON_CONFIG
+                | {
                     "selectedFacetStrategy": "entity",
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
                 },
             },
         ]
@@ -222,7 +229,7 @@ def edit_faust(c):
             },
         ],
         params={
-            "conflict_name": lambda view: _get_conflict_type(view, choice_names),
+            "conflict_name": lambda view: _set_title_ending(view, choice_names),
         },
     )
 
@@ -249,8 +256,30 @@ def edit_indicator_displays(view):
                 }
 
 
-def _get_conflict_type(view, choice_names):
-    conflict_name = "state-based conflicts"
+def _set_subtitle(view):
+    # DoD
+    if view.dimensions["conflict_type"] in ("state-based", "state_based_stacked"):
+        dod = "[armed conflicts](#dod:armed-conflict-ucdp)"
+    elif view.dimensions["conflict_type"] == "interstate":
+        dod = "[interstate conflicts](#dod:interstate-ucdp)"
+    elif view.dimensions["conflict_type"] == "intrastate":
+        dod = "[civil conflicts](#dod:intrastate-ucdp)"
+    elif view.dimensions["conflict_type"] == "non-state conflict":
+        dod = "[non-state conflicts](#dod:nonstate-ucdp)"
+    elif view.dimensions["conflict_type"] == "all_stacked":
+        dod = "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [violence against civilians](#dod:onesided-ucdp)"
+    else:
+        raise ValueError(f"Unknown conflict type: {view.dimensions['conflict_type']}")
+
+    if view.dimensions["indicator"] == "deaths":
+        t = "Reported deaths of combatants and civilians due to fighting in {dod} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+
+
+def _set_title_ending(view, choice_names):
+    title = "all conflicts involving states"
     if view.dimensions["conflict_type"] not in {"state-based", "state_based_stacked"}:
-        conflict_name = choice_names.get(view.dimensions["conflict_type"]).lower()
-    return conflict_name
+        title = choice_names.get(view.dimensions["conflict_type"]).lower()
+
+    if view.dimensions["conflict_type"] == "state_based_stacked":
+        title += " by type"
+    return title
