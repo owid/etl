@@ -88,7 +88,7 @@ dimensions:
         group: Individual poverty lines
       - slug: "420"
         name: $4.20 a day
-        description: Set by the World Bank to reflect national definitions in lower-middle income
+        description: Set by the World Bank to reflect national definitions in lower-middle income countries
         group: Individual poverty lines
       - slug: "830"
         name: $8.30 a day
