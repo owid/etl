@@ -1,5 +1,4 @@
 steps:
   #
   # Temporary private step that will keep all new snapshots while they are not used in any data steps.
-  #
-  data-private://meadow/temp/latest/step:
+data-private://meadow/temp/latest/step:
