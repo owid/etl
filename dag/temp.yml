@@ -3,4 +3,3 @@ steps:
   # Temporary private step that will keep all new snapshots while they are not used in any data steps.
   #
   data-private://meadow/temp/latest/step:
-    - snapshot://tuberculosis/2025-06-16/data_dictionary.csv
