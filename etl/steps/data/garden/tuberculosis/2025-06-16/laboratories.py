@@ -55,6 +55,7 @@ def run() -> None:
         ds_income_groups=ds_income_groups,
         regions=REGIONS_TO_ADD,
         min_num_values_per_year=1,
+        frac_allowed_nans_per_year=0.3,
     )
     tb = calculate_positive_test_rate(tb)
     tb = add_population_and_rates(tb, tb_pop)

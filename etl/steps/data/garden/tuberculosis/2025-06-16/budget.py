@@ -77,7 +77,9 @@ def add_regional_aggregates(tb: Table, ds_regions: Table, ds_income_groups: Tabl
     tb_no_agg = tb[["country", "year"] + cols_to_drop]
     tb_agg = tb.drop(columns=cols_to_drop)
 
-    tb_agg = add_regions_to_table(tb_agg, ds_regions, ds_income_groups, REGIONS_TO_ADD, min_num_values_per_year=1)
+    tb_agg = add_regions_to_table(
+        tb_agg, ds_regions, ds_income_groups, REGIONS_TO_ADD, min_num_values_per_year=1, frac_allowed_nans_per_year=0.3
+    )
 
     tb = pr.merge(tb_agg, tb_no_agg, on=["country", "year"], how="left")
 
