@@ -54,9 +54,9 @@ definitions:
     <%- elif antigen == "DTPCV3" %>
     who have had three doses of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "MCV1" %>
-    who have had their first dose of the measles vaccine
+    who have had one dose of the measles vaccine
     <%- elif antigen == "POL3" %>
-    who have had their third dose of the polio vaccine
+    who have had three doses of the polio vaccine
     <%- elif antigen == "RCV1" %>
     vaccinated against rubella
     <%- elif antigen == "HEPB3" %>
@@ -72,23 +72,22 @@ definitions:
     <%- elif antigen == "PCV3" %>
     who have had their third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
-    who have had their first dose of the inactivated polio vaccine
+    who have had their one dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
-    who have had their second dose of the inactivated polio vaccine
-
+    who have had their two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    who have had their second dose of the measles vaccine
+    who have had their two doses of the measles vaccine
 
     <%- endif %>
   antigen_title_negative: |-
     <% if antigen == "BCG" %>
     who have not been vaccinated against tuberculosis
     <%- elif antigen == "DTPCV1" %>
-    who have not had one dose of the diphtheria, tetanus and pertussis vaccine
+    who have not had the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "DTPCV3" %>
     who have not had three doses of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "MCV1" %>
-    who have not had their first dose of the measles vaccine
+    who have not had the measles vaccine
     <%- elif antigen == "POL3" %>
     who have not had their third dose of the polio vaccine
     <%- elif antigen == "RCV1" %>
@@ -98,7 +97,7 @@ definitions:
     <%- elif antigen == "HIB3" %>
     who have not been vaccinated against Haemophilus influenzae type b
     <%- elif antigen == "HEPB_BD" %>
-    who have not had a hepatitis B vaccine dose within the first 24 hours of delivery
+    who have not had the hepatitis B vaccine within the first 24 hours of delivery
     <%- elif antigen == "MCV2" %>
     who are not fully vaccinated against measles
     <%- elif antigen == "ROTAC" %>
@@ -106,11 +105,11 @@ definitions:
     <%- elif antigen == "PCV3" %>
     who have not had their third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
-    who have not had their first dose of the inactivated polio vaccine
+    who have not had the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
-    who have not had their second dose of the inactivated polio vaccine
+    who have not had two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    who have not had their second dose of the measles vaccine
+    who have not had two doses of of the measles vaccine
     <%- endif %>
   antigen_description: |-
     <% if antigen == "BCG" %>
