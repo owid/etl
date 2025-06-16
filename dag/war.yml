@@ -47,12 +47,12 @@ steps:
   data://grapher/war/2025-06-13/ucdp:
     - data://garden/war/2025-06-13/ucdp
 
-  # UCDP (with candidate data, latest available)
+  # UCDP (+preview)
   data://meadow/war/latest/ucdp_ced:
-    - snapshot://war/latest/ucdp_ced_v24_01_24_12.csv
+    - snapshot://war/latest/ucdp_ced_v25_01_25_03.csv
   data://garden/war/latest/ucdp_preview:
-    - data://meadow/war/2024-08-26/ucdp
-    - data://garden/war/2024-08-26/ucdp
+    - data://meadow/war/2025-06-13/ucdp
+    - data://garden/war/2025-06-13/ucdp
     - data://garden/geography/2023-11-28/nat_earth_110
     - data://garden/demography/2024-07-15/population
     - data://garden/countries/2024-08-27/gleditsch
@@ -289,22 +289,3 @@ steps:
   # Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
   data://grapher/war/2025-05-15/nuclear_weapons_inventories:
     - data://garden/war/2025-05-15/nuclear_weapons_inventories
-
-  ########## TO ARCHIVE
-  # UCDP
-  data://meadow/war/2024-08-26/ucdp:
-    - snapshot://war/2024-08-26/ucdp_non_state.zip
-    - snapshot://war/2024-08-26/ucdp_ged.zip
-    - snapshot://war/2024-08-26/ucdp_battle_related_dyadic.zip
-    - snapshot://war/2024-08-26/ucdp_prio_armed_conflict.zip
-    - snapshot://war/2024-08-26/ucdp_battle_related_conflict.zip
-    - snapshot://war/2024-08-26/ucdp_one_sided.zip
-  data://garden/war/2024-08-26/ucdp:
-    - data://meadow/war/2024-08-26/ucdp
-    - data://garden/geography/2023-11-28/nat_earth_110
-    - data://garden/demography/2024-07-15/population
-    - data://garden/countries/2024-08-27/gleditsch
-  data://grapher/war/2024-08-26/ucdp:
-    - data://garden/war/2024-08-26/ucdp
-  export://multidim/war/latest/ucdp:
-    - data://grapher/war/2024-08-26/ucdp
