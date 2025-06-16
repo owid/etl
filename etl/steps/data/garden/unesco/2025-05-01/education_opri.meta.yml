@@ -24,11 +24,11 @@ definitions:
     - Higher numbers mean adults in that country have generally stayed in school longer, showing stronger educational foundations. However, this doesn't tell us about the quality of education, learning outside of school, or whether younger people today are getting better education than the average suggests.
 
   desc_key_sle: &desc_key_sle
-   - Expected years of schooling tells us how many years a child starting school today can expect to spend in education, based on how many students are currently enrolled at each level.
-   - This number is calculated by adding up enrollment rates across all ages and education levels. If 90% of 6-year-olds are in school, 85% of 16-year-olds are in school, and so on, these percentages get combined to predict total schooling years.
-   - "The measure can be broken down by education level: [pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education). Each level shows how many years children can expect to spend at that specific stage."
-   - The calculation assumes today's enrollment patterns will stay the same as children grow up, and it includes time spent repeating grades. However, it measures access to education rather than whether students actually finish their studies or learn effectively.
-   - Higher numbers mean the education system provides more opportunities for students to stay in school longer. For example, if pre-primary expected years is 2.5, it means most children can expect about 2.5 years of preschool education. A country might have 15 total expected years but only 0.5 years in pre-primary, showing limited early childhood education access.
+  - Expected years of schooling estimates how long a child starting school today is likely to stay in education, assuming current enrollment patterns continue throughout their schooling years.
+  - It is calculated by combining enrollment rates at each level of education and age group, adjusted for the official age of attendance, resulting in the average number of years a child can expect to complete—including time spent repeating grades.
+  - The measure reflects access to education rather than completion or learning outcomes, and assumes current patterns remain stable over time.
+  - Expected years can be broken down into [pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education), showing the expected time spent at each stage.
+  - A higher value means students are expected to spend more time in school. For example, 2.5 years in pre-primary means most children will attend around 2.5 years of preschool; a country with 15 total expected years but only 0.5 in pre-primary likely has limited access to early childhood education.
 
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
