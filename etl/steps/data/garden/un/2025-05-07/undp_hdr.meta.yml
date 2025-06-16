@@ -416,10 +416,10 @@ tables:
         description_short: |-
           Number of years a<% if sex == "female" %> girl<% elif sex == "male" %> boy<% else %> child<% endif %> of school-entrance-age can expect to receive if the current age-specific enrollment rates persist throughout the child's life.
         description_key:
-          - It reflects the total number of years of schooling from primary to tertiary education that a child can expect to receive based on current enrollment patterns.
-          - Acts as the forward‑looking component of the HDI education dimension, signalling a country's commitment to invest in human capital for the next generation.
-          - This indicator assumes that current age-specific enrollment rates will persist throughout the child's years of schooling, providing a snapshot of educational access and opportunity.
-          - The calculation includes all levels of education and accounts for the likelihood of enrollment at each age based on current patterns.
+          - Expected years of schooling tells us how many years a child starting school today can expect to spend in education, based on how many students are currently enrolled at each level.
+          - This number is calculated by adding up enrollment rates across all ages and education levels. If 90% of 6-year-olds are in school, 85% of 16-year-olds are in school, and so on, these percentages get combined to predict total schooling years.
+          - The calculation assumes today's enrollment patterns will stay the same as children grow up, and it includes time spent repeating grades. However, it measures access to education rather than whether students actually finish their studies or learn effectively.
+          - Higher numbers mean the education system provides more opportunities for students to stay in school longer.
           - "UNDP originally obtained this indicator from: ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2024) and United Nations Children's Fund (UNICEF) Multiple Indicator Cluster Surveys (various years)"
         presentation:
           title_public: Expected years of schooling<% if sex == "female" %> among girls<% elif sex == "male" %> among boys<% endif %>
@@ -446,11 +446,12 @@ tables:
         description_short: |-
           Average number of years (excluding years spent repeating individual grades)<% if sex == "female" %> women<% elif sex == "male" %> men<% else %> adults<% endif %> over 25 years participated in formal education.
         description_key:
-          - Serves as the attainment component of the HDI education dimension, complementing “expected years” to balance past and future schooling achievements.
-          - The average years of schooling measures the educational attainment of the adult population, reflecting the accumulated human capital in a country.
-          - Formal education is primary/ISCED 1 or higher.
-          - The measure is calculated based on educational attainment data from censuses and household surveys, where adults report their highest completed level of education.
-          - It ignores education quality, informal learning and younger cohorts; sensitive to outdated census rounds in data‑poor settings.
+          - Mean years of schooling shows the average number of years that adults in a country have spent in formal education, giving us a picture of how educated the population is overall.
+          - This number is calculated by asking adults about the highest level of school they completed, then figuring out how many years that typically takes. For example, someone who finished high school might have about 12 years of schooling.
+          - This indicator measures how much education adults have accumulated over their lifetimes, showing the results of past investments in schools and learning.
+          - The data comes from surveys and censuses where adults aged 25 and older report their educational background. Only formal schooling from primary school onwards is counted.
+          - Higher numbers mean adults in that country have generally stayed in school longer, showing stronger educational foundations. However, this measure ignores education quality, informal learning, and the progress of younger generations who may be better educated than the overall average.
+          - The indicator can be limited by outdated census data in countries with less frequent surveys, meaning the numbers may not reflect recent educational improvements or changes.
           - "UNDP originally obtained this indicator from: Barro and Lee (2018), Eurostat (2024), ICF Macro Demographic and Health Surveys (various years), UNESCO Institute for Statistics (2024) and UNICEF Multiple Indicator Cluster Surveys (various years)."
         presentation:
           title_public: Average years of schooling<% if sex == "female" %> among women<% elif sex == "male" %> among men<% endif %>

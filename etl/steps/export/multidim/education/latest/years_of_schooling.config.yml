@@ -5,7 +5,6 @@ default_selection:
   - United States
   - China
   - India
-  - Brazil
   - Chad
 dimensions:
   - slug: metric_type
