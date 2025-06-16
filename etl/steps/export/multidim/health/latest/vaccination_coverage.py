@@ -65,6 +65,7 @@ def run() -> None:
         ],
         params={
             "title": lambda view: CONFIG_GROUP["title"][view.dimensions["metric"]],
+            "title_public": lambda view: CONFIG_GROUP["title"][view.dimensions["metric"]]
             "subtitle": lambda view: CONFIG_GROUP["subtitle"][view.dimensions["metric"]],
         },
     )
