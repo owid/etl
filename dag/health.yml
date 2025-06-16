@@ -1306,7 +1306,15 @@ steps:
     - data://meadow/tuberculosis/2025-06-06/burden_estimates
     - data://garden/demography/2024-07-15/population
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-    - data://garden/wb/2023-04-30/income_groups
+    - data://garden/wb/2024-07-29/income_groups
     - data://garden/regions/2023-01-01/regions
   data://grapher/tuberculosis/2025-06-06/burden_estimates:
     - data://garden/tuberculosis/2025-06-06/burden_estimates
+  # Tuberculosis expenditure - WHO
+  data://meadow/tuberculosis/2025-06-16/expenditure:
+    - snapshot://tuberculosis/2025-06-16/expenditure.csv
+  data://garden/tuberculosis/2025-06-16/expenditure:
+    - data://meadow/tuberculosis/2025-06-16/expenditure
+    - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
+  data://grapher/tuberculosis/2025-06-16/expenditure:
+    - data://garden/tuberculosis/2025-06-16/expenditure
