@@ -25,10 +25,10 @@ tables:
         description_short: Number of previously treated cases in the cohort.
       newrel_succ:
         title: New and relapse cases - treatment success
-        description_short: Number of previously treated cases who were cureed or completed treatment.
+        description_short: Number of previously treated cases who were cured or completed treatment.
       newrel_fail:
         title: New and relapse cases - treatment failure
-        description_short: Number of previously treated cases were the treatment failed.
+        description_short: Number of previously treated cases where the treatment failed.
       newrel_died:
         title: New and relapse cases - died
         description_short: Number of previously treated cases who died.
@@ -50,10 +50,10 @@ tables:
         description_short: Number of previously treated cases in the cohort.
       ret_nrel_succ:
         title: Re-treatment cases - treatment success
-        description_short: Number of previously treated cases who were cureed or completed treatment.
+        description_short: Number of previously treated cases who were cured or completed treatment.
       ret_nrel_fail:
         title: Re-treatment cases - treatment failure
-        description_short: Number of previously treated cases were the treatment failed.
+        description_short: Number of previously treated cases where the treatment failed.
       ret_nrel_died:
         title: Re-treatment cases - died
         description_short: Number of previously treated cases who died.
@@ -72,10 +72,10 @@ tables:
         description_short: Number of HIV-positive TB cases in the cohort.
       tbhiv_succ:
         title: HIV-positive TB cases - treatment success
-        description_short: Number of HIV-positive TB cases who were cureed or completed treatment.
+        description_short: Number of HIV-positive TB cases who were cured or completed treatment.
       tbhiv_fail:
         title: HIV-positive TB cases - treatment failure
-        description_short: Number of HIV-positive TB cases were the treatment failed.
+        description_short: Number of HIV-positive TB cases where the treatment failed.
       tbhiv_died:
         title: HIV-positive TB cases - died
         description_short: Number of HIV-positive TB cases who died.
@@ -94,10 +94,10 @@ tables:
         description_short: Number of multidrug-resistant TB cases in the cohort.
       mdr_succ:
         title: Multidrug-resistant TB cases - treatment success
-        description_short: Number of multidrug-resistant TB cases who were cureed or completed treatment.
+        description_short: Number of multidrug-resistant TB cases who were cured or completed treatment.
       mdr_fail:
         title: Multidrug-resistant TB cases - treatment failure
-        description_short: Number of multidrug-resistant TB cases were the treatment failed.
+        description_short: Number of multidrug-resistant TB cases where the treatment failed.
       mdr_died:
         title: Multidrug-resistant TB cases - died
         description_short: Number of multidrug-resistant TB cases who died.
@@ -109,10 +109,10 @@ tables:
         description_short: Number of extensively drug-resistant TB cases in the cohort.
       xdr_succ:
         title: Extensively drug-resistant TB cases - treatment success
-        description_short: Number of extensively drug-resistant TB cases who were cureed or completed treatment.
+        description_short: Number of extensively drug-resistant TB cases who were cured or completed treatment.
       xdr_fail:
         title: Extensively drug-resistant TB cases - treatment failure
-        description_short: Number of extensively drug-resistant TB cases were the treatment failed.
+        description_short: Number of extensively drug-resistant TB cases where the treatment failed.
       xdr_died:
         title: Extensively drug-resistant TB cases - died
         description_short: Number of extensively drug-resistant TB cases who died.
