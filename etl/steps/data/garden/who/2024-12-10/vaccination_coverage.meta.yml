@@ -117,7 +117,7 @@ definitions:
     <%- elif antigen == "DTPCV1" %>
     one dose of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "DTPCV3" %>
-    three doses of the combined diphtheria, tetanus and pertussis vaccine
+    three doses of the combined diphtheria, tetanus and [pertussis](#dod:pertussis) vaccine
     <%- elif antigen == "MCV1" %>
     their first dose of the measles vaccine
     <%- elif antigen == "POL3" %>
