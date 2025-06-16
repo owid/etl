@@ -17,23 +17,18 @@ definitions:
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_mye: &desc_key_mye
-    - Adults around the world have spent different amounts of time in school — this indicator shows the average number of years completed by people aged 25 and older.
-    - It reflects the total years of formal education that adults have successfully finished, excluding any years they may have repeated.
-    - The data comes from censuses and household surveys, where adults report the highest level of education they completed. These levels are then matched to standard durations using the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) framework.
-    - This is a valuable indicator for understanding long-term trends in educational attainment and gender equality.
-    - However, it only measures how long people stayed in school — not what they learned or whether they received a quality education.
-    - Cross-country comparisons can be challenging. Education systems differ in how long programmes last, and qualifications may not be classified in the same way.
+    - Mean years of schooling shows the average number of years that adults in a country have spent in formal education, giving us a picture of how educated the population is overall.
+    - This number is calculated by asking adults about the highest level of school they completed, then figuring out how many years that typically takes. For example, someone who finished high school might have about 12 years of schooling.
+    - This indicator measures how much education adults have accumulated over their lifetimes, showing the results of past investments in schools and learning.
+    - The data comes from surveys and censuses where adults aged 25 and older report their educational background. Only formal schooling from primary school onwards is counted.
+    - Higher numbers mean adults in that country have generally stayed in school longer, showing stronger educational foundations. However, this doesn't tell us about the quality of education, learning outside of school, or whether younger people today are getting better education than the average suggests.
 
   desc_key_sle: &desc_key_sle
-    - Children around the world have different prospects for staying in school — this indicator shows how many years a child of school entrance age can expect to spend within a specified level of education.
-    - It reflects the expected duration of schooling based on current enrollment patterns, calculated as the sum of age-specific enrollment rates for the specified education levels.
-    - The calculation includes children of all ages enrolled in that level, with adjustments for enrollment not distributed by age. This is divided by the school-age population and multiplied by the duration of that education level.
-    - A higher school life expectancy indicates greater probability for children to spend more years in education and suggests better overall retention within the education system.
-    - The data comes from administrative school records and population estimates, typically provided by national statistical offices or UN sources.
-    - This indicator is valuable for assessing access to education and measuring progress toward universal education goals at different levels.
-    - However, the expected number of years does not necessarily coincide with the expected number of grades completed, because of grade repetition.
-    - The average may be pulled down by children who never enter school, while those who do attend may benefit from many more years of education than the overall average suggests.
-    - Cross-country comparisons should account for differences in education system structures and the typical duration of each level of education.
+  - Expected years of schooling estimates how long a child starting school today is likely to stay in education, assuming current enrollment patterns continue throughout their schooling years.
+  - It is calculated by combining enrollment rates at each level of education and age group, adjusted for the official age of attendance, resulting in the average number of years a child can expect to complete—including time spent repeating grades.
+  - The measure reflects access to education rather than completion or learning outcomes, and assumes current patterns remain stable over time.
+  - Expected years can be broken down into [pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education), showing the expected time spent at each stage.
+  - A higher value means students are expected to spend more time in school. For example, 2.5 years in pre-primary means most children will attend around 2.5 years of preschool; a country with 15 total expected years but only 0.5 in pre-primary likely has limited access to early childhood education.
 
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.

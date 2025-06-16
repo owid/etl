@@ -43,10 +43,8 @@ definitions:
     one-year-olds
     <%- elif antigen == "IPV2" %>
     one-year-olds
-
     <%- elif antigen == "MCV2X2" %>
     two year olds
-
     <%- endif %>
   antigen_title: |-
     <% if antigen == "BCG" %>
@@ -56,9 +54,9 @@ definitions:
     <%- elif antigen == "DTPCV3" %>
     who have had three doses of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "MCV1" %>
-    who have had their first dose of the measles vaccine
+    who have had one dose of the measles vaccine
     <%- elif antigen == "POL3" %>
-    who have had their third dose of the polio vaccine
+    who have had three doses of the polio vaccine
     <%- elif antigen == "RCV1" %>
     vaccinated against rubella
     <%- elif antigen == "HEPB3" %>
@@ -74,13 +72,44 @@ definitions:
     <%- elif antigen == "PCV3" %>
     who have had their third dose of the pneumococcal conjugate vaccine
     <%- elif antigen == "IPV1" %>
-    who have had their first dose of the inactivated polio vaccine
+    who have had their one dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
-    who have had their second dose of the inactivated polio vaccine
-
+    who have had their two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
-    who have had their second dose of the measles vaccine
+    who have had their two doses of the measles vaccine
 
+    <%- endif %>
+  antigen_title_negative: |-
+    <% if antigen == "BCG" %>
+    who have not been vaccinated against tuberculosis
+    <%- elif antigen == "DTPCV1" %>
+    who have not had the diphtheria, tetanus and pertussis vaccine
+    <%- elif antigen == "DTPCV3" %>
+    who have not had three doses of the diphtheria, tetanus and pertussis vaccine
+    <%- elif antigen == "MCV1" %>
+    who have not had the measles vaccine
+    <%- elif antigen == "POL3" %>
+    who have not had their third dose of the polio vaccine
+    <%- elif antigen == "RCV1" %>
+    who have not been vaccinated against rubella
+    <%- elif antigen == "HEPB3" %>
+    who have not had three doses of the hepatitis B vaccine
+    <%- elif antigen == "HIB3" %>
+    who have not been vaccinated against Haemophilus influenzae type b
+    <%- elif antigen == "HEPB_BD" %>
+    who have not had the hepatitis B vaccine within the first 24 hours of delivery
+    <%- elif antigen == "MCV2" %>
+    who are not fully vaccinated against measles
+    <%- elif antigen == "ROTAC" %>
+    who are not vaccinated against rotavirus
+    <%- elif antigen == "PCV3" %>
+    who have not had their third dose of the pneumococcal conjugate vaccine
+    <%- elif antigen == "IPV1" %>
+    who have not had the inactivated polio vaccine
+    <%- elif antigen == "IPV2" %>
+    who have not had two doses of the inactivated polio vaccine
+    <%- elif antigen == "MCV2X2" %>
+    who have not had two doses of of the measles vaccine
     <%- endif %>
   antigen_description: |-
     <% if antigen == "BCG" %>
@@ -88,7 +117,7 @@ definitions:
     <%- elif antigen == "DTPCV1" %>
     one dose of the diphtheria, tetanus and pertussis vaccine
     <%- elif antigen == "DTPCV3" %>
-    three doses of the combined diphtheria, tetanus and pertussis vaccine
+    three doses of the combined diphtheria, tetanus and [pertussis](#dod:pertussis) vaccine
     <%- elif antigen == "MCV1" %>
     their first dose of the measles vaccine
     <%- elif antigen == "POL3" %>
@@ -252,7 +281,7 @@ tables:
                   - 10000000
                   - 30000000
       unvaccinated:
-        title: Number of {definitions.antigen_age_group} who have not been {definitions.antigen_title}
+        title: Number of {definitions.antigen_age_group} {definitions.antigen_title_negative}
         description_short: The number of {definitions.antigen_age_group} who have not had {definitions.antigen_description} in a given year.
         unit: |-
           {definitions.antigen_age_group}
@@ -266,7 +295,7 @@ tables:
           name: "{definitions.antigen_display_name}"
         presentation:
           title_public: |-
-            Number of {definitions.antigen_age_group} who have not been {definitions.antigen_title}
+            Number of {definitions.antigen_age_group} {definitions.antigen_title_negative}
           grapher_config:
             note: |-
               {definitions.antigen_note}
