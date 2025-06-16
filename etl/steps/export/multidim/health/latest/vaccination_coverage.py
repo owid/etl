@@ -36,7 +36,7 @@ def run() -> None:
             "unvaccinated": "Number of one-year-olds who have not had each vaccination",
         },
         "subtitle": {
-            "coverage": "Share of one-year-olds who have been immunized against a disease or a pathogen.",
+            "coverage": "Share of one-year-olds who have been vaccinated against a disease or a pathogen.",
             "vaccinated": "Estimated number of one-year-olds who have received vaccinations for different diseases.",
             "unvaccinated": "Estimated number of one-year-olds who have not received vaccinations for different diseases.",
         },
