@@ -1284,13 +1284,13 @@ steps:
     - data://garden/tuberculosis/2025-06-16/budget
 
   # Tuberculosis laboratories - WHO
-data://meadow/tuberculosis/2025-06-16/laboratories:
-  - snapshot://tuberculosis/2025-06-16/laboratories.csv
-data://garden/tuberculosis/2025-06-16/laboratories:
-  - data://meadow/tuberculosis/2025-06-16/laboratories
-  - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
-  - data://garden/un/2024-07-12/un_wpp
-  - data://garden/regions/2023-01-01/regions
-  - data://garden/wb/2024-07-29/income_groups
-data://grapher/tuberculosis/2025-06-16/laboratories:
-  - data://garden/tuberculosis/2025-06-16/laboratories
+  data://meadow/tuberculosis/2025-06-16/laboratories:
+    - snapshot://tuberculosis/2025-06-16/laboratories.csv
+  data://garden/tuberculosis/2025-06-16/laboratories:
+    - data://meadow/tuberculosis/2025-06-16/laboratories
+    - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
+    - data://garden/un/2024-07-12/un_wpp
+    - data://garden/regions/2023-01-01/regions
+    - data://garden/wb/2024-07-29/income_groups
+  data://grapher/tuberculosis/2025-06-16/laboratories:
+    - data://garden/tuberculosis/2025-06-16/laboratories

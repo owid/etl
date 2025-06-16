@@ -36,7 +36,7 @@ def run() -> None:
     ds_regions = paths.load_dataset("regions")
     ds_income_groups = paths.load_dataset("income_groups")
 
-    ds_pop = ds_un_wpp["population"].reset_index()
+    tb_pop = ds_un_wpp["population"].reset_index()
     # Load data dictionary from snapshot.
     dd = snap.read(safe_types=False)
     # Read table from meadow dataset.
@@ -57,7 +57,7 @@ def run() -> None:
         min_num_values_per_year=1,
     )
     tb = calculate_positive_test_rate(tb)
-    tb = add_population_and_rates(tb, ds_pop)
+    tb = add_population_and_rates(tb, tb_pop)
     tb = tb.set_index(["country", "year"], verify_integrity=True)
 
     #
@@ -70,21 +70,15 @@ def run() -> None:
     ds_garden.save()
 
 
-def add_population_and_rates(tb: Table, ds_pop: Table) -> Table:
+def add_population_and_rates(tb: Table, tb_pop: Table) -> Table:
     """
     Adding the total population of each country-year to the table and then calculating the rates per million people.
 
     """
-    ds_pop = ds_pop[
-        (ds_pop["variant"] == "estimates")
-        & (ds_pop["age"] == "all")
-        & (ds_pop["sex"] == "all")
-        & (ds_pop["metric"] == "population")
-    ]
-    ds_pop = ds_pop.rename(columns={"location": "country", "value": "population"})
-    ds_pop = ds_pop[["country", "year", "population"]]
+    tb_pop = tb_pop[(tb_pop["variant"] == "estimates") & (tb_pop["age"] == "all") & (tb_pop["sex"] == "all")]
+    tb_pop = tb_pop[["country", "year", "population"]]
 
-    tb_pop = pr.merge(tb, ds_pop, on=["country", "year"], how="left")
+    tb_pop = pr.merge(tb, tb_pop, on=["country", "year"], how="left")
     tb_pop["culture_rate"] = (tb_pop["culture"] / tb_pop["population"]) * 1000000
     tb_pop["m_wrd_rate"] = (tb_pop["m_wrd"] / tb_pop["population"]) * 1000000
     # Converting to float16 to reduce warnings
