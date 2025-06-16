@@ -14,3 +14,7 @@ meta:
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/data-policy
+outs:
+  - md5: 47ecb417d54f2a4e9ec339f67599261f
+    size: 410651
+    path: laboratories.csv
