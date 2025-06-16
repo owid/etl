@@ -1277,8 +1277,8 @@ steps:
     - snapshot://tuberculosis/2025-06-16/budget.csv
   data://garden/tuberculosis/2025-06-16/budget:
     - data://meadow/tuberculosis/2025-06-16/budget
-data://grapher/tuberculosis/2025-06-16/budget:
-  - data://garden/tuberculosis/2025-06-16/budget
+  data://grapher/tuberculosis/2025-06-16/budget:
+    - data://garden/tuberculosis/2025-06-16/budget
 
   # Tuberculosis laboratories - WHO
 data://meadow/tuberculosis/2025-06-16/laboratories:
