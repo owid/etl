@@ -59,6 +59,7 @@ def run() -> None:
                 },
                 "view_metadata": {
                     "title": "{title}",
+                    "title_public": "{title_public}",
                     "description_short": "{subtitle}",
                 },
             }
