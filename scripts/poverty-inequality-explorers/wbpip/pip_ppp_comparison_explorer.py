@@ -1098,14 +1098,15 @@ df_graphers["note"] = df_graphers["note"].str.replace(
     regex=False,
 )
 
+# NOTE: Update when prices are updated
 # Reorder dropdown menus
 povline_dropdown_list = [
-    "$1.90 per day: International Poverty Line",
     "$2.15 per day: International Poverty Line",
-    "$3.20 per day: Lower-middle income poverty line",
+    "$3 per day: International Poverty Line",
     "$3.65 per day: Lower-middle income poverty line",
-    "$5.50 per day: Upper-middle income poverty line",
+    "$4.20 per day: Lower-middle income poverty line",
     "$6.85 per day: Upper-middle income poverty line",
+    "$8.30 per day: Upper-middle income poverty line",
     "$1 per day",
     "$10 per day",
     "$20 per day",
