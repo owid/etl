@@ -31,23 +31,21 @@ steps:
   data://meadow/war/2023-01-10/sutton_1971:
     - snapshot://war/2023-01-09/sutton_1971.csv
 
-  # UCDP
-  data://meadow/war/2024-08-26/ucdp:
-    - snapshot://war/2024-08-26/ucdp_non_state.zip
-    - snapshot://war/2024-08-26/ucdp_ged.zip
-    - snapshot://war/2024-08-26/ucdp_battle_related_dyadic.zip
-    - snapshot://war/2024-08-26/ucdp_prio_armed_conflict.zip
-    - snapshot://war/2024-08-26/ucdp_battle_related_conflict.zip
-    - snapshot://war/2024-08-26/ucdp_one_sided.zip
-  data://garden/war/2024-08-26/ucdp:
-    - data://meadow/war/2024-08-26/ucdp
-    - data://garden/geography/2023-11-28/nat_earth_110
+    # UCDP
+  data://meadow/war/2025-06-13/ucdp:
+    - snapshot://war/2025-06-13/ucdp_battle_related_conflict.zip
+    - snapshot://war/2025-06-13/ucdp_non_state.zip
+    - snapshot://war/2025-06-13/ucdp_prio_armed_conflict.zip
+    - snapshot://war/2025-06-13/ucdp_battle_related_dyadic.zip
+    - snapshot://war/2025-06-13/ucdp_ged.zip
+    - snapshot://war/2025-06-13/ucdp_one_sided.zip
+  data://garden/war/2025-06-13/ucdp:
+    - data://meadow/war/2025-06-13/ucdp
     - data://garden/demography/2024-07-15/population
+    - data://garden/geography/2023-11-28/nat_earth_110
     - data://garden/countries/2024-08-27/gleditsch
-  data://grapher/war/2024-08-26/ucdp:
-    - data://garden/war/2024-08-26/ucdp
-  export://multidim/war/latest/ucdp:
-    - data://grapher/war/2024-08-26/ucdp
+  data://grapher/war/2025-06-13/ucdp:
+    - data://garden/war/2025-06-13/ucdp
 
   # UCDP (with candidate data, latest available)
   data://meadow/war/latest/ucdp_ced:
@@ -72,15 +70,15 @@ steps:
     - data://garden/war/2023-09-21/prio_v31
 
   # UCDP/PRIO
-  data://garden/war/2024-08-26/ucdp_prio:
-    - data://garden/war/2024-08-26/ucdp
-    - data://garden/war/2023-09-21/prio_v31
+  data://garden/war/2025-06-16/ucdp_prio:
+    - data://garden/war/2025-06-13/ucdp
     - data://garden/countries/2024-08-27/gleditsch
-  data://grapher/war/2024-08-26/ucdp_prio:
-    - data://garden/war/2024-08-26/ucdp_prio
+    - data://garden/war/2023-09-21/prio_v31
+  data://grapher/war/2025-06-16/ucdp_prio:
+    - data://garden/war/2025-06-16/ucdp_prio
   export://multidim/war/latest/ucdp_prio:
-    - data://grapher/war/2024-08-26/ucdp_prio
-    - data://grapher/war/2024-08-26/ucdp
+    - data://grapher/war/2025-06-16/ucdp_prio
+    - data://grapher/war/2025-06-13/ucdp
 
   # COW - Wars
   data://meadow/war/2023-09-21/cow:
@@ -291,18 +289,22 @@ steps:
   # Federation of American Scientists - Estimated Global Nuclear Warhead Inventories.
   data://grapher/war/2025-05-15/nuclear_weapons_inventories:
     - data://garden/war/2025-05-15/nuclear_weapons_inventories
+
+  ########## TO ARCHIVE
   # UCDP
-  data://meadow/war/2025-06-13/ucdp:
-    - snapshot://war/2025-06-13/ucdp_battle_related_conflict.zip
-    - snapshot://war/2025-06-13/ucdp_non_state.zip
-    - snapshot://war/2025-06-13/ucdp_prio_armed_conflict.zip
-    - snapshot://war/2025-06-13/ucdp_battle_related_dyadic.zip
-    - snapshot://war/2025-06-13/ucdp_ged.zip
-    - snapshot://war/2025-06-13/ucdp_one_sided.zip
-  data://garden/war/2025-06-13/ucdp:
-    - data://meadow/war/2025-06-13/ucdp
-    - data://garden/demography/2024-07-15/population
+  data://meadow/war/2024-08-26/ucdp:
+    - snapshot://war/2024-08-26/ucdp_non_state.zip
+    - snapshot://war/2024-08-26/ucdp_ged.zip
+    - snapshot://war/2024-08-26/ucdp_battle_related_dyadic.zip
+    - snapshot://war/2024-08-26/ucdp_prio_armed_conflict.zip
+    - snapshot://war/2024-08-26/ucdp_battle_related_conflict.zip
+    - snapshot://war/2024-08-26/ucdp_one_sided.zip
+  data://garden/war/2024-08-26/ucdp:
+    - data://meadow/war/2024-08-26/ucdp
     - data://garden/geography/2023-11-28/nat_earth_110
+    - data://garden/demography/2024-07-15/population
     - data://garden/countries/2024-08-27/gleditsch
-  data://grapher/war/2025-06-13/ucdp:
-    - data://garden/war/2025-06-13/ucdp
+  data://grapher/war/2024-08-26/ucdp:
+    - data://garden/war/2024-08-26/ucdp
+  export://multidim/war/latest/ucdp:
+    - data://grapher/war/2024-08-26/ucdp
