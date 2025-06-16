@@ -50,7 +50,7 @@ dimensions:
       - slug: girls
         name: Girls/women
       - slug: boys
-        name: Boys/ men
+        name: Boys/men
       - slug: "sex_side_by_side"
         name: Girls and boys
         description: Compare genders
