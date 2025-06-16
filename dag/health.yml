@@ -1277,6 +1277,9 @@ steps:
     - snapshot://tuberculosis/2025-06-16/budget.csv
   data://garden/tuberculosis/2025-06-16/budget:
     - data://meadow/tuberculosis/2025-06-16/budget
+    - data://garden/regions/2023-01-01/regions
+    - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
+    - data://garden/wb/2024-07-29/income_groups
   data://grapher/tuberculosis/2025-06-16/budget:
     - data://garden/tuberculosis/2025-06-16/budget
 
