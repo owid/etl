@@ -1329,3 +1329,12 @@ steps:
     - data://garden/regions/2023-01-01/regions
   data://grapher/tuberculosis/2025-06-16/burden_disaggregated:
     - data://garden/tuberculosis/2025-06-16/burden_disaggregated
+
+    # Tuberculosis outcomes - WHO
+  data://meadow/tuberculosis/2025-06-16/outcomes:
+    - snapshot://tuberculosis/2025-06-16/outcomes.csv
+  data://garden/tuberculosis/2025-06-16/outcomes:
+    - data://meadow/tuberculosis/2025-06-16/outcomes
+    - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
+  data://grapher/tuberculosis/2025-06-16/outcomes:
+    - data://garden/tuberculosis/2025-06-16/outcomes
