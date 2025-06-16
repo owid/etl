@@ -14,6 +14,55 @@ MULTIDIM_CONFIG = {
     "addCountryMode": "change-country",
 }
 
+# Common mappings for title generation
+GENDER_MAPPINGS = {
+    "title": {"both": "people", "boys": "boys", "girls": "girls", "sex_side_by_side": "people"},
+    "tertiary": {"both": "people", "boys": "men", "girls": "women", "sex_side_by_side": "people"},
+}
+
+LEVEL_MAPPINGS = {
+    "title": {
+        "primary": "primary education",
+        "preprimary": "pre-primary education",
+        "secondary": "secondary education",
+        "tertiary": "tertiary education",
+        "all": "all education levels",
+        "level_side_by_side": "education",
+    },
+}
+
+METRIC_MAPPINGS = {
+    "expected_years_schooling": "Expected years of schooling",
+    "average_years_schooling": "Average years of schooling",
+    "learning_adjusted_years_schooling": "Learning-adjusted years of schooling",
+}
+
+
+def _get_gender_term(sex, level, context="title"):
+    """Get appropriate gender term based on context and level."""
+    if level == "tertiary" and sex in GENDER_MAPPINGS["tertiary"]:
+        return GENDER_MAPPINGS["tertiary"][sex]
+    return GENDER_MAPPINGS[context].get(sex, "")
+
+
+def generate_title_by_gender_level_and_metric(sex, level, metric_type):
+    """Generate title based on gender, education level, and metric type."""
+    gender_term = _get_gender_term(sex, level, "title")
+    level_term = LEVEL_MAPPINGS["title"].get(level, "")
+    metric_term = METRIC_MAPPINGS.get(metric_type, "")
+
+    if not level_term:
+        raise ValueError(f"Unknown education level: {level}")
+    if not metric_term:
+        raise ValueError(f"Unknown metric type: {metric_type}")
+
+    if level == "level_side_by_side":
+        return f"{metric_term} among {gender_term} by education level"
+    elif level == "all":
+        return f"{metric_term} among {gender_term}"
+    else:
+        return f"{metric_term} among {gender_term} in {level_term}"
+
 
 def run() -> None:
     #
@@ -151,6 +200,18 @@ def run() -> None:
     )
 
     for view in c.views:
+        # Update title and subtitle based on view dimensions
+        sex = view.dimensions["sex"]
+        level = view.dimensions["level"]
+        metric_type = view.dimensions["metric_type"]
+
+        # Create a copy of the config to avoid shared references
+        view.config = view.config.copy()
+
+        # Generate dynamic title
+        if sex and level and metric_type:
+            view.config["title"] = generate_title_by_gender_level_and_metric(sex, level, metric_type)
+
         edit_indicator_displays(view)
 
     #
@@ -249,6 +310,7 @@ def edit_indicator_displays(view):
     if view.dimensions["level"] == "level_side_by_side":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
+            display_name = None
             if "expectancy__primary" in indicator.catalogPath:
                 display_name = "Primary"
             elif "expectancy__pre_primary" in indicator.catalogPath:
@@ -260,6 +322,7 @@ def edit_indicator_displays(view):
             elif "all" in indicator.catalogPath or "eys" in indicator.catalogPath or "mys" in indicator.catalogPath:
                 display_name = "All levels"
 
-            indicator.display = {
-                "name": display_name,
-            }
+            if display_name:
+                indicator.display = {
+                    "name": display_name,
+                }
