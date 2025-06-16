@@ -199,14 +199,6 @@ def run() -> None:
     tb = tb.format(["country", "year"])
     tb_regions = tb_regions.format(["country", "year"], short_name="un_members_in_regions")
 
-    ####################################################################################################################
-    # When combining tables with population, there is a known issue, and population's attribution gets propagated and overrides the true origins of the indicators in grapher.
-    # For now, remove that presentation attribution.
-    # TODO: Remove this temporary solution once the issues is fixed.
-    for column in ["membership_pop", "non_membership_pop"]:
-        tb_regions[column].metadata.presentation.attribution = None
-    ####################################################################################################################
-
     #
     # Save outputs.
     #
