@@ -23,7 +23,7 @@ tables:
       description_processing: |-
         We source the data from Gapminder for the years 2006 to 2020, and directly from the Economist Intelligence Unit for more recent years.
 
-        For the world as a whole and for each region (as [defined by us](https://ourworldindata.org/grapher/continents-according-to-our-world-in-data)), we calculate both simple country averages and [population-weighted](https://ourworldindata.org/explorers/democracy?country=OWID_WRL~OWID_AFR~OWID_ASI~OWID_EUR~OWID_NAM~OWID_OCE~OWID_SAM&Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=%C2%AD%C2%AD%C2%AD%C2%AD%C2%AD%C2%AD%C2%ADMain+index+weighted+by+population) averages. A population-weighted average gives more important to countries with larger populations, so that the results better reflect the experiences of the average person.
+        For the world as a whole and for each region (as [defined by us](https://ourworldindata.org/grapher/continents-according-to-our-world-in-data)), we calculate both simple country averages and [population-weighted](https://ourworldindata.org/explorers/democracy?country=OWID_WRL~OWID_AFR~OWID_ASI~OWID_EUR~OWID_NAM~OWID_OCE~OWID_SAM&Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=%C2%AD%C2%AD%C2%AD%C2%AD%C2%AD%C2%AD%C2%ADMain+index+weighted+by+population) averages. A population-weighted average assigns more weight to countries with larger populations, so that the results better reflect the experiences of the average person.
 
     variables:
       democracy_eiu:
