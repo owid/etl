@@ -2,10 +2,7 @@ title:
   title: Years of schooling
   title_variant: by level of education and gender
 default_selection:
-  - United States
-  - China
-  - India
-  - Chad
+  - Germany
 dimensions:
   - slug: metric_type
     name: Metric
