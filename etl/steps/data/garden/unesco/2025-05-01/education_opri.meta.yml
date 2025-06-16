@@ -17,16 +17,16 @@ definitions:
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_mye: &desc_key_mye
-          - Mean years of schooling shows the average number of years that adults in a country have spent in formal education, giving us a picture of how educated the population is overall.
-          - This number is calculated by asking adults about the highest level of school they completed, then figuring out how many years that typically takes. For example, someone who finished high school might have about 12 years of schooling.
-          - This indicator measures how much education adults have accumulated over their lifetimes, showing the results of past investments in schools and learning.
-          - The data comes from surveys and censuses where adults aged 25 and older report their educational background. Only formal schooling from primary school onwards is counted.
-          - Higher numbers mean adults in that country have generally stayed in school longer, showing stronger educational foundations. However, this doesn't tell us about the quality of education, learning outside of school, or whether younger people today are getting better education than the average suggests.
+    - Mean years of schooling shows the average number of years that adults in a country have spent in formal education, giving us a picture of how educated the population is overall.
+    - This number is calculated by asking adults about the highest level of school they completed, then figuring out how many years that typically takes. For example, someone who finished high school might have about 12 years of schooling.
+    - This indicator measures how much education adults have accumulated over their lifetimes, showing the results of past investments in schools and learning.
+    - The data comes from surveys and censuses where adults aged 25 and older report their educational background. Only formal schooling from primary school onwards is counted.
+    - Higher numbers mean adults in that country have generally stayed in school longer, showing stronger educational foundations. However, this doesn't tell us about the quality of education, learning outside of school, or whether younger people today are getting better education than the average suggests.
 
   desc_key_sle: &desc_key_sle
    - Expected years of schooling tells us how many years a child starting school today can expect to spend in education, based on how many students are currently enrolled at each level.
    - This number is calculated by adding up enrollment rates across all ages and education levels. If 90% of 6-year-olds are in school, 85% of 16-year-olds are in school, and so on, these percentages get combined to predict total schooling years.
-   - "The measure can be broken down by education level: pre-[pre-primary](#dod:pre-primary-education) (preschool, ages 3-5), [primary](#dod:primary-education) (elementary school, usually 6 years), [secondary](#dod:secondary-education) (middle and high school, typically 6 years total), and [tertiary](#dod:tertiary-education) (college, university, and vocational training after high school). Each level shows how many years children can expect to spend at that specific stage."
+   - "The measure can be broken down by education level: [pre-primary](#dod:pre-primary-education) (preschool, ages 3-5), [primary](#dod:primary-education) (elementary school, usually 6 years), [secondary](#dod:secondary-education) (middle and high school, typically 6 years total), and [tertiary](#dod:tertiary-education) (college, university, and vocational training after high school). Each level shows how many years children can expect to spend at that specific stage."
    - The calculation assumes today's enrollment patterns will stay the same as children grow up, and it includes time spent repeating grades. However, it measures access to education rather than whether students actually finish their studies or learn effectively.
    - Higher numbers mean the education system provides more opportunities for students to stay in school longer. For example, if pre-primary expected years is 2.5, it means most children can expect about 2.5 years of preschool education. A country might have 15 total expected years but only 0.5 years in pre-primary, showing limited early childhood education access.
 
