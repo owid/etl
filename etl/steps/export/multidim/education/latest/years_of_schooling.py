@@ -14,10 +14,11 @@ MULTIDIM_CONFIG = {
     "addCountryMode": "change-country",
 }
 
-# Common mappings for title generation
+# Common mappings for title and subtitle generation
 GENDER_MAPPINGS = {
-    "title": {"both": "people", "boys": "boys", "girls": "girls", "sex_side_by_side": "people"},
-    "tertiary": {"both": "people", "boys": "men", "girls": "women", "sex_side_by_side": "people"},
+    "title": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "girls and boys"},
+    "subtitle": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "boys and girls"},
+    "tertiary": {"both": "young people", "boys": "men", "girls": "women", "sex_side_by_side": "men and women"},
 }
 
 LEVEL_MAPPINGS = {
@@ -29,12 +30,26 @@ LEVEL_MAPPINGS = {
         "all": "all education levels",
         "level_side_by_side": "education",
     },
+    "subtitle": {
+        "primary": "[primary](#dod:primary-education)",
+        "preprimary": "[pre-primary](#dod:pre-primary-education)",
+        "secondary": "[secondary](#dod:secondary-education)",
+        "tertiary": "[tertiary](#dod:tertiary-education)",
+        "all": "all education levels",
+        "level_side_by_side": "[pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education)",
+    },
 }
 
 METRIC_MAPPINGS = {
     "expected_years_schooling": "Expected years of schooling",
     "average_years_schooling": "Average years of schooling",
     "learning_adjusted_years_schooling": "Learning-adjusted years of schooling",
+}
+
+METRIC_DESCRIPTION_MAP = {
+    "expected_years_schooling": "Expected years of schooling is the number of years a person is expected to spend in school or university, including years spent on repetition.",
+    "average_years_schooling": "Average years of schooling is the average number of completed years of education of a population.",
+    "learning_adjusted_years_schooling": "Learning-adjusted years of schooling is the expected years of schooling adjusted for quality of learning.",
 }
 
 
@@ -62,6 +77,25 @@ def generate_title_by_gender_level_and_metric(sex, level, metric_type):
         return f"{metric_term} among {gender_term}"
     else:
         return f"{metric_term} among {gender_term} in {level_term}"
+
+
+def generate_subtitle_by_level(level, sex, metric_type):
+    """Generate subtitle based on education level, gender, and metric type with links."""
+    level_term = LEVEL_MAPPINGS["subtitle"].get(level, "")
+    gender_term = _get_gender_term(sex, level, "subtitle")
+    metric_description = METRIC_DESCRIPTION_MAP.get(metric_type, "")
+
+    if not level_term:
+        raise ValueError(f"Unknown education level: {level}")
+    if not metric_description:
+        raise ValueError(f"Unknown metric type: {metric_type}")
+
+    if level_term and gender_term:
+        return f"{metric_description} This is shown for {gender_term} in {level_term} education."
+    elif level_term:
+        return f"{metric_description} This is shown for {level_term} education."
+    else:
+        return metric_description
 
 
 def run() -> None:
@@ -211,6 +245,10 @@ def run() -> None:
         # Generate dynamic title
         if sex and level and metric_type:
             view.config["title"] = generate_title_by_gender_level_and_metric(sex, level, metric_type)
+
+        # Generate dynamic subtitle
+        if level and metric_type:
+            view.config["subtitle"] = generate_subtitle_by_level(level, sex, metric_type)
 
         edit_indicator_displays(view)
 
