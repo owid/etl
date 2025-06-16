@@ -4,6 +4,19 @@ def create_full_queries():
     return queries
 
 
+def create_single_queries():
+    queries = create_queries()
+    single_queries = {}
+    for term, query_dict in queries.items():
+        single_terms = queries[term]["single_terms"]
+        query_str = " OR ".join(f'"{term}"' for term in single_terms)
+        if queries[term]["exclude_terms"]:
+            ex_terms = '" OR "'.join(queries[term]["exclude_terms"])
+            query_str += f' NOT ("{ex_terms}")'
+        single_queries[term] = query_str
+    return single_queries
+
+
 def create_queries():
     """Create queries for each cause of death.
     Each query should be a dictionary with the following format:
@@ -155,7 +168,8 @@ def create_queries():
             "stroke transient ischemic attack",
             "stroke cerebral",
             "stroke hemorrhage",
-            "stroke neurolog*" "thrombosis brain",
+            "stroke neurolog*",
+            "thrombosis brain",
             "thrombosis stroke",
             "embolism brain",
             "embolism stroke",
@@ -233,6 +247,7 @@ def create_queries():
         "combinations": [
             "Alzheimer Alzheimer",
             "dementia dementia",
+            "Alzheimer dementia",
         ],
         "exclude_terms": [],
     }
@@ -494,7 +509,7 @@ def create_queries():
             "kill killer",
             "kill killing",
         ],
-        "excluded_terms": [],
+        "exclude_terms": [],  # ["war", "soldier", "military"],
     }
 
     query_terrorism_dict = {
@@ -514,9 +529,9 @@ def create_queries():
         "combinations": [
             "terrorist terror*",
             "terrorism terror*",
-            "extremism violence",
-            "extremism kill",
-            "extremism terror*",
+            "extremis* violence",
+            "extremis* kill",
+            "extremis* terror*",
             "radicalization violence",
             "radicalization kill",
             "radicalization terrorism",
@@ -530,7 +545,7 @@ def create_queries():
             "terrorism bomb",
             "terrorism hostage",
         ],
-        "excluded_terms": [],
+        "exclude_terms": [],
     }
 
     query_war_dict = {
@@ -591,7 +606,7 @@ def create_queries():
             "hostilities military",
             "genocide military",
         ],
-        "excluded_terms": ["trade war"],
+        "exclude_terms": ["trade war"],
     }
 
     all_queries = {
@@ -632,7 +647,12 @@ def create_query_str(query_dict, proximity=1000):
 
     for term in query_dict["single_terms"][:-1]:
         query_str += f'"{term}" OR '
-    query_str += f'"{query_dict["single_terms"][-1]})"'
+    query_str += f'"{query_dict["single_terms"][-1]}")'
+
+    if query_dict["exclude_terms"]:
+        ex_terms = '" OR "'.join(query_dict["exclude_terms"])
+        query_str += f' NOT ("{ex_terms}")'
+
     return query_str
 
 

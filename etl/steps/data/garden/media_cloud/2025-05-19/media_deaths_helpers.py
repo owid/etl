@@ -26,11 +26,87 @@ import matplotlib.pyplot as plt
 import mediacloud.api
 import pandas as pd
 from dotenv import load_dotenv
-from media_deaths_queries import create_full_queries, create_queries, create_single_queries
+from media_deaths_queries import create_full_queries, create_queries
 
 from etl.helpers import PathFinder
 
 PATHS = PathFinder(__file__)
+
+
+def load_gbd_data():
+    # ds_leading_causes = PATHS.load_dataset("leading_causes_deaths")
+    # ds_cause = PATHS.load_dataset("gbd_cause")
+    ds_hierarchy = PATHS.load_dataset("cause_hierarchy")
+
+    # tb_c = ds_cause.read("gbd_cause_deaths")
+    tb_h = ds_hierarchy.read("cause_hierarchy")
+
+    tb_h[["level1", "level2", "level3", "level4"]] = tb_h["cause_outline"].str.split(".", expand=True)
+
+
+def plot_differences_in_articles():
+    verbose = False
+    plotting = False
+
+    c_dict = {}
+    tb_dicts = []
+    for cause in CAUSES_OF_DEATH:
+        mult_mentions = pd.read_csv(
+            f"/Users/tunaacisu/Data/Media Deaths/NYT_articles/{cause}_multiple_terms_2025_06_12_multiple_mentions.csv"
+        )
+        singl_mentions = pd.read_csv(
+            f"/Users/tunaacisu/Data/Media Deaths/NYT_articles/{cause}_single_queries_all_stories_2025_06_12_multiple_mentions.csv"
+        )
+        c_dict[cause] = {
+            "multiple_mentions": mult_mentions,
+            "single_mentions": singl_mentions,
+            "hits_multiple": len(mult_mentions),
+            "hits_single": len(singl_mentions),
+        }
+        tb_dicts.append({"cause": cause, "hits_multiple": len(mult_mentions), "hits_single": len(singl_mentions)})
+
+    for cause in CAUSES_OF_DEATH:
+        mult_mentions = c_dict[cause]["multiple_mentions"]
+        dupl_mult = mult_mentions[mult_mentions.duplicated(subset=["title"], keep="first")]
+        print(f"mult duplicates for {cause} - {len(dupl_mult)}/ {len(mult_mentions)}")
+
+        singl_mentions = c_dict[cause]["single_mentions"]
+        dupl_singl = singl_mentions[singl_mentions.duplicated(subset=["title"], keep="first")]
+        print(f"singl duplicates for {cause} - {len(dupl_singl)}/ {len(singl_mentions)}")
+        titles = mult_mentions["title"].unique()
+        removed = singl_mentions[~singl_mentions["title"].isin(titles)]
+        if verbose:
+            for _, row in mult_mentions.iterrows():
+                print(f'{row["title"]} - {row["url"]}')
+        mult_mentions[["http", "empty", "site", "year", "month", "day", "section"]] = (
+            mult_mentions["url"].str.split("/", expand=True).iloc[:, :7]
+        )
+        singl_mentions[["http", "empty", "site", "year", "month", "day", "section"]] = (
+            singl_mentions["url"].str.split("/", expand=True).iloc[:, :7]
+        )
+        removed[["http", "empty", "site", "year", "month", "day", "section"]] = (
+            removed["url"].str.split("/", expand=True).iloc[:, :7]
+        )
+        if plotting:
+            singl_mentions["section"].value_counts().head(10).plot(kind="bar")
+            plt.xticks(rotation=90)  # Rotate x-axis labels vertically
+            plt.title(f"Section for single mention of {cause}")
+            plt.tight_layout()  # Helps prevent label cutoff
+            plt.show()
+
+            mult_mentions["section"].value_counts().head(10).plot(kind="bar")
+            plt.xticks(rotation=90)  # Rotate x-axis labels vertically
+            plt.title("Section for multiple mentions of " + cause)
+            plt.tight_layout()  # Helps prevent label cutoff
+            plt.show()
+
+            removed["section"].value_counts().head(10).plot(kind="bar")
+            plt.xticks(rotation=90)  # Rotate x-axis labels vertically
+            plt.title("Section for removed stories of " + cause)
+            plt.tight_layout()  # Helps prevent label cutoff
+            plt.show()
+    return pd.DataFrame(tb_dicts)
+
 
 load_dotenv()
 
@@ -39,7 +115,7 @@ NYT_API_TOKEN = os.getenv("NYT_API_TOKEN")
 
 YEAR = 2023
 TODAY_STR = dt.date.today().strftime("%Y_%m_%d")
-SAVE_TOKEN = f"{TODAY_STR}_"
+SAVE_TOKEN = f"{TODAY_STR}_multiple_mentions"
 
 CAUSES_OF_DEATH_PATH = f"/Users/tunaacisu/Data/Media Deaths/Underlying Cause of Death_{YEAR}.csv"
 EXTERNAL_CAUSES_PATH = f"/Users/tunaacisu/Data/Media Deaths/Underlying Cause of Death_{YEAR}_external_factors.csv"
@@ -64,7 +140,8 @@ END_2023 = dt.date(2023, 12, 31)
 
 QUERIES = create_queries()
 STR_QUERIES = create_full_queries()
-SINGLE_QUERIES = create_single_queries()
+
+SINGLE_QUERIES = {name: " OR ".join(f'"{term}"' for term in val["single_terms"]) for name, val in QUERIES.items()}
 
 # Initialize the Media Cloud API client
 search_api = mediacloud.api.SearchApi(MC_API_TOKEN)
@@ -108,79 +185,29 @@ WAR_DEATHS = 0  # from CDC Wonder database
 TERRORISM_DEATHS_2023 = 16  # from Global Terrorism Index
 TERRORISM_DEATHS_2022 = 11  # from Global Terrorism Index
 
+HEALTH_QUERY = "health OR disease OR illness OR sick OR sickness OR injury OR injuries OR fatality OR fatalities OR mortality OR mortalities OR drug OR hospital OR clinic OR doctor OR physician OR nurse OR medical OR healthcare OR treatment OR therapy OR care OR patient OR patients OR prescription OR medication OR vaccine OR vaccination OR immunization OR outbreak OR epidemic OR pandemic"
 
-def load_gbd_data():
-    # ds_leading_causes = PATHS.load_dataset("leading_causes_deaths")
-    # ds_cause = PATHS.load_dataset("gbd_cause")
-    ds_hierarchy = PATHS.load_dataset("cause_hierarchy")
-
-    # tb_c = ds_cause.read("gbd_cause_deaths")
-    tb_h = ds_hierarchy.read("cause_hierarchy")
-
-    tb_h[["level1", "level2", "level3", "level4"]] = tb_h["cause_outline"].str.split(".", expand=True)
+DEATH_QUERY = "death OR died OR dead OR fatality OR fatalities OR mortality OR mortalities OR dies OR dying OR die OR fatal OR deadliness OR lethality OR lethal OR kill OR killed OR killing OR killer OR kills"
 
 
-def plot_single_vs_multiple_mentions():
-    death_df = create_death_df()
-    start_time = time.time()
+def test_queries(term):
+    query_hits_list = []
+    query_df = []
+    queries_list = QUERIES[term]["combinations"]
+    for query in queries_list:
+        hits = query_results(query, source_ids=[NYT_ID])
+        query_hits_list.append({"cause": term, "search_term": query, "results": hits})
+        print(f"{query}:{hits}")
+        results = query_stories(query, source_ids=[NYT_ID])
+        if not results.empty:
+            results["search_term"] = query
+            results["cause"] = term
+            query_df.append(results)
 
-    source_ids = [NYT_ID, GUARDIAN_ID, WAPO_ID, FOX_ID]
-    sources = ["The New York Times", "The Guardian", "The Washington Post", "Fox News"]
-
-    mult_mentions = []
-
-    for s_id, s_name in zip(source_ids, sources):
-        mentions = get_mentions_from_source(
-            [s_id],
-            s_name,
-            STR_QUERIES,
-            death_df=death_df,
-            verbose=True,
-        )
-        mult_mentions.append(mentions.copy(deep=True))
-        print(f"Time taken for {s_name}: {time.time() - start_time:.2f} seconds")
-    mult_mentions_df = pd.concat(mult_mentions, ignore_index=True)
-    mult_mentions_df["multiple_mentions"] = mult_mentions_df["mentions"]
-    mult_mentions_df["multiple_mentions_share"] = mult_mentions_df["mentions_share"]
-    mult_mentions_df = mult_mentions_df.drop(columns=["mentions", "mentions_share"])
-
-    single_mentions = []
-    for s_id, s_name in zip(source_ids, sources):
-        mentions = get_mentions_from_source(
-            [s_id],
-            s_name,
-            SINGLE_QUERIES,
-            death_df=death_df,
-            verbose=True,
-        )
-        single_mentions.append(mentions.copy(deep=True))
-        print(f"Time taken for {s_name}: {time.time() - start_time:.2f} seconds")
-    single_mentions_df = pd.concat(single_mentions, ignore_index=True)
-    single_mentions_df["single_mentions"] = single_mentions_df["mentions"]
-    single_mentions_df["single_mentions_share"] = single_mentions_df["mentions_share"]
-    single_mentions_df = single_mentions_df.drop(columns=["mentions", "mentions_share"])
-
-    # merge the two DataFrames on 'cause' and 'source' and deaths and deaths_share columns
-    media_deaths_df = pd.merge(
-        mult_mentions_df,
-        single_mentions_df,
-        on=["cause", "source", "deaths", "deaths_share"],
-        how="left",
-    )
-
-    # plot single and multiple mentions for each source
-    for source in sources:
-        source_df = media_deaths_df[media_deaths_df["source"] == source]
-        if source_df.empty:
-            print(f"No data for {source}")
-            continue
-
-        plot_media_deaths(
-            source_df,
-            columns=["deaths_share", "multiple_mentions_share", "single_mentions_share"],
-            bar_labels=["Deaths", "Multiple Mentions", "Single Mentions"],
-            title=f"Media Mentions of Causes of Death - {source} ({YEAR})",
-        )
+        time.sleep(30)  # Sleep to avoid hitting API rate limits
+    if query_df:
+        query_df = pd.concat(query_df, ignore_index=True)
+    return pd.DataFrame(query_hits_list), query_df
 
 
 def create_death_df():
@@ -294,7 +321,7 @@ def print_example_stories(queries: dict, timeout: int = 35, source_ids=[NYT_ID],
 def add_shares(media_deaths_df: pd.DataFrame, columns=None):
     """Add shares of columns to DataFrame."""
     if columns is None:
-        columns = ["mentions", "deaths"]
+        columns = ["mentions", "mentions_incl_health", "deaths"]
 
     for col in columns:
         total = media_deaths_df[col].sum()
@@ -373,6 +400,45 @@ def plot_media_deaths(media_deaths_df, columns=None, bar_labels=None, title=None
     plt.show()
 
 
+def test_query_terms(
+    queries: dict,
+    single_terms=True,
+    double_terms=True,
+    source_ids=[NYT_ID],
+    start_date=START_CURR_YEAR,
+    end_date=END_CURR_YEAR,
+):
+    """Test how many results each query term (in single terms) returns and plot the results."""
+    query_counts = []
+    for name, query in queries.items():
+        if single_terms:
+            single_terms = query["single_terms"]
+            for term in single_terms:
+                count = query_results(f'"{term}"', source_ids, start_date=start_date, end_date=end_date)
+                query_counts.append({"cause": name, "query": term, "count": count})
+                print(f"{term}: {count}")
+                # print example stories for the term
+                print_example_stories({name: term}, source_ids=source_ids, n_stories=5)
+        if double_terms:
+            double_terms = query["combinations"]
+            for term in double_terms:
+                count = query_results(f'"{term}"~1000', source_ids, start_date=start_date, end_date=end_date)
+                query_counts.append({"cause": name, "query": term, "count": count})
+                print(f"{term}: {count}")
+                # print example stories for the term
+                print_example_stories({name: term}, source_ids=source_ids, n_stories=5)
+
+    df_counts = pd.DataFrame(query_counts)
+    for cause, c_dict in QUERIES.items():
+        df_s_cause = df_counts[df_counts["cause"].isin(c_dict["combinations"])]
+        ax = df_s_cause.plot(
+            x="query", y="count", kind="bar", title=f"hit counts for terms for {cause}", figsize=(6, 4)
+        )
+        ax.figure.tight_layout()
+        ax.figure.savefig(f"/Users/tunaacisu/Data/Media Deaths/Outputs/{cause}_terms_analysis_combinations.png")
+    return df_counts
+
+
 def get_mentions_from_source(
     source_ids: list,
     source_name: str,
@@ -382,6 +448,7 @@ def get_mentions_from_source(
     end_date=None,
     verbose: bool = False,
     collection_ids=None,
+    incl_health: bool = False,
 ):
     causes_to_exclude = ["war"]
     query_count = []
@@ -395,8 +462,20 @@ def get_mentions_from_source(
             cnt = query_results(
                 query, source_ids, start_date=start_date, end_date=end_date, collection_ids=collection_ids
             )
+            if incl_health:
+                _ = query_results(
+                    f"({query}) AND ({HEALTH_QUERY} OR {DEATH_QUERY})",
+                    source_ids,
+                    start_date=start_date,
+                    end_date=end_date,
+                    collection_ids=collection_ids,
+                )
         else:
             cnt = query_results(query, source_ids, collection_ids=collection_ids)
+            if incl_health:
+                _ = query_results(
+                    f"({query}) AND ({HEALTH_QUERY} OR {DEATH_QUERY})", source_ids, collection_ids=collection_ids
+                )
 
         n_deaths = death_df[death_df["cause"] == name]["deaths"].iloc[0]
         if verbose:
