@@ -211,25 +211,43 @@ def edit_faust(c):
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_indicator_displays(view)
 
+    subtitle_deaths = "Reported deaths of combatants and civilians due to fighting{placeholder} {dods} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+
     c.edit_views(
         [
             {"config": {"timelineMinTime": 1946}},
-            {"dimensions": {"indicator": "deaths"}, "config": {"title": "Deaths in {conflict_name}"}},
+            {
+                "dimensions": {"indicator": "deaths"},
+                "config": {
+                    "title": "Deaths in {conflict_name}",
+                    "subtitle": subtitle_deaths.format(placeholder=" in"),
+                },
+            },
             {
                 "dimensions": {"indicator": "death_rate"},
-                "config": {"title": "Death rate in {conflict_name}"},
+                "config": {
+                    "title": "Death rate in {conflict_name}",
+                    "subtitle": subtitle_deaths.format(placeholder=", per 100,000 people. Included are"),
+                },
             },
             {
                 "dimensions": {"indicator": "wars_ongoing"},
-                "config": {"title": "Number of {conflict_name}"},
+                "config": {
+                    "title": "Number of {conflict_name}",
+                    "subtitle": "Included are {dods} conflicts that were ongoing that year.",
+                },
             },
             {
                 "dimensions": {"indicator": "wars_ongoing_country_rate"},
-                "config": {"title": "Rate of {conflict_name}"},
+                "config": {
+                    "title": "Rate of {conflict_name}",
+                    "subtitle": "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts that were ongoing that year.",
+                },
             },
         ],
         params={
             "conflict_name": lambda view: _set_title_ending(view, choice_names),
+            "dods": lambda view: _set_dods(view),
         },
     )
 
@@ -256,23 +274,22 @@ def edit_indicator_displays(view):
                 }
 
 
-def _set_subtitle(view):
+def _set_dods(view):
     # DoD
     if view.dimensions["conflict_type"] in ("state-based", "state_based_stacked"):
-        dod = "[armed conflicts](#dod:armed-conflict-ucdp)"
+        dods = "[armed conflicts](#dod:armed-conflict-ucdp)"
     elif view.dimensions["conflict_type"] == "interstate":
-        dod = "[interstate conflicts](#dod:interstate-ucdp)"
+        dods = "[interstate conflicts](#dod:interstate-ucdp)"
     elif view.dimensions["conflict_type"] == "intrastate":
-        dod = "[civil conflicts](#dod:intrastate-ucdp)"
+        dods = "[civil conflicts](#dod:intrastate-ucdp)"
     elif view.dimensions["conflict_type"] == "non-state conflict":
-        dod = "[non-state conflicts](#dod:nonstate-ucdp)"
+        dods = "[non-state conflicts](#dod:nonstate-ucdp)"
     elif view.dimensions["conflict_type"] == "all_stacked":
-        dod = "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [violence against civilians](#dod:onesided-ucdp)"
+        dods = "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [violence against civilians](#dod:onesided-ucdp)"
     else:
         raise ValueError(f"Unknown conflict type: {view.dimensions['conflict_type']}")
 
-    if view.dimensions["indicator"] == "deaths":
-        t = "Reported deaths of combatants and civilians due to fighting in {dod} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+    return dods
 
 
 def _set_title_ending(view, choice_names):
