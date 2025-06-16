@@ -1349,3 +1349,6 @@ steps:
     - data://garden/wb/2024-07-29/income_groups
   data://grapher/tuberculosis/2025-06-16/drug_resistance_surveillance:
     - data://garden/tuberculosis/2025-06-16/drug_resistance_surveillance
+  # Tuberculosis budget - WHO
+  data://meadow/tuberculosis/2025-06-16/budget:
+    - snapshot://tuberculosis/2025-06-16/budget.csv
