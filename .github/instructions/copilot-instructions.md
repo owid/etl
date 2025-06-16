@@ -19,6 +19,7 @@ This repository contains the ETL (Extract, Transform, Load) system for Our World
 - Document functions and classes with docstrings
 - Add appropriate metadata to datasets according to our metadata schema
 - Write unit tests for new functionality
+- Imports should be always at the top of the file
 
 ## Process for Creating ETL Steps
 1. Create a snapshot of the raw data

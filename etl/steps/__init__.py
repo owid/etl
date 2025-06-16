@@ -90,21 +90,26 @@ def to_dependency_order(
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    subgraph = (
-        filter_to_subgraph(dag, includes, downstream=downstream, only=only, exact_match=exact_match)
-        if includes
-        else dag
-    )
+    # Always filter if we have includes OR excludes
+    if includes or excludes:
+        subgraph = filter_to_subgraph(
+            dag, includes, downstream=downstream, only=only, exact_match=exact_match, excludes=excludes
+        )
+    else:
+        subgraph = dag
+
     in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
 
-    # filter out explicit excludes
-    filtered = [s for s in in_order if not any(re.findall(pattern, s) for pattern in excludes)]
-
-    return filtered
+    return in_order
 
 
 def filter_to_subgraph(
-    graph: Graph, includes: Iterable[str], downstream: bool = False, only: bool = False, exact_match: bool = False
+    graph: Graph,
+    includes: Iterable[str],
+    downstream: bool = False,
+    only: bool = False,
+    exact_match: bool = False,
+    excludes: Optional[List[str]] = None,
 ) -> Graph:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
@@ -116,23 +121,49 @@ def filter_to_subgraph(
     dependent on B).
     """
     all_steps = graph_nodes(graph)
-    if exact_match:
-        included = set(includes) & all_steps
+    includes_list = list(includes)
+
+    # Handle exclusions first - find all steps that should be excluded
+    excluded_steps = set()
+    if excludes:
+        compiled_excludes = [re.compile(p) for p in excludes]
+        for step in all_steps:
+            if any(p.search(step) for p in compiled_excludes):
+                excluded_steps.add(step)
+
+    # Find downstream dependencies of excluded steps that should also be excluded
+    if excluded_steps:
+        downstream_of_excluded = set(traverse(reverse_graph(graph), excluded_steps))
+        excluded_steps.update(downstream_of_excluded)
+
+    # Remove excluded steps from consideration
+    available_steps = all_steps - excluded_steps
+
+    # If includes is empty, include all available steps
+    if not includes_list:
+        included = available_steps
+    elif exact_match:
+        included = set(includes_list) & available_steps
     else:
-        compiled_includes = [re.compile(p) for p in includes]
-        included = {s for s in all_steps if any(p.search(s) for p in compiled_includes)}
+        compiled_includes = [re.compile(p) for p in includes_list]
+        included = {s for s in available_steps if any(p.search(s) for p in compiled_includes)}
 
     if only:
-        # Only include explicitly selected nodes
-        return {step: graph.get(step, set()) & included for step in included}
+        # Only include explicitly selected nodes, but filter out excluded steps
+        return {step: graph.get(step, set()) & included for step in included if step not in excluded_steps}
 
     if downstream:
         # Reverse the graph to find all nodes dependent on included nodes (forward deps)
         forward_deps = set(traverse(reverse_graph(graph), included))
         included = included.union(forward_deps)
+        # Remove any excluded steps from the included set
+        included = included - excluded_steps
 
     # Now traverse the other way to find all dependencies of included nodes (backward deps)
-    return traverse(graph, included)
+    subgraph = traverse(graph, included)
+
+    # Ensure no excluded steps are in the final subgraph
+    return {step: deps - excluded_steps for step, deps in subgraph.items() if step not in excluded_steps}
 
 
 def traverse(graph: Graph, nodes: Set[str]) -> Graph:
