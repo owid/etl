@@ -1,4 +1,4 @@
-# top 10 causes of death:
+# top 10 causes of death in US:
 # 1 heart disease, I00-I09,I11,I13,I20-I51
 # 2 cancer C00-C97
 # 3 accidents (unintentional injuries), V01-X59,Y85-Y86
@@ -53,14 +53,6 @@ FOX_ID = 1092
 
 US_NATIONAL_COLLECTION_ID = 34412234
 
-START_CURR_YEAR = dt.date(YEAR, 1, 1)
-END_CURR_YEAR = dt.date(YEAR, 12, 31)
-
-START_2022 = dt.date(2022, 1, 1)
-END_2022 = dt.date(2022, 12, 31)
-
-START_2023 = dt.date(2023, 1, 1)
-END_2023 = dt.date(2023, 12, 31)
 
 QUERIES = create_queries()
 STR_QUERIES = create_full_queries()
@@ -87,6 +79,10 @@ CAUSES_OF_DEATH = [
     "homicide",
     "terrorism",
     "war",
+    "hiv",
+    "malaria",
+    "tb",
+    "diarrhea",
 ]
 
 CAUSES_MAP = {
@@ -109,15 +105,195 @@ TERRORISM_DEATHS_2023 = 16  # from Global Terrorism Index
 TERRORISM_DEATHS_2022 = 11  # from Global Terrorism Index
 
 
-def load_gbd_data():
-    # ds_leading_causes = PATHS.load_dataset("leading_causes_deaths")
-    # ds_cause = PATHS.load_dataset("gbd_cause")
+def get_start_end(year):
+    return (dt.date(year, 1, 1), dt.date(year, 12, 31))
+
+
+def global_causes_mentions(year):
+    death_df = load_gbd_data()
+    death_df = death_df[death_df["year"] == year]
+
+    source_ids = [NYT_ID, GUARDIAN_ID, WAPO_ID, FOX_ID]
+    sources = ["The New York Times", "The Guardian", "The Washington Post", "Fox News"]
+
+    mentions = []
+
+    for s_id, s_name in zip(source_ids, sources):
+        mentions = get_mentions_from_source(
+            [s_id], s_name, STR_QUERIES, death_df=death_df, verbose=True, causes_to_exclude=["war"], year=year
+        )
+        mentions.append(mentions.copy(deep=True))
+
+    all_mentions = pd.concat(
+        mentions,
+        ignore_index=True,
+    )
+
+    all_mentions["year"] = year
+
+    mentions_pv = pivot_media_mentions(all_mentions)
+
+    plot_media_deaths(
+        mentions_pv,
+        columns=[
+            "deaths_share",
+            "mentions_share The New York Times",
+            "mentions_share The Washington Post",
+            "mentions_share Fox News",
+        ],
+        bar_labels=["Deaths", "NYT", "WaPo", "Fox News"],
+        title=f"Media Mentions of Causes of Death - Global ({year})",
+    )
+
+    return all_mentions
+
+
+def load_gbd_data(year=None):
+    ds_cause = PATHS.load_dataset("gbd_cause")
     ds_hierarchy = PATHS.load_dataset("cause_hierarchy")
 
-    # tb_c = ds_cause.read("gbd_cause_deaths")
+    tb_c = ds_cause.read("gbd_cause_deaths")
+    tb_c_rel = tb_c[(tb_c["metric"] == "Number") & (tb_c["age"] == "All ages") & (tb_c["country"] == "World")]
+    tb_c_rel = tb_c_rel.drop(columns=["metric", "age"])
+
     tb_h = ds_hierarchy.read("cause_hierarchy")
 
     tb_h[["level1", "level2", "level3", "level4"]] = tb_h["cause_outline"].str.split(".", expand=True)
+
+    # only include level 3 causes
+    card_codes = [
+        "Aortic aneurysm",
+        "Atrial fibrillation and flutter",
+        "Cardiomyopathy and myocarditis",
+        "Endocarditis",
+        "Hypertensive heart disease",
+        "Ischemic heart disease",
+        "Lower extremity peripheral arterial disease",
+        "Non-rheumatic valvular heart disease",
+        "Other cardiovascular and circulatory diseases",
+        "Pulmonary Arterial Hypertension",
+        "Rheumatic heart disease",
+    ]  # without stroke
+    stroke_codes = ["Stroke"]
+    resp_codes = [
+        "Asthma",
+        "Chronic obstructive pulmonary disease",
+        "Interstitial lung disease and pulmonary sarcoidosis",
+        "Other chronic respiratory diseases",
+        "Pneumoconiosis",
+    ]
+    liver_codes = ["Cirrhosis and other chronic liver diseases"]
+    accid_codes = [
+        "Adverse effects of medical treatment",
+        "Animal contact",
+        "Drowning",
+        "Environmental heat and cold exposure",
+        "Exposure to forces of nature",
+        "Exposure to mechanical forces",
+        "Falls",
+        "Fire, heat, and hot substances",
+        "Foreign body",
+        "Other transport injuries",
+        "Other unintentional injuries",
+        "Poisonings",
+        "Road injuries",
+    ]  # includes transport injuries and unintentional injuries
+    alzh_codes = ["Alzheimer's disease and other dementias"]
+    drug_use_codes = ["Drug use disorders"]  # without alcoholism
+    suicide_codes = ["Self-harm"]
+    homicide_codes = ["Interpersonal violence"]  # not including war or police violence
+    war_terrorism_codes = ["Conflict and terrorism"]
+    cancer_codes = [
+        "Bladder cancer",
+        "Brain and central nervous system cancer",
+        "Breast cancer",
+        "Cervical cancer",
+        "Colon and rectum cancer",
+        "Esophageal cancer",
+        "Eye cancer",
+        "Gallbladder and biliary tract cancer",
+        "Hodgkin lymphoma",
+        "Kidney cancer",
+        "Larynx cancer",
+        "Leukemia",
+        "Lip and oral cavity cancer",
+        "Liver cancer",
+        "Malignant neoplasm of bone and articular cartilage",
+        "Malignant skin melanoma",
+        "Mesothelioma",
+        "Multiple myeloma",
+        "Nasopharynx cancer",
+        "Neuroblastoma and other peripheral nervous cell tumors",
+        "Non-Hodgkin lymphoma",
+        "Non-melanoma skin cancer",
+        "Other malignant neoplasms",
+        "Other neoplasms",
+        "Other pharynx cancer",
+        "Ovarian cancer",
+        "Pancreatic cancer",
+        "Prostate cancer",
+        "Soft tissue and other extraosseous sarcomas",
+        "Stomach cancer",
+        "Testicular cancer",
+        "Thyroid cancer",
+        "Tracheal, bronchus, and lung cancer",
+        "Uterine cancer",
+    ]
+    covid_codes = ["COVID-19"]
+    kidney_codes = ["Chronic kidney disease", "Acute glomerulonephritis"]
+    diabetes_codes = ["Diabetes mellitus"]
+    # influenza & pneumonia as upper and lower respiratory diseases
+    infl_codes = ["Lower respiratory infections", "Upper respiratory infections"]
+
+    # additional causes
+    hiv_codes = ["HIV/AIDS"]
+    malaria_codes = ["Malaria"]
+    tb_codes = ["Tuberculosis"]
+    diarrhea_codes = ["Diarrheal diseases"]
+    # acute_hep_codes = ["Acute hepatitis"]
+
+    # Map each cause in CAUSES_OF_DEATH to its corresponding code list
+    codes = {
+        "heart disease": card_codes,
+        "cancer": cancer_codes,
+        "accidents": accid_codes,
+        "stroke": stroke_codes,
+        "respiratory": resp_codes,
+        "alzheimers": alzh_codes,
+        "diabetes": diabetes_codes,
+        "kidney": kidney_codes,
+        "liver": liver_codes,
+        "covid": covid_codes,
+        "suicide": suicide_codes,
+        "influenza": infl_codes,
+        "drug overdose": drug_use_codes,
+        "homicide": homicide_codes,
+        "terrorism": war_terrorism_codes,
+        # "war": war_terrorism_codes,
+        "hiv": hiv_codes,
+        "malaria": malaria_codes,
+        "tb": tb_codes,
+        "diarrhea": diarrhea_codes,
+    }
+
+    all_codes = [code for c_list in codes.values() for code in c_list]
+    tb_c_rel = tb_c_rel[tb_c_rel["cause"].isin(all_codes)]
+    tb_c_rel["mapped_cause"] = tb_c_rel["cause"].apply(lambda x: find_mapping_cause(x, codes))
+
+    gb = tb_c_rel.groupby(["mapped_cause", "country", "year"])
+    tb_c = gb.sum().reset_index().drop(columns="cause")
+    tb_c = tb_c.rename(columns={"value": "deaths", "mapped_cause": "cause"}, errors="raise")
+
+    if not year:
+        return tb_c
+    else:
+        return tb_c[tb_c["year"] == year]
+
+
+def find_mapping_cause(cause, map):
+    for key, cause_list in map.items():
+        if cause in cause_list:
+            return key
 
 
 def plot_single_vs_multiple_mentions():
@@ -216,7 +392,8 @@ def create_death_df():
     return pd.DataFrame(deaths)
 
 
-def query_results(query, source_ids, start_date=START_CURR_YEAR, end_date=END_CURR_YEAR, collection_ids=None):
+def query_results(query, source_ids, year=YEAR, collection_ids=None):
+    start_date, end_date = get_start_end(year)
     if collection_ids:
         results = search_api.story_count(
             query=query, start_date=start_date, end_date=end_date, collection_ids=collection_ids
@@ -226,7 +403,8 @@ def query_results(query, source_ids, start_date=START_CURR_YEAR, end_date=END_CU
     return results["relevant"]
 
 
-def query_stories(query, source_ids, start_date=START_CURR_YEAR, end_date=END_CURR_YEAR, collection_ids=None):
+def query_stories(query, source_ids, year=YEAR, collection_ids=None):
+    start_date, end_date = get_start_end(year)
     if collection_ids:
         results = search_api.story_list(
             query=query, start_date=start_date, end_date=end_date, collection_ids=collection_ids
@@ -236,9 +414,8 @@ def query_stories(query, source_ids, start_date=START_CURR_YEAR, end_date=END_CU
     return pd.DataFrame(results[0])
 
 
-def query_all_stories(
-    query, source_ids, start_date=START_CURR_YEAR, end_date=END_CURR_YEAR, timeout=35, collection_ids=None
-):
+def query_all_stories(query, source_ids, year=YEAR, timeout=35, collection_ids=None):
+    start_date, end_date = get_start_end(year)
     all_stories = []
     more_stories = True
     pagination_token = None
@@ -324,11 +501,15 @@ def plot_media_deaths(media_deaths_df, columns=None, bar_labels=None, title=None
         "homicide": "#ff9896",  # Light red
         "terrorism": "#c5b0d5",  # Light purple
         "war": "#c49c94",  # Light brown
+        "hiv": "#f7b6d2",  # Light pink
+        "malaria": "#c7c7c7",  # Light gray
+        "tb": "#dbdb8d",  # Light olive
+        "diarrhea": "#9edae5",  # Light teal
     }
 
     if columns is None:
-        columns = ["deaths_share", "mentions_share"]  # , "mentions_incl_health_share"]
-        bar_labels = ["Deaths", "Mentions"]  # , "Mentions keyword + health"]
+        columns = ["deaths_share", "mentions_share"]
+        bar_labels = ["Deaths", "Mentions"]
     if bar_labels is None:
         bar_labels = columns  # fallback to original column names
     if title is None:
@@ -378,12 +559,24 @@ def get_mentions_from_source(
     source_name: str,
     queries: dict,
     death_df,
-    start_date=None,
-    end_date=None,
+    year=YEAR,
     verbose: bool = False,
     collection_ids=None,
+    causes_to_exclude=["war", "hiv", "malaria", "tb", "diarrhea"],  # causes to exclude from analysis
 ):
-    causes_to_exclude = ["war"]
+    """
+    Get mentions of causes of death from a specific source.
+    Args:
+        source_ids (list): List of source IDs to query.
+        source_name (str): Name of the source.
+        queries (dict): Dictionary of queries to run.‚‚
+        death_df (pd.DataFrame): DataFrame containing causes of death and their respective death counts.
+        year (int): Year to query for.
+        verbose (bool): Whether to print verbose output.
+        collection_ids (list): List of collection IDs to query.
+        causes_to_exclude (list): List of causes to exclude from the analysis.
+    Returns:
+        pd.DataFrame: DataFrame containing the results of the queries."""
     query_count = []
 
     for name, query in queries.items():
@@ -391,13 +584,7 @@ def get_mentions_from_source(
             if verbose:
                 print(f"Skipping {name} as it is excluded from the analysis.")
             continue
-        if start_date is not None and end_date is not None:
-            cnt = query_results(
-                query, source_ids, start_date=start_date, end_date=end_date, collection_ids=collection_ids
-            )
-        else:
-            cnt = query_results(query, source_ids, collection_ids=collection_ids)
-
+        cnt = query_results(query, source_ids, collection_ids=collection_ids, year=year)
         n_deaths = death_df[death_df["cause"] == name]["deaths"].iloc[0]
         if verbose:
             print(f"Q: {query}")
