@@ -72,6 +72,8 @@ log = get_logger()
 
 memory = Memory(CACHE_DIR, verbose=0)
 
+CURRENT_DIR = Path(__file__).parent
+
 # Basic parameters to use in the functions
 MAX_REPEATS = 15
 TIMEOUT = 500
@@ -617,6 +619,16 @@ def generate_percentiles_raw(wb_api: WB_API):
         """
         Here I check if the country file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
         """
+        # Use custom files
+        custom_csv = None
+        if country_code == "CHN" and povline == 101 and ppp_version == 2021:
+            custom_csv = "pip_country_CHN_year_1981_povline_101_welfare_income_rep_urban_fillgaps_false_ppp_2021.csv"
+        elif country_code == "CHN" and povline == 41 and ppp_version == 2021:
+            custom_csv = "pip_country_CHN_year_1981_povline_41_welfare_income_rep_rural_fillgaps_false_ppp_2021.csv"
+
+        if custom_csv:
+            return pd.read_csv(CURRENT_DIR / "custom_files" / custom_csv)
+
         file_path_country = f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
         if Path(file_path_country).is_file():
             df_query_country = pd.read_csv(file_path_country)
