@@ -1318,3 +1318,14 @@ steps:
     - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
   data://grapher/tuberculosis/2025-06-16/expenditure:
     - data://garden/tuberculosis/2025-06-16/expenditure
+  # Tuberculosis burden disaggregated - WHO
+  data://meadow/tuberculosis/2025-06-16/burden_disaggregated:
+    - snapshot://tuberculosis/2025-06-16/burden_disaggregated.csv
+  data://garden/tuberculosis/2025-06-16/burden_disaggregated:
+    - data://meadow/tuberculosis/2025-06-16/burden_disaggregated
+    - data://garden/demography/2024-07-15/population
+    - snapshot://tuberculosis/2025-06-06/data_dictionary.csv
+    - data://garden/wb/2024-07-29/income_groups
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/tuberculosis/2025-06-16/burden_disaggregated:
+    - data://garden/tuberculosis/2025-06-16/burden_disaggregated
