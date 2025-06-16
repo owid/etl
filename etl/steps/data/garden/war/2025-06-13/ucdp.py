@@ -93,6 +93,7 @@ def run() -> None:
     # Load tables
     tb_ged = ds_meadow.read("ucdp_ged")
     tb_conflict = ds_meadow.read("ucdp_battle_related_conflict")
+    tb_dyadic = ds_meadow.read("ucdp_battle_related_dyadic")
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw.read("gleditsch_countries")
@@ -100,6 +101,9 @@ def run() -> None:
 
     # Filter codes
     tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR].set_index(["id", "year"])
+
+    # TODO: Temporary fix (conflict type in "Conflict" table is not available, instead combine it with "Dyadic" table)
+    tb_conflict = _load_conflict_table(tb_conflict, tb_dyadic)
 
     #
     # Run main code
@@ -1563,3 +1567,25 @@ def get_summary_unknown(tb: Table):
     tbx = tbx.sort_values(["num_events", "date_start"], ascending=False)
 
     return tbx
+
+
+def _load_conflict_table(tb_conflict, tb_dyadic):
+    tb_types = tb_dyadic.groupby(["conflict_id", "year"], as_index=False)["type_of_conflict"].unique()
+    tb_types["type_of_conflict"] = tb_types["type_of_conflict"].apply(_fix_type_conflict)
+    tb_conflict = tb_conflict.drop(columns="type_of_conflict")
+    tb_conflict = tb_conflict.merge(tb_types, on=["year", "conflict_id"], validate="1:1")
+    return tb_conflict
+
+
+def _fix_type_conflict(x):
+    """Fix type of conflict.
+
+    Each conflict should only have one conflict type per year. This is mostly the case in the "dyadic" version, except for intrastate (intl) and intrastate (non-intl) conflicts. That's because the same conflict can have different dyads (country-pairs) and each of them might or might not be internationalized.
+    """
+    if len(x) == 1:
+        return x[0]
+    elif len(x) == 2:
+        assert set(x) == {3, 4}, "Only combination of types 3 and 4 are allowed!"
+        return 4
+    else:
+        raise ValueError("Unexpected number of different conflict types!")

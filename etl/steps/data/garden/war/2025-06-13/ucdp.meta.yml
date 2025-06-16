@@ -173,7 +173,7 @@ tables:
   ucdp_country:
     common:
       presentation:
-        attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+        attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
       description_key:
         - "{definitions.all.conflict_type}"
         - A country is considered to participate in a conflict if they were a primary participant, which refers to those participants that have the main disagreement of the conflict.
@@ -425,7 +425,7 @@ tables:
               colorScale:
                 binningStrategy: "manual"
                 customNumericValues: [1, 2, 5, 10]
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024); Natural Earth (2022)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); Natural Earth (2022)
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per state
@@ -436,7 +436,7 @@ tables:
         display:
           numDecimalPlaces: 3
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       number_ongoing_conflicts_per_country_pair:
         title: Number of ongoing conflicts per state-pair
@@ -447,7 +447,7 @@ tables:
         display:
           numDecimalPlaces: 5
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       #################
       # New conflicts #
@@ -459,7 +459,7 @@ tables:
           {definitions.number_new_conflicts.description_short}
         description_key: *description_key_new
         presentation: # TODO
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       number_new_conflicts_per_country:
         title: Number of new conflicts per state
@@ -470,7 +470,7 @@ tables:
         display:
           numDecimalPlaces: 3
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
       number_new_conflicts_per_country_pair:
         title: Number of new conflicts per state-pair
@@ -481,7 +481,7 @@ tables:
         display:
           numDecimalPlaces: 5
         presentation:
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025)
 
 dataset:
   title: UCDP, History of war
