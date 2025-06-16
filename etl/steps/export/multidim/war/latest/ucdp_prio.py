@@ -211,11 +211,16 @@ def edit_faust(c):
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_indicator_displays(view)
 
-    subtitle_deaths = "Reported deaths of combatants and civilians due to fighting{placeholder} {dods} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+    subtitle_deaths = "Reported deaths of combatants and civilians due to fighting{placeholder} {{dods}} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
 
     c.edit_views(
         [
-            {"config": {"timelineMinTime": 1946}},
+            {
+                "config": {
+                    "timelineMinTime": 1946,
+                    "note": lambda view: _set_note(view),
+                }
+            },
             {
                 "dimensions": {"indicator": "deaths"},
                 "config": {
@@ -277,15 +282,17 @@ def edit_indicator_displays(view):
 def _set_dods(view):
     # DoD
     if view.dimensions["conflict_type"] in ("state-based", "state_based_stacked"):
-        dods = "[armed conflicts](#dod:armed-conflict-ucdp)"
+        dods = (
+            "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), and [colonial](#dod:extrasystemic-ucdp)"
+        )
     elif view.dimensions["conflict_type"] == "interstate":
-        dods = "[interstate conflicts](#dod:interstate-ucdp)"
-    elif view.dimensions["conflict_type"] == "intrastate":
-        dods = "[civil conflicts](#dod:intrastate-ucdp)"
-    elif view.dimensions["conflict_type"] == "non-state conflict":
-        dods = "[non-state conflicts](#dod:nonstate-ucdp)"
-    elif view.dimensions["conflict_type"] == "all_stacked":
-        dods = "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [violence against civilians](#dod:onesided-ucdp)"
+        dods = " [interstate conflicts](#dod:interstate-ucdp)"
+    elif view.dimensions["conflict_type"] == "intrastate (internationalized)":
+        dods = "[foreign-backed civil conflicts](#dod:intrastate-ucdp)"
+    elif view.dimensions["conflict_type"] == "intrastate (non-internationalized)":
+        dods = "[domestic civil conflicts](#dod:intrastate-ucdp)"
+    elif view.dimensions["conflict_type"] == "extrasystemic":
+        dods = "[colonial conflicts](#dod:extrasystemic-ucdp)"
     else:
         raise ValueError(f"Unknown conflict type: {view.dimensions['conflict_type']}")
 
@@ -300,3 +307,10 @@ def _set_title_ending(view, choice_names):
     if view.dimensions["conflict_type"] == "state_based_stacked":
         title += " by type"
     return title
+
+
+def _set_note(view):
+    if view.dimensions["indicator"] in ("wars_ongoing", "wars_ongoing_country_rate"):
+        return "Some conflicts affect several regions. The sum across all regions can therefore be higher than the total number."
+    if view.dimensions["indicator"] in ("deaths", "death_rate") and (view.dimensions["estimate"] == "best_ci"):
+        return "'Best' estimates as identified by UCDP and PRIO."
