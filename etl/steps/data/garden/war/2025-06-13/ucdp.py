@@ -174,7 +174,7 @@ def _sanity_checks(ds: Dataset) -> None:
             res = res.loc[~res["conflict_new_id"].isin(conflict_ids_errors)]
         assert (
             len(res) == 0
-        ), f"Dicrepancy between number of deaths in conflict ({tb_ged.m.short_name} vs. {tb_type.m.short_name}). \n {res})"
+        ), f"Discrepancy between number of deaths in conflict ({tb_ged.m.short_name} vs. {tb_type.m.short_name}). \n {res})"
 
     # Read tables
     tb_ged = ds.read("ucdp_ged")
@@ -579,7 +579,7 @@ def estimate_metrics_participants_prio(tb_prio: Table, tb_codes: Table) -> Table
     tb_country["participated_in_conflict"] = 1
     tb_country["participated_in_conflict"].m.origins = tb_prio["gwno_a"].m.origins
 
-    # Format conflict tyep
+    # Format conflict type
     tb_country["conflict_type"] = tb_country["type_of_conflict"].astype(object).replace(TYPE_OF_CONFLICT_MAPPING)
     tb_country = tb_country.drop(columns=["type_of_conflict"])
 
@@ -971,7 +971,7 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     paths.log.info(f"{len(tb.loc[mask, COLUMN_COUNTRY_NAME])} datapoints in land contested by Morocco/W.Sahara")
     tb.loc[mask, COLUMN_COUNTRY_NAME] = "Western Sahara"
 
-    # Add a flag column for points likely to have inccorect corrdinates:
+    # Add a flag column for points likely to have incorrect coordinates:
     # a) points where coordiantes are (0 0), or points where latitude and longitude are exactly the same
     tb["flag"] = ""
     # Items are (mask, flag_message)
@@ -1064,7 +1064,7 @@ def _sanity_check_prio_conflict_types(tb_prio: Table):
     """Check conflict type in UCDP/PRIO data.
 
     - Only transitions accepted between intrastate conflicts.
-    - The same conflict is only expceted to have one type in a year.
+    - The same conflict is only expected to have one type in a year.
     """
     # Define expected combinations of conflict_types for a conflict. Typically, only in the intrastate domain
     TRANSITIONS_EXPECTED = {"{3, 4}"}
@@ -1078,7 +1078,7 @@ def _sanity_check_prio_conflict_types(tb_prio: Table):
     # Check if different regions categorise the conflict differently in the same year
     assert not (
         tb_prio.groupby(["conflict_id", "year"])["type_of_conflict"].nunique() > 1
-    ).any(), "Seems like the conflict hast multiple types for a single year! Is it categorised differently depending on the region?"
+    ).any(), "Seems like the conflict has multiple types for a single year! Is it categorised differently depending on the region?"
 
     assert not transitions_unk, f"Unknown transitions found: {transitions_unk}"
 
