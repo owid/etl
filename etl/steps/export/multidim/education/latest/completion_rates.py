@@ -91,23 +91,25 @@ def run() -> None:
     )
 
     for view in c.views:
-        # Update title and subtitle based on view dimensions
+        # Update title and subtitle only for side-by-side grouped views
         sex = view.dimensions.get("sex")
         level = view.dimensions.get("level")
 
-        # Create a copy of the config to avoid shared references
-        if view.config is None:
-            view.config = {}
-        else:
-            view.config = view.config.copy()
+        # Only process side-by-side views
+        if sex == "sex_side_by_side" or level == "level_side_by_side":
+            # Create a copy of the config to avoid shared references
+            if view.config is None:
+                view.config = {}
+            else:
+                view.config = view.config.copy()
 
-        # Generate dynamic title
-        if sex and level:
-            view.config["title"] = generate_title_by_gender_and_level(sex, level)
+            # Generate dynamic title for side-by-side views
+            if sex == "sex_side_by_side" or level == "level_side_by_side":
+                view.config["title"] = generate_title_by_gender_and_level(sex, level)
 
-        # Generate dynamic subtitle
-        if level:
-            view.config["subtitle"] = generate_subtitle_by_level(level, sex)
+            # Generate dynamic subtitle for side-by-side views
+            if level == "level_side_by_side":
+                view.config["subtitle"] = generate_subtitle_by_level(level, sex)
 
         edit_indicator_displays(view)
     #
@@ -135,7 +137,6 @@ def adjust_dimensions(tb):
         if col in ["country", "year"]:
             continue
         tb[col].metadata.original_short_name = "completion_rates"
-
         tb[col].metadata.dimensions = {}
 
         # --- Level ---
@@ -153,7 +154,6 @@ def adjust_dimensions(tb):
 
         # Set dimensions
         tb[col].metadata.dimensions["level"] = level
-
         tb[col].metadata.dimensions["sex"] = sex or "both"
 
     # Add our dimension definitions
@@ -169,21 +169,15 @@ def adjust_dimensions(tb):
 
 # Common mappings used by both title and subtitle functions
 GENDER_MAPPINGS = {
-    "title": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "children"},
-    "subtitle": {"both": "children", "boys": "boys", "girls": "girls", "sex_side_by_side": "boys and girls"},
+    "title": {"sex_side_by_side": "children"},
+    "subtitle": {"sex_side_by_side": "boys and girls"},
 }
 
 LEVEL_MAPPINGS = {
     "title": {
-        "primary": "primary school",
-        "lower_secondary": "lower secondary school",
-        "upper_secondary": "upper secondary school",
         "level_side_by_side": "school",
     },
     "subtitle": {
-        "primary": "[primary](#dod:primary-education)",
-        "lower_secondary": "[lower secondary](#dod:lower-secondary-education)",
-        "upper_secondary": "[upper secondary](#dod:upper-secondary-education)",
         "level_side_by_side": "[primary](#dod:primary-education), [lower secondary](#dod:lower-secondary-education), and [upper secondary](#dod:upper-secondary-education)",
     },
 }
@@ -196,30 +190,23 @@ def _get_gender_term(sex, context="title"):
 
 def generate_title_by_gender_and_level(sex, level):
     """Generate title based on gender and education level."""
-    gender_term = _get_gender_term(sex, "title")
-    level_term = LEVEL_MAPPINGS["title"].get(level, "")
-
-    if not level_term:
-        raise ValueError(f"Unknown education level: {level}")
-
     if level == "level_side_by_side":
+        gender_term = _get_gender_term(sex, "title")
         return f"Completion rate for {gender_term}, by education level"
-
-    return f"Completion rate for {gender_term} in {level_term}"
+    elif sex == "sex_side_by_side":
+        return "Completion rate, by gender"
 
 
 def generate_subtitle_by_level(level, sex):
     """Generate subtitle based on education level and gender with links."""
-    level_term = LEVEL_MAPPINGS["subtitle"].get(level, "")
-    gender_term = _get_gender_term(sex, "subtitle")
+    if level == "level_side_by_side":
+        level_term = LEVEL_MAPPINGS["subtitle"].get(level, "")
+        gender_term = _get_gender_term(sex, "subtitle")
 
-    if not level_term:
-        raise ValueError(f"Unknown education level: {level}")
-
-    if level_term and gender_term:
-        return f"The share of {gender_term} who completed {level_term} education."
-    elif level_term:
-        return f"The share of children who completed {level_term} education."
+        if level_term and gender_term:
+            return f"The share of {gender_term} who completed {level_term} education."
+        elif level_term:
+            return f"The share of children who completed {level_term} education."
 
 
 def edit_indicator_displays(view):
