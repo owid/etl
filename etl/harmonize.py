@@ -190,8 +190,21 @@ class CountryRegionMapper:
         return self.aliases[key.lower()]
 
     def suggestions(self, region: str, institution: Optional[str] = None, num_suggestions: int = 5) -> List[str]:
-        # get the aliases which score highest on fuzzy matching
-        results = process.extract(region.lower(), self.aliases.keys(), limit=1000)
+        if institution is None:
+            # get the aliases which score highest on fuzzy matching
+            results = process.extract(region.lower(), self.aliases.keys(), limit=1000)
+        else:
+            # If an institution is given, try fuzzy matching both the region, and the "Region (Institution)".
+            region_institution = f"{region} ({institution})"
+            # Search for both region and "region (institution)"
+            results_region = process.extract(region.lower(), self.aliases.keys(), limit=500)
+            results_region_institution = process.extract(region_institution.lower(), self.aliases.keys(), limit=500)
+            # Combine results, keeping best score for each match
+            seen = {}
+            for name, score, idx in results_region + results_region_institution:
+                if name not in seen or score > seen[name][1]:
+                    seen[name] = (name, score, idx)
+            results = sorted(seen.values(), key=lambda x: x[1], reverse=True)[:1000]
 
         if not results:
             return []
@@ -210,8 +223,10 @@ class CountryRegionMapper:
         pairs = pairs[:num_suggestions]
 
         if institution is not None:
-            # Prepend the option to include this region as a custom entry for the given institution.
-            pairs = [(0, f"{region} ({institution})")] + pairs
+            # Prepend option to include this region as a custom entry for the given institution (if not already there).
+            region_institution = f"{region} ({institution})"
+            if region_institution not in [pair[1] for pair in pairs]:
+                pairs = [(0, region_institution)] + pairs
         return [m for _, m in pairs]
 
 
