@@ -7,7 +7,6 @@ dimensions:
   - slug: level
     name: Education level
     choices:
-
       - slug: primary
         name: Primary
         description: Marks the start of formal schooling, typically for children aged 5 to 7.
