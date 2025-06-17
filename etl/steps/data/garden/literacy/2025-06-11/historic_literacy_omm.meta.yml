@@ -25,10 +25,10 @@ tables:
     variables:
       literacy_rate:
         title: Literacy rate
-        description_short: Share of the population who can read and write a short, simple statement on their everyday life.
+        description_short: Share of adults who can read and write a simple statement about their everyday life.
         description_key:
           - Being able to read and write is fundamental to participating in modern society. This indicator aims to measure the percentage of people aged 15 and older who can read and write a simple sentence about their daily life. But measuring literacy across history is tricky—what counted as 'literate' has changed over time.
-          - We've pieced together data from many different sources spanning centuries. The challenge is that countries and time periods used wildly different definitions of literacy, so any comparisons should be taken with a grain of salt.
+          - We've pieced together data from many different sources spanning centuries. The challenge is that countries and time periods often used very different definitions of literacy, so any comparisons should be taken with a grain of salt.
           - "1451–1800: Direct literacy surveys did not exist during this period. Researchers from the [Charting the Rise of the West](https://www.researchgate.net/publication/46544350_Charting_the_Rise_of_the_West_Manuscripts_and_Printed_Books_in_Europe_A_Long-Term_Perspective_from_the_Sixth_through_Eighteenth_Centuries) study estimated literacy rates using manuscript and book production as indirect indicators. While more books likely indicated more readers, this approach has clear limitations."
           - "1820–2010: Global estimates are drawn from the OECD's [How Was Life? Global Well-being Since 1820](https://www.oecd.org/en/publications/how-was-life_9789264214262-en.html) report, which compiled available historical records. A key limitation is that early literacy measures often accepted minimal skills—such as the ability to sign marriage documents—which fall short of contemporary literacy standards involving actual reading and writing proficiency."
           - "1900–1950: UNESCO's [Progress of literacy in various countries](https://unesdoc.unesco.org/ark:/48223/pf0000002898) gathered data from 26 countries, revealing substantial variation in definitions. Some countries required only reading or writing skills, others demanded both, and some accepted signature ability as sufficient proof. Age thresholds also varied widely, ranging from 5 to 15 years."
@@ -39,4 +39,4 @@ tables:
         description_from_producer: The current UNESCO standard for defining literacy is the percentage of the population age 15 and above who can, with understanding, read and write a short, simple statement on their everyday life. Generally, 'literacy' also encompasses 'numeracy', the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 15 years and over by the corresponding age group population and multiplying the result by 100.
       illiteracy_rate:
         title: Illiteracy rate
-        description_short: Share of the population who cannot read and write a short, simple statement on their everyday life.
+        description_short: Share of adults who cannot read and write a short, simple statement on their everyday life.
