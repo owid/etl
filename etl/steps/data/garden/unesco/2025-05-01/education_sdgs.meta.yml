@@ -681,7 +681,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Greens
         display:
           name: Primary education
           numDecimalPlaces: 1
@@ -712,7 +712,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Greens
         display:
           name: Lower secondary education
           numDecimalPlaces: 1
@@ -742,7 +742,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Greens
         display:
           name: Upper secondary education
           numDecimalPlaces: 1
@@ -772,7 +772,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Purples
         display:
           name: Girls
           numDecimalPlaces: 1
@@ -802,7 +802,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Purples
         display:
           name: Girls
           numDecimalPlaces: 1
@@ -832,7 +832,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Purples
         display:
           name: Girls
           numDecimalPlaces: 1
@@ -862,7 +862,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Blues
         display:
           name: Boys
           numDecimalPlaces: 1
@@ -892,7 +892,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Blues
         display:
           name: Boys
           numDecimalPlaces: 1
@@ -922,7 +922,7 @@ tables:
               colorScale:
                 binningStrategy: manual
                 customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-                baseColorScheme: YlOrRd
+                baseColorScheme: Blues
         display:
           name: Boys
           numDecimalPlaces: 1
