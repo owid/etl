@@ -2,7 +2,10 @@ title:
   title: School completion rates
   title_variant: by level of education and gender
 default_selection:
-  - World
+  - South Sudan
+  - Niger
+  - Turkey
+  - Peru
 dimensions:
   - slug: level
     name: Education level
