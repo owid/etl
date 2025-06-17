@@ -9,12 +9,8 @@ definitions:
     display:
       numDecimalPlaces: 1
     description_processing: |-
-      - "**Historical data (1451–1800):** Estimates from Buringh and van Zanden (2009) based on book sales data. This method uses the relationship between book prices and sales volumes to estimate literate populations, assuming people primarily buy books they can read."
-      - "**Early 20th century data (1900–1950):** UNESCO historical estimates from their 1953 report 'Progress of Literacy in Various Countries'. This covers the period when governments began systematic literacy measurement but methodologies varied significantly between countries."
-      - "**Mid-20th century data (1950):** UNESCO estimates from their 1957 report 'World Illiteracy at Mid-Century', providing comprehensive global coverage for this benchmark year."
-      - "**Global estimates (1820–1970):** OECD's 'How Was Life?' dataset covering the period when more standardized measurement approaches emerged."
-      - "**Contemporary data (1970–present):** UNESCO Sustainable Development Goals education indicators, representing the current international standard for literacy measurement focused on population aged 15+."
-      - "Where illiteracy rates were not directly available, they were calculated as 100 minus the literacy rate, and vice versa."
+      - Where only one of literacy or illiteracy was reported, the other was derived by subtracting the given value from 100%.
+      - For 1950, data was reported as a range (e.g. 10–20%). To allow for consistent analysis, these ranges were converted into single-point estimates by taking their midpoint. For example, a range of 10–20% was recorded as 15%.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -31,14 +27,14 @@ tables:
         title: Literacy rate
         description_short: Share of the population who can read and write a short, simple statement on their everyday life.
         description_key:
-          - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
-          - This indicator shows what share of the population can read and write a short, simple sentence with understanding.
-          - The literacy rate is calculated by dividing the number of literate individuals by the total population in the same age group, excluding those with unknown literacy status.
-          - A high literacy rate suggests that most people have acquired basic reading and writing skills, typically through primary education or literacy programs.
-          - Contemporary data typically come from population censuses or household surveys and are often self-reported. Historical estimates before 1800 are based on indirect evidence such as manuscript and book production.
-          - Age groups vary across time periods and sources. Early historical data often measured literacy from age 10+, while modern standards focus on ages 15+. Users should consider these methodological differences when making comparisons across time periods.
-          - Literacy should not be confused with functional literacy — this indicator reflects basic reading and writing skills, but not their practical application in daily life or work.
-
+          - Literacy is essential for full participation in education, employment, and civic life. This indicator measures the share of people aged 15 and older who can read and write a short, simple sentence with understanding.
+          - The data is compiled from multiple historical and contemporary sources. Because definitions and methods vary across time and countries, figures are not always directly comparable.
+          - "1451–1800: European countries — Data for Great Britain, Ireland, France, Belgium, the Netherlands, Germany, Italy, Spain, Sweden, and Poland are based on the 'Charting the Rise of the West' study. Literacy rates are estimated using manuscript and early printed book production as proxies, due to the lack of direct census data."
+          - "1820–1870s: Global estimates — From the OECD’s 'How Was Life? Global Well-being Since 1820' report. Early estimates reflect broad definitions of being 'educated'. Over time, the focus narrowed to basic reading and writing skills, influenced by the spread of mass education."
+          - "1900–1950: 26 countries — Based on UNESCO’s first comparative survey of illiteracy. Data is drawn from national censuses and official sources. Definitions varied widely: some countries counted those who could read or write, others required both, and in some cases, being able to sign one’s name was sufficient. Age thresholds ranged from 5 to 15 years."
+          - "1950: Global coverage — UNESCO’s 'World Illiteracy at Mid-Century' report provided the first global overview of adult literacy, covering over 60 countries. Most data came from censuses conducted between 1945 and 1954 for the 15+ population. Where data was missing, estimates were made using past trends and country-specific information. Results are reported in 5% intervals to reflect uncertainty."
+          - "1970–Present: UNESCO Institute for Statistics — Contemporary data comes from censuses and household surveys conducted by national governments. Literacy is defined as the ability to read and write a short, simple statement about daily life, and often includes basic numeracy. The rate is calculated as the number of literate individuals aged 15 and over, divided by the total population in that age group."
+          - Across all periods, the indicator reflects basic literacy — the ability to read and write simple text. It does not measure functional literacy, which refers to the ability to apply these skills effectively in everyday situations, such as reading instructions, completing forms, or managing finances. Functional literacy is typically acquired after several years of formal education.
 
       illiteracy_rate:
         title: Illiteracy rate

@@ -5,7 +5,11 @@ meta:
     # Data product / Snapshot
     title: Progress of literacy in various countries
     description: |-
-      This dataset contains UNESCO's systematic global survey of illiteracy rates, representing the organization's first comprehensive international comparative study of literacy and illiteracy incidence. The data is compiled from census information and official government sources across 26 countries, specifically including only those nations for which illiteracy figures are available for three or more census years since approximately 1900. The study incorporates results from the most recent census data available for each included country.
+      This dataset presents UNESCO’s first global survey of adult illiteracy, based on census and official government data from 26 countries. Countries were included if they had illiteracy data for at least three census years since around 1900. The dataset uses the most recent available figures and shows how literacy levels changed over time in the first half of the 20th century.
+
+      The study shows that countries defined and measured literacy in different ways. Some counted people as literate if they could read or write; others required more, like writing a letter or reading a passage. In some places, being able to sign one’s name was enough; in others, it was not. The age at which people were counted also varied—from as young as 5 to as old as 15.
+
+      These differences make it hard to compare literacy rates across countries or even across time within a country. People who could only read or only write were classified differently depending on local rules. Other issues, like missing data and unclear definitions, add to the difficulty. Despite these limits, the dataset offers important insights into global literacy patterns during this period.
     date_published: "1953"
 
     # Citation
