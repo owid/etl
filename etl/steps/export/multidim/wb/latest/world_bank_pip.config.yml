@@ -41,7 +41,7 @@ definitions:
   spells_subtitle: The chart shows breaks in the comparability of the underlying household survey data over time within each country individually.
 
   ppp_adjustment_subtitle: This data is adjusted for inflation and for differences in living costs between countries.
-  ppp_adjustment_welfare_type_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Depending on the country and year, it relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+  ppp_adjustment_welfare_type_note: This data is expressed in [international-$](#dod:int_dollar_abbreviation) at 2021 prices. Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
 
   description_key_extreme_poverty: Extreme poverty here is defined as living below the International Poverty Line of $3 a day.
   description_key_lmic_poverty_line: A poverty line of $4.20 a day represents definitions of national poverty lines in lower-middle-income countries.
@@ -50,7 +50,7 @@ definitions:
   description_key_ppp: |-
     The data is measured in international-$ at 2021 prices – this adjusts for inflation and for differences in living costs between countries.
 
-  description_key_welfare_type: Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. _Per capita_ means that the income of each household is attributed equally to each member of the household (including children).
+  description_key_welfare_type: Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, per capita. _Per capita_ means that the income of each household is attributed equally to each member of the household (including children).
 
   description_key_not_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
 
