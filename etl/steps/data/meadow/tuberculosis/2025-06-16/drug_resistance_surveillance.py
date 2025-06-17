@@ -11,11 +11,11 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("burden_estimates.csv")
+    snap = paths.load_snapshot("drug_resistance_surveillance.csv")
 
     # Load data from snapshot.
     tb = snap.read(safe_types=False)
-
+    tb = tb.drop(columns=["iso2", "iso3", "iso_numeric", "g_whoregion"])
     #
     # Process data.
     #
