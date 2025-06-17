@@ -167,7 +167,7 @@ definitions:
     <%- elif welfare_type == "consumption" %>
     The data relates to consumption per capita. {definitions.description_key_per_capita}
     <%- else %>
-    Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. {definitions.description_key_per_capita}
+    Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, per capita. {definitions.description_key_per_capita}
     <%- endif %>
 
   description_key_not_market_income: Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
@@ -369,7 +369,7 @@ definitions:
 
   note_ppp: |-
     <% if welfare_type == "income or consumption" %>
-    {definitions.ppp_adjustment_note} Depending on the country and year, it relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+    {definitions.ppp_adjustment_note} Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
     <%- elif welfare_type == "income" %>
     {definitions.ppp_adjustment_note} It relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
@@ -377,7 +377,7 @@ definitions:
     <%- endif %>
 
   note_ppp_longer: |-
-    {definitions.ppp_adjustment_note_longer} Depending on the country and year, it relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+    {definitions.ppp_adjustment_note_longer} Depending on the country and year, it relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
     <%- if welfare_type == "income" %>
     {definitions.ppp_adjustment_note_longer} It relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
@@ -386,7 +386,7 @@ definitions:
 
   note_without_ppp: |-
     <% if welfare_type == "income or consumption" %>
-    Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, [per capita](#dod:per-capita).
+    Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, [per capita](#dod:per-capita).
     <%- elif welfare_type == "income" %>
     The data relates to income measured after taxes and benefits [per capita](#dod:per-capita).
     <%- elif welfare_type == "consumption" %>
