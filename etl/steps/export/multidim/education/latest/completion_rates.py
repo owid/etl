@@ -215,8 +215,7 @@ def generate_subtitle_by_level(level, sex):
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
 
-    if level == "level_side_by_side" or sex == "sex_side_by_side":
-        return f" Percentage of {gender_term} aged 3 to 5 years above the official age for the last grade of {level_term} education who have successfully completed that level."
+    return f" Percentage of {gender_term} aged 3 to 5 years above the official age for the last grade of {level_term} education who have successfully completed that level."
 
 
 def edit_indicator_displays(view):
