@@ -8,7 +8,7 @@ tables:
   bullfighting_laws:
     variables:
       status:
-        title: Banning of bullfighting
+        title: Bans on bullfighting
         unit: ""
         short_unit: ""
         processing_level: minor
