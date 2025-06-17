@@ -67,7 +67,7 @@ def run() -> None:
 
     # Concatenate all tables
     tb = pr.concat(tables_clean, axis=0, ignore_index=True)
-    tb = tb.format(["country", "year"], verify_integrity=True, short_name="historic_literacy_omm")
+    tb = tb.format(["country", "year"], short_name="historic_literacy_omm")
 
     #
     # Save outputs.
