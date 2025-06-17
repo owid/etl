@@ -672,9 +672,20 @@ tables:
           - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
         presentation:
           title_public: Completion rate in primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                baseColorScheme: YlOrRd
         display:
-          name:  Primary education
+          name: Primary education
           numDecimalPlaces: 1
+          tolerance: 5
 
       completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
         title: Completion rate in lower secondary education
@@ -692,9 +703,20 @@ tables:
           - Changes in school duration, entry age, or national classification over time may also affect how results are interpreted.
         presentation:
           title_public: Completion rate in lower secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                baseColorScheme: YlOrRd
         display:
-          name:  Secondary education
+          name: Lower secondary education
           numDecimalPlaces: 1
+          tolerance: 5
 
       completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
         title: Completion rate in upper secondary education
@@ -711,9 +733,20 @@ tables:
           - Limitations include variations in programme length, national classification systems, and the quality or recency of input data used in modelling.
         presentation:
           title_public: Completion rate in upper secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                baseColorScheme: YlOrRd
         display:
-          name:  Upper secondary education
+          name: Upper secondary education
           numDecimalPlaces: 1
+          tolerance: 5
 
       completion_rate__lower_secondary_education__female__pct__modelled_data__cr_mod_2_f:
         title: Completion rate in lower secondary education among girls
