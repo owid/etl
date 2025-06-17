@@ -54,7 +54,7 @@ PPP_VERSION_CURRENT_PIP = PPP_VERSIONS_PIP[1]
 PPP_VERSION_COMPARISON_PIP = PPP_VERSION_OLD_PIP
 
 
-INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income measured after taxes and benefits, or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
+INCOME_OR_CONSUMPTION_PIP = "Depending on the country and year, the data relates to income (measured after taxes and benefits) or to consumption, per capita. 'Per capita' means that the incomes of each household are attributed equally to each member of the household (including children)."
 NON_MARKET_DESCRIPTION_PIP = "Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account."
 NOWCAST_REGIONS_DESCRIPTION = "Regional and global estimates are extrapolated up until the year of the data release using GDP growth estimates and forecasts. For more details about the methodology, please refer to the [World Bank PIP documentation](https://datanalytics.worldbank.org/PIP-Methodology/lineupestimates.html#nowcasts)."
 
