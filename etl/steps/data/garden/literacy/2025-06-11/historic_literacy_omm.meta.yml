@@ -9,7 +9,7 @@ definitions:
     display:
       numDecimalPlaces: 1
     description_processing: |-
-      - Where only one of literacy or illiteracy was reported, the other was derived by subtracting the given value from 100%.
+      - When only the illiteracy rate was reported, the literacy rate was calculated by subtracting it from 100%.
       - For 1950, data was reported as a range (e.g. 10–20%). To allow for consistent analysis, these ranges were converted into single-point estimates by taking their midpoint. For example, a range of 10–20% was recorded as 15%.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
