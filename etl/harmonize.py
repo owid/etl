@@ -223,10 +223,13 @@ class CountryRegionMapper:
         pairs = pairs[:num_suggestions]
 
         if institution is not None:
-            # Prepend option to include this region as a custom entry for the given institution (if not already there).
-            region_institution = f"{region} ({institution})"
-            if region_institution not in [pair[1] for pair in pairs]:
-                pairs = [(0, region_institution)] + pairs
+            # Prepend the option to include this region as a custom entry for the given institution.
+            # NOTE: We could only prepend the "region (institution)" entry if it's not already in the list "pairs".
+            # However, I think it's important to signal to the user if the entry already exists in the default list.
+            # So, currently, the only way to achieve that is to always show "region (institution)" as the first entry in the default list, and the subsequent entries would be the default options available.
+            # An even more ideal solution would be to have the "region (institution)" option out of the default list.
+            # But that requires some additional changes.
+            pairs = [(0, f"{region} ({institution})")] + pairs
         return [m for _, m in pairs]
 
 
