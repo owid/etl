@@ -55,7 +55,6 @@ def run() -> None:
         tb=tb,
         common_view_config=MULTIDIM_CONFIG,
     )
-    print(c)
     # Add grouped view
     c.group_views(
         groups=[
@@ -135,9 +134,7 @@ def adjust_dimensions(tb):
     for col in tb.columns:
         if col in ["country", "year"]:
             continue
-        print(col)
         tb[col].metadata.original_short_name = "completion_rates"
-        print("these should be country + year", tb.metadata.dimensions)
 
         tb[col].metadata.dimensions = {}
 
@@ -153,13 +150,11 @@ def adjust_dimensions(tb):
             if f"__{key}__" in col or col.endswith(f"_{key}"):
                 sex = val
                 break
-        print("these should remain as country + year", tb.metadata.dimensions)
 
         # Set dimensions
         tb[col].metadata.dimensions["level"] = level
 
         tb[col].metadata.dimensions["sex"] = sex or "both"
-        print("-----")
 
     # Add our dimension definitions
     tb.metadata.dimensions.extend(
@@ -168,7 +163,6 @@ def adjust_dimensions(tb):
             {"name": "Gender", "slug": "sex"},
         ]
     )
-    print(tb.metadata.dimensions)
 
     return tb
 
