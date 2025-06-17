@@ -110,6 +110,7 @@ def run() -> None:
             view.config["subtitle"] = generate_subtitle_by_level(level, sex)
 
         edit_indicator_displays(view)
+
     #
     # Save garden dataset.
     #
@@ -135,7 +136,6 @@ def adjust_dimensions(tb):
         if col in ["country", "year"]:
             continue
         tb[col].metadata.original_short_name = "completion_rates"
-
         tb[col].metadata.dimensions = {}
 
         # --- Level ---
@@ -153,7 +153,6 @@ def adjust_dimensions(tb):
 
         # Set dimensions
         tb[col].metadata.dimensions["level"] = level
-
         tb[col].metadata.dimensions["sex"] = sex or "both"
 
     # Add our dimension definitions
