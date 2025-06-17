@@ -8,24 +8,19 @@ paths = PathFinder(__file__)
 # Common configuration for all charts
 MULTIDIM_CONFIG = {
     "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-    "hasMapTab": True,
-    "tab": "map",
     "originUrl": "ourworldindata.org/education",
     "hideAnnotationFieldsInTitle": {"time": True},
-    "addCountryMode": "change-country",
     "yAxis": {"min": 0, "max": 100},
+    "hasMapTab": True,
+    "tab": "map",
+    "addCountryMode": "change-country",
 }
 
 # Common grouped view configuration
-GROUPED_VIEW_CONFIG = {
-    "$schema": "https://files.ourworldindata.org/schemas/grapher-schema.005.json",
-    "originUrl": "ourworldindata.org/education",
-    "hideAnnotationFieldsInTitle": {"time": True},
-    "addCountryMode": "change-country",
+GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
     "selectedFacetStrategy": "entity",
-    "yAxis": {"min": 0, "max": 100},
 }
 
 # Column filtering patterns
@@ -88,7 +83,7 @@ def create_grouped_views(collection):
                 "dimension": "sex",
                 "choice_new_slug": "sex_side_by_side",
                 "choices": ["girls", "boys"],
-                "view_config": GROUPED_VIEW_CONFIG,
+                "view_config": GROUPED_VIEW_CONFIG | {},
             },
             {
                 "dimension": "level",
