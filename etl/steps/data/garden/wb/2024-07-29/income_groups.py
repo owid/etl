@@ -7,7 +7,7 @@ import owid.catalog.processing as pr
 from owid.catalog import Dataset, Table
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -35,7 +35,7 @@ REGIONS = ["Europe", "Asia", "North America", "South America", "Africa", "Oceani
 FRAC_ALLOWED_NANS_PER_YEAR = 0.2
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -61,7 +61,7 @@ def run(dest_dir: str) -> None:
     tb = tb.drop(columns=["country_code"], errors="raise")
 
     # Create an additional table for the classification of the latest year available.
-    tb_latest = tb.reset_index().drop_duplicates(subset=["country"], keep="last")
+    tb_latest = tb.reset_index(drop=True).drop_duplicates(subset=["country"], keep="last")
 
     # Rename new table.
     tb_latest.metadata.short_name = "income_groups_latest"
@@ -100,11 +100,20 @@ def run(dest_dir: str) -> None:
     # Set an appropriate index and sort conveniently.
     tb_latest = tb_latest.format(["country"])
 
+    # Find the version of the current World Bank's classification.
+    origin = tb_latest["classification"].metadata.origins[0]
+    assert origin.producer == "World Bank", "Unexpected list of origins."
+    year_world_bank_classification = origin.date_published.split("-")[0]
+
     #
     # Save outputs.
     #
     # Create a new garden dataset.
-    ds_garden = create_dataset(dest_dir, tables=[tb, tb_latest], default_metadata=ds_meadow.metadata)
+    ds_garden = paths.create_dataset(
+        tables=[tb, tb_latest],
+        default_metadata=ds_meadow.metadata,
+        yaml_params={"year_world_bank_classification": year_world_bank_classification},
+    )
     ds_garden.save()
 
 

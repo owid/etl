@@ -17,12 +17,18 @@ definitions:
     - The data comes from school administrative records that track enrolment by individual age, combined with population estimates from national statistics offices or UN sources.
 
   desc_key_mye: &desc_key_mye
-    - Adults around the world have spent different amounts of time in school — this indicator shows the average number of years completed by people aged 25 and older.
-    - It reflects the total years of formal education that adults have successfully finished, excluding any years they may have repeated.
-    - The data comes from censuses and household surveys, where adults report the highest level of education they completed. These levels are then matched to standard durations using the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) framework.
-    - This is a valuable indicator for understanding long-term trends in educational attainment and gender equality.
-    - However, it only measures how long people stayed in school — not what they learned or whether they received a quality education.
-    - Cross-country comparisons can be challenging. Education systems differ in how long programmes last, and qualifications may not be classified in the same way.
+    - Mean years of schooling shows the average number of years that adults in a country have spent in formal education, giving us a picture of how educated the population is overall.
+    - This number is calculated by asking adults about the highest level of school they completed, then figuring out how many years that typically takes. For example, someone who finished high school might have about 12 years of schooling.
+    - This indicator measures how much education adults have accumulated over their lifetimes, showing the results of past investments in schools and learning.
+    - The data comes from surveys and censuses where adults aged 25 and older report their educational background. Only formal schooling from primary school onwards is counted.
+    - Higher numbers mean adults in that country have generally stayed in school longer, showing stronger educational foundations. However, this doesn't tell us about the quality of education, learning outside of school, or whether younger people today are getting better education than the average suggests.
+
+  desc_key_sle: &desc_key_sle
+  - Expected years of schooling estimates how long a child starting school today is likely to stay in education, assuming current enrollment patterns continue throughout their schooling years.
+  - It is calculated by combining enrollment rates at each level of education and age group, adjusted for the official age of attendance, resulting in the average number of years a child can expect to complete—including time spent repeating grades.
+  - The measure reflects access to education rather than completion or learning outcomes, and assumes current patterns remain stable over time.
+  - Expected years can be broken down into [pre-primary](#dod:pre-primary-education), [primary](#dod:primary-education), [secondary](#dod:secondary-education), and [tertiary](#dod:tertiary-education), showing the expected time spent at each stage.
+  - A higher value means students are expected to spend more time in school. For example, 2.5 years in pre-primary means most children will attend around 2.5 years of preschool; a country with 15 total expected years but only 0.5 in pre-primary likely has limited access to early childhood education.
 
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
@@ -221,7 +227,7 @@ tables:
           numDecimalPlaces: 1
 
       school_life_expectancy__primary__adjusted_gender_parity_index__gpia:
-        title: School life expectancy in primary education
+        title: School life expectancy in primary education, adjusted gender parity index
         description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equality in the expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) school between boys and girls. Values below 1 favor boys, and above 1 favor girls.
         unit: "index"
         description_key:
@@ -958,6 +964,270 @@ tables:
                 binningStrategy: manual
                 customNumericValues: *enrolment_rate_bins
                 baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      school_life_expectancy__pre_primary__both_sexes__years:
+        title: School life expectancy in pre-primary education
+        description_short: Expected number of years a child of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in pre-primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0.5,1,1.5,2,2.5,3,3.5,4]
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Pre-primary education
+
+      school_life_expectancy__pre_primary__female__years:
+        title: School life expectancy in pre-primary education among girls
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in pre-primary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0.5,1,1.5,2,2.5,3,3.5,4]
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      school_life_expectancy__pre_primary__male__years:
+        title: School life expectancy in pre-primary education among boys
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [pre-primary](#dod:pre-primary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in pre-primary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0.5,1,1.5,2,2.5,3,3.5,4]
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      school_life_expectancy__primary__both_sexes__years:
+        title: School life expectancy in primary education
+        description_short: Expected number of years a child of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [2,3,4,5,6,7,8,9]
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Primary education
+
+      school_life_expectancy__primary__female__years:
+        title: School life expectancy in primary education among girls
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in primary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [2,3,4,5,6,7,8,9]
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      school_life_expectancy__primary__male__years:
+        title: School life expectancy in primary education among boys
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [primary](#dod:primary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in primary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [2,3,4,5,6,7,8,9]
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      school_life_expectancy__secondary__both_sexes__years:
+        title: School life expectancy in secondary education
+        description_short: Expected number of years a child of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1,2,3,4,5,6,7,8]
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Secondary education
+
+      school_life_expectancy__secondary__female__years:
+        title: School life expectancy in secondary education among girls
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in secondary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1,2,3,4,5,6,7,8]
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      school_life_expectancy__secondary__male__years:
+        title: School life expectancy in secondary education among boys
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [secondary](#dod:secondary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in secondary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [1,2,3,4,5,6,7,8]
+                baseColorScheme: BuGn
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Boys
+
+      school_life_expectancy__tertiary__both_sexes__years:
+        title: School life expectancy in tertiary education
+        description_short: Expected number of years a child of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in tertiary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0.5,1,1.5,2,2.5,3,4,5]
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Tertiary education
+
+      school_life_expectancy__tertiary__female__years:
+        title: School life expectancy in tertiary education among girls
+        description_short: Expected number of years a girl of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in tertiary education among girls
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0.5,1,1.5,2,2.5,3,4,5]
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 1
+          tolerance: 5
+          name: Girls
+
+      school_life_expectancy__tertiary__male__years:
+        title: School life expectancy in tertiary education among boys
+        description_short: Expected number of years a boy of school entrance age is likely to spend in [tertiary](#dod:tertiary-education) education based on current enrollment patterns.
+        unit: "years"
+        description_key: *desc_key_sle
+        presentation:
+          title_public: School life expectancy in tertiary education among boys
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [0.5,1,1.5,2,2.5,3,4,5]
+                baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
           tolerance: 5
