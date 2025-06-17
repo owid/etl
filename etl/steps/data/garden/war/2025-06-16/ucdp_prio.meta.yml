@@ -36,20 +36,22 @@ definitions:
       <%- elif conflict_type == "state-based" -%>
       A state-based conflict is a conflict between two armed groups, at least one of which is a state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
+
       <%- elif conflict_type == "interstate" -%>
-      An interstate conflict is a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An interstate conflict is a is a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate" -%>
       An intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}. If a foreign state is involved, it is called "internationalized", and "non-internationalized" otherwise.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      An internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A foreign-backed civil conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and at least one foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
+
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      An non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A domestic civil conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and no foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "extrasystemic" -%>
-      An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A colonial conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and takes place outside of the state's territory. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "non-state conflict" -%>
       A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
@@ -58,6 +60,24 @@ definitions:
       One-sided violence is the use of armed force by a state or non-state armed group against civilians that causes at least 25 civilian deaths during a year.
 
       <%- endif -%>
+    description_key_deaths: &description_key_deaths
+      - |-
+        {definitions.all.conflict_type}
+      - |-
+        <% if conflict_type == "state-based" %>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        <%- endif %>
+      - UCDP and PRIO identify conflict deaths based on news reports, other contemporary sources, and academic research.
+    description_key_deaths_best: &description_key_deaths_best
+      - |-
+        {definitions.all.conflict_type}
+      - |-
+        <% if conflict_type == "state-based" %>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        <%- endif %>
+      - UCDP and PRIO identify conflict deaths based on news reports, other contemporary sources, and academic research.
+      - |-
+        'Best' death estimates as identified by UCDP and PRIO.
 
   common:
     presentation:
@@ -103,6 +123,7 @@ tables:
           {definitions.common.description_processing}
 
           For conflict years without a best deaths estimate in the PRIO data, we conservatively coded the low estimate.
+        description_key: *description_key_deaths_best
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -110,6 +131,7 @@ tables:
         description_short: |-
           <% set estimate = "high" %>
           {definitions.all.description_short}
+        description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_low:
         title: Deaths in ongoing conflicts (low estimate)
@@ -117,6 +139,7 @@ tables:
         description_short: |-
           <% set estimate = "low" %>
           {definitions.all.description_short}
+        description_key: *description_key_deaths
 
       number_deaths_ongoing_conflicts_per_capita:
         title: Death rate in ongoing conflicts (best estimate)
@@ -128,6 +151,7 @@ tables:
           {definitions.common.description_processing}
 
           For conflict years without a best deaths estimate in the PRIO data, we conservatively coded the low estimate.
+        description_key: *description_key_deaths_best
         display:
           numDecimalPlaces: 1
 
@@ -137,6 +161,7 @@ tables:
         description_short: |-
           <% set estimate = "high" %>
           {definitions.all.description_short_per_capita}
+        description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1
 
@@ -146,5 +171,6 @@ tables:
         description_short: |-
           <% set estimate = "low" %>
           {definitions.all.description_short_per_capita}
+        description_key: *description_key_deaths
         display:
           numDecimalPlaces: 1

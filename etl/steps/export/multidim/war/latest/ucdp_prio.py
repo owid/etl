@@ -108,7 +108,7 @@ def run() -> None:
     )
 
     # Edit FAUST
-    edit_faust(c)
+    edit_faust(c, tb_ucdp, tb_up)
 
     # Save & upload
     c.save()
@@ -204,57 +204,89 @@ def adjust_dimensions(tb, indicator_dim, fct_dims):  # -> Any:
     return tb
 
 
-def edit_faust(c):
+def edit_faust(c, tb_ucdp, tb_up):
     """Edit FAUST of views: Chart and indicator-level."""
     choice_names = c.get_choice_names("conflict_type")
     for view in c.views:
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
         edit_indicator_displays(view)
 
-    subtitle_deaths = "Reported deaths of combatants and civilians due to fighting{placeholder} {{dods}} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
-
-    c.edit_views(
-        [
-            {
-                "config": {
-                    "timelineMinTime": 1946,
-                    "note": lambda view: _set_note(view),
-                }
-            },
-            {
-                "dimensions": {"indicator": "deaths"},
-                "config": {
-                    "title": "Deaths in {conflict_name}",
-                    "subtitle": subtitle_deaths.format(placeholder=" in"),
-                },
-            },
-            {
-                "dimensions": {"indicator": "death_rate"},
-                "config": {
-                    "title": "Death rate in {conflict_name}",
-                    "subtitle": subtitle_deaths.format(placeholder=", per 100,000 people. Included are"),
-                },
-            },
-            {
-                "dimensions": {"indicator": "wars_ongoing"},
-                "config": {
-                    "title": "Number of {conflict_name}",
-                    "subtitle": "Included are {dods} conflicts that were ongoing that year.",
-                },
-            },
-            {
-                "dimensions": {"indicator": "wars_ongoing_country_rate"},
-                "config": {
-                    "title": "Rate of {conflict_name}",
-                    "subtitle": "The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts that were ongoing that year.",
-                },
-            },
-        ],
-        params={
-            "conflict_name": lambda view: _set_title_ending(view, choice_names),
-            "dods": lambda view: _set_dods(view),
-        },
+    c.set_global_config(
+        {
+            "title": lambda view: _set_title(view, choice_names),
+            "subtitle": lambda view: _set_subtitle(view),
+            "timelineMinTime": 1946,
+            "note": lambda view: _set_note(view),
+            "hideRelativeToggle": lambda view: view.dimensions["conflict_type"] != "state_based_stacked",
+            "hideFacetControl": lambda view: view.dimensions["estimate"] == "best_ci",
+        }
     )
+    c.set_global_metadata(
+        {
+            "description_short": (
+                lambda view: _set_subtitle(view)
+                if (
+                    (view.dimensions["conflict_type"] == "state_based_stacked")
+                    or (view.dimensions["estimate"] == "best_ci")
+                )
+                else None
+            ),
+            "description_key": lambda view: _set_description_key(view, tb_ucdp=tb_ucdp, tb_up=tb_up),
+        }
+    )
+
+
+def _set_description_key(view, tb_ucdp, tb_up):
+    if (view.dimensions["conflict_type"] == "state_based_stacked") or (view.dimensions["estimate"] == "best_ci"):
+        if view.dimensions["indicator"] == "deaths":
+            keys = tb_up["number_deaths_ongoing_conflicts__conflict_type_state_based"].metadata.description_key
+        elif view.dimensions["indicator"] == "death_rate":
+            keys = tb_up[
+                "number_deaths_ongoing_conflicts_per_capita__conflict_type_state_based"
+            ].metadata.description_key
+        elif view.dimensions["indicator"] == "wars_ongoing":
+            keys = tb_ucdp["number_ongoing_conflicts__conflict_type_all"].metadata.description_key
+        elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+            keys = tb_ucdp["number_ongoing_conflicts_per_country__conflict_type_all"].metadata.description_key
+        else:
+            raise ValueError(f"Unknown indicator: {view.dimensions['indicator']}")
+
+        # return
+        if view.dimensions["estimate"] == "best_ci":
+            assert keys[-1].startswith("'Best' death estimates")
+            keys = keys[:-1] + [None]
+        return keys
+    return None
+
+
+def _set_title(view, choice_names):
+    conflict_name = _set_title_ending(view, choice_names)
+    if view.dimensions["indicator"] == "deaths":
+        return f"Deaths in {conflict_name}"
+    elif view.dimensions["indicator"] == "death_rate":
+        return f"Death rate in {conflict_name}"
+    elif view.dimensions["indicator"] == "wars_ongoing":
+        return f"Number of {conflict_name}"
+    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+        return f"Rate of {conflict_name}"
+    else:
+        raise ValueError(f"Unknown indicator: {view.dimensions['indicator']}")
+
+
+def _set_subtitle(view):
+    dods = _set_dods(view)
+    subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+
+    if view.dimensions["indicator"] == "deaths":
+        return subtitle_deaths.format(placeholder=" in")
+    elif view.dimensions["indicator"] == "death_rate":
+        return subtitle_deaths.format(placeholder=", per 100,000 people. Included are")
+    elif view.dimensions["indicator"] == "wars_ongoing":
+        return f"Included are {dods} conflicts that were ongoing that year."
+    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts that were ongoing that year."
+    else:
+        raise ValueError(f"Unknown indicator: {view.dimensions['indicator']}")
 
 
 def edit_indicator_displays(view):

@@ -29,22 +29,22 @@ dimensions:
     name: "Conflict type"
     choices:
       - slug: "state-based"
-        name: "All"
-        description: All conflicts involving states
+        name: "All involving states"
+        # description: All conflicts involving states
       - slug: "state_based_stacked"
-        name: "All (by type)"
-        description: All conflicts involving states. Breakdown by conflict type
+        name: "All involving states (by type)"
+        # description: All conflicts involving states. Breakdown by conflict type
       - slug: "interstate"
-        name: "Interstate conflicts"
+        name: "Interstate"
         description: Between states
       - slug: "intrastate (internationalized)"
-        name: "Foreign-backed civil conflicts"
+        name: "Foreign-backed civil"
         description: Between a state and another armed group, involving a foreign state
       - slug: "intrastate (non-internationalized)"
-        name: "Domestic civil conflicts"
+        name: "Domestic civil"
         description: Between a state and another armed group, not involving a foreign state
       - slug: "extrasystemic"
-        name: "Colonial conflicts"
+        name: "Colonial"
         description: Between a state and another armed group outside its territory
   - slug: estimate
     name: "Estimate"
