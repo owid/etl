@@ -35,11 +35,15 @@ COUNTRY_MAPPING = {
     24: "Hong Kong",
 }
 
-# -98: Saw, skipped
-# 98: Don't know
-# 99: Refused
-
-# binary values are given as 1/2, 1 if yes, 2 if no
+# columns_mapping:
+# - "system" columns are system variables, such as id, country, wave, etc.
+# - "demographic" columns are demographic variables, such as age
+# - "special_demographic" columns are demographic variables which are different for each region
+# target varibles:
+# - "binary" columns are binary variables, where 1 is yes and 2 is no
+# - "cat_X" columns are categorical variables with X possible answers
+# - "scored_X" columns are numerical variables with a scale of X (e.g. scored_10 means scale of 1-10)
+# - "scored_97" columns are numerical variables with a scale up to 97 (these are topcoded to 97)
 COLUMNS_MAPPING = {
     "id": "system",
     "country": "system",
@@ -217,6 +221,9 @@ def run(dest_dir: str) -> None:
     tb["country"] = tb["country"].map(COUNTRY_MAPPING)
 
     # cleaning nan values
+    # -98: Saw, skipped
+    # 98: Don't know
+    # 99: Refused
     for val in ["-98", "98", "99", -98, 98, 99, " ", ""]:
         tb = tb.replace(val, np.nan)  # type: ignore
 
