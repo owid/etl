@@ -246,6 +246,20 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
     insert_list_with_links_in_gdoc(google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
     insert_list_with_links_in_gdoc(google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")
 
+    ####################################################################################################################
+    # Create PDF copy of the report.
+
+    # Create PDF copy in Google Drive
+    pdf_id = google_doc.save_as_pdf(overwrite=True)
+
+    # Generate direct links
+    doc_link = f"https://docs.google.com/document/d/{google_doc.doc_id}/edit"
+    pdf_link = f"https://drive.google.com/file/d/{pdf_id}/view"
+
+    log.info(f"Google Doc created: {doc_link}")
+    log.info(f"PDF created: {pdf_link}")
+    log.info(f"Both files are saved in folder: https://drive.google.com/drive/folders/{FOLDER_ID}")
+
 
 def print_impact_highlights(highlights: pd.DataFrame) -> None:
     # TODO:
