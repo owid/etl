@@ -1,0 +1,31 @@
+# Source files
+src/**
+test/**
+*.ts
+
+# Development files
+node_modules/**
+.vscode/**
+*.map
+
+# Build files
+out/**
+esbuild.js
+eslint.config.mjs
+tsconfig.json
+
+# Test and debug files
+debug_test.py
+test_highlighting.py
+test_sample.py
+
+# Package files
+package-lock.json
+README.md
+
+# Install files  
+install/**
+
+# Temporary files
+*.log
+.DS_Store

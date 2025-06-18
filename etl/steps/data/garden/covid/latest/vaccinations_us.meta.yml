@@ -19,7 +19,7 @@ tables:
       total_vaccinations:
         title: Total vaccinations
         unit: doses
-        description_short: Cumularive number of COVID-19 vaccination doses administered.
+        description_short: Cumulative number of COVID-19 vaccination doses administered.
         description_processing: All doses, including boosters, are counted individually.
       total_vaccinations_per_hundred:
         title: Total vaccinations (per 100 people)
