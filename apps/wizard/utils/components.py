@@ -223,7 +223,7 @@ def _chart_html(chart_config: Dict[str, Any], owid_env: OWIDEnv, height=600, **k
         <script> document.cookie = "isAdmin=true;max-age=31536000" </script>
         <script type="module" src="https://ourworldindata.org/assets/owid.mjs"></script>
         <script type="module">
-            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.Grapher.renderSingleGrapherOnGrapherPage(jsonConfig);
+            var jsonConfig = {json.dumps(chart_config_tmp, default=default_converter)}; window.renderSingleGrapherOnGrapherPage(jsonConfig);
         </script>
     </div>
     """
