@@ -9,7 +9,7 @@ meta:
     date_published: "2025-06-05"
     title_snapshot: Reproducibility package for Global Poverty Revisited Using 2021 PPPs And New Data On Consumption - Poverty projections
     description_snapshot: |-
-      This are poverty projections updated with the newly estimated poverty lines in 2021 international dollars: $3, $4.20, and $8.30 a day.
+      These are poverty projections updated with the newly estimated poverty lines in 2021 international dollars: $3, $4.20, and $8.30 a day.
 
     # Citation
     producer: Lakner et al.
@@ -23,6 +23,6 @@ meta:
 
     # License
     license:
-      name: CC BY 4.0
+      name: Modified BSD3
+      url: https://reproducibility.worldbank.org/index.php/catalog/285/#project_desc_container1674844764972
 
-  
