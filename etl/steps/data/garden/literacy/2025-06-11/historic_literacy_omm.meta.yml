@@ -44,9 +44,9 @@ tables:
       illiteracy_rate:
         title: Illiteracy rate
         description_short: Share of adults who cannot read and write a short, simple statement on their everyday life.
-
       source:
         title: Source for literacy data OMM
+        unit: ''
         description_short: The source of the literacy data, which varies by historical period and region.
         description_key:
           -  At Our World in Data, [we investigated](https://ourworldindata.org/how-is-literacy-measured) the strengths and shortcomings of the available data on literacy. Based on this work, we've pieced together data from many different sources spanning centuries.
