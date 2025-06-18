@@ -320,7 +320,7 @@ def _set_dods(view):
             "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), and [colonial](#dod:extrasystemic-ucdp)"
         )
     elif view.dimensions["conflict_type"] == "interstate":
-        dods = " [interstate conflicts](#dod:interstate-ucdp)"
+        dods = "[interstate conflicts](#dod:interstate-ucdp)"
     elif view.dimensions["conflict_type"] == "intrastate (internationalized)":
         dods = "[foreign-backed civil conflicts](#dod:intrastate-ucdp)"
     elif view.dimensions["conflict_type"] == "intrastate (non-internationalized)":
