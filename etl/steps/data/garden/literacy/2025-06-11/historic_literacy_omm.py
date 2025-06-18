@@ -67,7 +67,7 @@ def run() -> None:
         tables_clean.append(table.dropna(subset=["literacy_rate"]))
     # Concatenate all tables
     tb = pr.concat(tables_clean, axis=0, ignore_index=True)
-    tb["source"] = tb["literacy_rate"].copy_metadata(tb["literacy_rate"])
+    tb["source"] = tb["source"].copy_metadata(tb["literacy_rate"])
     tb = tb.format(["country", "year"], short_name="historic_literacy_omm")
 
     #
