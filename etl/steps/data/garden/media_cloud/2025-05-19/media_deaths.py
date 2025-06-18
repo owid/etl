@@ -41,6 +41,8 @@ YEAR = 2023
 TODAY_STR = dt.date.today().strftime("%Y_%m_%d")
 SAVE_TOKEN = f"{TODAY_STR}_"
 
+MENTIONS_PATH = f"/Users/tunaacisu/Data/Media Deaths/mentions_{SAVE_TOKEN}.csv"
+
 CAUSES_OF_DEATH_PATH = f"/Users/tunaacisu/Data/Media Deaths/Underlying Cause of Death_{YEAR}.csv"
 EXTERNAL_CAUSES_PATH = f"/Users/tunaacisu/Data/Media Deaths/Underlying Cause of Death_{YEAR}_external_factors.csv"
 
@@ -116,13 +118,13 @@ def global_causes_mentions(year):
     source_ids = [NYT_ID, GUARDIAN_ID, WAPO_ID, FOX_ID]
     sources = ["The New York Times", "The Guardian", "The Washington Post", "Fox News"]
 
-    mentions = []
+    mentions_ls = []
 
     for s_id, s_name in zip(source_ids, sources):
         mentions = get_mentions_from_source(
             [s_id], s_name, STR_QUERIES, death_df=death_df, verbose=True, causes_to_exclude=["war"], year=year
         )
-        mentions.append(mentions.copy(deep=True))
+        mentions_ls.append(mentions.copy(deep=True))
 
     all_mentions = pd.concat(
         mentions,
@@ -305,6 +307,8 @@ def plot_single_vs_multiple_mentions():
 
     mult_mentions = []
 
+    exclude_causes = ["war", "hiv", "malaria", "tb", "diarrhea"]
+
     for s_id, s_name in zip(source_ids, sources):
         mentions = get_mentions_from_source(
             [s_id],
@@ -312,6 +316,7 @@ def plot_single_vs_multiple_mentions():
             STR_QUERIES,
             death_df=death_df,
             verbose=True,
+            causes_to_exclude=exclude_causes,
         )
         mult_mentions.append(mentions.copy(deep=True))
         print(f"Time taken for {s_name}: {time.time() - start_time:.2f} seconds")
@@ -328,6 +333,7 @@ def plot_single_vs_multiple_mentions():
             SINGLE_QUERIES,
             death_df=death_df,
             verbose=True,
+            causes_to_exclude=exclude_causes,
         )
         single_mentions.append(mentions.copy(deep=True))
         print(f"Time taken for {s_name}: {time.time() - start_time:.2f} seconds")
@@ -353,8 +359,8 @@ def plot_single_vs_multiple_mentions():
 
         plot_media_deaths(
             source_df,
-            columns=["deaths_share", "multiple_mentions_share", "single_mentions_share"],
-            bar_labels=["Deaths", "Multiple Mentions", "Single Mentions"],
+            columns=["multiple_mentions_share", "single_mentions_share"],
+            bar_labels=["Multiple Mentions", "Single Mentions"],
             title=f"Media Mentions of Causes of Death - {source} ({YEAR})",
         )
 
@@ -478,9 +484,69 @@ def add_shares(media_deaths_df: pd.DataFrame, columns=None):
         if total == 0:
             media_deaths_df[col] = 0
         else:
-            media_deaths_df[f"{col}_share"] = (media_deaths_df[col] / total) * 100  # convert to percentage
+            media_deaths_df[f"{col}_share"] = round(
+                (media_deaths_df[col] / total) * 100, 3
+            )  # convert to percentage, round to three decimal places
 
     return media_deaths_df
+
+
+def excluding_war():
+    death_df = create_death_df()
+
+    queries_excl_war = STR_QUERIES
+    queries_incl_war = STR_QUERIES.copy()
+    queries_incl_war["homicide"] = STR_QUERIES["homicide"].split(" NOT ")[0]
+
+    cdc_excludes = ["war", "hiv", "malaria", "tb", "diarrhea"]  # causes to exclude from the analysis
+
+    source_ids = [NYT_ID, WAPO_ID, FOX_ID]
+    sources = ["The New York Times", "The Washington Post", "Fox News"]
+
+    mentions_ls = []
+    stories_ls = []
+
+    for s_id, s_name in zip(source_ids, sources):
+        mentions = get_mentions_from_source(
+            [s_id], s_name, queries_incl_war, death_df=death_df, verbose=True, causes_to_exclude=cdc_excludes, year=YEAR
+        )
+        mentions_ls.append(mentions.copy(deep=True))
+        stories = query_all_stories({"homicide": queries_incl_war["homicide"]}, source_ids=[s_id], timeout=30)
+        stories_ls.append(stories.copy(deep=True))
+
+    stories_war_df = pd.concat(stories_ls, ignore_index=True)
+
+    sources_no_war = [f"{s} (no war)" for s in sources]
+    stories_no_war_ls = []
+
+    for s_id, s_name in zip(source_ids, sources_no_war):
+        mentions = get_mentions_from_source(
+            [s_id], s_name, queries_excl_war, death_df=death_df, verbose=True, causes_to_exclude=cdc_excludes, year=YEAR
+        )
+        mentions_ls.append(mentions.copy(deep=True))
+        stories = query_all_stories({"homicide": queries_excl_war["homicide"]}, source_ids=[s_id], timeout=30)
+        stories_no_war_ls.append(stories.copy(deep=True))
+
+    stories_no_war_df = pd.concat(stories_no_war_ls, ignore_index=True)
+
+    if not stories_war_df.empty:
+        titles = stories_war_df["title"].tolist()
+        stories_excluded = stories_no_war_df[stories_no_war_df["title"].isin(titles)]
+
+    all_mentions = pd.concat(mentions_ls, ignore_index=True)
+
+    pv = pivot_media_mentions(all_mentions)
+    for s_name in sources:
+        plot_media_deaths(
+            pv,
+            columns=[
+                f"mentions_share {s_name}",
+                f"mentions_share {s_name} (no war)",
+            ],
+            bar_labels=[s_name, f"{s_name} (no war)"],
+            title=f"Media Mentions of Causes of Death - {YEAR} (US)",
+        )
+    return stories_excluded
 
 
 def plot_media_deaths(media_deaths_df, columns=None, bar_labels=None, title=None):
@@ -562,14 +628,14 @@ def get_mentions_from_source(
     year=YEAR,
     verbose: bool = False,
     collection_ids=None,
-    causes_to_exclude=["war", "hiv", "malaria", "tb", "diarrhea"],  # causes to exclude from analysis
+    causes_to_exclude=[],  # causes to exclude from analysis
 ):
     """
     Get mentions of causes of death from a specific source.
     Args:
         source_ids (list): List of source IDs to query.
         source_name (str): Name of the source.
-        queries (dict): Dictionary of queries to run.‚‚
+        queries (dict): Dictionary of queries to run.
         death_df (pd.DataFrame): DataFrame containing causes of death and their respective death counts.
         year (int): Year to query for.
         verbose (bool): Whether to print verbose output.
@@ -602,6 +668,17 @@ def get_mentions_from_source(
     return df_results
 
 
+def filter_mentions_on_source(media_mentions_df: pd.DataFrame, source_name: str) -> pd.DataFrame:
+    """Filter media mentions DataFrame on a specific source."""
+    if "source" not in media_mentions_df.columns:
+        raise ValueError("The DataFrame must contain a 'source' column.")
+
+    filtered_df = media_mentions_df[media_mentions_df["source"] == source_name].copy()
+    if filtered_df.empty:
+        print(f"No mentions found for source: {source_name}")
+    return filtered_df.reset_index(drop=True)
+
+
 def pivot_media_mentions(media_deaths_df: pd.DataFrame):
     """Pivot media mentions to have mentions per outlet as columns."""
     media_pv = media_deaths_df.pivot(
@@ -615,99 +692,86 @@ def pivot_media_mentions(media_deaths_df: pd.DataFrame):
 
 def run() -> None:
     use_saved_data = False  # set to True to use saved data, False to query the API
-    find_stories = True  # set to True to find stories, False to skip finding stories
+    find_stories = False  # set to True to find stories, False to skip finding stories
+
+    all_queries = STR_QUERIES  # queries to use
 
     if use_saved_data:
         # Load saved data
-        media_deaths_df = pd.read_csv(MEDIA_MENTIONS_PATH)
+        all_mentions = pd.read_csv(MEDIA_MENTIONS_PATH)
 
-        nyt_mentions = media_deaths_df[media_deaths_df["source"] == "The New York Times"]
-        guardian_mentions = media_deaths_df[media_deaths_df["source"] == "The Guardian"]
-        wapo_mentions = media_deaths_df[media_deaths_df["source"] == "The Washington Post"]
-        collection_mentions = media_deaths_df[media_deaths_df["source"] == "US National Collection"]
-        fox_mentions = media_deaths_df[media_deaths_df["source"] == "Fox News"]
-
-    #
     else:
         death_df = create_death_df()
 
         all_queries = STR_QUERIES
 
-        nyt_mentions = get_mentions_from_source(
-            source_ids=[NYT_ID], source_name="The New York Times", queries=all_queries, death_df=death_df, verbose=True
-        )
+        cdc_excludes = ["war", "hiv", "malaria", "tb", "diarrhea"]  # causes to exclude from the analysis
 
-        guardian_mentions = get_mentions_from_source(
-            source_ids=[GUARDIAN_ID],
-            source_name="The Guardian",
-            queries=all_queries,
-            death_df=death_df,
-            verbose=True,
-        )
+        source_ids = [NYT_ID, GUARDIAN_ID, WAPO_ID, FOX_ID]
+        sources = ["The New York Times", "The Guardian", "The Washington Post", "Fox News"]
 
-        wapo_mentions = get_mentions_from_source(
-            source_ids=[WAPO_ID],
-            source_name="The Washington Post",
-            queries=all_queries,
-            death_df=death_df,
-            verbose=True,
-        )
+        mentions_ls = []
 
-        collection_mentions = get_mentions_from_source(
-            source_ids=[],
-            source_name="US National Collection",
-            queries=all_queries,
-            death_df=death_df,
-            collection_ids=[US_NATIONAL_COLLECTION_ID],
-            verbose=True,
-        )
+        # querying single sources
+        for s_id, s_name in zip(source_ids, sources):
+            mentions = get_mentions_from_source(
+                [s_id], s_name, all_queries, death_df=death_df, verbose=True, causes_to_exclude=cdc_excludes, year=YEAR
+            )
+            mentions_ls.append(mentions.copy(deep=True))
 
-        fox_mentions = get_mentions_from_source(
-            source_ids=[FOX_ID],
-            source_name="Fox News",
-            queries=all_queries,
-            death_df=death_df,
-            verbose=True,
-        )
+        collection_ids = [US_NATIONAL_COLLECTION_ID]
+        collections = ["US National Collection"]
+
+        # querying collections
+        for c_id, c_name in zip(collection_ids, collections):
+            mentions = get_mentions_from_source(
+                [],
+                c_name,
+                all_queries,
+                death_df=death_df,
+                verbose=True,
+                causes_to_exclude=cdc_excludes,
+                collection_ids=collection_ids,
+            )
+            mentions_ls.append(mentions.copy(deep=True))
+
+        all_mentions = pd.concat(mentions_ls, ignore_index=True)
 
     if find_stories:
         # Save stories to csv
-        stories_to_csv(QUERIES, source_ids=[NYT_ID], source_name="NYT")
+        stories_to_csv(all_queries, source_ids=[NYT_ID], source_name="NYT")
 
         # Find stories for each source
-        print_example_stories(QUERIES, source_ids=[NYT_ID], n_stories=5)
-        print_example_stories(QUERIES, source_ids=[GUARDIAN_ID], n_stories=5)
-        print_example_stories(QUERIES, source_ids=[WAPO_ID], n_stories=5)
-        print_example_stories(QUERIES, source_ids=[FOX_ID], n_stories=5)
+        print_example_stories(all_queries, source_ids=[NYT_ID], n_stories=5)
+        print_example_stories(all_queries, source_ids=[GUARDIAN_ID], n_stories=5)
+        print_example_stories(all_queries, source_ids=[WAPO_ID], n_stories=5)
+        print_example_stories(all_queries, source_ids=[FOX_ID], n_stories=5)
 
     # plot media deaths:
 
     title_str = f"Media Mentions, Causes of Death (w/o war) - {YEAR}"
 
-    plot_media_deaths(guardian_mentions, title=f"{title_str} - The Guardian")
-    plot_media_deaths(nyt_mentions, title=f"{title_str} - The New York Times")
-    plot_media_deaths(wapo_mentions, title=f"{title_str} - The Washington Post")
-    plot_media_deaths(collection_mentions, title=f"{title_str} - US National Collection")
+    for s_name in sources:
+        mentions = filter_mentions_on_source(all_mentions, s_name)
+        if not mentions.empty:
+            plot_media_deaths(mentions, title=f"{title_str} - {s_name}")
 
-    all_mentions = [nyt_mentions, guardian_mentions, wapo_mentions, collection_mentions, fox_mentions]
-
-    mentions_pv = pivot_media_mentions(pd.concat(all_mentions, ignore_index=True))
+    mentions_pv = pivot_media_mentions(all_mentions)
     plot_media_deaths(
         mentions_pv,
         columns=[
             "deaths_share",
             "mentions_share The New York Times",
-            "mentions_share The Guardian",
+            "mentions_share The Washington Post",
             "mentions_share Fox News",
         ],
-        bar_labels=["Deaths", "NYT", "Guardian", "Fox News"],
+        bar_labels=["Deaths", "NYT", "WaPo", "Fox News"],
+        title=f"Media Mentions of Causes of Death - {YEAR} (US)",
     )
 
     # combine dataframes and save to csv
     if not use_saved_data:
-        all_mentions = [nyt_mentions, guardian_mentions, wapo_mentions, collection_mentions]
-        media_deaths_df = pd.concat(all_mentions, ignore_index=True)
-        media_deaths_df["year"] = YEAR
+        all_mentions["year"] = YEAR
 
         # save to csv
-        media_deaths_df.to_csv(MEDIA_MENTIONS_PATH)
+        all_mentions.to_csv(MEDIA_MENTIONS_PATH)
