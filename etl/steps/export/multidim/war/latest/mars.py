@@ -29,11 +29,7 @@ DIMENSION_ESTIMATE = {
 
 # Common config
 COMMON_CONFIG = {
-    "hasMapTab": True,
     "originUrl": "ourworldindata.org/war-and-peace",
-    "map": {
-        "colorScale": {"baseColorScheme": "OrRd"},
-    },
     "relatedQuestions": [
         {
             "text": "How do different approaches measure armed conflicts and their deaths?",
