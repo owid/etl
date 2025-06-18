@@ -224,6 +224,10 @@ def run(dest_dir: str) -> None:
     # -98: Saw, skipped
     # 98: Don't know
     # 99: Refused
+
+    for col in tb.select_dtypes(include="category").columns:
+        tb[col] = tb[col].astype(str)
+
     for val in ["-98", "98", "99", -98, 98, 99, " ", ""]:
         tb = tb.replace(val, np.nan)  # type: ignore
 
@@ -335,10 +339,18 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
     col_ans = {1: "yes", 2: "no"}
     res_tbs = []
     for col in cols:
-        res = tb_binary.groupby(groups + [col], dropna=False)["annual_weight1"].sum()
-        denom = res.groupby(groups).sum()
-        res = (res / denom).unstack()
+        res = tb_binary.groupby(groups + [col], dropna=False)["annual_weight1"].sum().reset_index()
+        denom = res.groupby(groups).sum().reset_index()
+        # res_1 = (res / denom).unstack()
 
+        # alternative approach:
+        res = pr.merge(res, denom, on=groups, suffixes=("", "_country"), how="left")
+        res["share"] = res["annual_weight1"] / res["annual_weight1_country"]
+        res = res.pivot(
+            index=groups,
+            columns=col,
+            values="share",
+        )
         col_names = [col_ans[x] if x in col_ans.keys() else "na" for x in res.columns]
         res.columns = [f"{col}_{x}_share" for x in col_names]
         res_tbs.append(res.reset_index())
@@ -350,9 +362,17 @@ def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
     tb_cat = tb[groups + cols + ["annual_weight1"]].copy()
     res_tbs = []
     for col in cols:
-        res = tb_cat.groupby(groups + [col], dropna=False)["annual_weight1"].sum()
-        denom = res.groupby(groups).sum()
-        res = (res / denom).unstack()
+        res = tb_cat.groupby(groups + [col], dropna=False)["annual_weight1"].sum().reset_index()
+        denom = res.groupby(groups).sum().reset_index()
+        # res = (res / denom).unstack()
+
+        res = pr.merge(res, denom, on=groups, suffixes=("", "_country"), how="left")
+        res["share"] = res["annual_weight1"] / res["annual_weight1_country"]
+        res = res.pivot(
+            index=groups,
+            columns=col,
+            values="share",
+        )
 
         col_names = ["na" if pd.isna(x) else f"ans_{int(x)}" for x in res.columns]
         res.columns = [f"{col}_{x}_share" for x in col_names]
