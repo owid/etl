@@ -18,6 +18,8 @@ COMMON_CONFIG = {
         "time": True,
         "entity": True,
     },
+    "entityType": "region",
+    "entityTypePlural": "regions",
 }
 
 
