@@ -29,6 +29,6 @@ meta:
       url: https://gisaid.org/terms-of-use/
   is_public: false
 outs:
-  - md5: 2d0fcd474d685adac76ca19a4501c385
-    size: 31679958
+  - md5: b14aae0c6769bc78cad7f471f8e9051d
+    size: 32435122
     path: sequence.json
