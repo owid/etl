@@ -485,8 +485,8 @@ def run(producer, quarter, year, overwrite_pdf):
     df = pd.DataFrame(
         {
             "producer": [producer],
-            "year": [year],
-            "quarter": [quarter],
+            "year": [int(year)],
+            "quarter": [int(quarter)],
             "report": [report.pdf_link],
             "gdoc": [report.doc_link],
             "reviewed": [0],

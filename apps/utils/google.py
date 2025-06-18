@@ -8,6 +8,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+import numpy as np
 import pandas as pd
 import pandas_gbq
 from google.oauth2 import service_account
@@ -533,7 +534,7 @@ class GoogleSheet:
         )
         return result.get("values", [])
 
-    def update_values(self, range_name: str, values: List[List[Any]], value_input_option: str = "RAW") -> None:
+    def update_values(self, range_name: str, values: List[List[Any]], value_input_option: str = "USER_ENTERED") -> None:
         """
         Update values in a specified range of the spreadsheet.
 
@@ -553,7 +554,7 @@ class GoogleSheet:
             spreadsheetId=self.sheet_id, range=range_name, valueInputOption=value_input_option, body=body
         ).execute()
 
-    def append_values(self, range_name: str, values: List[List[Any]], value_input_option: str = "RAW") -> None:
+    def append_values(self, range_name: str, values: List[List[Any]], value_input_option: str = "USER_ENTERED") -> None:
         """
         Append values to the end of a specified range in the spreadsheet.
 
@@ -585,7 +586,7 @@ class GoogleSheet:
         """
         self.sheets_service.spreadsheets().values().clear(spreadsheetId=self.sheet_id, range=range_name).execute()
 
-    def batch_update_values(self, value_ranges: List[Dict[str, Any]], value_input_option: str = "RAW") -> None:
+    def batch_update_values(self, value_ranges: List[Dict[str, Any]], value_input_option: str = "USER_ENTERED") -> None:
         """
         Update multiple ranges in the spreadsheet in a single request.
 
@@ -679,7 +680,7 @@ class GoogleSheet:
         return self.get_values(range_name)
 
     def write_sheet_data(
-        self, data: List[List[Any]], sheet_name: str = "Sheet1", value_input_option: str = "RAW"
+        self, data: List[List[Any]], sheet_name: str = "Sheet1", value_input_option: str = "USER_ENTERED"
     ) -> None:
         """
         Write data to a worksheet, starting from A1.
@@ -709,7 +710,7 @@ class GoogleSheet:
         self.update_values(range_name, data, value_input_option)
 
     def append_sheet_data(
-        self, data: List[List[Any]], sheet_name: str = "Sheet1", value_input_option: str = "RAW"
+        self, data: List[List[Any]], sheet_name: str = "Sheet1", value_input_option: str = "USER_ENTERED"
     ) -> None:
         """
         Append data to the end of a worksheet.
@@ -780,7 +781,7 @@ class GoogleSheet:
         sheet_name: str = "Sheet1",
         include_index: bool = False,
         include_header: bool = True,
-        value_input_option: str = "RAW",
+        value_input_option: str = "USER_ENTERED",
     ) -> None:
         """
         Write a pandas DataFrame to a worksheet, replacing all existing data.
@@ -818,8 +819,21 @@ class GoogleSheet:
                 row_values = [str(idx)] + row_values
             values.append(row_values)
 
-        # Convert all values to strings to avoid issues with different data types
-        values = [[str(cell) if cell is not None else "" for cell in row] for row in values]
+        # Convert values to appropriate types for Google Sheets
+        def convert_value(cell):
+            if cell is None or pd.isna(cell):
+                return ""
+            elif isinstance(cell, (int, float)) and not isinstance(cell, bool):
+                # Ensure we return native Python int/float, not numpy types
+                if isinstance(cell, np.number):
+                    return cell.item()  # Convert numpy types to native Python types
+                return cell  # Keep numbers as numbers
+            elif isinstance(cell, bool):
+                return cell  # Keep booleans as booleans
+            else:
+                return str(cell)  # Convert everything else to strings
+
+        values = [[convert_value(cell) for cell in row] for row in values]
 
         self.write_sheet_data(values, sheet_name, value_input_option)
 
@@ -829,7 +843,7 @@ class GoogleSheet:
         sheet_name: str = "Sheet1",
         include_index: bool = False,
         include_header: bool = False,
-        value_input_option: str = "RAW",
+        value_input_option: str = "USER_ENTERED",
     ) -> None:
         """
         Append a pandas DataFrame to the end of a worksheet.
@@ -864,8 +878,21 @@ class GoogleSheet:
                 row_values = [str(idx)] + row_values
             values.append(row_values)
 
-        # Convert all values to strings to avoid issues with different data types
-        values = [[str(cell) if cell is not None else "" for cell in row] for row in values]
+        # Convert values to appropriate types for Google Sheets
+        def convert_value(cell):
+            if cell is None or pd.isna(cell):
+                return ""
+            elif isinstance(cell, (int, float)) and not isinstance(cell, bool):
+                # Ensure we return native Python int/float, not numpy types
+                if isinstance(cell, np.number):
+                    return cell.item()  # Convert numpy types to native Python types
+                return cell  # Keep numbers as numbers
+            elif isinstance(cell, bool):
+                return cell  # Keep booleans as booleans
+            else:
+                return str(cell)  # Convert everything else to strings
+
+        values = [[convert_value(cell) for cell in row] for row in values]
 
         self.append_sheet_data(values, sheet_name, value_input_option)
 
