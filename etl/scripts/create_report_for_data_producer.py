@@ -10,6 +10,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.utils.google import GoogleDoc, GoogleDrive
+from apps.utils.notion import get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
     get_post_views_by_chart_id,
@@ -45,18 +46,15 @@ def get_chart_title_from_url(chart_url: str) -> str:
     return title
 
 
-def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame, df_insights: pd.DataFrame) -> None:
+def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame) -> None:
     error = "Expected no duplicates in df_producer. If there are, drop duplicates (and check if that's expected)."
     assert df_charts[df_charts.duplicated(subset=["chart_id"])].empty, error
 
     error = "Unexpected post type."
     assert set(df_posts["post_type"]) <= set(["article", "topic-page", "linear-topic-page", "data-insight"]), error
 
-    error = "Expected no duplicates in df_articles. If there are, drop duplicates (and check if that's expected)."
+    error = "Expected no duplicates in df_posts. If there are, drop duplicates (and check if that's expected)."
     assert df_posts[df_posts.duplicated(subset=["url"])].empty, error
-
-    error = "Expected no duplicates in df_insights. If there are, drop duplicates (and check if that's expected)."
-    assert df_insights[df_insights.duplicated(subset=["url"])].empty, error
 
 
 def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Dict[str, pd.DataFrame]:
@@ -82,7 +80,7 @@ def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Di
     df_charts["featured_on_homepage"] = False
 
     # Get posts showing charts using data from the current data producer.
-    # NOTE: Include DIs as part of posts (for the total view count). But then create a separate dataframe for DIs.
+    # NOTE: Include DIs as part of posts (for the total view count).
     df_posts = get_post_views_by_chart_id(chart_ids=producer_chart_ids, date_min=min_date, date_max=max_date)
 
     # This dataframe may contain the homepage among the list of posts.
@@ -101,18 +99,11 @@ def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Di
         .reset_index(drop=True)
     )
 
-    # Create a separate dataframe for DIs published during the quarter.
-    df_insights = df_posts[
-        (df_posts["post_type"].isin(["data-insight"]))
-        & (df_posts["post_publication_date"] >= min_date)
-        & (df_posts["post_publication_date"] <= max_date)
-    ].reset_index(drop=True)
-
     # Sanity checks.
-    run_sanity_checks(df_charts=df_charts, df_posts=df_posts, df_insights=df_insights)
+    run_sanity_checks(df_charts=df_charts, df_posts=df_posts)
 
     # Create a dictionary with all analytics.
-    analytics = {"charts": df_charts, "posts": df_posts, "insights_in_quarter": df_insights}
+    analytics = {"charts": df_charts, "posts": df_posts}
 
     return analytics
 
@@ -126,7 +117,7 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
     for i, (_, row) in enumerate(df.iterrows(), start=1):
         title = row["title"]
         url = row["url"]
-        views = f"{row['views']:,}"
+        views = humanize_number(number=row["views"], sig_figs=3)
 
         numbered_title = f"{i}. {title}"
         line = f"{numbered_title} – {views} views\n"
@@ -177,19 +168,10 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
         .iloc[0:10]
         .assign(**{"featured_on_homepage": False})
     )
-    # Create a dataframe of the top DIs (althought it will likely be the same as all DIs).
-    df_top_insights = (
-        analytics["insights_in_quarter"]
-        .sort_values(["views"], ascending=False)
-        .reset_index(drop=True)
-        .iloc[0:10]
-        .assign(**{"featured_on_homepage": False})
-    )
 
     # Create the required numeric inputs for the document.
     n_charts = len(analytics["charts"])
-    n_articles = len(analytics["posts"])
-    n_insights = len(analytics["insights_in_quarter"])
+    n_publications = len(analytics["posts"])
     n_chart_views = analytics["charts"]["views"].sum()
     n_post_views = analytics["posts"]["views"].sum()
     # We have the average number of daily views for each chart. But we now want the macroaverage number of daily views.
@@ -198,12 +180,11 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
 
     # Humanize numbers.
     n_charts_humanized = humanize_number(n_charts)
-    n_posts_humanized = humanize_number(n_articles)
+    n_posts_humanized = humanize_number(n_publications)
     n_chart_views_humanized = humanize_number(n_chart_views)
     n_daily_chart_views_humanized = humanize_number(n_daily_chart_views)
     n_post_views_humanized = humanize_number(n_post_views)
     n_daily_post_views_humanized = humanize_number(n_daily_post_views)
-    n_insights_humanized = humanize_number(n_insights)
     max_date_humanized = datetime.strptime(f"{year}-{QUARTERS[quarter]['max_date']}", "%Y-%m-%d").strftime("%B %d, %Y")
     quarter_date_humanized = f"the {QUARTERS[quarter]['name']} quarter of {year}"
 
@@ -217,18 +198,14 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
     if n_charts == 0:
         raise AssertionError("Expected at least one chart to report.")
     elif n_charts == 1:
-        executive_summary_intro += f""" {n_charts_humanized} chart"""
+        executive_summary_intro += f""" {n_charts_humanized} interactive chart"""
     else:
-        executive_summary_intro += f""" {n_charts_humanized} charts"""
-    if n_articles == 0:
-        raise AssertionError("Expected at least one article to report.")
+        executive_summary_intro += f""" {n_charts_humanized} interactive charts"""
+    if n_publications == 0:
+        raise AssertionError("Expected at least one publication to report.")
 
-    plural_articles = "s" if n_articles > 1 else ""
-    plural_insights = "s" if n_insights > 1 else ""
-    if n_insights == 0:
-        executive_summary_intro += f""" and {n_posts_humanized} article{plural_articles}."""
-    else:
-        executive_summary_intro += f""", {n_posts_humanized} article{plural_articles}, and {n_insights_humanized} data insight{plural_insights}."""
+    plural_publications = "s" if n_publications > 1 else ""
+    executive_summary_intro += f""" and {n_posts_humanized} publication{plural_publications}."""
 
     ####################################################################################################################
     # Create a new google doc.
@@ -268,19 +245,22 @@ def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, p
     google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
     insert_list_with_links_in_gdoc(google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
     insert_list_with_links_in_gdoc(google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")
-    if not df_top_insights.empty:
-        # Get the index of the position of the data_insights placeholder.
-        insert_index = google_doc.find_marker_index(marker=r"{{data_insights}}")
 
-        if len(df_top_insights) == 1:
-            text = f"""During {quarter_date_humanized}, the following data insight was also published:
-            """
-        else:
-            text = f"""During {quarter_date_humanized}, the following data insights were also published:
-            """
-        edits = [{"insertText": {"location": {"index": insert_index}, "text": text}}]
-        google_doc.edit(requests=edits)
-        insert_list_with_links_in_gdoc(google_doc, df=df_top_insights, placeholder=r"{{data_insights}}")
+
+def print_impact_highlights(highlights: pd.DataFrame) -> None:
+    # TODO:
+    # * Consider creating another column in the highlights table, that contains the description to be shared with the data provider.
+    # * Then, here, filter for only those selected highlights where that column is not empty.
+    # * Adapt GDoc template to include those highlights, if any.
+    # * It might be useful to create a function that writes to GDoc with embedded hyperlinks.
+    if not highlights.empty:
+        print(
+            f"{len(highlights)} highlights found for this data producer. Manually check them and consider adding them to the producer GDoc."
+        )
+        for _, highlight in highlights.iterrows():
+            print(f"* {highlight['Highlight']}")
+            print(f"Source link: {highlight['Source link']}")
+            print(f"Notion highlight: {highlight['notion_url']}")
 
 
 @click.command(name="create_data_producer_report", cls=RichCommand, help=__doc__)
@@ -308,6 +288,13 @@ def run(producer, quarter, year):
 
     # Gather producer analytics.
     analytics = gather_producer_analytics(producer=producer, min_date=min_date, max_date=max_date)
+
+    ####################################################################################################################
+    # Get impact highlights, if any.
+    highlights = get_impact_highlights(producers=[producer], min_date=min_date, max_date=max_date)
+
+    # For now, print highlights here, and consider manually adding them to the document.
+    print_impact_highlights(highlights=highlights)
 
     ####################################################################################################################
     # Generate report.

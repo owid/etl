@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional, Union, cast
 
-from etl.collection import combine_collections
 from etl.collection.explorer import Explorer
 from etl.helpers import PathFinder
 
@@ -59,36 +58,15 @@ class ExplorerCreator:
         tb = self.table(table_name)
         tb_proj = self.table_proj(table_name)
 
-        # Explorer with estimates
-        explorer = self.paths.create_collection(
-            tb=tb,
-            dimensions=dimensions,
-            indicator_as_dimension=True,
-            explorer=True,
-            **kwargs,
-        )
-
         # Explorer with projections
-        if dimensions_proj is not None:
-            dimensions.update(dimensions_proj)
-        else:
-            dimensions["variant"] = ["medium", "high", "low"]
+        dimensions_ = {**dimensions, **(dimensions_proj or {"variant": ["medium", "high", "low"]})}
 
-        explorer_proj = self.paths.create_collection(
-            tb=tb_proj,
-            dimensions=dimensions,
+        explorer = self.paths.create_collection(
+            tb=[tb, tb_proj],
+            dimensions=[dimensions, dimensions_],
             indicator_as_dimension=True,
             explorer=True,
             **kwargs,
-        )
-
-        assert isinstance(explorer, Explorer)
-        assert isinstance(explorer_proj, Explorer)
-
-        explorer = combine_collections(
-            collections=[explorer, explorer_proj],
-            collection_name=explorer.short_name,
-            config=kwargs["config"],
         )
 
         return explorer

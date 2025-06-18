@@ -121,6 +121,70 @@ def test_dependency_filtering():
     }
 
 
+def test_dependency_filtering_with_excludes():
+    """Test that excludes properly remove steps and their downstream dependencies."""
+    dag = {
+        "f": {"e"},  # f depends on e
+        "e": {"d"},  # e depends on d
+        "d": {"c"},  # d depends on c
+        "c": {"b"},  # c depends on b
+        "b": {"a"},  # b depends on a
+        "a": set(),  # a has no dependencies
+        "g": {"a"},  # g also depends on a (parallel branch)
+    }
+
+    # Test excluding step "c" - should also exclude "d", "e", "f" (downstream dependencies)
+    # but keep "a", "b", "g" (not dependent on c)
+    result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["c"])
+    expected = {
+        "a": set(),
+        "b": {"a"},
+        "g": {"a"},
+    }
+    assert result == expected
+
+    # Test excluding with regex pattern
+    result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["[cd]"])
+    expected = {
+        "a": set(),
+        "b": {"a"},
+        "g": {"a"},
+    }
+    assert result == expected
+
+    # Test excluding step "a" - should exclude everything since all depend on "a"
+    result = filter_to_subgraph(dag, ["a", "b", "c", "d", "e", "f", "g"], excludes=["a"])
+    expected = {}
+    assert result == expected
+
+    # Test excludes with empty includes (should include all except excluded and their downstream)
+    result = filter_to_subgraph(dag, [], excludes=["c"])
+    expected = {
+        "a": set(),
+        "b": {"a"},
+        "g": {"a"},
+    }
+    assert result == expected
+
+
+def test_dependency_filtering_empty_includes_with_excludes():
+    """Test that excludes work properly when includes is empty."""
+    dag = {
+        "step1": set(),
+        "step2": {"step1"},
+        "step3": {"step2"},
+        "step4": set(),
+    }
+
+    # When includes is empty but excludes has values, should exclude specified steps and their downstream
+    result = filter_to_subgraph(dag, [], excludes=["step2"])
+    expected = {
+        "step1": set(),
+        "step4": set(),
+    }
+    assert result == expected
+
+
 @patch("etl.steps.parse_step")
 def test_selection_selects_parents(parse_step):
     "When you pick a step, it should select everything that step depends on."
