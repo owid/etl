@@ -19,10 +19,13 @@ meta:
 
     # Files
     url_main: https://reproducibility.worldbank.org/catalog/285
-    date_accessed: 2025-06-18
+    date_accessed: '2025-06-18'
 
     # License
     license:
       name: Modified BSD3
       url: https://reproducibility.worldbank.org/index.php/catalog/285/#project_desc_container1674844764972
-
+outs:
+  - md5: ffa4d03ac46cba8305e6f084f1e7b834
+    size: 339656
+    path: poverty_aggregates.dta
