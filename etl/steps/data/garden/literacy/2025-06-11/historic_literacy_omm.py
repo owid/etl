@@ -43,7 +43,6 @@ def run() -> None:
     tb_oecd = tb_oecd[["country", "year", "literacy"]].copy()
     tb_oecd = tb_oecd.rename(columns={"literacy": "literacy_rate"})
     tb_oecd["illiteracy_rate"] = 100 - tb_oecd["literacy_rate"]
-    tb_oecd = tb_oecd[tb_oecd["country"] == "World"]
     tb_oecd = tb_oecd[tb_oecd["year"] < 1970]
 
     # Process UNESCO data: filter and rename
@@ -59,12 +58,8 @@ def run() -> None:
     tables = [tb_1950, tb_1900_1950, tb_1451_1800, tb_oecd, tb_unesco]
     tables_clean = []
     for table in tables:
-        if not table.empty:
-            # Drop rows with missing literacy_rate
-            table_clean = table.dropna(subset=["literacy_rate"])
-            if not table_clean.empty:
-                tables_clean.append(table_clean)
-
+        # Drop rows with missing literacy_rate
+        tables_clean.append(table.dropna(subset=["literacy_rate"]))
     # Concatenate all tables
     tb = pr.concat(tables_clean, axis=0, ignore_index=True)
     tb = tb.format(["country", "year"], short_name="historic_literacy_omm")
