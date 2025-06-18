@@ -1,4 +1,5 @@
 import pickle
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -7,8 +8,13 @@ import pandas_gbq
 from google.oauth2 import service_account
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaIoBaseUpload
+from structlog import get_logger
 
 from etl.config import GOOGLE_APPLICATION_CREDENTIALS
+
+# Initialize logger.
+log = get_logger()
 
 ########################################################################################################################
 # TODO: Handling gdocs will not work for other users, because they won't have the client_secret.json file.
@@ -345,3 +351,114 @@ class GoogleDoc:
 
         # Remove the original placeholder text.
         self.replace_text(mapping={placeholder: ""})
+
+    def save_as_pdf(
+        self, pdf_name: Optional[str] = None, folder_id: Optional[str] = None, overwrite: bool = False
+    ) -> str:
+        """
+        Export this Google Doc as PDF and save it to Google Drive.
+
+        Parameters
+        ----------
+        pdf_name : str, optional
+            Name for the PDF file (without extension). If None, the Google Doc's name will be used.
+        folder_id : str, optional
+            Google Drive folder ID where the PDF should be saved. If None, the PDF will be saved in the same folder as the original Google Doc.
+        overwrite : bool, optional
+            If True, overwrite existing PDF with the same name. If False, raise an error if a file with the same name exists.
+
+        Returns
+        -------
+        pdf_id : str
+            The ID of the created PDF file in Google Drive.
+
+        """
+        try:
+            # Get document info (name and parents)
+            doc_info = self.drive.drive_service.files().get(fileId=self.doc_id, fields="name,parents").execute()
+
+            # If no pdf_name provided, use the document's name
+            if pdf_name is None:
+                pdf_name = doc_info.get("name", "Untitled document")
+
+            # If no folder_id provided, use the document's current folder(s)
+            if folder_id is None:
+                parents = doc_info.get("parents", [])
+            else:
+                parents = [folder_id]
+
+            pdf_filename = f"{pdf_name}.pdf"
+
+            # Check for existing PDF with the same name in the target folder(s)
+            existing_pdf_id = None
+            for parent in parents:
+                # Search for files with the same name in this folder
+                query = (
+                    f"name='{pdf_filename}' and '{parent}' in parents and trashed=false and mimeType='application/pdf'"
+                )
+                response = self.drive.drive_service.files().list(q=query, fields="files(id, name)").execute()
+
+                files = response.get("files", [])
+                if files:
+                    existing_pdf_id = files[0]["id"]
+                    break
+
+            # Handle existing file based on overwrite setting
+            if existing_pdf_id:
+                if not overwrite:
+                    raise FileExistsError(
+                        f"PDF file '{pdf_filename}' already exists in the target folder. Set overwrite=True to replace it."
+                    )
+                else:
+                    log.info(f"Found existing PDF '{pdf_filename}', will overwrite it")
+
+            # Export the document as PDF
+            request = self.drive.drive_service.files().export_media(
+                fileId=self.doc_id,
+                mimeType="application/pdf",
+            )
+
+            # Get the PDF content
+            pdf_content = request.execute()
+
+            # Upload the PDF to Google Drive
+            media = MediaIoBaseUpload(
+                BytesIO(pdf_content),
+                mimetype="application/pdf",
+                resumable=True,
+            )
+
+            if existing_pdf_id and overwrite:
+                # Update existing file
+                updated_file = (
+                    self.drive.drive_service.files()
+                    .update(fileId=existing_pdf_id, media_body=media, fields="id")
+                    .execute()
+                )
+                pdf_id = updated_file.get("id")
+                log.info(f"PDF updated in Google Drive with ID: {pdf_id}")
+            else:
+                # Create new file
+                pdf_metadata = {
+                    "name": pdf_filename,
+                    "parents": parents,
+                    "mimeType": "application/pdf",
+                }
+
+                pdf_file = (
+                    self.drive.drive_service.files()
+                    .create(
+                        body=pdf_metadata,
+                        media_body=media,
+                        fields="id",
+                    )
+                    .execute()
+                )
+                pdf_id = pdf_file.get("id")
+                log.info(f"PDF created in Google Drive with ID: {pdf_id}")
+
+            return pdf_id
+
+        except Exception as e:
+            log.error(f"Failed to create PDF in Drive: {e}")
+            raise
