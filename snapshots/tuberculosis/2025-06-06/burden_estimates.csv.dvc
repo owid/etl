@@ -1,7 +1,7 @@
 meta:
   origin:
     producer: WHO
-    title: Global Tuberculosis Report
+    title: Global Tuberculosis Report - Burden Estimates
     description: |-
       WHO has published a global tuberculosis (TB) report every year since 1997. The report provides a comprehensive and up-to-date assessment of the TB epidemic, and of progress in prevention, diagnosis and treatment of the disease at global, regional and country levels.
     title_snapshot: Global Tuberculosis Report - Burden Estimates
@@ -10,11 +10,11 @@ meta:
     url_main: https://www.who.int/teams/global-tuberculosis-programme/data
     url_download: https://extranet.who.int/tme/generateCSV.asp?ds=estimates
     date_accessed: "2025-06-06"
-    date_published: "2025-10-29"
+    date_published: "2024-10-29"
     license:
       name: CC BY-NC-SA 3.0 IGO
       url: https://www.who.int/about/policies/publishing/data-policy
 outs:
-  - md5: d99f0bbddae376ca700a6991bfc10cf1
-    size: 1057503
+  - md5: d06638ed7aafb7b3f48695315a623881
+    size: 1057523
     path: burden_estimates.csv
