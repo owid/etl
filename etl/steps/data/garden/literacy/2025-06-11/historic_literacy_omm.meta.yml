@@ -30,7 +30,7 @@ dataset:
   title: Historic literacy rates - Combined sources
   description: >
     This data is compiled from various sources for different historical periods and regions. More details on sources are available in the indicator description
-    It includes stimates based on book sales, field research and surveys of self-reported literacy, provided by Buringh and van Zanden, UNESCO reports and SDG data collection, covering different age groups and methodologies.
+    It includes estimates based on book sales, field research and surveys of self-reported literacy, provided by Buringh and van Zanden, UNESCO reports and SDG data collection, covering different age groups and methodologies.
   update_period_days: 365
 
 tables:
