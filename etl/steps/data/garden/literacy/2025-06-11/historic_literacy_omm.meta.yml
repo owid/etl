@@ -21,6 +21,7 @@ definitions:
           - All of this data measures basic literacy — can you read simple text and write your name? It doesn't capture functional literacy — can you understand a job application or follow written instructions? That requires years more education and is much harder to measure historically.
     description_from_producer: The current UNESCO standard for defining literacy is the percentage of the population age 15 and above who can, with understanding, read and write a short, simple statement on their everyday life. Generally, 'literacy' also encompasses 'numeracy', the ability to make simple arithmetic calculations. This indicator is calculated by dividing the number of literates aged 15 years and over by the corresponding age group population and multiplying the result by 100.
     description_processing: |-
+      - This dataset combines historical and contemporary literacy rates from various sources to provide a long-term view of global literacy trends from 1451 to the present.
       - When only the illiteracy rate was reported, the literacy rate was calculated by subtracting it from 100%.
       - For 1950, data was reported as a range (e.g. 10–20%). To allow for consistent analysis, these ranges were converted into single-point estimates by taking their midpoint. For example, a range of 10–20% was recorded as 15%.
 # Learn more about the available fields:
@@ -29,8 +30,7 @@ dataset:
   title: Historic literacy rates - Combined sources
   description: >
     This data is compiled from various sources for different historical periods and regions. More details on sources are available in the indicator description
-    This dataset combines historical and contemporary literacy rates from various sources to provide a long-term view of global literacy trends from 1451 to the present.
-    It includes estimates based on book sales, UNESCO reports, and SDG indicators, covering different age groups and methodologies.
+    It includes stimates based on book sales, field research and surveys of self-reported literacy, provided by Buringh and van Zanden, UNESCO reports and SDG data collection, covering different age groups and methodologies.
   update_period_days: 365
 
 tables:
