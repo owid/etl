@@ -38,7 +38,7 @@ definitions:
 
 
       <%- elif conflict_type == "interstate" -%>
-      An interstate conflict is a is a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      An interstate conflict is a conflict between states that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate" -%>
       An intrastate conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}. If a foreign state is involved, it is called "internationalized", and "non-internationalized" otherwise.
