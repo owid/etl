@@ -9,7 +9,7 @@ import requests
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
-from apps.utils.google import GoogleDoc, GoogleDrive
+from apps.utils.google import GoogleDoc, GoogleDrive, GoogleSheet
 from apps.utils.notion import get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
@@ -30,6 +30,9 @@ FOLDER_ID = "1SySOSNXgNLEJe2L1k7985p-zSeUoU4kN"
 
 # Document ID of template.
 TEMPLATE_ID = "149cLrJK9VI-BNjnM-LxnWgbQoB7mwjSpgjO497rzxeU"
+
+# Document ID of reports status sheet.
+STATUS_SHEET_ID = "1CLM4EKiu0DZaNz5BFdDvMvCxbveKUHCsgNd-a4Fumnk"
 
 # Common definitions of quarters.
 QUARTERS = {
@@ -160,28 +163,89 @@ class Report:
         self.min_date = f"{year}-{QUARTERS[quarter]['min_date']}"
         self.max_date = f"{year}-{QUARTERS[quarter]['max_date']}"
 
-        # Initialize other attributes (that will be populated later on).
-        self.analytics: Dict[str, pd.DataFrame] | None = None
-        self.google_doc: GoogleDoc | None = None
-        self.doc_id: str | None = None
-        self.pdf_id: str | None = None
-
-    def check_existing(self) -> tuple[str | None, str | None]:
-        """Check if this report already exists in Google Drive."""
+        # Check if this report already exists in Google Drive
         google_drive = GoogleDrive()
         files = google_drive.list_files_in_folder(folder_id=FOLDER_ID)
 
-        doc_id = None
-        pdf_id = None
+        self.doc_id: str | None = None
+        self.pdf_id: str | None = None
 
         for file in files:
             if file["name"] == self.title:
                 if file["mimeType"] == "application/vnd.google-apps.document":
-                    doc_id = file["id"]
-                elif file["mimeType"] == "application/pdf":
-                    pdf_id = file["id"]
+                    self.doc_id = file["id"]
+            elif file["name"] == f"{self.title}.pdf":
+                if file["mimeType"] in [
+                    "application/pdf",
+                    "application/x-pdf",
+                    "application/acrobat",
+                    "application/vnd.pdf",
+                ]:
+                    self.pdf_id = file["id"]
 
-        return doc_id, pdf_id
+        # Log what was found during initialization
+        if self.doc_id and self.pdf_id:
+            log.info(f"Found existing Google Doc and PDF for {self.title}")
+        elif self.doc_id:
+            log.info(f"Found existing Google Doc (no PDF) for {self.title}")
+        elif self.pdf_id:
+            log.info(f"Found existing PDF (no Google Doc) for {self.title}")
+        else:
+            log.info(f"No existing files found for {self.title}")
+
+        # Initialize other attributes (that will be populated later on).
+        self.analytics: Dict[str, pd.DataFrame] | None = None
+        self.google_doc: GoogleDoc | None = None
+        if self.doc_id:
+            self.google_doc = GoogleDoc(doc_id=self.doc_id)
+
+    @property
+    def doc_link(self) -> str | None:
+        """Get the Google Doc link if doc_id exists."""
+        if self.doc_id:
+            return f"https://docs.google.com/document/d/{self.doc_id}/edit"
+        return None
+
+    @property
+    def pdf_link(self) -> str | None:
+        """Get the PDF link if pdf_id exists."""
+        if self.pdf_id:
+            return f"https://drive.google.com/file/d/{self.pdf_id}/view"
+        return None
+
+    @property
+    def folder_link(self) -> str:
+        """Get the folder link where reports are stored."""
+        return f"https://drive.google.com/drive/folders/{FOLDER_ID}"
+
+    @property
+    def exists(self) -> bool:
+        """Check if this report already exists (has a Google Doc)."""
+        return self.doc_id is not None
+
+    @property
+    def has_pdf(self) -> bool:
+        """Check if this report has a PDF."""
+        return self.pdf_id is not None
+
+    @property
+    def status(self) -> str:
+        """Get a human-readable status of the report."""
+        if not self.exists:
+            return "Not created"
+        elif not self.has_pdf:
+            return "Google Doc exists, no PDF"
+        else:
+            return "Both Google Doc and PDF exist"
+
+    def status_with_links(self) -> str:
+        """Get a detailed status including links."""
+        if not self.exists:
+            return "Not created"
+        elif not self.has_pdf:
+            return f"Google Doc exists (no PDF)\n  📄 Doc: {self.doc_link}"
+        else:
+            return f"Both Google Doc and PDF exist\n  📄 Doc: {self.doc_link}\n  📋 PDF: {self.pdf_link}"
 
     def gather_analytics(self) -> None:
         """Gather analytics data for this report."""
@@ -295,16 +359,23 @@ class Report:
         return self.pdf_id
 
     def generate_links(self) -> None:
-        """Generate and log report links."""
-        if not self.doc_id or not self.pdf_id:
-            raise ValueError("Both doc_id and pdf_id must be set")
+        """Log report links."""
+        if self.doc_link:
+            log.info(f"Google Doc: {self.doc_link}")
+        if self.pdf_link:
+            log.info(f"PDF: {self.pdf_link}")
+        if self.doc_link or self.pdf_link:
+            log.info(f"Files are saved in folder: {self.folder_link}")
 
-        doc_link = f"https://docs.google.com/document/d/{self.doc_id}/edit"
-        pdf_link = f"https://drive.google.com/file/d/{self.pdf_id}/view"
-
-        log.info(f"Google Doc: {doc_link}")
-        log.info(f"PDF: {pdf_link}")
-        log.info(f"Both files are saved in folder: https://drive.google.com/drive/folders/{FOLDER_ID}")
+    def get_links(self) -> Dict[str, str]:
+        """Get all available links for this report."""
+        links = {}
+        if self.doc_link:
+            links["google_doc"] = self.doc_link
+        if self.pdf_link:
+            links["pdf"] = self.pdf_link
+        links["folder"] = self.folder_link
+        return links
 
     def create_full_report(self, overwrite_pdf: bool = True) -> None:
         """Create a complete report from scratch."""
@@ -318,6 +389,24 @@ class Report:
         self.create_google_doc()
         self.create_pdf(overwrite=overwrite_pdf)
         self.generate_links()
+
+    def print_summary(self) -> None:
+        """Print a comprehensive summary of the report status and links."""
+        print(f"\n📊 Report: {self.title}")
+        print(f"Status: {self.status}")
+        print(f"Period: {self.min_date} to {self.max_date}")
+
+        if self.doc_link:
+            print(f"📄 Google Doc: {self.doc_link}")
+        if self.pdf_link:
+            print(f"📋 PDF: {self.pdf_link}")
+        print(f"📁 Folder: {self.folder_link}")
+
+        if self.analytics:
+            n_charts = len(self.analytics["charts"])
+            n_posts = len(self.analytics["posts"])
+            print(f"📈 Analytics: {n_charts} charts, {n_posts} posts")
+        print()
 
 
 def print_impact_highlights(highlights: pd.DataFrame) -> None:
@@ -359,26 +448,30 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     help="Overwrite existing PDF if report already exists.",
 )
 def run(producer, quarter, year, overwrite_pdf):
-    # Create report instance
+    # Create report instance (it will automatically check for existing reports)
     report = Report(producer, quarter, year)
 
-    # Check if report already exists
-    existing_doc_id, existing_pdf_id = report.check_existing()
+    print("\n📊 Report Status:")
+    print(report.status_with_links())
+    print(f"📁 Folder: {report.folder_link}")
+    print()
 
-    if existing_doc_id:
+    if report.exists:
         log.warning(f"Google Doc report already exists for {producer} Q{quarter} {year}")
+        # Since report.exists is True, we know doc_id is not None
+        assert report.doc_id is not None
 
-        if existing_pdf_id:
+        if report.has_pdf:
             if overwrite_pdf:
                 log.info("Overwriting existing PDF...")
-                report.update_pdf_from_existing(existing_doc_id, overwrite=True)
+                report.update_pdf_from_existing(report.doc_id, overwrite=True)
                 report.generate_links()
             else:
                 log.warning("PDF already exists and overwrite_pdf=False. No action taken.")
         else:
             if overwrite_pdf:
                 log.info("Creating PDF from existing Google Doc...")
-                report.update_pdf_from_existing(existing_doc_id, overwrite=True)
+                report.update_pdf_from_existing(report.doc_id, overwrite=True)
                 report.generate_links()
             else:
                 log.warning("Google Doc exists but no PDF found, and overwrite_pdf=False. No action taken.")
@@ -387,6 +480,21 @@ def run(producer, quarter, year, overwrite_pdf):
     # Report doesn't exist, create it from scratch
     log.info(f"Creating new report for {producer} Q{quarter} {year}")
     report.create_full_report(overwrite_pdf=overwrite_pdf)
+
+    # Add new entry in the status sheet.
+    df = pd.DataFrame(
+        {
+            "producer": [producer],
+            "year": [year],
+            "quarter": [quarter],
+            "report": [report.pdf_link],
+            "gdoc": [report.doc_link],
+            "reviewed": [0],
+            "shared with producer on": [None],
+        }
+    )
+    sheet = GoogleSheet(sheet_id=STATUS_SHEET_ID)
+    sheet.append_dataframe(df=df, sheet_name="status")
 
 
 if __name__ == "__main__":
