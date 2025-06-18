@@ -406,9 +406,10 @@ class GoogleDoc:
             # Handle existing file based on overwrite setting
             if existing_pdf_id:
                 if not overwrite:
-                    raise FileExistsError(
+                    log.warning(
                         f"PDF file '{pdf_filename}' already exists in the target folder. Set overwrite=True to replace it."
                     )
+                    return existing_pdf_id
                 else:
                     log.info(f"Found existing PDF '{pdf_filename}', will overwrite it")
 

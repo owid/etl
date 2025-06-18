@@ -354,9 +354,8 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     help="Year.",
 )
 @click.option(
-    "--overwrite-pdf",
-    is_flag=True,
-    default=True,
+    "--overwrite-pdf/--no-overwrite-pdf",
+    default=False,
     help="Overwrite existing PDF if report already exists.",
 )
 def run(producer, quarter, year, overwrite_pdf):
@@ -379,7 +378,7 @@ def run(producer, quarter, year, overwrite_pdf):
         else:
             if overwrite_pdf:
                 log.info("Creating PDF from existing Google Doc...")
-                report.update_pdf_from_existing(existing_doc_id, overwrite=False)
+                report.update_pdf_from_existing(existing_doc_id, overwrite=True)
                 report.generate_links()
             else:
                 log.warning("Google Doc exists but no PDF found, and overwrite_pdf=False. No action taken.")
