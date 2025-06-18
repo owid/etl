@@ -68,6 +68,8 @@ def run() -> None:
     # Concatenate all tables
     tb = pr.concat(tables_clean, axis=0, ignore_index=True)
     tb["source"] = tb["source"].copy_metadata(tb["literacy_rate"])
+    tb["source"] = tb["source"].astype(str)
+
     tb = tb.format(["country", "year"], short_name="historic_literacy_omm")
 
     #
