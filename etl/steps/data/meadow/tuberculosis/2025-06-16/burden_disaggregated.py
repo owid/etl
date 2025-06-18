@@ -11,16 +11,20 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("burden_estimates.csv")
+    snap = paths.load_snapshot("burden_disaggregated.csv")
 
     # Load data from snapshot.
     tb = snap.read(safe_types=False)
-
     #
     # Process data.
     #
+    tb = tb.drop(columns=["iso2", "iso3", "iso_numeric"])
     # Ensure all columns are snake-case, set an appropriate index, and sort conveniently.
-    tb = tb.underscore().set_index(["country", "year"], verify_integrity=True).sort_index()
+    tb = (
+        tb.underscore()
+        .set_index(["country", "year", "age_group", "sex", "risk_factor"], verify_integrity=True)
+        .sort_index()
+    )
 
     #
     # Save outputs.
