@@ -17,20 +17,20 @@ definitions:
   poverty_line: |-
     <% if poverty_line == 300 %>
     $3
-    <% elif poverty_line == 420 %>
+    <%- elif poverty_line == 420 %>
     $4.20
-    <% elif poverty_line == 830 %>
+    <%- elif poverty_line == 830 %>
     $8.30
-    <% endif %>
+    <%- endif %>
 
   description_key_povertyline: |-
     <% if poverty_line == 300 %>
     Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line} per day.
-    <% elif poverty_line == 420 %>
+    <%- elif poverty_line == 420 %>
     A poverty line of {definitions.poverty_line} a day represents definitions of national poverty lines in lower-middle-income countries.
-    <% elif poverty_line == 830 %>
+    <%- elif poverty_line == 830 %>
     A poverty line of {definitions.poverty_line} a day represents definitions of national poverty lines in upper-middle-income countries.
-    <% endif %>
+    <%- endif %>
 
   description_key_ppp: |-
     The data is measured in international-$ at {definitions.ppp_year} prices – this adjusts for inflation and for differences in the cost of living between countries.
