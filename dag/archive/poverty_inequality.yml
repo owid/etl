@@ -128,3 +128,9 @@ steps:
     - data://meadow/wb/2025-01-15/poverty_projections
   data://grapher/wb/2025-01-15/poverty_projections:
     - data://garden/wb/2025-01-15/poverty_projections
+
+  # 1000 Binned Global Distribution (World Bank PIP)
+  data://meadow/wb/2025-03-10/thousand_bins_distribution:
+    - snapshot://wb/2025-03-10/thousand_bins_distribution.dta
+  data://garden/wb/2025-03-10/thousand_bins_distribution:
+    - data://meadow/wb/2025-03-10/thousand_bins_distribution
