@@ -27,6 +27,26 @@ DIMENSION_ESTIMATE = {
     "low": "low",
 }
 
+# Common config
+COMMON_CONFIG = {
+    "hasMapTab": True,
+    "originUrl": "ourworldindata.org/war-and-peace",
+    "map": {
+        "colorScale": {"baseColorScheme": "OrRd"},
+    },
+    "relatedQuestions": [
+        {
+            "text": "How do different approaches measure armed conflicts and their deaths?",
+            "url": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+        }
+    ],
+    "hideAnnotationFieldsInTitle": {
+        "time": True,
+    },
+    "entityType": "region",
+    "entityTypePlural": "regions",
+}
+
 
 def run() -> None:
     # Load configuration from adjacent yaml file.
@@ -54,6 +74,7 @@ def run() -> None:
             "conflict_type": ["all", "civil war", "others (non-civil)"],
             "estimate": "*",
         },
+        common_view_config=COMMON_CONFIG,
     )
 
     # Edit indicator-level display settings
@@ -80,24 +101,22 @@ def run() -> None:
             {
                 "dimension": "conflict_type",
                 "choices": ["civil war", "others (non-civil)"],
-                "choice_new_slug": "all",
-                "view_config": {
+                "choice_new_slug": "all_stacked",
+                "view_config": COMMON_CONFIG
+                | {
                     "chartTypes": ["StackedBar"],
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
+                    "hasMapTab": False,
                 },
-                "overwrite_dimension_choice": True,
+                # "overwrite_dimension_choice": True,
             },
             {
                 "dimension": "estimate",
                 "choices": ["low", "high"],
                 "choice_new_slug": "low_high",
-                "view_config": {
+                "view_config": COMMON_CONFIG
+                | {
                     "selectedFacetStrategy": "entity",
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
+                    "hasMapTab": False,
                 },
             },
         ]
@@ -106,44 +125,21 @@ def run() -> None:
     # Remove certain views
     c.drop_views(
         [
-            {"conflict_type": ["civil war", "others (non-civil)"]},
+            # {"conflict_type": ["civil war", "others (non-civil)"]},
             {"estimate": ["high"]},
         ]
     )
 
     # Edit FAUST
-    c.edit_views(
-        [
-            {"config": {"timelineMinTime": 1800}},
-            {
-                "dimensions": {"indicator": "deaths"},
-                "config": {
-                    "title": "Deaths in wars",
-                    "subtitle": "Included are deaths of combatants due to fighting in [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-                },
-            },
-            {
-                "dimensions": {"indicator": "death_rate"},
-                "config": {
-                    "title": "Death rate in wars",
-                    "subtitle": "Deaths of combatants due to fighting, per 100,000 people. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-                },
-            },
-            {
-                "dimensions": {"indicator": "wars_ongoing"},
-                "config": {
-                    "title": "Number of wars",
-                    "subtitle": "Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-                },
-            },
-            {
-                "dimensions": {"indicator": "wars_ongoing_country_rate"},
-                "config": {
-                    "title": "Rate of wars",
-                    "subtitle": "The number of wars divided by the number of all states. This accounts for the changing number of states over time. Included are [interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars) wars that were ongoing that year.",
-                },
-            },
-        ]
+    c.set_global_config(
+        {
+            "timelineMinTime": 1900,
+            "title": lambda view: _set_title(view),
+            "subtitle": lambda view: _set_subtitle(view),
+            "hideRelativeToggle": lambda view: (view.dimensions["conflict_type"] != "all_stacked"),
+            "hideFacetControl": lambda view: view.dimensions["estimate"] == "low_high",
+            "selectedFacetStrategy": "entity",
+        }
     )
 
     # Save & upload
@@ -184,3 +180,55 @@ def adjust_dimensions(tb):
             }
         )
     return tb
+
+
+def _set_title(view):
+    conflict_type = get_conflict_type(view.dimensions["conflict_type"])
+    if view.dimensions["indicator"] == "deaths":
+        return f"Deaths in {conflict_type}"
+    elif view.dimensions["indicator"] == "death_rate":
+        return f"Death rate in {conflict_type}"
+    elif view.dimensions["indicator"] == "wars_ongoing":
+        return f"Number of {conflict_type}"
+    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+        return f"Rate of {conflict_type}"
+    else:
+        raise ValueError(f"Unknown indicator {view.dimensions['indicator']}")
+
+
+def _set_subtitle(view):
+    dods = get_dods(view.dimensions["conflict_type"])
+    if view.dimensions["indicator"] == "deaths":
+        return f"Deaths of combatants due to fighting in {dods} wars that were ongoing that year. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
+    elif view.dimensions["indicator"] == "death_rate":
+        return f"Deaths of combatants due to fighting, per 100,000 people. Included are {dods} wars that were ongoing that year. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
+    elif view.dimensions["indicator"] == "wars_ongoing":
+        return f"Included are {dods} wars that were ongoing that year."
+    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+        return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} wars that were ongoing that year."
+    else:
+        raise ValueError(f"Unknown indicator {view.dimensions['indicator']}")
+
+
+def get_conflict_type(ctype):
+    if ctype == "civil war":
+        return "civil wars"
+    elif ctype == "others (non-civil)":
+        return "interstate wars"
+    elif ctype == "all":
+        return "wars"
+    elif ctype == "all_stacked":
+        return "wars by type"
+    else:
+        raise ValueError(f"Unknown conflict type {ctype}")
+
+
+def get_dods(ctype):
+    if ctype in ("all", "all_stacked"):
+        return "[interstate](#dod:interstate-war-mars) and [civil](#dod:civil-war-mars)"
+    elif ctype == "civil war":
+        return "[civil wars](#dod:civil-war-mars)"
+    elif ctype == "others (non-civil)":
+        return "[interstate wars](#dod:interstate-war-mars)"
+    else:
+        raise ValueError(f"Unknown conflict type {ctype}")
