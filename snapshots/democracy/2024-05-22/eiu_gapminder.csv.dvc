@@ -5,9 +5,7 @@ meta:
     # Data product / Snapshot
     title: Democracy Index
     description: |-
-      The Democracy Index measures the quality of the democracy in a country and is produced by the Economist Intelligence Unit and published on a yearly basis.
-
-      Gapminder has combined the numbers from all the years the index has been published, into an online spreadsheet, also downloadable as an Excel file.
+      Gapminder has compiled data from earlier editions of the Economist Intelligence Unit's Democracy Index, covering 2006 to 2020. Gapminder is a Swedish foundation that works to correct common misunderstandings about global development by creating clear and accessible educational materials.
     date_published: "2021-04-06"
     version_producer: v4
     title_snapshot: Democracy Index, Gapminder 2006-2020
@@ -19,13 +17,12 @@ meta:
 
     # Files
     url_main: https://www.gapminder.org/data/documentation/democracy-index/
-    date_accessed: 2024-05-22
+    date_accessed: '2024-05-22'
 
     # License
     license:
       name: CC BY 4.0
       url: https://docs.google.com/document/d/1-RmthhS2EPMK_HIpnPctcXpB0n7ADSWnXa5Hb3PxNq4/edit?usp=sharing
-
 outs:
   - md5: a0a83113f66599ad285496253c279039
     size: 108880

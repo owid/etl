@@ -49,14 +49,15 @@ REGIONS_MAPPING = {
 }
 REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 # Last year of data
-LAST_YEAR = 2023
-LAST_YEAR_PREVIEW = 2024
+LAST_YEAR = 2024
+LAST_YEAR_PREVIEW = 2025
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 2316
+NUM_MISSING_LOCATIONS = 2433
 
 # Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
-CATALOG_PATH = "garden/war/2024-08-26/ucdp"
+VERSION_UCDP_STABLE = "2025-06-13"
+CATALOG_PATH = f"garden/war/{VERSION_UCDP_STABLE}/ucdp"
 
 
 def run() -> None:
@@ -66,7 +67,9 @@ def run() -> None:
     # Load inputs.
     #
     # Load datasets
-    ds_meadow = paths.load_dataset(short_name="ucdp", channel="meadow", namespace="war", version="2024-08-26")  # UCDP
+    ds_meadow = paths.load_dataset(
+        short_name="ucdp", channel="meadow", namespace="war", version=VERSION_UCDP_STABLE
+    )  # UCDP
     ds_gw = paths.load_dataset("gleditsch")  # Gleditsch
     ds_maps = paths.load_dataset("nat_earth_110")  # Nat Earth
     ds_population = paths.load_dataset("population")  # Population
@@ -83,14 +86,14 @@ def run() -> None:
     tb_conflict = ds_meadow.read("ucdp_battle_related_conflict")
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
-    tb_codes = ds_gw["gleditsch_countries"]
+    tb_codes = ds_gw.read("gleditsch_countries")
     tb_maps = ds_maps.read("nat_earth_110")
 
     #
     # Adapt for with CED data
     #
     ## Extend codes to have data for latest years
-    tb_codes = extend_latest_years(tb_codes, LAST_YEAR, LAST_YEAR_PREVIEW)
+    tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR_PREVIEW].set_index(["id", "year"])
     ## Add CED data
     tb_ged = add_ced_data(tb_ged, LAST_YEAR, LAST_YEAR_PREVIEW)
 

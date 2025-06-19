@@ -1,4 +1,15 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+NOTES: there seems to be some values for indicator `turnout_total_vdem` (i.e. `v2elvaptrn`) that exceed 100% (e.g. Gabon@1986, Somalia@1979, etc.).
+
+You can check by running:
+
+```python
+tb.sort_values("v2elvaptrn", ascending=False)[["country", "year", "v2elvaptrn"]].head(50)
+```
+
+Unclear why this occurs, but leads to sudden jumps for region aggregates, e.g. for Africa in 1986 (chart_id=7777).
+"""
 
 from typing import List
 

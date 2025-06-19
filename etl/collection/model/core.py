@@ -1,5 +1,6 @@
 """Model for collections."""
 
+import inspect
 import json
 import re
 from collections import defaultdict
@@ -908,6 +909,10 @@ def _set_config_metadata_with_params(
     new_config = fill_placeholders(view_config, params_view) if view_config else None
     new_metadata = fill_placeholders(view_metadata, params_view) if view_metadata else None
 
+    # Run callbacks on config and metadata
+    new_config = run_callbacks(new_config, view)
+    new_metadata = run_callbacks(new_metadata, view)
+
     # Add config and metadata to new view
     view.config = cast(GrapherConfig, new_config)
     view.metadata = new_metadata
@@ -1010,3 +1015,22 @@ def camelize(obj: Any, exclude_keys: Optional[Set[str]] = None) -> Any:
         return [camelize(item, exclude_keys) for item in obj]
     else:
         return obj
+
+
+def run_callbacks(data, view):
+    """Run callbacks on the data."""
+    if data is None:
+        return data
+
+    if isinstance(data, dict):
+        return {k: run_callbacks(v, view) for k, v in data.items()}
+
+    if isinstance(data, (list, tuple, set)):
+        container_type = type(data)
+        return container_type(run_callbacks(item, view) for item in data)
+
+    if inspect.isfunction(data):
+        # All placeholders are present – safe to format
+        return data(view)
+    # Otherwise, return the data as is
+    return data

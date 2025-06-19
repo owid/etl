@@ -1448,7 +1448,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-         Average score people gave when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+         Average score people gave when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
       wb_today_na_share:
         title: Share of respondents who did not answer the life evaluation question
         unit: "%"
@@ -1456,13 +1456,13 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-         Share of respondents who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+         Share of respondents who did not answer the question "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
       wb_today_ans_0_share:
         title: Life evaluation - Share of people who answered 0
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 0 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+         Share of people who answered 0 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_1_share:
@@ -1470,7 +1470,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-         Share of people who answered 1 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+         Share of people who answered 1 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_2_share:
@@ -1478,7 +1478,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 2 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 2 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_3_share:
@@ -1486,7 +1486,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 3 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 3 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_4_share:
@@ -1494,7 +1494,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 4 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 4 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_5_share:
@@ -1502,7 +1502,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 5 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 5 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_6_share:
@@ -1510,7 +1510,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 6 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 6 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_7_share:
@@ -1518,7 +1518,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 7 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 7 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_8_share:
@@ -1526,7 +1526,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 8 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 8 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_9_share:
@@ -1534,7 +1534,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 9 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 9 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_today_ans_10_share:
@@ -1542,7 +1542,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 10 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
+          Share of people who answered 10 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. On which step of the ladder would you say you personally feel you stand at this time?"
         description_key:
           - "{definitions.survey_text.wb_today}"
       wb_fiveyrs_mean:
@@ -1550,7 +1550,7 @@ tables:
         unit: ""
         short_unit: ""
         description_short: |-
-          Average score people gave when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Average score people gave when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
       wb_fiveyrs_na_share:
         title: Share of respondents who did not answer the life evaluation outlook question
         unit: "%"
@@ -1558,13 +1558,13 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of respondents who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of respondents who did not answer the question "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
       wb_fiveyrs_ans_0_share:
         title : Life evaluation outlook - Share of people who answered 0
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 0 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 0 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_1_share:
@@ -1572,7 +1572,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 1 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 1 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_2_share:
@@ -1580,7 +1580,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 2 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 2 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_3_share:
@@ -1588,7 +1588,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 3 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 3 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_4_share:
@@ -1596,7 +1596,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 4 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 4 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_5_share:
@@ -1604,7 +1604,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 5 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 5 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_6_share:
@@ -1612,7 +1612,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 6 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 6 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_7_share:
@@ -1620,7 +1620,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 7 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 7 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_8_share:
@@ -1628,7 +1628,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 8 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 8 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_9_share:
@@ -1636,7 +1636,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 9 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 9 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_fiveyrs_ans_10_share:
@@ -1644,7 +1644,7 @@ tables:
         unit: "%"
         short_unit: "%"
         description_short: |-
-          Share of people who answered 10 when asked "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of people who answered 10 when asked "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
         description_key:
           - "{definitions.survey_text.wb_fiveyrs}"
       wb_improvement_yes_share:
@@ -1666,7 +1666,7 @@ tables:
         description_key:
           - "{definitions.survey_text.no_answer}"
         description_short: |-
-          Share of respondents who did not answer the question "Imagine a ladder with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
+          Share of respondents who did not answer the question "Imagine a [ladder](#dod:cantril-ladder) with steps numbered from 0 at the bottom to 10 at the top. The 10 at the top of the ladder represents the best possible life for you and the 0 at the bottom of the ladder represents the worst possible life for you. Take your best guess: On which step of the ladder do you think you will stand in about five years from now?"
       worry_safety_mean:
         title: Worry about safety, food, or housing
         unit: ""

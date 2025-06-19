@@ -6,15 +6,11 @@ definitions:
         - Global Education
 
   desc_key_lays: &desc_key_lays
-    - Students around the world spend different amounts of time in school and learn at different rates — this indicator combines both the quantity and quality of education into a single measure.
+    - Students around the world spend different amounts of time in school and receive a different quality of education while they’re there. This indicator combines both the quantity and quality of education into a single measure.
     - It reflects the number of years of schooling that would be equivalent to those completed in a benchmark country, accounting for differences in learning achievement between education systems.
     - The measure is calculated by multiplying average years of schooling by a learning adjustment factor, which compares a country's test performance to that of a high-performing benchmark country.
-    - Learning-adjusted years of schooling are derived using international assessments such as TIMSS (Trends in International Mathematics and Science Study), with learning productivity measured as test scores divided by years of schooling preceding the assessment.
-    - A country with higher learning-adjusted years has either more years of schooling, better learning outcomes per year, or both, compared to countries with lower values.
-    - The data combines information from household surveys measuring years of schooling with international learning assessments administered at specific grade levels.
-    - This indicator is valuable for comparing education systems across countries, as it accounts for both access to education and the quality of learning that occurs during those years.
-    - However, the measure relies on test scores from specific grades and subjects, which may not fully capture all aspects of education quality or learning across different areas of knowledge.
-    - Cross-country comparisons should consider that the learning adjustment is based on performance relative to benchmark countries and may reflect broader socioeconomic factors beyond just education system effectiveness.
+    - Learning-adjusted years of schooling are derived using international assessments such as TIMSS (Trends in International Mathematics and Science Study), with learning productivity measured as test scores divided by years of schooling preceding the assessment. Since it relies on test scores from specific grades and subjects, it may not fully capture all aspects of education quality or learning across different areas of knowledge.
+    - A country with higher learning-adjusted years has either more years of schooling, better learning outcomes per year, or both.
 
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/dataset/

@@ -47,11 +47,13 @@ def run(dest_dir: str) -> None:
     tb = geo.harmonize_countries(
         df=tb, countries_file=paths.country_mapping_path, excluded_countries_file=paths.excluded_countries_path
     )
-    # Keep only data from WUENIC
+    # Keep only data from WUENIC (the estimates by World Health Organization and UNICEF).
     tb = use_only_wuenic_data(tb)
     tb = clean_data(tb)
     # Add denominator column
     tb = tb.assign(denominator=tb["antigen"].map(DENOMINATOR))
+    # Drop vaccines that are not globally recommended by WHO and UNICEF - https://www.who.int/publications/m/item/table1-summary-of-who-position-papers-recommendations-for-routine-immunization
+    tb = tb[~tb["antigen"].isin(["YFV", "MENA_C"])]
     # Calculate the number of one-year-olds vaccinated for each antigen.
     tb_one_year_olds = calculate_one_year_olds_vaccinated(tb, ds_population)
     tb_newborns = calculate_newborns_vaccinated(tb, ds_population)

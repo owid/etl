@@ -1,0 +1,20 @@
+meta:
+  origin:
+    producer: WHO
+    title: Global Tuberculosis Report
+    description: |-
+      WHO has published a global tuberculosis (TB) report every year since 1997. The report provides a comprehensive and up-to-date assessment of the TB epidemic, and of progress in prevention, diagnosis and treatment of the disease at global, regional and country levels.
+    title_snapshot: Global Tuberculosis Report - Drug resistance testing in TB patients
+    citation_full: "Global tuberculosis report 2024. Geneva: World Health Organization; 2024. Licence: CC BY-NC-SA 3.0 IGO"
+    attribution_short: WHO
+    url_main: https://www.who.int/teams/global-tuberculosis-programme/data
+    url_download: https://extranet.who.int/tme/generateCSV.asp?ds=dr_surveillance
+    date_accessed: "2025-06-16"
+    date_published: "2024-10-29"
+    license:
+      name: CC BY-NC-SA 3.0 IGO
+      url: https://creativecommons.org/licenses/by-nc-sa/3.0/igo/
+outs:
+  - md5: 3b19fa9604b2265c038d24da00fec235
+    size: 197740
+    path: drug_resistance_surveillance.csv

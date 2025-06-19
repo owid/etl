@@ -9,7 +9,7 @@ import requests
 from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
-from apps.utils.google import GoogleDoc, GoogleDrive
+from apps.utils.google import GoogleDoc, GoogleDrive, GoogleSheet
 from apps.utils.notion import get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
@@ -31,6 +31,9 @@ FOLDER_ID = "1SySOSNXgNLEJe2L1k7985p-zSeUoU4kN"
 # Document ID of template.
 TEMPLATE_ID = "149cLrJK9VI-BNjnM-LxnWgbQoB7mwjSpgjO497rzxeU"
 
+# Document ID of reports status sheet.
+STATUS_SHEET_ID = "1CLM4EKiu0DZaNz5BFdDvMvCxbveKUHCsgNd-a4Fumnk"
+
 # Common definitions of quarters.
 QUARTERS = {
     1: {"name": "first", "min_date": "01-01", "max_date": "03-31"},
@@ -46,18 +49,15 @@ def get_chart_title_from_url(chart_url: str) -> str:
     return title
 
 
-def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame, df_insights: pd.DataFrame) -> None:
+def run_sanity_checks(df_charts: pd.DataFrame, df_posts: pd.DataFrame) -> None:
     error = "Expected no duplicates in df_producer. If there are, drop duplicates (and check if that's expected)."
     assert df_charts[df_charts.duplicated(subset=["chart_id"])].empty, error
 
     error = "Unexpected post type."
     assert set(df_posts["post_type"]) <= set(["article", "topic-page", "linear-topic-page", "data-insight"]), error
 
-    error = "Expected no duplicates in df_articles. If there are, drop duplicates (and check if that's expected)."
+    error = "Expected no duplicates in df_posts. If there are, drop duplicates (and check if that's expected)."
     assert df_posts[df_posts.duplicated(subset=["url"])].empty, error
-
-    error = "Expected no duplicates in df_insights. If there are, drop duplicates (and check if that's expected)."
-    assert df_insights[df_insights.duplicated(subset=["url"])].empty, error
 
 
 def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Dict[str, pd.DataFrame]:
@@ -83,7 +83,7 @@ def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Di
     df_charts["featured_on_homepage"] = False
 
     # Get posts showing charts using data from the current data producer.
-    # NOTE: Include DIs as part of posts (for the total view count). But then create a separate dataframe for DIs.
+    # NOTE: Include DIs as part of posts (for the total view count).
     df_posts = get_post_views_by_chart_id(chart_ids=producer_chart_ids, date_min=min_date, date_max=max_date)
 
     # This dataframe may contain the homepage among the list of posts.
@@ -102,18 +102,11 @@ def gather_producer_analytics(producer: str, min_date: str, max_date: str) -> Di
         .reset_index(drop=True)
     )
 
-    # Create a separate dataframe for DIs published during the quarter.
-    df_insights = df_posts[
-        (df_posts["post_type"].isin(["data-insight"]))
-        & (df_posts["post_publication_date"] >= min_date)
-        & (df_posts["post_publication_date"] <= max_date)
-    ].reset_index(drop=True)
-
     # Sanity checks.
-    run_sanity_checks(df_charts=df_charts, df_posts=df_posts, df_insights=df_insights)
+    run_sanity_checks(df_charts=df_charts, df_posts=df_posts)
 
     # Create a dictionary with all analytics.
-    analytics = {"charts": df_charts, "posts": df_posts, "insights_in_quarter": df_insights}
+    analytics = {"charts": df_charts, "posts": df_posts}
 
     return analytics
 
@@ -127,7 +120,7 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
     for i, (_, row) in enumerate(df.iterrows(), start=1):
         title = row["title"]
         url = row["url"]
-        views = f"{row['views']:,}"
+        views = humanize_number(number=row["views"], sig_figs=3)
 
         numbered_title = f"{i}. {title}"
         line = f"{numbered_title} – {views} views\n"
@@ -159,129 +152,261 @@ def insert_list_with_links_in_gdoc(google_doc: GoogleDoc, df: pd.DataFrame, plac
     google_doc.replace_text(mapping={placeholder: ""})
 
 
-def create_report(producer: str, quarter: int, year: int, analytics: Dict[str, pd.DataFrame]) -> None:
-    ####################################################################################################################
-    # Gather inputs for report.
+class Report:
+    """A quarterly analytics report for a data producer."""
 
-    # Create a dataframe of the top charts.
-    df_top_charts = (
-        analytics["charts"]
-        .sort_values("views", ascending=False)[["url", "views", "title", "featured_on_homepage"]]
-        .reset_index(drop=True)
-        .iloc[0:10]
-    )
-    # Create a dataframe of the top posts (articles, topic pages and DIs).
-    df_top_posts = (
-        analytics["posts"]
-        .sort_values(["views"], ascending=False)
-        .reset_index(drop=True)
-        .iloc[0:10]
-        .assign(**{"featured_on_homepage": False})
-    )
-    # Create a dataframe of the top DIs (althought it will likely be the same as all DIs).
-    df_top_insights = (
-        analytics["insights_in_quarter"]
-        .sort_values(["views"], ascending=False)
-        .reset_index(drop=True)
-        .iloc[0:10]
-        .assign(**{"featured_on_homepage": False})
-    )
+    def __init__(self, producer: str, quarter: int, year: int):
+        self.producer = producer
+        self.quarter = quarter
+        self.year = year
+        self.title = f"{year}-Q{quarter} Our World in Data analytics report for {producer}"
+        self.min_date = f"{year}-{QUARTERS[quarter]['min_date']}"
+        self.max_date = f"{year}-{QUARTERS[quarter]['max_date']}"
 
-    # Create the required numeric inputs for the document.
-    n_charts = len(analytics["charts"])
-    n_articles = len(analytics["posts"])
-    n_insights = len(analytics["insights_in_quarter"])
-    n_chart_views = analytics["charts"]["views"].sum()
-    n_post_views = analytics["posts"]["views"].sum()
-    # We have the average number of daily views for each chart. But we now want the macroaverage number of daily views.
-    n_daily_chart_views = n_chart_views / analytics["charts"]["n_days"].max()
-    n_daily_post_views = n_post_views / analytics["posts"]["n_days"].max()
+        # Check if this report already exists in Google Drive
+        google_drive = GoogleDrive()
+        files = google_drive.list_files_in_folder(folder_id=FOLDER_ID)
 
-    # Humanize numbers.
-    n_charts_humanized = humanize_number(n_charts)
-    n_posts_humanized = humanize_number(n_articles)
-    n_chart_views_humanized = humanize_number(n_chart_views)
-    n_daily_chart_views_humanized = humanize_number(n_daily_chart_views)
-    n_post_views_humanized = humanize_number(n_post_views)
-    n_daily_post_views_humanized = humanize_number(n_daily_post_views)
-    n_insights_humanized = humanize_number(n_insights)
-    max_date_humanized = datetime.strptime(f"{year}-{QUARTERS[quarter]['max_date']}", "%Y-%m-%d").strftime("%B %d, %Y")
-    quarter_date_humanized = f"the {QUARTERS[quarter]['name']} quarter of {year}"
+        self.doc_id: str | None = None
+        self.pdf_id: str | None = None
 
-    # Report title.
-    report_title = f"{year}-Q{quarter} Our World in Data analytics report for {producer}"
+        for file in files:
+            if file["name"] == self.title:
+                if file["mimeType"] == "application/vnd.google-apps.document":
+                    self.doc_id = file["id"]
+            elif file["name"] == f"{self.title}.pdf":
+                if file["mimeType"] in [
+                    "application/pdf",
+                    "application/x-pdf",
+                    "application/acrobat",
+                    "application/vnd.pdf",
+                ]:
+                    self.pdf_id = file["id"]
 
-    ####################################################################################################################
-    # Prepare executive summary.
-
-    executive_summary_intro = f"""As of {max_date_humanized}, Our World in Data features your data in"""
-    if n_charts == 0:
-        raise AssertionError("Expected at least one chart to report.")
-    elif n_charts == 1:
-        executive_summary_intro += f""" {n_charts_humanized} chart"""
-    else:
-        executive_summary_intro += f""" {n_charts_humanized} charts"""
-    if n_articles == 0:
-        raise AssertionError("Expected at least one article to report.")
-
-    plural_articles = "s" if n_articles > 1 else ""
-    plural_insights = "s" if n_insights > 1 else ""
-    if n_insights == 0:
-        executive_summary_intro += f""" and {n_posts_humanized} article{plural_articles}."""
-    else:
-        executive_summary_intro += f""", {n_posts_humanized} article{plural_articles}, and {n_insights_humanized} data insight{plural_insights}."""
-
-    ####################################################################################################################
-    # Create a new google doc.
-
-    # Initialize a google drive object.
-    google_drive = GoogleDrive()
-    # google_drive.list_files_in_folder(folder_id=FOLDER_ID)
-
-    # Duplicate template report.
-    report_id = google_drive.copy(file_id=TEMPLATE_ID, body={"name": report_title})
-
-    # Initialize a google doc object.
-    google_doc = GoogleDoc(doc_id=report_id)
-
-    ####################################################################################################################
-    # Replace simple placeholders.
-
-    replacements = {
-        r"{{producer}}": producer,
-        r"{{year}}": str(year),
-        r"{{quarter}}": str(quarter),
-        r"{{executive_summary_intro}}": executive_summary_intro,
-        r"{{n_charts_humanized}}": n_charts_humanized,
-        r"{{n_posts_humanized}}": n_posts_humanized,
-        r"{{n_post_views_humanized}}": n_post_views_humanized,
-        r"{{quarter_date_humanized}}": quarter_date_humanized,
-        r"{{n_chart_views_humanized}}": n_chart_views_humanized,
-        r"{{n_daily_chart_views_humanized}}": n_daily_chart_views_humanized,
-        r"{{n_daily_post_views_humanized}}": n_daily_post_views_humanized,
-    }
-    google_doc.replace_text(mapping=replacements)
-
-    ####################################################################################################################
-    # Populate pages of top charts, top posts, and top insights.
-
-    top_chart_url = df_top_charts.iloc[0]["url"] + ".png"
-    google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
-    insert_list_with_links_in_gdoc(google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
-    insert_list_with_links_in_gdoc(google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")
-    if not df_top_insights.empty:
-        # Get the index of the position of the data_insights placeholder.
-        insert_index = google_doc.find_marker_index(marker=r"{{data_insights}}")
-
-        if len(df_top_insights) == 1:
-            text = f"""During {quarter_date_humanized}, the following data insight was also published:
-            """
+        # Log what was found during initialization
+        if self.doc_id and self.pdf_id:
+            log.info(f"Found existing Google Doc and PDF for {self.title}")
+        elif self.doc_id:
+            log.info(f"Found existing Google Doc (no PDF) for {self.title}")
+        elif self.pdf_id:
+            log.info(f"Found existing PDF (no Google Doc) for {self.title}")
         else:
-            text = f"""During {quarter_date_humanized}, the following data insights were also published:
-            """
-        edits = [{"insertText": {"location": {"index": insert_index}, "text": text}}]
-        google_doc.edit(requests=edits)
-        insert_list_with_links_in_gdoc(google_doc, df=df_top_insights, placeholder=r"{{data_insights}}")
+            log.info(f"No existing files found for {self.title}")
+
+        # Initialize other attributes (that will be populated later on).
+        self.analytics: Dict[str, pd.DataFrame] | None = None
+        self.google_doc: GoogleDoc | None = None
+        if self.doc_id:
+            self.google_doc = GoogleDoc(doc_id=self.doc_id)
+
+    @property
+    def doc_link(self) -> str | None:
+        """Get the Google Doc link if doc_id exists."""
+        if self.doc_id:
+            return f"https://docs.google.com/document/d/{self.doc_id}/edit"
+        return None
+
+    @property
+    def pdf_link(self) -> str | None:
+        """Get the PDF link if pdf_id exists."""
+        if self.pdf_id:
+            return f"https://drive.google.com/file/d/{self.pdf_id}/view"
+        return None
+
+    @property
+    def folder_link(self) -> str:
+        """Get the folder link where reports are stored."""
+        return f"https://drive.google.com/drive/folders/{FOLDER_ID}"
+
+    @property
+    def exists(self) -> bool:
+        """Check if this report already exists (has a Google Doc)."""
+        return self.doc_id is not None
+
+    @property
+    def has_pdf(self) -> bool:
+        """Check if this report has a PDF."""
+        return self.pdf_id is not None
+
+    @property
+    def status(self) -> str:
+        """Get a human-readable status of the report."""
+        if not self.exists:
+            return "Not created"
+        elif not self.has_pdf:
+            return "Google Doc exists, no PDF"
+        else:
+            return "Both Google Doc and PDF exist"
+
+    def status_with_links(self) -> str:
+        """Get a detailed status including links."""
+        if not self.exists:
+            return "Not created"
+        elif not self.has_pdf:
+            return f"Google Doc exists (no PDF)\n  📄 Doc: {self.doc_link}"
+        else:
+            return f"Both Google Doc and PDF exist\n  📄 Doc: {self.doc_link}\n  📋 PDF: {self.pdf_link}"
+
+    def gather_analytics(self) -> None:
+        """Gather analytics data for this report."""
+        log.info(f"Gathering analytics for {self.producer} Q{self.quarter} {self.year}")
+        self.analytics = gather_producer_analytics(
+            producer=self.producer, min_date=self.min_date, max_date=self.max_date
+        )
+
+    def create_google_doc(self) -> None:
+        """Create the Google Doc from template."""
+        if not self.analytics:
+            raise ValueError("Analytics must be gathered before creating the document")
+
+        # Initialize Google Drive and copy template.
+        google_drive = GoogleDrive()
+        self.doc_id = google_drive.copy(file_id=TEMPLATE_ID, body={"name": self.title})
+        self.google_doc = GoogleDoc(doc_id=self.doc_id)
+
+        # Populate the document.
+        self._populate_document()
+
+    def _populate_document(self) -> None:
+        """Internal method to populate the Google Doc with data."""
+        if not self.analytics or not self.google_doc:
+            raise ValueError("Analytics and Google Doc must be initialized")
+
+        # Create dataframes for top content.
+        df_top_charts = (
+            self.analytics["charts"]
+            .sort_values("views", ascending=False)[["url", "views", "title", "featured_on_homepage"]]
+            .reset_index(drop=True)
+            .iloc[0:10]
+        )
+        df_top_posts = (
+            self.analytics["posts"]
+            .sort_values(["views"], ascending=False)
+            .reset_index(drop=True)
+            .iloc[0:10]
+            .assign(**{"featured_on_homepage": False})
+        )
+
+        # Calculate metrics.
+        n_charts = len(self.analytics["charts"])
+        n_publications = len(self.analytics["posts"])
+        n_chart_views = self.analytics["charts"]["views"].sum()
+        n_post_views = self.analytics["posts"]["views"].sum()
+        n_daily_chart_views = n_chart_views / self.analytics["charts"]["n_days"].max()
+        n_daily_post_views = n_post_views / self.analytics["posts"]["n_days"].max()
+
+        # Humanize numbers.
+        n_charts_humanized = humanize_number(n_charts)
+        n_posts_humanized = humanize_number(n_publications)
+        n_chart_views_humanized = humanize_number(n_chart_views)
+        n_daily_chart_views_humanized = humanize_number(n_daily_chart_views)
+        n_post_views_humanized = humanize_number(n_post_views)
+        n_daily_post_views_humanized = humanize_number(n_daily_post_views)
+        max_date_humanized = datetime.strptime(
+            f"{self.year}-{QUARTERS[self.quarter]['max_date']}", "%Y-%m-%d"
+        ).strftime("%B %d, %Y")
+        quarter_date_humanized = f"the {QUARTERS[self.quarter]['name']} quarter of {self.year}"
+
+        # Prepare executive summary.
+        executive_summary_intro = f"""As of {max_date_humanized}, Our World in Data features your data in"""
+        if n_charts == 0:
+            raise AssertionError("Expected at least one chart to report.")
+        elif n_charts == 1:
+            executive_summary_intro += f""" {n_charts_humanized} interactive chart"""
+        else:
+            executive_summary_intro += f""" {n_charts_humanized} interactive charts"""
+        if n_publications == 0:
+            raise AssertionError("Expected at least one publication to report.")
+
+        plural_publications = "s" if n_publications > 1 else ""
+        executive_summary_intro += f""" and {n_posts_humanized} publication{plural_publications}."""
+
+        # Replace placeholders.
+        replacements = {
+            r"{{producer}}": self.producer,
+            r"{{year}}": str(self.year),
+            r"{{quarter}}": str(self.quarter),
+            r"{{executive_summary_intro}}": executive_summary_intro,
+            r"{{n_charts_humanized}}": n_charts_humanized,
+            r"{{n_posts_humanized}}": n_posts_humanized,
+            r"{{n_post_views_humanized}}": n_post_views_humanized,
+            r"{{quarter_date_humanized}}": quarter_date_humanized,
+            r"{{n_chart_views_humanized}}": n_chart_views_humanized,
+            r"{{n_daily_chart_views_humanized}}": n_daily_chart_views_humanized,
+            r"{{n_daily_post_views_humanized}}": n_daily_post_views_humanized,
+        }
+        self.google_doc.replace_text(mapping=replacements)
+
+        # Add content
+        top_chart_url = df_top_charts.iloc[0]["url"] + ".png"
+        self.google_doc.insert_image(image_url=top_chart_url, placeholder=r"{{top_chart_image}}", width=320)
+        insert_list_with_links_in_gdoc(self.google_doc, df=df_top_charts, placeholder=r"{{top_charts_list}}")
+        insert_list_with_links_in_gdoc(self.google_doc, df=df_top_posts, placeholder=r"{{top_posts_list}}")
+
+    def create_pdf(self, overwrite: bool = True) -> str:
+        """Create PDF from the Google Doc."""
+        if not self.google_doc:
+            raise ValueError("Google Doc must be created before generating PDF")
+
+        self.pdf_id = self.google_doc.save_as_pdf(overwrite=overwrite)
+        return self.pdf_id
+
+    def update_pdf_from_existing(self, doc_id: str, overwrite: bool = True) -> str:
+        """Update PDF from an existing Google Doc."""
+        self.doc_id = doc_id
+        self.google_doc = GoogleDoc(doc_id=doc_id)
+        self.pdf_id = self.google_doc.save_as_pdf(overwrite=overwrite)
+        return self.pdf_id
+
+    def generate_links(self) -> None:
+        """Log report links."""
+        if self.doc_link:
+            log.info(f"Google Doc: {self.doc_link}")
+        if self.pdf_link:
+            log.info(f"PDF: {self.pdf_link}")
+        if self.doc_link or self.pdf_link:
+            log.info(f"Files are saved in folder: {self.folder_link}")
+
+    def get_links(self) -> Dict[str, str]:
+        """Get all available links for this report."""
+        links = {}
+        if self.doc_link:
+            links["google_doc"] = self.doc_link
+        if self.pdf_link:
+            links["pdf"] = self.pdf_link
+        links["folder"] = self.folder_link
+        return links
+
+    def create_full_report(self, overwrite_pdf: bool = True) -> None:
+        """Create a complete report from scratch."""
+        self.gather_analytics()
+
+        # Get impact highlights
+        highlights = get_impact_highlights(producers=[self.producer], min_date=self.min_date, max_date=self.max_date)
+        print_impact_highlights(highlights=highlights)
+
+        # Create the report
+        self.create_google_doc()
+        self.create_pdf(overwrite=overwrite_pdf)
+        self.generate_links()
+
+    def print_summary(self) -> None:
+        """Print a comprehensive summary of the report status and links."""
+        print(f"\n📊 Report: {self.title}")
+        print(f"Status: {self.status}")
+        print(f"Period: {self.min_date} to {self.max_date}")
+
+        if self.doc_link:
+            print(f"📄 Google Doc: {self.doc_link}")
+        if self.pdf_link:
+            print(f"📋 PDF: {self.pdf_link}")
+        print(f"📁 Folder: {self.folder_link}")
+
+        if self.analytics:
+            n_charts = len(self.analytics["charts"])
+            n_posts = len(self.analytics["posts"])
+            print(f"📈 Analytics: {n_charts} charts, {n_posts} posts")
+        print()
 
 
 def print_impact_highlights(highlights: pd.DataFrame) -> None:
@@ -304,8 +429,6 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
 @click.option(
     "--producer",
     type=str,
-    # multiple=True,
-    # default=None,
     help="Producer name(s).",
 )
 @click.option(
@@ -319,23 +442,59 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     default=datetime.today().year,
     help="Year.",
 )
-def run(producer, quarter, year):
-    min_date = f"{year}-{QUARTERS[quarter]['min_date']}"
-    max_date = f"{year}-{QUARTERS[quarter]['max_date']}"
+@click.option(
+    "--overwrite-pdf/--no-overwrite-pdf",
+    default=False,
+    help="Overwrite existing PDF if report already exists.",
+)
+def run(producer, quarter, year, overwrite_pdf):
+    # Create report instance (it will automatically check for existing reports)
+    report = Report(producer, quarter, year)
 
-    # Gather producer analytics.
-    analytics = gather_producer_analytics(producer=producer, min_date=min_date, max_date=max_date)
+    print("\n📊 Report Status:")
+    print(report.status_with_links())
+    print(f"📁 Folder: {report.folder_link}")
+    print()
 
-    ####################################################################################################################
-    # Get impact highlights, if any.
-    highlights = get_impact_highlights(producers=[producer], min_date=min_date, max_date=max_date)
+    if report.exists:
+        log.warning(f"Google Doc report already exists for {producer} Q{quarter} {year}")
+        # Since report.exists is True, we know doc_id is not None
+        assert report.doc_id is not None
 
-    # For now, print highlights here, and consider manually adding them to the document.
-    print_impact_highlights(highlights=highlights)
+        if report.has_pdf:
+            if overwrite_pdf:
+                log.info("Overwriting existing PDF...")
+                report.update_pdf_from_existing(report.doc_id, overwrite=True)
+                report.generate_links()
+            else:
+                log.warning("PDF already exists and overwrite_pdf=False. No action taken.")
+        else:
+            if overwrite_pdf:
+                log.info("Creating PDF from existing Google Doc...")
+                report.update_pdf_from_existing(report.doc_id, overwrite=True)
+                report.generate_links()
+            else:
+                log.warning("Google Doc exists but no PDF found, and overwrite_pdf=False. No action taken.")
+        return
 
-    ####################################################################################################################
-    # Generate report.
-    create_report(producer=producer, quarter=quarter, year=year, analytics=analytics)
+    # Report doesn't exist, create it from scratch
+    log.info(f"Creating new report for {producer} Q{quarter} {year}")
+    report.create_full_report(overwrite_pdf=overwrite_pdf)
+
+    # Add new entry in the status sheet.
+    df = pd.DataFrame(
+        {
+            "producer": [producer],
+            "year": [int(year)],
+            "quarter": [int(quarter)],
+            "report": [report.pdf_link],
+            "gdoc": [report.doc_link],
+            "reviewed": [0],
+            "shared with producer on": [None],
+        }
+    )
+    sheet = GoogleSheet(sheet_id=STATUS_SHEET_ID)
+    sheet.append_dataframe(df=df, sheet_name="status")
 
 
 if __name__ == "__main__":

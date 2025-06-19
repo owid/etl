@@ -56,7 +56,7 @@ def _get_engine_cached(cf: Any, pid: int) -> Engine:
 
 
 def get_engine(conf: Optional[Dict[str, Any]] = None) -> Engine:
-    cf: Any = dict_to_object(conf) if conf else config
+    cf: Any = dict_to_object(d=conf) if conf else config
     # pid in memoization makes sure every process gets its own Engine
     pid = os.getpid()
     return _get_engine_cached(cf, pid)

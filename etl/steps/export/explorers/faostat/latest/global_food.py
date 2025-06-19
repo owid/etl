@@ -517,6 +517,7 @@ def run():
             "fat__camels": "Fat, camel",
             "fat__goats": "Fat, goat",
             "fat__cattle": "Fat, cattle",
+            "laying": "Laying birds",
         },
     )
 

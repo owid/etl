@@ -54,10 +54,11 @@ def _stream_to_file(
     """Stream the response to the file, returning the checksum.
     :param progress_bar_min_bytes: Minimum number of bytes to display a progress bar for. Default is 32MB
     """
-    # check header to get content length, in bytes
+    # Check header to get content length, in bytes
     total_length = int(r.headers.get("content-length", 0))
 
     md5 = hashlib.md5()
+    bytes_downloaded = 0
 
     streamer = r.iter_content(chunk_size=chunk_size)
     display_progress = total_length > progress_bar_min_bytes
@@ -69,11 +70,21 @@ def _stream_to_file(
     for chunk in streamer:  # 16k
         file.write(chunk)
         md5.update(chunk)
+        bytes_downloaded += len(chunk)
         if display_progress:
             progress.update(task_id, advance=len(chunk))  # type: ignore
 
     if display_progress:
         progress.stop()  # type: ignore
+
+    # Verify content length if provided by server and content is not compressed
+    # When content is gzipped, requests decompresses it automatically, so bytes_downloaded
+    # will be larger than the compressed content-length header
+    is_compressed = r.headers.get("content-encoding") in ("gzip", "deflate", "br")
+    if total_length > 0 and not is_compressed and bytes_downloaded != total_length:
+        raise DownloadCorrupted(
+            f"Download corrupted: expected {total_length} bytes but received {bytes_downloaded} bytes"
+        )
 
     return md5.hexdigest()
 
@@ -82,7 +93,7 @@ def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet:
     "Download the file at the URL to the given local filename."
     # NOTE: we are not streaming to a NamedTemporaryFile because it was causing weird
     # issues one some systems, it's safer to stream directly to the file and remove it
-    # if md5 don't match
+    # if md5 doesn't match
     tmp_filename = filename + ".tmp"
     # Add a header to the request, to avoid a "requests.exceptions.HTTPError: 403 Client Error: Forbidden for url: ..."
     # error when accessing data files in certain URLs.
@@ -109,4 +120,8 @@ def download(url: str, filename: str, expected_md5: Optional[str] = None, quiet:
 
 
 class ChecksumDoesNotMatch(Exception):
+    pass
+
+
+class DownloadCorrupted(Exception):
     pass

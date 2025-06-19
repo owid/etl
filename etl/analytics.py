@@ -960,7 +960,7 @@ def get_visualizations_using_data_by_producer(
     query = f"""WITH t_base AS (
 	SELECT
 		cd.chartId chart_id,
-		JSON_EXTRACT(cc.full, '$.title') chart_title,
+		JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.title')) chart_title,
 		cc.slug chart_slug,
 		CONCAT('{GRAPHERS_BASE_URL}', cc.slug) chart_url,
 		JSON_EXTRACT(cc.full, '$.isPublished') is_published,

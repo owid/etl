@@ -8,7 +8,7 @@ from etl.helpers import PathFinder, create_dataset
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
-
+# Columns used in charts
 REL_COL_VAR = [
     "abused",
     "cigarettes",
