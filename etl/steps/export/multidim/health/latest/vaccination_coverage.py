@@ -61,6 +61,9 @@ def run() -> None:
                     "title": "{title}",
                     "title_public": "{title_public}",
                     "description_short": "{subtitle}",
+                    "presentation": {
+                        "title_public": "{title_public}",
+                    },
                 },
             }
         ],
