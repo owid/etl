@@ -294,15 +294,15 @@ def create_new_indicators_and_format(tb: Table) -> Table:
         "headcount_ratio",
         "income_gap_ratio",
         "poverty_gap_index",
-        #     "headcount_ratio_40_median",
-        #     "headcount_ratio_50_median",
-        #     "headcount_ratio_60_median",
-        #     "income_gap_ratio_40_median",
-        #     "income_gap_ratio_50_median",
-        #     "income_gap_ratio_60_median",
-        #     "poverty_gap_index_40_median",
-        #     "poverty_gap_index_50_median",
-        #     "poverty_gap_index_60_median",
+        # "headcount_ratio_40_median",
+        # "headcount_ratio_50_median",
+        # "headcount_ratio_60_median",
+        # "income_gap_ratio_40_median",
+        # "income_gap_ratio_50_median",
+        # "income_gap_ratio_60_median",
+        # "poverty_gap_index_40_median",
+        # "poverty_gap_index_50_median",
+        # "poverty_gap_index_60_median",
     ]
     tb.loc[:, pct_indicators] = tb[pct_indicators] * 100
 
@@ -1001,7 +1001,7 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
             (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1).fillna("")).astype(int).cumsum().max()
         )
 
-        # If there are only two welfare series, use both, except for countries where we have to choose one
+        # If there are only two welfare series, use one for these countries
         if number_of_welfare_series == 2:
             # assert if last_welfare type values are expected
             if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
@@ -1009,15 +1009,26 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
                 assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
                     f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
                 )
+                tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
-            elif country in ["Kosovo", "North Macedonia", "Peru"]:
+            elif country in ["Kosovo", "North Macedonia", "Peru", "Uzbekistan"]:
                 assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
                     f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
                 )
+                tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
-            tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
+            # Don't do anything for the rest
+            # [
+            #     "China",
+            #     "China (urban)",
+            #     "China (rural)",
+            #     "Kazakhstan",
+            #     "Namibia",
+            #     "Nepal",
+            #     "Seychelles",
+            # ]
 
-        # With Turkey I also want to keep both series, but there are duplicates for some years
+        # With Turkey I want to keep both series, but there are duplicates for some years
         elif country in ["Turkey"]:
             welfare_expected = ["income"]
             assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
@@ -1043,9 +1054,9 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
             assert len(last_welfare_type) == 2 and last_welfare_type == welfare_expected, log.fatal(
                 f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
             )
-            if country in ["Haiti", "Romania", "Saint Lucia"]:
+            if country in ["Haiti", "Saint Lucia"]:
                 tb_country = tb_country[tb_country["welfare_type"] == "income"].reset_index(drop=True)
-            else:
+            elif country in ["Philippines"]:
                 tb_country = tb_country[tb_country["welfare_type"] == "consumption"].reset_index(drop=True)
 
         else:
