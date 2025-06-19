@@ -355,6 +355,17 @@ def run_snap_step() -> None:
     st.session_state["run_step"] = True
 
 
+def create_snapshot_command(form: SnapshotForm, manual_import_file: Optional[str] = None) -> str:
+    """Create the command string for running a snapshot step."""
+    snapshot_path = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
+    command = f"etls {snapshot_path}"
+    if form.dataset_manual_import and manual_import_file:
+        command += f" --path-to-file {manual_import_file}"
+    elif form.dataset_manual_import:
+        command += " --path-to-file **relative_path_of_file**"
+    return command
+
+
 #########################################################
 # MAIN ##################################################
 #########################################################
@@ -418,7 +429,7 @@ if submitted:
         )
 
         # If DVC-only mode is enabled, remove the generated Python script
-        if getattr(form, "dvc_only", False):
+        if form.dvc_only:
             if ingest_path.exists():
                 ingest_path.unlink()
 
@@ -437,7 +448,7 @@ if submitted:
         with st.expander("⏭️ **Next steps**", expanded=True):
             # 1/ Verification
             st.markdown("#### 1. Verification")
-            if getattr(form, "dvc_only", False):
+            if form.dvc_only:
                 st.markdown(
                     "Verify that the generated .dvc metadata file is correct and update it if necessary. No Python script was created since you selected DVC-only mode."
                 )
@@ -450,25 +461,12 @@ if submitted:
                     label="Select local file to import", placeholder="path/to/file.csv", key="snapshot_file"
                 )
             st.button("Run snapshot step", key="run_snapshot_step", on_click=run_snap_step)  # type: ignore
-            # Build command line instruction based on whether we have a Python script or just DVC
-            if ingest_path.exists():
-                # Use the new etls command for scripts
-                snapshot_path = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
-                command = f"etls {snapshot_path}"
-                if manual_import_instructions:
-                    command += " --path-to-file **relative_path_of_file**"
-            else:
-                # DVC-only mode - use etls with just the identifier
-                snapshot_path = f"{form.namespace}/{form.snapshot_version}/{form.short_name}"
-                command = f"etls {snapshot_path}"
-                if manual_import_instructions:
-                    command += " --path-to-file **relative_path_of_file**"
 
             st.markdown(
                 f"""
             You can also run the step from the command line:
             ```bash
-            {command}
+            {create_snapshot_command(form)}
             ```
             """
             )

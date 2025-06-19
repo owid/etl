@@ -16,11 +16,21 @@ log = structlog.get_logger()
 
 
 @click.command("snapshot")
-@click.argument("dataset_name", type=str)
+@click.argument("dataset_name", type=str, metavar="DATASET_PATH")
 @click.option("--upload/--skip-upload", default=True, type=bool, help="Upload dataset to Snapshot")
 @click.option("--path-to-file", type=str, help="Path to local data file (for manual upload scenarios)")
 def snapshot_cli(dataset_name: str, upload: bool, path_to_file: Optional[str] = None) -> None:
     """Create snapshot from a snapshot script or .dvc file.
+
+    DATASET_PATH can be provided in several formats:
+    - Full path: namespace/version/short_name (e.g., tourism/2024-08-17/unwto_gdp)
+    - Partial path: version/short_name (e.g., 2024-08-17/unwto_gdp)
+    - Short name only: short_name (e.g., unwto_gdp)
+    - Full file path: snapshots/namespace/version/short_name.py
+
+    The command will automatically find the corresponding .py script or .dvc file
+    in the snapshots directory. If multiple matches are found, you'll need to
+    provide a more specific path.
 
     Run snapshot scripts in a standardized way. Supports three scenarios:
     1. Scripts with main() function - runs module directly
@@ -56,11 +66,11 @@ def find_snapshot_script(dataset_name: str) -> Optional[Path]:
     """Find the snapshot script for the given dataset name.
 
     Args:
-        dataset_name: Can be:
+        dataset_name: Dataset path in one of several formats:
                      - Full file path: "snapshots/tourism/2024-08-17/unwto_gdp.py"
-                     - Full path: "tourism/2024-08-17/unwto_gdp"
-                     - Partial path: "2024-08-17/unwto_gdp"
-                     - Just filename: "unwto_gdp"
+                     - Full path: "tourism/2024-08-17/unwto_gdp" (namespace/version/short_name)
+                     - Partial path: "2024-08-17/unwto_gdp" (version/short_name)
+                     - Short name only: "unwto_gdp" (short_name)
 
     Returns:
         Path to the .py script file, or None if not found
@@ -81,18 +91,18 @@ def find_snapshot_script(dataset_name: str) -> Optional[Path]:
     path_parts = dataset_name.split("/")
 
     if len(path_parts) == 3:
-        # Full path: namespace/version/filename
+        # Full path: namespace/version/short_name
         script_path = paths.SNAPSHOTS_DIR / f"{dataset_name}.py"
         return script_path if script_path.exists() else None
 
     elif len(path_parts) == 2:
-        # Partial path: version/filename - search for matching namespace
+        # Partial path: version/short_name - search for matching namespace
         version, filename = path_parts
         pattern = f"*/{version}/{filename}.py"
         script_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
 
     elif len(path_parts) == 1:
-        # Just filename - search in all directories
+        # Short name only - search in all directories
         filename = path_parts[0]
         pattern = f"**/{filename}.py"
         script_files = list(paths.SNAPSHOTS_DIR.glob(pattern))
