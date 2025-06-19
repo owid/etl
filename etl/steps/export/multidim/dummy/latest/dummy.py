@@ -53,7 +53,6 @@ def run() -> None:
                     "maxTime": "latest",
                     "title": lambda view: _set_title(view),
                     "subtitle": lambda view: _set_subtitle(view),
-                    "unit": "cases or deaths",
                 },
                 "view_metadata": {
                     "description_short": "Custom description for the grouped view.",
@@ -62,6 +61,12 @@ def run() -> None:
                         "One could also use a function here to generate dynamic descriptions based on dimensions.",
                         "I could go on and on, but you get the gist of it!",
                     ],
+                    "presentation": {
+                        "title_public": lambda view: _set_title(view),
+                    },
+                    "display": {
+                        "unit": "cases or deaths",
+                    },
                 },
             }
         ]
