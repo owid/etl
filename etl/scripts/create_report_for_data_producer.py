@@ -429,7 +429,7 @@ class Report:
         self.create_pdf(overwrite=overwrite_pdf)
         self.generate_links()
 
-        # Gather contact emails (with whome reports will be shared).
+        # Gather contact emails (with whom reports will be shared).
         self.gather_emails()
 
         # Change file permissions, to include data providers emails.
