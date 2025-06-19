@@ -21,5 +21,5 @@ steps:
   export://multidim/dummy/latest/dummy:
     - export://multidim/covid/latest/covid
 
-  export://multidim/dummy/latest/demo:
+  export://multidim/dummy/latest/issue_reporting:
     - data://grapher/covid/latest/cases_deaths
