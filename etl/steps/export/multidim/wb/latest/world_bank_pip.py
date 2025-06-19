@@ -67,10 +67,10 @@ def run() -> None:
     config["views"] += config_new["views"]
 
     # Create mdim
-    mdim = paths.create_collection(
+    c = paths.create_collection(
         config=config,
         short_name="poverty",
     )
 
     # Save & upload
-    mdim.save()
+    c.save()

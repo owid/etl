@@ -620,6 +620,10 @@ METABASE_API_KEY = os.environ.get("METABASE_API_KEY")
 METABASE_URL = os.environ.get("METABASE_URL")
 METABASE_SEMANTIC_LAYER_DATABASE_ID = 2
 ########################################################################################################################
-# While users don't have Metadata credentials, default to Dataset.
+# While users don't have Metadata credentials, default to Datassette.
 FORCE_DATASETTE = (not METABASE_API_KEY) or (not METABASE_URL)
 ########################################################################################################################
+# Get Notion credentials.
+NOTION_API_KEY = os.environ.get("NOTION_API_KEY")
+NOTION_IMPACT_HIGHLIGHTS_TABLE_URL = os.environ.get("NOTION_IMPACT_HIGHLIGHTS_TABLE_URL")
+NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL = os.environ.get("NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL")
