@@ -39,13 +39,13 @@ tables:
       licensed_motor_vehicles:
         title: Number of motor vehicles
         unit: vehicles
-        short_unit: miles
         display:
           name: Vehicles
         description: The number of licensed motor vehicles.
       traffic_vehicle_miles:
         title: Vehicle miles driven
         unit: miles
+        short_unit: miles
         display:
           name: Miles driven
         description: The number of vehicle miles driven.
