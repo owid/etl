@@ -101,22 +101,22 @@ def test_unique_validations():
     """
     # Test successful validation with unique names and slugs
     dim = make_dimension()
-    dim.validate_unique_names()  # Should pass - all names are unique
-    dim.validate_unique_slugs()  # Should pass - all slugs are unique
+    dim.validate_choice_names_unique()  # Should pass - all names are unique
+    dim.validate_choice_slugs_unique()  # Should pass - all slugs are unique
 
     # Test validation failure with duplicate name
     # Create dimension with duplicate name "Old" (different slugs)
     dim_dup_name = make_dimension()
     dim_dup_name.choices.append(DimensionChoice(slug="child", name="Old"))  # "Old" already exists
     with pytest.raises(DuplicateValuesError):
-        dim_dup_name.validate_unique_names()
+        dim_dup_name.validate_choice_names_unique()
 
     # Test validation failure with duplicate slug
     # Create dimension with duplicate slug "old" (different names)
     dim_dup_slug = make_dimension()
     dim_dup_slug.choices.append(DimensionChoice(slug="old", name="Very Old"))  # "old" already exists
     with pytest.raises(DuplicateValuesError):
-        dim_dup_slug.validate_unique_slugs()
+        dim_dup_slug.validate_choice_slugs_unique()
 
 
 def test_indicator_expand_path():
