@@ -1,5 +1,6 @@
 """Script to generate a quarterly analytics report for a data producer."""
 
+import re
 from datetime import datetime
 from typing import Dict, List
 
@@ -10,7 +11,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.utils.google import GoogleDoc, GoogleDrive, GoogleSheet
-from apps.utils.notion import get_impact_highlights
+from apps.utils.notion import get_data_producer_contacts, get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
     get_post_views_by_chart_id,
@@ -386,18 +387,36 @@ class Report:
         return links
 
     def gather_emails(self) -> None:
-        # TODO: Read contact emails from Notion.
-        log.warning("Could not find contact emails for this data provider in the Notion contacts page.")
-        self.emails = None
+        # Fetch data provider contacts from Notion table.
+        df = get_data_producer_contacts(producers=[self.producer])
+
+        if len(df) == 1:
+            emails_raw = df["Emails for analytics reports"].item()
+            email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+            emails = re.findall(email_pattern, emails_raw)
+        else:
+            emails = []
+
+        if emails:
+            self.emails = emails
+        else:
+            log.warning("Could not find contact emails for this data provider in the Notion contacts page.")
+            self.emails = None
 
     def change_file_permissions(self) -> None:
-        # Add data providers emails with reading premissions.
+        # Add data providers emails with reading permissions.
         if self.emails is not None:
-            GoogleDrive().set_file_permissions(file_id=self.pdf_id, role="reader", emails=self.emails)  # type: ignore
+            GoogleDrive().set_file_permissions(
+                file_id=self.pdf_id,  # type: ignore
+                role="reader",
+                emails=self.emails,
+                send_notification_email=False,
+            )
+            log.info(f"Read access has been granted to emails: {self.emails}")
         else:
             log.warning("Emails are not defined. Consider manually changing sharing permissions directly from the PDF.")
 
-    def create_full_report(self, overwrite_pdf: bool = True) -> None:
+    def create_full_report(self, overwrite_pdf: bool = True, grant_permissions: bool = False) -> None:
         """Create a complete report from scratch."""
         self.gather_analytics()
 
@@ -414,7 +433,8 @@ class Report:
         self.gather_emails()
 
         # Change file permissions, to include data providers emails.
-        self.change_file_permissions()
+        if grant_permissions:
+            self.change_file_permissions()
 
 
 def print_impact_highlights(highlights: pd.DataFrame) -> None:
@@ -455,7 +475,12 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     default=False,
     help="Overwrite existing PDF if report already exists.",
 )
-def run(producer, quarter, year, overwrite_pdf):
+@click.option(
+    "--grant-permissions/--no-grant-permissions",
+    default=False,
+    help="Grant permissions to data providers to access PDF file.",
+)
+def run(producer, quarter, year, overwrite_pdf, grant_permissions):
     # Create report instance (it will automatically check for existing reports).
     report = Report(producer, quarter, year)
 
@@ -473,18 +498,17 @@ def run(producer, quarter, year, overwrite_pdf):
                 report.generate_links()
             else:
                 log.warning("PDF already exists and overwrite_pdf=False. No action taken.")
-        else:
-            if overwrite_pdf:
-                log.info("Creating PDF from existing Google Doc...")
-                report.update_pdf_from_existing(report.doc_id, overwrite=True)
-                report.generate_links()
-            else:
-                log.warning("Google Doc exists but no PDF found, and overwrite_pdf=False. No action taken.")
+
+            if grant_permissions:
+                # Gather data provider emails and grant read access to already existing PDF.
+                report.gather_emails()
+                report.change_file_permissions()
+
         return
 
     # Report doesn't exist, create it from scratch
     log.info(f"Creating new report for {producer} Q{quarter} {year}")
-    report.create_full_report(overwrite_pdf=overwrite_pdf)
+    report.create_full_report(overwrite_pdf=overwrite_pdf, grant_permissions=grant_permissions)
 
     # Add new entry in the status sheet.
     df = pd.DataFrame(
