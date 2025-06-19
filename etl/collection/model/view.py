@@ -1,12 +1,11 @@
 import re
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union
-
-from owid.catalog.meta import GrapherConfig
+from typing import Any, Dict, List, Optional, Union, cast
 
 from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError
 from etl.collection.model.base import MDIMBase, pruned_json
+from etl.collection.model.schema_types import ViewConfig, ViewMetadata
 from etl.collection.utils import CHART_DIMENSIONS
 
 REGEX_CATALOG_PATH = (
@@ -21,8 +20,8 @@ REGEX_CATALOG_PATH_OPTIONS = (
 @dataclass
 class CommonView(MDIMBase):
     dimensions: Optional[Dict[str, Any]] = None
-    config: Optional[Dict[str, Any]] = None
-    metadata: Optional[Dict[str, Any]] = None
+    config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
+    metadata: Optional[Union[ViewMetadata, Dict[str, Any]]] = None
 
     @property
     def num_dimensions(self) -> int:
@@ -208,9 +207,8 @@ class View(MDIMBase):
 
     dimensions: Dict[str, str]
     indicators: ViewIndicators
-    # NOTE: Maybe worth putting as classes at some point?
-    config: Optional[GrapherConfig] = None
-    metadata: Optional[Any] = None
+    config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
+    metadata: Optional[Union[ViewMetadata, Dict[str, Any]]] = None
 
     @property
     def d(self):
@@ -267,7 +265,7 @@ class View(MDIMBase):
             common_has_priority=common_has_priority,
         )
         if new_config:
-            self.config = new_config
+            self.config = cast(ViewConfig, new_config)
         # Update metadata
         new_metadata = merge_common_metadata_by_dimension(
             common_views,
@@ -277,7 +275,7 @@ class View(MDIMBase):
             common_has_priority=common_has_priority,
         )
         if new_metadata:
-            self.metadata = new_metadata
+            self.metadata = cast(ViewMetadata, new_metadata)
 
         return self
 

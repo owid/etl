@@ -483,7 +483,9 @@ def test_validate_dimension_uniqueness_duplicate_slugs():
         default_selection=["country"],
         dimensions=[
             Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")]),
-            Dimension(slug="country", name="Another Country", choices=[DimensionChoice(slug="uk", name="UK")]),  # Duplicate slug
+            Dimension(
+                slug="country", name="Another Country", choices=[DimensionChoice(slug="uk", name="UK")]
+            ),  # Duplicate slug
         ],
         views=[View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[]))],
         _definitions=Definitions(),
@@ -546,8 +548,12 @@ def test_validate_dimension_uniqueness_multiple_duplicates():
         dimensions=[
             Dimension(slug="country", name="Country 1", choices=[DimensionChoice(slug="usa", name="USA")]),
             Dimension(slug="metric", name="Metric 1", choices=[DimensionChoice(slug="cases", name="Cases")]),
-            Dimension(slug="country", name="Country 2", choices=[DimensionChoice(slug="uk", name="UK")]),  # First duplicate
-            Dimension(slug="metric", name="Metric 2", choices=[DimensionChoice(slug="deaths", name="Deaths")]),  # Second duplicate
+            Dimension(
+                slug="country", name="Country 2", choices=[DimensionChoice(slug="uk", name="UK")]
+            ),  # First duplicate
+            Dimension(
+                slug="metric", name="Metric 2", choices=[DimensionChoice(slug="deaths", name="Deaths")]
+            ),  # Second duplicate
         ],
         views=[View(dimensions={"country": "usa", "metric": "cases"}, indicators=ViewIndicators(y=[]))],
         _definitions=Definitions(),
