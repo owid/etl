@@ -107,6 +107,9 @@ tags:
 
 # Collections reference
 
+!!! warning "AI-Generated Documentation"
+    This documentation was generated with AI assistance and is currently under construction. The content is dynamically generated from `schemas/multidim-schema.json`. If you notice any inconsistencies or missing information, please check the source schema file or report the issue.
+
 Multi-dimensional collections (MDIMs) are interactive data explorers that allow users to explore datasets across multiple dimensions. This reference documents the schema structure for defining collections.
 
 <div class="grid cards" markdown>
