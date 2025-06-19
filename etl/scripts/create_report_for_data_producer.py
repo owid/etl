@@ -1,7 +1,7 @@
 """Script to generate a quarterly analytics report for a data producer."""
 
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 
 import click
 import pandas as pd
@@ -169,6 +169,10 @@ class Report:
 
         self.doc_id: str | None = None
         self.pdf_id: str | None = None
+
+        # Data provider emails, that will be granted reading permissions to access the pdf reports.
+        # NOTE: They will be fetched by gather_emails()
+        self.emails: List[str] | None = None
 
         for file in files:
             if file["name"] == self.title:
@@ -377,6 +381,18 @@ class Report:
         links["folder"] = self.folder_link
         return links
 
+    def gather_emails(self) -> None:
+        # TODO: Read contact emails from Notion.
+        log.warning("Could not find contact emails for this data provider in the Notion contacts page.")
+        self.emails = None
+
+    def change_file_permissions(self) -> None:
+        # Add data providers emails with reading premissions.
+        if self.emails is not None:
+            GoogleDrive().set_file_permissions(file_id=self.pdf_id, role="reader", emails=self.emails)  # type: ignore
+        else:
+            log.warning("Emails are not defined. Consider manually changing sharing permissions directly from the PDF.")
+
     def create_full_report(self, overwrite_pdf: bool = True) -> None:
         """Create a complete report from scratch."""
         self.gather_analytics()
@@ -389,6 +405,12 @@ class Report:
         self.create_google_doc()
         self.create_pdf(overwrite=overwrite_pdf)
         self.generate_links()
+
+        # Gather contact emails (with whome reports will be shared).
+        self.gather_emails()
+
+        # Change file permissions, to include data providers emails.
+        self.change_file_permissions()
 
     def print_summary(self) -> None:
         """Print a comprehensive summary of the report status and links."""
