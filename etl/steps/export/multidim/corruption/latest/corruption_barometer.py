@@ -66,16 +66,18 @@ def run() -> None:
                     "tab": "chart",
                     # "facettingLabelByYVariables": "institution",
                     # "selectedFacetStrategy": "metric",
-                    "title": "How many of the following people do you think are involved in corruption? {answer}",
+                    "title": "title_public",
                     "subtitle": 'Percentage of respondents who answered {answer} to the question "How many of the following people do you think are involved in corruption?".',
                 },
                 "view_metadata": {
                     "description_short": 'Percentage of respondents who answered "{answer}" to the question "How many of the following people do you think are involved in corruption?".',
+                    "presentation": {"title_public": "{title_public}"},
                 },
             },
         ],
         params={
             "answer": lambda view: CHOICE_NAMES.get(view.dimensions["answer"]),
+            "title_public": lambda view: f"How many of the following people do you think are involved in corruption? {view.dimensions['answer']}",
         },
     )
     # Sort choices alphabetically
