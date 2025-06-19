@@ -53,6 +53,7 @@ class Dimension(MDIMBase):
 
     slug: str
     name: str
+    description: str
     choices: List[DimensionChoice]
     presentation: Optional[DimensionPresentation] = None
 
