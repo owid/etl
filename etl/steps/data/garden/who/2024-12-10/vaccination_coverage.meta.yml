@@ -77,7 +77,6 @@ definitions:
     who have had their two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
     who have had their two doses of the measles vaccine
-
     <%- endif %>
   antigen_title_negative: |-
     <% if antigen == "BCG" %>
@@ -140,10 +139,8 @@ definitions:
     their first dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
     their second dose of the inactivated polio vaccine
-
     <%- elif antigen == "MCV2X2" %>
     their second dose of the measles vaccine
-
     <%- endif %>
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
@@ -204,10 +201,8 @@ definitions:
     Inactivated polio (IPV1)
     <%- elif antigen == "IPV2" %>
     Inactivated polio (IPV2)
-
     <%- elif antigen == "MCV2X2" %>
     Measles, second dose (MCV2X2)
-
     <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
