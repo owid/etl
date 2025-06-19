@@ -5,7 +5,9 @@ meta:
     # Data product / Snapshot
     title: World illiteracy at mid-century
     description: |-
-      This dataset contains UNESCO's systematic global survey of illiteracy rates, representing the organization's first comprehensive worldwide assessment of literacy levels. The data is compiled from census information and government sources across multiple countries, with primary focus on literacy statistics from approximately 1950, expanding upon earlier research that examined 26 countries using data from 1900 onward.
+        This dataset gives an early global picture of adult literacy, using data mostly collected between 1945 and 1954. UNESCO estimated illiteracy rates for people aged 15 and over. In many cases, the numbers came from recent censuses. Where data were missing or outdated, estimates were made using past trends, school or military records, or general information about each country.
+
+        Because the data was not always complete, most illiteracy rates are shown in 5% steps. Even in countries with high literacy, a small number of people—about 1–2%—were assumed to be unable to learn to read or write due to disabilities. The estimates use a simple definition of literacy: being able to read or to read and write.
     date_published: "1957"
 
     # Citation

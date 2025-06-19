@@ -35,11 +35,15 @@ COUNTRY_MAPPING = {
     24: "Hong Kong",
 }
 
-# -98: Saw, skipped
-# 98: Don't know
-# 99: Refused
-
-# binary values are given as 1/2, 1 if yes, 2 if no
+# columns_mapping:
+# - "system" columns are system variables, such as id, country, wave, etc.
+# - "demographic" columns are demographic variables, such as age
+# - "special_demographic" columns are demographic variables which are different for each region
+# target varibles:
+# - "binary" columns are binary variables, where 1 is yes and 2 is no
+# - "cat_X" columns are categorical variables with X possible answers
+# - "scored_X" columns are numerical variables with a scale of X (e.g. scored_10 means scale of 0-10)
+# - "scored_97" columns are numerical variables with a scale up to 97 (these are topcoded to 97)
 COLUMNS_MAPPING = {
     "id": "system",
     "country": "system",
@@ -216,7 +220,23 @@ def run(dest_dir: str) -> None:
 
     tb["country"] = tb["country"].map(COUNTRY_MAPPING)
 
+    # set survey year:
+    tb["year"] = pd.to_datetime(tb["doi_annual"], format="%m/%d/%Y").dt.year
+    # check that 2023 is most common year and appears in >84% of rows
+    year_counts = tb["year"].value_counts(normalize=True)
+    assert year_counts.idxmax() == 2023, "Most common year is not 2023"
+    assert year_counts.max() > 0.80, "Most common year does not appear in >80% of rows"
+    # set all rows to the most common year
+    tb["year"] = year_counts.idxmax()
+
     # cleaning nan values
+    # -98: Saw, skipped
+    # 98: Don't know
+    # 99: Refused
+
+    for col in tb.select_dtypes(include="category").columns:
+        tb[col] = tb[col].astype(str)
+
     for val in ["-98", "98", "99", -98, 98, 99, " ", ""]:
         tb = tb.replace(val, np.nan)  # type: ignore
 
@@ -328,10 +348,18 @@ def share_binary(tb, groups=["country"], cols=BINARY_COLS):
     col_ans = {1: "yes", 2: "no"}
     res_tbs = []
     for col in cols:
-        res = tb_binary.groupby(groups + [col], dropna=False)["annual_weight1"].sum()
-        denom = res.groupby(groups).sum()
-        res = (res / denom).unstack()
+        res = tb_binary.groupby(groups + [col], dropna=False)["annual_weight1"].sum().reset_index()
+        denom = res.groupby(groups).sum().reset_index()
+        # res_1 = (res / denom).unstack()
 
+        # alternative approach:
+        res = pr.merge(res, denom, on=groups, suffixes=("", "_country"), how="left")
+        res["share"] = res["annual_weight1"] / res["annual_weight1_country"]
+        res = res.pivot(
+            index=groups,
+            columns=col,
+            values="share",
+        )
         col_names = [col_ans[x] if x in col_ans.keys() else "na" for x in res.columns]
         res.columns = [f"{col}_{x}_share" for x in col_names]
         res_tbs.append(res.reset_index())
@@ -343,9 +371,17 @@ def share_categorical(tb, groups: list = ["country"], cols: list = CAT_COLS):
     tb_cat = tb[groups + cols + ["annual_weight1"]].copy()
     res_tbs = []
     for col in cols:
-        res = tb_cat.groupby(groups + [col], dropna=False)["annual_weight1"].sum()
-        denom = res.groupby(groups).sum()
-        res = (res / denom).unstack()
+        res = tb_cat.groupby(groups + [col], dropna=False)["annual_weight1"].sum().reset_index()
+        denom = res.groupby(groups).sum().reset_index()
+        # res = (res / denom).unstack()
+
+        res = pr.merge(res, denom, on=groups, suffixes=("", "_country"), how="left")
+        res["share"] = res["annual_weight1"] / res["annual_weight1_country"]
+        res = res.pivot(
+            index=groups,
+            columns=col,
+            values="share",
+        )
 
         col_names = ["na" if pd.isna(x) else f"ans_{int(x)}" for x in res.columns]
         res.columns = [f"{col}_{x}_share" for x in col_names]

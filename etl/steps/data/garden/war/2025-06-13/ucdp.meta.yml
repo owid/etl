@@ -24,13 +24,13 @@ definitions:
       A civil conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year. A non-state armed group can be a rebel group, criminal organization, or ethnic group. Foreign states can still be involved in a supporting role. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate (internationalized)" -%>
-      An internationalized intrastate conflict is a conflict between a state and a non-state armed group, with involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A foreign-backed civil conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and at least one foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "intrastate (non-internationalized)" -%>
-      An non-internationalized intrastate conflict is a conflict between a state and a non-state armed group, without involvement of a foreign state, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A domestic civil conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and no foreign state is involved in a supporting role. A non-state armed group can be a rebel group, criminal organization, or ethnic group. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "extrasystemic" -%>
-      An extrasystemic conflict is a conflict between a state and a non-state armed group outside its territory that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
+      A colonial conflict is a conflict between a state and a non-state armed group that causes at least 25 deaths during a year, and takes place outside of the state's territory. {definitions.all.conflict_type_base}.
 
       <%- elif conflict_type == "non-state conflict" -%>
       A non-state conflict is a conflict between non-state armed groups, such as rebel groups, criminal organizations, or ethnic groups, that causes at least 25 deaths during a year. {definitions.all.conflict_type_base}.
@@ -151,6 +151,8 @@ definitions:
       - |-
         <% if conflict_type == "all" %>
         This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), [colonial conflicts](#dod:extrasystemic-ucdp), [non-state conflicts](#dod:nonstate-ucdp), and [violence against civilians](#dod:onesided-ucdp).
+        <%- elif conflict_type == "state-based" -%>
+        This includes [interstate conflicts](#dod:interstate-ucdp), [civil conflicts](#dod:intrastate-ucdp), and [colonial conflicts](#dod:extrasystemic-ucdp).
         <%- endif %>
       - UCDP identifies conflict deaths based on news reports, other contemporary sources, and academic research.
 
