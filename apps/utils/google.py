@@ -212,6 +212,69 @@ class GoogleDrive:
 
         return files
 
+    def set_file_permissions(
+        self,
+        file_id: str,
+        role: str = "reader",
+        general_access: Optional[str] = None,
+        emails: Optional[List[str]] = None,
+        send_notification_email: bool = False,
+    ) -> None:
+        """
+        Set permissions for a file in Google Drive.
+
+        - If no arguments (besides the file_id) are passed, this function does nothing.
+        - If argument general_access is "anyone", the file is made publicly accessible.
+        - If argument general_access is "restricted", general access permissions are removed, making the file accessible only to explicitly added users.
+        - If argument emails is given, then those emails are assigned the specified role.
+
+        Parameters
+        ----------
+        file_id : str
+            The ID of the file to update permissions for.
+        role : str
+            The role to assign. Use "reader" for view-only access, "commenter" for comment access, or "writer" for edit access.
+            Default is "reader".
+        general_access : str, optional
+            The type of sharing. Use "anyone" for public access or "restricted" to remove general access permissions.
+            If not specified, general access permissions are not modified.
+        emails : list of str, optional
+            A list of email addresses to grant access to.
+            NOTE: Currently, this function simply adds access (with the specified role) to the given list of emails. There's currently no way to remove access (this would need to be done manually).
+        send_notification_email: bool
+            Send a notification email to the list given in emails, when they are accessed permissions to access the file.
+
+        """
+        # Add specific email addresses for access
+        if emails:
+            for email in emails:
+                permission = {"role": role, "type": "user", "emailAddress": email}
+                self.drive_service.permissions().create(
+                    fileId=file_id, body=permission, fields="id", sendNotificationEmail=send_notification_email
+                ).execute()
+                log.info(f"Permissions updated for file {file_id} (role: {role}, email: {email})")
+
+        # Modify general access permissions only if `type` is specified
+        if general_access:
+            if general_access == "anyone":
+                permission = {"role": role, "type": general_access}
+                self.drive_service.permissions().create(fileId=file_id, body=permission, fields="id").execute()
+                log.info(
+                    f"General access permissions updated for file {file_id} (role: {role}, type: {general_access})"
+                )
+            elif general_access == "restricted":
+                # Check if the file is already restricted
+                permissions = (
+                    self.drive_service.permissions().list(fileId=file_id, fields="permissions(id, type)").execute()
+                )
+                if not any(p["type"] == "anyone" for p in permissions.get("permissions", [])):
+                    log.info(f"File {file_id} is already restricted. No changes made.")
+                    return
+                self.drive_service.permissions().delete(fileId=file_id, permissionId="anyoneWithLink").execute()
+                log.info(f"General access permissions removed for file {file_id}, making it restricted.")
+            else:
+                raise ValueError("general_access must be either 'anyone' or 'restricted'.")
+
 
 class GoogleDoc:
     def __init__(self, doc_id: str):
