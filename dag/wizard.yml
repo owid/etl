@@ -20,4 +20,6 @@ steps:
 
   export://multidim/dummy/latest/dummy:
     - export://multidim/covid/latest/covid
-    - data://grapher/regions/2023-01-01/regions
+
+  export://multidim/dummy/latest/issue_reporting:
+    - data://grapher/covid/latest/cases_deaths
