@@ -60,10 +60,10 @@ tables:
     common:
       display:
         numDecimalPlaces: 0
-      description_processing: |-
-        The default regional aggregates (including values for the World) have been estimated by averaging the country values.
+      description_processing: &processing_regions |-
+        The default regional aggregates (including values for the World) have been estimated by averaging the country values. These are only estimated when data for most countries and populations is available (i.e. 70% for most continents). We have used the list of countries in 1900 as a reference.
 
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
+        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighted by population. The population values are from the UN WPP 2024 revision dataset. These are only estimated when 70% of people in region have data for the given year.
       description_key:
         - *key_regions
       presentation: &ppt_uni_w_regions
@@ -263,19 +263,72 @@ tables:
         unit: ""
 
       # 3.4.2.18 HOS female
-      wom_hos_vdem: # wom_hos_vdem_owid
+      v2exfemhos: # wom_hos_vdem_owid
         title: Woman head of state
+        description_short: |-
+          Denotes whether the head of state in office is a woman at anytime during the year.
+        description_from_producer: |-
+          If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
+
+          Indicator name: `v2exfemhos`
+        unit: ""
+
+      wom_hos_vdem: # (corrected)
+        title: Woman head of state (31st December)
         description_short: |-
           Denotes whether the head of state in office on December 31 is a woman.
         description_from_producer: |-
           If the head of state is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
 
-          V-Dem indicator name: `v2exfemhos`
+          Indicator name: `v2exfemhos`
+        description_processing: |-
+          Equivalent to V-Dem's `v2exfemhos` indicator, but it is modified to reflect the gender of the head of state by the end of the year, December 31. V-Dem, instead, seems to refer to other points during the year.
+
+          Affected by change are:
+
+          - Ali Ben Bongo Ondimba:
+            - 2009-2022 Gabon
+          - Chulalongkorn (Rama V):
+            - 1873-1909 Kingdom of Siam	(Thailand)
+          - Dieudonné François Joseph Marie Reste:
+            - 1923-1925 Tchad [part of French Equatorial Africa]
+            - 1929-1930 French Dahomey [colony within French West Africa]
+            - 1932-1934 Ivory Coast [part of French West Africa]
+            - 1936-1938 Middle Congo as part of the French Equatorial Africa
+          - Letsie III:
+            - 1990-1994, 1996-2024 Lesotho
+          - Miguel I "o Rei Absoluto":
+            - 1828-1833 Portugal
+          - Moshoeshoe II:
+            - 1960-1965 British Protectorate of Basutoland (Lesotho)
+            - 1966-1989, 1995 Lesotho
+          - Prince Zaifeng:
+            - 1908-1911 China
+          - Rajkeswur Purryag:
+            - 2012-2014 Mauritius
+          - Shimon Peres:
+            - 2007-2013 Israel
         unit: ""
 
       ## 3.4.3.16 HOG female
-      wom_hog_vdem: # wom_hog_vdem_owid
+      v2exfemhog:
         title: Woman head of government
+        description_short: |-
+          Denotes whether the head of government in office is a woman at anytime during the year.
+        description_from_producer: |-
+          Question: What is the gender of the head of government?
+
+          Clarification: If the head of government is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
+
+          Responses:
+          0: Male
+          1: Female
+
+          Indicator name: `v2exfemhog`
+        unit: ""
+
+      wom_hog_vdem: # (corrected)
+        title: Woman head of government  (31st December)
         description_short: |-
           Denotes whether the head of government in office on December 31 is a woman.
         description_from_producer: |-
@@ -284,15 +337,43 @@ tables:
           Clarification: If the head of government is a collective body, provide the gender of the person executing the most effective power over this body, or, if no such person exists, answer if any persons in the body are female.
 
           Responses:
-          - 0: Male
-          - 1: Female
+          0: Male
+          1: Female
 
-          V-Dem indicator name: `v2exfemhog`
+          Indicator name: `v2exfemhog`
+        description_processing: |-
+          Equivalent to V-Dem's `v2exfemhog` indicator, but it is modified to reflect the gender of the head of government by the end of the year, December 31. V-Dem, instead, seems to refer to other points during the year.
+
+          Affected by change are:
+
+          Diango Cissoko: 2012 Mali
+          Ion Chicu: 2019-2020 Moldova
+          Joseph Jacques Jean Chrétien: 1993-2002 Canada
+          KåreIsaachsen Willoch: 1981-1985 Norway
+          YuriiIvanovych Yekhanurov: 2005 Ukraine
         unit: ""
 
       ## HOE female (custom)
-      wom_hoe_vdem: # wom_hoe_vdem_owid
+      v2exfemhoe:
         title: Woman chief executive
+        description_short: |-
+          The variable denotes whether the chief executive of government in office is a woman at anytime during the year.
+        description_processing: |-
+          Assigns the value based on the gender of the most powerful chief: either Head of state or Head of government.
+
+          Uses gender from HOS:
+            - If head of state is more powerful than head of government, and head of state is the head of the executive.
+            - If head of state is also head of government.
+            - If head of government is less powerful than head of state.
+
+          Uses HOG if:
+            - If head of state is less powerful than head of government
+
+          We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+        unit: ""
+
+      wom_hoe_vdem: # (corrected)
+        title: Woman chief executive (31st December)
         description_short: |-
           The variable denotes whether the chief executive of government in office on December 31 is a woman.
         description_processing: |-
@@ -307,6 +388,58 @@ tables:
             - If head of state is less powerful than head of government
 
           We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+        unit: ""
+
+      # Had female HOE ever
+      wom_hoe_ever: # wom_hoe_vdem_owid
+        title: Country had a woman chief executive at least once
+        description_short: |-
+          The variable denotes whether a country ever had a female chief executive of government in office as of December 31 of the given year.
+        description_processing: |-
+          We derive this indicator as follows:
+
+          1) Estimate the gender of the chief executive for a given year. We have used the gender of the most powerful chief: either Head of state or Head of government.
+          2) Once 1) evaluates to "female", we assign the value 1 to the indicator for the given year and all following years.
+
+          To get the gender of the chief executive for a given year, we have used the gender of the most powerful chief: either Head of state or Head of government.
+
+          Used gender from HOS:
+            - If head of state is more powerful than head of government, and head of state is the head of the executive.
+            - If head of state is also head of government.
+            - If head of government is less powerful than head of state.
+
+          Used HOG if:
+            - If head of state is less powerful than head of government
+
+          We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+
+          This indicator is only estimated for countries listed in V-Dem in 2024.
+        unit: ""
+
+      # Had female democratically elected HOE ever
+      wom_hoe_ever_dem: # wom_hoe_vdem_owid
+        title: Country had a woman chief executive democratically elected at least once
+        description_short: |-
+          The variable denotes whether a country ever had a democratically elected female chief executive of government in office as of December 31 of the given year.
+        description_processing: |-
+          We derive this indicator as follows:
+
+          1) Estimate the gender of the chief executive for a given year. We have used the gender of the most powerful chief: either Head of state or Head of government.
+          2) If 1) evaluates to "female" and the country is an electoral or liberal democracy, we assign the value 1 to the indicator for the given year and all following years.
+
+          To get the gender of the chief executive for a given year, we have used the gender of the most powerful chief: either Head of state or Head of government.
+
+          Used gender from HOS:
+            - If head of state is more powerful than head of government, and head of state is the head of the executive.
+            - If head of state is also head of government.
+            - If head of government is less powerful than head of state.
+
+          Used HOG if:
+            - If head of state is less powerful than head of government
+
+          We derive this indicator from V-Dem indicators: `v2exfemhos`, `v2exfemhog`, `v2ex_hosw`, and `v2ex_hogw`.
+
+          In addition, we used the V-Dem indicator `electmulpar_hoe_row_owid`, which is based on V-Dem indicator `v2elmulpar_osp_hoe`, to assess if the country goes through electoral processes to elect the chief executive.
         unit: ""
 
       wom_parl_vdem_cat: # wom_parl_gr_vdem_owid
@@ -440,10 +573,7 @@ tables:
   # TABLE: MULTI-DIMENSIONAL TABLES, WITH REGIONS
   vdem_multi_with_regions:
     common:
-      description_processing: |-
-        The default regional aggregates (including values for the World) have been estimated by averaging the country values.
-
-        In addition, regional aggregates with names like `Region (population-weighted)` (including values for World) have been estimated by averaging the country values weighed by population. $\alpha$. The population values are from the UN WPP 2024 revision dataset.
+      description_processing: *processing_regions
       display:
         numDecimalPlaces: 2
       description_key:
@@ -1819,7 +1949,7 @@ tables:
       ## 5.9.3 Property rights
       v2xcl_prpty:
         title: |-
-          Property rights
+          Property rights ({definitions.auxiliary.estimate} estimate)
         description_short: |-
           Gauges the security of private-property rights—acquiring, possessing, inheriting, and selling assets—by averaging indicators for men and women.
         presentation:
@@ -2179,6 +2309,43 @@ tables:
 
           Otherwise this variable is zero.
 
+      num_countries_wom_hoe_ever:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown female chief executive history
+          <%- elif category == "yes" %>
+          Number of countries that had a woman chief executive
+          <%- elif category == "no" %>
+          Number of countries that never had a woman chief executive
+          <%- endif -%>
+
+      num_countries_wom_hoe_ever_demelect:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown democratically elected female chief executive history
+          <%- elif category == "yes" %>
+          Number of countries that had a woman chief executive elected democratically
+          <%- elif category == "no" %>
+          Number of countries that never had a woman chief executive elected democratically
+          <%- endif -%>
+
+  ##################################################################################################
+  ##################################################################################################
+  # TABLE: SHARE OF COUNTRIES WITH X
+  vdem_share_countries:
+    common:
+      unit: "%"
+      description_processing: |-
+        We estimate the share based on the countries that V-Dem lists in 2024.
+    variables:
+      share_countries_wom_hoe_ever:
+        title: |-
+          Share of countries that had a woman chief executive
+
+      share_countries_wom_hoe_ever_demelect:
+        title: |-
+          Share of countries that had a woman chief executive elected democratically
+
   ##################################################################################################
   ##################################################################################################
   # TABLE: NUMBER OF PEOPLE LIVING IN COUNTRIES WITH X REGIME
@@ -2263,3 +2430,23 @@ tables:
           People living in countries that << category >> in the given year.
           <%- endif -%>
         description_processing: *country_natelect_processing
+
+      population_wom_hoe_ever:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown female chief executive history
+          <%- elif category == "yes" %>
+          People living in countries that had a woman chief executive
+          <%- elif category == "no" %>
+          People living in countries that never had a woman chief executive
+          <%- endif -%>
+
+      population_wom_hoe_ever_demelect:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown democratically elected female chief executive history
+          <%- elif category == "yes" %>
+          People living in countries that had a woman chief executive elected democratically
+          <%- elif category == "no" %>
+          People living in countries that never had a woman chief executive elected democratically
+          <%- endif -%>

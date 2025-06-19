@@ -12,12 +12,13 @@ meta:
     attribution_short: RFF
     url_main: https://github.com/g-dolphin/ECP
     url_download: https://github.com/g-dolphin/ECP/archive/refs/heads/master.zip
-    date_accessed: '2025-06-02'
-    date_published: '2025-06-02'
+    # We re-run the snapshot because a data issue was found and the data providers fixed it a few days after the update.
+    date_accessed: '2025-06-10'
+    date_published: '2025-06-10'
     license:
       name: CC BY-NC-ND 4.0
       url: https://github.com/g-dolphin/ECP
 outs:
-  - md5: d358805ff572d17f407047921cb45860
-    size: 213159163
+  - md5: b25a0c2c3b9b8805f959c79812c2ad5b
+    size: 190410333
     path: emissions_weighted_carbon_price.zip

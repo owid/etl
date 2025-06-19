@@ -238,3 +238,5 @@ steps:
     - snapshot://fasttrack/latest/bank_account_selected_countries_global_findex_2021.csv
   data://grapher/fasttrack/latest/account_ownership_by_region:
     - snapshot://fasttrack/latest/account_ownership_by_region.csv
+  data://grapher/fasttrack/latest/uk_road_deaths_ons:
+    - snapshot://fasttrack/latest/uk_road_deaths_ons.csv
