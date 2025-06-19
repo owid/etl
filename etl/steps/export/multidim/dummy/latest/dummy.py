@@ -99,7 +99,7 @@ def _set_subtitle(view):
 
     if view.dimensions["metric"] == "absolute":
         subtitle += "."
-    elif view.dimensions["metric"] == "per_capita":
+    elif view.dimensions["metric"] == "per_million":
         subtitle += ", per million people."
     elif view.dimensions["metric"] == "change":
         subtitle = subtitle.replace("Cumulative", "Change in cumulative")
