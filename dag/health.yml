@@ -882,16 +882,6 @@ steps:
   data://grapher/gavi/2025-02-11/eligibility:
     - data://garden/gavi/2025-02-11/eligibility
 
-  #
-  # Vaccine confidence - to archive
-  #
-  data://meadow/health/2025-02-13/vaccine_confidence:
-    - snapshot://health/2025-02-13/vaccine_confidence.csv
-  data://garden/health/2025-02-13/vaccine_confidence:
-    - data://meadow/health/2025-02-13/vaccine_confidence
-  data://grapher/health/2025-02-13/vaccine_confidence:
-    - data://garden/health/2025-02-13/vaccine_confidence
-
   # Vaccine confidence project
   data://meadow/vcp/2025-06-04/vaccine_confidence:
     - snapshot://vcp/2025-06-04/vaccine_confidence.xlsx
