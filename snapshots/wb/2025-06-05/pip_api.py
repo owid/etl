@@ -1,15 +1,14 @@
 # NOTE: Check all the TODO comments in the code, to modify data related to the new 2021 prices
 # TODO: Extract data in arrow files, for faster processing.
-# NOTE: Check if we can modify the functions to extract missing percentile series for countries in specific years (Cote d'Ivoire 1998 2008, Montenegro 2013 for example).
 """
 DATA EXTRACTION FOR THE WORLD BANK POVERTY AND INEQUALITY PLATFORM (PIP) API
 
 This code generates key indicators and percentiles from the World Bank PIP API.
 This is done by combining the results of several queries to the API:
     - A set of poverty lines (8) to obtain key indicators per PPP year (PPP_VERSIONS) and for countries and regions.
-    - 2298 poverty lines to construct percentiles for a group of countries.
-    - 5148 poverty lines to construct percentiles for all the regions.
-    - 8217 of poverty lines to construct estimates of relative poverty.
+    - Thousands of poverty lines to construct percentiles for a group of countries.
+    - Thousands of poverty lines to construct percentiles for all the regions.
+    - Thousands of poverty lines to construct estimates of relative poverty.
 
 Percentiles are partially constructed because the data officially published by the World Bank is missing some countries and all the regions.
 
@@ -89,7 +88,6 @@ LIVE_API = 1
 def poverty_lines_countries():
     """
     These poverty lines are used to calculate percentiles for countries that are not in the percentile file.
-    # We only extract to $150 because the highest P99 not available is St. Lucia
     # NOTE: In future updates, check if these poverty lines are enough for the extraction
     """
     # Define poverty lines and their increase
@@ -123,7 +121,6 @@ def poverty_lines_countries():
 def poverty_lines_regions():
     """
     These poverty lines are used to calculate percentiles for regions. None of them are in the percentile file.
-    # We only extract to $300 because the highest P99 not available is Other High Income Countries, with $280
     # NOTE: In future updates, check if these poverty lines are enough for the extraction
     """
     # Define poverty lines and their increase
@@ -545,7 +542,7 @@ def pip_query_region(
 def generate_percentiles_raw(wb_api: WB_API):
     """
     Generates percentiles data from query results. This is the raw data to get the percentiles.
-    Uses concurrent.futures to speed up the process.
+    Uses concurrency to speed up the process.
     """
     start_time = time.time()
 
@@ -1202,13 +1199,13 @@ def sanity_checks(df_percentiles):
 
 def generate_relative_poverty(wb_api: WB_API):
     """
-    Generates relative poverty indicators from query results. Uses concurrent.futures to speed up the process.
+    Generates relative poverty indicators from query results. Uses concurrency to speed up the process.
     """
     start_time = time.time()
 
     def get_relative_data(df_row, pct, versions):
         """
-        This function is structured in a way to make it work with concurrent.futures.
+        This function is structured in a way to make it work with concurrency.
         It checks if the country file related to the row exists. If not, it runs the query.
         """
         if ~np.isnan(df_row["median"]):
@@ -1243,7 +1240,7 @@ def generate_relative_poverty(wb_api: WB_API):
 
     def get_relative_data_region(df_row, pct, versions):
         """
-        This function is structured in a way to make it work with concurrent.futures.
+        This function is structured in a way to make it work with concurrency.
         It checks if the regional file related to the row exists. If not, it runs the query.
         """
         if ~np.isnan(df_row["median"]):
@@ -1404,13 +1401,13 @@ def generate_relative_poverty(wb_api: WB_API):
 
 def generate_key_indicators(wb_api: WB_API):
     """
-    Generate the main indicators file, from a set of poverty lines and PPP versions. Uses concurrent.futures to speed up the process.
+    Generate the main indicators file, from a set of poverty lines and PPP versions. Uses concurrency to speed up the process.
     """
     start_time = time.time()
 
     def get_country_data(povline, ppp_version, versions):
         """
-        This function is defined inside the main function because it needs to be called by concurrent.futures.
+        This function is defined inside the main function because it needs to be called by concurrency.
         For country data.
         """
         return pip_query_country(
@@ -1429,7 +1426,7 @@ def generate_key_indicators(wb_api: WB_API):
 
     def get_region_data(povline, ppp_version, versions):
         """
-        This function is defined inside the main function because it needs to be called by concurrent.futures.
+        This function is defined inside the main function because it needs to be called by concurrency.
         For regional data.
         """
         return pip_query_region(
