@@ -20,7 +20,7 @@ def run() -> None:
     #
     c = paths.create_collection(
         config=paths.load_collection_config(),
-        short_name="demo",
+        short_name="issue_reporting",
     )
 
     #
