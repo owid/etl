@@ -1168,4 +1168,4 @@ for i in survey_list:
         + table_tsv_indented
     )
 
-upsert_to_db("poverty-explorer-2011-vs-2017-ppp", content)
+upsert_to_db("poverty-explorer-ppp-comparison", content)
