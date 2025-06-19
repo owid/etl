@@ -163,6 +163,7 @@ def combine_collections(
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = COLLECTION_SLUG,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> E: ...
@@ -177,6 +178,7 @@ def combine_collections(
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = COLLECTION_SLUG,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> T: ...
@@ -191,6 +193,7 @@ def combine_collections(
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = COLLECTION_SLUG,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> Union[Collection, Explorer]:
@@ -212,8 +215,10 @@ def combine_collections(
             Set of dependencies for the combined collection
         force_collection_dimension:
             If True, adds a dimension to identify the source collection even if there are no duplicate views
+        collection_dimension_slug:
+            Slug for the dimension that identifies the source collection. If None, defaults to "collection__slug".
         collection_dimension_name:
-            Name for the dimension that identifies the source collection (defaults to "MDIM" for Collections or "Explorer" for Explorers)
+            Name for the dimension that identifies the source collection. If None, defaults to "Collection".
         collection_choices_names:
             Names for the choices in the source dimension (should match the length of collections)
         is_explorer:
@@ -244,6 +249,8 @@ def combine_collections(
     # Set appropriate default dimension name based on collection type
     if collection_dimension_name is None:
         collection_dimension_name = COLLECTION_TITLE
+    if collection_dimension_slug is None:
+        collection_dimension_slug = COLLECTION_SLUG
 
     # Check that all collections have the same dimensions structure
     collection_dims = None
@@ -290,7 +297,7 @@ def combine_collections(
                 choice_name = collection.title.get("title", collection.short_name)
 
             dimension_collection = Dimension(
-                slug=COLLECTION_SLUG,
+                slug=collection_dimension_slug,
                 name=collection_dimension_name,
                 choices=[
                     DimensionChoice(slug=collection.short_name, name=choice_name),
