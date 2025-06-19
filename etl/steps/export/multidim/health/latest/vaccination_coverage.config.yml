@@ -19,6 +19,7 @@ dimensions:
 
   - name: Vaccine
     slug: antigen
+    description: "Type of vaccine given to children"
     choices:
       - slug: comparison
         name: "Comparison across vaccines"

@@ -77,6 +77,10 @@ def combine_config_dimensions(
             if "presentation" in dim_overwrite:
                 dim["presentation"] = dim_overwrite["presentation"]
 
+            # Overwrite description
+            if "description" in dim_overwrite:
+                dim["description"] = dim_overwrite["description"]
+
             # Overwrite choices
             if "choices" in dim_overwrite:
                 choices_overwrite = records_to_dictionary(
@@ -163,6 +167,7 @@ def combine_collections(
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = None,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> E: ...
@@ -177,6 +182,7 @@ def combine_collections(
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = None,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> T: ...
@@ -191,6 +197,7 @@ def combine_collections(
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = None,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> Union[Collection, Explorer]:
@@ -212,8 +219,10 @@ def combine_collections(
             Set of dependencies for the combined collection
         force_collection_dimension:
             If True, adds a dimension to identify the source collection even if there are no duplicate views
+        collection_dimension_slug:
+            Slug for the dimension that identifies the source collection. If None, defaults to "collection__slug".
         collection_dimension_name:
-            Name for the dimension that identifies the source collection (defaults to "MDIM" for Collections or "Explorer" for Explorers)
+            Name for the dimension that identifies the source collection. If None, defaults to "Collection".
         collection_choices_names:
             Names for the choices in the source dimension (should match the length of collections)
         is_explorer:
@@ -244,6 +253,8 @@ def combine_collections(
     # Set appropriate default dimension name based on collection type
     if collection_dimension_name is None:
         collection_dimension_name = COLLECTION_TITLE
+    if collection_dimension_slug is None:
+        collection_dimension_slug = COLLECTION_SLUG
 
     # Check that all collections have the same dimensions structure
     collection_dims = None
@@ -290,7 +301,7 @@ def combine_collections(
                 choice_name = collection.title.get("title", collection.short_name)
 
             dimension_collection = Dimension(
-                slug=COLLECTION_SLUG,
+                slug=collection_dimension_slug,
                 name=collection_dimension_name,
                 choices=[
                     DimensionChoice(slug=collection.short_name, name=choice_name),
@@ -298,7 +309,7 @@ def combine_collections(
             )
             collection.dimensions = [dimension_collection] + collection.dimensions
             for v in collection.views:
-                v.dimensions[COLLECTION_SLUG] = collection.short_name
+                v.dimensions[collection_dimension_slug] = collection.short_name
 
     # Create dictionary with collections for tracking
     collections_by_id = {str(i): deepcopy(collection) for i, collection in enumerate(collections)}
@@ -364,7 +375,11 @@ def combine_collections(
             cconfig["config"]["explorerSubtitle"] = default_title["title_variant"]
 
     # Set dimensions and views
-    cconfig["dimensions"] = dimensions
+    # cconfig["dimensions"] = dimensions
+    cconfig["dimensions"] = combine_config_dimensions(
+        [d.to_dict() for d in dimensions],
+        cconfig.get("dimensions", []),
+    )
     cconfig["views"] = views
 
     # Create the combined collection

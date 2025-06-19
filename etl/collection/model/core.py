@@ -18,7 +18,7 @@ from structlog import get_logger
 from typing_extensions import Self
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.exceptions import DuplicateCollectionViews, DuplicateValuesError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import CommonView, View, ViewIndicators
@@ -168,7 +168,7 @@ class Collection(MDIMBase):
 
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")
-        self.save_file(self.local_config_path, force_create=False)
+        self.save_file(self.local_config_path, force_create=True)
 
     def save(  # type: ignore[override]
         self,
@@ -193,6 +193,9 @@ class Collection(MDIMBase):
 
         # Check that no choice name or slug is repeated
         self.validate_choice_uniqueness()
+
+        # Check that no choice name or slug is repeated
+        self.validate_dimension_uniqueness()
 
         # Check that all indicators in explorer exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
@@ -462,13 +465,21 @@ class Collection(MDIMBase):
     def validate_choice_uniqueness(self):
         """Validate that all choice names (and slugs) are unique."""
         for dim in self.dimensions:
-            dim.validate_unique_names()
-            dim.validate_unique_slugs()
+            dim.validate_choice_names_unique()
+            dim.validate_choice_slugs_unique()
 
-    def validate_choice_names(self):
-        """Validate that all choice names are unique."""
+    def validate_dimension_uniqueness(self):
+        """Validate that all choice names (and slugs) are unique."""
+        slugs = set()
         for dim in self.dimensions:
-            dim.validate_unique_names()
+            # Check if slug was already seen
+            if dim.slug in slugs:
+                raise DuplicateValuesError(
+                    f"Dimension slug '{dim.slug}' is not unique! Found in dimensions: {self.dimensions}"
+                )
+
+            # Add slug to set
+            slugs.add(dim.slug)
 
     def prune_dimensions(self):
         """Remove dimension if only one of its choice is in use."""
@@ -900,7 +911,8 @@ def _set_config_metadata_with_params(
 
     # Sanity check
     if (view_config is None) and (view_metadata is None):
-        raise ValueError("Either view_config or view_metadata must be provided!")
+        return view
+        # raise ValueError("Either view_config or view_metadata must be provided!")
 
     # Execute callables in params to get a proper Dict[str, str]
     params_view = _expand_params(params, view)
