@@ -8,7 +8,7 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     # Load grapher dataset.
-    ds = paths.load_dataset("cases_deaths")
+    # ds = paths.load_dataset("cases_deaths")
     # tb = ds.read("cases_deaths", load_data=False)
 
     #
