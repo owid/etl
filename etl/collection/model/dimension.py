@@ -53,9 +53,9 @@ class Dimension(MDIMBase):
 
     slug: str
     name: str
-    description: str
     choices: List[DimensionChoice]
-    presentation: Optional[DimensionPresentation] = None
+    description: str | None = None
+    presentation: DimensionPresentation | None = None
 
     def __post_init__(self):
         """Validations."""
