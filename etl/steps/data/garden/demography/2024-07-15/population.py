@@ -68,6 +68,37 @@ def run(dest_dir: str) -> None:
     ds_land_area = paths.load_dataset("faostat_rl")
     tb_land_area = ds_land_area["faostat_rl_flat"].reset_index()
 
+    ####################################################################################################################
+    # TODO: Remove temporary code to check that the resulting area coincides with the original.
+    ds_land_area_2 = paths.load_dataset("faostat_rl_auxiliary")
+    tb_land_area_2 = ds_land_area_2.read("faostat_rl_auxiliary_flat")[
+        ["country", "year", "land_area__00006601__area__005110__hectares"]
+    ]
+    tb_land_area_2 = geo.add_regions_to_table(
+        tb=tb_land_area_2,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        num_allowed_nans_per_year=None,
+        frac_allowed_nans_per_year=None,
+    )
+    tb_land_area = (
+        tb_land_area[["country", "year", "land_area__00006601__area__005110__hectares"]]
+        .astype({"country": "string", "year": int, "land_area__00006601__area__005110__hectares": float})
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
+    )
+    tb_land_area_2 = (
+        tb_land_area_2[["country", "year", "land_area__00006601__area__005110__hectares"]]
+        .astype({"country": "string", "year": int, "land_area__00006601__area__005110__hectares": float})
+        .sort_values(["country", "year"])
+        .reset_index(drop=True)
+    )
+    from pandas.testing import assert_frame_equal
+
+    assert_frame_equal(tb_land_area, tb_land_area_2, check_dtype=False, check_like=True, rtol=1e-4)
+    # So, the old and new areas are identical within a relative tolerance of 0.01%.
+    ####################################################################################################################
+
     #
     # Process data.
     #

@@ -91,6 +91,10 @@ steps:
     - data://garden/regions/2023-01-01/regions
     - data://garden/wb/2024-03-11/income_groups
   ######################################################################################################################
+  # Auxiliary FAOSTAT RL step with basic processing, used by the population dataset to generate population density.
+  # TODO: Once adapted, archive all other steps above.
+  data://garden/faostat/2024-03-14/faostat_rl_auxiliary:
+    - snapshot://faostat/2024-03-14/faostat_rl.zip
   #
   # FAOSTAT meadow steps for version 2025-03-17
   #
