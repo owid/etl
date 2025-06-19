@@ -900,7 +900,8 @@ def _set_config_metadata_with_params(
 
     # Sanity check
     if (view_config is None) and (view_metadata is None):
-        raise ValueError("Either view_config or view_metadata must be provided!")
+        return view
+        # raise ValueError("Either view_config or view_metadata must be provided!")
 
     # Execute callables in params to get a proper Dict[str, str]
     params_view = _expand_params(params, view)
