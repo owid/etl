@@ -170,6 +170,36 @@ class ViewIndicators(MDIMBase):
 
         return self
 
+    def set_indicator(
+        self,
+        y: List[str] | List[Dict[str, Any]] | str | Dict[str, Any] | None = None,
+        x: str | None = None,
+        color: str | None = None,
+        size: str | None = None,
+    ):
+        def _load_indicator(indicator_raw, indicator_label):
+            if isinstance(indicator_raw, str):
+                indicator = Indicator(catalogPath=indicator_raw)
+            elif isinstance(indicator_raw, dict):
+                indicator = Indicator.from_dict(indicator_raw)
+            else:
+                raise ValueError(
+                    f"Invalid type for indicator {indicator_label}: {type(indicator_raw)}. Expected str or dict."
+                )
+            return indicator
+
+        if y is not None:
+            if isinstance(y, list):
+                self.y = [_load_indicator(yy, "y") for yy in y]
+            else:
+                self.y = [_load_indicator(y, "y")]
+        if x is not None:
+            self.x = _load_indicator(x, "x")
+        if color is not None:
+            self.color = _load_indicator(color, "color")
+        if size is not None:
+            self.size = _load_indicator(size, "size")
+
 
 @pruned_json
 @dataclass
