@@ -43,7 +43,7 @@ dimensions:
       - slug: absolute
         name: Absolute number
         description: Absolute values of the indicator
-      - slug: per_million
+      - slug: per_capita
         name: Per million people
       - slug: change
         name: Relative change (%)
