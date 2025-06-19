@@ -38,6 +38,7 @@ def make_dimension():
     return Dimension(
         slug="age",
         name="Age",
+        description="Age groups of individuals",
         choices=[
             DimensionChoice(slug="old", name="Old"),
             DimensionChoice(slug="young", name="Young"),
