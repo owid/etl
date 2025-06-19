@@ -317,14 +317,14 @@ def render_collection(level: int = 1) -> str:
     # Use the generic recursive rendering like other schema functions
     collection = MULTIDIM_SCHEMA
     documentation = render_props_recursive(
-        collection, 
-        "collection", 
-        level, 
-        "", 
+        collection,
+        "collection",
+        level,
+        "",
         ignore_fields=[
             "collection.views.config",  # Too detailed, reference external schema
             "collection.views.metadata",  # Too detailed, reference external schema
-        ]
+        ],
     )
     return documentation
 
@@ -333,17 +333,11 @@ def render_collection_view_config(level: int = 1) -> str:
     """Render documentation for Collection view config."""
     # Extract the config property from the views schema
     views_config = MULTIDIM_SCHEMA["properties"]["views"]["items"]["properties"]["config"]
-    documentation = render_props_recursive(
-        views_config, 
-        "view.config", 
-        level, 
-        "",
-        render_top_as_scalar=False
-    )
-    
+    documentation = render_props_recursive(views_config, "view.config", level, "", render_top_as_scalar=False)
+
     # Add reference to full grapher schema
     documentation += "\n\nFor the complete list of available configuration options, see the [Grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.007.json).\n\n"
-    
+
     return documentation
 
 
@@ -351,15 +345,9 @@ def render_collection_view_metadata(level: int = 1) -> str:
     """Render documentation for Collection view metadata."""
     # Extract the metadata property from the views schema
     views_metadata = MULTIDIM_SCHEMA["properties"]["views"]["items"]["properties"]["metadata"]
-    documentation = render_props_recursive(
-        views_metadata, 
-        "view.metadata", 
-        level, 
-        "",
-        render_top_as_scalar=False
-    )
-    
+    documentation = render_props_recursive(views_metadata, "view.metadata", level, "", render_top_as_scalar=False)
+
     # Add reference to full dataset schema
     documentation += "\n\nFor the complete metadata structure, see the [Dataset schema](https://files.ourworldindata.org/schemas/dataset-schema.json).\n\n"
-    
+
     return documentation
