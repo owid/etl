@@ -242,14 +242,18 @@ class Report:
         else:
             return "Both Google Doc and PDF exist"
 
-    def status_with_links(self) -> str:
+    def print_status_with_links(self) -> None:
         """Get a detailed status including links."""
+        folder_text = f"📁 Folder: {self.folder_link}"
         if not self.exists:
-            return "Not created"
+            text = "Not created"
         elif not self.has_pdf:
-            return f"Google Doc exists (no PDF)\n  📄 Doc: {self.doc_link}"
+            text = f"Google Doc exists (no PDF)\n  📄 Doc: {self.doc_link}\n  {folder_text}"
         else:
-            return f"Both Google Doc and PDF exist\n  📄 Doc: {self.doc_link}\n  📋 PDF: {self.pdf_link}"
+            text = (
+                f"Both Google Doc and PDF exist\n  📄 Doc: {self.doc_link}\n  📋 PDF: {self.pdf_link}\n  {folder_text}"
+            )
+        log.info(text)
 
     def gather_analytics(self) -> None:
         """Gather analytics data for this report."""
@@ -412,24 +416,6 @@ class Report:
         # Change file permissions, to include data providers emails.
         self.change_file_permissions()
 
-    def print_summary(self) -> None:
-        """Print a comprehensive summary of the report status and links."""
-        print(f"\n📊 Report: {self.title}")
-        print(f"Status: {self.status}")
-        print(f"Period: {self.min_date} to {self.max_date}")
-
-        if self.doc_link:
-            print(f"📄 Google Doc: {self.doc_link}")
-        if self.pdf_link:
-            print(f"📋 PDF: {self.pdf_link}")
-        print(f"📁 Folder: {self.folder_link}")
-
-        if self.analytics:
-            n_charts = len(self.analytics["charts"])
-            n_posts = len(self.analytics["posts"])
-            print(f"📈 Analytics: {n_charts} charts, {n_posts} posts")
-        print()
-
 
 def print_impact_highlights(highlights: pd.DataFrame) -> None:
     # TODO:
@@ -438,13 +424,13 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     # * Adapt GDoc template to include those highlights, if any.
     # * It might be useful to create a function that writes to GDoc with embedded hyperlinks.
     if not highlights.empty:
-        print(
+        log.info(
             f"{len(highlights)} highlights found for this data producer. Manually check them and consider adding them to the producer GDoc."
         )
         for _, highlight in highlights.iterrows():
-            print(f"* {highlight['Highlight']}")
-            print(f"Source link: {highlight['Source link']}")
-            print(f"Notion highlight: {highlight['notion_url']}")
+            log.info(f"* {highlight['Highlight']}")
+            log.info(f"Source link: {highlight['Source link']}")
+            log.info(f"Notion highlight: {highlight['notion_url']}")
 
 
 @click.command(name="create_data_producer_report", cls=RichCommand, help=__doc__)
@@ -470,17 +456,14 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     help="Overwrite existing PDF if report already exists.",
 )
 def run(producer, quarter, year, overwrite_pdf):
-    # Create report instance (it will automatically check for existing reports)
+    # Create report instance (it will automatically check for existing reports).
     report = Report(producer, quarter, year)
 
-    print("\n📊 Report Status:")
-    print(report.status_with_links())
-    print(f"📁 Folder: {report.folder_link}")
-    print()
+    # Print status with links.
+    report.print_status_with_links()
 
     if report.exists:
         log.warning(f"Google Doc report already exists for {producer} Q{quarter} {year}")
-        # Since report.exists is True, we know doc_id is not None
         assert report.doc_id is not None
 
         if report.has_pdf:
