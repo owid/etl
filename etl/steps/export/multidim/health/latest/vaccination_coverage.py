@@ -32,8 +32,8 @@ def run() -> None:
     CONFIG_GROUP = {
         "title": {
             "coverage": "Vaccination coverage",
-            "vaccinated": "Number of one-year-olds who have had each vaccination",
-            "unvaccinated": "Number of one-year-olds who have not had each vaccination",
+            "vaccinated": "Vaccinated one-year-olds",
+            "unvaccinated": "Unvaccinated one-year-olds",
         },
         "subtitle": {
             "coverage": "Share of one-year-olds who have been vaccinated against a disease or a pathogen.",
