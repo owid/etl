@@ -195,6 +195,13 @@ def run() -> None:
         if level and metric_type:
             view.config["subtitle"] = generate_subtitle_by_level(level, metric_type)
 
+        if sex == "sex_side_by_side" or level == "level_side_by_side":
+            view.metadata = {
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+                "description_short": view.config["subtitle"],
+            }
         edit_indicator_displays(view)
 
     #

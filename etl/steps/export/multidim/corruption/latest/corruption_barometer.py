@@ -66,7 +66,7 @@ def run() -> None:
                     "tab": "chart",
                     # "facettingLabelByYVariables": "institution",
                     # "selectedFacetStrategy": "metric",
-                    "title": "title_public",
+                    "title": "{title_public}",
                     "subtitle": 'Percentage of respondents who answered {answer} to the question "How many of the following people do you think are involved in corruption?".',
                 },
                 "view_metadata": {
