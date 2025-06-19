@@ -1,6 +1,8 @@
 """Script to create a snapshot of dataset."""
 
-from etl.snapshot import Snapshot
+from etl.helpers import PathFinder
+
+paths = PathFinder(__file__)
 
 
 def run(upload: bool = True) -> None:
@@ -9,8 +11,8 @@ def run(upload: bool = True) -> None:
     Args:
         upload: Whether to upload the snapshot to S3.
     """
-    # Create a new snapshot using the script's location.
-    snap = Snapshot.from_script(__file__)
+    # Init snapshot object
+    snap = paths.init_snapshot()
 
     # Download data from source, add file to DVC and upload to S3.
     snap.create_snapshot(upload=upload)
