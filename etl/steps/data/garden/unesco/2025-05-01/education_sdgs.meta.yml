@@ -656,7 +656,7 @@ tables:
 
       completion_rate__primary_education__both_sexes__pct__modelled_data__cr_mod_1:
         title: Completion rate in primary education
-        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
+        description_short: The share of children who are 3 to 5 years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -670,7 +670,7 @@ tables:
 
       completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
         title: Completion rate in lower secondary education
-        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
+        description_short: The share of children who are 3 to 5 years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -684,7 +684,7 @@ tables:
 
       completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
         title: Completion rate in upper secondary education
-        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
+        description_short: The share of children who are 3 to 5 years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -698,7 +698,7 @@ tables:
 
       completion_rate__lower_secondary_education__female__pct__modelled_data__cr_mod_2_f:
         title: Completion rate in lower secondary education among girls
-        description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
+        description_short: The share of girls who are 3 to 5 years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -712,7 +712,7 @@ tables:
 
       completion_rate__primary_education__female__pct__modelled_data__cr_mod_1_f:
         title: Completion rate in primary education among girls
-        description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
+        description_short: The share of girls who are 3 to 5 years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -726,7 +726,7 @@ tables:
 
       completion_rate__upper_secondary_education__female__pct__modelled_data__cr_mod_3_f:
         title: Completion rate in upper secondary education among girls
-        description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
+        description_short: The share of girls who are 3 to 5 years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -740,7 +740,7 @@ tables:
 
       completion_rate__lower_secondary_education__male__pct__modelled_data__cr_mod_2_m:
         title: Completion rate in lower secondary education among boys
-        description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
+        description_short: The share of boys who are 3 to 5 years older than the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -754,7 +754,7 @@ tables:
 
       completion_rate__primary_education__male__pct__modelled_data__cr_mod_1_m:
         title: Completion rate in primary education among boys
-        description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
+        description_short: The share of boys who are 3 to 5 years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
@@ -768,7 +768,7 @@ tables:
 
       completion_rate__upper_secondary_education__male__pct__modelled_data__cr_mod_3_m:
         title: Completion rate in upper secondary education among boys
-        description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
+        description_short: The share of boys who are 3 to 5 years older than the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
         unit: "%"
         short_unit: "%"
         description_key: *desc_key_completion_rate
