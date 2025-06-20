@@ -119,8 +119,6 @@ def adjust_dimensions(tb):
 
         # Extract gender
         sex = _extract_gender(col, SEX_KEYWORDS)
-        # Set metadata
-        tb[col].metadata.dimensions = {}
         # Set indicator name
         tb[col].metadata.original_short_name = "completion_rates"
         # Set dimensions
