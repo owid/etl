@@ -13,7 +13,54 @@ definitions:
           timeTolerance: 5
     display:
       tolerance: 5
-  enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
+  bins: &bins [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+
+  # Common grapher config templates for indicators with gender/demographic variations
+  common_grapher_config: &common_grapher_config
+    maxTime: 2024
+    hasMapTab: true
+  common_grapher_map_config: &common_grapher_map_config
+    time: 2024
+    timeTolerance: 5
+  common_grapher_map_color_config: &common_grapher_map_color_config
+    binningStrategy: manual
+    customNumericValues: *bins
+
+  # Gender-specific color scheme variations
+  grapher_config_bugn: &grapher_config_bugn
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        <<: *common_grapher_map_color_config
+        baseColorScheme: BuGn
+
+  # Purples
+  grapher_config_purples: &grapher_config_purples
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        <<: *common_grapher_map_color_config
+        baseColorScheme: Purples
+
+  # Blues
+  grapher_config_blues: &grapher_config_blues
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        <<: *common_grapher_map_color_config
+        baseColorScheme: Blues
+
+  # Greens
+  grapher_config_greens: &grapher_config_greens
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        <<: *common_grapher_map_color_config
+        baseColorScheme: Greens
 
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
@@ -39,6 +86,15 @@ definitions:
     - The UNESCO Institute for Statistics (UIS) and its partners also use statistical models to estimate literacy rates for years or regions where recent data are not available, supporting regional and global comparisons.
     - For most countries literacy is self-reported but there may be some challenges associated to changes over time in a given country and to differences in definition across countries.
     - Literacy should not be confused with functional literacy. This indicator reflects basic abilities but does not measure whether individuals can apply these skills effectively in daily life, work, or learning.
+
+  desc_key_completion_rate: &desc_key_completion_rate
+    - This indicator estimates how many children complete a given level of education, even if they do so later than the expected age.
+    - It captures the percentage of the population aged 3 to 5 years above the official age for the last grade of the education level who are estimated to have successfully completed that level.
+    - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating grades.
+    - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
+    - A high rate means that most children eventually reach the final grade of the education level, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition.
+    - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
+    - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -46,7 +102,7 @@ dataset:
   title: UNESCO Institute for Statistics (UIS) - Education (SDGs)
 
 tables:
- education_sdgs:
+  education_sdgs:
     variables:
       adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99:
         title: Literacy rate among adults
@@ -62,7 +118,7 @@ tables:
 
       youth_literacy_rate__population_15_24_years__male__pct__lr_ag15t24_m:
         title: Literacy rate among young men
-        description_short:  Share of men aged 15 to 24 years who can read and write.
+        description_short: Share of men aged 15 to 24 years who can read and write.
         unit: "%"
         short_unit: "%"
         description_key: *desc_literacy
@@ -71,7 +127,6 @@ tables:
         display:
           numDecimalPlaces: 1
           name: Literacy rate among young men
-
 
       youth_literacy_rate__population_15_24_years__female__pct__lr_ag15t24_f:
         title: Literacy rate among young women
@@ -84,7 +139,6 @@ tables:
         display:
           numDecimalPlaces: 1
           name: Literacy rate among young women
-
 
       elderly_literacy_rate__population_65plus_years__both_sexes__pct__lr_ag65t99:
         title: Literacy rate among older adults
@@ -437,126 +491,18 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-        - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing primary school.
-        - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
-        - It combines the percentage of children who complete primary school with the percentage who meet the math benchmark.
-        - This reflects outcomes for the full population — not just those still enrolled.
-        - A higher percentage suggests education systems are enabling most children to complete school and build essential math skills.
-        - Data comes from assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on household surveys or models.
-        - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
+          - This indicator shows the share of all children who reach minimum math proficiency by the expected age of completing primary school.
+          - Minimum math proficiency at this level means demonstrating skills in computation, solving problems, interpreting tables and graphs, and using algebraic representations.
+          - It combines the percentage of children who complete primary school with the percentage who meet the math benchmark.
+          - This reflects outcomes for the full population — not just those still enrolled.
+          - A higher percentage suggests education systems are enabling most children to complete school and build essential math skills.
+          - Data comes from assessments such as [TIMSS](https://timssandpirls.bc.edu/), along with completion estimates based on household surveys or models.
+          - Differences in assessment coverage, definitions of proficiency, and data timing may affect comparisons across countries.
         presentation:
           title_public: Share of children achieving minimum math proficiency by the end of primary age
         display:
           numDecimalPlaces: 1
           name: Share achieving math proficiency by end of primary
-
-      completion_rate__primary_education__both_sexes__pct__modelled_data__cr_mod_1:
-        title: Completion rate in primary education
-        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator estimates how many children complete primary education, even if they do so later than the expected age.
-          - It captures the percentage of the population aged 3 to 5 years above the official age for the last grade of primary school who are estimated to have successfully completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating.
-          - For example, if primary starts at age 6 and lasts six years, completion is assessed among 14- to 16-year-olds. For the UK this would be children aged 14-16 years as the age of primary completion is 11.
-          - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
-          - A high rate means that most children eventually reach the final grade of primary school, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition.
-          - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
-          - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
-        presentation:
-          title_public: Completion rate in primary education
-        display:
-          name:  Primary education
-          numDecimalPlaces: 1
-
-      completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
-        title: Completion rate in lower secondary education
-        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator estimates the share of adolescents who complete lower secondary education, even if they do so later than the expected age.
-          - It refers to the population aged 3 to 5 years above the official age for the last grade of lower secondary school who are estimated to have completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating.
-          - For example, if lower secondary begins at age 12 and lasts three years, the completion rate is assessed among 18- to 20-year-olds.
-          - Estimates are modelled using household surveys and administrative records, helping fill data gaps and support trend analysis in countries without recent direct data.
-          - A high completion rate suggests that most adolescents reach the final grade of lower secondary school, while lower rates may point to issues in access, progression, or retention.
-          - Modelled rates offer improved cross-country comparability but may differ from national figures due to different definitions or data quality.
-          - Changes in school duration, entry age, or national classification over time may also affect how results are interpreted.
-        presentation:
-          title_public: Completion rate in lower secondary education
-        display:
-          name:  Secondary education
-          numDecimalPlaces: 1
-
-      completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
-        title: Completion rate in upper secondary education
-        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator estimates how many young people complete upper secondary education, even if they do so later than the expected age.
-          - It reflects the percentage of the population aged 3 to 5 years above the official age for the last grade of upper secondary school who are estimated to have completed that level.
-          - Completion age is based on the standard progression — if upper secondary starts at age 15 and lasts three years, the indicator is assessed among 21- to 23-year-olds.
-          - Modelled estimates combine household survey responses with administrative data to fill gaps and adjust for inconsistencies in reporting.
-          - A high value indicates that most young people eventually complete upper secondary education, while a low value may highlight challenges related to cost, access, or academic failure.
-          - These estimates allow for better international comparison but may not match official national data exactly, especially where school structures differ.
-          - Limitations include variations in programme length, national classification systems, and the quality or recency of input data used in modelling.
-        presentation:
-          title_public: Completion rate in upper secondary education
-        display:
-          name:  Upper secondary education
-          numDecimalPlaces: 1
-
-
-      completion_rate__primary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
-        title: Completion rate in primary education, adjusted gender parity index (GPIA)
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal primary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
-        unit: ""
-        description_key:
-          - Many children never make it to the final grade of their school level — this indicator shows how close boys and girls are to completing primary education by a slightly older age than expected.
-          - It captures gender equality in completion rates for [primary education](#dod:primary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of primary school, who have successfully completed that level.
-          - The completion age group is based on the expected school path — if children start school on time and progress without repeating or skipping grades. For example, if primary starts at age 6 and lasts 6 years, completion is measured among 14–16-year-olds.
-          - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
-          - A value of 1 means girls and boys complete primary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
-          - A high completion rate — close to 100% — means nearly all children complete primary school by the benchmark age, allowing for delays. Lower rates may point to late school entry, dropouts, repetition, or other barriers to completion.
-          - The data comes from national censuses, labour force surveys, or other household surveys, and are usually mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) levels after data collection. This is combined with official data on school starting ages and duration.
-          - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
-        display:
-          numDecimalPlaces: 1
-
-      completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_2_gpia:
-        title: Completion rate in lower secondary education, adjusted gender parity index (GPIA)
-        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal lower secondary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
-        unit: ""
-        description_key:
-          - Many children do not reach the final grade of lower secondary education — this indicator shows how close boys and girls are to completing lower secondary school by a slightly older age than expected.
-          - It captures gender equality in completion rates for [lower secondary education](#dod:lower-secondary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of lower secondary school, who have successfully completed that level.
-          - The completion age group is based on the expected school progression — assuming students start on time and advance without repeating or skipping grades. For example, if lower secondary starts at age 12 and lasts 3 years, completion is measured among 17–19-year-olds.
-          - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
-          - A value of 1 means girls and boys complete lower secondary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
-          - A high completion rate — close to 100% — indicates that nearly all children complete lower secondary school by the benchmark age, accounting for delays. Lower rates may reflect late school entry, dropout, repetition, or systemic barriers to completion.
-          - The data are derived from national censuses, labour force surveys, or other household surveys, often mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) levels post-collection. These are combined with official data on school starting ages and programme duration.
-          - Key limitations exist. Cross-country comparisons can be influenced by differences in ISCED mappings, evolving national education structures, and potential underestimation of completion rates when actual programme lengths deviate from official definitions.
-        display:
-          numDecimalPlaces: 1
-
-      completion_rate__upper_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_3_gpia:
-          title: Completion rate in upper secondary education, adjusted gender parity index (GPIA)
-          description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal upper secondary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
-          unit: ""
-          description_key:
-            - Many young people do not reach the final grade of upper secondary education — this indicator shows how close boys and girls are to completing upper secondary school by a slightly older age than expected.
-            - It captures gender equality in completion rates for [upper secondary education](#dod:upper-secondary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of upper secondary school, who have successfully completed that level.
-            - The completion age group is based on the expected educational pathway — assuming students enter school on time and progress without repeating or skipping grades. For example, if upper secondary starts at age 15 and lasts 3 years, completion is measured among 20–22-year-olds.
-            - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
-            - A value of 1 means girls and boys complete upper secondary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
-            - A high completion rate — close to 100% — indicates that nearly all young people complete upper secondary school by the benchmark age, allowing for delays. Lower rates may reflect late school entry, dropout, repetition, or social and economic barriers to completion.
-            - The data are drawn from national censuses, labour force surveys, or other household surveys, which are generally mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) levels after data collection. These are combined with official information on school starting ages and programme durations.
-            - Important limitations apply. Cross-country comparisons may be affected by differences in ISCED mappings, changes in national education systems over time, and the possibility of underestimating completion when actual programme lengths differ from official definitions.
-          display:
-            numDecimalPlaces: 1
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
@@ -633,21 +579,11 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment ratio in tertiary education
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: *enrolment_rate_bins
-                baseColorScheme: BuGn
+          grapher_config: *grapher_config_bugn
         display:
           numDecimalPlaces: 1
           tolerance: 5
           name: Tertiary education
-
 
       gross_enrolment_ratio_for_tertiary_education__female__pct__ger_5t8_f:
         title: Gross enrolment ratio in tertiary education among women
@@ -657,16 +593,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment ratio in tertiary education among women
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Purples
+          grapher_config: *grapher_config_purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -680,16 +607,7 @@ tables:
         description_key: *desc_key_ger
         presentation:
           title_public: Gross enrolment ratio in tertiary education among men
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+          grapher_config: *grapher_config_blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -703,16 +621,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public: Net enrolment rate in pre-primary education
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: *enrolment_rate_bins
-                baseColorScheme: BuGn
+          grapher_config: *grapher_config_bugn
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -726,16 +635,7 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public: Net enrolment rate in pre-primary education among girls
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Purples
+          grapher_config: *grapher_config_purples
         display:
           numDecimalPlaces: 1
           tolerance: 5
@@ -749,17 +649,182 @@ tables:
         description_key: *desc_key_net_enr
         presentation:
           title_public: Net enrolment rate in pre-primary education among boys
-          grapher_config:
-            maxTime: 2024
-            hasMapTab: true
-            map:
-              time: 2024
-              timeTolerance: 5
-              colorScale:
-                binningStrategy: manual
-                customNumericValues: *enrolment_rate_bins
-                baseColorScheme: Blues
+          grapher_config: *grapher_config_blues
         display:
           numDecimalPlaces: 1
           tolerance: 5
           name: Boys
+
+      completion_rate__primary_education__both_sexes__pct__modelled_data__cr_mod_1:
+        title: Completion rate in primary education
+        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in primary education
+          grapher_config: *grapher_config_greens
+        display:
+          name: Primary education
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
+        title: Completion rate in lower secondary education
+        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in lower secondary education
+          grapher_config: *grapher_config_greens
+        display:
+          name: Lower secondary education
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
+        title: Completion rate in upper secondary education
+        description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in upper secondary education
+          grapher_config: *grapher_config_greens
+        display:
+          name: Upper secondary education
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__lower_secondary_education__female__pct__modelled_data__cr_mod_2_f:
+        title: Completion rate in lower secondary education among girls
+        description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in lower secondary education among girls
+          grapher_config: *grapher_config_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__primary_education__female__pct__modelled_data__cr_mod_1_f:
+        title: Completion rate in primary education among girls
+        description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in primary education among girls
+          grapher_config: *grapher_config_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__upper_secondary_education__female__pct__modelled_data__cr_mod_3_f:
+        title: Completion rate in upper secondary education among girls
+        description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in upper secondary education among girls
+          grapher_config: *grapher_config_purples
+        display:
+          name: Girls
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__lower_secondary_education__male__pct__modelled_data__cr_mod_2_m:
+        title: Completion rate in lower secondary education among boys
+        description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in lower secondary education among boys
+          grapher_config: *grapher_config_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__primary_education__male__pct__modelled_data__cr_mod_1_m:
+        title: Completion rate in primary education among boys
+        description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in primary education among boys
+          grapher_config: *grapher_config_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__upper_secondary_education__male__pct__modelled_data__cr_mod_3_m:
+        title: Completion rate in upper secondary education among boys
+        description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
+        unit: "%"
+        short_unit: "%"
+        description_key: *desc_key_completion_rate
+        presentation:
+          title_public: Completion rate in upper secondary education among boys
+          grapher_config: *grapher_config_blues
+        display:
+          name: Boys
+          numDecimalPlaces: 1
+          tolerance: 5
+
+      completion_rate__primary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
+        title: Completion rate in primary education, adjusted gender parity index (GPIA)
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal primary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
+        unit: ""
+        description_key:
+          - Many children never make it to the final grade of their school level — this indicator shows how close boys and girls are to completing primary education by a slightly older age than expected.
+          - It captures gender equality in completion rates for [primary education](#dod:primary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of primary school, who have successfully completed that level.
+          - The completion age group is based on the expected school path — if children start school on time and progress without repeating or skipping grades. For example, if primary starts at age 6 and lasts 6 years, completion is measured among 14–16-year-olds.
+          - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
+          - A value of 1 means girls and boys complete primary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
+          - A high completion rate — close to 100% — means nearly all children complete primary school by the benchmark age, allowing for delays. Lower rates may point to late school entry, dropouts, repetition, or other barriers to completion.
+          - The data comes from national censuses, labour force surveys, or other household surveys, and are usually mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) levels after data collection. This is combined with official data on school starting ages and duration.
+          - There are important limitations to consider. Comparisons across countries may be affected by differences in how qualifications are mapped to ISCED levels, changes in school structure over time, and the risk of underestimating completion when programme durations differ in practice from official definitions.
+        display:
+          numDecimalPlaces: 1
+
+      completion_rate__lower_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_2_gpia:
+        title: Completion rate in lower secondary education, adjusted gender parity index (GPIA)
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal lower secondary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
+        unit: ""
+        description_key:
+          - Many children do not reach the final grade of lower secondary education — this indicator shows how close boys and girls are to completing lower secondary school by a slightly older age than expected.
+          - It captures gender equality in completion rates for [lower secondary education](#dod:lower-secondary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of lower secondary school, who have successfully completed that level.
+          - The completion age group is based on the expected school progression — assuming students start on time and advance without repeating or skipping grades. For example, if lower secondary starts at age 12 and lasts 3 years, completion is measured among 17–19-year-olds.
+          - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
+          - A value of 1 means girls and boys complete lower secondary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
+          - A high completion rate — close to 100% — indicates that nearly all children complete lower secondary school by the benchmark age, accounting for delays. Lower rates may reflect late school entry, dropout, repetition, or systemic barriers to completion.
+          - The data are derived from national censuses, labour force surveys, or other household surveys, often mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) levels post-collection. These are combined with official data on school starting ages and programme duration.
+          - Key limitations exist. Cross-country comparisons can be influenced by differences in ISCED mappings, evolving national education structures, and potential underestimation of completion rates when actual programme lengths deviate from official definitions.
+        display:
+          numDecimalPlaces: 1
+
+      completion_rate__upper_secondary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_3_gpia:
+        title: Completion rate in upper secondary education, adjusted gender parity index (GPIA)
+        description_short: An [adjusted gender parity index](#dod:adjusted-gpi) of 1 indicates equal upper secondary school completion rates between boys and girls. Values below 1 favor boys, and values above 1 favor girls.
+        unit: ""
+        description_key:
+          - Many young people do not reach the final grade of upper secondary education — this indicator shows how close boys and girls are to completing upper secondary school by a slightly older age than expected.
+          - It captures gender equality in completion rates for [upper secondary education](#dod:upper-secondary-education) by comparing the percentage of girls and boys, aged 3 to 5 years older than the official age for the last grade of upper secondary school, who have successfully completed that level.
+          - The completion age group is based on the expected educational pathway — assuming students enter school on time and progress without repeating or skipping grades. For example, if upper secondary starts at age 15 and lasts 3 years, completion is measured among 20–22-year-olds.
+          - The adjusted gender parity index (GPIA) is calculated by dividing the female completion rate by the male completion rate. If the result exceeds 1, it is inverted and subtracted from 2. The index ranges from 0 to 2, with 1 indicating exact parity.
+          - A value of 1 means girls and boys complete upper secondary education at equal rates. Values below 1 suggest an advantage for boys; values above 1 suggest an advantage for girls.
+          - A high completion rate — close to 100% — indicates that nearly all young people complete upper secondary school by the benchmark age, allowing for delays. Lower rates may reflect late school entry, dropout, repetition, or social and economic barriers to completion.
+          - The data are drawn from national censuses, labour force surveys, or other household surveys, which are generally mapped to the [International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced) levels after data collection. These are combined with official information on school starting ages and programme durations.
+          - Important limitations apply. Cross-country comparisons may be affected by differences in ISCED mappings, changes in national education systems over time, and the possibility of underestimating completion when actual programme lengths differ from official definitions.
+        display:
+          numDecimalPlaces: 1

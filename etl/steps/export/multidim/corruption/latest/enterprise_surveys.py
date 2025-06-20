@@ -54,7 +54,8 @@ def run() -> None:
                     "subtitle": "Share of firms that were asked to pay a bribe, by type of interaction with public officials.",
                 },
                 "view_metadata": {
-                    "description_short": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials."
+                    "description_short": "The percentage of businesses that encountered a bribe request when dealing with six public services - such as import or operating licenses, construction permits, utility connections, and dealings with tax officials.",
+                    "presentation": {"title_public": "Share of firms that were asked to pay a bribe, by interaction"},
                 },
             },
         ]

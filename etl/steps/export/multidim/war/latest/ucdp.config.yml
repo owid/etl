@@ -51,13 +51,13 @@ dimensions:
         name: "All armed conflicts (by type)"
         description: Breakdown by conflict type
       - slug: "interstate"
-        name: "Interstate conflicts"
+        name: "Interstate"
         description: Between states
       - slug: "intrastate"
-        name: "Civil conflicts"
+        name: "Civil"
         description: Between a state and another armed group
       - slug: "non-state conflict"
-        name: "Non-state conflicts"
+        name: "Non-state"
         description: Between non-state armed groups
       - slug: "one-sided violence"
         name: "Violence against civilians"

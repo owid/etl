@@ -68,6 +68,8 @@ VARIANTS_DETAILS = {
     "24H (Omicron)": {"rename": "Omicron (LF.7)", "relevant": True},
     "24I (Omicron)": {"rename": "Omicron (MV.1)", "relevant": True},
     "25A (Omicron)": {"rename": "Omicron (LP.8.1)", "relevant": True},
+    "25B (Omicron)": {"rename": "Omicron (NB.1.8.1)", "relevant": True},
+    "25C (Omicron)": {"rename": "Omicron (XFG)", "relevant": True},
     "S:677H.Robin1": {"rename": "S:677H.Robin1", "relevant": False},
     "S:677P.Pelican": {"rename": "S:677P.Pelican", "relevant": False},
     "recombinant": {"rename": "Recombinant", "relevant": False},

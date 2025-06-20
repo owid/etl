@@ -42,7 +42,7 @@ definitions:
     Non-market sources of income, including food grown by subsistence farmers for their own consumption, are taken into account.
 
   description_key_scenarios: |-
-    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP growth estimates and forecasts, with projections based on GDP growth projections from the World Bank's Global Economic Prospects and the the Macro Poverty Outlook, together with IMF's World Economic Outlook, in the period 2025-2029. For 2030, the data is projected using the average annual historical GDP per capita growth over 2010-2019.
+    This data combines data based on household surveys or extrapolated up until the year of the data release using GDP per capita growth estimates and forecasts, with projections from 2026-2030 based on GDP per capita growth projections from the World Bank's Macro Poverty Outlook (April 2025) together with IMF's World Economic Outlook (April 2025).
 
 
 # Learn more about the available fields:
