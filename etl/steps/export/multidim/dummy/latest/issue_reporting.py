@@ -23,6 +23,20 @@ def run() -> None:
         short_name="issue_reporting",
     )
 
+    c.group_views(
+        [
+            {
+                "dimension": "view",
+                "choice_new_slug": "view_combined",
+                "view_metadata": {
+                    "presentation": {
+                        "title_public": "Combined View",
+                    }
+                },
+            }
+        ]
+    )
+
     #
     # Save garden dataset.
     #
