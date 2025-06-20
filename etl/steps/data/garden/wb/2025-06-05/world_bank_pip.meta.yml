@@ -1715,6 +1715,36 @@ tables:
           numDecimalPlaces: 2
           <<: *common_display
 
+      cpi:
+        title: Consumer Price Index (CPI) - {definitions.table}{definitions.survey_comparability}
+        unit: ""
+        short_unit: ""
+        description_short: The Consumer Price Index (CPI) summarizes the prices of a representative basket of goods and services consumed by households within an economy over a period of time. Inflation (deflation) occurs when there is a positive (negative) change in the CPI between two time periods.
+        display:
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Consumer Price Index (CPI)
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
+          numDecimalPlaces: 1
+          <<: *common_display
+
+      ppp:
+        title: Purchasing Power Parity (PPP) rates (<<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        unit: ""
+        short_unit: ""
+        description_short: The Purchasing Power Parity (PPP) rates adjust for differences in price levels between countries, allowing for a more accurate comparison of living standards and welfare.
+        display:
+          name: |-
+            <% if survey_comparability == "No spells" %>
+            Purchasing Power Parity (PPP) rates
+            <% else %>
+            <<welfare_type.capitalize()>> surveys
+            <% endif %>
+          numDecimalPlaces: 1
+          <<: *common_display
+
       # ADDITIONAL VARIABLES
       surveys_past_decade:
         title: Number of surveys in the past decade{definitions.short_title}
