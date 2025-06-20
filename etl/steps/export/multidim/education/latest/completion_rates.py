@@ -83,25 +83,6 @@ def get_completion_rate_columns(tb):
     return completion_cols
 
 
-def create_grouped_views(collection):
-    """Add grouped views for gender and education level comparisons."""
-    collection.group_views(
-        groups=[
-            {
-                "dimension": "sex",
-                "choice_new_slug": "sex_side_by_side",
-                "choices": ["girls", "boys"],
-                "view_config": GROUPED_VIEW_CONFIG | {},
-            },
-            {
-                "dimension": "level",
-                "choice_new_slug": "level_side_by_side",
-                "view_config": GROUPED_VIEW_CONFIG,
-            },
-        ]
-    )
-
-
 def process_views(collection):
     """Process all views to add titles, subtitles, and display names."""
     for view in collection.views:
@@ -131,6 +112,8 @@ def process_views(collection):
 
         # Update indicator display names
         edit_indicator_displays(view)
+
+
 def adjust_dimensions(tb):
     """Add dimensions to completion rates table columns."""
 
