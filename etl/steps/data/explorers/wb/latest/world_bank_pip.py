@@ -137,7 +137,7 @@ def create_inequality_table(tb: Table, short_name: str) -> Table:
         "decile10_share",
         "bottom50_share",
         "palma_ratio",
-        # "headcount_ratio_50_median",
+        "headcount_ratio_50_median",
     ]
 
     tb_pip_inequality = tb_pip_inequality[inequality_vars]

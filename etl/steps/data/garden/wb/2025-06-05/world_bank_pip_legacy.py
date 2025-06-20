@@ -352,17 +352,17 @@ def process_data(tb: Table) -> Table:
     # Calculate income gap ratio (according to Ravallion's definition)
     tb["income_gap_ratio"] = (tb["total_shortfall"] / tb["headcount"]) / tb["poverty_line"]
 
-    # # Same for relative poverty
-    # for pct in [40, 50, 60]:
-    #     tb[f"headcount_{pct}_median"] = tb[f"headcount_ratio_{pct}_median"] * tb["reporting_pop"]
-    #     tb[f"headcount_{pct}_median"] = tb[f"headcount_{pct}_median"].round(0)
-    #     tb[f"total_shortfall_{pct}_median"] = (
-    #         tb[f"poverty_gap_index_{pct}_median"] * tb["median"] * pct / 100 * tb["reporting_pop"]
-    #     )
-    #     tb[f"avg_shortfall_{pct}_median"] = tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]
-    #     tb[f"income_gap_ratio_{pct}_median"] = (tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]) / (
-    #         tb["median"] * pct / 100
-    #     )
+    # Same for relative poverty
+    for pct in [40, 50, 60]:
+        tb[f"headcount_{pct}_median"] = tb[f"headcount_ratio_{pct}_median"] * tb["reporting_pop"]
+        tb[f"headcount_{pct}_median"] = tb[f"headcount_{pct}_median"].round(0)
+        tb[f"total_shortfall_{pct}_median"] = (
+            tb[f"poverty_gap_index_{pct}_median"] * tb["median"] * pct / 100 * tb["reporting_pop"]
+        )
+        tb[f"avg_shortfall_{pct}_median"] = tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]
+        tb[f"income_gap_ratio_{pct}_median"] = (tb[f"total_shortfall_{pct}_median"] / tb[f"headcount_{pct}_median"]) / (
+            tb["median"] * pct / 100
+        )
 
     # Shares to percentages
     # executing the function over list of vars
@@ -370,15 +370,15 @@ def process_data(tb: Table) -> Table:
         "headcount_ratio",
         "income_gap_ratio",
         "poverty_gap_index",
-        # "headcount_ratio_40_median",
-        # "headcount_ratio_50_median",
-        # "headcount_ratio_60_median",
-        # "income_gap_ratio_40_median",
-        # "income_gap_ratio_50_median",
-        # "income_gap_ratio_60_median",
-        # "poverty_gap_index_40_median",
-        # "poverty_gap_index_50_median",
-        # "poverty_gap_index_60_median",
+        "headcount_ratio_40_median",
+        "headcount_ratio_50_median",
+        "headcount_ratio_60_median",
+        "income_gap_ratio_40_median",
+        "income_gap_ratio_50_median",
+        "income_gap_ratio_60_median",
+        "poverty_gap_index_40_median",
+        "poverty_gap_index_50_median",
+        "poverty_gap_index_60_median",
     ]
     tb.loc[:, pct_indicators] = tb[pct_indicators] * 100
 
@@ -423,30 +423,30 @@ def process_data(tb: Table) -> Table:
             "is_interpolated",
             "distribution_type",
             "estimation_type",
-            # "headcount_40_median",
-            # "headcount_50_median",
-            # "headcount_60_median",
-            # "headcount_ratio_40_median",
-            # "headcount_ratio_50_median",
-            # "headcount_ratio_60_median",
-            # "income_gap_ratio_40_median",
-            # "income_gap_ratio_50_median",
-            # "income_gap_ratio_60_median",
-            # "poverty_gap_index_40_median",
-            # "poverty_gap_index_50_median",
-            # "poverty_gap_index_60_median",
-            # "avg_shortfall_40_median",
-            # "avg_shortfall_50_median",
-            # "avg_shortfall_60_median",
-            # "total_shortfall_40_median",
-            # "total_shortfall_50_median",
-            # "total_shortfall_60_median",
-            # "poverty_severity_40_median",
-            # "poverty_severity_50_median",
-            # "poverty_severity_60_median",
-            # "watts_40_median",
-            # "watts_50_median",
-            # "watts_60_median",
+            "headcount_40_median",
+            "headcount_50_median",
+            "headcount_60_median",
+            "headcount_ratio_40_median",
+            "headcount_ratio_50_median",
+            "headcount_ratio_60_median",
+            "income_gap_ratio_40_median",
+            "income_gap_ratio_50_median",
+            "income_gap_ratio_60_median",
+            "poverty_gap_index_40_median",
+            "poverty_gap_index_50_median",
+            "poverty_gap_index_60_median",
+            "avg_shortfall_40_median",
+            "avg_shortfall_50_median",
+            "avg_shortfall_60_median",
+            "total_shortfall_40_median",
+            "total_shortfall_50_median",
+            "total_shortfall_60_median",
+            "poverty_severity_40_median",
+            "poverty_severity_50_median",
+            "poverty_severity_60_median",
+            "watts_40_median",
+            "watts_50_median",
+            "watts_60_median",
             "spl",
             "spr",
             "pg",
@@ -1378,8 +1378,8 @@ def define_columns_for_ppp_comparison(tb: Table, id_cols: list, ppp_version: int
         id_cols
         + headcount_absolute_cols
         + headcount_ratio_absolute_cols
-        # + headcount_relative_cols
-        # + headcount_ratio_relative_cols
+        + headcount_relative_cols
+        + headcount_ratio_relative_cols
         + ["mean", "median", "decile1_thr", "decile9_thr"]
     )
 
