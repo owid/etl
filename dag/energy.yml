@@ -330,3 +330,14 @@ steps:
   #
   data://grapher/energy/2025-05-12/uk_historical_electricity:
     - data://garden/energy/2025-05-12/uk_historical_electricity
+  #
+  # IRENA - Renewable energy patents.
+  #
+  data://meadow/irena/2025-06-20/renewable_energy_patents:
+    - snapshot://irena/2025-06-20/renewable_energy_patents.csv
+  data://garden/irena/2025-06-20/renewable_energy_patents:
+    - data://garden/wb/2024-07-29/income_groups
+    - data://meadow/irena/2025-06-20/renewable_energy_patents
+    - data://garden/regions/2023-01-01/regions
+  data://grapher/irena/2025-06-20/renewable_energy_patents:
+    - data://garden/irena/2025-06-20/renewable_energy_patents
