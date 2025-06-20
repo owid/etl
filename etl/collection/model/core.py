@@ -174,7 +174,7 @@ class Collection(MDIMBase):
         return SCHEMAS_DIR / f"{self._collection_type}-schema.json"
 
     def save_config_local(self) -> None:
-        log.info(f"Exporting config to {self.local_config_path}")
+        log.info(f"Exporting collection config to {self.local_config_path}")
         self.save_file(self.local_config_path, force_create=True)
 
     def save(  # type: ignore[override]
@@ -238,6 +238,9 @@ class Collection(MDIMBase):
         # Upsert config via Admin API
         admin_api = AdminAPI(owid_env)
         admin_api.put_mdim_config(self.catalog_path, config)
+
+        # Link to preview
+        log.info(f"PREVIEW: {OWID_ENV.collection_preview(self.catalog_path)}")
 
     def snake_case_slugs(self):
         """
