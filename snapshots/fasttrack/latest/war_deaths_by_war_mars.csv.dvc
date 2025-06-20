@@ -13,14 +13,13 @@ meta:
 
 
       You can find more details on the dataset in its notes at https://web.archive.org/web/20230717140532/https://dataverse.harvard.edu/file.xhtml?fileId=5857673&version=2.0
-    citation_full: 'Lyall, Jason. Divided Armies: Inequality and Battlefield Performance
-      in Modern War (Princeton, NJ: Princeton University Press, 2020)'
-    attribution: Jason Lyall - Project Mars (2020)
+    citation_full: "Lyall, Jason. Divided Armies: Inequality and Battlefield Performance
+      in Modern War (Princeton, NJ: Princeton University Press, 2020)"
+    attribution: Jason Lyall, Project Mars (2020)
     url_main: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DUO7IE
-    url_download:
-      https://docs.google.com/spreadsheets/d/e/2PACX-1vRbq_yaMbSCxeoKNr5u4nUk6iUrRXJjlv81JTCfIRve3hJFuQl4OJMlQOEjTZ909OzwYs3Na3IHTS-b/pub?output=csv
-    date_accessed: '2024-01-29'
-    date_published: '2020-10-26'
+    url_download: https://docs.google.com/spreadsheets/d/e/2PACX-1vRbq_yaMbSCxeoKNr5u4nUk6iUrRXJjlv81JTCfIRve3hJFuQl4OJMlQOEjTZ909OzwYs3Na3IHTS-b/pub?output=csv
+    date_accessed: "2024-01-29"
+    date_published: "2020-10-26"
   name: War Deaths by War — Project Mars
   description: >-
     This dataset records new data on 229 unique belligerents in 252 conventional wars
@@ -36,6 +35,6 @@ meta:
   license: {}
 wdir: ../../../data/snapshots/fasttrack/latest
 outs:
-- md5: 1216d5fc24b9763755c9474d4a24df92
-  size: 12739
-  path: war_deaths_by_war_mars.csv
+  - md5: 1216d5fc24b9763755c9474d4a24df92
+    size: 12739
+    path: war_deaths_by_war_mars.csv
