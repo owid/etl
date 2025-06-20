@@ -240,9 +240,9 @@ def generate_title_by_gender_and_level(view):
         raise ValueError(f"Unknown education level: {level}")
 
     if level == "level_side_by_side":
-        return f"Share of {gender_term} completing school, by education level"
+        return f"Share of {gender_term} that have completed school, by education level"
     else:
-        return f"Share of {gender_term} completing {level_term}"
+        return f"Share of {gender_term} that have completed {level_term}"
 
 
 def generate_subtitle_by_level(view):
@@ -255,7 +255,7 @@ def generate_subtitle_by_level(view):
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
 
-    return f"Percentage of {gender_term} aged 3 to 5 years above the official age for the last grade of {level_term} education who have successfully completed that level."
+    return f"The share of {gender_term} who are 3 to 5 years older than the official age for the last grade of {level_term} education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years."
 
 
 def edit_indicator_displays(view):
