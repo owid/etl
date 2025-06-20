@@ -246,3 +246,5 @@ steps:
     - snapshot://fasttrack/latest/un_mmeig_countries_dhs_only_source.csv
   data://grapher/fasttrack/latest/annual_number_dhs_surveys_by_type:
     - snapshot://fasttrack/latest/annual_number_dhs_surveys_by_type.csv
+  data://grapher/fasttrack/latest/countries_dhs_surveys_ongoing_before_termination:
+    - snapshot://fasttrack/latest/countries_dhs_surveys_ongoing_before_termination.csv
