@@ -139,3 +139,13 @@ steps:
     - snapshot://wb/2025-03-10/thousand_bins_distribution.dta
   data://garden/wb/2025-03-10/thousand_bins_distribution:
     - data://meadow/wb/2025-03-10/thousand_bins_distribution
+
+  #
+  # Harmonized national poverty lines (for 2021 PPPs poverty lines)
+  #
+  data://meadow/wb/2025-06-08/harmonized_national_poverty_lines:
+    - snapshot://wb/2025-06-08/global_poverty_revisited_2021_ppps.zip
+  data://garden/wb/2025-06-08/harmonized_national_poverty_lines:
+    - data://meadow/wb/2025-06-08/harmonized_national_poverty_lines
+  data://grapher/wb/2025-06-08/harmonized_national_poverty_lines:
+    - data://garden/wb/2025-06-08/harmonized_national_poverty_lines
