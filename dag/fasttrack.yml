@@ -240,3 +240,5 @@ steps:
     - snapshot://fasttrack/latest/account_ownership_by_region.csv
   data://grapher/fasttrack/latest/uk_road_deaths_ons:
     - snapshot://fasttrack/latest/uk_road_deaths_ons.csv
+  data://grapher/fasttrack/latest/national_surveys_conducted_by_dhs:
+    - snapshot://fasttrack/latest/national_surveys_conducted_by_dhs.csv
