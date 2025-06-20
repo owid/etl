@@ -75,21 +75,7 @@ def run() -> None:
 
     # Edit indicator-level display settings
     for view in c.views:
-        if view.dimensions["conflict_type"] == "civil war":
-            assert view.indicators.y is not None
-            view.indicators.y[0].display = {"name": "Civil wars"}
-        elif view.dimensions["conflict_type"] == "others (non-civil)":
-            assert view.indicators.y is not None
-            view.indicators.y[0].display = {"name": "Interstate wars"}
-        elif view.dimensions["conflict_type"] == "all":
-            assert view.indicators.y is not None
-            view.indicators.y[0].display = {
-                "name": f"{view.dimensions['estimate'].title()} estimate",
-            }
-            if view.dimensions["estimate"] == "high":
-                view.indicators.y[0].display["color"] = "#561802"
-            elif view.dimensions["estimate"] == "low":
-                view.indicators.y[0].display["color"] = "#B13507"
+        _edit_indicator_display(view)
 
     # Group certain views together: used to create StackedBar charts
     c.group_views(
@@ -103,6 +89,10 @@ def run() -> None:
                     "chartTypes": ["StackedBar"],
                     "hasMapTab": False,
                 },
+                "view_metadata": {
+                    "description_short": lambda view: _set_subtitle(view),
+                    "description_key": lambda view: _set_description_key(view, tb),
+                },
                 # "overwrite_dimension_choice": True,
             },
             {
@@ -113,6 +103,12 @@ def run() -> None:
                 | {
                     "selectedFacetStrategy": "entity",
                     "hasMapTab": False,
+                },
+                "view_metadata": {
+                    "description_short": lambda view: _set_subtitle(view),
+                    "presentation": {
+                        "title_public": lambda view: f"{_set_title(view)}, low and high estimates",
+                    },
                 },
             },
         ]
@@ -138,8 +134,45 @@ def run() -> None:
         }
     )
 
+    for view in c.views:
+        if view.dimensions["estimate"] == "low_high":
+            assert view.indicators.y is not None
+            for indicator in view.indicators.y:
+                assert indicator.display is not None
+                if view.dimensions["conflict_type"] == "civil war":
+                    color_low = "#5C1B04"
+                    color_high = "#CF8063"
+                elif view.dimensions["conflict_type"] == "others (non-civil)":
+                    color_low = "#12213C"
+                    color_high = "#748AB0"
+                elif view.dimensions["conflict_type"] == "all":
+                    color_low = "#2F1146"
+                    color_high = "#B084D1"
+                else:
+                    raise ValueError(f"Unknown conflict type {view.dimensions['conflict_type']}")
+
+                if "_low_" in indicator.catalogPath:
+                    indicator.display = {
+                        "name": "Low estimate",
+                        "color": color_low,
+                    }
+                elif "_high_" in indicator.catalogPath:
+                    indicator.display = {
+                        "name": "High estimate",
+                        "color": color_high,
+                    }
     # Save & upload
     c.save()
+
+
+def _set_description_key(view, tb):
+    if view.dimensions["indicator"] in ("deaths", "death_rate"):
+        column = "number_deaths_ongoing_conflicts_high__conflict_type_all"
+    elif view.dimensions["indicator"] in ("wars_ongoing", "wars_ongoing_country_rate"):
+        column = "number_ongoing_conflicts__conflict_type_all"
+    else:
+        return []
+    return tb[column].m.description_key
 
 
 def adjust_dimensions(tb):
@@ -228,3 +261,28 @@ def get_dods(ctype):
         return "[interstate wars](#dod:interstate-war-mars)"
     else:
         raise ValueError(f"Unknown conflict type {ctype}")
+
+
+def _edit_indicator_display(view):
+    if view.dimensions["conflict_type"] == "civil war":
+        assert view.indicators.y is not None
+        view.indicators.y[0].display = {
+            "name": "Civil wars",
+            "color": "#B13507",
+        }
+    elif view.dimensions["conflict_type"] == "others (non-civil)":
+        assert view.indicators.y is not None
+        view.indicators.y[0].display = {
+            "name": "Interstate wars",
+            "color": "#4C6A9C",
+        }
+    elif view.dimensions["conflict_type"] == "all":
+        assert view.indicators.y is not None
+        view.indicators.y[0].display = {
+            "name": "All wars",
+            "color": "#6D3E91",
+        }
+    #     if view.dimensions["estimate"] == "high":
+    #         view.indicators.y[0].display["color"] = "#561802"
+    #     elif view.dimensions["estimate"] == "low":
+    #         view.indicators.y[0].display["color"] = "#B13507"
