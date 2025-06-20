@@ -39,6 +39,15 @@ definitions:
     - The UNESCO Institute for Statistics (UIS) and its partners also use statistical models to estimate literacy rates for years or regions where recent data are not available, supporting regional and global comparisons.
     - For most countries literacy is self-reported but there may be some challenges associated to changes over time in a given country and to differences in definition across countries.
     - Literacy should not be confused with functional literacy. This indicator reflects basic abilities but does not measure whether individuals can apply these skills effectively in daily life, work, or learning.
+
+  desc_key_completion_rate: &desc_key_completion_rate
+    - This indicator estimates how many children complete a given level of education, even if they do so later than the expected age.
+    - It captures the percentage of the population aged 3 to 5 years above the official age for the last grade of the education level who are estimated to have successfully completed that level.
+    - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating grades.
+    - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
+    - A high rate means that most children eventually reach the final grade of the education level, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition.
+    - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
+    - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/
 dataset:
@@ -661,15 +670,7 @@ tables:
         description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates how many children complete primary education, even if they do so later than the expected age.
-          - It captures the percentage of the population aged 3 to 5 years above the official age for the last grade of primary school who are estimated to have successfully completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating.
-          - For example, if primary starts at age 6 and lasts six years, completion is assessed among 14- to 16-year-olds. For the UK this would be children aged 14-16 years as the age of primary completion is 11.
-          - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
-          - A high rate means that most children eventually reach the final grade of primary school, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition.
-          - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
-          - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in primary education
           grapher_config:
@@ -692,15 +693,7 @@ tables:
         description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates the share of adolescents who complete lower secondary education, even if they do so later than the expected age.
-          - It refers to the population aged 3 to 5 years above the official age for the last grade of lower secondary school who are estimated to have completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating.
-          - For example, if lower secondary begins at age 12 and lasts three years, the completion rate is assessed among 18- to 20-year-olds.
-          - Estimates are modelled using household surveys and administrative records, helping fill data gaps and support trend analysis in countries without recent direct data.
-          - A high completion rate suggests that most adolescents reach the final grade of lower secondary school, while lower rates may point to issues in access, progression, or retention.
-          - Modelled rates offer improved cross-country comparability but may differ from national figures due to different definitions or data quality.
-          - Changes in school duration, entry age, or national classification over time may also affect how results are interpreted.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in lower secondary education
           grapher_config:
@@ -723,14 +716,7 @@ tables:
         description_short: Percentage of children aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates how many young people complete upper secondary education, even if they do so later than the expected age.
-          - It reflects the percentage of the population aged 3 to 5 years above the official age for the last grade of upper secondary school who are estimated to have completed that level.
-          - Completion age is based on the standard progression — if upper secondary starts at age 15 and lasts three years, the indicator is assessed among 21- to 23-year-olds.
-          - Modelled estimates combine household survey responses with administrative data to fill gaps and adjust for inconsistencies in reporting.
-          - A high value indicates that most young people eventually complete upper secondary education, while a low value may highlight challenges related to cost, access, or academic failure.
-          - These estimates allow for better international comparison but may not match official national data exactly, especially where school structures differ.
-          - Limitations include variations in programme length, national classification systems, and the quality or recency of input data used in modelling.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in upper secondary education
           grapher_config:
@@ -753,14 +739,7 @@ tables:
         description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates how many girls complete lower secondary education, even if they do so later than the expected age.
-          - It captures the percentage of girls aged 3 to 5 years above the official age for the last grade of lower secondary school who are estimated to have successfully completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating or skipping grades. For example, if lower secondary starts at age 12 and lasts 3 years, completion is measured among 17–19-year-old girls.
-          - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
-          - A high rate means that most girls eventually reach the final grade of lower secondary school, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition specifically affecting girls.
-          - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
-          - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in lower secondary education among girls
           grapher_config:
@@ -783,14 +762,7 @@ tables:
         description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates how many girls complete primary education, even if they do so later than the expected age.
-          - It captures the percentage of girls aged 3 to 5 years above the official age for the last grade of primary school who are estimated to have successfully completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating. For example, if primary starts at age 6 and lasts six years, completion is assessed among 14- to 16-year-old girls.
-          - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
-          - A high rate means that most girls eventually reach the final grade of primary school, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition specifically affecting girls.
-          - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
-          - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in primary education among girls
           grapher_config:
@@ -813,14 +785,7 @@ tables:
         description_short: Percentage of girls aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates how many girls complete upper secondary education, even if they do so later than the expected age.
-          - It reflects the percentage of girls aged 3 to 5 years above the official age for the last grade of upper secondary school who are estimated to have completed that level.
-          - Completion age is based on the standard progression — if upper secondary starts at age 15 and lasts three years, the indicator is assessed among 21- to 23-year-old girls.
-          - Modelled estimates combine household survey responses with administrative data to fill gaps and adjust for inconsistencies in reporting.
-          - A high value indicates that most girls eventually complete upper secondary education, while a low value may highlight challenges related to cost, access, or academic failure specifically affecting girls.
-          - These estimates allow for better international comparison but may not match official national data exactly, especially where school structures differ.
-          - Limitations include variations in programme length, national classification systems, and the quality or recency of input data used in modelling.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in upper secondary education among girls
           grapher_config:
@@ -843,14 +808,7 @@ tables:
         description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [lower secondary education](#dod:lower-secondary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates how many boys complete lower secondary education, even if they do so later than the expected age.
-          - It captures the percentage of boys aged 3 to 5 years above the official age for the last grade of lower secondary school who are estimated to have successfully completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating or skipping grades. For example, if lower secondary starts at age 12 and lasts 3 years, completion is measured among 17–19-year-old boys.
-          - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
-          - A high rate means that most boys eventually reach the final grade of lower secondary school, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition specifically affecting boys.
-          - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
-          - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in lower secondary education among boys
           grapher_config:
@@ -873,14 +831,7 @@ tables:
         description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [primary education](#dod:primary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates how many boys complete primary education, even if they do so later than the expected age.
-          - It captures the percentage of boys aged 3 to 5 years above the official age for the last grade of primary school who are estimated to have successfully completed that level.
-          - Completion age is based on the expected school trajectory — if children start school on time and progress without repeating. For example, if primary starts at age 6 and lasts six years, completion is assessed among 14- to 16-year-old boys.
-          - These estimates are produced using a statistical model that draws from administrative and survey data, filling gaps where direct observations are missing or inconsistent.
-          - A high rate means that most boys eventually reach the final grade of primary school, with some allowance for delays. Lower rates may signal barriers to school entry, dropout, or grade repetition specifically affecting boys.
-          - The data sources include household surveys, censuses, and administrative records, with modelled adjustments to improve comparability across countries.
-          - Because values are estimated, they may differ from official national figures. Differences in school systems or grade structures can also affect comparability.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in primary education among boys
           grapher_config:
@@ -903,14 +854,7 @@ tables:
         description_short: Percentage of boys aged 3 to 5 years above the official age for the last grade of [upper secondary education](#dod:upper-secondary-education) who have successfully completed that level.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - This indicator estimates how many boys complete upper secondary education, even if they do so later than the expected age.
-          - It reflects the percentage of boys aged 3 to 5 years above the official age for the last grade of upper secondary school who are estimated to have completed that level.
-          - Completion age is based on the standard progression — if upper secondary starts at age 15 and lasts three years, the indicator is assessed among 21- to 23-year-old boys.
-          - Modelled estimates combine household survey responses with administrative data to fill gaps and adjust for inconsistencies in reporting.
-          - A high value indicates that most boys eventually complete upper secondary education, while a low value may highlight challenges related to cost, access, or academic failure specifically affecting boys.
-          - These estimates allow for better international comparison but may not match official national data exactly, especially where school structures differ.
-          - Limitations include variations in programme length, national classification systems, and the quality or recency of input data used in modelling.
+        description_key: *desc_key_completion_rate
         presentation:
           title_public: Completion rate in upper secondary education among boys
           grapher_config:
