@@ -1,0 +1,17 @@
+dataset:
+  title: UN MMEIG countries where DHS is the only source
+  description: Whether the DHS is the only source for maternal mortality data for the UN MMEIG's maternal mortality estimates
+  licenses:
+    - {}
+tables:
+  un_mmeig_countries_dhs_only_source:
+    variables:
+      dhs_only:
+        title: DHS is only data source
+        unit: ''
+        description: Whether the only source of maternal mortality data is the Demographic and Health Surveys
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
