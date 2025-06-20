@@ -77,7 +77,6 @@ definitions:
     who have had their two doses of the inactivated polio vaccine
     <%- elif antigen == "MCV2X2" %>
     who have had their two doses of the measles vaccine
-
     <%- endif %>
   antigen_title_negative: |-
     <% if antigen == "BCG" %>
@@ -140,10 +139,8 @@ definitions:
     their first dose of the inactivated polio vaccine
     <%- elif antigen == "IPV2" %>
     their second dose of the inactivated polio vaccine
-
     <%- elif antigen == "MCV2X2" %>
     their second dose of the measles vaccine
-
     <%- endif %>
   antigen_description_key: |-
     <% if antigen == "MCV1" %>
@@ -165,7 +162,7 @@ definitions:
     <%- elif antigen in ["HEPB3", "HEPB_BD"] %>
       Hepatitis B is a viral infection that attacks the liver and can cause both acute and chronic disease.
     <%- elif antigen == "HIB3" %>
-      Haemophilus influenza type B is a bacteria responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
+      Haemophilus influenzae type B is a bacteria responsible for severe pneumonia, meningitis and other invasive diseases almost exclusively in children younger than five years.
     <%- elif antigen == "PCV3" %>
       Streptococcus pneumoniae is a bacterium that causes a number of common diseases including meningitis, septicaemia and pneumonia. It is most common in young children and the elderly.
     <%- elif antigen in ["IPV1", "IPV2","POL3"]  %>
@@ -191,7 +188,7 @@ definitions:
     <%- elif antigen == "HEPB3" %>
     Hepatitis B (HepB3)
     <%- elif antigen == "HIB3" %>
-    H. influenza type b (Hib3)
+    H. influenzae type b (Hib3)
     <%- elif antigen == "HEPB_BD" %>
     Hepatitis B birth dose (HepB_BD)
     <%- elif antigen == "MCV2" %>
@@ -204,10 +201,8 @@ definitions:
     Inactivated polio (IPV1)
     <%- elif antigen == "IPV2" %>
     Inactivated polio (IPV2)
-
     <%- elif antigen == "MCV2X2" %>
     Measles, second dose (MCV2X2)
-
     <%- endif %>
 # Learn more about the available fields:
 # http://docs.owid.io/projects/etl/architecture/metadata/reference/

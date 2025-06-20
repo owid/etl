@@ -111,6 +111,16 @@ def process_views(collection):
             view.config["title"] = generate_title_by_gender_and_level(sex, level)
             view.config["subtitle"] = generate_subtitle_by_level(level, sex)
 
+            view.metadata = {
+                "presentation": {
+                    "title_public": view.config["title"],
+                },
+                "description_short": view.config["subtitle"],
+            }
+        # Generate dynamic title
+        if sex and level:
+            view.config["title"] = generate_title_by_gender_and_level(sex, level)
+
         # Update indicator display names
         edit_indicator_displays(view)
 

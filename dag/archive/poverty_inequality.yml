@@ -121,6 +121,14 @@ steps:
   data://grapher/oecd/2024-04-10/income_distribution_database:
     - data://garden/oecd/2024-04-10/income_distribution_database
 
+    # Poverty projections from the Poverty, Prosperity and Planet Report 2024
+  data://meadow/wb/2025-01-15/poverty_projections:
+    - snapshot://wb/2025-01-15/reproducibility_package_poverty_prosperity_planet.zip
+  data://garden/wb/2025-01-15/poverty_projections:
+    - data://meadow/wb/2025-01-15/poverty_projections
+  data://grapher/wb/2025-01-15/poverty_projections:
+    - data://garden/wb/2025-01-15/poverty_projections
+
   # 1000 Binned Global Distribution (World Bank PIP)
   data://meadow/wb/2025-03-10/thousand_bins_distribution:
     - snapshot://wb/2025-03-10/thousand_bins_distribution.dta
