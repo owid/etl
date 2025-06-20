@@ -1,7 +1,8 @@
 """Script to generate a quarterly analytics report for a data producer."""
 
+import re
 from datetime import datetime
-from typing import Dict
+from typing import Dict, List
 
 import click
 import pandas as pd
@@ -10,7 +11,7 @@ from rich_click.rich_command import RichCommand
 from structlog import get_logger
 
 from apps.utils.google import GoogleDoc, GoogleDrive, GoogleSheet
-from apps.utils.notion import get_impact_highlights
+from apps.utils.notion import get_data_producer_contacts, get_impact_highlights
 from etl.analytics import (
     get_chart_views_by_chart_id,
     get_post_views_by_chart_id,
@@ -170,6 +171,10 @@ class Report:
         self.doc_id: str | None = None
         self.pdf_id: str | None = None
 
+        # Data provider emails, that will be granted reading permissions to access the pdf reports.
+        # NOTE: They will be fetched by gather_emails()
+        self.emails: List[str] | None = None
+
         for file in files:
             if file["name"] == self.title:
                 if file["mimeType"] == "application/vnd.google-apps.document":
@@ -238,14 +243,18 @@ class Report:
         else:
             return "Both Google Doc and PDF exist"
 
-    def status_with_links(self) -> str:
+    def print_status_with_links(self) -> None:
         """Get a detailed status including links."""
+        folder_text = f"📁 Folder: {self.folder_link}"
         if not self.exists:
-            return "Not created"
+            text = "Not created"
         elif not self.has_pdf:
-            return f"Google Doc exists (no PDF)\n  📄 Doc: {self.doc_link}"
+            text = f"Google Doc exists (no PDF)\n  📄 Doc: {self.doc_link}\n  {folder_text}"
         else:
-            return f"Both Google Doc and PDF exist\n  📄 Doc: {self.doc_link}\n  📋 PDF: {self.pdf_link}"
+            text = (
+                f"Both Google Doc and PDF exist\n  📄 Doc: {self.doc_link}\n  📋 PDF: {self.pdf_link}\n  {folder_text}"
+            )
+        log.info(text)
 
     def gather_analytics(self) -> None:
         """Gather analytics data for this report."""
@@ -377,7 +386,37 @@ class Report:
         links["folder"] = self.folder_link
         return links
 
-    def create_full_report(self, overwrite_pdf: bool = True) -> None:
+    def gather_emails(self) -> None:
+        # Fetch data provider contacts from Notion table.
+        df = get_data_producer_contacts(producers=[self.producer])
+
+        if len(df) == 1:
+            emails_raw = df["Emails for analytics reports"].item()
+            email_pattern = r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+            emails = re.findall(email_pattern, emails_raw)
+        else:
+            emails = []
+
+        if emails:
+            self.emails = emails
+        else:
+            log.warning("Could not find contact emails for this data provider in the Notion contacts page.")
+            self.emails = None
+
+    def change_file_permissions(self) -> None:
+        # Add data providers emails with reading permissions.
+        if self.emails is not None:
+            GoogleDrive().set_file_permissions(
+                file_id=self.pdf_id,  # type: ignore
+                role="reader",
+                emails=self.emails,
+                send_notification_email=False,
+            )
+            log.info(f"Read access has been granted to emails: {self.emails}")
+        else:
+            log.warning("Emails are not defined. Consider manually changing sharing permissions directly from the PDF.")
+
+    def create_full_report(self, overwrite_pdf: bool = True, grant_permissions: bool = False) -> None:
         """Create a complete report from scratch."""
         self.gather_analytics()
 
@@ -390,23 +429,12 @@ class Report:
         self.create_pdf(overwrite=overwrite_pdf)
         self.generate_links()
 
-    def print_summary(self) -> None:
-        """Print a comprehensive summary of the report status and links."""
-        print(f"\n📊 Report: {self.title}")
-        print(f"Status: {self.status}")
-        print(f"Period: {self.min_date} to {self.max_date}")
+        # Gather contact emails (with whom reports will be shared).
+        self.gather_emails()
 
-        if self.doc_link:
-            print(f"📄 Google Doc: {self.doc_link}")
-        if self.pdf_link:
-            print(f"📋 PDF: {self.pdf_link}")
-        print(f"📁 Folder: {self.folder_link}")
-
-        if self.analytics:
-            n_charts = len(self.analytics["charts"])
-            n_posts = len(self.analytics["posts"])
-            print(f"📈 Analytics: {n_charts} charts, {n_posts} posts")
-        print()
+        # Change file permissions, to include data providers emails.
+        if grant_permissions:
+            self.change_file_permissions()
 
 
 def print_impact_highlights(highlights: pd.DataFrame) -> None:
@@ -416,13 +444,13 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     # * Adapt GDoc template to include those highlights, if any.
     # * It might be useful to create a function that writes to GDoc with embedded hyperlinks.
     if not highlights.empty:
-        print(
+        log.info(
             f"{len(highlights)} highlights found for this data producer. Manually check them and consider adding them to the producer GDoc."
         )
         for _, highlight in highlights.iterrows():
-            print(f"* {highlight['Highlight']}")
-            print(f"Source link: {highlight['Source link']}")
-            print(f"Notion highlight: {highlight['notion_url']}")
+            log.info(f"* {highlight['Highlight']}")
+            log.info(f"Source link: {highlight['Source link']}")
+            log.info(f"Notion highlight: {highlight['notion_url']}")
 
 
 @click.command(name="create_data_producer_report", cls=RichCommand, help=__doc__)
@@ -447,18 +475,20 @@ def print_impact_highlights(highlights: pd.DataFrame) -> None:
     default=False,
     help="Overwrite existing PDF if report already exists.",
 )
-def run(producer, quarter, year, overwrite_pdf):
-    # Create report instance (it will automatically check for existing reports)
+@click.option(
+    "--grant-permissions/--no-grant-permissions",
+    default=False,
+    help="Grant permissions to data providers to access PDF file.",
+)
+def run(producer, quarter, year, overwrite_pdf, grant_permissions):
+    # Create report instance (it will automatically check for existing reports).
     report = Report(producer, quarter, year)
 
-    print("\n📊 Report Status:")
-    print(report.status_with_links())
-    print(f"📁 Folder: {report.folder_link}")
-    print()
+    # Print status with links.
+    report.print_status_with_links()
 
     if report.exists:
         log.warning(f"Google Doc report already exists for {producer} Q{quarter} {year}")
-        # Since report.exists is True, we know doc_id is not None
         assert report.doc_id is not None
 
         if report.has_pdf:
@@ -468,18 +498,17 @@ def run(producer, quarter, year, overwrite_pdf):
                 report.generate_links()
             else:
                 log.warning("PDF already exists and overwrite_pdf=False. No action taken.")
-        else:
-            if overwrite_pdf:
-                log.info("Creating PDF from existing Google Doc...")
-                report.update_pdf_from_existing(report.doc_id, overwrite=True)
-                report.generate_links()
-            else:
-                log.warning("Google Doc exists but no PDF found, and overwrite_pdf=False. No action taken.")
+
+            if grant_permissions:
+                # Gather data provider emails and grant read access to already existing PDF.
+                report.gather_emails()
+                report.change_file_permissions()
+
         return
 
     # Report doesn't exist, create it from scratch
     log.info(f"Creating new report for {producer} Q{quarter} {year}")
-    report.create_full_report(overwrite_pdf=overwrite_pdf)
+    report.create_full_report(overwrite_pdf=overwrite_pdf, grant_permissions=grant_permissions)
 
     # Add new entry in the status sheet.
     df = pd.DataFrame(

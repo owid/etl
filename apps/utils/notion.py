@@ -7,7 +7,7 @@ import pandas as pd
 import requests
 from structlog import get_logger
 
-from etl.config import NOTION_API_KEY, NOTION_IMPACT_HIGHLIGHTS_TABLE_URL
+from etl.config import NOTION_API_KEY, NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL, NOTION_IMPACT_HIGHLIGHTS_TABLE_URL
 
 # Initialize log.
 log = get_logger()
@@ -237,5 +237,16 @@ def get_impact_highlights(
         indexes = [i for i, producers_in_row in enumerate(df[producer_col]) if set(producers) & set(producers_in_row)]
         # Select relevant rows.
         df = df.loc[indexes].reset_index(drop=True)
+
+    return df
+
+
+def get_data_producer_contacts(producers: Optional[List[str]] = None) -> pd.DataFrame:
+    # Fetch data providers contacts table from Notion.
+    df = get_table_from_notion_url(notion_url=NOTION_DATA_PROVIDERS_CONTACTS_TABLE_URL)  # type: ignore
+
+    if producers is not None:
+        # Select relevant producers.
+        df = df[df["Name"].isin(producers)].reset_index(drop=True)
 
     return df
