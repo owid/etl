@@ -200,8 +200,7 @@ LEVEL_MAPPINGS = {
 
 def generate_title_by_gender_and_level(view):
     """Generate title based on gender and education level."""
-    sex = view.dimensions["sex"]
-    level = view.dimensions["level"]
+    sex, level = view.dimensions["sex"], view.dimensions["level"]
 
     # Get gender term
     gender_term = GENDER_MAPPINGS["title"].get(sex, "")
@@ -219,8 +218,7 @@ def generate_title_by_gender_and_level(view):
 
 def generate_subtitle_by_level(view):
     """Generate subtitle based on education level and gender with links."""
-    sex = view.dimensions.get("sex")
-    level = view.dimensions.get("level")
+    sex, level = view.dimensions["sex"], view.dimensions["level"]
 
     level_term = LEVEL_MAPPINGS["subtitle"].get(level, "")
     gender_term = GENDER_MAPPINGS["subtitle"].get(sex, "")
