@@ -18,9 +18,16 @@ from structlog import get_logger
 from typing_extensions import Self
 
 from apps.chart_sync.admin_api import AdminAPI
-from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.exceptions import DuplicateCollectionViews, DuplicateValuesError
 from etl.collection.model.base import MDIMBase, pruned_json
 from etl.collection.model.dimension import Dimension, DimensionChoice
+from etl.collection.model.schema_types import (
+    GroupViewsConfig,
+    ViewConfig,
+    ViewConfigParam,
+    ViewMetadata,
+    ViewMetadataParam,
+)
 from etl.collection.model.view import CommonView, View, ViewIndicators
 from etl.collection.utils import (
     fill_placeholders,
@@ -168,7 +175,7 @@ class Collection(MDIMBase):
 
     def save_config_local(self) -> None:
         log.info(f"Exporting config to {self.local_config_path}")
-        self.save_file(self.local_config_path, force_create=False)
+        self.save_file(self.local_config_path, force_create=True)
 
     def save(  # type: ignore[override]
         self,
@@ -193,6 +200,9 @@ class Collection(MDIMBase):
 
         # Check that no choice name or slug is repeated
         self.validate_choice_uniqueness()
+
+        # Check that no choice name or slug is repeated
+        self.validate_dimension_uniqueness()
 
         # Check that all indicators in explorer exist
         indicators = self.indicators_in_use(tolerate_extra_indicators)
@@ -462,13 +472,21 @@ class Collection(MDIMBase):
     def validate_choice_uniqueness(self):
         """Validate that all choice names (and slugs) are unique."""
         for dim in self.dimensions:
-            dim.validate_unique_names()
-            dim.validate_unique_slugs()
+            dim.validate_choice_names_unique()
+            dim.validate_choice_slugs_unique()
 
-    def validate_choice_names(self):
-        """Validate that all choice names are unique."""
+    def validate_dimension_uniqueness(self):
+        """Validate that all choice names (and slugs) are unique."""
+        slugs = set()
         for dim in self.dimensions:
-            dim.validate_unique_names()
+            # Check if slug was already seen
+            if dim.slug in slugs:
+                raise DuplicateValuesError(
+                    f"Dimension slug '{dim.slug}' is not unique! Found in dimensions: {self.dimensions}"
+                )
+
+            # Add slug to set
+            slugs.add(dim.slug)
 
     def prune_dimensions(self):
         """Remove dimension if only one of its choice is in use."""
@@ -564,7 +582,7 @@ class Collection(MDIMBase):
 
     def group_views(
         self,
-        groups: List[Dict[str, Any]],
+        groups: List[GroupViewsConfig],  # Also accepts List[Dict[str, Any]] for backward compatibility
         drop_dimensions_if_single_choice: bool = True,
         params: Optional[Dict[str, Any]] = None,
     ):
@@ -573,7 +591,7 @@ class Collection(MDIMBase):
         Group views in a single view to show an aggregate view combining multiple choices for a given dimension. It takes all the views where the `dimension` choice is one of `choices` and groups them together to create a new one.
 
         Args:
-            groups (List[Dict[str, Any]]): List of dictionaries with the following keys:
+            groups (List[GroupViewsConfig]): List of group configurations with the following keys:
                     - dimension: str
                         Slug of the dimension that contains the choices to group.
                     - choices: List[str]
@@ -649,16 +667,21 @@ class Collection(MDIMBase):
         )
         ```
         """
+
+        def _ensure_choices(group, dimension):
+            # Get choice slugs
+            if "choices" not in group:
+                return self.get_dimension(dimension).choice_slugs
+            else:
+                return group["choices"]
+
         new_views_all = []
         for group in groups:
             # Get dimension slug
             assert "dimension" in group, "Dimension must be provided!"
             dimension = group["dimension"]
             # Get choice slugs
-            if "choices" not in group:
-                choices = self.get_dimension(dimension).choice_slugs
-            else:
-                choices = group["choices"]
+            choices = _ensure_choices(group, dimension)
 
             # Get new choice slug
             assert "choice_new_slug" in group, "Dimension must be provided!"
@@ -729,7 +752,7 @@ class Collection(MDIMBase):
         for group in groups:
             if group.get("replace", False):
                 dimension = group["dimension"]
-                choices = group["choices"]
+                choices = _ensure_choices(group, dimension)
                 # Remove views with old choices
                 new_views = [view for view in self.views if view.dimensions[dimension] not in choices]
                 # Remove unused choices
@@ -741,7 +764,7 @@ class Collection(MDIMBase):
 
     def set_global_config(
         self,
-        config,
+        config: ViewConfigParam,
         params: Optional[Dict[str, Any]] = None,
     ):
         self.edit_views(
@@ -756,7 +779,7 @@ class Collection(MDIMBase):
 
     def set_global_metadata(
         self,
-        metadata,
+        metadata: ViewMetadataParam,
         params: Optional[Dict[str, Any]] = None,
     ):
         self.edit_views(
@@ -837,8 +860,8 @@ class Collection(MDIMBase):
         dimension: str,
         choices: List[str],
         choice_new_slug: str,
-        view_config: Optional[GrapherConfig] = None,
-        view_metadata: Optional[Any] = None,
+        view_config: ViewConfigParam | None = None,
+        view_metadata: ViewMetadataParam | None = None,
         params: Optional[Dict[str, Any]] = None,
     ) -> List[View]:
         """Create new grouped views."""
@@ -890,8 +913,8 @@ def _expand_params(params: Dict[str, Any], view: View) -> Dict[str, Any]:
 
 def _set_config_metadata_with_params(
     view,
-    view_config: Optional[GrapherConfig] = None,
-    view_metadata: Optional[Any] = None,
+    view_config: Optional[Union[ViewConfigParam, GrapherConfig]] = None,
+    view_metadata: Optional[Union[ViewMetadataParam, Any]] = None,
     params: Optional[Dict[str, Any]] = None,
 ) -> View:
     # Set params to dict if None
@@ -900,7 +923,8 @@ def _set_config_metadata_with_params(
 
     # Sanity check
     if (view_config is None) and (view_metadata is None):
-        raise ValueError("Either view_config or view_metadata must be provided!")
+        return view
+        # raise ValueError("Either view_config or view_metadata must be provided!")
 
     # Execute callables in params to get a proper Dict[str, str]
     params_view = _expand_params(params, view)
@@ -914,8 +938,9 @@ def _set_config_metadata_with_params(
     new_metadata = run_callbacks(new_metadata, view)
 
     # Add config and metadata to new view
-    view.config = cast(GrapherConfig, new_config)
-    view.metadata = new_metadata
+    # For now, keep as dicts to maintain compatibility with existing merge logic
+    view.config = cast(ViewConfig, new_config)
+    view.metadata = cast(ViewMetadata, new_metadata)
 
     return view
 
