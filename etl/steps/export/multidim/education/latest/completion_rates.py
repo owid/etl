@@ -83,37 +83,6 @@ def get_completion_rate_columns(tb):
     return completion_cols
 
 
-def process_views(collection):
-    """Process all views to add titles, subtitles, and display names."""
-    for view in collection.views:
-        sex = view.dimensions.get("sex")
-        level = view.dimensions.get("level")
-
-        # Ensure view config exists and is a copy
-        if view.config is None:
-            view.config = {}
-        else:
-            view.config = view.config.copy()
-
-        # Generate titles and subtitles for side-by-side views only
-        if sex in ["sex_side_by_side"] or level in ["level_side_by_side"]:
-            view.config["title"] = generate_title_by_gender_and_level(sex, level)
-            view.config["subtitle"] = generate_subtitle_by_level(level, sex)
-
-            view.metadata = {
-                "presentation": {
-                    "title_public": view.config["title"],
-                },
-                "description_short": view.config["subtitle"],
-            }
-        # Generate dynamic title
-        else:
-            view.config["title"] = generate_title_by_gender_and_level(sex, level)
-
-        # Update indicator display names
-        edit_indicator_displays(view)
-
-
 def adjust_dimensions(tb):
     """Add dimensions to completion rates table columns."""
 
@@ -240,9 +209,9 @@ def generate_title_by_gender_and_level(view):
         raise ValueError(f"Unknown education level: {level}")
 
     if level == "level_side_by_side":
-        return f"Share of {gender_term} completing school, by education level"
+        return f"Share of {gender_term} that have completed school, by education level"
     else:
-        return f"Share of {gender_term} completing {level_term}"
+        return f"Share of {gender_term} that have completed {level_term}"
 
 
 def generate_subtitle_by_level(view):
@@ -255,7 +224,7 @@ def generate_subtitle_by_level(view):
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
 
-    return f"Percentage of {gender_term} aged 3 to 5 years above the official age for the last grade of {level_term} education who have successfully completed that level."
+    return f"The share of {gender_term} who are 3 to 5 years older than the official age for the last grade of {level_term} education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years."
 
 
 def edit_indicator_displays(view):
