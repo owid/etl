@@ -9,8 +9,6 @@ tables:
       standard_dhs:
         title: Standard DHS
         unit: ''
-        display:
-          name: DHS is only data source
         description: |-
           The annual number of standard surveys conducted by the Demographic and Health Surveys. This is given by the year that the survey was conducted; for surveys spanning multiple years, the first year is given.
       special_dhs:
