@@ -83,7 +83,6 @@ def get_completion_rate_columns(tb):
     return completion_cols
 
 
-<<<<<<< HEAD
 def create_grouped_views(collection):
     """Add grouped views for gender and education level comparisons."""
     collection.group_views(
@@ -132,10 +131,6 @@ def process_views(collection):
 
         # Update indicator display names
         edit_indicator_displays(view)
-
-
-=======
->>>>>>> mdim-completion-change-suggestions
 def adjust_dimensions(tb):
     """Add dimensions to completion rates table columns."""
 
