@@ -25,7 +25,7 @@ from utils import (
 )
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -44,30 +44,30 @@ COLUMNS_INDEX = [
 KNOWN_OVERLAPS_IN_LAND_AREA_DATA = [{year: {"Netherlands Antilles", "Aruba"} for year in range(1961, 2011)}]
 
 
-def run(dest_dir: str) -> None:
-    """Run main code."""
+def run() -> None:
     #
     # Load inputs.
     #
     # Load UN WPP dataset.
     ds_un = paths.load_dataset("un_wpp")
-    tb_un = ds_un["population"].reset_index()
+    tb_un = ds_un.read("population")
     # Load HYDE dataset.
     ds_hyde = paths.load_dataset("all_indicators")
-    tb_hyde = ds_hyde["all_indicators"].reset_index()
+    tb_hyde = ds_hyde.read("all_indicators")
     # Load Gapminder dataset
     ds_gapminder = paths.load_dataset("population", namespace="gapminder")
-    tb_gapminder = ds_gapminder["population"].reset_index()
+    tb_gapminder = ds_gapminder.read("population")
     # Load Gapminder SG dataset
     ds_gapminder_sg = paths.load_dataset(short_name="gapminder__systema_globalis", channel="open_numbers")
-    tb_gapminder_sg = ds_gapminder_sg["total_population_with_projections"].reset_index()
+    tb_gapminder_sg = ds_gapminder_sg.read("total_population_with_projections")
 
-    # Load regions table
+    # Load auxiliary datasets:
+    # * Regions
     ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions["regions"]
-    # Load income groups table
+    tb_regions = ds_regions.read("regions", reset_index=False)
+    # * Income groups
     ds_income_groups = paths.load_dataset("income_groups")
-    # Load FAO
+    # * Land area (FAOSTAT RL)
     ds_land_area = paths.load_dataset("faostat_rl_auxiliary")
     tb_land_area = ds_land_area.read("faostat_rl_auxiliary")
 
@@ -156,11 +156,7 @@ def run(dest_dir: str) -> None:
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=tables,
-        check_variables_metadata=True,
-    )
+    ds_garden = paths.create_dataset(tables=tables)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
