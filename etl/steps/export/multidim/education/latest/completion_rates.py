@@ -61,6 +61,7 @@ def run() -> None:
     c.set_global_config(
         config={
             "title": lambda view: generate_title_by_gender_and_level(view),
+            "subtitle": lambda view: generate_subtitle_by_level(view),
         }
     )
 
@@ -81,37 +82,6 @@ def get_completion_rate_columns(tb):
         completion_cols.extend(cols)
 
     return completion_cols
-
-
-def process_views(collection):
-    """Process all views to add titles, subtitles, and display names."""
-    for view in collection.views:
-        sex = view.dimensions.get("sex")
-        level = view.dimensions.get("level")
-
-        # Ensure view config exists and is a copy
-        if view.config is None:
-            view.config = {}
-        else:
-            view.config = view.config.copy()
-
-        # Generate titles and subtitles for side-by-side views only
-        if sex in ["sex_side_by_side"] or level in ["level_side_by_side"]:
-            view.config["title"] = generate_title_by_gender_and_level(sex, level)
-            view.config["subtitle"] = generate_subtitle_by_level(level, sex)
-
-            view.metadata = {
-                "presentation": {
-                    "title_public": view.config["title"],
-                },
-                "description_short": view.config["subtitle"],
-            }
-        # Generate dynamic title
-        else:
-            view.config["title"] = generate_title_by_gender_and_level(sex, level)
-
-        # Update indicator display names
-        edit_indicator_displays(view)
 
 
 def adjust_dimensions(tb):
