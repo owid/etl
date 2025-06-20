@@ -13,6 +13,6 @@ meta:
   description: The cumulative number of surveys conducted per country in the Demographic and Health surveys since it began in 1984.
   license: {}
 outs:
-  - md5: 24624519a72a706d748f37e4085d2575
-    size: 3382
+  - md5: c709cb457904de0e5041071fc07482e0
+    size: 3368
     path: national_surveys_conducted_by_dhs.csv
