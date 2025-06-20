@@ -118,7 +118,7 @@ def process_views(collection):
                 "description_short": view.config["subtitle"],
             }
         # Generate dynamic title
-        if sex and level:
+        else:
             view.config["title"] = generate_title_by_gender_and_level(sex, level)
 
         # Update indicator display names
@@ -145,8 +145,6 @@ def adjust_dimensions(tb):
 
         # Extract gender
         sex = _extract_gender(col, SEX_KEYWORDS)
-        # Set metadata
-        tb[col].metadata.dimensions = {}
         # Set indicator name
         tb[col].metadata.original_short_name = "completion_rates"
         # Set dimensions
