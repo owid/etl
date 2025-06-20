@@ -57,8 +57,16 @@ def run() -> None:
     # Add grouped views
     create_grouped_views(c)
 
-    # Process views (titles, subtitles, display names)
-    process_views(c)
+    # Edit FAUST
+    c.set_global_config(
+        config={
+            "title": lambda view: generate_title_by_gender_and_level(view),
+        }
+    )
+
+    # Edit display names
+    for view in c.views:
+        edit_indicator_displays(view)
 
     # Save collection
     c.save()
@@ -75,58 +83,24 @@ def get_completion_rate_columns(tb):
     return completion_cols
 
 
-def create_grouped_views(collection):
-    """Add grouped views for gender and education level comparisons."""
-    collection.group_views(
-        groups=[
-            {
-                "dimension": "sex",
-                "choice_new_slug": "sex_side_by_side",
-                "choices": ["girls", "boys"],
-                "view_config": GROUPED_VIEW_CONFIG | {},
-            },
-            {
-                "dimension": "level",
-                "choice_new_slug": "level_side_by_side",
-                "view_config": GROUPED_VIEW_CONFIG,
-            },
-        ]
-    )
-
-
-def process_views(collection):
-    """Process all views to add titles, subtitles, and display names."""
-    for view in collection.views:
-        sex = view.dimensions.get("sex")
-        level = view.dimensions.get("level")
-
-        # Ensure view config exists and is a copy
-        if view.config is None:
-            view.config = {}
-        else:
-            view.config = view.config.copy()
-
-        # Generate titles and subtitles for side-by-side views only
-        if sex in ["sex_side_by_side"] or level in ["level_side_by_side"]:
-            view.config["title"] = generate_title_by_gender_and_level(sex, level)
-            view.config["subtitle"] = generate_subtitle_by_level(level, sex)
-
-            view.metadata = {
-                "presentation": {
-                    "title_public": view.config["title"],
-                },
-                "description_short": view.config["subtitle"],
-            }
-        # Generate dynamic title
-        if sex and level:
-            view.config["title"] = generate_title_by_gender_and_level(sex, level)
-
-        # Update indicator display names
-        edit_indicator_displays(view)
-
-
 def adjust_dimensions(tb):
     """Add dimensions to completion rates table columns."""
+
+    # Auxiliary functions just used in this function
+    def _extract_dimension(column_name, keyword_map):
+        """Extract dimension value from column name using keyword mapping."""
+        for keyword, value in keyword_map.items():
+            if keyword in column_name:
+                return value
+        return None
+
+    def _extract_gender(column_name, sex_keywords):
+        """Extract gender dimension from column name."""
+        for keyword, value in sex_keywords.items():
+            if f"__{keyword}__" in column_name or column_name.endswith(f"_{keyword}"):
+                return value
+        return "both"  # Default for both_sexes
+
     # Dimension mapping configurations
     LEVEL_KEYWORDS = {
         "primary": "primary",
@@ -166,20 +140,40 @@ def adjust_dimensions(tb):
     return tb
 
 
-def _extract_dimension(column_name, keyword_map):
-    """Extract dimension value from column name using keyword mapping."""
-    for keyword, value in keyword_map.items():
-        if keyword in column_name:
-            return value
-    return None
+def create_grouped_views(collection):
+    """Add grouped views for gender and education level comparisons."""
+    view_metadata = {
+        "presentation": {
+            "title_public": "{title}",
+        },
+        "description_short": "{subtitle}",
+    }
+    view_config = GROUPED_VIEW_CONFIG | {
+        "title": "{title}",
+        "subtitle": "{subtitle}",
+    }
 
-
-def _extract_gender(column_name, sex_keywords):
-    """Extract gender dimension from column name."""
-    for keyword, value in sex_keywords.items():
-        if f"__{keyword}__" in column_name or column_name.endswith(f"_{keyword}"):
-            return value
-    return "both"  # Default for both_sexes
+    collection.group_views(
+        groups=[
+            {
+                "dimension": "sex",
+                "choice_new_slug": "sex_side_by_side",
+                "choices": ["girls", "boys"],
+                "view_config": view_config,
+                "view_metadata": view_metadata,
+            },
+            {
+                "dimension": "level",
+                "choice_new_slug": "level_side_by_side",
+                "view_config": view_config,
+                "view_metadata": view_metadata,
+            },
+        ],
+        params={
+            "title": lambda view: generate_title_by_gender_and_level(view),
+            "subtitle": lambda view: generate_subtitle_by_level(view),
+        },
+    )
 
 
 # Common mappings used by both title and subtitle functions
@@ -204,14 +198,14 @@ LEVEL_MAPPINGS = {
 }
 
 
-def _get_gender_term(sex, context="title"):
-    """Get appropriate gender term based on context."""
-    return GENDER_MAPPINGS[context].get(sex, "")
-
-
-def generate_title_by_gender_and_level(sex, level):
+def generate_title_by_gender_and_level(view):
     """Generate title based on gender and education level."""
-    gender_term = _get_gender_term(sex, "title")
+    sex = view.dimensions["sex"]
+    level = view.dimensions["level"]
+
+    # Get gender term
+    gender_term = GENDER_MAPPINGS["title"].get(sex, "")
+    # Get level term
     level_term = LEVEL_MAPPINGS["title"].get(level, "")
 
     if not level_term:
@@ -223,10 +217,13 @@ def generate_title_by_gender_and_level(sex, level):
         return f"Share of {gender_term} completing {level_term}"
 
 
-def generate_subtitle_by_level(level, sex):
+def generate_subtitle_by_level(view):
     """Generate subtitle based on education level and gender with links."""
+    sex = view.dimensions.get("sex")
+    level = view.dimensions.get("level")
+
     level_term = LEVEL_MAPPINGS["subtitle"].get(level, "")
-    gender_term = _get_gender_term(sex, "subtitle")
+    gender_term = GENDER_MAPPINGS["subtitle"].get(sex, "")
 
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
