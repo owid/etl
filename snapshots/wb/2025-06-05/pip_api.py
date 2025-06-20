@@ -35,7 +35,7 @@ To run this code from scratch,
 When the code finishes, you will have the following files in the cache folder:
     - world_bank_pip.csv: file with the results of the queries for key indicators (8 for countries and 8 for regions), plus some additional indicators (thresholds, relative poverty).
     - world_bank_pip_percentiles.csv: file with the percentiles taken from WB Databank and the ones constructed from the API.
-    - world_bank_pip_percentiles.csv: file with the definitions of the regions used in the API.
+    - world_bank_pip_regions.csv: file with the definitions of the regions used in the API.
 
 Copy these files to this folder and run in the terminal:
     python snapshots/wb/{version}/world_bank_pip.py --path-to-file snapshots/wb/{version}/world_bank_pip.csv
