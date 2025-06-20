@@ -1,4 +1,24 @@
 # NOTE: To learn more about the fields, hover over their names.
+macros: |-
+  <% macro percentiles_thr(decile) -%>
+    <% if decile == 1 -%>
+    Poorest decile
+    <%- elif decile == 2 -%>
+    2nd decile
+    <%- elif decile == 3 -%>
+    3rd decile
+    <%- elif decile in [4, 5, 6, 7, 8] -%>
+    <<decile>>th decile
+    <%- elif decile == 9 -%>
+    Richest decile
+    <%- endif -%>
+  <% endmacro %>
+
+  <# Poverty lines levels #>
+  <% set poverty_line_ipl = ["215", "300"] %>
+  <% set poverty_line_lmic = ["365", "420"] %>
+  <% set poverty_line_umic = ["685", "830"] %>
+
 definitions:
   poverty_line_ipl: ["215", "300"]
   poverty_line_lmic: ["365", "420"]
@@ -303,14 +323,16 @@ definitions:
     <%- endif %>
 
   threshold_title: |-
+    {macros}
     <% if decile == 5 %>
-    Threshold <<welfare_type>> per day marking the {definitions.percentiles_thr}.lower() (median)
+    Threshold <<welfare_type>> per day marking the <<percentiles_thr(decile) | lower>> (median)
     <%- else %>
-    Threshold <<welfare_type>> per day marking the {definitions.percentiles_thr}.lower()
+    Threshold <<welfare_type>> per day marking the <<percentiles_thr(decile) | lower>>
     <%- endif %>
 
   poverty_line_subtitle: |-
-    <% if poverty_line in ["215", "300"] %>
+    {macros}
+    <% if poverty_line in poverty_line_ipl %>
     Extreme poverty is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in ["365", "420"] %>
     The poverty line of {definitions.poverty_line_per_day} is set by the World Bank to be representative of the definitions of poverty adopted in lower-middle-income countries. {definitions.ppp_adjustment_subtitle}
