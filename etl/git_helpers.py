@@ -139,11 +139,19 @@ class GitError(Exception):
 def log_time(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        log.info(f"{func.__name__}.start")
+        # Determine the name to use for logging
+        if args and hasattr(args[0], "__class__") and hasattr(args[0].__class__, func.__name__):
+            # This is a method call - include class name
+            name = f"{args[0].__class__.__name__}.{func.__name__}"
+        else:
+            # This is a function call
+            name = func.__name__
+
+        log.info(f"{name}.start")
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
-        log.info(f"{func.__name__}.end", t=end_time - start_time)
+        log.info(f"{name}.end", t=round(end_time - start_time, 3))
         return result
 
     return wrapper
