@@ -3,8 +3,8 @@ meta:
     producer: Our World in Data based on UN MMEIG
     title: Countries for which DHS is the only source for UN MMEIG maternal mortality estimates
     citation_full: |-
-      Our World in Data based on UN MMEIG (2013) https://github.com/WorldHealthOrganization/bmat/blob/master/main_data_adjusted.csv
-    attribution: Our World in Data based on UN MMEIG (2013)
+      Our World in Data based on UN MMEIG (2023) https://github.com/WorldHealthOrganization/bmat/blob/master/main_data_adjusted.csv
+    attribution: Our World in Data based on UN MMEIG (2023)
     attribution_short: OWID; UN MMEIG (2023)
     url_main: https://github.com/WorldHealthOrganization/bmat/blob/master/main_data_adjusted.csv
     url_download: |-
