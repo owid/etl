@@ -7,7 +7,7 @@ initialization, validation, view management, dimension handling, and data export
 
 import pytest
 
-from etl.collection.exceptions import DuplicateCollectionViews
+from etl.collection.exceptions import DuplicateCollectionViews, DuplicateValuesError
 from etl.collection.model.core import Collection, Definitions
 from etl.collection.model.dimension import Dimension, DimensionChoice
 from etl.collection.model.view import Indicator, View, ViewIndicators
@@ -446,3 +446,119 @@ def test_sort_views_with_default_first():
     # After sorting - USA view should be first
     assert collection.views[0].dimensions["country"] == "usa"
     assert collection.views[1].dimensions["country"] == "uk"
+
+
+def test_validate_dimension_uniqueness_success():
+    """
+    Test Collection.validate_dimension_uniqueness - passes with unique dimension slugs.
+
+    Example: Collection with dimensions having different slugs should pass validation
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country", "metric"],
+        dimensions=[
+            Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")]),
+            Dimension(slug="metric", name="Metric", choices=[DimensionChoice(slug="cases", name="Cases")]),
+            Dimension(slug="year", name="Year", choices=[DimensionChoice(slug="2023", name="2023")]),
+        ],
+        views=[View(dimensions={"country": "usa", "metric": "cases", "year": "2023"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+    # Should not raise any exception
+    collection.validate_dimension_uniqueness()
+
+
+def test_validate_dimension_uniqueness_duplicate_slugs():
+    """
+    Test Collection.validate_dimension_uniqueness - fails with duplicate dimension slugs.
+
+    Example: Collection with dimensions having same slug should raise DuplicateValuesError
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")]),
+            Dimension(
+                slug="country", name="Another Country", choices=[DimensionChoice(slug="uk", name="UK")]
+            ),  # Duplicate slug
+        ],
+        views=[View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+    with pytest.raises(DuplicateValuesError, match="Dimension slug 'country' is not unique"):
+        collection.validate_dimension_uniqueness()
+
+
+def test_validate_dimension_uniqueness_empty_dimensions():
+    """
+    Test Collection.validate_dimension_uniqueness - passes with no dimensions.
+
+    Example: Collection with empty dimensions list should pass validation
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=[],
+        dimensions=[],
+        views=[],
+        _definitions=Definitions(),
+    )
+
+    # Should not raise any exception
+    collection.validate_dimension_uniqueness()
+
+
+def test_validate_dimension_uniqueness_single_dimension():
+    """
+    Test Collection.validate_dimension_uniqueness - passes with single dimension.
+
+    Example: Collection with only one dimension should always pass validation
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(slug="country", name="Country", choices=[DimensionChoice(slug="usa", name="USA")]),
+        ],
+        views=[View(dimensions={"country": "usa"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+    # Should not raise any exception
+    collection.validate_dimension_uniqueness()
+
+
+def test_validate_dimension_uniqueness_multiple_duplicates():
+    """
+    Test Collection.validate_dimension_uniqueness - catches first duplicate when multiple exist.
+
+    Example: Collection with multiple duplicate dimension slugs should raise error for first found
+    """
+    collection = Collection(
+        catalog_path="test#table",
+        title={"en": "Test"},
+        default_selection=["country"],
+        dimensions=[
+            Dimension(slug="country", name="Country 1", choices=[DimensionChoice(slug="usa", name="USA")]),
+            Dimension(slug="metric", name="Metric 1", choices=[DimensionChoice(slug="cases", name="Cases")]),
+            Dimension(
+                slug="country", name="Country 2", choices=[DimensionChoice(slug="uk", name="UK")]
+            ),  # First duplicate
+            Dimension(
+                slug="metric", name="Metric 2", choices=[DimensionChoice(slug="deaths", name="Deaths")]
+            ),  # Second duplicate
+        ],
+        views=[View(dimensions={"country": "usa", "metric": "cases"}, indicators=ViewIndicators(y=[]))],
+        _definitions=Definitions(),
+    )
+
+    # Should raise error for the first duplicate found (country)
+    with pytest.raises(DuplicateValuesError, match="Dimension slug 'country' is not unique"):
+        collection.validate_dimension_uniqueness()
