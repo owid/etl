@@ -1,0 +1,38 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Uncategorized
+    processing_level: minor
+
+
+dataset:
+  update_period_days: 365
+
+
+tables:
+  housing_prices:
+    variables:
+      nom_house_price_idx:
+        description_short: Index of residential property prices for both new and existing homes. This index is normalized to 2015 prices (=100) and is not adjusted for inflation.
+        description_from_producer: Residential property prices, sales of newly-built and existing dwellings, all types of dwellings.
+      real_house_price_idx:
+        description_short: Index of residential property prices for both new and existing homes. This index is normalized to 2015 prices (=100) and is adjusted for inflation.
+        description_from_producer: Nominal house prices deflated using the private consumption deflator from the national account statistics.
+      rent_prices:
+        description_short: Index for rents prices of residential property. This index is normalized to 2015 prices (=100) and not adjusted for inflation.
+        description_from_producer: Data from the OECD Main Economic Indicators database or from Eurostat, Consumer Price Indices (CPIs) for Actual rentals for housing (COICOP 04.1)
+      price_to_income_ratio:
+        description_short: Ratio of house prices to household disposable income per person, a measure for how affordable buying a home is. It is calculated as the ratio of the "nominal house price index" to "net household disposable income index".
+        description_from_producer: Nominal house prices divided by nominal disposable income per head. Net household disposable income is used. The population data come from the OECD national accounts database.
+      price_to_rent_ratio:
+        description_short: Ratio of house prices to rent prices, used to compare the cost of buying versus renting a home. It is calculated as the ratio of the "nominal house price index" to the "rent index".
+        description_from_producer: Nominal house prices divided by rent price indices.
+      std_price_income_ratio:
+        description_short: Ratio of house prices to income, compared to the long-term average (since 1980). The average is set to 100.
+        description_from_producer: eNominal house prices divided by nominal disposable income per head. Net household disposable income is used. The population data come from the OECD national accounts database. The long-term average is calculated over the whole period available when the indicator begins after 1980 or after 1980 if the indicator is longer. This value is used as a reference value. The ratio is calculated by dividing the indicator source on this long-term average, and indexed to a reference value equal to 100.
+      std_price_rent_ratio:
+        description_short: Ratio of house prices to rent, compared to the long-term average (since 1980). The average is set to 100.
+        description_from_producer: Nominal house prices divided by rent price indices. The long-term average is calculated over the whole period available when the indicator begins after 1980 or after 1980 if the indicator is longer. This value is used as a reference value. The ratio is calculated by dividing the indicator source on this long-term average, and indexed to a reference value equal to 100.
+
