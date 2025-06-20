@@ -61,7 +61,6 @@ def run() -> None:
     c.set_global_config(
         config={
             "title": lambda view: generate_title_by_gender_and_level(view),
-            "subtitle": lambda view: generate_subtitle_by_level(view),
         }
     )
 
