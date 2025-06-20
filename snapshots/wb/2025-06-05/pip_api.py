@@ -1,15 +1,14 @@
 # NOTE: Check all the TODO comments in the code, to modify data related to the new 2021 prices
 # TODO: Extract data in arrow files, for faster processing.
-# NOTE: Check if we can modify the functions to extract missing percentile series for countries in specific years (Cote d'Ivoire 1998 2008, Montenegro 2013 for example).
 """
 DATA EXTRACTION FOR THE WORLD BANK POVERTY AND INEQUALITY PLATFORM (PIP) API
 
 This code generates key indicators and percentiles from the World Bank PIP API.
 This is done by combining the results of several queries to the API:
     - A set of poverty lines (8) to obtain key indicators per PPP year (PPP_VERSIONS) and for countries and regions.
-    - 2298 poverty lines to construct percentiles for a group of countries.
-    - 5148 poverty lines to construct percentiles for all the regions.
-    - 8217 of poverty lines to construct estimates of relative poverty.
+    - Thousands of poverty lines to construct percentiles for a group of countries.
+    - Thousands of poverty lines to construct percentiles for all the regions.
+    - Thousands of poverty lines to construct estimates of relative poverty.
 
 Percentiles are partially constructed because the data officially published by the World Bank is missing some countries and all the regions.
 
@@ -22,10 +21,10 @@ To run this code from scratch,
     - (If needed) Delete the files in R2:
         rclone delete r2:owid-private/cache/ --fast-list --transfers 32 --checkers 32 --verbose
     - Check if you need to update the poverty lines in the functions `poverty_lines_countries` and `poverty_lines_regions`.
-        - Check the list of countries without percentile data. It will show up as a list in the output (These countries are available in a common query but not in the percentile file:)
+        - Check the list of countries without percentile data. It will show up as a list in the output (_These countries are available in a common query but not in the percentile file:_)
         - Open
             https://api.worldbank.org/pip/v1/pip?country=LCA&year=all&povline=150&fill_gaps=false&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&identity=PROD&format=csv
-            https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=300&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
+            https://api.worldbank.org/pip/v1/pip-grp?country=OHI&year=all&povline=320&group_by=wb&welfare_type=all&reporting_level=all&additional_ind=false&ppp_version=2021&format=csv
         - And see if any of the `headcount` values is lower than 0.99. If so, you need to add more poverty lines to the functions.
     - Run the code. You have two options to see the output, in the terminal or in the background:
         python snapshots/wb/{version}/pip_api.py
@@ -36,7 +35,7 @@ To run this code from scratch,
 When the code finishes, you will have the following files in the cache folder:
     - world_bank_pip.csv: file with the results of the queries for key indicators (8 for countries and 8 for regions), plus some additional indicators (thresholds, relative poverty).
     - world_bank_pip_percentiles.csv: file with the percentiles taken from WB Databank and the ones constructed from the API.
-    - world_bank_pip_percentiles.csv: file with the definitions of the regions used in the API.
+    - world_bank_pip_regions.csv: file with the definitions of the regions used in the API.
 
 Copy these files to this folder and run in the terminal:
     python snapshots/wb/{version}/world_bank_pip.py --path-to-file snapshots/wb/{version}/world_bank_pip.csv
@@ -89,7 +88,6 @@ LIVE_API = 1
 def poverty_lines_countries():
     """
     These poverty lines are used to calculate percentiles for countries that are not in the percentile file.
-    # We only extract to $150 because the highest P99 not available is St. Lucia
     # NOTE: In future updates, check if these poverty lines are enough for the extraction
     """
     # Define poverty lines and their increase
@@ -123,7 +121,6 @@ def poverty_lines_countries():
 def poverty_lines_regions():
     """
     These poverty lines are used to calculate percentiles for regions. None of them are in the percentile file.
-    # We only extract to $300 because the highest P99 not available is Other High Income Countries, with $280
     # NOTE: In future updates, check if these poverty lines are enough for the extraction
     """
     # Define poverty lines and their increase
@@ -140,6 +137,7 @@ def poverty_lines_regions():
     between_150_and_175_dollars = list(range(15000, 17500, 10))
     between_175_and_250_dollars = list(range(17500, 25000, 20))
     between_250_and_300_dollars = list(range(25000, 30000, 50))
+    between_300_and_320_dollars = list(range(30000, 32000, 100))
 
     # povlines is all these lists together
     povlines = (
@@ -155,6 +153,7 @@ def poverty_lines_regions():
         + between_150_and_175_dollars
         + between_175_and_250_dollars
         + between_250_and_300_dollars
+        + between_300_and_320_dollars
     )
 
     return povlines
@@ -165,14 +164,17 @@ def poverty_lines_regions():
 # NOTE: Define this dictionary to show the most recent PPP prices second
 POVLINES_DICT = {
     2017: [100, 215, 365, 685, 1000, 2000, 3000, 4000],
-    2021: [100, 215, 365, 685, 1000, 2000, 3000, 4000],  # TODO: add lines
+    2021: [100, 300, 420, 830, 1000, 2000, 3000, 4000],  # TODO: add lines
 }
 
-# Define current International Poverty Line (IPL) in the latest prices
-INTERNATIONAL_POVERTY_LINE_CURRENT = 2.15  # TODO: change to 2021 prices
+# Define international poverty lines as the second value in each list in POVLINES_DICT
+INTERNATIONAL_POVERTY_LINES = {ppp_year: poverty_lines[1] for ppp_year, poverty_lines in POVLINES_DICT.items()}
 
 # Define PPP versions from POVLINES_DICT
 PPP_VERSIONS = list(POVLINES_DICT.keys())
+
+# Define current International Poverty Line (IPL) in the latest prices
+INTERNATIONAL_POVERTY_LINE_CURRENT = INTERNATIONAL_POVERTY_LINES[PPP_VERSIONS[1]] / 100
 
 # Define poverty lines to calculate percentiles
 POV_LINES_COUNTRIES = poverty_lines_countries()
@@ -431,6 +433,13 @@ def pip_query_country(
     version = versions[ppp_version]["version"]
     release_version = versions[ppp_version]["release_version"]
 
+    # NOTE: There is a bug for China: when querying specific poverty lines (as for relative poverty), the API doesn't respond
+    # One hacky way to fix it is to call a more generalized query first (with no welfare_type, reporting_level nor release version)
+    if country_code == "CHN":
+        wb_api.fetch_csv(
+            f"/pip?country={country_code}&year={year}&{popshare_or_povline}={value}&ppp_version={ppp_version}&fill_gaps={fill_gaps}&format=csv"
+        )
+
     # Build query
     df = wb_api.fetch_csv(
         f"/pip?{popshare_or_povline}={value}&country={country_code}&year={year}&fill_gaps={fill_gaps}&welfare_type={welfare_type}&reporting_level={reporting_level}&ppp_version={ppp_version}&version={version}&release_version={release_version}&format=csv"
@@ -452,7 +461,7 @@ def pip_query_country(
         Path(f"{CACHE_DIR}/pip_country_data").mkdir(parents=True, exist_ok=True)
         # Save to csv
         df.to_csv(
-            f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value*100))}_welfare_{welfare_type}_rep_{reporting_level}_fillgaps_{fill_gaps}_ppp_{ppp_version}.csv",
+            f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value * 100))}_welfare_{welfare_type}_rep_{reporting_level}_fillgaps_{fill_gaps}_ppp_{ppp_version}.csv",
             index=False,
         )
 
@@ -512,7 +521,7 @@ def pip_query_region(
         Path(f"{CACHE_DIR}/pip_region_data").mkdir(parents=True, exist_ok=True)
         # Save to csv
         df.to_csv(
-            f"{CACHE_DIR}/pip_region_data/pip_region_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value*100))}_ppp_{ppp_version}.csv",
+            f"{CACHE_DIR}/pip_region_data/pip_region_{country_code}_year_{year}_{popshare_or_povline}_{int(round(value * 100))}_ppp_{ppp_version}.csv",
             index=False,
         )
 
@@ -533,7 +542,7 @@ def pip_query_region(
 def generate_percentiles_raw(wb_api: WB_API):
     """
     Generates percentiles data from query results. This is the raw data to get the percentiles.
-    Uses concurrent.futures to speed up the process.
+    Uses concurrency to speed up the process.
     """
     start_time = time.time()
 
@@ -612,6 +621,7 @@ def generate_percentiles_raw(wb_api: WB_API):
         """
         Here I check if the country file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
         """
+
         file_path_country = f"{CACHE_DIR}/pip_country_data/pip_country_{country_code}_year_all_povline_{povline}_welfare_all_rep_all_fillgaps_{FILL_GAPS}_ppp_{ppp_version}.csv"
         if Path(file_path_country).is_file():
             df_query_country = pd.read_csv(file_path_country)
@@ -1189,13 +1199,13 @@ def sanity_checks(df_percentiles):
 
 def generate_relative_poverty(wb_api: WB_API):
     """
-    Generates relative poverty indicators from query results. Uses concurrent.futures to speed up the process.
+    Generates relative poverty indicators from query results. Uses concurrency to speed up the process.
     """
     start_time = time.time()
 
     def get_relative_data(df_row, pct, versions):
         """
-        This function is structured in a way to make it work with concurrent.futures.
+        This function is structured in a way to make it work with concurrency.
         It checks if the country file related to the row exists. If not, it runs the query.
         """
         if ~np.isnan(df_row["median"]):
@@ -1230,12 +1240,12 @@ def generate_relative_poverty(wb_api: WB_API):
 
     def get_relative_data_region(df_row, pct, versions):
         """
-        This function is structured in a way to make it work with concurrent.futures.
+        This function is structured in a way to make it work with concurrency.
         It checks if the regional file related to the row exists. If not, it runs the query.
         """
         if ~np.isnan(df_row["median"]):
             if Path(
-                f"{CACHE_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median']*pct))}_ppp_{PPP_VERSIONS[1]}.csv"
+                f"{CACHE_DIR}/pip_region_data/pip_region_{df_row['country_code']}_year_{df_row['year']}_povline_{int(round(df_row['median'] * pct))}_ppp_{PPP_VERSIONS[1]}.csv"
             ).is_file():
                 return
             else:
@@ -1276,7 +1286,7 @@ def generate_relative_poverty(wb_api: WB_API):
                 if ~np.isnan(df["median"].iloc[i]):
                     if country_or_region == "country":
                         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-                        file_path = f"{CACHE_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_{PPP_VERSIONS[1]}.csv"
+                        file_path = f"{CACHE_DIR}/pip_country_data/pip_country_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median'] * pct))}_welfare_{df.iloc[i]['welfare_type']}_rep_{df.iloc[i]['reporting_level']}_fillgaps_{FILL_GAPS}_ppp_{PPP_VERSIONS[1]}.csv"
                         if Path(file_path).is_file():
                             results = pd.read_csv(file_path)
                         else:
@@ -1286,7 +1296,7 @@ def generate_relative_poverty(wb_api: WB_API):
 
                     elif country_or_region == "region":
                         # Here I check if the file exists even after the original extraction. If it does, I read it. If not, I start the queries again.
-                        file_path = f"{CACHE_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median']*pct))}_ppp_{PPP_VERSIONS[1]}.csv"
+                        file_path = f"{CACHE_DIR}/pip_region_data/pip_region_{df.iloc[i]['country_code']}_year_{df.iloc[i]['year']}_povline_{int(round(df.iloc[i]['median'] * pct))}_ppp_{PPP_VERSIONS[1]}.csv"
                         if Path(file_path).is_file():
                             results = pd.read_csv(file_path)
                         else:
@@ -1391,13 +1401,13 @@ def generate_relative_poverty(wb_api: WB_API):
 
 def generate_key_indicators(wb_api: WB_API):
     """
-    Generate the main indicators file, from a set of poverty lines and PPP versions. Uses concurrent.futures to speed up the process.
+    Generate the main indicators file, from a set of poverty lines and PPP versions. Uses concurrency to speed up the process.
     """
     start_time = time.time()
 
     def get_country_data(povline, ppp_version, versions):
         """
-        This function is defined inside the main function because it needs to be called by concurrent.futures.
+        This function is defined inside the main function because it needs to be called by concurrency.
         For country data.
         """
         return pip_query_country(
@@ -1416,7 +1426,7 @@ def generate_key_indicators(wb_api: WB_API):
 
     def get_region_data(povline, ppp_version, versions):
         """
-        This function is defined inside the main function because it needs to be called by concurrent.futures.
+        This function is defined inside the main function because it needs to be called by concurrency.
         For regional data.
         """
         return pip_query_region(
@@ -1766,7 +1776,7 @@ def add_regional_definitions(wb_api: WB_API, df: pd.DataFrame) -> pd.DataFrame:
     df_regional_definitions["year"] = MAX_YEAR
 
     # Save to csv
-    df_regional_definitions.to_csv(f"{CACHE_DIR}/world_bank_pip_percentiles.csv", index=False)
+    df_regional_definitions.to_csv(f"{CACHE_DIR}/world_bank_pip_regions.csv", index=False)
 
     log.info("Regional definitions generated from API.")
 
