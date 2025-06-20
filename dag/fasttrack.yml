@@ -242,3 +242,5 @@ steps:
     - snapshot://fasttrack/latest/uk_road_deaths_ons.csv
   data://grapher/fasttrack/latest/national_surveys_conducted_by_dhs:
     - snapshot://fasttrack/latest/national_surveys_conducted_by_dhs.csv
+  data://grapher/fasttrack/latest/un_mmeig_countries_dhs_only_source:
+    - snapshot://fasttrack/latest/un_mmeig_countries_dhs_only_source.csv
