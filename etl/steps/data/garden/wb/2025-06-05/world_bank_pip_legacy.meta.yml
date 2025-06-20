@@ -504,6 +504,24 @@ tables:
               - Europe and Central Asia (PIP)
               - Sub-Saharan Africa (PIP)
 
+      cpi:
+        title: Consumer Price Index (CPI)
+        unit: ""
+        short_unit: ""
+        description_short: The Consumer Price Index (CPI) summarizes the prices of a representative basket of goods and services consumed by households within an economy over a period of time. Inflation (deflation) occurs when there is a positive (negative) change in the CPI between two time periods.
+        display:
+          name: Consumer Price Index (CPI)
+          numDecimalPlaces: 1
+
+      ppp:
+        title: Purchasing Power Parity (PPP) rates
+        unit: ""
+        short_unit: ""
+        description_short: The Purchasing Power Parity (PPP) rates adjust for differences in price levels between countries, allowing for a more accurate comparison of living standards and welfare.
+        display:
+          name: Purchasing Power Parity (PPP) rates
+          numDecimalPlaces: 1
+
       surveys_past_decade:
         title: Number of surveys in the past decade
         unit: "surveys"

@@ -450,6 +450,8 @@ def process_data(tb: Table) -> Table:
             "spl",
             "spr",
             "pg",
+            "cpi",
+            "ppp",
         ],
         columns="poverty_line_cents",
         values=[
