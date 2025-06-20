@@ -1,5 +1,10 @@
 # NOTE: To learn more about the fields, hover over their names.
 macros: |-
+  <# Poverty lines levels #>
+  <% set poverty_line_ipl = ["215", "300"] %>
+  <% set poverty_line_lmic = ["365", "420"] %>
+  <% set poverty_line_umic = ["685", "830"] %>
+
   <% macro percentiles_thr(decile) -%>
     <% if decile == 1 -%>
     Poorest decile
@@ -28,11 +33,6 @@ macros: |-
     <%- endif -%>
   <% endmacro %>
 
-  <# Poverty lines levels #>
-  <% set poverty_line_ipl = ["215", "300"] %>
-  <% set poverty_line_lmic = ["365", "420"] %>
-  <% set poverty_line_umic = ["685", "830"] %>
-
 definitions:
   common:
     processing_level: major
@@ -43,7 +43,9 @@ definitions:
         - Economic Inequality
         - Economic Growth
       faqs:
-        - fragment_id: <% if poverty_line in poverty_line_ipl %>poverty-international-poverty-line<%- endif %>
+        - fragment_id: |-
+            {macros}
+            <% if poverty_line in poverty_line_ipl %>poverty-international-poverty-line<%- endif %>
           gdoc_id: "{definitions.gdoc_id}"
         - fragment_id: poverty-international-dollars
           gdoc_id: "{definitions.gdoc_id}"
@@ -148,6 +150,7 @@ definitions:
     <%- endif %>
 
   description_key_poverty_line: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     Extreme poverty here is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}.
     <%- elif poverty_line in poverty_line_lmic %>
@@ -255,6 +258,7 @@ definitions:
   # For Grapher configuration
 
   headcount_ratio_title: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     Share of population living in extreme poverty
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
@@ -264,6 +268,7 @@ definitions:
     <%- endif %>
 
   headcount_title: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     Number of people living in extreme poverty
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
@@ -273,6 +278,7 @@ definitions:
     <%- endif %>
 
   total_shortfall_title: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     Total shortfall from extreme poverty
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
@@ -282,6 +288,7 @@ definitions:
     <%- endif %>
 
   avg_shortfall_title: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     Average shortfall from extreme poverty
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
@@ -291,6 +298,7 @@ definitions:
     <%- endif %>
 
   income_gap_ratio_title: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     Average shortfall from extreme poverty (as a share of the poverty line)
     <%- elif poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
@@ -315,6 +323,7 @@ definitions:
     <%- endif %>
 
   poverty_line_subtitle: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     Extreme poverty is defined as living below the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in poverty_line_lmic %>
@@ -328,6 +337,7 @@ definitions:
     <%- endif %>
 
   total_shortfall_subtitle: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line_per_day}. {definitions.ppp_adjustment_subtitle}
     <%- elif poverty_line in poverty_line_lmic %>
@@ -341,6 +351,7 @@ definitions:
     <%- endif %>
 
   avg_shortfall_subtitle: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     This is the amount of money that would be theoretically needed to lift the incomes of all people in extreme poverty up to the International Poverty Line of {definitions.poverty_line_per_day}, averaged across the population in poverty.
     <%- elif poverty_line in poverty_line_lmic %>
@@ -357,6 +368,7 @@ definitions:
     This is the average shortfall expressed as a share of the poverty line, sometimes called the _income gap ratio_.
 
   income_gap_ratio_subtitle: |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     {definitions.income_gap_ratio_subtitle_base} It captures the depth of poverty of those living on less than the International Poverty Line ({definitions.poverty_line_per_day}).
     <%- elif poverty_line in poverty_line_lmic %>
@@ -450,7 +462,8 @@ definitions:
     Purples
     <%- endif %>
 
-  map_brackets_headcount_ratio: &map_brackets_headcount_ratio
+  map_brackets_headcount_ratio: &map_brackets_headcount_ratio |-
+    {macros}
     <% if poverty_line in poverty_line_ipl %>
     [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- elif poverty_line in ["40% of the median"] %>
@@ -470,7 +483,8 @@ definitions:
     [100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
     <%- endif %>
 
-  map_brackets_total_shortfall: &map_brackets_total_shortfall
+  map_brackets_total_shortfall: &map_brackets_total_shortfall |-
+    {macros}
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
     [100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1]
     <%- elif poverty_line in ["100"] %>
@@ -491,7 +505,8 @@ definitions:
     [10000000000,30000000000,100000000000,300000000000,1000000000000,3000000000000,10000000000000,1]
     <%- endif %>
 
-  map_brackets_avg_shortfall: &map_brackets_avg_shortfall
+  map_brackets_avg_shortfall: &map_brackets_avg_shortfall |-
+    {macros}
     <% if poverty_line in ["40% of the median"] %>
     [1, 2, 3, 4, 5, 6, 1]
     <%- elif poverty_line in ["50% of the median"] %>
@@ -516,7 +531,8 @@ definitions:
     [5, 10 , 15, 20, 25, 30, 35, 40]
     <%- endif %>
 
-  map_brackets_poverty_gap_index: &map_brackets_poverty_gap_index
+  map_brackets_poverty_gap_index: &map_brackets_poverty_gap_index |-
+    {macros}
     <% if poverty_line in ["40% of the median"] %>
     [1, 2, 3, 4, 5, 6, 7, 8, 1]
     <%- elif poverty_line in ["50% of the median"] %>
@@ -1438,10 +1454,14 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       avg:
-        title: Average ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: |-
+          {macros}
+          Average (<<percentiles_avg_share(decile)>>, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
-        description_short: The mean <<welfare_type>> per day within the {definitions.percentiles_avg_share} (tenth of the population).
+        description_short: |-
+          {macros}
+          The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile)>> (tenth of the population).
         description_key:
           - "{definitions.description_key_ppp}"
           - "{definitions.description_key_welfare_type}"
@@ -1451,8 +1471,9 @@ tables:
           {definitions.description_processing_main}
         display:
           name: |-
+            {macros}
             <% if survey_comparability == "No spells" %>
-            Average ({definitions.percentiles_avg_share})
+            Average (<<percentiles_avg_share(decile)>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -1460,8 +1481,12 @@ tables:
           <<: *common_display
         presentation:
           grapher_config:
-            title: Mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>>
-            subtitle: The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}
+            title: |-
+              {macros}
+              Mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>>
+            subtitle: |-
+              {macros}
+              The mean <<welfare_type>> per day within the <<percentiles_avg_share(decile) | lower>> (tenth of the population). {definitions.ppp_adjustment_subtitle}
             note: "{definitions.note_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1477,10 +1502,14 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       share:
-        title: Share ({definitions.percentiles_avg_share}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: |-
+          {macros}
+          Share (<<percentiles_avg_share(decile)>>, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: "%"
         short_unit: "%"
-        description_short: The share of <<welfare_type>> {definitions.welfare_type_verb} by the {definitions.percentiles_avg_share} (tenth of the population)
+        description_short: |-
+          {macros}
+          The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile)>> (tenth of the population)
         description_key:
           - "{definitions.description_key_welfare_type}"
           - "{definitions.description_key_not_market_income}"
@@ -1490,8 +1519,9 @@ tables:
           Percentage share of income or consumption is the share that accrues to subgroups of population indicated by deciles. Percentage shares by deciles may not sum to 100 because of rounding.
         display:
           name: |-
+            {macros}
             <% if survey_comparability == "No spells" %>
-            Share ({definitions.percentiles_avg_share})
+            Share (<<percentiles_avg_share(decile)>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
@@ -1499,8 +1529,12 @@ tables:
           <<: *common_display
         presentation:
           grapher_config:
-            title: <<welfare_type.capitalize()>> share of the <<percentiles_avg_share(decile) | lower>>
-            subtitle: The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
+            title: |-
+              {macros}
+              <<welfare_type.capitalize()>> share of the <<percentiles_avg_share(decile) | lower>>
+            subtitle: |-
+              {macros}
+              The share of <<welfare_type>> {definitions.welfare_type_verb} by the <<percentiles_avg_share(decile) | lower>> (tenth of the population).
             note: "{definitions.note_without_ppp}"
             hasMapTab: "{definitions.hasmaptab}"
             tab: "{definitions.tab}"
@@ -1515,7 +1549,9 @@ tables:
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       thr:
-        title: Threshold ({definitions.percentiles_thr}, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
+        title: |-
+          {macros}
+          Threshold (<<percentiles_thr(decile)>>, <<ppp_version>> prices) - {definitions.table}{definitions.survey_comparability}
         unit: international-$ in <<ppp_version>> prices
         short_unit: $
         description_short: The level of <<welfare_type>> per day below which <<decile>>0% of the population falls.
@@ -1528,8 +1564,9 @@ tables:
           {definitions.description_processing_main}
         display:
           name: |-
+            {macros}
             <% if survey_comparability == "No spells" %>
-            Threshold ({definitions.percentiles_thr})
+            Threshold (<<percentiles_thr(decile)>>)
             <% else %>
             <<welfare_type.capitalize()>> surveys
             <% endif %>
