@@ -584,7 +584,7 @@ definitions:
     <%- elif decile in [9] %>
     [8, 10, 12, 14, 16, 1]
     <%- elif decile in [10] %>
-    [20, 25, 30, 35, 40, 45, 50, 1]
+    [20, 25, 30, 35, 40, 45, 1]
     <%- endif %>
 
   custom_numeric_min_value_share:
