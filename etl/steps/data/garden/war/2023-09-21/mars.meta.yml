@@ -14,7 +14,7 @@ definitions:
       <%- elif conflict_type == "others (non-civil)" %>
       An interstate war is a conflict between states with differentiated militaries and clear frontlines that causes at least 500 deaths over its duration.
       <%- elif conflict_type == "civil war" %>
-      A civil war is a conflict between combatants that were previously part of the same state, but now at least one seeks control or secession. It is fought with differentiated militaries and clear frontlines and causes at least 500
+      A civil war is a conflict between combatants that were previously part of the same state, but now at least one seeks control or secession. It is fought with differentiated militaries and clear frontlines and causes at least 500 deaths over its duration.
       <%- endif -%>
     conflict_type_noncivil: |-
       <%- if conflict_type == "others (non-civil)" -%>
