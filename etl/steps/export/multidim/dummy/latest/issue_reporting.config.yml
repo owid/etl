@@ -14,6 +14,10 @@ dimensions:
       - slug: view_2
         name: No edits
         description: No edits done to the metadata/config.
+      - slug: view_combined
+        name: Combined view
+        description: This view combines the two above views, and should show the edits from view_1.
+        group: Grouped views
 
 views:
   - dimensions:
