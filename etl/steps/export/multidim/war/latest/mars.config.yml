@@ -23,25 +23,28 @@ dimensions:
         name: "Number of wars"
         # description: People moving to country
       - slug: "wars_ongoing_country_rate"
-        name: "War rate"
+        name: "Rate of wars"
         description: The number of wars divided by the number of countries
+
   - slug: conflict_type
     name: "Conflict type"
     choices:
       - slug: "all"
-        name: "All"
+        name: "All wars"
+      - slug: "all_stacked"
+        name: "All wars (by type)"
+      - slug: "others (non-civil)"
+        name: "Interstate wars"
         # description: People moving to country
       - slug: "civil war"
         name: "Civil wars"
         # description: People moving to country
-      - slug: "others (non-civil)"
-        name: "Interstate Wars"
-        # description: People moving to country
+
   - slug: estimate
     name: "Estimate"
     choices:
       - slug: low
-        name: Low estimate
+        name: Low estimate only
       - slug: high
         name: High estimate
       - slug: na

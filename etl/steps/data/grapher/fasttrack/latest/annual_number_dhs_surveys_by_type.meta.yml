@@ -1,0 +1,43 @@
+dataset:
+  title: Annual number of DHS surveys by type
+  description: The annual number of Demographic and Health Surveys conducted by type of survey
+  licenses:
+    - {}
+tables:
+  annual_number_dhs_surveys_by_type:
+    variables:
+      standard_dhs:
+        title: Standard DHS
+        unit: ''
+        description: |-
+          The annual number of standard surveys conducted by the Demographic and Health Surveys. This is given by the year that the survey was conducted; for surveys spanning multiple years, the first year is given.
+      special_dhs:
+        title: Special DHS
+        unit: ''
+        description: |-
+          The annual number of special surveys conducted by the Demographic and Health Surveys. This is given by the year that the survey was conducted; for surveys spanning multiple years, the first year is given.
+      interim_dhs:
+        title: Interim DHS
+        unit: ''
+        description: |-
+          The annual number of interim surveys conducted by the Demographic and Health Surveys. This is given by the year that the survey was conducted; for surveys spanning multiple years, the first year is given.
+      standard_aids_survey:
+        title: Standard AIDS survey
+        unit: ''
+        description: |-
+          The annual number of standard AIDS surveys conducted by the Demographic and Health Surveys. This is given by the year that the survey was conducted; for surveys spanning multiple years, the first year is given.
+      continuous_dhs:
+        title: Continuous DHS
+        unit: ''
+        description: |-
+          The annual number of continuous surveys conducted by the Demographic and Health Surveys. This is given by the year that the survey was conducted; for surveys spanning multiple years, the first year is given.
+      malaria_indicator_survey:
+        title: Malaria Indicator Survey
+        unit: ''
+        description: |-
+          The annual number of Malaria Indicator Surveys conducted by the Demographic and Health Surveys. This is given by the year that the survey was conducted; for surveys spanning multiple years, the first year is given.
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
