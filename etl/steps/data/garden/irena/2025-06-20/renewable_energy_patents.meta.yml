@@ -1,0 +1,187 @@
+definitions:
+  common:
+    processing_level: major
+    unit: patents
+    short_unit: ""
+    presentation:
+      topic_tags:
+        - Energy
+    display:
+      numDecimalPlaces: 0
+    description_key:
+    - The number of patents filed for the last few years may be subject to a time lag; processing times of patent applications vary and some patents submitted over this period may not yet be recorded in the statistics.
+
+dataset:
+  update_period_days: 365
+
+tables:
+  renewable_energy_patents:
+    title: Renewable energy patents
+    variables:
+      patents:
+        title: Number of patents
+  renewable_energy_patents_by_technology:
+    title: Renewable energy patents by technology
+    variables:
+      batteries:
+        title: Number of patents in batteries
+        display:
+          name: Batteries
+        presentation:
+          title_public: Number of patents in batteries
+      bioenergy:
+        title: Number of patents in bioenergy
+        display:
+          name: Bioenergy
+        presentation:
+          title_public: Number of patents in bioenergy
+      carbon_capture_and_storage:
+        title: Number of patents in carbon capture and storage
+        display:
+          name: Carbon capture and storage
+        presentation:
+          title_public: Number of patents in carbon capture and storage
+      cross_cutting_energy_tech:
+        title: Number of patents in cross-cutting energy technology
+        display:
+          name: Cross-cutting energy technology
+        presentation:
+          title_public: Number of patents in cross-cutting energy technology
+      ev_charging_stations:
+        title: Number of patents in electric vehicle charging stations
+        display:
+          name: EV charging stations
+        presentation:
+          title_public: Number of patents in electric vehicle charging stations
+      ev_management:
+        title: Number of patents in electric vehicle management
+        display:
+          name: EV management
+        presentation:
+          title_public: Number of patents in electric vehicle management
+      ev_storage:
+        title: Number of patents in electric vehicle storage
+        display:
+          name: EV storage
+        presentation:
+          title_public: Number of patents in electric vehicle storage
+      ev_communication_tech:
+        title: Number of patents in electric vehicle communication technology
+        display:
+          name: EV communication tech
+        presentation:
+          title_public: Number of patents in electric vehicle communication technology
+      ev_machine_tech:
+        title: Number of patents in electric vehicle machine technology
+        display:
+          name: EV machine tech
+        presentation:
+          title_public: Number of patents in electric vehicle machine technology
+      efficiency:
+        title: Number of patents in efficiency
+        display:
+          name: Efficiency
+        presentation:
+          title_public: Number of patents in efficiency
+      storage__general:
+        title: Number of patents in storage (general)
+        display:
+          name: Storage (general)
+        presentation:
+          title_public: Number of patents in storage (general)
+      fuel_cells:
+        title: Number of patents in fuel cells
+        display:
+          name: Fuel cells
+        presentation:
+          title_public: Number of patents in fuel cells
+      geothermal:
+        title: Number of patents in geothermal energy
+        display:
+          name: Geothermal
+        presentation:
+          title_public: Number of patents in geothermal energy
+      green_hydrogen:
+        title: Number of patents in green hydrogen energy
+        display:
+          name: Green hydrogen
+        presentation:
+          title_public: Number of patents in green hydrogen energy
+      hydrogen:
+        title: Number of patents in hydrogen energy
+        display:
+          name: Hydrogen
+        presentation:
+          title_public: Number of patents in hydrogen energy
+      hydropower:
+        title: Number of patents in hydropower
+        display:
+          name: Hydropower
+        presentation:
+          title_public: Number of patents in hydropower
+      storage__excl__batteries:
+        title: Number of patents in storage (excluding batteries)
+        display:
+          name: Storage (excl. batteries)
+        presentation:
+          title_public: Number of patents in storage (excluding batteries)
+      marine_and_tidal:
+        title: Number of patents in marine and tidal energy
+        display:
+          name: Marine and tidal
+        presentation:
+          title_public: Number of patents in marine and tidal energy
+      other:
+        title: Number of patents in other technologies
+        display:
+          name: Other
+        presentation:
+          title_public: Number of patents in other technologies
+      solar_pv:
+        title: Number of patents in solar photovoltaic technology
+        display:
+          name: Solar PV
+        presentation:
+          title_public: Number of patents in solar photovoltaic technology
+      solar_pv_thermal_hybrid:
+        title: Number of patents in solar photovoltaic and thermal hybrid technology
+        display:
+          name: Solar PV and thermal hybrid
+        presentation:
+          title_public: Number of patents in solar photovoltaic and thermal hybrid technology
+      smart_grids:
+        title: Number of patents in smart grids
+        display:
+          name: Smart grids
+        presentation:
+          title_public: Number of patents in smart grids
+      solar_thermal:
+        title: Number of patents in solar thermal technology
+        display:
+          name: Solar thermal
+        presentation:
+          title_public: Number of patents in solar thermal technology
+      thermal_energy_storage:
+        title: Number of patents in thermal energy storage
+        display:
+          name: Thermal energy storage
+        presentation:
+          title_public: Number of patents in thermal energy storage
+      ultracapacitors:
+        title: Number of patents in ultracapacitors
+        display:
+          name: Ultracapacitors
+        presentation:
+          title_public: Number of patents in ultracapacitors
+      wind:
+        title: Number of patents in wind energy
+        display:
+          name: Wind
+        presentation:
+          title_public: Number of patents in wind energy
+      total_patents:
+        title: Total number of patents in renewable energy technologies
+        display:
+          name: Total patents
+        presentation:
+          title_public: Total number of patents in renewable energy technologies
