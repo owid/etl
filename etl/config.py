@@ -15,6 +15,7 @@ from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
 from typing import List, Literal, Optional, cast
+from urllib.parse import quote
 
 import git
 import pandas as pd
@@ -543,6 +544,10 @@ class OWIDEnv:
     def data_page_preview(self, variable_id: str | int) -> str:
         """Get indicator admin url."""
         return f"{self.admin_site}/datapage-preview/{variable_id}/"
+
+    def collection_preview(self, catalog_path: str):
+        encoded_path = quote(catalog_path, safe="")
+        return f"{self.admin_site}/grapher/{encoded_path}/"
 
     def thumb_url(self, slug: str):
         """
