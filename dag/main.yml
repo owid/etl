@@ -732,20 +732,15 @@ steps:
   data://meadow/media_cloud/2025-05-19/media_deaths:
     - snapshot://media_cloud/2025-05-19/media_deaths.csv
   data://garden/media_cloud/2025-05-19/media_deaths:
-  #  - data://meadow/media_cloud/2025-05-19/media_deaths
-     - data-private://garden/ihme_gbd/2024-05-20/gbd_cause
-     - data-private://meadow/ihme_gbd/2024-06-10/cause_hierarchy
-     - data-private://garden/ihme_gbd/2024-06-10/leading_causes_deaths
+     - data://meadow/media_cloud/2025-05-19/media_deaths
+     - data://meadow/cdc/2025-05-19/external_causes
+     - data://meadow/cdc/2025-05-19/leading_causes
   #data://grapher/media_cloud/2025-05-19/media_deaths:
   #  - data://garden/media_cloud/2025-05-19/media_deaths
 
+# CDC Wonder - Causes of Death
   data://meadow/cdc/2025-05-19/leading_causes:
     - snapshot://cdc/2025-05-19/leading_causes.csv
-
-  
-  #
-  # TODO: add step name (just something recognizable)
-  #
   data://meadow/cdc/2025-05-19/external_causes:
     - snapshot://cdc/2025-05-19/external_causes.csv
 

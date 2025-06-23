@@ -11,7 +11,7 @@ def run() -> None:
     # Load inputs.
     #
     # Retrieve snapshot.
-    snap = paths.load_snapshot("family_database.csv")
+    snap = paths.load_snapshot("media_deaths.csv")
 
     # Load data from snapshot.
     tb = snap.read()
@@ -20,7 +20,7 @@ def run() -> None:
     # Process data.
     #
     # Improve tables format.
-    tables = [tb.format(["country", "year"])]
+    tables = [tb.format(["cause", "source", "year"])]
 
     #
     # Save outputs.
