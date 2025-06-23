@@ -150,7 +150,6 @@ steps:
     - data://meadow/igh/2024-07-05/better_data_homelessness
   data://grapher/igh/2024-07-05/better_data_homelessness:
     - data://garden/igh/2024-07-05/better_data_homelessness
-
   #
   # Harmonized national poverty lines (for 2021 PPPs poverty lines)
   #
