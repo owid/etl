@@ -1,4 +1,19 @@
 {
+  "mcp": {
+    "servers": {
+      "catalog": {
+          "type": "stdio",
+          "command": ".venv/bin/fastmcp",
+          "args": [
+              "run",
+              "mcp/server.py"
+          ],
+          "dev": {
+            "watch": "mcp/**/*.py",
+          }
+      }
+    }
+  },
   "esbonio.sphinx.confDir": "",
   "files.associations": {
     "*.dvc": "yaml"
@@ -53,6 +68,8 @@
     "snapshots/backport": true,
   },
   "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "chat.mcp.enabled": true,
+  "chat.mcp.discovery.enabled": true,
 
   // Settings for the "Run Until Cursor" extension
   "runUntilCursor.execDelay": 100,    // Delay before executing code (default: 100ms)
