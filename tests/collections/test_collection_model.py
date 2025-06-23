@@ -729,8 +729,14 @@ def test_grouped_view_validation_with_incomplete_metadata():
             )
         ],
         views=[
-            View(dimensions={"category": "a"}, indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator1"}]})),
-            View(dimensions={"category": "b"}, indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator2"}]})),
+            View(
+                dimensions={"category": "a"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator1"}]}),
+            ),
+            View(
+                dimensions={"category": "b"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator2"}]}),
+            ),
         ],
         catalog_path="test#collection2",
         title={"title": "Test Collection 2"},
