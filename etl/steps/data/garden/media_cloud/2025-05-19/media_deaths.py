@@ -127,7 +127,7 @@ def global_causes_mentions(year):
         mentions_ls.append(mentions.copy(deep=True))
 
     all_mentions = pd.concat(
-        mentions,
+        mentions_ls,
         ignore_index=True,
     )
 
@@ -474,7 +474,7 @@ def print_example_stories(queries: dict, timeout: int = 35, source_ids=[NYT_ID],
         time.sleep(timeout)  # Sleep to avoid hitting API rate limits
 
 
-def add_shares(media_deaths_df: pd.DataFrame, columns=None):
+def add_shares(media_deaths_df, columns=None):
     """Add shares of columns to DataFrame."""
     if columns is None:
         columns = ["mentions", "deaths"]
@@ -532,10 +532,12 @@ def excluding_war():
     if not stories_war_df.empty:
         titles = stories_war_df["title"].tolist()
         stories_excluded = stories_no_war_df[stories_no_war_df["title"].isin(titles)]
+        return stories_excluded
 
     all_mentions = pd.concat(mentions_ls, ignore_index=True)
 
     pv = pivot_media_mentions(all_mentions)
+
     for s_name in sources:
         plot_media_deaths(
             pv,
@@ -546,7 +548,6 @@ def excluding_war():
             bar_labels=[s_name, f"{s_name} (no war)"],
             title=f"Media Mentions of Causes of Death - {YEAR} (US)",
         )
-    return stories_excluded
 
 
 def plot_media_deaths(media_deaths_df, columns=None, bar_labels=None, title=None):
@@ -668,7 +669,7 @@ def get_mentions_from_source(
     return df_results
 
 
-def filter_mentions_on_source(media_mentions_df: pd.DataFrame, source_name: str) -> pd.DataFrame:
+def filter_mentions_on_source(media_mentions_df, source_name: str) -> pd.DataFrame:
     """Filter media mentions DataFrame on a specific source."""
     if "source" not in media_mentions_df.columns:
         raise ValueError("The DataFrame must contain a 'source' column.")
@@ -679,7 +680,7 @@ def filter_mentions_on_source(media_mentions_df: pd.DataFrame, source_name: str)
     return filtered_df.reset_index(drop=True)
 
 
-def pivot_media_mentions(media_deaths_df: pd.DataFrame):
+def pivot_media_mentions(media_deaths_df):
     """Pivot media mentions to have mentions per outlet as columns."""
     media_pv = media_deaths_df.pivot(
         index=["cause", "deaths_share"], columns=["source"], values=["mentions_share"]
@@ -696,6 +697,9 @@ def run() -> None:
 
     all_queries = STR_QUERIES  # queries to use
 
+    source_ids = [NYT_ID, GUARDIAN_ID, WAPO_ID, FOX_ID]
+    sources = ["The New York Times", "The Guardian", "The Washington Post", "Fox News"]
+
     if use_saved_data:
         # Load saved data
         all_mentions = pd.read_csv(MEDIA_MENTIONS_PATH)
@@ -706,9 +710,6 @@ def run() -> None:
         all_queries = STR_QUERIES
 
         cdc_excludes = ["war", "hiv", "malaria", "tb", "diarrhea"]  # causes to exclude from the analysis
-
-        source_ids = [NYT_ID, GUARDIAN_ID, WAPO_ID, FOX_ID]
-        sources = ["The New York Times", "The Guardian", "The Washington Post", "Fox News"]
 
         mentions_ls = []
 
