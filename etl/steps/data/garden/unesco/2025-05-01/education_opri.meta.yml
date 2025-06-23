@@ -563,7 +563,7 @@ tables:
 
       official_entrance_age_to_pre_primary_education__years:
         title: Official entrance age to pre-primary education
-        description_short: TThe official entry age at which children are expected to start [pre-primary education](#dod:pre-primary-education) according to national legislation or policies.
+        description_short: The official entry age at which children are expected to start [pre-primary education](#dod:pre-primary-education) according to national legislation or policies.
         unit: "years"
         description_key:
           - Children begin their education journeys at different ages around the world — this indicator shows the age at which they are officially expected to start pre-primary education in a given country.
