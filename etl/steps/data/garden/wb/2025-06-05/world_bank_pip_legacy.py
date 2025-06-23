@@ -44,7 +44,7 @@ PPP_YEAR_CURRENT = PPP_VERSIONS[1]
 INTERNATIONAL_POVERTY_LINES = {ppp_year: poverty_lines[1] for ppp_year, poverty_lines in POVLINES_DICT.items()}
 
 # Define current International Poverty Line (IPL) in the latest prices
-INTERNATIONAL_POVERTY_LINE_CURRENT = INTERNATIONAL_POVERTY_LINES[PPP_VERSIONS[1]]
+INTERNATIONAL_POVERTY_LINE_CURRENT = INTERNATIONAL_POVERTY_LINES[PPP_YEAR_CURRENT]
 
 # Define regions in the dataset
 REGIONS_LIST = [
