@@ -218,6 +218,16 @@ class View(MDIMBase):
     # config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
     config: ViewConfig | Dict[str, Any] | None = None
     metadata: ViewMetadata | Dict[str, Any] | None = None
+    _is_grouped: bool = False  # Private flag to mark views created by grouping
+
+    @property
+    def is_grouped(self) -> bool:
+        """Check if this view was created by grouping other views."""
+        return self._is_grouped
+
+    def mark_as_grouped(self) -> None:
+        """Mark this view as created by grouping other views."""
+        object.__setattr__(self, '_is_grouped', True)
 
     @property
     def d(self) -> ReadOnlyNamespace:

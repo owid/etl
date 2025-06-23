@@ -208,6 +208,9 @@ class Collection(MDIMBase):
         indicators = self.indicators_in_use(tolerate_extra_indicators)
         validate_indicators_in_db(indicators, owid_env.engine)
 
+        # Run sanity checks on grouped views
+        self.validate_grouped_views()
+
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
 
@@ -490,6 +493,11 @@ class Collection(MDIMBase):
 
             # Add slug to set
             slugs.add(dim.slug)
+
+    def validate_grouped_views(self):
+        for view in self.views:
+            if view.is_grouped:
+                sanity_check_grouped_view(view)
 
     def prune_dimensions(self):
         """Remove dimension if only one of its choice is in use."""
@@ -895,6 +903,9 @@ class Collection(MDIMBase):
                 dimensions=new_dimensions,
                 indicators=_combine_view_indicators(view_group),
             )
+            # Mark as grouped view
+            new_view.mark_as_grouped()
+
             # Create config for new view
             new_view = _set_config_metadata_with_params(new_view, view_config, view_metadata, params)
 
@@ -1062,3 +1073,56 @@ def run_callbacks(data, view):
         return data(view)
     # Otherwise, return the data as is
     return data
+
+
+def sanity_check_grouped_view(view: View) -> None:
+    """
+    Perform sanity checks on grouped views.
+
+    Validates that grouped views have proper metadata configuration,
+    specifically checking for required description fields.
+
+    Args:
+        view: The grouped view to validate
+
+    Warns:
+        UserWarning: If required metadata fields are missing
+    """
+    import warnings
+
+    # Check if metadata is defined
+    if view.metadata is None:
+        warnings.warn(
+            f"Grouped view with dimensions {view.dimensions} is missing 'metadata' attribute. "
+            "Consider adding metadata with 'description_key' and 'description_short' fields.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return
+
+    # Convert to dict if it's a ViewMetadata object for easier checking
+    metadata_dict = (
+        view.metadata
+        if isinstance(view.metadata, dict)
+        else view.metadata.to_dict()
+        if hasattr(view.metadata, "to_dict")
+        else {}
+    )
+
+    # Check for description_key
+    if "description_key" not in metadata_dict or metadata_dict["description_key"] is None:
+        warnings.warn(
+            f"Grouped view with dimensions {view.dimensions} is missing 'description_key' in metadata. "
+            "This field provides key information about the grouped view.",
+            UserWarning,
+            stacklevel=2,
+        )
+
+    # Check for description_short
+    if "description_short" not in metadata_dict or metadata_dict["description_short"] is None:
+        warnings.warn(
+            f"Grouped view with dimensions {view.dimensions} is missing 'description_short' in metadata. "
+            "This field provides a short description of the grouped view.",
+            UserWarning,
+            stacklevel=2,
+        )
