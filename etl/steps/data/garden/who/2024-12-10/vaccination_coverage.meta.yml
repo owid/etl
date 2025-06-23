@@ -236,6 +236,7 @@ tables:
                 baseColorScheme: "YlGnBu"
                 binningStrategy: "manual"
                 customNumericValues:
+                  - 0
                   - 50
                   - 75
                   - 90
@@ -269,6 +270,7 @@ tables:
                 baseColorScheme: "YlGnBu"
                 binningStrategy: "manual"
                 customNumericValues:
+                  - 0
                   - 100000
                   - 300000
                   - 1000000
@@ -300,6 +302,7 @@ tables:
                 baseColorScheme: "OrRd"
                 binningStrategy: "manual"
                 customNumericValues:
+                  - 0
                   - 10000
                   - 30000
                   - 100000
