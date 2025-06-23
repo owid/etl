@@ -59,48 +59,27 @@ INSTANT_METADATA_DIFF = {}
 
 def compile_steps(
     dag: DAG,
-    includes: Optional[List[str]] = None,
-    excludes: Optional[List[str]] = None,
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
+    subdag: DAG,
 ) -> List["Step"]:
     """
     Return the list of steps which, if executed in order, mean that every
     step has its dependencies ready for it.
     """
-    includes = includes or []
-    excludes = excludes or []
-
     # make sure each step runs after its dependencies
-    steps = to_dependency_order(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
+    steps = to_dependency_order(subdag)
 
     # parse the steps into Python objects
+    # TODO: we need full DAG here to get dependencies of each step
     return [parse_step(name, dag) for name in steps]
 
 
-def to_dependency_order(
-    dag: DAG,
-    includes: List[str],
-    excludes: List[str],
-    downstream: bool = False,
-    only: bool = False,
-    exact_match: bool = False,
-) -> List[str]:
+def to_dependency_order(dag: DAG) -> List[str]:
     """
     Organize the steps in dependency order with a topological sort. In other words,
     the resulting list of steps is a valid ordering of steps such that no step is run
     before the steps it depends on. Note: this ordering is not necessarily unique.
     """
-    # Always filter if we have includes OR excludes
-    if includes or excludes:
-        subgraph = filter_to_subgraph(
-            dag, includes, downstream=downstream, only=only, exact_match=exact_match, excludes=excludes
-        )
-    else:
-        subgraph = dag
-
-    in_order = list(graphlib.TopologicalSorter(subgraph).static_order())
+    in_order = list(graphlib.TopologicalSorter(dag).static_order())
 
     return in_order
 

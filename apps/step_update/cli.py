@@ -17,7 +17,7 @@ from etl.dag_helpers import (
 )
 from etl.paths import BASE_DIR, DAG_ARCHIVE_FILE, DAG_DIR, DAG_TEMP_FILE, SNAPSHOTS_DIR, STEP_DIR
 from etl.snapshot import SnapshotMeta
-from etl.steps import to_dependency_order
+from etl.steps import filter_to_subgraph, to_dependency_order
 from etl.version_tracker import DAG_TEMP_STEP, UpdateState, VersionTracker
 
 log = structlog.get_logger()
@@ -337,15 +337,16 @@ class StepUpdater:
             # Otherwise, if we updated meadow_c before meadow_a and meadow_b, the new meadow_c would depend on the old
             # meadow_a and meadow_b, and the new meadow_a and meadow_b would not be used.
             # This is the same topological sorting problem we have when deciding the order of steps to execute by etl.
-            # Therefore, we can use the same function to_dependency_order to solve it.
-            steps = to_dependency_order(
-                dag=self.tracker.dag_active,
-                includes=steps,  # type: ignore
+            # Therefore, we can use the same functions filter_to_subgraph and to_dependency_order to solve it.
+            filtered_dag = filter_to_subgraph(
+                graph=self.tracker.dag_active,
+                includes=steps,
                 excludes=[],
                 downstream=False,
                 only=True,
                 exact_match=True,
             )
+            steps = to_dependency_order(filtered_dag)
 
             message = "The following steps will be updated:"
             for step in steps:
@@ -434,13 +435,14 @@ class StepUpdater:
         # You attempt to archive [meadow_1, snapshot_1] (where snapshot_1 is a dependency of meadow_1).
         # In this case, if you archive meadow_1 first, the snapshot_1 is also removed from the active dag, and
         # when attempting to archive snapshot_1 afterwards, an error is raised. To avoid this, first archive snapshot_1.
-        steps = to_dependency_order(
-            dag=self.tracker.dag_active,
-            includes=steps,  # type: ignore
+        filtered_dag = filter_to_subgraph(
+            graph=self.tracker.dag_active,
+            includes=steps,
             excludes=[],
             downstream=False,
             only=True,
         )
+        steps = to_dependency_order(filtered_dag)
 
         if self.interactive:
             message = "The following steps will be archived:"

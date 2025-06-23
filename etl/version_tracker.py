@@ -326,6 +326,8 @@ class VersionTracker:
         warn_on_unused: bool = True,
         ignore_archive: bool = False,
         exclude_steps: Optional[list[str]] = None,
+        # includes
+        # excludes
     ):
         # Load dag of active steps (a dictionary step: set of dependencies).
         self.dag_active = load_dag(paths.DAG_FILE)
@@ -518,7 +520,7 @@ class VersionTracker:
 
         if omit_base_dir and path_to_script_detected is not None:
             # Return the path relative to the base directory (omitting the local path to the ETL repos).
-            path_to_script_detected = path_to_script_detected.relative_to(paths.BASE_DIR)
+            path_to_script_detected = Path(str(path_to_script_detected).replace(str(paths.BASE_DIR), ""))
 
         return path_to_script_detected
 

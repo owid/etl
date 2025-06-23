@@ -32,6 +32,7 @@ from etl.steps import (
     GrapherStep,
     Step,
     compile_steps,
+    filter_to_subgraph,
     parse_step,
     select_dirty_steps,
 )
@@ -257,7 +258,7 @@ def main_cli(
         downstream=downstream,
         only=only,
         exact_match=exact_match,
-        exclude=exclude,
+        excludes=exclude.split(",") if exclude else None,
         dag_path=dag_path,
         workers=workers,
         strict=strict,
@@ -280,6 +281,14 @@ def main_cli(
             main(**kwargs)  # type: ignore
 
 
+def _find_closest_matches(includes_str: str, dag: DAG) -> None:
+    """Find and print closest matches for misspelled step names."""
+    print(f"No steps matched `{includes_str}`. Closest matches:")
+    # NOTE: We could use a better edit distance to find the closest matches.
+    for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
+        print(match)
+
+
 def main(
     steps: List[str],
     dry_run: bool = False,
@@ -290,7 +299,7 @@ def main(
     downstream: bool = False,
     only: bool = False,
     exact_match: bool = False,
-    exclude: Optional[str] = None,
+    excludes: Optional[List[str]] = None,
     dag_path: Path = paths.DEFAULT_DAG_FILE,
     workers: int = 1,
     strict: Optional[bool] = None,
@@ -301,21 +310,33 @@ def main(
     if grapher:
         sanity_check_db_settings()
 
-    dag = construct_dag(dag_path, private=private, grapher=grapher, export=export)
+    # Load DAG
+    dag = load_dag(dag_path)
 
-    excludes = exclude.split(",") if exclude else []
+    # Create full DAG
+    full_dag = construct_full_dag(dag)
 
-    # Run the steps we have selected, and everything downstream of them
-    run_dag(
-        dag,
-        steps,
-        dry_run=dry_run,
-        force=force,
+    # Filter to the subdag based on includes & excludes
+    subdag = construct_subdag(
+        full_dag,
+        includes=steps,
+        excludes=excludes,
+        grapher=grapher,
+        export=export,
         private=private,
         downstream=downstream,
         only=only,
         exact_match=exact_match,
-        excludes=excludes,
+    )
+
+    # Run the steps we have selected, and everything downstream of them
+    run_subdag(
+        full_dag,
+        subdag,
+        dry_run=dry_run,
+        force=force,
+        private=private,
+        only=only,
         workers=workers,
         strict=strict,
     )
@@ -331,51 +352,21 @@ def sanity_check_db_settings() -> None:
         sys.exit(1)
 
 
-def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) -> DAG:
+def construct_full_dag(dag: DAG) -> DAG:
     """Construct full DAG."""
-
-    # Load our graph of steps and the things they depend on
-    dag = load_dag(dag_path)
 
     # Make sure we don't have both public and private steps in the same DAG
     _check_public_private_steps(dag)
 
-    if export:
-        # If there were any "export://multidim" or "export://explorers" steps, keep them in the dag, to be executed.
-        for step in list(dag.keys()):
-            if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
-                # If private is false and any of the dependencies are private, continue
-                if not private and any(_is_private_step(dep) for dep in dag[step]):
-                    continue
+    # For export:// steps, add the grapher:// steps that are needed to upsert data to DB.
+    for step in list(dag.keys()):
+        if step.startswith("export://multidim/") or step.startswith("export://explorers/"):
+            for dep in list(dag[step]):
+                if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep):
+                    dag[step].add(re.sub(r"^(data|data-private)://", "grapher://", dep))
 
-                # We want to execute export steps after any grapher://grapher steps,
-                # to ensure that any indicators required by the collection step are already pushed to DB.
-                # To achieve that, replace "data://grapher" dependencies with "grapher://grapher".
-                dag[step] = {
-                    re.sub(r"^(data|data-private)://", "grapher://", dep)
-                    if re.match(r"^data://grapher/", dep) or re.match(r"^data-private://grapher/", dep)
-                    else dep
-                    for dep in dag[step]
-                }
-
-        # Finally, ensure that the added grapher://grapher steps will be executed,
-        # by activating the "grapher" flag.
-        grapher = True
-    else:
-        # If there were any "export://" steps in the dag, remove them.
-        dag = {step: deps for step, deps in dag.items() if not step.startswith("export://")}
-
-    # If --grapher is set, add all steps for upserting to DB
-    if grapher:
-        steps = _grapher_steps(dag, private)
-        dag.update(steps)
-    # Otherwise just add those in dependencies, even if they're private
-    else:
-        steps = _grapher_steps(dag, True)
-        for deps in list(dag.values()):
-            for dep in deps:
-                if dep.startswith("grapher://"):
-                    dag[dep] = steps[dep]
+    # Add all grapher steps
+    dag.update(_grapher_steps(dag, private=True))
 
     # Validate the DAG
     _check_dag_completeness(dag)
@@ -383,16 +374,69 @@ def construct_dag(dag_path: Path, private: bool, grapher: bool, export: bool) ->
     return dag
 
 
-def run_dag(
+def construct_subdag(
     dag: DAG,
     includes: Optional[List[str]] = None,
-    dry_run: bool = False,
-    force: bool = False,
+    excludes: Optional[List[str]] = None,
+    grapher: bool = False,
+    export: bool = False,
     private: bool = False,
     downstream: bool = False,
     only: bool = False,
     exact_match: bool = False,
-    excludes: Optional[List[str]] = None,
+) -> DAG:
+    orig_includes = includes
+
+    # Include everything when no arguments provided
+    if not includes:
+        includes = [".*"]
+    if not excludes:
+        excludes = []
+
+    # Export steps
+    if export:
+        includes = ["export://.*" + include for include in includes]
+    else:
+        excludes.append("export://.*")
+
+    # Include grapher steps
+    if grapher:
+        includes = ["grapher://.*" + include for include in includes]
+    else:
+        if not export:
+            excludes.append("grapher://.*")
+
+    # Exclude private steps
+    if not private:
+        excludes.append("private://.*")
+
+    # Exclude grapher regions, they're fetched by owid-grapher as CSV from catalog
+    # but are not supposed to be in DB
+    excludes.append("grapher://grapher/regions/latest/regions")
+
+    __import__("ipdb").set_trace()
+
+    # Filter the dag
+    subdag = filter_to_subgraph(
+        dag, includes=includes, excludes=excludes, downstream=downstream, only=only, exact_match=exact_match
+    )
+
+    if not subdag:
+        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
+        # Print a short error message, show a list of the closest matches, and exit.
+        _find_closest_matches(" ".join(orig_includes or []), dag)
+        sys.exit(1)
+
+    return subdag
+
+
+def run_subdag(
+    dag: DAG,
+    subdag: DAG,
+    dry_run: bool = False,
+    force: bool = False,
+    private: bool = False,
+    only: bool = False,
     workers: int = 1,
     strict: Optional[bool] = None,
 ) -> None:
@@ -403,29 +447,11 @@ def run_dag(
     By default, data steps do not re-run if they appear to be up-to-date already by
     looking at their checksum.
     """
-    excludes = excludes or []
+    steps = compile_steps(dag, subdag)
 
-    if not private:
-        excludes.append("-private://")
-
-    # Exclude grapher regions, they're fetched by owid-grapher as CSV from catalog
-    # but are not supposed to be in DB
-    excludes.append("grapher://grapher/regions/latest/regions")
-
-    steps = compile_steps(dag, includes, excludes, downstream=downstream, only=only, exact_match=exact_match)
-
+    # AI: can we move this outside the function?
     if not private:
         _validate_private_steps(steps)
-
-    if not steps:
-        # If no steps are found, the most likely case is that the step passed as argument was misspelled.
-        # Print a short error message, show a list of the closest matches, and exit.
-        includes_str = " ".join(includes or [])
-        print(f"No steps matched `{includes_str}`. Closest matches:")
-        # NOTE: We could use a better edit distance to find the closest matches.
-        for match in difflib.get_close_matches(includes_str, list(dag), n=5, cutoff=0.0):
-            print(match)
-        sys.exit(1)
 
     # do not run dependencies if `only` is set by setting them to non-dirty
     if only:
@@ -459,7 +485,8 @@ def run_dag(
         print(
             f"--- Running {len(steps)} steps with {workers} processes ({config.GRAPHER_INSERT_WORKERS} threads each):"
         )
-        return exec_steps_parallel(steps, workers, dag=dag, strict=strict)
+        # AI: do we have to pass subdag?
+        return exec_steps_parallel(steps, workers, dag=subdag, strict=strict)
 
 
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:

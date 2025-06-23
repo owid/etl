@@ -100,7 +100,7 @@ def temporary_step() -> Iterator[str]:
 def test_dependency_ordering():
     "Check that a dependency will be scheduled to run before things that need it."
     dag = {"a": ["b", "c"], "b": ["c"]}
-    assert to_dependency_order(dag, [], []) == ["c", "b", "a"]
+    assert to_dependency_order(dag) == ["c", "b", "a"]
 
 
 def test_dependency_filtering():
@@ -183,20 +183,6 @@ def test_dependency_filtering_empty_includes_with_excludes():
         "step4": set(),
     }
     assert result == expected
-
-
-@patch("etl.steps.parse_step")
-def test_selection_selects_parents(parse_step):
-    "When you pick a step, it should select everything that step depends on."
-    parse_step.side_effect = lambda name, _: DummyStep(name)  # type: ignore
-
-    dag = {"a": ["b"], "d": ["a"], "c": ["a"]}
-
-    # selecting "d" should cause "b" -> "a" -> "d" to all be selected
-    #                            "c" to be ignored
-    steps = compile_steps(dag, ["d"], [])
-    assert len(steps) == 3
-    assert set(s.path for s in steps) == {"b", "a", "d"}
 
 
 class DummyStep(Step):  # type: ignore

@@ -25,7 +25,7 @@ def dag():
 
 
 def test_validate_private_steps(dag):
-    cmd._validate_private_steps(compile_steps(dag))
+    cmd._validate_private_steps(compile_steps(dag, dag))
 
     # public step with private dependency should raise an error
     new_dag = dict(
@@ -35,7 +35,7 @@ def test_validate_private_steps(dag):
         },
     )
     with pytest.raises(ValueError):
-        cmd._validate_private_steps(compile_steps(new_dag))
+        cmd._validate_private_steps(compile_steps(new_dag, new_dag))
 
 
 def test_exec_graph_parallel():
@@ -61,3 +61,28 @@ def test_exec_graph_parallel():
 
     # Assert that all tasks have been completed
     assert all(task in done for task in exec_graph.keys())
+
+
+def test_construct_full_dag():
+    """Test construct_full_dag function covers grapher step generation and export step handling."""
+    # Test DAG with data://grapher step and export step
+    dag = {
+        "data://meadow/happiness/2023-01-01/happiness": {"snapshot://meadow/happiness/2023-01-01/happiness"},
+        "data://garden/happiness/2023-01-01/happiness": {"data://meadow/happiness/2023-01-01/happiness"},
+        "data://grapher/happiness/2023-01-01/happiness": {"data://garden/happiness/2023-01-01/happiness"},
+        "export://explorers/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+    }
+
+    full_dag = cmd.construct_full_dag(dag)
+
+    # Check that grapher step was generated
+    expected_grapher_step = "grapher://grapher/happiness/2023-01-01/happiness"
+    assert expected_grapher_step in full_dag
+    assert full_dag[expected_grapher_step] == {"data://grapher/happiness/2023-01-01/happiness"}
+
+    # Check that export step dependencies were updated to include grapher step
+    assert expected_grapher_step in full_dag["export://explorers/happiness"]
+
+    # Check that original dependencies are preserved
+    assert "data://garden/happiness/2023-01-01/happiness" in full_dag
+    assert "data://meadow/happiness/2023-01-01/happiness" in full_dag["data://garden/happiness/2023-01-01/happiness"]
