@@ -7,7 +7,7 @@ from collections import defaultdict
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Union, cast
+from typing import Any, Callable, Dict, List, Set, cast
 
 import fastjsonschema
 import pandas as pd
@@ -47,7 +47,7 @@ log = get_logger()
 @pruned_json
 @dataclass
 class Definitions(MDIMBase):
-    common_views: Optional[List[CommonView]] = None
+    common_views: List[CommonView] | None = None
 
     def __post_init__(self):
         # Validate that there is no duplicate common view (based on dimensions)
@@ -81,11 +81,11 @@ class Collection(MDIMBase):
 
     _definitions: Definitions
 
-    topic_tags: Optional[List[str]] = None
-    _default_dimensions: Optional[Dict[str, str]] = None
+    topic_tags: List[str] | None = None
+    _default_dimensions: Dict[str, str] | None = None
 
     # Internal use. For save() method.
-    _collection_type: Optional[str] = field(init=False, default="multidim")
+    _collection_type: str | None = field(init=False, default="multidim")
 
     _group_operations_done: int = field(init=False, default=0)
 
@@ -119,7 +119,7 @@ class Collection(MDIMBase):
         return self._definitions
 
     @property
-    def default_dimensions(self) -> Optional[Dict[str, str]]:
+    def default_dimensions(self) -> Dict[str, str] | None:
         return self._default_dimensions
 
     @default_dimensions.setter
@@ -179,7 +179,7 @@ class Collection(MDIMBase):
 
     def save(  # type: ignore[override]
         self,
-        owid_env: Optional[OWIDEnv] = None,
+        owid_env: OWIDEnv | None = None,
         tolerate_extra_indicators: bool = False,
         prune_choices: bool = True,
         prune_dimensions: bool = True,
@@ -367,7 +367,7 @@ class Collection(MDIMBase):
                     view.dimensions[dim_slug] in choice_slugs
                 ), f"Choice {view.dimensions[dim_slug]} not found for dimension {dim_slug}! View: {view.to_dict()}; Available choices: {choice_slugs}"
 
-    def validate_schema(self, schema_path: Optional[Union[str, Path]] = None):
+    def validate_schema(self, schema_path: str | Path | None = None):
         """Validate class against schema."""
         if schema_path is None:
             schema_path = self.schema_path
@@ -418,7 +418,7 @@ class Collection(MDIMBase):
         """Check for duplicate views in the collection."""
         check_duplicate_views(self.views)
 
-    def sort_choices(self, slug_order: Dict[str, Union[List[str], Callable]]):
+    def sort_choices(self, slug_order: Dict[str, List[str] | Callable]):
         """Sort choices based on the given order."""
         not_expected = set(slug_order).difference(self.dimension_slugs)
         if not_expected:
@@ -537,7 +537,7 @@ class Collection(MDIMBase):
 
     def drop_views(
         self,
-        dimensions: Union[Dict[str, Union[List[str], str]], List[Dict[str, Union[List[str], str]]]],
+        dimensions: Dict[str, List[str] | str] | List[Dict[str, List[str] | str]],
     ):
         """Remove views that have any set of dimensions that can be generated from the given in `dimensions`.
 
@@ -587,7 +587,7 @@ class Collection(MDIMBase):
         self,
         groups: List[GroupViewsConfig],  # Also accepts List[Dict[str, Any]] for backward compatibility
         drop_dimensions_if_single_choice: bool = True,
-        params: Optional[Dict[str, Any]] = None,
+        params: Dict[str, Any] | None = None,
     ):
         """Group views into new ones.
 
@@ -768,7 +768,7 @@ class Collection(MDIMBase):
     def set_global_config(
         self,
         config: ViewConfigParam,
-        params: Optional[Dict[str, Any]] = None,
+        params: Dict[str, Any] | None = None,
     ):
         self.edit_views(
             [
@@ -783,7 +783,7 @@ class Collection(MDIMBase):
     def set_global_metadata(
         self,
         metadata: ViewMetadataParam,
-        params: Optional[Dict[str, Any]] = None,
+        params: Dict[str, Any] | None = None,
     ):
         self.edit_views(
             [
@@ -798,7 +798,7 @@ class Collection(MDIMBase):
     def edit_views(
         self,
         edits: List[Dict[str, Any]],
-        params: Optional[Dict[str, Any]] = None,
+        params: Dict[str, Any] | None = None,
     ):
         """Edit the display of a view. Text can come from `config` (Grapher config) or `metadata` (Grapher metadata, i.e. text in the data page).
 
@@ -865,7 +865,7 @@ class Collection(MDIMBase):
         choice_new_slug: str,
         view_config: ViewConfigParam | None = None,
         view_metadata: ViewMetadataParam | None = None,
-        params: Optional[Dict[str, Any]] = None,
+        params: Dict[str, Any] | None = None,
     ) -> List[View]:
         """Create new grouped views."""
         if params is None:
@@ -916,9 +916,9 @@ def _expand_params(params: Dict[str, Any], view: View) -> Dict[str, Any]:
 
 def _set_config_metadata_with_params(
     view,
-    view_config: Optional[Union[ViewConfigParam, GrapherConfig]] = None,
-    view_metadata: Optional[Union[ViewMetadataParam, Any]] = None,
-    params: Optional[Dict[str, Any]] = None,
+    view_config: ViewConfigParam | GrapherConfig | None = None,
+    view_metadata: ViewMetadataParam | Any | None = None,
+    params: Dict[str, Any] | None = None,
 ) -> View:
     # Set params to dict if None
     if params is None:
@@ -1020,7 +1020,7 @@ def snake_to_camel(s: str) -> str:
 
 
 # model.core
-def camelize(obj: Any, exclude_keys: Optional[Set[str]] = None) -> Any:
+def camelize(obj: Any, exclude_keys: Set[str] | None = None) -> Any:
     """
     Recursively converts dictionary keys from snake_case to camelCase, unless the key is in exclude_keys.
 

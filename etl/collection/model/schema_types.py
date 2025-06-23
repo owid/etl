@@ -242,7 +242,7 @@ class PresentationConfig(TypedDict, total=False):
 
 class _ViewConfigBase(TypedDict, total=False):
     """Base ViewConfig without the $schema field."""
-    
+
     addCountryMode: Literal["add-country", "change-country", "disabled"]
     baseColorScheme: dict[str, Any]
     chartTypes: list[
@@ -312,6 +312,7 @@ class _ViewConfigBase(TypedDict, total=False):
 
 class ViewConfig(_ViewConfigBase, total=False):
     """View configuration options based on multidim schema."""
+
     pass
 
 

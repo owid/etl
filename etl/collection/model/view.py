@@ -1,7 +1,7 @@
 import re
 from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, cast
 
 from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError
 from etl.collection.model.base import MDIMBase, pruned_json
@@ -19,9 +19,9 @@ REGEX_CATALOG_PATH_OPTIONS = (
 @pruned_json
 @dataclass
 class CommonView(MDIMBase):
-    dimensions: Optional[Dict[str, Any]] = None
-    config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
-    metadata: Optional[Union[ViewMetadata, Dict[str, Any]]] = None
+    dimensions: Dict[str, Any] | None = None
+    config: ViewConfig | Dict[str, Any] | None = None
+    metadata: ViewMetadata | Dict[str, Any] | None = None
 
     @property
     def num_dimensions(self) -> int:
@@ -32,7 +32,7 @@ class CommonView(MDIMBase):
 @dataclass
 class Indicator(MDIMBase):
     catalogPath: str
-    display: Optional[Dict[str, Any]] = None
+    display: Dict[str, Any] | None = None
 
     def __post_init__(self):
         # Validate that the catalog path is either (i) complete or (ii) in the format table#indicator.
@@ -101,10 +101,10 @@ class Indicator(MDIMBase):
 class ViewIndicators(MDIMBase):
     """Indicators in a MDIM/Explorer view."""
 
-    y: Optional[List[Indicator]] = None
-    x: Optional[Indicator] = None
-    size: Optional[Indicator] = None
-    color: Optional[Indicator] = None
+    y: List[Indicator] | None = None
+    x: Indicator | None = None
+    size: Indicator | None = None
+    color: Indicator | None = None
 
     @property
     def num_indicators(self) -> int:
@@ -134,7 +134,7 @@ class ViewIndicators(MDIMBase):
         # Now that data is in the expected shape, let the parent class handle the rest
         return super().from_dict(data)
 
-    def to_records(self) -> List[Dict[str, Union[str, Dict[str, Any]]]]:
+    def to_records(self) -> List[Dict[str, str | Dict[str, Any]]]:
         indicators = []
         for dim in CHART_DIMENSIONS:
             dimension_val = getattr(self, dim, None)
@@ -207,8 +207,9 @@ class View(MDIMBase):
 
     dimensions: Dict[str, str]
     indicators: ViewIndicators
-    config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
-    metadata: Optional[Union[ViewMetadata, Dict[str, Any]]] = None
+    # config: Optional[Union[ViewConfig, Dict[str, Any]]] = None
+    config: ViewConfig | Dict[str, Any] | None = None
+    metadata: ViewMetadata | Dict[str, Any] | None = None
 
     @property
     def d(self):
