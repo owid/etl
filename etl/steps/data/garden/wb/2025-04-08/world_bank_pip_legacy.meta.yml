@@ -59,6 +59,7 @@ tables:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 3
                   - 10
                   - 20
@@ -109,6 +110,7 @@ tables:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -158,6 +160,7 @@ tables:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -204,6 +207,7 @@ tables:
                 baseColorScheme: OrRd
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -249,6 +253,7 @@ tables:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 5
                   - 10
                   - 15
@@ -289,6 +294,7 @@ tables:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 3
                   - 6
                   - 9
@@ -331,6 +337,7 @@ tables:
                 baseColorScheme: YlOrBr
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 2
                   - 4
                   - 6
@@ -382,6 +389,7 @@ tables:
                 binningStrategy: manual
                 baseColorScheme: Reds
                 customNumericValues:
+                  - 0
                   - 100000
                   - 300000
                   - 1000000
@@ -431,8 +439,8 @@ tables:
               colorScale:
                 baseColorScheme: Oranges
                 binningStrategy: manual
-                customNumericMinValue: 1
                 customNumericValues:
+                  - 1
                   - 0.3
                   - 0.35
                   - 0.4
