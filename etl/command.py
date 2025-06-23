@@ -414,9 +414,7 @@ def construct_subdag(
     # but are not supposed to be in DB
     excludes.append("grapher://grapher/regions/latest/regions")
 
-    __import__("ipdb").set_trace()
-
-    # Filter the dag
+    # Get subdag based on includes and excludes
     subdag = filter_to_subgraph(
         dag, includes=includes, excludes=excludes, downstream=downstream, only=only, exact_match=exact_match
     )
@@ -431,7 +429,7 @@ def construct_subdag(
 
 
 def run_subdag(
-    dag: DAG,
+    full_dag: DAG,
     subdag: DAG,
     dry_run: bool = False,
     force: bool = False,
@@ -447,9 +445,9 @@ def run_subdag(
     By default, data steps do not re-run if they appear to be up-to-date already by
     looking at their checksum.
     """
-    steps = compile_steps(dag, subdag)
+    steps = compile_steps(full_dag, subdag)
 
-    # AI: can we move this outside the function?
+    # Validate private steps
     if not private:
         _validate_private_steps(steps)
 
@@ -485,8 +483,7 @@ def run_subdag(
         print(
             f"--- Running {len(steps)} steps with {workers} processes ({config.GRAPHER_INSERT_WORKERS} threads each):"
         )
-        # AI: do we have to pass subdag?
-        return exec_steps_parallel(steps, workers, dag=subdag, strict=strict)
+        return exec_steps_parallel(steps, workers, dag=full_dag, strict=strict)
 
 
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
@@ -571,6 +568,7 @@ def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optio
             exec_graph[str(step)] = {str(dep) for dep in step.dependencies if str(dep) in steps_str}
 
         # Prepare a function for execution that includes the necessary arguments
+        # AI: instead of using dag, pass {step_name: Step object} and use it to get dependencies
         exec_func = partial(_exec_step_job, execution_times=execution_times, dag=dag, strict=strict)
 
         # Execute the graph of tasks in parallel
@@ -670,9 +668,7 @@ def _create_expected_time_message(
         return prepend_message + partial_message + append_message
 
 
-def _exec_step_job(
-    step_name: str, execution_times: MutableMapping, dag: Optional[DAG] = None, strict: Optional[bool] = None
-) -> None:
+def _exec_step_job(step_name: str, execution_times: MutableMapping, dag: DAG, strict: Optional[bool] = None) -> None:
     """
     Executes a step.
 
