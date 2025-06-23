@@ -76,7 +76,7 @@ def create_queries():
             "carcinogenesis",
             "metastasis",
             "remission",
-            "cargonenic",
+            "carcinogenic",
             "carcinogen",
         ],
         "combinations": [
