@@ -1193,16 +1193,7 @@ tables:
         description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education), encompassing all levels and types of spending, as a percentage of [GDP](#dod:gdp), including funds from international government transfers.
         unit: "%"
         short_unit: "%"
-        description_key:
-          - Governments allocate part of their national income to fund education — this indicator shows how much is spent specifically on primary education relative to the overall economy.
-          - It captures the share of total general government spending on education that goes to primary education, including spending by local, regional, and central government authorities.
-          - The indicator is calculated by dividing government spending on primary education by total spending on education across all levels, and multiplying by 100.
-          - A higher percentage means that a greater share of education funding is being directed toward primary education, which may reflect a government’s priority for foundational learning.
-          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education ([International Standard Classification of Education (ISCED)](https://uis.unesco.org/en/topic/international-standard-classification-education-isced)) to ensure global comparability.
-          - This indicator is useful for understanding how governments prioritize different stages of education. It should be interpreted alongside data on enrolment and per-student costs, which can influence how funding is allocated.
-          - There are some limitations. In some cases, spending by education level is estimated, and it may be difficult to separate primary from pre-primary or lower from upper secondary education.
-          - The reference year usually reflects the end of the school year, which may span two calendar years depending on the country.
-          - Despite these challenges, the share of education spending on primary education offers valuable insight into national priorities and the public investment made in the earliest years of formal learning.
+        description_key: *desc_key_govt_expenditure_gdp_share
         presentation:
           title_public: Government spending on primary education as share of GDP
           grapher_config: *grapher_config_gdp_share

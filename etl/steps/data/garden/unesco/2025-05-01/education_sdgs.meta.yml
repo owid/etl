@@ -876,7 +876,7 @@ tables:
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
-        unit: "%"
+        unit: "% of GDP"
         short_unit: "%"
         description_short: Total [general government](#dod:general-government) spending on education (all levels of government and all levels of education), given as a share of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
