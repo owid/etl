@@ -60,9 +60,7 @@ def run() -> None:
 
     # Get spending columns from both datasets
     spending_cols_opri = get_spending_columns(tb_opri)
-    print(spending_cols_opri)
     spending_cols_sdgs = get_spending_columns(tb_sdgs)
-    print(spending_cols_sdgs)
 
     # Select relevant columns and combine tables
     tb_opri = tb_opri.loc[:, ["country", "year"] + spending_cols_opri].copy()
