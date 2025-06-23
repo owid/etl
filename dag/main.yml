@@ -742,6 +742,13 @@ steps:
   data://meadow/cdc/2025-05-19/leading_causes:
     - snapshot://cdc/2025-05-19/leading_causes.csv
 
+  
+  #
+  # TODO: add step name (just something recognizable)
+  #
+  data://meadow/cdc/2025-05-19/external_causes:
+    - snapshot://cdc/2025-05-19/external_causes.csv
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml
