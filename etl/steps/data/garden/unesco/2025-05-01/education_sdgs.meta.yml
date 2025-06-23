@@ -168,6 +168,11 @@ dataset:
 tables:
   education_sdgs:
     variables:
+
+      # ========================================================================
+      # Literacy
+      # ========================================================================
+
       adult_literacy_rate__population_15plus_years__both_sexes__pct__lr_ag15t99:
         title: Literacy rate among adults
         description_short: Share of the population aged 15 years and older who can read and write.
@@ -244,6 +249,54 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      combined_literate:
+        title: Literacy rate (historical and recent)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
+        description_key:
+          - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
+          - It captures the percentage of individuals aged 15 and above who are considered literate, based on their ability to both read and write.
+          - The literacy rate is calculated by dividing the number of literate individuals by the total population in the same age group, excluding those with unknown literacy status.
+          - A high literacy rate suggests that most people have acquired basic reading and writing skills, typically through primary education or literacy programs.
+          - Data typically come from population censuses or household surveys and are often self-reported.
+          - The UNESCO Institute for Statistics (UIS) and its partners also use statistical models to estimate literacy rates when recent data are unavailable.
+          - Literacy should not be confused with functional literacy — this indicator reflects basic skills, but not their practical application in daily life or work.
+          - Historical literacy rates are not directly comparable to recent ones due to differences in definitions, sources, and estimation methods, and should be interpreted with caution.
+          - Historical estimates before 1800 are based on indirect evidence such as manuscript and book production.
+        description_processing: |-
+          **Recent estimates:**
+
+          Percentage of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
+
+          Original source: UNESCO Institute for Statistics
+
+          **Historical literacy data:**
+
+          The historical estimates in this long-run cross-country dataset were derived from a blend of diverse sources, each contributing to different time periods. For data before 1800, the dataset relies on the work of Buringh and Van Zanden (2009), which offers insights into literacy through the lens of manuscript and book production in Europe from the sixth to the eighteenth centuries. For the years 1820 and 1870 (excluding the United States), it incorporates data from Broadberry and O'Rourke's "The Cambridge Economic History of Modern Europe." The United States data comes from the National Center for Education Statistics. Additionally, global estimates for the period 1820-2000 are drawn from van Zanden and colleagues’ "How Was Life?: Global Well-being since 1820," an OECD publication. For historical estimates specific to Latin America, the dataset uses the Oxford Latin American Economic History Database (OxLAD). Each source follows a consistent conceptual definition of literacy, although discrepancies among sources are acknowledged, necessitating cautious interpretation of year-to-year changes. The dataset also includes instances where specific sources were preferred, such as opting for OxLAD data over the World Bank for Paraguay in 1982 due to significant differences in literacy rate estimates.
+        presentation:
+          title_public: Literacy rate
+        display:
+          numDecimalPlaces: 1
+          name: Literate
+
+      combined_illiterate:
+        title: Illiteracy rate (historical and recent)
+        unit: "%"
+        short_unit: "%"
+        description_short: Share of the population aged 15 and above who cannot read and write a short, simple statement on their everyday life.
+        description_processing: |-
+          The illiteracy rate is calculated as 100% minus the literacy rate, which measures the share of people aged 15 and above who can read and write a short, simple statement.
+        presentation:
+          title_public: Illiteracy rate
+        display:
+          numDecimalPlaces: 2
+          name: Illiterate
+
+      # ========================================================================
+      # Educational attainment (formal schooling)
+      # ========================================================================
+
       educational_attainment_rate__completed_post_secondary_non_tertiary_education_or_higher__population_25plus_years__both_sexes__pct__ea_4t8_ag25t99:
         title: Share of the population with post-secondary education or higher (25+)
         description_short: Percentage of adults aged 25 and older who have completed [post-secondary](#dod:post-secondary-education) or [tertiary](#dod:tertiary-education) education.
@@ -280,6 +333,10 @@ tables:
           title_public: Share of the population aged 25+ years with lower secondary education
         display:
           numDecimalPlaces: 1
+
+      # ========================================================================
+      # Pupil-teacher ratios and qualified teachers
+      # ========================================================================
 
       pupil_qualified_teacher_ratio_in_primary_education__headcount_basis__ptrhc_1_qualified:
         description_short: A qualified teacher is one who has the minimum academic qualifications necessary to teach at a [primary](#dod:primary-education) level of education in a given country.
@@ -318,6 +375,27 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      percentage_of_qualified_teachers_in_secondary_education__both_sexes__pct__qutp_2t3:
+        title: Percentage of qualified teachers in secondary education
+        description_short: Share of qualified teachers in [secondary](#dod:secondary-education) education represent those with the necessary academic qualifications to teach at that level in a given country.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Trained teachers are essential for delivering quality education — this indicator shows what share of secondary school teachers have the minimum required qualifications.
+          - It captures the percentage of lower and upper secondary teachers who have received at least the minimum organized pedagogical training, either pre-service or in-service, required to teach at their level according to national standards.
+          - The indicator is calculated by dividing the number of trained teachers in secondary education by the total number of teachers at that level, and multiplying the result by 100.
+          - A high value indicates that most students in secondary education are being taught by teachers who are considered pedagogically qualified to teach at that level.
+          - The data comes from administrative records collected at the school or national level and typically includes information on teacher training credentials and employment status.
+          - This indicator is disaggregated by sex and level of education (lower and upper secondary), allowing for a closer look at training disparities across groups.
+          - Limitations arise from the fact that national standards for minimum teacher qualifications vary widely, making it difficult to compare levels of training across countries.
+          - Additionally, in many countries, data may not distinguish between subject-specific training and general pedagogical training, which can affect how meaningful the figures are for judging teacher preparedness.
+        display:
+          numDecimalPlaces: 1
+
+      # ========================================================================
+      # OUT-OF-SCHOOL CHILDREN
+      # ========================================================================
+
       out_of_school_rate_for_children_of_primary_school_age__both_sexes__pct__rofst_1_cp:
         title: Out-of-school rate for children of primary school age
         description_short: Percentage of children in the official primary school age group who are not enrolled in any level of education.
@@ -337,25 +415,6 @@ tables:
           name: Primary school age
           numDecimalPlaces: 1
 
-      government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov:
-        title: Government spending on education as share of GDP
-        description_short: Share of a country’s gross domestic product (GDP) that is allocated to education from the national budget.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - This indicator shows how much of a country’s overall economic resources are invested in its education system.
-          - It captures government spending on education — both current and capital — as a percentage of national GDP for a given year.
-          - The indicator is calculated by dividing total government spending on education by the country's gross domestic product (GDP) and multiplying by 100.
-          - A higher value suggests a stronger policy commitment to education and potentially greater availability of funding for schools, teachers, materials, and infrastructure.
-          - The Education 2030 Framework for Action recommends allocating at least 4% to 6% of GDP to education as a benchmark for sufficient public investment.
-          - Data on education spending are gathered from national finance or education ministries through the annual UNESCO Institute for Statistics (UIS) education survey or the UNESCO-OECD-Eurostat (UOE) collection.
-          - GDP data come from the World Bank’s World Development Indicators and are updated quarterly, with the June release typically used for reporting this indicator.
-          - Disaggregated values by level of education (e.g. primary, secondary) can reveal how resources are distributed across the system.
-          - While useful for comparing education investment across countries, the indicator may underestimate total spending if education budgets from ministries other than the Ministry of Education are not included.
-          - Changes in economic output (GDP) can also affect the indicator, so it’s important to interpret trends in the context of both economic and education sector developments.
-        display:
-          numDecimalPlaces: 1
-
       out_of_school_rate_for_adolescents_of_lower_secondary_school_age__both_sexes__pct__rofst_2_cp:
         title: Out-of-school rate for adolescents of lower secondary school age
         description_short: Percentage of adolescents in the official age group for [lower secondary](#dod:lower-secondary-education) education who are not enrolled in school at any level.
@@ -372,22 +431,9 @@ tables:
         display:
           numDecimalPlaces: 1
 
-      percentage_of_qualified_teachers_in_secondary_education__both_sexes__pct__qutp_2t3:
-        title: Percentage of qualified teachers in secondary education
-        description_short: Share of qualified teachers in [secondary](#dod:secondary-education) education represent those with the necessary academic qualifications to teach at that level in a given country.
-        unit: "%"
-        short_unit: "%"
-        description_key:
-          - Trained teachers are essential for delivering quality education — this indicator shows what share of secondary school teachers have the minimum required qualifications.
-          - It captures the percentage of lower and upper secondary teachers who have received at least the minimum organized pedagogical training, either pre-service or in-service, required to teach at their level according to national standards.
-          - The indicator is calculated by dividing the number of trained teachers in secondary education by the total number of teachers at that level, and multiplying the result by 100.
-          - A high value indicates that most students in secondary education are being taught by teachers who are considered pedagogically qualified to teach at that level.
-          - The data comes from administrative records collected at the school or national level and typically includes information on teacher training credentials and employment status.
-          - This indicator is disaggregated by sex and level of education (lower and upper secondary), allowing for a closer look at training disparities across groups.
-          - Limitations arise from the fact that national standards for minimum teacher qualifications vary widely, making it difficult to compare levels of training across countries.
-          - Additionally, in many countries, data may not distinguish between subject-specific training and general pedagogical training, which can affect how meaningful the figures are for judging teacher preparedness.
-        display:
-          numDecimalPlaces: 1
+      # ========================================================================
+      # BASIC SERVICES IN SCHOOLS
+      # ========================================================================
 
       proportion_of_primary_schools_with_access_to_basic_drinking_water__pct__schbsp_1_wwata:
         title: Share of primary schools with access to drinking water
@@ -550,50 +596,9 @@ tables:
           numDecimalPlaces: 1
           name: Share achieving math proficiency by end of primary
 
-
-      combined_literate:
-        title: Literacy rate (historical and recent)
-        unit: "%"
-        short_unit: "%"
-        description_short: Share of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
-        description_key:
-          - Literacy unlocks access to education, employment, and civic participation — this indicator shows what share of young people and adults can read and write a short, simple sentence with understanding.
-          - It captures the percentage of individuals aged 15 and above who are considered literate, based on their ability to both read and write.
-          - The literacy rate is calculated by dividing the number of literate individuals by the total population in the same age group, excluding those with unknown literacy status.
-          - A high literacy rate suggests that most people have acquired basic reading and writing skills, typically through primary education or literacy programs.
-          - Data typically come from population censuses or household surveys and are often self-reported.
-          - The UNESCO Institute for Statistics (UIS) and its partners also use statistical models to estimate literacy rates when recent data are unavailable.
-          - Literacy should not be confused with functional literacy — this indicator reflects basic skills, but not their practical application in daily life or work.
-          - Historical literacy rates are not directly comparable to recent ones due to differences in definitions, sources, and estimation methods, and should be interpreted with caution.
-          - Historical estimates before 1800 are based on indirect evidence such as manuscript and book production.
-        description_processing: |-
-          **Recent estimates:**
-
-          Percentage of the population aged 15 and above who can read and write a short, simple statement on their everyday life.
-
-          Original source: UNESCO Institute for Statistics
-
-          **Historical literacy data:**
-
-          The historical estimates in this long-run cross-country dataset were derived from a blend of diverse sources, each contributing to different time periods. For data before 1800, the dataset relies on the work of Buringh and Van Zanden (2009), which offers insights into literacy through the lens of manuscript and book production in Europe from the sixth to the eighteenth centuries. For the years 1820 and 1870 (excluding the United States), it incorporates data from Broadberry and O'Rourke's "The Cambridge Economic History of Modern Europe." The United States data comes from the National Center for Education Statistics. Additionally, global estimates for the period 1820-2000 are drawn from van Zanden and colleagues’ "How Was Life?: Global Well-being since 1820," an OECD publication. For historical estimates specific to Latin America, the dataset uses the Oxford Latin American Economic History Database (OxLAD). Each source follows a consistent conceptual definition of literacy, although discrepancies among sources are acknowledged, necessitating cautious interpretation of year-to-year changes. The dataset also includes instances where specific sources were preferred, such as opting for OxLAD data over the World Bank for Paraguay in 1982 due to significant differences in literacy rate estimates.
-        presentation:
-          title_public: Literacy rate
-        display:
-          numDecimalPlaces: 1
-          name: Literate
-
-      combined_illiterate:
-        title: Illiteracy rate (historical and recent)
-        unit: "%"
-        short_unit: "%"
-        description_short: Share of the population aged 15 and above who cannot read and write a short, simple statement on their everyday life.
-        description_processing: |-
-          The illiteracy rate is calculated as 100% minus the literacy rate, which measures the share of people aged 15 and above who can read and write a short, simple statement.
-        presentation:
-          title_public: Illiteracy rate
-        display:
-          numDecimalPlaces: 2
-          name: Illiterate
+      # ========================================================================
+      # Enrolment ratios
+      # ========================================================================
 
       gross_enrolment_ratio_for_tertiary_education__both_sexes__pct__ger_5t8:
         title: Gross enrolment ratio in tertiary education
@@ -679,6 +684,10 @@ tables:
           tolerance: 5
           name: Boys
 
+      # ========================================================================
+      # Completion rates
+      # ========================================================================
+
       completion_rate__primary_education__both_sexes__pct__modelled_data__cr_mod_1:
         title: Completion rate in primary education
         description_short: The share of children who are 3 to 5 years older than the official age for the last grade of [primary education](#dod:primary-education) education who have successfully completed it. This broader age band is used to include children who started school late or had to resit particular years.
@@ -706,6 +715,7 @@ tables:
           name: Lower secondary education
           numDecimalPlaces: 1
           tolerance: 5
+
 
       completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
         title: Completion rate in upper secondary education
@@ -871,6 +881,19 @@ tables:
         presentation:
           title_public: Expenditure on education as share of government spending
           grapher_config: *grapher_config_expenditure_from_total
+        display:
+          numDecimalPlaces: 1
+
+      # ========================================================================
+      # Expenditure on education
+      # ========================================================================
+
+      government_expenditure_on_education_as_a_percentage_of_gdp__pct__xgdp_fsgov:
+        title: Government spending on education as share of GDP
+        unit: "% of GDP"
+        short_unit: "%"
+        description_short: Total [general government](#dod:general-government) spending on education (all levels of government and all levels of education), given as a share of [GDP](#dod:gdp).
+        description_key: *desc_key_govt_expenditure_gdp_share
         display:
           numDecimalPlaces: 1
 
