@@ -19,13 +19,7 @@
                     "Reference definitions using JSON Pointer syntax or custom logic."
                 ]
             ],
-            "additionalProperties": true,
-            "properties": {
-                "grapherSchemaRef": {
-                    "type": "string",
-                    "const": "https://files.ourworldindata.org/schemas/grapher-schema.007.json"
-                }
-            }
+            "additionalProperties": true
         },
         "catalog_path": {
             "type": "string",
@@ -66,10 +60,10 @@
                 ]
             ],
             "examples": [
-                "https://files.ourworldindata.org/schemas/grapher-schema.007.json"
+                "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
             ],
             "examples_bad": [
-                ["http://invalid-url.com/schema.json", "grapher-schema.007.json"]
+                ["http://invalid-url.com/schema.json", "grapher-schema.008.json"]
             ]
         },
         "title": {
@@ -634,169 +628,169 @@
                         ],
                         "properties": {
                             "$schema": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/$schema"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/$schema"
                             },
                             "addCountryMode": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/addCountryMode"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/addCountryMode"
                             },
                             "compareEndPointsOnly": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/compareEndPointsOnly"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/compareEndPointsOnly"
                             },
                             "selectedEntityColors": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/selectedEntityColors"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/selectedEntityColors"
                             },
                             "relatedQuestions": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/relatedQuestions"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/relatedQuestions"
                             },
                             "title": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/title"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/title"
                             },
                             "map": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/map"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/map"
                             },
                             "maxTime": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/maxTime"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/maxTime"
                             },
                             "subtitle": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/subtitle"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/subtitle"
                             },
                             "selectedEntityNames": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/selectedEntityNames"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/selectedEntityNames"
                             },
                             "focusedSeriesNames": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/focusedSeriesNames"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/focusedSeriesNames"
                             },
                             "baseColorScheme": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/baseColorScheme"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/baseColorScheme"
                             },
                             "yAxis": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/yAxis"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/yAxis"
                             },
                             "tab": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/tab"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/tab"
                             },
                             "matchingEntitiesOnly": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/matchingEntitiesOnly"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/matchingEntitiesOnly"
                             },
                             "hideLegend": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideLegend"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideLegend"
                             },
                             "hideLogo": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideLogo"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideLogo"
                             },
                             "timelineMinTime": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/timelineMinTime"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/timelineMinTime"
                             },
                             "variantName": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/variantName"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/variantName"
                             },
                             "hideTimeline": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideTimeline"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideTimeline"
                             },
                             "originUrl": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/originUrl"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/originUrl"
                             },
                             "colorScale": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/colorScale"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/colorScale"
                             },
                             "scatterPointLabelStrategy": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/scatterPointLabelStrategy"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/scatterPointLabelStrategy"
                             },
                             "selectedFacetStrategy": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/selectedFacetStrategy"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/selectedFacetStrategy"
                             },
                             "sourceDesc": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/sourceDesc"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/sourceDesc"
                             },
                             "invertColorScheme": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/invertColorScheme"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/invertColorScheme"
                             },
                             "hideRelativeToggle": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideRelativeToggle"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideRelativeToggle"
                             },
                             "comparisonLines": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/comparisonLines"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/comparisonLines"
                             },
                             "internalNotes": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/internalNotes"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/internalNotes"
                             },
                             "version": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/version"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/version"
                             },
                             "logo": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/logo"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/logo"
                             },
                             "entityType": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/entityType"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/entityType"
                             },
                             "facettingLabelByYVariables": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/facettingLabelByYVariables"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/facettingLabelByYVariables"
                             },
                             "note": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/note"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/note"
                             },
                             "chartTypes": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/chartTypes"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/chartTypes"
                             },
                             "hasMapTab": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hasMapTab"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hasMapTab"
                             },
                             "stackMode": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/stackMode"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/stackMode"
                             },
                             "minTime": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/minTime"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/minTime"
                             },
                             "hideAnnotationFieldsInTitle": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideAnnotationFieldsInTitle"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideAnnotationFieldsInTitle"
                             },
                             "excludedEntityNames": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/excludedEntityNames"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/excludedEntityNames"
                             },
                             "xAxis": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/xAxis"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/xAxis"
                             },
                             "timelineMaxTime": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/timelineMaxTime"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/timelineMaxTime"
                             },
                             "hideConnectedScatterLines": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideConnectedScatterLines"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideConnectedScatterLines"
                             },
                             "showNoDataArea": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/showNoDataArea"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/showNoDataArea"
                             },
                             "zoomToSelection": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/zoomToSelection"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/zoomToSelection"
                             },
                             "showYearLabels": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/showYearLabels"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/showYearLabels"
                             },
                             "hideTotalValueLabel": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideTotalValueLabel"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideTotalValueLabel"
                             },
                             "hideScatterLabels": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideScatterLabels"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideScatterLabels"
                             },
                             "sortBy": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/sortBy"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/sortBy"
                             },
                             "sortOrder": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/sortOrder"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/sortOrder"
                             },
                             "sortColumnSlug": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/sortColumnSlug"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/sortColumnSlug"
                             },
                             "hideFacetControl": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/hideFacetControl"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/hideFacetControl"
                             },
                             "includedEntityNames": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/includedEntityNames"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/includedEntityNames"
                             },
                             "entityTypePlural": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/entityTypePlural"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/entityTypePlural"
                             },
                             "missingDataStrategy": {
-                                "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/missingDataStrategy"
+                                "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/missingDataStrategy"
                             }
                         },
                         "additionalProperties": false
@@ -893,7 +887,7 @@
                             "Common overrides include name, unit, and color settings."
                         ]
                     ],
-                    "$ref": "#/properties/definitions/properties/grapherSchemaRef#/properties/dimensions/items/properties/display"
+                    "$ref": "https://files.ourworldindata.org/schemas/grapher-schema.008.json#/properties/dimensions/items/properties/display"
                 }
             },
             "required": [
