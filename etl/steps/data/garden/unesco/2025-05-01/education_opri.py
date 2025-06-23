@@ -67,6 +67,10 @@ def run() -> None:
             update_metadata(meta, display_decimals=1, unit="index", short_unit="")
         elif "(current us$)" in column.lower():
             update_metadata(meta, display_decimals=1, unit="current US$", short_unit="current $")
+        elif "constant_pppdollar__millions" in column.lower():
+            # Convert values from millions to individual units
+            tb_pivoted[column] = tb_pivoted[column] * 1000000
+            update_metadata(meta, display_decimals=0, unit="international-$", short_unit="$")
         elif "(number)" in column.lower():
             update_metadata(meta, display_decimals=0, unit="number", short_unit="")
 
