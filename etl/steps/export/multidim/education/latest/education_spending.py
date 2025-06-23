@@ -37,7 +37,7 @@ SPENDING_PATTERNS = {
         "government_expenditure_on_primary_education__constant_pppdollar__millions",
         "government_expenditure_on_lower_secondary_education__constant_pppdollar__millions",
         "government_expenditure_on_upper_secondary_education__constant_pppdollar__millions",
-        "government_expenditure_on_tertiary__constant_pppdollar__millions",
+        "government_expenditure_on_tertiary_education__constant_pppdollar__millions",
         "government_expenditure_on_education__constant_pppdollar__millions",
     ],
     "total_government": [
@@ -66,16 +66,14 @@ def run() -> None:
     tb_opri = tb_opri.loc[:, ["country", "year"] + spending_cols_opri].copy()
     tb_sdgs = tb_sdgs.loc[:, ["country", "year"] + spending_cols_sdgs].copy()
 
-    # Merge the tables
-    tb = tb_opri.merge(tb_sdgs, on=["country", "year"], how="outer")
-
     # Adjust dimensions
-    tb = adjust_dimensions(tb)
+    tb_opri = adjust_dimensions(tb_opri)
+    tb_sdgs = adjust_dimensions(tb_sdgs)
 
     # Create collection
     c = paths.create_collection(
         config=config,
-        tb=tb,
+        tb=[tb_opri, tb_sdgs],
         common_view_config=MULTIDIM_CONFIG,
     )
 
@@ -114,8 +112,8 @@ def adjust_dimensions(tb):
 
     # Dimension mapping configurations
     LEVEL_KEYWORDS = {
-        "pre_primary": "preprimary",
-        "primary": "primary",
+        "expenditure_on_pre_primary": "preprimary",
+        "expenditure_on_primary": "primary",
         "lower_secondary": "lower_secondary",
         "upper_secondary": "upper_secondary",
         "tertiary": "tertiary",
@@ -123,6 +121,7 @@ def adjust_dimensions(tb):
 
     SPENDING_TYPE_KEYWORDS = {
         "percentage_of_gdp": "gdp_share",
+        "share_gdp": "gdp_share",
         "constant_pppdollar": "constant_ppp",
         "total_government_expenditure": "total_government",
     }
@@ -138,10 +137,6 @@ def adjust_dimensions(tb):
             if keyword in col:
                 level = value
                 break
-
-        # Default to "all" for combined measures
-        if level is None and ("combined" in col or "total_government" in col):
-            level = "all"
 
         # Extract spending type
         spending_type = None
@@ -159,7 +154,7 @@ def adjust_dimensions(tb):
             elif "total_government" in col:
                 spending_type = "total_government"
             elif "combined" in col:
-                spending_type = "combined_gdp"
+                spending_type = "gdp_share"
 
         # Set indicator name
         tb[col].metadata.original_short_name = "education_spending"
@@ -169,6 +164,9 @@ def adjust_dimensions(tb):
             "level": level or "all",
             "spending_type": spending_type or "gdp_share",
         }
+    # Add dimension definitions at table level
+    if not hasattr(tb.metadata, "dimensions") or tb.metadata.dimensions is None:
+        tb.metadata.dimensions = []
 
     # Add dimension definitions to table metadata
     tb.metadata.dimensions.extend(
@@ -182,7 +180,7 @@ def adjust_dimensions(tb):
 
 
 def create_grouped_views(collection):
-    """Add grouped views for spending type and education level comparisons."""
+    """Add grouped views for education level comparisons."""
     view_metadata = {
         "presentation": {
             "title_public": "{title}",
@@ -196,13 +194,6 @@ def create_grouped_views(collection):
 
     collection.group_views(
         groups=[
-            {
-                "dimension": "spending_type",
-                "choice_new_slug": "spending_type_side_by_side",
-                "choices": ["gdp_share", "constant_ppp", "total_government"],
-                "view_config": view_config,
-                "view_metadata": view_metadata,
-            },
             {
                 "dimension": "level",
                 "choice_new_slug": "level_side_by_side",
@@ -224,15 +215,11 @@ SPENDING_TYPE_MAPPINGS = {
         "gdp_share": "as a share of GDP",
         "constant_ppp": "in constant PPP dollars",
         "total_government": "as a share of total government expenditure",
-        "combined_gdp": "total education spending as a share of GDP",
-        "spending_type_side_by_side": "by spending measure",
     },
     "subtitle": {
         "gdp_share": "as a percentage of [gross domestic product (GDP)](#dod:gdp)",
         "constant_ppp": "in constant [purchasing power parity (PPP)](#dod:ppp) dollars",
         "total_government": "as a percentage of total government expenditure",
-        "combined_gdp": "combined across all education levels as a percentage of [gross domestic product (GDP)](#dod:gdp)",
-        "spending_type_side_by_side": "across different spending measures",
     },
 }
 
@@ -272,12 +259,7 @@ def generate_title_by_spending_type_and_level(view):
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
 
-    if spending_type == "spending_type_side_by_side":
-        return f"Government spending on {level_term} {spending_term}"
-    elif level == "level_side_by_side":
-        return f"Government spending on {level_term} {spending_term}"
-    else:
-        return f"Government spending on {level_term} {spending_term}"
+    return f"Government spending on {level_term} {spending_term}"
 
 
 def generate_subtitle_by_spending_type_and_level(view):
@@ -314,7 +296,6 @@ def edit_indicator_displays(view):
         "percentage_of_gdp": "Share of GDP",
         "constant_pppdollar": "Constant PPP dollars",
         "total_government": "Share of government spending",
-        "combined": "Combined spending",
     }
 
     for indicator in view.indicators.y:

@@ -46,7 +46,7 @@ dimensions:
         name: Tertiary
         description: Government spending on tertiary education, including formal post-secondary learning from short vocational programs to university degrees.
       - slug: level_side_by_side
-        name: All levels
+        name: By education level
         description: Compare government spending across all education levels.
 
 views: []
