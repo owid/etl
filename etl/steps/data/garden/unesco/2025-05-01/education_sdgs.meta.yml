@@ -414,8 +414,8 @@ tables:
 
       initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
         title: Initial government funding per primary student
-        description_short: Government funding for each student enrolled in [primary education](#dod:primary-education), measured in constant international dollars.
-        unit: "international $"
+        description_short: Government funding for each student enrolled in [primary education](#dod:primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
         short_unit: "$"
         description_key:
           - This indicator shows how much governments are investing, on average, in each primary school student.
@@ -845,7 +845,7 @@ tables:
 
       expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf:
         title: Expenditure on education as share of government spending
-        description_short: Percentage of total government spending (across all sectors) that is allocated to education, across all levels.
+        description_short: Percentage of total [general government](#dod:general-government) spending (across all sectors) that is allocated to education, across all levels.
         unit: "%"
         short_unit: "%"
         description_key:
@@ -868,7 +868,7 @@ tables:
         title: Public spending on education as a share of GDP (historical and recent)
         unit: "%"
         short_unit: "%"
-        description_short: Total [general government](#dod:general-government) expenditure on education (all levels of government and all levels of education), given as a share of GDP.
+        description_short: Total [general government](#dod:general-government) spending on education (all levels of government and all levels of education), given as a share of GDP.
         description_processing: |-
           **Historical expenditure data:**
 
