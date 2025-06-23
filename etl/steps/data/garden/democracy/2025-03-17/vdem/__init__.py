@@ -1,4 +1,15 @@
-"""Load a meadow dataset and create a garden dataset."""
+"""Load a meadow dataset and create a garden dataset.
+
+NOTES: there seems to be some values for indicator `turnout_total_vdem` (i.e. `v2elvaptrn`) that exceed 100% (e.g. Gabon@1986, Somalia@1979, etc.).
+
+You can check by running:
+
+```python
+tb.sort_values("v2elvaptrn", ascending=False)[["country", "year", "v2elvaptrn"]].head(50)
+```
+
+Unclear why this occurs, but leads to sudden jumps for region aggregates, e.g. for Africa in 1986 (chart_id=7777).
+"""
 
 from typing import List
 
@@ -12,6 +23,9 @@ from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
+
+# Number of countries as of 2024
+NUM_COUNTRIES_2024 = 179
 
 # REGION AGGREGATES
 REGIONS = {
@@ -56,6 +70,9 @@ INDICATORS_NO_ORIGINS = [
     "regime_amb_row_owid",
     "regime_redux_row_owid",
     "wom_hoe_vdem",
+    "wom_hoe_ever",
+    "wom_hoe_ever_dem",
+    "v2exfemhoe",
     "regime_imputed",
     "num_years_in_electdem_consecutive",
     "num_years_in_libdem_consecutive",
@@ -77,7 +94,7 @@ def run() -> None:
     ds_population = paths.load_dataset("population")
 
     # Read table from meadow dataset.
-    tb = ds_meadow.read("vdem").astype({"v2exnamhos": str})
+    tb = ds_meadow.read("vdem").astype({"v2exnamhos": "string"})
 
     #
     # Process data.
@@ -90,7 +107,7 @@ def run() -> None:
     # The following lines (until "PART 2") are the cleaning steps.
     # This is a transcription from Bastian's work: https://github.com/owid/notebooks/blob/main/BastianHerre/democracy/scripts/vdem_row_clean.do
     paths.log.info("1/ Cleaning data...")
-    tb = clean.run(tb, paths.country_mapping_path)
+    tb = clean.run(tb, country_mapping_path=paths.country_mapping_path)
 
     # %% PART 2: IMPUTE
     # The following lines concern imputing steps.
@@ -113,6 +130,13 @@ def run() -> None:
         tb_population_counts,
     ) = aggregate.run(tb, ds_regions, ds_population)
 
+    # %% PART 4B: Share of population
+    paths.log.info("4B/ Share of countries...")
+    num_countries = tb_uni_without_regions.loc[
+        tb_uni_without_regions["year"] == tb_uni_without_regions["year"].max()
+    ].shape[0]
+    tb_countries_share = estimate_share_countries(tb_countries_counts, num_countries_last=num_countries)
+
     # %% PART 5: Format and prepare tables
     paths.log.info("5/ Formatting tables...")
     tb_meta = tb.loc[:, ["year", "country", "regime_imputed", "regime_imputed_country", "histname"]]
@@ -123,18 +147,19 @@ def run() -> None:
         short_name="vdem_uni_without_regions",
     )
     tb_uni_with_regions = tb_uni_with_regions.format(
-        keys=["country", "year", "aggregate_method"],
+        keys=["country", "year"],
         short_name="vdem_uni_with_regions",
     )
     tb_multi_without_regions = tb_multi_without_regions.format(
         keys=["country", "year", "estimate"], short_name="vdem_multi_without_regions"
     )
     tb_multi_with_regions = tb_multi_with_regions.format(
-        keys=["country", "year", "estimate", "aggregate_method"], short_name="vdem_multi_with_regions"
+        keys=["country", "year", "estimate"], short_name="vdem_multi_with_regions"
     )
     tb_countries_counts = tb_countries_counts.format(
         keys=["country", "year", "category"], short_name="vdem_num_countries"
     )
+    tb_countries_share = tb_countries_share.format(keys=["country", "year"], short_name="vdem_share_countries")
     tb_population_counts = tb_population_counts.format(
         keys=["year", "country", "category"], short_name="vdem_population"
     )
@@ -152,6 +177,8 @@ def run() -> None:
         tb_multi_with_regions,
         # Number of countries with X properties
         tb_countries_counts,
+        # Share of countries with X properties
+        tb_countries_share,
         # Number of people living in countries with X property
         tb_population_counts,
     ]
@@ -329,3 +356,44 @@ def append_citation_full(tb: Table) -> Table:
                 f"{CITATION_LUHRMANN};\n\n" + tb[indicator_name].metadata.origins[0].citation_full
             )
     return tb
+
+
+def estimate_share_countries(tb: Table, num_countries_last) -> Table:
+    """Estimate the share of countries with a certain property."""
+    # NOTE: The count of countries only considers *actually* existing countries, and skips imputed countries. That's due to how `aggregate.run` has implemented that. Therefore, we can estimate the share of countries easily by num_countries_women_ever / total_countries * 100. No need to worry about counting imputed countries!
+    # The share is estimated relative to the number of countries as of 2024, which is a different strategy compared to the rest of indicators. That's because the framing is "looking backwards at the history of current countris".
+
+    assert num_countries_last == NUM_COUNTRIES_2024, "The number of countries should be 179 as of 2024."
+
+    columns_rename = {
+        "num_countries_wom_hoe_ever": "share_countries_wom_hoe_ever",
+        "num_countries_wom_hoe_ever_demelect": "share_countries_wom_hoe_ever_demelect",
+    }
+    columns = list(columns_rename.keys())
+    tb_share = (
+        tb.loc[:, ["country", "year", "category"] + columns]
+        .copy()
+        .dropna(how="all", subset=columns)
+        .rename(columns=columns_rename)
+    )
+
+    # Keep only category "yes", and entity "World"
+    tb_share = tb_share[(tb_share["category"] == "yes") & (tb_share["country"] == "World")].drop(columns=["category"])
+
+    # Add a column with the total count of countries per year-country
+    tb_share["total_countries"] = tb_share.groupby(["country", "year"], as_index=False)[
+        "share_countries_wom_hoe_ever"
+    ].transform("sum")
+
+    assert tb_share["total_countries"].notna().all(), "NA detected!"
+
+    # Option 1: Share of countries relative to current number of countries
+    # tb_share["share_countries_wom_hoe_ever"] /= tb_share["total_countries"] * 0.01
+    # tb_share["share_countries_wom_hoe_ever_demelect"] /= tb_share["total_countries"] * 0.01
+    tb_share = tb_share.drop(columns=["total_countries"])
+
+    # Option 2: Share of countries relative to number of countries as of 2024
+    tb_share["share_countries_wom_hoe_ever"] /= num_countries_last * 0.01
+    tb_share["share_countries_wom_hoe_ever_demelect"] /= num_countries_last * 0.01
+
+    return tb_share

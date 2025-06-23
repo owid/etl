@@ -4,6 +4,11 @@ title:
 default_selection:
   - World
 
+default_dimensions:
+  indicator: deaths
+  conflict_type: state_based_stacked
+  estimate: best
+
 dimensions:
   - slug: indicator
     name: Measure
@@ -15,31 +20,31 @@ dimensions:
         name: "Death rate"
         description: The number of deaths divided by the total population
       - slug: "wars_ongoing"
-        name: "Number of wars"
+        name: "Number of conflicts"
         # description: People moving to country
       - slug: "wars_ongoing_country_rate"
-        name: "War rate"
-        description: The number of wars divided by the number of countries
+        name: "Conflict rate"
+        description: The number of conflicts divided by the number of countries
   - slug: conflict_type
     name: "Conflict type"
     choices:
       - slug: "state-based"
-        name: "All"
-        description: All conflicts involving states
+        name: "All involving states"
+        # description: All conflicts involving states
       - slug: "state_based_stacked"
-        name: "All (breakdown)"
-        description: Breakdown by conflict type
+        name: "All involving states (by type)"
+        # description: All conflicts involving states. Breakdown by conflict type
       - slug: "interstate"
-        name: "Interstate conflicts"
+        name: "Interstate"
         description: Between states
       - slug: "intrastate (internationalized)"
-        name: "Foreign-backed civil conflicts"
+        name: "Foreign-backed civil"
         description: Between a state and another armed group, involving a foreign state
       - slug: "intrastate (non-internationalized)"
-        name: "Domestic civil conflicts"
+        name: "Domestic civil"
         description: Between a state and another armed group, not involving a foreign state
       - slug: "extrasystemic"
-        name: "Colonial conflicts"
+        name: "Colonial"
         description: Between a state and another armed group outside its territory
   - slug: estimate
     name: "Estimate"
@@ -47,13 +52,13 @@ dimensions:
       - slug: best
         name: Best estimate
       - slug: best_ci
-        name: Best estimate (with CI)
+        name: Show high and low estimates
       - slug: low
         name: Low estimate
       - slug: high
         name: High estimate
       - slug: na
-        name: " "
+        name: "Not applicable"
         description: "Not applicable"
       - slug: low_high
         name: "Low and high estimates"

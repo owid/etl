@@ -39,6 +39,9 @@ MAX_DATASETTE_N_ROWS = 10000
 # Base OWID URL, used to find views in articles and topic pages.
 OWID_BASE_URL = "https://ourworldindata.org/"
 
+# Base URL for grapher charts.
+GRAPHERS_BASE_URL = OWID_BASE_URL + "grapher/"
+
 # Complete list of component types in the posts_gdocs_links.
 # Each component type corresponds to a way in which a gdoc can be linked to another piece of content (e.g. a grapher chart, or an explorer).
 COMPONENT_TYPES_ALL = [
@@ -932,3 +935,75 @@ def get_post_views_last_n_days(
     )
 
     return df_views
+
+
+def get_visualizations_using_data_by_producer(
+    producers: Optional[List[str]] = None, excluded_steps: Optional[List[str]] = None
+) -> pd.DataFrame:
+    """Get all OWID visualizations (charts and collection views) using data from a given list of producers.
+
+    Parameters
+    ----------
+    producers : list of str, optional
+        Producer names to include. If None or empty, all producers are included.
+    excluded_steps : list, optional
+        Step patterns to exclude from the results. If empty, no filtering will be applied.
+        Example: ['demography/.*/population', 'energy/.*/primary_energy_consumption', 'ggdc/.*/maddison_project_database', 'wb/.*/income_groups']
+
+    TODO: Generalize to account for collection views, not only charts.
+    """
+    # Initialize empty lists if None is provided
+    if excluded_steps is None:
+        excluded_steps = []
+
+    # Construct the base SQL query
+    query = f"""WITH t_base AS (
+	SELECT
+		cd.chartId chart_id,
+		JSON_UNQUOTE(JSON_EXTRACT(cc.full, '$.title')) chart_title,
+		cc.slug chart_slug,
+		CONCAT('{GRAPHERS_BASE_URL}', cc.slug) chart_url,
+		JSON_EXTRACT(cc.full, '$.isPublished') is_published,
+		cd.variableId variable_id,
+		v.name variable_name,
+		d.id dataset_id,
+		d.name dataset_name,
+		d.catalogPath dataset_uri,
+		ov.originId origin_id,
+		o.title origin_name,
+        o.urlMain origin_url,
+		o.producer producer
+	FROM chart_dimensions cd
+	LEFT JOIN charts c ON c.id = cd.chartId
+	LEFT JOIN chart_configs cc ON cc.id = c.configId
+	LEFT JOIN origins_variables ov ON ov.variableId = cd.variableId
+	LEFT JOIN origins o ON o.id = ov.originId
+	LEFT JOIN variables v ON cd.variableId = v.id
+	LEFT JOIN datasets d ON d.id = v.datasetId
+)
+SELECT * FROM t_base
+WHERE origin_id IS NOT NULL
+AND is_published = true"""
+
+    # Select producers, if specified.
+    if producers and len(producers) > 0:
+        producers_str = ", ".join(f"'{p}'" for p in [p.replace("'", "''") for p in producers])
+        query += f"\nAND producer IN ({producers_str})"
+
+    # Execute the query.
+    df = OWID_ENV.read_sql(query)
+
+    # Exclude certain steps using regex.
+    # NOTE: This approach is safer and more accurate than excluding those steps directly in the query.
+    if excluded_steps:
+        exclude_steps_regex = "|".join(excluded_steps)
+        excluded_rows = df["dataset_uri"].str.fullmatch(exclude_steps_regex)
+        df = df.loc[~excluded_rows]
+
+    # Handle special case of "Various sources".
+    mask_various = df["producer"] == "Various sources"
+    df.loc[mask_various, "producer"] = (
+        df.loc[mask_various, "producer"] + " (" + df.loc[mask_various, "origin_url"] + ")"
+    )
+
+    return df

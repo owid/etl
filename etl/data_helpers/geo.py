@@ -5,7 +5,7 @@ import json
 import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Hashable, List, Literal, Optional, Set, TypeVar, Union, cast
+from typing import Any, Hashable, Literal, TypeVar, cast
 
 import numpy as np
 import owid.catalog.processing as pr
@@ -94,9 +94,9 @@ class RegionNotFound(ExceptionFromDocstring):
 
 def list_countries_in_region(
     region: str,
-    countries_regions: Optional[pd.DataFrame] = None,
-    income_groups: Optional[pd.DataFrame] = None,
-) -> List[str]:
+    countries_regions: pd.DataFrame | None = None,
+    income_groups: pd.DataFrame | None = None,
+) -> list[str]:
     """List countries that are members of a region.
 
     ####################################################################################################################
@@ -135,7 +135,7 @@ def list_countries_in_region(
         else:
             member_codes = json.loads(member_codes_str)
         # Get harmonized names of these countries.
-        members = countries_regions.loc[member_codes]["name"].tolist()  # type: List[str]
+        members = countries_regions.loc[member_codes]["name"].tolist()  # type: list[str]
     elif region in income_groups_names:
         members = income_groups[income_groups["income_group"] == region]["country"].unique().tolist()  # type: ignore
     else:
@@ -150,10 +150,10 @@ def list_countries_in_region_that_must_have_data(
     reference_year: int = REFERENCE_YEAR,
     min_frac_individual_population: float = MIN_FRAC_INDIVIDUAL_POPULATION,
     min_frac_cumulative_population: float = MIN_FRAC_CUMULATIVE_POPULATION,
-    countries_regions: Optional[pd.DataFrame] = None,
-    income_groups: Optional[pd.DataFrame] = None,
+    countries_regions: pd.DataFrame | None = None,
+    income_groups: pd.DataFrame | None = None,
     verbose: bool = False,
-) -> List[str]:
+) -> list[str]:
     """List countries of a region that are expected to have the largest contribution to any variable.
 
     ####################################################################################################################
@@ -242,7 +242,7 @@ def list_countries_in_region_that_must_have_data(
             f" {selected['fraction'].sum() * 100: .2f}% of the population; otherwise"
             " aggregate data will be nan."
         )
-    countries = selected["country"].tolist()  # type: List[str]
+    countries = selected["country"].tolist()  # type: list[str]
 
     return countries
 
@@ -250,16 +250,17 @@ def list_countries_in_region_that_must_have_data(
 def add_region_aggregates(
     df: TableOrDataFrame,
     region: str,
-    countries_in_region: Optional[List[str]] = None,
-    index_columns: Optional[List[str]] = None,
-    countries_that_must_have_data: Optional[Union[List[str], Literal["auto"]]] = None,
-    num_allowed_nans_per_year: Optional[int] = None,
-    frac_allowed_nans_per_year: Optional[float] = None,
-    min_num_values_per_year: Optional[int] = None,
+    countries_in_region: list[str] | None = None,
+    index_columns: list[str] | None = None,
+    countries_that_must_have_data: list[str] | Literal["auto"] | None = None,
+    frac_countries_that_must_have_data: float | None = None,
+    num_allowed_nans_per_year: int | None = None,
+    frac_allowed_nans_per_year: float | None = None,
+    min_num_values_per_year: int | None = None,
     country_col: str = "country",
     year_col: str = "year",
-    aggregations: Optional[Dict[str, Any]] = None,
-    keep_original_region_with_suffix: Optional[str] = None,
+    aggregations: dict[str, Any] | None = None,
+    keep_original_region_with_suffix: str | None = None,
 ) -> TableOrDataFrame:
     """Add aggregate data for a specific region (e.g. a continent or an income group) to a table.
 
@@ -306,6 +307,11 @@ def add_region_aggregates(
           those countries is not informed on a particular variable and year, the region will have nan for that particular
           variable and year.
         * If None, nothing happens: An aggregate is constructed even if important countries are missing.
+    frac_countries_that_must_have_data : float or None
+        * If a number is passed, this is the minimum fraction of the total population of the region that must be
+          represented by the countries that have data for a particular variable and year. If that fraction is not
+          reached, the aggregate will be nan.
+        * If None, it is assumed that a 100% fraction is required.
     num_allowed_nans_per_year : int or None
         * If a number is passed, this is the maximum number of nans that can be present in a particular variable and
           year. If that number of nans is exceeded, the aggregate will be nan.
@@ -359,12 +365,28 @@ def add_region_aggregates(
     # Select data for countries in the region.
     df_countries = df[df[country_col].isin(countries_in_region)]
 
+    def _check_countries_must_have_data(countries):
+        # Get set of countries with data
+        countries_with_data = set(list(countries))
+        if frac_countries_that_must_have_data is None:
+            return set(countries_that_must_have_data).issubset(countries_with_data)
+        elif frac_countries_that_must_have_data > 1:
+            raise ValueError(
+                f"`frac_countries_that_must_have_data` must be between 0 and 1, got {frac_countries_that_must_have_data}."
+            )
+        else:
+            # If a fraction of countries that must have data is defined, check that the fraction of countries that
+            # have data is larger than the defined fraction.
+            num_countries_relevant = len(countries_that_must_have_data)
+            num_countries_relevant_with_data = len(set(countries_that_must_have_data).intersection(countries_with_data))
+            return num_countries_relevant_with_data / num_countries_relevant >= frac_countries_that_must_have_data
+
     df_region = groupby_agg(
         df=df_countries,
         groupby_columns=[column for column in index_columns if column != country_col],
         aggregations=dict(
             **aggregations,
-            **{country_col: lambda x: set(countries_that_must_have_data).issubset(set(list(x)))},
+            **{country_col: lambda x: _check_countries_must_have_data(x)},
         ),
         num_allowed_nans=num_allowed_nans_per_year,
         frac_allowed_nans=frac_allowed_nans_per_year,
@@ -396,7 +418,8 @@ def add_region_aggregates(
         )
     else:
         # Remove rows in the original table containing rows for region, and append new rows for region.
-        df_updated = pd.concat([df[~(df[country_col] == region)], df_region], ignore_index=True)
+        dfs_to_concat = [df[~(df[country_col] == region)], df_region]
+        df_updated = pd.concat([df for df in dfs_to_concat if not df.empty], ignore_index=True)
         # WARNING: When an aggregate is added (e.g. "Europe") just for one of the columns (and no aggregation is
         # specified for the rest of columns) and there was already data for that region, the data for the rest of
         # columns is deleted for that particular region (in the following line).
@@ -412,7 +435,7 @@ def add_region_aggregates(
             )
 
     # Sort conveniently.
-    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)
+    df_updated = df_updated.sort_values(index_columns).reset_index(drop=True)  # type: ignore
 
     # Convert country to categorical if the original was
     if df[country_col].dtype.name == "category":
@@ -427,8 +450,8 @@ def add_region_aggregates(
 
 def harmonize_countries(
     df: TableOrDataFrame,
-    countries_file: Union[Path, str],
-    excluded_countries_file: Optional[Union[Path, str]] = None,
+    countries_file: Path | str,
+    excluded_countries_file: Path | str | None = None,
     country_col: str = "country",
     warn_on_missing_countries: bool = True,
     make_missing_countries_nan: bool = False,
@@ -526,7 +549,7 @@ def _add_population_to_dataframe(
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
     interpolate_missing_population: bool = False,
-    expected_countries_without_population: Optional[List[str]] = None,
+    expected_countries_without_population: list[str] | None = None,
     _warn_deprecated: bool = True,
 ) -> TableOrDataFrame:
     """Add column of population to a dataframe.
@@ -697,7 +720,7 @@ def add_population_to_table(
     warn_on_missing_countries: bool = True,
     show_full_warning: bool = True,
     interpolate_missing_population: bool = False,
-    expected_countries_without_population: Optional[List[str]] = None,
+    expected_countries_without_population: list[str] | None = None,
 ) -> Table:
     """Add column of population to a table with metadata.
 
@@ -849,14 +872,14 @@ def create_table_of_regions_and_subregions(ds_regions: Dataset, subregion_type: 
 def list_members_of_region(
     region: str,
     ds_regions: Dataset,
-    ds_income_groups: Optional[Dataset] = None,
-    additional_regions: Optional[List[str]] = None,
-    excluded_regions: Optional[List[str]] = None,
-    additional_members: Optional[List[str]] = None,
-    excluded_members: Optional[List[str]] = None,
+    ds_income_groups: Dataset | None = None,
+    additional_regions: list[str] | None = None,
+    excluded_regions: list[str] | None = None,
+    additional_members: list[str] | None = None,
+    excluded_members: list[str] | None = None,
     include_historical_regions_in_income_groups: bool = False,
     exclude_historical_countries: bool = False,
-) -> List[str]:
+) -> list[str]:
     """Get countries in a region, both for known regions (e.g. "Africa") and custom ones (e.g. "Europe (excl. EU-27)").
 
     Parameters
@@ -980,8 +1003,8 @@ def list_members_of_region(
 
 def detect_overlapping_regions(
     df: TableOrDataFrame,
-    index_columns: List[str],
-    regions_and_members: Dict[Hashable, List[str]],
+    index_columns: list[str],
+    regions_and_members: dict[Hashable, list[str]],
     country_col: str = "country",
     year_col: str = "year",
     ignore_overlaps_of_zeros: bool = True,
@@ -1068,21 +1091,22 @@ def detect_overlapping_regions(
 def add_regions_to_table(
     tb: TableOrDataFrame,
     ds_regions: Dataset,
-    ds_income_groups: Optional[Dataset] = None,
-    regions: Optional[Union[List[str], Dict[str, Any]]] = None,
-    aggregations: Optional[Dict[str, str]] = None,
-    index_columns: Optional[List[str]] = None,
-    num_allowed_nans_per_year: Optional[int] = None,
-    frac_allowed_nans_per_year: Optional[float] = None,
-    min_num_values_per_year: Optional[int] = None,
+    ds_income_groups: Dataset | None = None,
+    regions: list[str] | dict[str, Any] | None = None,
+    aggregations: dict[str, str] | None = None,
+    index_columns: list[str] | None = None,
+    num_allowed_nans_per_year: int | None = None,
+    frac_allowed_nans_per_year: float | None = None,
+    min_num_values_per_year: int | None = None,
     country_col: str = "country",
     year_col: str = "year",
-    keep_original_region_with_suffix: Optional[str] = None,
+    keep_original_region_with_suffix: str | None = None,
     check_for_region_overlaps: bool = True,
-    accepted_overlaps: Optional[List[Dict[int, Set[str]]]] = None,
+    accepted_overlaps: list[dict[int, set[str]]] | None = None,
     ignore_overlaps_of_zeros: bool = False,
     subregion_type: str = "successors",
-    countries_that_must_have_data: Optional[Dict[str, List[str]]] = None,
+    countries_that_must_have_data: dict[str, list[str]] | None = None,
+    frac_countries_that_must_have_data: dict[str, float] | None = None,
 ) -> Table:
     """Add one or more region aggregates to a table (or dataframe).
 
@@ -1104,7 +1128,7 @@ def add_regions_to_table(
         World Bank income groups dataset.
         * If given, aggregates for income groups may be added to the data.
         * If None, no aggregates for income groups will be added.
-    regions : Optional[Union[List[str], Dict[str, Any]]], default: None
+    regions : Optional[Union[list[str], dict[str, Any]]], default: None
         Regions to be added.
         * If it is a list, it must contain region names of default regions or income groups.
           Example: ["Africa", "Europe", "High-income countries"]
@@ -1122,7 +1146,7 @@ def add_regions_to_table(
                 },
             }
         * If None, the default regions will be added (defined as REGIONS in etl.data_helpers.geo).
-    aggregations : Optional[Dict[str, str]], default: None
+    aggregations : Optional[dict[str, str]], default: None
         Aggregation to implement for each variable.
         * If a dictionary is given, the keys must be columns of the input data, and the values must be valid operations.
           Only the variables indicated in the dictionary will be affected. All remaining variables will have an
@@ -1131,7 +1155,7 @@ def add_regions_to_table(
           If there is a "column_4" in the data, for which no aggregation is defined, then the e.g. "Europe" will have
           only nans for "column_4".
         * If None, "sum" will be assumed to all variables.
-    index_columns : Optional[List[str]], default: None
+    index_columns : Optional[list[str]], default: None
         Names of index columns (usually ["country", "year"]). Aggregations will be done on groups defined by these
         columns (excluding the country column). A country and a year column should always be included.
         But more dimensions are also allowed, e.g. index_columns=["country", "year", "type"].
@@ -1165,7 +1189,7 @@ def add_regions_to_table(
             Consider adding the option to remove the data for the historical region, or the data for the successor, at
             the moment the aggregate is created.
         * If False, any possible overlap is ignored.
-    accepted_overlaps : Optional[List[Dict[int, Set[str]]]], default: None
+    accepted_overlaps : Optional[list[dict[int, set[str]]]], default: None
         Only relevant if check_for_region_overlaps is True.
         * If a dictionary is passed, it must contain years as keys, and sets of overlapping countries as values.
           This is used to avoid warnings when there are known overlaps in the data that are accepted.
@@ -1182,11 +1206,16 @@ def add_regions_to_table(
         * If "successors", the function will look for overlaps between historical regions and their successors.
         * If "related", the function will look for overlaps between regions and their possibly related members (e.g.
           overseas territories).
-    countries_that_must_have_data : Optional[Dict[str, List[str]]], default: None
+    countries_that_must_have_data : Optional[dict[str, list[str]]], default: None
         * If a dictionary is passed, each key must be a valid region, and the value should be a list of countries that
           must have data for that region. If any of those countries is not informed on a particular variable and year,
           that region will have nan for that particular variable and year.
         * If None, an aggregate is constructed regardless of the countries missing.
+    frac_countries_that_must_have_data: dict[str, float] | None, default: None
+        * If a dictionary is passed, each key must be a valid region, and the value should be a float between 0 and 1,
+          indicating the fraction of countries that must have data for that region. NOTE: Only works if `countries_that_must_have_data` is passed.
+        * If None, an aggregate is constructed regardless of the fraction of countries missing. I.e. it assumes that fraction should be 1 (i.e. 100%).
+
 
     Returns
     -------
@@ -1258,6 +1287,16 @@ def add_regions_to_table(
     else:
         countries_that_must_have_data = {region: [] for region in list(regions)}
 
+    if frac_countries_that_must_have_data:
+        error = "Argument frac_countries_that_must_have_data must be a dictionary with regions as keys."
+        assert set(frac_countries_that_must_have_data) <= set(regions), error
+        # Fill missing regions with an empty list.
+        # frac_countries_that_must_have_data = {
+        #     region: frac_countries_that_must_have_data.get(region, 1) for region in list(regions)
+        # }
+    else:
+        frac_countries_that_must_have_data = {}  # {region: 1 for region in list(regions)}
+
     # Add region aggregates.
     for region in regions:
         # Check that the content of the region dictionary is as expected.
@@ -1292,6 +1331,7 @@ def add_regions_to_table(
             index_columns=index_columns,
             countries_in_region=members,
             countries_that_must_have_data=countries_that_must_have_data[region],
+            frac_countries_that_must_have_data=frac_countries_that_must_have_data.get(region),
             num_allowed_nans_per_year=num_allowed_nans_per_year,
             frac_allowed_nans_per_year=frac_allowed_nans_per_year,
             min_num_values_per_year=min_num_values_per_year,
@@ -1346,7 +1386,7 @@ def make_table_population_daily(ds_population: Dataset, year_min: int, year_max:
     return cast(Table, population)
 
 
-def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: Optional[Set] = None) -> Table:
+def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: set | None = None) -> Table:
     """Add `population` column to table.
 
     Adds population value on a daily basis (extrapolated from yearly data).
@@ -1370,7 +1410,13 @@ def add_population_daily(tb: Table, ds_population: Dataset, missing_countries: O
     return tb
 
 
-def countries_to_continent_mapping(ds_regions: Dataset):
+def countries_to_continent_mapping(
+    ds_regions: Dataset,
+    ds_income_groups: Dataset | None = None,
+    regions: dict[str, Any] | None = None,
+    exclude_historical_countries: bool = True,
+    include_historical_regions_in_income_groups: bool = False,
+) -> dict[str, str]:
     """Get dictionary mapping country names to continents.
 
     E.g.
@@ -1385,21 +1431,35 @@ def countries_to_continent_mapping(ds_regions: Dataset):
     ds_regions : Dataset
         Regions dataset.
     """
-    regions = [
-        "Africa",
-        "Asia",
-        "Europe",
-        "North America",
-        "Oceania",
-        "South America",
-    ]
+    if regions is None:
+        regions = {
+            "Africa": {},
+            "Asia": {},
+            "Europe": {},
+            "North America": {},
+            "Oceania": {},
+            "South America": {},
+        }
     countries_to_continent = {}
-    for region in regions:
+    for region in regions.keys():
+        # members = list_members_of_region(
+        #     region=region,
+        #     ds_regions=ds_regions,
+        #     # By default, include historical regions in income groups.
+        #     exclude_historical_countries=True,
+        # )
+
         members = list_members_of_region(
             region=region,
             ds_regions=ds_regions,
+            ds_income_groups=ds_income_groups,
+            additional_regions=regions[region].get("additional_regions"),
+            excluded_regions=regions[region].get("excluded_regions"),
+            additional_members=regions[region].get("additional_members"),
+            excluded_members=regions[region].get("excluded_members"),
             # By default, include historical regions in income groups.
-            exclude_historical_countries=True,
+            exclude_historical_countries=exclude_historical_countries,
+            include_historical_regions_in_income_groups=include_historical_regions_in_income_groups,
         )
         countries_to_continent |= {m: region for m in members}
 

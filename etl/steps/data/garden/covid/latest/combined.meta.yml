@@ -38,7 +38,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [1, 2, 5, 10, 20, 50, 100, 200]
+                customNumericValues: [0, 1, 2, 5, 10, 20, 50, 100, 200]
                 baseColorScheme: Reds
       # Tests per case, cumulative
       cumulative_tests_per_case:
@@ -68,7 +68,7 @@ tables:
               colorScale:
                 customNumericColorsActive: true
                 binningStrategy: manual
-                customNumericValues: [1, 2, 5, 10, 20, 50]
+                customNumericValues: [0, 1, 2, 5, 10, 20, 50]
                 baseColorScheme: Reds
       # Positivity rate, 7d avg
       cumulative_positivity_rate:

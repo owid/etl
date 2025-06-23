@@ -18,6 +18,7 @@ paths = PathFinder(__file__)
 CATEGORY_OTHERS = "Others"
 CATEGORY_NON_RELEVANT = "Non-relevant"
 CATEGORY_O_NON_RELEVANT = "Omicron (others)"
+# 'rename' field can be found in https://github.com/hodcroftlab/covariants/blob/master/scripts/clusters.py (field 'alt_display_name')
 VARIANTS_DETAILS = {
     "20A.EU2": {"rename": "B.1.160", "relevant": False},
     "20A/S:439K": {"rename": "B.1.258", "relevant": False},
@@ -60,6 +61,15 @@ VARIANTS_DETAILS = {
     "24A (Omicron)": {"rename": "Omicron (JN.1)", "relevant": True},
     "24B (Omicron)": {"rename": "Omicron (JN.1.11.1)", "relevant": True},
     "24C (Omicron)": {"rename": "Omicron (KP.3)", "relevant": True},
+    "24D (Omicron)": {"rename": "Omicron (XDV.1)", "relevant": True},
+    "24E (Omicron)": {"rename": "Omicron (KP.3.1.1)", "relevant": True},
+    "24F (Omicron)": {"rename": "Omicron (XEC)", "relevant": True},
+    "24G (Omicron)": {"rename": "Omicron (KP.2.3)", "relevant": True},
+    "24H (Omicron)": {"rename": "Omicron (LF.7)", "relevant": True},
+    "24I (Omicron)": {"rename": "Omicron (MV.1)", "relevant": True},
+    "25A (Omicron)": {"rename": "Omicron (LP.8.1)", "relevant": True},
+    "25B (Omicron)": {"rename": "Omicron (NB.1.8.1)", "relevant": True},
+    "25C (Omicron)": {"rename": "Omicron (XFG)", "relevant": True},
     "S:677H.Robin1": {"rename": "S:677H.Robin1", "relevant": False},
     "S:677P.Pelican": {"rename": "S:677P.Pelican", "relevant": False},
     "recombinant": {"rename": "Recombinant", "relevant": False},
@@ -71,9 +81,8 @@ VARIANTS_OMICRON_BA = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if
 VARIANTS_OMICRON_XBB = list(
     set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (XBB"))
 )
-VARIANTS_OMICRON_JN = list(
-    set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JNN"))
-)
+VARIANTS_OMICRON_JN = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (JN")))
+VARIANTS_OMICRON_KP = list(set(v["rename"] for v in VARIANTS_DETAILS.values() if v["rename"].startswith("Omicron (KP")))
 
 COUNTRY_MAPPING = {
     "USA": "United States",
@@ -126,7 +135,7 @@ def run(dest_dir: str) -> None:
     tb = add_category_non_relevant(tb)
     tb = add_percent(tb)
     tb = add_groupings(tb)
-    tb = filter_by_num_sequences(tb, "num_sequences_total")
+    tb = filter_by_num_sequences(tb, col_total="num_sequences_total")
 
     # Second table: Sequencing
     tb_seq = tb.astype({"country": "string", "variant": "string"}).copy()
@@ -334,34 +343,17 @@ def add_group_by_prefix(tb: Table, starts_with: str, variant_group_name: str) ->
 
 
 def add_groupings(tb: Table) -> Table:
-    tb = add_omicron(tb)
-    tb = add_omicron_ba(tb)
-    tb = add_omicron_xbb(tb)
-    tb = add_omicron_jn(tb)
-    return tb
-
-
-def add_omicron(tb: Table) -> Table:
-    """Get totals for 'Omicron' sublineages."""
+    # Main Omicron
     tb = add_group_by_prefix(tb, "Omicron", "Omicron")
-    return tb
-
-
-def add_omicron_ba(tb: Table) -> Table:
-    """Get totals for 'Omicron (BA)' sublineages."""
-    tb = add_group_by_prefix(tb, "Omicron (BA", "Omicron (BA)")
-    return tb
-
-
-def add_omicron_xbb(tb: Table) -> Table:
-    """Get totals for 'Omicron (XBB)' sublineages."""
-    tb = add_group_by_prefix(tb, "Omicron (XBB", "Omicron (XBB)")
-    return tb
-
-
-def add_omicron_jn(tb: Table) -> Table:
-    """Get totals for 'Omicron (JN)' sublineages."""
-    tb = add_group_by_prefix(tb, "Omicron (JN", "Omicron (JN)")
+    # Omicron sublineages
+    prefixes = [
+        "Omicron (BA",
+        "Omicron (XBB",
+        "Omicron (JN",
+        "Omicron (KP",
+    ]
+    for prefix in prefixes:
+        tb = add_group_by_prefix(tb, prefix, f"{prefix})")
     return tb
 
 
@@ -422,8 +414,9 @@ def add_metadata_variant_groups(tb: Table) -> Table:
     list_variants_omicron_ba = to_list_str(VARIANTS_OMICRON_BA)
     list_variants_omicron_xbb = to_list_str(VARIANTS_OMICRON_XBB)
     list_variants_omicron_jn = to_list_str(VARIANTS_OMICRON_JN)
+    list_variants_omicron_kp = to_list_str(VARIANTS_OMICRON_KP)
 
     tb["num_sequences"].metadata.description_key = [
-        f"""<% if variant == '{CATEGORY_NON_RELEVANT}' %>{text_common}{list_variants_non_relevant}<% elif variant == 'Omicron (BA)' %>{text_common}{list_variants_omicron_ba}<% elif variant == 'Omicron (XBB)' %>{text_common}{list_variants_omicron_xbb}<% elif variant == 'Omicron (JN)' %>{text_common}{list_variants_omicron_jn}<%- endif -%>"""
+        f"""<% if variant == '{CATEGORY_NON_RELEVANT}' %>{text_common}{list_variants_non_relevant}<% elif variant == 'Omicron (BA)' %>{text_common}{list_variants_omicron_ba}<% elif variant == 'Omicron (XBB)' %>{text_common}{list_variants_omicron_xbb}<% elif variant == 'Omicron (JN)' %>{text_common}{list_variants_omicron_jn}<% elif variant == 'Omicron (KP)' %>{text_common}{list_variants_omicron_kp}<%- endif -%>"""
     ]
     return tb

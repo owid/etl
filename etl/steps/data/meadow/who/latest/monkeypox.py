@@ -16,6 +16,9 @@ def run(dest_dir: str) -> None:
     # Load data from snapshot.
     tb = snap.read(safe_types=False)
 
+    # Remove rows with null values
+    tb = tb.dropna(subset=["DATE", "ISO3"], how="all")
+
     #
     # Process data.
     #

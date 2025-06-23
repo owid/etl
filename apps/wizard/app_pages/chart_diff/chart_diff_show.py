@@ -402,7 +402,7 @@ class ChartDiffShow:
                 target = filter_out_fields_in_metadata_for_checksum(target)
 
                 # Get meta json diff
-                meta_diff = compare_dictionaries(source, target)  # type: ignore
+                meta_diff = compare_dictionaries(source, target, fromfile="source", tofile="target")
                 if meta_diff:
                     meta_diffs[indicator_id] = meta_diff
 

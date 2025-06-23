@@ -6,8 +6,8 @@ meta:
     version_producer: Local CSV
     url_main: https://unknown.com
     url_download: extended_financial_inclusion_table.csv
-    date_accessed: '2025-05-09'
-    date_published: '2025-05-09'
+    date_accessed: '2025-05-19'
+    date_published: '2025-05-19'
   name: DRAFT extended_financial_inclusion_table
   description: ''
 outs:

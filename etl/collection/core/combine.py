@@ -77,6 +77,10 @@ def combine_config_dimensions(
             if "presentation" in dim_overwrite:
                 dim["presentation"] = dim_overwrite["presentation"]
 
+            # Overwrite description
+            if "description" in dim_overwrite:
+                dim["description"] = dim_overwrite["description"]
+
             # Overwrite choices
             if "choices" in dim_overwrite:
                 choices_overwrite = records_to_dictionary(
@@ -95,7 +99,9 @@ def combine_config_dimensions(
                         # Overwrite choice name
                         choice["name"] = choice_overwrite.get("name", dim["name"])
                         # Overwrite choice description
-                        choice["description"] = choice_overwrite.get("description", choice["description"])
+                        description = choice_overwrite.get("description", choice.get("description"))
+                        if description is not None:
+                            choice["description"] = description
                         # Overwrite group
                         group = choice_overwrite.get("group")
                         if group is not None:
@@ -155,11 +161,13 @@ def _order(config_yaml, config_combined):
 @overload
 def combine_collections(
     collections: List[E],
-    collection_name: str,
-    config: Optional[Dict[str, Any]] = None,
+    collection_name: str | None = None,
+    catalog_path: str | None = None,
+    config: dict[str, Any] | None = None,
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = None,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> E: ...
@@ -168,11 +176,13 @@ def combine_collections(
 @overload
 def combine_collections(
     collections: List[T],
-    collection_name: str,
-    config: Optional[Dict[str, Any]] = None,
+    collection_name: str | None = None,
+    catalog_path: str | None = None,
+    config: dict[str, Any] | None = None,
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = None,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> T: ...
@@ -181,11 +191,13 @@ def combine_collections(
 # COMBINE COLLECTIONS
 def combine_collections(
     collections: Union[List[Collection], List[Explorer]],
-    collection_name: str,
-    config: Optional[Dict[str, Any]] = None,
+    collection_name: str | None = None,
+    catalog_path: str | None = None,
+    config: dict[str, Any] | None = None,
     dependencies: Optional[Set[str]] = None,
     force_collection_dimension: bool = False,
     collection_dimension_name: Optional[str] = None,
+    collection_dimension_slug: str | None = None,
     collection_choices_names: Optional[List[str]] = None,
     is_explorer: Optional[bool] = None,
 ) -> Union[Collection, Explorer]:
@@ -195,18 +207,26 @@ def combine_collections(
     or MDIMs (Collections), abstracting the common logic between the two.
 
     Args:
-        collections: List of collections (either all MDIMs or all Explorers) to combine
-        collection_name: Name of the resulting combined collection
-        config: Configuration for the combined collection
-        dependencies: Set of dependencies for the combined collection
-        force_collection_dimension: If True, adds a dimension to identify the source collection
-            even if there are no duplicate views
-        collection_dimension_name: Name for the dimension that identifies the source collection
-            (defaults to "MDIM" for Collections or "Explorer" for Explorers)
-        collection_choices_names: Names for the choices in the source dimension
-            (should match the length of collections)
-        is_explorer: Force the result to be an Explorer (True) or MDIM (False).
-            If None (default), inferred from the input collections.
+        collections:
+            List of collections (either all MDIMs or all Explorers) to combine
+        collection_name:
+            Name of the resulting combined collection. This is used to define the `catalog_path` of the resulting combined collection (re-uses the catalog_path of the first collection, and replaced its short_name with the `collection_name`). Alternatively, you can use `catalog_path` to force a specific path.
+        catalog_path:
+            Force specific catalog path, regardless of `collection_name`.
+        config:
+            Configuration for the combined collection
+        dependencies:
+            Set of dependencies for the combined collection
+        force_collection_dimension:
+            If True, adds a dimension to identify the source collection even if there are no duplicate views
+        collection_dimension_slug:
+            Slug for the dimension that identifies the source collection. If None, defaults to "collection__slug".
+        collection_dimension_name:
+            Name for the dimension that identifies the source collection. If None, defaults to "Collection".
+        collection_choices_names:
+            Names for the choices in the source dimension (should match the length of collections)
+        is_explorer:
+            Force the result to be an Explorer (True) or MDIM (False). If None (default), inferred from the input collections.
 
     Returns:
         A combined Collection or Explorer, matching the type of the input collections
@@ -220,6 +240,10 @@ def combine_collections(
     assert len(collections) > 0, "No collections to combine."
     assert len(collections) > 1, "At least two collections should be provided."
 
+    # Check that either collection_name or catalog_path is provided
+    if collection_name is None and catalog_path is None:
+        raise ValueError("Either collection_name or catalog_path must be provided.")
+
     # Determine collection type if not specified
     if is_explorer is None:
         is_explorer = all(isinstance(c, Explorer) for c in collections)
@@ -229,6 +253,8 @@ def combine_collections(
     # Set appropriate default dimension name based on collection type
     if collection_dimension_name is None:
         collection_dimension_name = COLLECTION_TITLE
+    if collection_dimension_slug is None:
+        collection_dimension_slug = COLLECTION_SLUG
 
     # Check that all collections have the same dimensions structure
     collection_dims = None
@@ -275,7 +301,7 @@ def combine_collections(
                 choice_name = collection.title.get("title", collection.short_name)
 
             dimension_collection = Dimension(
-                slug=COLLECTION_SLUG,
+                slug=collection_dimension_slug,
                 name=collection_dimension_name,
                 choices=[
                     DimensionChoice(slug=collection.short_name, name=choice_name),
@@ -283,7 +309,7 @@ def combine_collections(
             )
             collection.dimensions = [dimension_collection] + collection.dimensions
             for v in collection.views:
-                v.dimensions[COLLECTION_SLUG] = collection.short_name
+                v.dimensions[collection_dimension_slug] = collection.short_name
 
     # Create dictionary with collections for tracking
     collections_by_id = {str(i): deepcopy(collection) for i, collection in enumerate(collections)}
@@ -310,8 +336,17 @@ def combine_collections(
         views.extend(collection.views)
 
     # Create catalog path
-    assert isinstance(collections[0].catalog_path, str), "Catalog path is not set. Please set it before saving."
-    catalog_path = collections[0].catalog_path.split("#")[0] + "#" + collection_name
+    if isinstance(catalog_path, str):
+        assert (
+            "#" in catalog_path
+        ), "Catalog path must contain a '#' to separate the base path from the collection name."
+        catalog_path_new = catalog_path
+        collection_name_new = catalog_path_new.split("#")[-1]
+    else:
+        assert isinstance(collections[0].catalog_path, str), "Catalog path is not set. Please set it before saving."
+        assert collection_name is not None, "Collection name must be provided if catalog_path is not set."
+        catalog_path_new = collections[0].catalog_path.split("#")[0] + "#" + collection_name
+        collection_name_new = collection_name
 
     # Ensure config has minimal required fields
     if config is None:
@@ -321,7 +356,7 @@ def combine_collections(
 
     # Make sure there is title and default_selection. If not given, use default values.
     default_title = {
-        "title": f"Combined Collection: {collection_name}",
+        "title": f"Combined Collection: {collection_name_new}",
         "title_variant": "Use a YAML to define these attributes",
     }
     if not is_explorer:
@@ -340,14 +375,18 @@ def combine_collections(
             cconfig["config"]["explorerSubtitle"] = default_title["title_variant"]
 
     # Set dimensions and views
-    cconfig["dimensions"] = dimensions
+    # cconfig["dimensions"] = dimensions
+    cconfig["dimensions"] = combine_config_dimensions(
+        [d.to_dict() for d in dimensions],
+        cconfig.get("dimensions", []),
+    )
     cconfig["views"] = views
 
     # Create the combined collection
     combined = create_collection_from_config(
         config=cconfig,
         dependencies=dependencies if dependencies is not None else set(),
-        catalog_path=catalog_path,
+        catalog_path=catalog_path_new,
         validate_schema=True if not is_explorer else False,
         explorer=is_explorer,
     )

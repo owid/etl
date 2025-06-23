@@ -5,6 +5,23 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+COMMON_CONFIG = {
+    "hasMapTab": True,
+    "originUrl": "ourworldindata.org/ucdp",
+    "relatedQuestions": [
+        {
+            "text": "How do different approaches measure armed conflicts and their deaths?",
+            "url": "https://ourworldindata.org/conflict-data-how-do-researchers-measure-armed-conflicts-and-their-deaths",
+        }
+    ],
+    "map": {
+        "colorScale": {"baseColorScheme": "OrRd"},
+    },
+    "hideAnnotationFieldsInTitle": {
+        "time": True,
+    },
+}
+
 
 def run() -> None:
     #
@@ -37,12 +54,7 @@ def run() -> None:
             "death_rate",
             "num_conflicts",
         ],
-        common_view_config={
-            "hideAnnotationFieldsInTitle": {
-                "time": True,
-            },
-        },
-        # dimensions={},
+        common_view_config=COMMON_CONFIG,
     )
 
     # Edit indicator-level display settings
@@ -55,7 +67,8 @@ def run() -> None:
 
     # Aggregate views
     c.group_views(
-        params=[
+        groups=[
+            # By conflict type
             {
                 "dimension": "conflict_type",
                 "choices": [
@@ -65,36 +78,35 @@ def run() -> None:
                     "one-sided violence",
                 ],
                 "choice_new_slug": "all_stacked",
-                "config_new": {
+                "view_config": COMMON_CONFIG
+                | {
                     "chartTypes": ["StackedBar"],
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
+                    "hasMapTab": False,
                 },
+                "view_metadata": {"description_key": lambda view: _set_description_key(view, tb)},
             },
-            {
-                "dimension": "estimate",
-                "choices": ["low", "high", "best"],
-                "choice_new_slug": "best_ci",
-                "config_new": {
-                    "selectedFacetStrategy": "entity",
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
-                },
-            },
+            # By death type
             {
                 "dimension": "people",
                 "choices": ["combatants", "civilians", "unknown"],
                 "choice_new_slug": "all_stacked",
-                "config_new": {
+                "view_config": COMMON_CONFIG
+                | {
                     "chartTypes": ["StackedBar"],
-                    "selectedFacetStrategy": "entity",
-                    "hideAnnotationFieldsInTitle": {
-                        "time": True,
-                    },
                     "sortBy": "custom",
+                    "hasMapTab": False,
                 },
+                "view_metadata": {
+                    "description_key": lambda view: _set_description_key(view, tb),
+                },
+            },
+            # Best + CI estimates
+            {
+                "dimension": "estimate",
+                "choices": ["low", "high", "best"],
+                "choice_new_slug": "best_ci",
+                "view_config": COMMON_CONFIG | {"hasMapTab": False},
+                "view_metadata": {"description_key": lambda view: _set_description_key(view, tb)},
             },
         ]
     )
@@ -112,6 +124,7 @@ def run() -> None:
             },
             {"estimate": ["low", "high"]},
             {"people": ["combatants", "civilians", "unknown"]},
+            {"conflict_type": "one-sided violence", "people": "all_stacked"},
         ]
     )
 
@@ -119,11 +132,22 @@ def run() -> None:
     # (optional) Edit views
     #
     for view in c.views:
-        # Edit title and subtitle in charts
-        edit_view_title(view, choice_names)
-
         # Edit FAUST in charts with CI (color, display names). Indicator-level.
-        edit_view_display_estimates_ci(view)
+        edit_indicator_displays(view)
+
+    # Edit view configs
+    c.set_global_config(
+        {
+            "timelineMinTime": 1989,
+            "selectedFacetStrategy": "entity",
+            "title": lambda view: _set_title(view, choice_names),
+            "subtitle": lambda view: _set_subtitle(view),
+            "note": lambda view: _set_note(view),
+            "hideRelativeToggle": lambda view: (view.dimensions["people"] != "all_stacked")
+            and (view.dimensions["conflict_type"] != "all_stacked"),
+            "hideFacetControl": lambda view: view.dimensions["estimate"] == "best_ci",
+        },
+    )
 
     #
     # Save garden dataset.
@@ -208,37 +232,115 @@ def adjust_dimensions(tb):
     return tb
 
 
-def edit_view_title(view, conflict_renames):
-    """Edit FAUST titles and subtitles."""
-    # Get conflict type name
-    conflict_name = "armed conflicts"
-    if view.dimensions["conflict_type"] not in {"all", "all_stacked"}:
-        conflict_name = conflict_renames.get(view.dimensions["conflict_type"]).lower()
+def _set_description_key(view, tb):
+    if view.dimensions["conflict_type"] in ("all", "all_stacked"):
+        column = "number_deaths_ongoing_conflicts__conflict_type_all"
+    elif view.dimensions["conflict_type"] == "intrastate":
+        column = "number_deaths_ongoing_conflicts__conflict_type_intrastate"
+    elif view.dimensions["conflict_type"] == "interstate":
+        column = "number_deaths_ongoing_conflicts__conflict_type_interstate"
+    elif view.dimensions["conflict_type"] == "non-state conflict":
+        column = "number_deaths_ongoing_conflicts__conflict_type_non_state_conflict"
+    else:
+        return []
+    keys = tb[column].m.description_key
 
-    # Add title based on indicator
-    if view.dimensions["indicator"] == "deaths":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Deaths in {conflict_name}",
-        }
-    elif view.dimensions["indicator"] == "death_rate":
-        view.config = {
-            **(view.config or {}),
-            "title": f"Death rate in {conflict_name}",
-        }
-    elif view.dimensions["indicator"] == "num_conflicts":
-        if view.dimensions["conflict_type"] == "one-sided violence":
-            title = f"Number of conflicts with {conflict_name}"
+    if (view.dimensions["estimate"] == "best_ci") or (view.dimensions["indicator"] == "num_conflicts"):
+        assert keys[-1].startswith("'Best' death estimates")
+        keys = keys[:-1] + [None]
+
+    return keys
+
+
+def _set_title(view, choice_names):
+    conflict_name = _get_conflict_name(view, choice_names)
+    if view.dimensions["indicator"] in ("deaths", "death_rate"):
+        # Condition by indicator: "Deaths" vs "Death rate"
+        if view.dimensions["indicator"] == "death_rate":
+            title = "Death rate"
         else:
-            title = f"Number of {conflict_name}"
-        view.config = {
-            **(view.config or {}),
-            "title": title,
-        }
+            title = "Deaths"
+
+        # Condition by conflict type: "in" vs "from", add conflict_name
+        title += f" {'from' if view.dimensions['conflict_type'] == 'one-sided violence' else 'in'} {conflict_name} based on where they occurred"
+
+        # Condition by people: "Civilian and combatant" breakdown or aggregate
+        if view.dimensions["people"] == "all_stacked":
+            title = f"Civilian and combatant {title.lower()}"
+    else:
+        title = f"Number of {'cases of ' if view.dimensions['conflict_type'] == 'one-sided violence' else ''}{conflict_name}"
+
+    # Add 'by type' at the end if applicable
+    if view.dimensions["conflict_type"] == "all_stacked":
+        title += " by type"
+    return title
 
 
-def edit_view_display_estimates_ci(view):
+def _set_subtitle(view):
+    """Set subtitle based on view dimensions."""
+    if view.dimensions["conflict_type"] == "one-sided violence":
+        if view.dimensions["indicator"] == "num_conflicts":
+            return "Included are cases of [one-sided violence against civilians](#dod:onesided-ucdp) that were ongoing that year."
+        return f"Reported deaths of civilians due to [one-sided violence](#dod:onesided-ucdp) that was ongoing that year{', per 100,000 people' if view.dimensions['indicator']=='death_rate' else ''}. Deaths due to disease and starvation resulting from one-sided violence are not included."
+
+    # DoD
+    if view.dimensions["conflict_type"] == "all":
+        dod = "[armed conflicts](#dod:armed-conflict-ucdp)"
+    elif view.dimensions["conflict_type"] == "interstate":
+        dod = "[interstate conflicts](#dod:interstate-ucdp)"
+    elif view.dimensions["conflict_type"] == "intrastate":
+        dod = "[civil conflicts](#dod:intrastate-ucdp)"
+    elif view.dimensions["conflict_type"] == "non-state conflict":
+        dod = "[non-state conflicts](#dod:nonstate-ucdp)"
+    elif view.dimensions["conflict_type"] == "all_stacked":
+        dod = "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), [non-state](#dod:nonstate-ucdp) conflicts, and [violence against civilians](#dod:onesided-ucdp)"
+    else:
+        raise ValueError(f"Unknown conflict type: {view.dimensions['conflict_type']}")
+
+    if view.dimensions["indicator"] in ("deaths", "death_rate"):
+        # Subtitle template
+        subtitle_template = "Reported deaths of combatants and civilians due to fighting{placeholder} that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
+
+        # Define subtitle
+        if view.dimensions["indicator"] == "deaths":
+            return subtitle_template.format(placeholder=f" in {dod}")
+        elif view.dimensions["indicator"] == "death_rate":
+            return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")
+    elif view.dimensions["indicator"] == "num_conflicts":
+        return f"Included are {dod} that were ongoing that year."
+    return ""
+
+
+def _set_note(view):
+    """Set subtitle based on view dimensions."""
+    note = ""
+    if view.dimensions["estimate"] == "best_ci":
+        note = "'Best' estimates as identified by UCDP."
+    elif view.dimensions["indicator"] == "num_conflicts":
+        note = "Some conflicts affect several countries and regions. The sum across all countries and regions can therefore be higher than the total number."
+    return note
+
+
+def _get_conflict_name(view, choice_names):
+    """Get conflict name based on view dimensions."""
+    conflict_name = "armed conflicts"
+    if view.dimensions["conflict_type"] == "one-sided violence":
+        conflict_name = "one-sided violence against civilians"
+    elif view.dimensions["conflict_type"] not in {"all", "all_stacked"}:
+        conflict_name = choice_names[view.dimensions["conflict_type"]].lower()
+    return conflict_name
+
+
+def edit_indicator_displays(view):
     """Edit FAUST estimates for confidence intervals."""
+    # Set color to red if there is only one line in the chart
+    if (view.indicators.y is not None) and (len(view.indicators.y) == 1):
+        if view.indicators.y[0].display is None:
+            view.indicators.y[0].display = {"color": "#B13507"}
+        else:
+            view.indicators.y[0].display["color"] = "#B13507"
+
+    # Set colors for stacked bar charts
     if view.dimensions["estimate"] == "best_ci":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:

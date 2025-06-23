@@ -104,6 +104,8 @@ steps:
   data://garden/unesco/2025-05-01/education_sdgs:
     - data://meadow/unesco/2025-05-01/education_sdgs
     - snapshot://wb/2024-06-18/edstats_metadata.xls
+    - data://garden/education/2018-04-18/literacy_rates
+    - data://garden/education/2017-09-30/public_expenditure
   data://grapher/unesco/2025-05-01/education_sdgs:
     - data://garden/unesco/2025-05-01/education_sdgs
 
@@ -114,6 +116,64 @@ steps:
     - data://meadow/wb/2024-11-04/edstats
     - data://garden/education/2017-09-30/public_expenditure
     - data://garden/education/2018-04-18/literacy_rates
-
   data://grapher/wb/2024-11-04/edstats:
     - data://garden/wb/2024-11-04/edstats
+  #
+  # Mdim for enrolment rates
+  #
+  export://multidim/education/latest/enrolment_rates:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/worldbank_wdi/2025-01-24/wdi
+    - data://grapher/unesco/2025-05-01/education_opri
+  #
+  # Buringh and van Zanden literacy rates between 1451 and 1800
+  #
+  data://meadow/education/2025-06-09/literacy_1451_1800:
+    - snapshot://education/2025-06-09/literacy_1451_1800.pdf
+  data://garden/education/2025-06-09/literacy_1451_1800:
+    - data://meadow/education/2025-06-09/literacy_1451_1800
+  data://grapher/education/2025-06-09/literacy_1451_1800:
+    - data://garden/education/2025-06-09/literacy_1451_1800
+  #
+  # World illiteracy at mid-century
+  #
+  data://meadow/education/2025-06-10/literacy_1950:
+    - snapshot://education/2025-06-10/literacy_1950.csv
+  data://garden/education/2025-06-10/literacy_1950:
+    - data://meadow/education/2025-06-10/literacy_1950
+  data://grapher/education/2025-06-10/literacy_1950:
+    - data://garden/education/2025-06-10/literacy_1950
+  #
+  #  Progress of literacy in various countries (1900-1950)
+  #
+  data://meadow/education/2025-06-10/literacy_1900_1950:
+    - snapshot://education/2025-06-10/literacy_1900_1950.csv
+  data://garden/education/2025-06-10/literacy_1900_1950:
+    - data://meadow/education/2025-06-10/literacy_1900_1950
+  data://grapher/education/2025-06-10/literacy_1900_1950:
+    - data://garden/education/2025-06-10/literacy_1900_1950
+  #
+  # Mdim for expected years of schooling
+  #
+  export://multidim/education/latest/years_of_schooling:
+    - data://grapher/un/2025-05-07/undp_hdr
+    - data://grapher/unesco/2025-05-01/education_opri
+    - data://grapher/wb/2024-06-10/gender_statistics
+
+  #
+  # Literacy OMM
+  #
+  data://garden/literacy/2025-06-11/historic_literacy_omm:
+    - data://garden/education/2025-06-10/literacy_1900_1950
+    - data://garden/education/2025-06-10/literacy_1950
+    - data://garden/education/2025-06-09/literacy_1451_1800
+    - data://meadow/education/2023-08-14/oecd_education
+    - data://garden/unesco/2025-05-01/education_sdgs
+  data://grapher/literacy/2025-06-11/historic_literacy_omm:
+    - data://garden/literacy/2025-06-11/historic_literacy_omm
+
+  #
+  # Mdim for completion rates
+  #
+  export://multidim/education/latest/completion_rates:
+    - data://grapher/unesco/2025-05-01/education_sdgs

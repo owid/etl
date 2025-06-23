@@ -1,6 +1,10 @@
+import structlog
+
 from etl.collection.model.view import View
-from etl.collection.utils import group_views
+from etl.collection.utils import group_views_legacy
 from etl.helpers import PathFinder
+
+log = structlog.get_logger()
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -19,7 +23,7 @@ def run() -> None:
     )
 
     # Add views for all dimensions
-    grouped_views = group_views(c.to_dict()["views"], by=["age", "metric"])
+    grouped_views = group_views_legacy(c.to_dict()["views"], by=["age", "metric"])
     grouped_views = [View.from_dict(view) for view in grouped_views]
     for view in grouped_views:
         view.dimensions["cause"] = "Side-by-side comparison of causes"
@@ -39,6 +43,13 @@ def run() -> None:
             ]
         }
     )
+
+    # Limit views to something manageable. This will ahve to improved before publishing.
+    MAX_INDICATORS = 10
+    for view in c.views:
+        if len(view.indicators.y) > MAX_INDICATORS:
+            log.warning(f"Limiting view with dimensions {view.dimensions} to {MAX_INDICATORS} indicators.")
+            view.indicators.y = view.indicators.y[:MAX_INDICATORS]
 
     # Save the collection
     c.save()

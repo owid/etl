@@ -69,6 +69,11 @@ log = structlog.get_logger()
     help="Run private steps.",
 )
 @click.option(
+    "--instant",
+    is_flag=True,
+    help="Only apply YAML metadata in the garden step.",
+)
+@click.option(
     "--grapher/--no-grapher",
     "-g/-ng",
     default=False,
@@ -138,9 +143,27 @@ log = structlog.get_logger()
 )
 @click.option(
     "--watch",
-    "-w",
     is_flag=True,
     help="Run ETL infinitely and update changed files.",
+)
+@click.option(
+    "--continue-on-failure",
+    is_flag=True,
+    help="Continue running remaining steps if a step fails (steps depending on failed step will be skipped).",
+)
+@click.option(
+    "--force-upload",
+    is_flag=True,
+    help="Always upload grapher data & metadata JSON files even if checksums match.",
+)
+@click.option(
+    "--prefer-download",
+    is_flag=True,
+    help="Prefer downloading datasets from catalog instead of building them.",
+)
+@click.option(
+    "--subset",
+    help="Filter to speed up development - works as regex for both data processing and grapher upload.",
 )
 @click.argument(
     "steps",
@@ -152,6 +175,7 @@ def main_cli(
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
+    instant: bool = False,
     grapher: bool = False,
     export: bool = False,
     ipdb: bool = False,
@@ -164,6 +188,10 @@ def main_cli(
     use_threads: bool = True,
     strict: Optional[bool] = None,
     watch: bool = False,
+    continue_on_failure: bool = False,
+    force_upload: bool = False,
+    prefer_download: bool = False,
+    subset: Optional[str] = None,
 ) -> None:
     """Generate datasets by running their corresponding ETL steps.
 
@@ -198,6 +226,26 @@ def main_cli(
     # GRAPHER_INSERT_WORKERS should be split among workers
     if workers > 1:
         config.GRAPHER_INSERT_WORKERS = config.GRAPHER_INSERT_WORKERS // workers
+
+    # Set INSTANT mode from CLI flag
+    if instant:
+        config.INSTANT = instant
+
+    # Set CONTINUE_ON_FAILURE from CLI flag
+    if continue_on_failure:
+        config.CONTINUE_ON_FAILURE = continue_on_failure
+
+    # Set FORCE_UPLOAD from CLI flag
+    if force_upload:
+        config.FORCE_UPLOAD = force_upload
+
+    # Set PREFER_DOWNLOAD from CLI flag
+    if prefer_download:
+        config.PREFER_DOWNLOAD = prefer_download
+
+    # Set SUBSET from CLI flag
+    if subset:
+        config.SUBSET = subset
 
     kwargs = dict(
         steps=steps,

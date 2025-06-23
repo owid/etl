@@ -1,0 +1,20 @@
+dataset:
+  title: DRAFT Bank Account Selected Countries Global Findex 2021
+  description: ''
+tables:
+  bank_account_selected_countries_global_findex_2021:
+    variables:
+      financial_institution_account_only:
+        title: Financial institution account only
+        unit: ''
+      financial_institution_account_and_mobile_money_account:
+        title: Financial institution account and mobile money account
+        unit: ''
+      mobile_money_account_only:
+        title: Mobile money account only
+        unit: ''
+    dimensions:
+      - name: country
+        slug: country
+      - name: year
+        slug: year
