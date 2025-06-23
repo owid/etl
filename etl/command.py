@@ -249,7 +249,7 @@ def main_cli(
         config.SUBSET = subset
 
     kwargs = dict(
-        steps=steps,
+        includes=steps,
         dry_run=dry_run,
         force=force,
         private=private,
@@ -290,7 +290,7 @@ def _find_closest_matches(includes_str: str, dag: DAG) -> None:
 
 
 def main(
-    steps: List[str],
+    includes: List[str],
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
@@ -319,7 +319,7 @@ def main(
     # Filter to the subdag based on includes & excludes
     subdag = construct_subdag(
         full_dag,
-        includes=steps,
+        includes=includes,
         excludes=excludes,
         grapher=grapher,
         export=export,
@@ -329,10 +329,12 @@ def main(
         exact_match=exact_match,
     )
 
-    # Run the steps we have selected, and everything downstream of them
-    run_subdag(
-        full_dag,
-        subdag,
+    # Compile subdag into Step objects
+    steps = compile_steps(full_dag, subdag)
+
+    # Run the steps we have selected and everything upstream of them
+    run_steps(
+        steps,
         dry_run=dry_run,
         force=force,
         private=private,
@@ -428,9 +430,8 @@ def construct_subdag(
     return subdag
 
 
-def run_subdag(
-    full_dag: DAG,
-    subdag: DAG,
+def run_steps(
+    steps: List[Step],
     dry_run: bool = False,
     force: bool = False,
     private: bool = False,
@@ -445,8 +446,6 @@ def run_subdag(
     By default, data steps do not re-run if they appear to be up-to-date already by
     looking at their checksum.
     """
-    steps = compile_steps(full_dag, subdag)
-
     # Validate private steps
     if not private:
         _validate_private_steps(steps)
@@ -483,7 +482,7 @@ def run_subdag(
         print(
             f"--- Running {len(steps)} steps with {workers} processes ({config.GRAPHER_INSERT_WORKERS} threads each):"
         )
-        return exec_steps_parallel(steps, workers, dag=full_dag, strict=strict)
+        return exec_steps_parallel(steps, workers, strict=strict)
 
 
 def exec_steps(steps: List[Step], strict: Optional[bool] = None) -> None:
@@ -549,7 +548,7 @@ def _steps_sort_key(step: Step) -> int:
         return 4
 
 
-def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optional[bool] = None) -> None:
+def exec_steps_parallel(steps: List[Step], workers: int, strict: Optional[bool] = None) -> None:
     # put grapher steps in front of the queue to process them as soon as possible and lessen
     # the load on MySQL
     steps = sorted(steps, key=_steps_sort_key)
@@ -561,6 +560,9 @@ def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optio
         # Create execution graph from steps
         exec_graph = {}
         steps_str = {str(step) for step in steps}
+        # Create step lookup dictionary
+        step_lookup = {str(step): step for step in steps}
+
         for step in steps:
             # only add dependencies that are in the list of steps (i.e. are dirty)
             # NOTE: we have to compare their string versions, the actual objects might have
@@ -568,8 +570,7 @@ def exec_steps_parallel(steps: List[Step], workers: int, dag: DAG, strict: Optio
             exec_graph[str(step)] = {str(dep) for dep in step.dependencies if str(dep) in steps_str}
 
         # Prepare a function for execution that includes the necessary arguments
-        # AI: instead of using dag, pass {step_name: Step object} and use it to get dependencies
-        exec_func = partial(_exec_step_job, execution_times=execution_times, dag=dag, strict=strict)
+        exec_func = partial(_exec_step_job, execution_times=execution_times, step_lookup=step_lookup, strict=strict)
 
         # Execute the graph of tasks in parallel
         exec_graph_parallel(exec_graph, exec_func, workers)
@@ -668,17 +669,18 @@ def _create_expected_time_message(
         return prepend_message + partial_message + append_message
 
 
-def _exec_step_job(step_name: str, execution_times: MutableMapping, dag: DAG, strict: Optional[bool] = None) -> None:
+def _exec_step_job(
+    step_name: str, execution_times: MutableMapping, step_lookup: Dict[str, Step], strict: Optional[bool] = None
+) -> None:
     """
     Executes a step.
 
     :param step_name: The name of the step to execute.
-    :param dag: The original DAG used to create Step object. This must be the same DAG as given to ETL.
+    :param step_lookup: Dictionary mapping step names to Step objects.
     :param strict: The strictness level for the step execution.
     """
     print(f"--- Starting {step_name}{_create_expected_time_message(_get_execution_time(step_name))}")
-    assert dag
-    step = parse_step(step_name, dag)
+    step = step_lookup[step_name]
     strict = _detect_strictness_level(step, strict)
     with strictness_level(strict):
         try:
