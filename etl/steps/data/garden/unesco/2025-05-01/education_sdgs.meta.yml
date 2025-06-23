@@ -860,7 +860,7 @@ tables:
           - Countries with younger populations may naturally allocate more to education, while those with older populations may invest more in healthcare or pensions — these context differences should be considered when interpreting this indicator.
         presentation:
           title_public: Expenditure on education as share of government spending
-          grapher_config: *grapher_config_expenditure
+          grapher_config: *grapher_config_expenditure_from_total
         display:
           numDecimalPlaces: 1
 
