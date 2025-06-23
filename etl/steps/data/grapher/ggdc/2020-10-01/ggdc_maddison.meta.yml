@@ -46,6 +46,7 @@ tables:
                 baseColorScheme: GnBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 1000
                   - 2000
                   - 5000
@@ -53,7 +54,6 @@ tables:
                   - 20000
                   - 50000
                   - 100000
-                binningStrategyBinCount: 9
             selectedEntityNames:
               - World
               - South and South-East Asia (MPD)

@@ -106,7 +106,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [2,4,6,8,10,12,14,16]
+                customNumericValues: [0,2,4,6,8,10,12,14,16]
                 baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
@@ -128,7 +128,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [2,4,6,8,10,12,14,16]
+                customNumericValues: [0,2,4,6,8,10,12,14,16]
                 baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
@@ -150,7 +150,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [2,4,6,8,10,12,14,16]
+                customNumericValues: [0,2,4,6,8,10,12,14,16]
                 baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1

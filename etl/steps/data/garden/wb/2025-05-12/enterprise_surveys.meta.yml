@@ -15,7 +15,7 @@ definitions:
           timeTolerance: 10
           colorScale:
             binningStrategy: manual
-            customNumericValues: [5,10,15,20,25,30,35,40]
+            customNumericValues: [0,5,10,15,20,25,30,35,40]
             baseColorScheme: OrRd
       topic_tags:
         - Corruption

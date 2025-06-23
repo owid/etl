@@ -312,7 +312,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [10, 100, 1000, 10000, 100000]
+                customNumericValues: [0, 10, 100, 1000, 10000, 100000]
 
       number_deaths_ongoing_conflicts_high:
         title: Deaths in ongoing conflicts (high estimate)
@@ -382,7 +382,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [0.1, 0.3, 1, 3, 10, 30, 100]
+                customNumericValues: [0, 0.1, 0.3, 1, 3, 10, 30, 100]
 
       number_deaths_ongoing_conflicts_high_per_capita:
         title: Death rate in ongoing conflicts (high estimate)
@@ -424,7 +424,7 @@ tables:
             map:
               colorScale:
                 binningStrategy: "manual"
-                customNumericValues: [1, 2, 5, 10]
+                customNumericValues: [0, 1, 2, 5, 10]
           attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2024); Natural Earth (2022)
 
       number_ongoing_conflicts_per_country:

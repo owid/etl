@@ -373,6 +373,7 @@ tables:
                 binningStrategy: manual
                 legendDescription: ""
                 customNumericValues:
+                  - 1
                   - 0.4
                   - 0.5
                   - 0.6
@@ -380,7 +381,6 @@ tables:
                   - 0.8
                   - 0.9
                   - 1
-                customNumericMinValue: 1
             selectedEntityNames:
               - United Kingdom
               - United States
@@ -432,7 +432,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [4, 6, 8, 10, 12, 14, 16, 18]
+                customNumericValues: [0, 4, 6, 8, 10, 12, 14, 16, 18]
                 baseColorScheme: <% if sex == "female" %>Purples<% elif sex == "male" %>BuGn<% else %>Blues<% endif %>
         display:
           numDecimalPlaces: 1
@@ -464,7 +464,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [2, 4, 6, 8, 10, 12, 14, 16]
+                customNumericValues: [0, 2, 4, 6, 8, 10, 12, 14, 16]
                 baseColorScheme: <% if sex == "female" %>Purples<% elif sex == "male" %>BuGn<% else %>Blues<% endif %>
         display:
           numDecimalPlaces: 1
