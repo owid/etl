@@ -584,7 +584,6 @@ tables:
           grapher_config: *grapher_config_tertiary_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Tertiary education
 
       gross_enrolment_ratio_for_tertiary_education__female__pct__ger_5t8_f:
@@ -598,7 +597,6 @@ tables:
           grapher_config: *grapher_config_tertiary_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Women
 
       gross_enrolment_ratio_for_tertiary_education__male__pct__ger_5t8_m:
@@ -612,7 +610,6 @@ tables:
           grapher_config: *grapher_config_tertiary_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Men
 
       net_enrolment_rate__pre_primary__both_sexes__pct__ner_02_cp:
@@ -626,7 +623,6 @@ tables:
           grapher_config: *grapher_config_enrolment_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Pre-primary education
 
       net_enrolment_rate__pre_primary__female__pct__ner_02_f_cp:
@@ -640,7 +636,6 @@ tables:
           grapher_config: *grapher_config_enrolment_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       net_enrolment_rate__pre_primary__male__pct__ner_02_m_cp:
@@ -654,7 +649,6 @@ tables:
           grapher_config: *grapher_config_enrolment_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       # ========================================================================
@@ -673,7 +667,6 @@ tables:
         display:
           name: Primary education
           numDecimalPlaces: 1
-          tolerance: 5
 
       completion_rate__lower_secondary_education__both_sexes__pct__modelled_data__cr_mod_2:
         title: Completion rate in lower secondary education
@@ -687,8 +680,6 @@ tables:
         display:
           name: Lower secondary education
           numDecimalPlaces: 1
-          tolerance: 5
-
 
       completion_rate__upper_secondary_education__both_sexes__pct__modelled_data__cr_mod_3:
         title: Completion rate in upper secondary education
@@ -702,7 +693,6 @@ tables:
         display:
           name: Upper secondary education
           numDecimalPlaces: 1
-          tolerance: 5
 
       completion_rate__lower_secondary_education__female__pct__modelled_data__cr_mod_2_f:
         title: Completion rate in lower secondary education among girls
@@ -716,7 +706,6 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
-          tolerance: 5
 
       completion_rate__primary_education__female__pct__modelled_data__cr_mod_1_f:
         title: Completion rate in primary education among girls
@@ -730,7 +719,6 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
-          tolerance: 5
 
       completion_rate__upper_secondary_education__female__pct__modelled_data__cr_mod_3_f:
         title: Completion rate in upper secondary education among girls
@@ -744,7 +732,6 @@ tables:
         display:
           name: Girls
           numDecimalPlaces: 1
-          tolerance: 5
 
       completion_rate__lower_secondary_education__male__pct__modelled_data__cr_mod_2_m:
         title: Completion rate in lower secondary education among boys
@@ -758,7 +745,6 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
-          tolerance: 5
 
       completion_rate__primary_education__male__pct__modelled_data__cr_mod_1_m:
         title: Completion rate in primary education among boys
@@ -772,7 +758,6 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
-          tolerance: 5
 
       completion_rate__upper_secondary_education__male__pct__modelled_data__cr_mod_3_m:
         title: Completion rate in upper secondary education among boys
@@ -786,7 +771,6 @@ tables:
         display:
           name: Boys
           numDecimalPlaces: 1
-          tolerance: 5
 
       completion_rate__primary_education__adjusted_gender_parity_index__gpia__modelled_data__cr_mod_1_gpia:
         title: Completion rate in primary education, adjusted gender parity index (GPIA)

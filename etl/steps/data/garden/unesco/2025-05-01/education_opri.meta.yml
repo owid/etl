@@ -744,7 +744,6 @@ tables:
           grapher_config: *grapher_config_enrolment_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Primary education
 
       total_net_enrolment_rate__primary__male__pct:
@@ -758,7 +757,6 @@ tables:
           grapher_config: *grapher_config_enrolment_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       total_net_enrolment_rate__primary__female__pct:
@@ -772,7 +770,6 @@ tables:
           grapher_config: *grapher_config_enrolment_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       total_net_enrolment_rate__lower_secondary__both_sexes__pct:
@@ -786,7 +783,6 @@ tables:
           grapher_config: *grapher_config_enrolment_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Lower secondary education
 
       total_net_enrolment_rate__lower_secondary__male__pct:
@@ -800,7 +796,6 @@ tables:
           grapher_config: *grapher_config_enrolment_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       total_net_enrolment_rate__lower_secondary__female__pct:
@@ -814,7 +809,6 @@ tables:
           grapher_config: *grapher_config_enrolment_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       total_net_enrolment_rate__upper_secondary__both_sexes__pct:
@@ -828,7 +822,6 @@ tables:
           grapher_config: *grapher_config_enrolment_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Upper secondary education
 
       total_net_enrolment_rate__upper_secondary__male__pct:
@@ -842,7 +835,6 @@ tables:
           grapher_config: *grapher_config_enrolment_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       total_net_enrolment_rate__upper_secondary__female__pct:
@@ -856,7 +848,6 @@ tables:
           grapher_config: *grapher_config_enrolment_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       # ========================================================================
@@ -874,7 +865,6 @@ tables:
           grapher_config: *grapher_config_enrolment_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Primary education
 
       gross_enrolment_ratio__primary__male__pct:
@@ -888,7 +878,6 @@ tables:
           grapher_config: *grapher_config_enrolment_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       gross_enrolment_ratio__primary__female__pct:
@@ -902,7 +891,6 @@ tables:
           grapher_config: *grapher_config_enrolment_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       gross_enrolment_ratio__lower_secondary__both_sexes__pct:
@@ -916,7 +904,6 @@ tables:
           grapher_config: *grapher_config_enrolment_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Lower secondary education
 
       gross_enrolment_ratio__lower_secondary__male__pct:
@@ -930,7 +917,6 @@ tables:
           grapher_config: *grapher_config_enrolment_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       gross_enrolment_ratio__lower_secondary__female__pct:
@@ -944,7 +930,6 @@ tables:
           grapher_config: *grapher_config_enrolment_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       gross_enrolment_ratio__upper_secondary__both_sexes__pct:
@@ -958,7 +943,6 @@ tables:
           grapher_config: *grapher_config_enrolment_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name:  Upper secondary education
 
       gross_enrolment_ratio__upper_secondary__female__pct:
@@ -972,7 +956,6 @@ tables:
           grapher_config: *grapher_config_enrolment_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       gross_enrolment_ratio__upper_secondary__male__pct:
@@ -986,7 +969,6 @@ tables:
           grapher_config: *grapher_config_enrolment_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       gross_enrolment_ratio__secondary__both_sexes__pct:
@@ -1011,7 +993,6 @@ tables:
           grapher_config: *grapher_config_sle_preprimary_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Pre-primary education
 
       school_life_expectancy__pre_primary__female__years:
@@ -1024,7 +1005,6 @@ tables:
           grapher_config: *grapher_config_sle_preprimary_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       school_life_expectancy__pre_primary__male__years:
@@ -1037,7 +1017,6 @@ tables:
           grapher_config: *grapher_config_sle_preprimary_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       school_life_expectancy__primary__both_sexes__years:
@@ -1050,7 +1029,6 @@ tables:
           grapher_config: *grapher_config_sle_primary_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Primary education
 
       school_life_expectancy__primary__female__years:
@@ -1063,7 +1041,6 @@ tables:
           grapher_config: *grapher_config_sle_primary_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       school_life_expectancy__primary__male__years:
@@ -1076,7 +1053,6 @@ tables:
           grapher_config: *grapher_config_sle_primary_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       school_life_expectancy__secondary__both_sexes__years:
@@ -1089,7 +1065,6 @@ tables:
           grapher_config: *grapher_config_sle_secondary_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Secondary education
 
       school_life_expectancy__secondary__female__years:
@@ -1102,7 +1077,6 @@ tables:
           grapher_config: *grapher_config_sle_secondary_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       school_life_expectancy__secondary__male__years:
@@ -1115,7 +1089,6 @@ tables:
           grapher_config: *grapher_config_sle_secondary_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       school_life_expectancy__tertiary__both_sexes__years:
@@ -1128,7 +1101,6 @@ tables:
           grapher_config: *grapher_config_sle_tertiary_blues
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Tertiary education
 
       school_life_expectancy__tertiary__female__years:
@@ -1141,7 +1113,6 @@ tables:
           grapher_config: *grapher_config_sle_tertiary_purples
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Girls
 
       school_life_expectancy__tertiary__male__years:
@@ -1154,7 +1125,6 @@ tables:
           grapher_config: *grapher_config_sle_tertiary_bugn
         display:
           numDecimalPlaces: 1
-          tolerance: 5
           name: Boys
 
       school_life_expectancy__primary__adjusted_gender_parity_index__gpia:
