@@ -463,6 +463,208 @@ tables:
         display:
           numDecimalPlaces: 1
 
+      government_expenditure_on_lower_secondary_education_as_a_percentage_of_gdp__pct:
+        title: Government spending on lower secondary education as share of GDP
+        description_short: Government spending on [lower secondary education](#dod:lower-secondary-education), encompassing all levels and types of spending, as a percentage of GDP, including funds from international government transfers.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education — this indicator shows how much is spent specifically on lower secondary education relative to the overall economy.
+          - It captures the share of total general government spending on education that goes to lower secondary education, including spending by local, regional, and central government authorities.
+          - The indicator is calculated by dividing government spending on lower secondary education by the country's GDP and multiplying by 100.
+          - A higher percentage means that a greater share of national income is being directed toward lower secondary education, which may reflect a government's priority for adolescent education and skill development.
+          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education to ensure global comparability.
+          - This indicator is useful for understanding how governments prioritize different stages of education. It should be interpreted alongside data on enrolment and per-student costs, which can influence how funding is allocated.
+          - There are some limitations. In some cases, spending by education level is estimated, and it may be difficult to separate lower from upper secondary education.
+          - Despite these challenges, the share of education spending on lower secondary education offers valuable insight into national priorities and the public investment made in this critical stage of learning.
+        display:
+          numDecimalPlaces: 1
+
+      government_expenditure_on_upper_secondary_education_as_a_percentage_of_gdp__pct:
+        title: Government spending on upper secondary education as share of GDP
+        description_short: Government spending on [upper secondary education](#dod:upper-secondary-education), encompassing all levels and types of spending, as a percentage of GDP, including funds from international government transfers.
+        unit: "%"
+        short_unit: "%"
+        description_key:
+          - Governments allocate part of their national income to fund education — this indicator shows how much is spent specifically on upper secondary education relative to the overall economy.
+          - It captures the share of total general government spending on education that goes to upper secondary education, including spending by local, regional, and central government authorities.
+          - The indicator is calculated by dividing government spending on upper secondary education by the country's GDP and multiplying by 100.
+          - A higher percentage means that a greater share of national income is being directed toward upper secondary education, which may reflect a government's priority for preparing students for tertiary education or the workforce.
+          - The data comes from official sources reported to the UNESCO Institute for Statistics, and is mapped to the International Standard Classification of Education to ensure global comparability.
+          - This indicator is useful for understanding how governments prioritize different stages of education. It should be interpreted alongside data on enrolment and per-student costs, which can influence how funding is allocated.
+          - There are some limitations. In some cases, spending by education level is estimated, and it may be difficult to separate upper from lower secondary education.
+          - Despite these challenges, the share of education spending on upper secondary education offers valuable insight into national priorities and the public investment made in preparing students for adult life.
+        display:
+          numDecimalPlaces: 1
+
+      government_expenditure_on_pre_primary_education__constant_pppdollar__millions:
+        title: Government spending on pre-primary education
+        description_short: Government spending on [pre-primary education](#dod:pre-primary-education), including all levels and types of spending, expressed in constant purchasing power parity (PPP) dollars.
+        unit: "international $"
+        short_unit: "$"
+        description_key:
+          - This indicator shows the total amount a government spends on pre-primary education, expressed in millions of constant purchasing power parity (PPP)-adjusted US dollars to account for differences in cost of living across countries.
+          - It includes current spending, capital spending, and transfers from both domestic sources and international donors to the government for pre-primary education.
+          - Educational spending covers both core education services — like teacher salaries, school infrastructure, and learning materials — and peripheral services such as administration and student support at the pre-primary level.
+          - The amount is originally reported in national currency and converted into PPP$ using GDP-based conversion factors, adjusted for inflation to provide constant price comparisons.
+          - This indicator enables comparison of pre-primary education spending volumes across countries and over time, regardless of national income levels or currency differences.
+          - A higher value indicates greater absolute investment in early childhood education, which is crucial for child development and later educational success.
+        presentation:
+          title_public: Government spending on pre-primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [10,50,100,500,1000,2000,5000,10000]
+                baseColorScheme: Oranges
+        display:
+          numDecimalPlaces: 0
+          name: Pre-primary
+
+      government_expenditure_on_primary_education__constant_pppdollar__millions:
+        title: Government spending on primary education
+        description_short: Government spending on [primary education](#dod:primary-education), including all levels and types of spending, expressed in constant purchasing power parity (PPP) dollars.
+        unit: "international $"
+        short_unit: "$"
+        description_key:
+          - This indicator shows the total amount a government spends on primary education, expressed in millions of constant purchasing power parity (PPP)-adjusted US dollars to account for differences in cost of living across countries.
+          - It includes current spending, capital spending, and transfers from both domestic sources and international donors to the government for primary education.
+          - Educational spending covers both core education services — like teacher salaries, school infrastructure, and learning materials — and peripheral services such as administration and student support at the primary level.
+          - The amount is originally reported in national currency and converted into PPP$ using GDP-based conversion factors, adjusted for inflation to provide constant price comparisons.
+          - This indicator enables comparison of primary education spending volumes across countries and over time, regardless of national income levels or currency differences.
+          - A higher value indicates greater absolute investment in foundational education, which is essential for literacy, numeracy, and lifelong learning.
+        presentation:
+          title_public: Government spending on primary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [50,200,500,1000,2000,5000,10000,20000]
+                baseColorScheme: Blues
+        display:
+          numDecimalPlaces: 0
+          name: Primary
+
+      government_expenditure_on_lower_secondary_education__constant_pppdollar__millions:
+        title: Government spending on lower secondary education
+        description_short: Government spending on [lower secondary education](#dod:lower-secondary-education), including all levels and types of spending, expressed in constant purchasing power parity (PPP) dollars.
+        unit: "international $"
+        short_unit: "$"
+        description_key:
+          - This indicator shows the total amount a government spends on lower secondary education, expressed in millions of constant purchasing power parity (PPP)-adjusted US dollars to account for differences in cost of living across countries.
+          - It includes current spending, capital spending, and transfers from both domestic sources and international donors to the government for lower secondary education.
+          - Educational spending covers both core education services — like teacher salaries, school infrastructure, and learning materials — and peripheral services such as administration and student support at the lower secondary level.
+          - The amount is originally reported in national currency and converted into PPP$ using GDP-based conversion factors, adjusted for inflation to provide constant price comparisons.
+          - This indicator enables comparison of lower secondary education spending volumes across countries and over time, regardless of national income levels or currency differences.
+          - A higher value indicates greater absolute investment in adolescent education, which is crucial for developing critical thinking and specialized skills.
+        presentation:
+          title_public: Government spending on lower secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [25,100,250,500,1000,2500,5000,10000]
+                baseColorScheme: Greens
+        display:
+          numDecimalPlaces: 0
+          name: Lower secondary
+
+      government_expenditure_on_upper_secondary_education__constant_pppdollar__millions:
+        title: Government spending on upper secondary education
+        description_short: Government spending on [upper secondary education](#dod:upper-secondary-education), including all levels and types of spending, expressed in constant purchasing power parity (PPP) dollars.
+        unit: "international $"
+        short_unit: "$"
+        description_key:
+          - This indicator shows the total amount a government spends on upper secondary education, expressed in millions of constant purchasing power parity (PPP)-adjusted US dollars to account for differences in cost of living across countries.
+          - It includes current spending, capital spending, and transfers from both domestic sources and international donors to the government for upper secondary education.
+          - Educational spending covers both core education services — like teacher salaries, school infrastructure, and learning materials — and peripheral services such as administration and student support at the upper secondary level.
+          - The amount is originally reported in national currency and converted into PPP$ using GDP-based conversion factors, adjusted for inflation to provide constant price comparisons.
+          - This indicator enables comparison of upper secondary education spending volumes across countries and over time, regardless of national income levels or currency differences.
+          - A higher value indicates greater absolute investment in preparing students for tertiary education or entry into the workforce with advanced skills.
+        presentation:
+          title_public: Government spending on upper secondary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [25,100,250,500,1000,2500,5000,10000]
+                baseColorScheme: Purples
+        display:
+          numDecimalPlaces: 0
+          name: Upper secondary
+
+      government_expenditure_on_tertiary_education__constant_pppdollar__millions:
+        title: Government spending on tertiary education
+        description_short: Government spending on [tertiary education](#dod:tertiary-education), including all levels and types of spending, expressed in constant purchasing power parity (PPP) dollars.
+        unit: "international $"
+        short_unit: "$"
+        description_key:
+          - This indicator shows the total amount a government spends on tertiary education, expressed in millions of constant purchasing power parity (PPP)-adjusted US dollars to account for differences in cost of living across countries.
+          - It includes current spending, capital spending, and transfers from both domestic sources and international donors to the government for tertiary education.
+          - Educational spending covers both core education services — like faculty salaries, university infrastructure, and research materials — and peripheral services such as administration and student support at the tertiary level.
+          - The amount is originally reported in national currency and converted into PPP$ using GDP-based conversion factors, adjusted for inflation to provide constant price comparisons.
+          - This indicator enables comparison of tertiary education spending volumes across countries and over time, regardless of national income levels or currency differences.
+          - A higher value indicates greater absolute investment in higher education, research, and advanced skill development, which is crucial for innovation and economic growth.
+        presentation:
+          title_public: Government spending on tertiary education
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [50,200,500,1000,2000,5000,10000,20000]
+                baseColorScheme: Reds
+        display:
+          numDecimalPlaces: 0
+          name: Tertiary
+
+      government_expenditure_on_education__constant_pppdollar__millions:
+        title: Government spending on education (total)
+        description_short: Total government spending on education across all levels, including all types of spending, expressed in constant purchasing power parity (PPP) dollars.
+        unit: "international $"
+        short_unit: "$"
+        description_key:
+          - This indicator shows the total amount a government spends on education at all levels, expressed in millions of constant purchasing power parity (PPP)-adjusted US dollars to account for differences in cost of living across countries.
+          - It includes current spending, capital spending, and transfers from both domestic sources and international donors to the government across all education levels.
+          - Educational spending covers both core education services — like teacher salaries, school infrastructure, and learning materials — and peripheral services such as administration and student support.
+          - The amount is originally reported in national currency and converted into PPP$ using GDP-based conversion factors, adjusted for inflation to provide constant price comparisons.
+          - This indicator enables comparison of total education spending volumes across countries and over time, regardless of national income levels or currency differences.
+          - A higher value indicates greater absolute investment in education overall, reflecting the government's total commitment to developing human capital.
+        presentation:
+          title_public: Government spending on education (total)
+          grapher_config:
+            maxTime: 2024
+            hasMapTab: true
+            map:
+              time: 2024
+              timeTolerance: 5
+              colorScale:
+                binningStrategy: manual
+                customNumericValues: [500,2000,5000,10000,20000,50000,100000,200000]
+                baseColorScheme: YlOrRd
+        display:
+          numDecimalPlaces: 0
+          name: Total
+
       government_expenditure_on_education__pppdollar__millions:
         title: Government spending on education
         description_short: Total government spending on education, including all levels and types of spending, expressed in purchasing power parity (PPP) dollars.

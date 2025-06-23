@@ -12,14 +12,14 @@ MULTIDIM_CONFIG = {
     "hideAnnotationFieldsInTitle": {"time": True},
     "hasMapTab": True,
     "tab": "map",
-    "addCountryMode": "change-country",
+    "addCountryMode": "add-country",
 }
 
 # Common grouped view configuration
 GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
     "hasMapTab": False,
     "tab": "chart",
-    "selectedFacetStrategy": "entity",
+    "selectedFacetStrategy": "metric",
 }
 
 # Column patterns for education spending indicators
@@ -60,7 +60,9 @@ def run() -> None:
 
     # Get spending columns from both datasets
     spending_cols_opri = get_spending_columns(tb_opri)
+    print(spending_cols_opri)
     spending_cols_sdgs = get_spending_columns(tb_sdgs)
+    print(spending_cols_sdgs)
 
     # Select relevant columns and combine tables
     tb_opri = tb_opri.loc[:, ["country", "year"] + spending_cols_opri].copy()
@@ -293,13 +295,6 @@ def edit_indicator_displays(view):
         "tertiary": "Tertiary",
     }
 
-    # Display name mappings for spending types
-    SPENDING_DISPLAY_NAMES = {
-        "percentage_of_gdp": "Share of GDP",
-        "constant_pppdollar": "Constant PPP dollars",
-        "total_government": "Share of government spending",
-    }
-
     for indicator in view.indicators.y:
         display_name = None
 
@@ -307,12 +302,5 @@ def edit_indicator_displays(view):
         if view.dimensions.get("level") == "level_side_by_side":
             for level_key, display_name in LEVEL_DISPLAY_NAMES.items():
                 if level_key in indicator.catalogPath:
-                    indicator.display = {"name": display_name}
-                    break
-
-        # Check for spending type-based display names
-        elif view.dimensions.get("spending_type") == "spending_type_side_by_side":
-            for spending_key, display_name in SPENDING_DISPLAY_NAMES.items():
-                if spending_key in indicator.catalogPath:
                     indicator.display = {"name": display_name}
                     break
