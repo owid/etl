@@ -1,0 +1,52 @@
+title:
+  title: Government spending on education
+  title_variant: by spending type and level of education
+default_selection:
+  - United States
+  - Germany
+  - Brazil
+  - India
+
+dimensions:
+  - slug: spending_type
+    name: Spending type
+    choices:
+      - slug: gdp_share
+        name: Share of GDP
+        description: Government spending on education as a percentage of gross domestic product (GDP).
+      - slug: constant_ppp
+        name: Constant PPP dollars
+        description: Government spending on education in constant purchasing power parity (PPP) dollars.
+      - slug: total_government
+        name: Share of government spending
+        description: Government spending on education as a percentage of total government expenditure.
+      - slug: spending_type_side_by_side
+        name: All spending types
+        description: Compare government spending on education across different spending measures.
+
+  - slug: level
+    name: Education level
+    choices:
+      - slug: all
+        name: All levels
+        description: Government spending across all education levels combined.
+      - slug: preprimary
+        name: Pre-primary
+        description: Government spending on pre-primary education, often provided through kindergarten or nursery for children ages around 3 to 5.
+      - slug: primary
+        name: Primary
+        description: Government spending on primary education, which marks the start of formal schooling, typically for children aged 5 to 7.
+      - slug: lower_secondary
+        name: Lower secondary
+        description: Government spending on lower secondary education, for students generally aged 11 to 14.
+      - slug: upper_secondary
+        name: Upper secondary
+        description: Government spending on upper secondary education, for students generally aged 15 to 18.
+      - slug: tertiary
+        name: Tertiary
+        description: Government spending on tertiary education, including formal post-secondary learning from short vocational programs to university degrees.
+      - slug: level_side_by_side
+        name: All levels
+        description: Compare government spending across all education levels.
+
+views: []
