@@ -70,7 +70,7 @@ def test_collection_set(tmp_path: Path):
 
 def test_grouped_view_validation_warnings():
     """Test that grouped views without proper metadata generate warnings during save.
-    
+
     This test verifies the sanity_check_grouped_view functionality by:
     1. Creating a collection with multiple views
     2. Grouping views to create grouped views without metadata
@@ -82,11 +82,11 @@ def test_grouped_view_validation_warnings():
         dimensions=[
             Dimension(
                 slug="sex",
-                name="Sex", 
+                name="Sex",
                 choices=[
                     DimensionChoice(slug="male", name="Male"),
                     DimensionChoice(slug="female", name="Female"),
-                ]
+                ],
             ),
             Dimension(
                 slug="age",
@@ -94,63 +94,59 @@ def test_grouped_view_validation_warnings():
                 choices=[
                     DimensionChoice(slug="adults", name="Adults"),
                     DimensionChoice(slug="children", name="Children"),
-                ]
-            )
+                ],
+            ),
         ],
         views=[
             View(
                 dimensions={"sex": "male", "age": "adults"},
-                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator1"}])
+                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator1"}]),
             ),
             View(
                 dimensions={"sex": "female", "age": "adults"},
-                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator2"}])
+                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator2"}]),
             ),
             View(
                 dimensions={"sex": "male", "age": "children"},
-                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator3"}])
+                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator3"}]),
             ),
             View(
                 dimensions={"sex": "female", "age": "children"},
-                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator4"}])
+                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator4"}]),
             ),
         ],
         catalog_path="test#collection",
         title={"title": "Test Collection"},
         default_selection=["test"],
-        _definitions={"common_views": None}
+        _definitions={"common_views": None},
     )
-    
+
     # Group views by sex dimension (creates grouped views without metadata)
-    collection.group_views([{
-        "dimension": "sex",
-        "choice_new_slug": "all_sexes",
-        "choices": ["male", "female"]
-    }])
-    
+    collection.group_views([{"dimension": "sex", "choice_new_slug": "all_sexes", "choices": ["male", "female"]}])
+
     # Verify that grouped views were created and marked as grouped
     grouped_views = [view for view in collection.views if view.is_grouped]
     assert len(grouped_views) == 2  # Should have 2 grouped views (one for each age group)
-    
+
     # Mock database validation to avoid DB dependency
-    with patch('etl.collection.utils.validate_indicators_in_db'):
+    with patch("etl.collection.utils.validate_indicators_in_db"):
         # Capture warnings during save
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")  # Ensure all warnings are captured
-            
+
             # This should trigger warnings for missing metadata
             collection.validate_grouped_views()
-            
+
             # Verify warnings were raised
             assert len(w) >= 2  # At least 2 warnings (one per grouped view)
-            
+
             # Check that warnings mention missing metadata
             warning_messages = [str(warning.message) for warning in w]
-            
+
             # Should have warnings about missing metadata attribute
             missing_metadata_warnings = [msg for msg in warning_messages if "missing 'metadata' attribute" in msg]
             assert len(missing_metadata_warnings) >= 2
-            
+
             # Verify warning details
             for warning_msg in missing_metadata_warnings:
                 assert "description_key" in warning_msg
@@ -165,45 +161,43 @@ def test_grouped_view_validation_with_incomplete_metadata():
         dimensions=[
             Dimension(
                 slug="category",
-                name="Category", 
+                name="Category",
                 choices=[
                     DimensionChoice(slug="a", name="A"),
                     DimensionChoice(slug="b", name="B"),
-                ]
+                ],
             )
         ],
         views=[
-            View(
-                dimensions={"category": "a"},
-                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator1"}])
-            ),
-            View(
-                dimensions={"category": "b"},
-                indicators=ViewIndicators(y=[{"catalogPath": "table#indicator2"}])
-            ),
+            View(dimensions={"category": "a"}, indicators=ViewIndicators(y=[{"catalogPath": "table#indicator1"}])),
+            View(dimensions={"category": "b"}, indicators=ViewIndicators(y=[{"catalogPath": "table#indicator2"}])),
         ],
         catalog_path="test#collection2",
         title={"title": "Test Collection 2"},
         default_selection=["test"],
-        _definitions={"common_views": None}
+        _definitions={"common_views": None},
     )
-    
+
     # Group views with partial metadata (missing description_short)
-    collection.group_views([{
-        "dimension": "category",
-        "choice_new_slug": "combined",
-        "choices": ["a", "b"],
-        "view_metadata": {
-            "description_key": ["Some key info"]  # Missing description_short
-        }
-    }])
-    
+    collection.group_views(
+        [
+            {
+                "dimension": "category",
+                "choice_new_slug": "combined",
+                "choices": ["a", "b"],
+                "view_metadata": {
+                    "description_key": ["Some key info"]  # Missing description_short
+                },
+            }
+        ]
+    )
+
     # Test validation
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("always")
-        
+
         collection.validate_grouped_views()
-        
+
         # Should have warning about missing description_short
         warning_messages = [str(warning.message) for warning in w]
         missing_desc_short = [msg for msg in warning_messages if "missing 'description_short'" in msg]

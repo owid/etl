@@ -227,7 +227,7 @@ class View(MDIMBase):
 
     def mark_as_grouped(self) -> None:
         """Mark this view as created by grouping other views."""
-        object.__setattr__(self, '_is_grouped', True)
+        object.__setattr__(self, "_is_grouped", True)
 
     @property
     def d(self) -> ReadOnlyNamespace:
