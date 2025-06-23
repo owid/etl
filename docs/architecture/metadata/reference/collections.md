@@ -29,18 +29,18 @@ Multi-dimensional collections (MDIMs) are interactive data explorers that allow 
 Unique identifier for the collection in the format 'namespace/version/dataset#name'.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must follow the pattern 'namespace/version/dataset#name'.
 	- Must be unique across all collections.
 	- Should use descriptive names that identify the collection's purpose.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`energy/2024-01-01/energy_mix#renewable_energy`» | «`energy`», «`energy/2024-01-01`», «`energy/2024-01-01/energy_mix`» |
 	| «`demography/2023-12-15/population#age_structure`» | «`demography`», «`population#age_structure`» |
-    
+
 
 
 ---
@@ -57,20 +57,20 @@ Mapping of dimension slugs to their default choice slugs for the initial view.
 List of entity names (e.g., countries) selected by default when the collection loads.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must contain at least one entity.
 	- Entity names must be harmonized country names from the OWID catalog.
 	- Should include 3-8 entities for optimal visualization.
 	- Should represent a diverse and meaningful set of entities.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`["United States", "China", "Germany", "India"]`» | «`[]`», «`["USA", "PRC"]`» |
 	| «`["World"]`» | «`["Earth"]`», «`["Global"]`» |
 	| «`["Europe", "North America", "Asia"]`» | «`["EU", "NA", "AS"]`», «`["Too many entities..."]`» |
-    
+
 
 
 ---
@@ -87,12 +87,12 @@ Common definitions and configurations that can be referenced across multiple vie
 Array of dimension objects that define the filter dropdowns available to users.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must contain at least one dimension.
 	- Each dimension creates a dropdown filter in the user interface.
 	- Dimension slugs must be unique within the collection.
 	- Should be ordered by importance or logical flow.
-    
+
 
 
 
@@ -106,16 +106,16 @@ Array of dimension objects that define the filter dropdowns available to users.
 URL pointing to the JSON schema that validates the grapher configuration.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Should point to the current version of the OWID Grapher schema.
 	- Used for validation of chart configuration objects.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
-	| «`https://files.ourworldindata.org/schemas/grapher-schema.007.json`» | «`http://invalid-url.com/schema.json`», «`grapher-schema.007.json`» |
-    
+	| «`https://files.ourworldindata.org/schemas/grapher-schema.008.json`» | «`http://invalid-url.com/schema.json`», «`grapher-schema.008.json`» |
+
 
 
 ---
@@ -132,12 +132,12 @@ URL pointing to the JSON schema that validates the grapher configuration.
 Description of the indicator written by the producer, if any was given.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits.
 	- Should only be given if the producer clearly provides such definitions in a structured way. Avoid spending time searching for a definition given by the producer elsewhere.
-    
+
 
 
 
@@ -151,7 +151,7 @@ Description of the indicator written by the producer, if any was given.
 List of key pieces of information about the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must be a list of one or more short paragraphs.
 		- Each paragraph must start with a capital letter.
 		- Each paragraph must end with a period.
@@ -161,7 +161,7 @@ List of key pieces of information about the indicator.
 	- Should not contain information about processing (which should be in `description_processing`).
 	- Should only contain information that is key to the public.
 		- Anything that is too detailed or technical should be left in the code.
-    
+
 
 
 
@@ -175,14 +175,14 @@ List of key pieces of information about the indicator.
 Relevant information about the processing of the indicator done by OWID.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Must be used if important editorial decisions have been taken during data processing.
 	- Must not be used to describe common processing steps like country harmonization.
 	- Should only contain key processing information to the public.
 		- Anything that is too detailed or technical should be left in the code.
-    
+
 
 
 
@@ -196,13 +196,13 @@ Relevant information about the processing of the indicator done by OWID.
 One or a few lines that complement the title to have a short description of the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Must be one short paragraph (for example suitable to fit in a chart subtitle).
 	- Should not mention any other metadata fields (like information about the processing, or the origins, or the units). **Exceptions:**
 		- The unit can be mentioned if it is crucial for the description.
-    
+
 
 
 
@@ -233,9 +233,9 @@ Color to use for the indicator in e.g. line charts.
 Conversion factor to apply to indicator values.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- **Note:** We should avoid using this, and instead convert data and units (and possibly other metadata fields where the units are mentioned) consistently in the ETL grapher step.
-    
+
 
 
 
@@ -301,18 +301,18 @@ Indicates if this time series is a forward projection (if so then this is render
 Indicator's title to display in the legend of a chart. NOTE: For backwards compatibility, `display.name` also replaces the indicator's title in other public places. Therefore, whenever `display.name` is defined, `title_public` should also be defined.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must be very short, to fit the legend of a chart.
 	- Must not end with a period.
 	- Should not mention other metadata fields like `producer` or `version`.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Agriculture`» | «`Nitrous oxide emissions from agriculture`» |
 	| «`Area harvested`» | «`Barley | 00000044 || Area harvested | 005312 || hectares`» |
-    
+
 
 
 ---
@@ -459,10 +459,10 @@ ISO date day string for the starting date if `yearIsDay` is `True`.
 License of the indicator, which depends on the indicator's processing level and the origins' licenses.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- If the indicator's `processing_level` is major, assign `CC BY 4.0`.
 	- If the indicator's `processing_level` is minor, choose the most strict license among the origins' `licenses`.
-    
+
 
 
 
@@ -476,9 +476,9 @@ License of the indicator, which depends on the indicator's processing level and 
 List of all origins of the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- **Note:** Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails.
-    
+
 
 
 
@@ -496,20 +496,20 @@ An indicator's presentation defines how the indicator's metadata will be shown o
 Citation of the indicator's origins, to override the automatic format `producer1 (year1); producer2 (year2)`.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter. **Exceptions:**
 		- The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`.
 	- Must join multiple attributions by a `;`.
 	- Must not end in a period (and must **not** end in `;`).
 	- Must contain the year of `date_published`, for each origin, in parenthesis.
 	- Should only be used when the automatic format `producer1 (year1); producer2 (year2)` needs to be overridden.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Energy Institute - Statistical Review of World Energy (2023); Ember (2022)`» | «`UN (2023), WHO (2023)`» |
-    
+
 
 
 ---
@@ -522,13 +522,13 @@ Citation of the indicator's origins, to override the automatic format `producer1
 Very short citation of the indicator's main producer(s).
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter. **Exceptions:**
 		- The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`.
 	- Must not end in a period.
 	- Should be very short.
 	- Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data).
-    
+
 
 
 
@@ -542,9 +542,9 @@ Very short citation of the indicator's main producer(s).
 List of references to questions in an FAQ google document, relevant to the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Each reference must contain `fragment_id` (question identifier) and `gdoc_id` (document identifier).
-    
+
 
 
 
@@ -1417,13 +1417,13 @@ The desired strategy for handling entities with missing data
 Default footer note to use in charts for the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Must not include 'Note:' at the beginning (this is added automatically).
 	- Must be one short paragraph, usually one sentence, suitable to fit in a chart footer note.
 	- Should not mention any other metadata fields.
-    
+
 
 
 
@@ -1600,11 +1600,11 @@ Stack mode. Only absolute and relative are actively used.
 Default subtitle to use in charts for the indicator. NOTE: Use this field to override an indicator's `description_short` with information that is more suitable for a chart subtitle.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Must be one short paragraph, suitable to fit in a chart subtitle.
-    
+
 
 
 
@@ -1661,13 +1661,13 @@ any data before this year
 Default title to use in charts for the indicator, overriding the indicator's `title`.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end with a period.
 	- Must be one short sentence (a few words).
 	- Must fit and be an appropriate choice for a chart's public title.
 	- Should not mention other metadata fields like `producer` or `version`.
-    
+
 
 
 
@@ -1910,7 +1910,7 @@ Whether to zoom to the selected data points
 Indicator title to be shown in public places like data pages, that overrides the indicator's title.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end with a period.
 	- Must be one short sentence (a few words).
@@ -1918,7 +1918,7 @@ Indicator title to be shown in public places like data pages, that overrides the
 	- Should help OWID and expert users identify the indicator.
 	- For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), this field is mandatory, to improve the public appearance of the title.
 	- When `display.name` is defined (to edit the default title in the legend of a chart), `title_public` must also be defined (otherwise `display.name` will be used as a public title).
-    
+
 
 
 
@@ -1932,20 +1932,20 @@ Indicator title to be shown in public places like data pages, that overrides the
 Short disambiguation of the title that references a special feature of the methods or nature of the data.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end in a period.
 	- Should be very short.
 	- Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title).
 	- Should not reference the data provider. For that, instead, use `attribution_short`.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Age-standardized`» | «`The data is age-standardized`» |
 	| «`Historical data`» | «`Historical data from 1800 to 2010`» |
-    
+
 
 
 ---
@@ -1958,11 +1958,11 @@ Short disambiguation of the title that references a special feature of the metho
 List of topics where the indicator is relevant.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](http://analytics/private?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name) (requires Tailscale).
 	- The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator).
 	- Should contain 1, 2, or at most 3 tags.
-    
+
 
 
 
@@ -2006,7 +2006,7 @@ License to display for the indicator, overriding `license`.
 Level of processing that the indicator values have experienced.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must be `minor` if the indicator has undergone only minor operations since its origin:
 		- Rename entities (e.g. countries or columns)
 		- Multiplication by a constant (e.g. unit change)
@@ -2015,7 +2015,7 @@ Level of processing that the indicator values have experienced.
 		- Data aggregates (e.g. sum data for continents or income groups)
 		- Operations between indicators (e.g. per capita, percentages, annual changes)
 		- Concatenation of indicators, etc.
-    
+
 
 
 
@@ -2029,21 +2029,21 @@ Level of processing that the indicator values have experienced.
 Characters that represent the unit we use to measure the indicator value.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must follow the rules of capitalization of the International System of Units, when applicable.
 	- Must not end with a period.
 	- Must be empty if the indicator has no units.
 	- Should not contain spaces.
 	- If, for clarity, we prefer to simplify the units in a chart, e.g. to show `kWh` instead of `kWh/person`, use `display.short_unit` for the simplified units, and keep the correct one in `indicator.short_unit` (and ensure there is no ambiguity in the chart).
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`t/ha`» | «`t / ha`» |
 	| «`%`» | «`pct`» |
 	| «`kWh/person`» | «`pc`» |
-    
+
 
 
 ---
@@ -2082,21 +2082,21 @@ List of all sources of the indicator. Automatically filled. NOTE: This is no lon
 Title of the indicator, which is a few words definition of the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end with a period.
 	- Must be one short sentence (a few words).
 	- For 'small datasets', this should be the publicly displayed title. For 'big datasets' (like FAOSTAT, with many dimensions), it can be less human-readable, optimized for internal searches (then, use `presentation.title_public` for the public title).
 	- Should not mention other metadata fields like `producer` or `version`.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Number of neutron star mergers in the Milky Way`» | «`Number of neutron stars (NASA)`» |
 	| «`Share of neutron star mergers that happen in the Milky Way`» | «`Share of neutron star mergers that happen in the Milky Way (2023)`» |
 	| «`Barley | 00000044 || Area harvested | 005312 || hectares`» | «`Barley`» |
-    
+
 
 
 ---
@@ -2122,7 +2122,7 @@ Indicator type is usually automatically inferred from the data, but must be manu
 Very concise name of the unit we use to measure the indicator values.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must not start with a capital letter.
 	- Must not end with a period.
 	- Must be empty if the indicator has no units.
@@ -2131,14 +2131,14 @@ Very concise name of the unit we use to measure the indicator values.
 	- Should not use symbols like “/”.
 		- If it is a derived unit, use 'per' to denote a division, e.g. '... per hectare', or '... per person'.
 	- Should be '%' for percentages.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`tonnes per hectare`» | «`tonnes/hectare`» |
 	| «`kilowatts per person`» | «`kilowatts per capita`» |
-    
+
 
 
 ---
@@ -2155,20 +2155,20 @@ Title configuration for the collection display.
 Primary title displayed for the collection.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end with a period.
 	- Should be concise but descriptive.
 	- Should clearly indicate the collection's purpose.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Energy Mix`» | «`energy mix`», «`Energy Mix.`», «`Energy`» |
 	| «`Global Population Demographics`» | «`global population demographics`», «`Demographics`» |
 	| «`Climate Change Indicators`» | «`climate change indicators`», «`Climate`» |
-    
+
 
 
 ---
@@ -2181,11 +2181,11 @@ Primary title displayed for the collection.
 Additional context or variant information for the title.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must not end with a period.
 	- Should provide disambiguation or additional context.
 	- Should be shorter than the main title.
-    
+
 
 
 
@@ -2199,19 +2199,19 @@ Additional context or variant information for the title.
 List of topic categories that this collection relates to.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must use existing OWID topic tags.
 	- Should include 1-3 relevant topic tags.
 	- The first tag should be the most relevant topic.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`["Energy"]`» | «`["energy"]`», «`["Invalid Topic"]`» |
 	| «`["Climate Change", "Energy"]`» | «`["climate change", "energy"]`», «`["Too", "Many", "Tags"]`» |
 	| «`["Population Growth", "Demography"]`» | «`["population growth", "demography"]`», «`["Nonexistent Topic"]`» |
-    
+
 
 
 ---
@@ -2224,11 +2224,11 @@ List of topic categories that this collection relates to.
 Array of view configurations that define specific chart instances.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must contain at least one view.
 	- Each view represents a specific combination of dimension choices and chart configuration.
 	- Views are generated automatically based on dimension combinations, but can be customized.
-    
+
 
 
 
@@ -3598,7 +3598,7 @@ Whether to zoom to the selected data points
 
 
 
-For the complete list of available configuration options, see the [Grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.007.json).
+For the complete list of available configuration options, see the [Grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.008.json).
 
 
 ## `view.metadata`
@@ -3612,12 +3612,12 @@ For the complete list of available configuration options, see the [Grapher schem
 Description of the indicator written by the producer, if any was given.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Should be identical to the producer's text, except for some formatting changes, typo corrections, or other appropriate minor edits.
 	- Should only be given if the producer clearly provides such definitions in a structured way. Avoid spending time searching for a definition given by the producer elsewhere.
-    
+
 
 
 
@@ -3631,7 +3631,7 @@ Description of the indicator written by the producer, if any was given.
 List of key pieces of information about the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must be a list of one or more short paragraphs.
 		- Each paragraph must start with a capital letter.
 		- Each paragraph must end with a period.
@@ -3641,7 +3641,7 @@ List of key pieces of information about the indicator.
 	- Should not contain information about processing (which should be in `description_processing`).
 	- Should only contain information that is key to the public.
 		- Anything that is too detailed or technical should be left in the code.
-    
+
 
 
 
@@ -3655,14 +3655,14 @@ List of key pieces of information about the indicator.
 Relevant information about the processing of the indicator done by OWID.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Must be used if important editorial decisions have been taken during data processing.
 	- Must not be used to describe common processing steps like country harmonization.
 	- Should only contain key processing information to the public.
 		- Anything that is too detailed or technical should be left in the code.
-    
+
 
 
 
@@ -3676,13 +3676,13 @@ Relevant information about the processing of the indicator done by OWID.
 One or a few lines that complement the title to have a short description of the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Must be one short paragraph (for example suitable to fit in a chart subtitle).
 	- Should not mention any other metadata fields (like information about the processing, or the origins, or the units). **Exceptions:**
 		- The unit can be mentioned if it is crucial for the description.
-    
+
 
 
 
@@ -3713,9 +3713,9 @@ Color to use for the indicator in e.g. line charts.
 Conversion factor to apply to indicator values.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- **Note:** We should avoid using this, and instead convert data and units (and possibly other metadata fields where the units are mentioned) consistently in the ETL grapher step.
-    
+
 
 
 
@@ -3781,18 +3781,18 @@ Indicates if this time series is a forward projection (if so then this is render
 Indicator's title to display in the legend of a chart. NOTE: For backwards compatibility, `display.name` also replaces the indicator's title in other public places. Therefore, whenever `display.name` is defined, `title_public` should also be defined.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must be very short, to fit the legend of a chart.
 	- Must not end with a period.
 	- Should not mention other metadata fields like `producer` or `version`.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Agriculture`» | «`Nitrous oxide emissions from agriculture`» |
 	| «`Area harvested`» | «`Barley | 00000044 || Area harvested | 005312 || hectares`» |
-    
+
 
 
 ---
@@ -3939,10 +3939,10 @@ ISO date day string for the starting date if `yearIsDay` is `True`.
 License of the indicator, which depends on the indicator's processing level and the origins' licenses.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- If the indicator's `processing_level` is major, assign `CC BY 4.0`.
 	- If the indicator's `processing_level` is minor, choose the most strict license among the origins' `licenses`.
-    
+
 
 
 
@@ -3956,9 +3956,9 @@ License of the indicator, which depends on the indicator's processing level and 
 List of all origins of the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- **Note:** Origins should be propagated automatically from snapshots. Therefore, this field should only be manually filled out if automatic propagation fails.
-    
+
 
 
 
@@ -3976,20 +3976,20 @@ An indicator's presentation defines how the indicator's metadata will be shown o
 Citation of the indicator's origins, to override the automatic format `producer1 (year1); producer2 (year2)`.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter. **Exceptions:**
 		- The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`.
 	- Must join multiple attributions by a `;`.
 	- Must not end in a period (and must **not** end in `;`).
 	- Must contain the year of `date_published`, for each origin, in parenthesis.
 	- Should only be used when the automatic format `producer1 (year1); producer2 (year2)` needs to be overridden.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Energy Institute - Statistical Review of World Energy (2023); Ember (2022)`» | «`UN (2023), WHO (2023)`» |
-    
+
 
 
 ---
@@ -4002,13 +4002,13 @@ Citation of the indicator's origins, to override the automatic format `producer1
 Very short citation of the indicator's main producer(s).
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter. **Exceptions:**
 		- The name of the institution or the author must be spelled with small letter, e.g. `van Haasteren`.
 	- Must not end in a period.
 	- Should be very short.
 	- Should be used if the automatic concatenation of origin's `attribution_short` are too long. In those cases, choose the most important `attribution` (e.g. the main producer of the data).
-    
+
 
 
 
@@ -4022,9 +4022,9 @@ Very short citation of the indicator's main producer(s).
 List of references to questions in an FAQ google document, relevant to the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Each reference must contain `fragment_id` (question identifier) and `gdoc_id` (document identifier).
-    
+
 
 
 
@@ -4897,13 +4897,13 @@ The desired strategy for handling entities with missing data
 Default footer note to use in charts for the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Must not include 'Note:' at the beginning (this is added automatically).
 	- Must be one short paragraph, usually one sentence, suitable to fit in a chart footer note.
 	- Should not mention any other metadata fields.
-    
+
 
 
 
@@ -5080,11 +5080,11 @@ Stack mode. Only absolute and relative are actively used.
 Default subtitle to use in charts for the indicator. NOTE: Use this field to override an indicator's `description_short` with information that is more suitable for a chart subtitle.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must end with a period.
 	- Must be one short paragraph, suitable to fit in a chart subtitle.
-    
+
 
 
 
@@ -5141,13 +5141,13 @@ any data before this year
 Default title to use in charts for the indicator, overriding the indicator's `title`.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end with a period.
 	- Must be one short sentence (a few words).
 	- Must fit and be an appropriate choice for a chart's public title.
 	- Should not mention other metadata fields like `producer` or `version`.
-    
+
 
 
 
@@ -5390,7 +5390,7 @@ Whether to zoom to the selected data points
 Indicator title to be shown in public places like data pages, that overrides the indicator's title.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end with a period.
 	- Must be one short sentence (a few words).
@@ -5398,7 +5398,7 @@ Indicator title to be shown in public places like data pages, that overrides the
 	- Should help OWID and expert users identify the indicator.
 	- For big datasets where constructing human-readable titles is hard (e.g. FAOSTAT), this field is mandatory, to improve the public appearance of the title.
 	- When `display.name` is defined (to edit the default title in the legend of a chart), `title_public` must also be defined (otherwise `display.name` will be used as a public title).
-    
+
 
 
 
@@ -5412,20 +5412,20 @@ Indicator title to be shown in public places like data pages, that overrides the
 Short disambiguation of the title that references a special feature of the methods or nature of the data.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end in a period.
 	- Should be very short.
 	- Should only be used if the indicator's title is ambiguous (e.g. if there are multiple indicators with the same title).
 	- Should not reference the data provider. For that, instead, use `attribution_short`.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Age-standardized`» | «`The data is age-standardized`» |
 	| «`Historical data`» | «`Historical data from 1800 to 2010`» |
-    
+
 
 
 ---
@@ -5438,11 +5438,11 @@ Short disambiguation of the title that references a special feature of the metho
 List of topics where the indicator is relevant.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must be an existing topic tag, and be spelled correctly (see the list of topic tags in [datasette](http://analytics/private?sql=SELECT%0D%0A++DISTINCT+t.name%0D%0AFROM%0D%0A++tag_graph+tg%0D%0A++LEFT+JOIN+tags+t+ON+tg.childId+%3D+t.id%0D%0A++LEFT+JOIN+posts_gdocs+p+ON+t.slug+%3D+p.slug%0D%0A++AND+p.published+%3D+1%0D%0A++AND+p.type+IN+%28%27article%27%2C+%27topic-page%27%2C+%27linear-topic-page%27%29%0D%0AWHERE%0D%0A++p.slug+IS+NOT+NULL%0D%0AUNION%0D%0ASELECT%0D%0A++%27Uncategorized%27%0D%0AORDER+BY%0D%0A++t.name) (requires Tailscale).
 	- The first tag must correspond to the most relevant topic page (since that topic page will be used in citations of this indicator).
 	- Should contain 1, 2, or at most 3 tags.
-    
+
 
 
 
@@ -5486,7 +5486,7 @@ License to display for the indicator, overriding `license`.
 Level of processing that the indicator values have experienced.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must be `minor` if the indicator has undergone only minor operations since its origin:
 		- Rename entities (e.g. countries or columns)
 		- Multiplication by a constant (e.g. unit change)
@@ -5495,7 +5495,7 @@ Level of processing that the indicator values have experienced.
 		- Data aggregates (e.g. sum data for continents or income groups)
 		- Operations between indicators (e.g. per capita, percentages, annual changes)
 		- Concatenation of indicators, etc.
-    
+
 
 
 
@@ -5509,21 +5509,21 @@ Level of processing that the indicator values have experienced.
 Characters that represent the unit we use to measure the indicator value.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must follow the rules of capitalization of the International System of Units, when applicable.
 	- Must not end with a period.
 	- Must be empty if the indicator has no units.
 	- Should not contain spaces.
 	- If, for clarity, we prefer to simplify the units in a chart, e.g. to show `kWh` instead of `kWh/person`, use `display.short_unit` for the simplified units, and keep the correct one in `indicator.short_unit` (and ensure there is no ambiguity in the chart).
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`t/ha`» | «`t / ha`» |
 	| «`%`» | «`pct`» |
 	| «`kWh/person`» | «`pc`» |
-    
+
 
 
 ---
@@ -5562,21 +5562,21 @@ List of all sources of the indicator. Automatically filled. NOTE: This is no lon
 Title of the indicator, which is a few words definition of the indicator.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must start with a capital letter.
 	- Must not end with a period.
 	- Must be one short sentence (a few words).
 	- For 'small datasets', this should be the publicly displayed title. For 'big datasets' (like FAOSTAT, with many dimensions), it can be less human-readable, optimized for internal searches (then, use `presentation.title_public` for the public title).
 	- Should not mention other metadata fields like `producer` or `version`.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`Number of neutron star mergers in the Milky Way`» | «`Number of neutron stars (NASA)`» |
 	| «`Share of neutron star mergers that happen in the Milky Way`» | «`Share of neutron star mergers that happen in the Milky Way (2023)`» |
 	| «`Barley | 00000044 || Area harvested | 005312 || hectares`» | «`Barley`» |
-    
+
 
 
 ---
@@ -5602,7 +5602,7 @@ Indicator type is usually automatically inferred from the data, but must be manu
 Very concise name of the unit we use to measure the indicator values.
 
 === ":fontawesome-solid-list:  Guidelines"
-        
+
 	- Must not start with a capital letter.
 	- Must not end with a period.
 	- Must be empty if the indicator has no units.
@@ -5611,14 +5611,14 @@ Very concise name of the unit we use to measure the indicator values.
 	- Should not use symbols like “/”.
 		- If it is a derived unit, use 'per' to denote a division, e.g. '... per hectare', or '... per person'.
 	- Should be '%' for percentages.
-    
+
 === ":material-note-edit: Examples"
-        
+
 	| :material-check: DO      | :material-close: DON'T  |
 	| ----------- | --------- |
 	| «`tonnes per hectare`» | «`tonnes/hectare`» |
 	| «`kilowatts per person`» | «`kilowatts per capita`» |
-    
+
 
 
 ---

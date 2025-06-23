@@ -15,6 +15,7 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Set
 
+from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.files import get_schema_from_url
 from etl.paths import SCHEMAS_DIR
 
@@ -273,7 +274,7 @@ class TypedDictGenerator:
             dataset_schema = json.load(f)
 
         try:
-            grapher_schema = get_schema_from_url("https://files.ourworldindata.org/schemas/grapher-schema.007.json")
+            grapher_schema = get_schema_from_url(DEFAULT_GRAPHER_SCHEMA)
         except Exception:
             grapher_schema = {}  # Fallback if can't fetch
 
