@@ -14,12 +14,12 @@ dimensions:
       - slug: gdp_share
         name: Education spending as a share of GDP
         description: Education spending as a share of gross domestic product (GDP).
-      - slug: total_government
-        name: Education spending as a share of total government spending
-        description: Education's share of total government spending.
       - slug: constant_ppp
         name: Total government spending on education
         description: The total amount the government spends on education.
+      - slug: total_government
+        name: Education spending as a share of total government spending
+        description: Education's share of total government spending.
 
   - slug: level
     name: Education level
