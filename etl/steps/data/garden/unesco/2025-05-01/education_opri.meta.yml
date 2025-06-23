@@ -1235,7 +1235,7 @@ tables:
 
       government_expenditure_on_secondary_education_as_a_percentage_of_gdp__pct:
         title: Government spending on secondary education as share of GDP
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary](#dod:lowersecondary-education) and [upper secondary](#dod:upper-secondary-education) education (including local, regional, central, current, capital, and transfers) as a percentage of [GDP](#dod:gdp), inclusive of international transfers.
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary](#dod:lower-secondary-education) and [upper secondary](#dod:upper-secondary-education) education (including local, regional, central, current, capital, and transfers) as a percentage of [GDP](#dod:gdp), inclusive of international transfers.
         unit: "% of GDP"
         short_unit: "%"
         description_key: *desc_key_govt_expenditure_gdp_share
