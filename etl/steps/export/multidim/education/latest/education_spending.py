@@ -213,12 +213,11 @@ def create_grouped_views(collection):
 SPENDING_TYPE_MAPPINGS = {
     "title": {
         "gdp_share": "as a share of GDP",
-        "constant_ppp": "in constant PPP dollars",
-        "total_government": "as a share of total government expenditure",
+        "total_government": "as a share of total spending",
     },
     "subtitle": {
         "gdp_share": "as a percentage of [gross domestic product (GDP)](#dod:gdp)",
-        "constant_ppp": "in constant [purchasing power parity (PPP)](#dod:ppp) dollars",
+        "constant_ppp": "in constant [international-$](#dod:int_dollar_abbreviation).",
         "total_government": "as a percentage of total government expenditure",
     },
 }
@@ -258,7 +257,8 @@ def generate_title_by_spending_type_and_level(view):
         raise ValueError(f"Unknown spending type: {spending_type}")
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
-
+    if spending_type == "constant_ppp":
+        return f"Total government spending on {level_term}"
     return f"Government spending on {level_term} {spending_term}"
 
 
