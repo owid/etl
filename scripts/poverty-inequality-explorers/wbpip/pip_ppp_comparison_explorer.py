@@ -1056,10 +1056,11 @@ for survey in range(len(survey_type)):
 # Final adjustments to the graphers table:
 
 # Add PPP comparison article as related question link
-df_graphers["relatedQuestionText"] = "From $1.90 to $2.15 a day: the updated International Poverty Line"
-df_graphers["relatedQuestionUrl"] = (
-    "https://ourworldindata.org/from-1-90-to-2-15-a-day-the-updated-international-poverty-line"
-)
+# NOTE: Uncomment if we decide to add an article again
+# df_graphers["relatedQuestionText"] = "From $1.90 to $2.15 a day: the updated International Poverty Line"
+# df_graphers["relatedQuestionUrl"] = (
+#     "https://ourworldindata.org/from-1-90-to-2-15-a-day-the-updated-international-poverty-line"
+# )
 
 # Select one default view
 df_graphers.loc[
