@@ -1,6 +1,7 @@
 import re
 from copy import deepcopy
 from dataclasses import dataclass
+from types import SimpleNamespace
 from typing import Any, Dict, List, cast
 
 from etl.collection.exceptions import CommonViewParamConflict, ExtraIndicatorsInUseError
@@ -14,6 +15,13 @@ REGEX_CATALOG_PATH = (
 REGEX_CATALOG_PATH_OPTIONS = (
     r"^(?:(?:grapher/[A-Za-z0-9_]+/(?:\d{4}-\d{2}-\d{2}|\d{4}|latest)/)?[A-Za-z0-9_]+/)?[A-Za-z0-9_]+#[A-Za-z0-9_]+$"
 )
+
+
+class ReadOnlyNamespace(SimpleNamespace):
+    def __setattr__(self, name, value):
+        if hasattr(self, name):
+            raise AttributeError(f"Cannot modify attribute '{name}'")
+        super().__setattr__(name, value)
 
 
 @pruned_json
@@ -212,8 +220,29 @@ class View(MDIMBase):
     metadata: ViewMetadata | Dict[str, Any] | None = None
 
     @property
-    def d(self):
-        return self.dimensions
+    def d(self) -> ReadOnlyNamespace:
+        # Create a hash of current dimensions content for cache invalidation
+        current_hash = hash(frozenset(self.dimensions.items()))
+
+        # Check if we have a cached version and if dimensions haven't changed
+        if hasattr(self, "_d_cache") and hasattr(self, "_d_hash") and self._d_hash == current_hash:
+            return self._d_cache
+
+        # Create new ReadOnlyNamespace and cache it with current hash
+        self._d_cache = ReadOnlyNamespace(**self.dimensions)
+        self._d_hash = current_hash
+        return self._d_cache
+
+    def __setattr__(self, name, value):
+        if name == "d":
+            raise AttributeError(f"Cannot set read-only property '{name}'")
+        # Clear cache when dimensions object is replaced entirely
+        if name == "dimensions":
+            if hasattr(self, "_d_cache"):
+                delattr(self, "_d_cache")
+            if hasattr(self, "_d_hash"):
+                delattr(self, "_d_hash")
+        super().__setattr__(name, value)
 
     def has_non_y_indicators(self) -> bool:
         """Check if the view has non-y indicators."""
