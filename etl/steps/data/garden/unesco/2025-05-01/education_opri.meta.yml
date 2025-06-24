@@ -37,7 +37,7 @@ definitions:
   expenditure_bins_by_level: &expenditure_bins_by_level   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000]
 
   # Per-student spending bins (in international dollars per student)
-  per_student_spending_bins: &per_student_spending_bins [100, 500, 1000, 5000, 10000 ]
+  per_student_spending_bins: &per_student_spending_bins [100, 500, 1000, 5000, 10000,15000,20000]
 
   # Common enrollment and education indicator configurations
   grapher_config_enrolment_bugn: &grapher_config_enrolment_bugn
