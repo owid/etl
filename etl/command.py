@@ -573,6 +573,8 @@ def exec_graph_parallel(
     with pool_factory(max_workers=workers) as executor:
         # Dictionary to keep track of future tasks
         future_to_task: Dict[Future, str] = {}
+        failed_tasks = set()
+        exceptions = []
 
         ready_tasks = []
 
@@ -580,10 +582,20 @@ def exec_graph_parallel(
             # add new tasks
             ready_tasks += topological_sorter.get_ready()
 
-            # Submit tasks that are ready to the executor
-            # NOTE: limit it to `workers`, otherwise it might accept tasks that are not CPU bound
-            # and overload our DB
+            # Submit tasks that are ready to the executor, but skip those dependent on failed tasks
+            tasks_to_submit = []
             for task in ready_tasks[:workers]:
+                if config.CONTINUE_ON_FAILURE:
+                    # Check if any dependency of this task has failed
+                    task_deps = exec_graph.get(task, set())
+                    if task_deps & failed_tasks:
+                        print(f"--- Skipping {task} (depends on failed task)")
+                        topological_sorter.done(task)  # Mark as done so execution can continue
+                        continue
+
+                tasks_to_submit.append(task)
+
+            for task in tasks_to_submit:
                 future = executor.submit(func, task, **kwargs)
                 future_to_task[future] = task
 
@@ -591,13 +603,29 @@ def exec_graph_parallel(
             ready_tasks = ready_tasks[workers:]
 
             # Wait for at least one future to complete
-            done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
+            if future_to_task:
+                done, _ = wait(future_to_task.keys(), return_when=FIRST_COMPLETED)
 
-            # Mark completed tasks as done
-            for future in done:
-                task = future_to_task.pop(future)
-                future.result()
-                topological_sorter.done(task)
+                # Mark completed tasks as done
+                for future in done:
+                    task = future_to_task.pop(future)
+                    try:
+                        future.result()
+                        topological_sorter.done(task)
+                    except Exception as e:
+                        if config.CONTINUE_ON_FAILURE:
+                            failed_tasks.add(task)
+                            exceptions.append(e)
+                            topological_sorter.done(task)  # Mark as done so execution can continue
+                            print(f"--- Failed {task} - {click.style('FAILED', fg='red')}")
+                        else:
+                            raise e
+
+        # If we collected exceptions during CONTINUE_ON_FAILURE mode, raise the first one
+        if config.CONTINUE_ON_FAILURE and exceptions:
+            for exception in exceptions:
+                log.error("step_exception", exception=str(exception))
+            raise exceptions[0]
 
 
 def _create_expected_time_message(
