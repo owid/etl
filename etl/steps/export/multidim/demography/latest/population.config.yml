@@ -37,8 +37,10 @@ views:
   - dimensions:
       mode: data
     indicators:
-      y: grapher/demography/2024-07-15/population/historical#population_historical
+      y:
+        - grapher/demography/2024-07-15/population/historical#population_historical
+        - grapher/demography/2024-07-15/population/population#source_short
   - dimensions:
       mode: metadata
     indicators:
-      y: grapher/demography/2024-07-15/population/population#source
+      y: grapher/demography/2024-07-15/population/population#source_short

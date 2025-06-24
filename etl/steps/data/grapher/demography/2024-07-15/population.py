@@ -23,7 +23,8 @@ def run(dest_dir: str) -> None:
     tb_original = ds_garden["population_original"].update_metadata(short_name="population")
 
     # Set origins on `source`
-    tb_original.source.m.origins = tb_original.population.m.origins
+    tb_original["source"].m.origins = tb_original["population"].m.origins
+    tb_original["source_short"].m.origins = tb_original["population"].m.origins
 
     #
     # Save outputs.

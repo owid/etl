@@ -17,6 +17,7 @@ from utils import (
     GAPMINDER_SG_COUNTRIES_FORMER,
     GAPMINDER_SG_ORIGINS,
     SOURCES_NAMES,
+    SOURCES_NAMES_SHORT,
     YEAR_END_WPP,
     YEAR_START_GAPMINDER,
     YEAR_START_HYDE,
@@ -128,7 +129,7 @@ def run() -> None:
 
     # Create table with historical & projection data
     tbs = [
-        tb.drop(columns=["source"]),
+        tb.drop(columns=["source", "source_short"]),
         tb_density,
         tb_growth_rate,
     ]
@@ -350,7 +351,8 @@ def select_source(tb: Table) -> Table:
     _ = tb.set_index(["country", "year"], verify_integrity=True)
 
     # # map to source full names
-    tb["source"] = tb["source"].map(SOURCES_NAMES)
+    tb["source_short"] = tb.loc[:, "source"].map(SOURCES_NAMES_SHORT)
+    tb["source"] = tb.loc[:, "source"].map(SOURCES_NAMES)
     return tb
 
 
@@ -378,8 +380,8 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
 
     # keep sources per countries, remove from tb
     # remove from tb: otherwsie geo.add_region_aggregates will add this column too
-    sources = tb.loc[:, ["country", "year", "source"]].copy()
-    tb = tb.drop(columns=["source"])
+    sources = tb.loc[:, ["country", "year", "source", "source_short"]].copy()
+    tb = tb.drop(columns=["source", "source_short"])
 
     # Build table specifically for estimating regions: (1) no historical regions, (2) interpolation of country values
 
@@ -470,6 +472,10 @@ def add_regions(tb: Table, ds_regions: Dataset, ds_income_groups: Dataset) -> Ta
         s = tb.loc[tb["country"].isin(members), "source"].unique()
         sources_region = sorted(s)
         tb.loc[tb["country"] == region, "source"] = "; ".join(sources_region)
+
+        s = tb.loc[tb["country"].isin(members), "source_short"].unique()
+        sources_region = sorted(s)
+        tb.loc[tb["country"] == region, "source_short"] = "; ".join(sources_region)
     return tb
 
 
@@ -526,6 +532,7 @@ def add_world(tb: Table) -> Table:
 
     # add sources for world
     tb.loc[tb["country"] == "World", "source"] = "; ".join(sorted(SOURCES_NAMES.values()))
+    tb.loc[tb["country"] == "World", "source_short"] = "; ".join(sorted(SOURCES_NAMES_SHORT.values()))
     return tb
 
 
@@ -543,6 +550,7 @@ def add_historical_regions(tb: Table, tb_gm: Table, tb_regions: Table) -> Table:
     paths.log.info("loading data (Gapminder Systema Globalis)")
     # Add to main table
     tb_gm["source"] = SOURCES_NAMES["gapminder_sg"]
+    tb_gm["source_short"] = SOURCES_NAMES_SHORT["gapminder_sg"]
     tb = pr.concat([tb, tb_gm], ignore_index=True)
 
     # 2. Add historical regions by grouping and summing current countries.
@@ -565,7 +573,11 @@ def add_historical_regions(tb: Table, tb_gm: Table, tb_regions: Table) -> Table:
         tb_suc = tb_suc[tb_suc["year"].isin(year_filter)]
         # Perform operations
         tb_suc = tb_suc.groupby("year", as_index=False, observed=True).agg(
-            {"population": sum, "source": lambda x: "; ".join(sorted(set(x)))}
+            {
+                "population": sum,
+                "source": lambda x: "; ".join(sorted(set(x))),
+                "source_short": lambda x: "; ".join(sorted(set(x))),
+            }
         )
         tb_suc["country"] = former_country_name
         # Add to main table

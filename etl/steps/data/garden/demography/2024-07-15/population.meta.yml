@@ -43,6 +43,13 @@ tables:
           Name of the source for a specific data point. The name includes a short name for the source and a link.
         unit: ""
 
+      source_short:
+        title: Source (short)
+        description_short: *population-source-description
+        unit: ""
+        presentation:
+          title_public: Source
+
   # Table with full metadata (to be used when showing the population time series, e.g. the data page for the population indicator)
   population_original:
     title: Population
@@ -60,6 +67,10 @@ tables:
         short_unit: "%"
       source:
         title: Source
+        description_short: *population-source-description
+        unit: ""
+      source_short:
+        title: Source (short)
         description_short: *population-source-description
         unit: ""
 
