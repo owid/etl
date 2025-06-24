@@ -98,7 +98,7 @@ def temporary_step() -> Iterator[str]:
 
 def test_dependency_ordering():
     "Check that a dependency will be scheduled to run before things that need it."
-    dag = {"a": ["b", "c"], "b": ["c"]}
+    dag = {"a": {"b", "c"}, "b": {"c"}}
     assert to_dependency_order(dag) == ["c", "b", "a"]
 
 

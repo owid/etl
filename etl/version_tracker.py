@@ -16,7 +16,7 @@ from etl.config import ADMIN_HOST
 from etl.dag_helpers import load_dag
 from etl.db import can_connect
 from etl.grapher.io import get_info_for_etl_datasets
-from etl.steps import extract_step_attributes, reverse_graph
+from etl.steps import extract_step_attributes, filter_to_subgraph, reverse_graph
 
 log = structlog.get_logger()
 
@@ -325,12 +325,18 @@ class VersionTracker:
         warn_on_archivable: bool = True,
         warn_on_unused: bool = True,
         ignore_archive: bool = False,
+        include_steps: Optional[list[str]] = None,
         exclude_steps: Optional[list[str]] = None,
         # includes
         # excludes
     ):
         # Load dag of active steps (a dictionary step: set of dependencies).
         self.dag_active = load_dag(paths.DAG_FILE)
+
+        # Filter DAG to speed it up
+        if include_steps:
+            self.dag_active = filter_to_subgraph(self.dag_active, includes=include_steps)
+
         if ignore_archive:
             # Fully ignore the archive dag (so that all steps are only active steps, and there are no archive steps).
             self.dag_all = self.dag_active.copy()

@@ -2,7 +2,7 @@ import difflib
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Union
 
 import click
 import structlog
@@ -27,7 +27,9 @@ STEP_VERSION_NEW = datetime.now().strftime("%Y-%m-%d")
 
 
 class StepUpdater:
-    def __init__(self, dry_run: bool = False, interactive: bool = True):
+    def __init__(self, dry_run: bool = False, interactive: bool = True, steps: List[str] | None = None):
+        # If steps are provided, we can load a DAG subset and speed up version tracker.
+        self.steps = steps
         # Initialize version tracker and load dataframe of all active steps.
         self._load_version_tracker()
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
@@ -41,7 +43,7 @@ class StepUpdater:
         # It can be used when initializing StepUpdater, but also to reload steps_df after making changes to the dag.
 
         # Initialize version tracker.
-        self.tracker = VersionTracker(ignore_archive=True)
+        self.tracker = VersionTracker(ignore_archive=True, include_steps=self.steps)
 
         # Update the temporary dag.
         _update_temporary_dag(dag_active=self.tracker.dag_active, dag_all_reverse=self.tracker.dag_all_reverse)
@@ -275,20 +277,13 @@ class StepUpdater:
 
     def update_steps(
         self,
-        steps: Union[str, List[str], Tuple[str]],
+        steps: List[str],
         step_version_new: Optional[str] = STEP_VERSION_NEW,
         include_dependencies: bool = False,
         include_usages: bool = False,
         step_headers: Optional[Dict[str, str]] = None,
     ) -> None:
         """Update one or more steps to their new version, if possible."""
-
-        # If a single step is given, convert it to a list.
-        if isinstance(steps, str):
-            steps = [steps]
-        elif isinstance(steps, tuple):
-            steps = list(steps)
-
         # Gather all steps to be updated.
         for step in steps:
             # Check that step to be updated exists in the active dag.
@@ -568,8 +563,14 @@ def cli(
 
         Note that the code of the explorers step itself will not be updated (since it has version "latest"), but its dependencies will be updated in the dag.
     """
+    # If a single step is given, convert it to a list.
+    if isinstance(steps, str):
+        steps = [steps]
+    elif isinstance(steps, tuple):
+        steps = list(steps)
+
     # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
+    StepUpdater(dry_run=dry_run, interactive=interactive, steps=steps).update_steps(
         steps=steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,

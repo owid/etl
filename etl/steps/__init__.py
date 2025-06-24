@@ -48,8 +48,7 @@ from etl.snapshot import Snapshot
 
 log = structlog.get_logger()
 
-Graph = Dict[str, Set[str]]
-DAG = Dict[str, Any]
+DAG = Dict[str, Set[str]]
 
 
 ipynb_lock = fasteners.InterProcessLock(paths.BASE_DIR / ".ipynb_lock")
@@ -86,13 +85,13 @@ def to_dependency_order(dag: DAG) -> List[str]:
 
 
 def filter_to_subgraph(
-    graph: Graph,
+    graph: DAG,
     includes: Iterable[str],
     downstream: bool = False,
     only: bool = False,
     exact_match: bool = False,
     excludes: Optional[List[str]] = None,
-) -> Graph:
+) -> DAG:
     """
     Filter the full graph to only the included nodes, and all their dependencies.
 
@@ -148,12 +147,12 @@ def filter_to_subgraph(
     return {step: deps - excluded_steps for step, deps in subgraph.items() if step not in excluded_steps}
 
 
-def traverse(graph: Graph, nodes: Set[str]) -> Graph:
+def traverse(graph: DAG, nodes: Set[str]) -> DAG:
     """
     Use BFS to find all nodes in a graph that are reachable from a given
     subset of nodes.
     """
-    reachable: Graph = defaultdict(set)
+    reachable: DAG = defaultdict(set)
     to_visit = nodes.copy()
 
     while to_visit:
@@ -172,7 +171,7 @@ def _parse_dag_yaml(dag: Dict[str, Any]) -> Dict[str, Any]:
     return {node: set(deps) if deps else set() for node, deps in steps.items()}
 
 
-def reverse_graph(graph: Graph) -> Graph:
+def reverse_graph(graph: DAG) -> DAG:
     """
     Invert the edge direction of a graph.
     """
@@ -187,7 +186,7 @@ def reverse_graph(graph: Graph) -> Graph:
     return dict(g)
 
 
-def graph_nodes(graph: Graph) -> Set[str]:
+def graph_nodes(graph: DAG) -> Set[str]:
     all_steps = set(graph)
     for children in graph.values():
         all_steps.update(children)
