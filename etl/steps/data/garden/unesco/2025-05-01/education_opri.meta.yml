@@ -1374,7 +1374,7 @@ tables:
         description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         description_processing: *description_processing_per_student
         presentation:
           title_public: Government spending on pre-primary education per student (international-$)
@@ -1388,7 +1388,7 @@ tables:
         description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         description_processing: *description_processing_per_student
         presentation:
           title_public: Government spending on primary education per student (international-$)
@@ -1402,7 +1402,7 @@ tables:
         description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         description_processing: *description_processing_per_student
         presentation:
           title_public: Government spending on lower secondary education per student (international-$)
@@ -1416,7 +1416,7 @@ tables:
         description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         description_processing: *description_processing_per_student
         presentation:
           title_public: Government spending on upper secondary education per student (international-$)
@@ -1430,7 +1430,7 @@ tables:
         description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         description_processing: *description_processing_per_student
         presentation:
           title_public: Government spending on tertiary education per student (international-$)
@@ -1444,7 +1444,7 @@ tables:
         description_short: Total [general government](#dod:general-government) spending on education across all levels, including all types of spending, per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
         unit: "international-$"
         short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
         description_processing: *description_processing_per_student
         presentation:
           title_public: Government spending on education per student (international-$)
