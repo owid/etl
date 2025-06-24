@@ -240,18 +240,12 @@ class PresentationConfig(TypedDict, total=False):
 # =============================================================================
 
 
-class ViewConfig(TypedDict, total=False):
-    """View configuration options based on multidim schema."""
+class _ViewConfigBase(TypedDict, total=False):
+    """Base ViewConfig without the $schema field."""
 
-    # Fields defined via __annotations__ to handle special characters
-    pass
-
-
-ViewConfig.__annotations__ = {
-    "$schema": str,
-    "addCountryMode": Literal["add-country", "change-country", "disabled"],
-    "baseColorScheme": dict[str, Any],
-    "chartTypes": list[
+    addCountryMode: Literal["add-country", "change-country", "disabled"]
+    baseColorScheme: dict[str, Any]
+    chartTypes: list[
         Literal[
             "LineChart",
             "ScatterPlot",
@@ -262,59 +256,68 @@ ViewConfig.__annotations__ = {
             "StackedBar",
             "Marimekko",
         ]
-    ],
-    "colorScale": dict[str, Any],
-    "compareEndPointsOnly": bool,
-    "comparisonLines": list[ComparisonLinesConfig],
-    "entityType": str,
-    "entityTypePlural": str,
-    "excludedEntityNames": list[str],
-    "facettingLabelByYVariables": str,
-    "focusedSeriesNames": list[str],
-    "hasMapTab": bool,
-    "hideAnnotationFieldsInTitle": HideAnnotationFieldsInTitleConfig,
-    "hideConnectedScatterLines": bool,
-    "hideFacetControl": bool,
-    "hideLegend": bool,
-    "hideLogo": bool,
-    "hideRelativeToggle": bool,
-    "hideScatterLabels": bool,
-    "hideTimeline": bool,
-    "hideTotalValueLabel": bool,
-    "includedEntityNames": list[str],
-    "internalNotes": str,
-    "invertColorScheme": bool,
-    "logo": Literal["owid", "core+owid", "gv+owid"],
-    "map": MapConfig,
-    "matchingEntitiesOnly": bool,
-    "maxTime": dict[str, Any],
-    "minTime": dict[str, Any],
-    "missingDataStrategy": Literal["auto", "hide", "show"],
-    "note": str,
-    "originUrl": str,
-    "relatedQuestions": list[RelatedQuestionsConfig],
-    "scatterPointLabelStrategy": Literal["x", "y", "year"],
-    "selectedEntityColors": dict[str, Any],
-    "selectedEntityNames": list[str],
-    "selectedFacetStrategy": Literal["none", "entity", "metric"],
-    "showNoDataArea": bool,
-    "showYearLabels": bool,
-    "sortBy": Literal["column", "total", "entityName", "custom"],
-    "sortColumnSlug": str,
-    "sortOrder": Literal["desc", "asc"],
-    "sourceDesc": str,
-    "stackMode": Literal["absolute", "relative", "grouped", "stacked"],
-    "subtitle": str,
-    "tab": Literal["chart", "map", "table", "line", "slope"],
-    "timelineMaxTime": dict[str, Any],
-    "timelineMinTime": dict[str, Any],
-    "title": str,
-    "variantName": str,
-    "version": int,
-    "xAxis": dict[str, Any],
-    "yAxis": dict[str, Any],
-    "zoomToSelection": bool,
-}
+    ]
+    colorScale: dict[str, Any]
+    compareEndPointsOnly: bool
+    comparisonLines: list[ComparisonLinesConfig]
+    entityType: str
+    entityTypePlural: str
+    excludedEntityNames: list[str]
+    facettingLabelByYVariables: str
+    focusedSeriesNames: list[str]
+    hasMapTab: bool
+    hideAnnotationFieldsInTitle: HideAnnotationFieldsInTitleConfig
+    hideConnectedScatterLines: bool
+    hideFacetControl: bool
+    hideLegend: bool
+    hideLogo: bool
+    hideRelativeToggle: bool
+    hideScatterLabels: bool
+    hideTimeline: bool
+    hideTotalValueLabel: bool
+    includedEntityNames: list[str]
+    internalNotes: str
+    invertColorScheme: bool
+    logo: Literal["owid", "core+owid", "gv+owid"]
+    map: MapConfig
+    matchingEntitiesOnly: bool
+    maxTime: dict[str, Any]
+    minTime: dict[str, Any]
+    missingDataStrategy: Literal["auto", "hide", "show"]
+    note: str
+    originUrl: str
+    relatedQuestions: list[RelatedQuestionsConfig]
+    scatterPointLabelStrategy: Literal["x", "y", "year"]
+    selectedEntityColors: dict[str, Any]
+    selectedEntityNames: list[str]
+    selectedFacetStrategy: Literal["none", "entity", "metric"]
+    showNoDataArea: bool
+    showYearLabels: bool
+    sortBy: Literal["column", "total", "entityName", "custom"]
+    sortColumnSlug: str
+    sortOrder: Literal["desc", "asc"]
+    sourceDesc: str
+    stackMode: Literal["absolute", "relative", "grouped", "stacked"]
+    subtitle: str
+    tab: Literal["chart", "map", "table", "line", "slope"]
+    timelineMaxTime: dict[str, Any]
+    timelineMinTime: dict[str, Any]
+    title: str
+    variantName: str
+    version: int
+    xAxis: dict[str, Any]
+    yAxis: dict[str, Any]
+    zoomToSelection: bool
+
+
+class ViewConfig(_ViewConfigBase, total=False):
+    """View configuration options based on multidim schema."""
+
+    pass
+
+
+# Add the $schema field using __annotations__ to avoid syntax issues
+ViewConfig.__annotations__.update({"$schema": str})
 
 
 # =============================================================================
