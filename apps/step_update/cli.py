@@ -342,7 +342,6 @@ class StepUpdater:
                 graph=self.tracker.dag_active,
                 includes=steps,
                 excludes=[],
-                downstream=False,
                 only=True,
                 exact_match=True,
             )
@@ -439,7 +438,6 @@ class StepUpdater:
             graph=self.tracker.dag_active,
             includes=steps,
             excludes=[],
-            downstream=False,
             only=True,
         )
         steps = to_dependency_order(filtered_dag)

@@ -3,7 +3,6 @@
 #  steps
 #
 import graphlib
-from functools import partial
 import hashlib
 import importlib.util
 import inspect
@@ -19,6 +18,7 @@ from collections.abc import Generator
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
 from dataclasses import dataclass, field
+from functools import partial
 from glob import glob
 from importlib import import_module
 from pathlib import Path
@@ -1169,6 +1169,7 @@ def _cached_is_dirty(step: Step, cache: files.RuntimeCache) -> bool:
     if key not in cache:
         cache.add(key, step._is_dirty())
     return cache[key]
+
 
 def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     """Save copy of a method to _is_dirty and replace it with a cached version."""

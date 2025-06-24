@@ -92,16 +92,10 @@ log = structlog.get_logger()
     help="Run the debugger on uncaught exceptions.",
 )
 @click.option(
-    "--downstream",
-    "-d",
-    is_flag=True,
-    help="Include downstream dependencies (steps that depend on the included steps).",
-)
-@click.option(
     "--only",
     "-o",
     is_flag=True,
-    help="Only run the selected step (no upstream or downstream dependencies). Overrides `--downstream` option.",
+    help="Only run the selected step (no upstream dependencies).",
 )
 @click.option(
     "--exact-match",
@@ -179,7 +173,6 @@ def main_cli(
     grapher: bool = False,
     export: bool = False,
     ipdb: bool = False,
-    downstream: bool = False,
     only: bool = False,
     exact_match: bool = False,
     exclude: Optional[str] = None,
@@ -254,7 +247,6 @@ def main_cli(
         private=private,
         grapher=grapher,
         export=export,
-        downstream=downstream,
         only=only,
         exact_match=exact_match,
         excludes=exclude.split(",") if exclude else None,
@@ -295,7 +287,6 @@ def main(
     private: bool = False,
     grapher: bool = False,
     export: bool = False,
-    downstream: bool = False,
     only: bool = False,
     exact_match: bool = False,
     excludes: Optional[List[str]] = None,
@@ -323,7 +314,6 @@ def main(
         grapher=grapher,
         export=export,
         private=private,
-        downstream=downstream,
         only=only,
         exact_match=exact_match,
     )
@@ -382,7 +372,6 @@ def construct_subdag(
     grapher: bool = False,
     export: bool = False,
     private: bool = False,
-    downstream: bool = False,
     only: bool = False,
     exact_match: bool = False,
 ) -> DAG:
@@ -416,9 +405,7 @@ def construct_subdag(
     excludes.append("grapher://grapher/regions/latest/regions")
 
     # Get subdag based on includes and excludes
-    subdag = filter_to_subgraph(
-        dag, includes=includes, excludes=excludes, downstream=downstream, only=only, exact_match=exact_match
-    )
+    subdag = filter_to_subgraph(dag, includes=includes, excludes=excludes, only=only, exact_match=exact_match)
 
     if not subdag:
         # If no steps are found, the most likely case is that the step passed as argument was misspelled.
