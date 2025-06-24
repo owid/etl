@@ -26,7 +26,6 @@ from etl.steps import (
     DataStepPrivate,
     SnapshotStep,
     Step,
-    compile_steps,
     filter_to_subgraph,
     get_etag,
     isolated_env,

@@ -33,7 +33,6 @@ from etl.steps import (
     Step,
     compile_steps,
     filter_to_subgraph,
-    parse_step,
     select_dirty_steps,
 )
 
@@ -795,14 +794,19 @@ def _update_open_file_limit() -> None:
         resource.setrlimit(resource.RLIMIT_NOFILE, (min(LIMIT_NOFILE, hard_limit), hard_limit))
 
 
+def _always_clean() -> bool:
+    """Always return False to indicate step is not dirty."""
+    return False
+
+
 def _set_dependencies_to_nondirty(step: Step) -> None:
     """Set all dependencies of a step to non-dirty."""
     if isinstance(step, DataStep):
         for step_dep in step.dependencies:
-            step_dep.is_dirty = lambda: False
+            step_dep.is_dirty = _always_clean
     if isinstance(step, GrapherStep):
         for step_dep in step.data_step.dependencies:
-            step.data_step.is_dirty = lambda: False
+            step.data_step.is_dirty = _always_clean
 
 
 def _check_public_private_steps(dag: DAG) -> None:

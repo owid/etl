@@ -68,25 +68,25 @@ def test_get_exact_matches():
     # Try all possible combinations of "exact_match" and "only" arguments, when passing the full step uri as arguments.
     subdag = filter_to_subgraph(dag, includes=["data://test/step_1"], exact_match=True, only=True)
     assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_1"]
-    
+
     subdag = filter_to_subgraph(dag, includes=["data://test/step_1"], exact_match=True, only=False)
     assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_0", "test/step_1"]
-    
+
     subdag = filter_to_subgraph(dag, includes=["data://test/step_1"], exact_match=False, only=True)
     assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_1"]
-    
+
     subdag = filter_to_subgraph(dag, includes=["data://test/step_1"], exact_match=False, only=False)
     assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_0", "test/step_1"]
 
     # Try all possible combinations of "exact_match" and "only" arguments, when passing a substring of the step uri.
     subdag = filter_to_subgraph(dag, includes=["step_1"], exact_match=True, only=True)
     assert [s.path for s in compile_steps(dag, subdag)] == []
-    
+
     subdag = filter_to_subgraph(dag, includes=["step_1"], exact_match=True, only=False)
     assert [s.path for s in compile_steps(dag, subdag)] == []
-    
+
     subdag = filter_to_subgraph(dag, includes=["step_1"], exact_match=False, only=True)
     assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_1"]
-    
+
     subdag = filter_to_subgraph(dag, includes=["step_1"], exact_match=False, only=False)
     assert [s.path for s in compile_steps(dag, subdag)] == ["test/step_0", "test/step_1"]

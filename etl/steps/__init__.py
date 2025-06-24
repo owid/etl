@@ -3,6 +3,7 @@
 #  steps
 #
 import graphlib
+from functools import partial
 import hashlib
 import importlib.util
 import inspect
@@ -1163,17 +1164,17 @@ def _step_is_dirty(s: Step) -> bool:
     return s.is_dirty()
 
 
-def _cached_is_dirty(self: Step, cache: files.RuntimeCache) -> bool:
-    key = str(self)
+def _cached_is_dirty(step: Step, cache: files.RuntimeCache) -> bool:
+    key = str(step)
     if key not in cache:
-        cache.add(key, self._is_dirty())  # type: ignore
-    return cache[key]  # type: ignore
-
+        cache.add(key, step._is_dirty())
+    return cache[key]
 
 def _add_is_dirty_cached(s: Step, cache: files.RuntimeCache) -> None:
     """Save copy of a method to _is_dirty and replace it with a cached version."""
-    s._is_dirty = s.is_dirty  # type: ignore
-    s.is_dirty = lambda s=s: _cached_is_dirty(s, cache)  # type: ignore
+    s._is_dirty = s.is_dirty
+    s._cache = cache
+    s.is_dirty = partial(_cached_is_dirty, s, cache)
     for dep in getattr(s, "dependencies", []):
         _add_is_dirty_cached(dep, cache)
 
