@@ -31,6 +31,8 @@ steps:
     - data://garden/faostat/2024-03-14/faostat_rl_auxiliary
   data://grapher/demography/2024-07-15/population:
     - data://garden/demography/2024-07-15/population
+  export://multidim/demography/latest/population:
+    - data://grapher/demography/2024-07-15/population
 
   # WPP ########################################
   # WPP (2024)
