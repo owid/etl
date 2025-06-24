@@ -243,7 +243,7 @@ class Collection(MDIMBase):
         admin_api.put_mdim_config(self.catalog_path, config)
 
         # Link to preview
-        log.info(f"PREVIEW: {OWID_ENV.collection_preview(self.catalog_path)}")
+        log.info(f"PREVIEW: {owid_env.collection_preview(self.catalog_path)}")
 
     def snake_case_slugs(self):
         """
