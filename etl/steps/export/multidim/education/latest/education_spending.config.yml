@@ -3,7 +3,6 @@ title:
   title_variant: by spending type and level of education
 default_selection:
   - United States
-  - Germany
   - Brazil
   - India
 
@@ -14,12 +13,15 @@ dimensions:
       - slug: gdp_share
         name: Education spending as a share of GDP
         description: Education spending as a share of gross domestic product (GDP).
-      - slug: constant_ppp
-        name: Total government spending on education
-        description: The total amount the government spends on education.
+      - slug: per_student
+        name: Education spending per student
+        description: The total amount the government spends on education per student.
       - slug: total_government
         name: Education spending as a share of total government spending
         description: Education's share of total government spending.
+      - slug: constant_ppp
+        name: Total government spending on education
+        description: The total amount the government spends on education.
 
   - slug: level
     name: Education level

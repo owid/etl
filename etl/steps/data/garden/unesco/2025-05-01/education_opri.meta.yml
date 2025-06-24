@@ -33,6 +33,15 @@ definitions:
   school_life_expectancy_primary_bins: &school_life_expectancy_primary_bins [2,3,4,5,6,7,8,9]
   school_life_expectancy_secondary_bins: &school_life_expectancy_secondary_bins [1,2,3,4,5,6,7,8]
   school_life_expectancy_tertiary_bins: &school_life_expectancy_tertiary_bins [0.5,1,1.5,2,2.5,3,4,5]
+  expenditure_bins_total: &expenditure_bins_total   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000, 500000000000, 1000000000000]
+  expenditure_bins_by_level: &expenditure_bins_by_level   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000]
+
+  # Per-student spending bins (in international dollars per student)
+  per_student_spending_preprimary_bins: &per_student_spending_preprimary_bins [100, 500, 1000, 2000, 3000, 5000, 8000, 12000]
+  per_student_spending_primary_bins: &per_student_spending_primary_bins [200, 500, 1000, 2000, 4000, 6000, 10000, 15000]
+  per_student_spending_secondary_bins: &per_student_spending_secondary_bins [500, 1000, 2000, 4000, 6000, 10000, 15000, 20000]
+  per_student_spending_tertiary_bins: &per_student_spending_tertiary_bins [1000, 3000, 6000, 10000, 15000, 25000, 40000, 60000]
+  per_student_spending_total_bins: &per_student_spending_total_bins [500, 1000, 2000, 4000, 6000, 10000, 15000, 25000]
 
   # Common enrollment and education indicator configurations
   grapher_config_enrolment_bugn: &grapher_config_enrolment_bugn
@@ -182,7 +191,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [10,50,100,500,1000,2000,5000,10000]
+        customNumericValues: *expenditure_bins_by_level
         baseColorScheme: Oranges
 
   grapher_config_spending_primary: &grapher_config_spending_primary
@@ -191,7 +200,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [50,200,500,1000,2000,5000,10000,20000]
+        customNumericValues: *expenditure_bins_by_level
         baseColorScheme: Blues
 
   grapher_config_spending_lower_secondary: &grapher_config_spending_lower_secondary
@@ -200,7 +209,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [25,100,250,500,1000,2500,5000,10000]
+        customNumericValues: *expenditure_bins_by_level
         baseColorScheme: Greens
 
   grapher_config_spending_upper_secondary: &grapher_config_spending_upper_secondary
@@ -209,7 +218,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [25,100,250,500,1000,2500,5000,10000]
+        customNumericValues: *expenditure_bins_by_level
         baseColorScheme: Purples
 
   grapher_config_spending_tertiary: &grapher_config_spending_tertiary
@@ -218,8 +227,54 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [50,200,500,1000,2000,5000,10000,20000]
+        customNumericValues: *expenditure_bins_by_level
         baseColorScheme: Reds
+
+  # Per-student spending configurations (using per-student bins)
+  grapher_config_per_student_spending_preprimary: &grapher_config_per_student_spending_preprimary
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_preprimary_bins
+        baseColorScheme: Oranges
+
+  grapher_config_per_student_spending_primary: &grapher_config_per_student_spending_primary
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_primary_bins
+        baseColorScheme: Blues
+
+  grapher_config_per_student_spending_secondary: &grapher_config_per_student_spending_secondary
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_secondary_bins
+        baseColorScheme: Greens
+
+  grapher_config_per_student_spending_tertiary: &grapher_config_per_student_spending_tertiary
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_tertiary_bins
+        baseColorScheme: Reds
+
+  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_total_bins
+        baseColorScheme: YlOrRd
 
   grapher_config_spending_total: &grapher_config_spending_total
     <<: *common_grapher_config
@@ -227,7 +282,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: [500,2000,5000,10000,20000,50000,100000,200000]
+        customNumericValues: *expenditure_bins_total
         baseColorScheme: YlOrRd
 
   # Education spending as share of GDP configuration
@@ -241,30 +296,29 @@ definitions:
         baseColorScheme: YlOrBr
 
   # ============================================================================
-  # DESCRIPTION TEMPLATES
+  # DESCRIPTIONS
   # ============================================================================
 
+  description_processing_per_student: &description_processing_per_student
+    This indicator was calculated by dividing the total government expenditure on education at a specific level by the number of students enrolled at that level.
   # Government expenditure descriptions
   desc_key_govt_expenditure_constant_ppp: &desc_key_govt_expenditure_constant_ppp
-    - This indicator captures the total amount a government invests in education at a specific level, expressed in millions of constant international dollars.
-    - International dollars adjust for differences in the cost of living between countries and allow spending comparisons that reflect real purchasing power.
-    - It includes all types of public education spending — such as teacher salaries, textbooks, school maintenance, capital investments like building new classrooms, and transfers from international donors to the government for education.
-    - Spending figures are initially reported in local currency, then converted into international dollars using standardized purchasing power estimates and adjusted for inflation.
-    - This ensures that values reflect the real quantity of resources committed, rather than nominal amounts influenced by local prices or exchange rates.
-    - The indicator allows for meaningful comparisons of education spending volumes across countries and over time, regardless of income levels or currency differences.
-    - A higher value indicates a greater absolute investment in education, which may support improvements in infrastructure, teacher quality, and learning outcomes.
-    - This measure does not show how efficiently funds are used or how much is spent per student — it should be interpreted alongside indicators like enrolment rates and per-student spending.
-    - Data is reported by governments and compiled by organizations such as the UNESCO Institute for Statistics, using international standards to ensure comparability across countries and education levels.
+   - This indicator tracks how much a government spends on education at a specific level, adjusted for inflation and differences in the cost of living. Spending is expressed in constant international dollars, which allows for comparisons across countries and over time.
+   - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
+   - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations. For example, data released in 2017 would typically be expressed in 2014 dollars.
+   - This measure provides a comparable view of how much governments invest in education in absolute terms. But it doesn’t show how spending is distributed or how effectively it’s used — it should be interpreted alongside indicators like enrolment and per-student spending.
+
+  desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
+   - This indicator shows how much a government spends per student at a particular level of education, expressed in constant international dollars.
+   - It’s calculated by dividing total government spending by the number of enrolled students, and adjusted for inflation and differences in purchasing power between countries. This makes it possible to compare investment levels across education systems and over time.
+   - Higher values suggest that more resources are available per student — which could support better infrastructure, teaching quality, and learning environments. But it doesn’t tell us how effectively the money is used, or whether outcomes are improving.
+   - This is one of the most useful measures for understanding how governments fund education relative to the size of their student population. It’s especially helpful when comparing countries with different overall budgets or economic conditions.
 
   desc_key_govt_expenditure_gdp_share: &desc_key_govt_expenditure_gdp_share
-    - Governments invest part of their national income in education — this indicator shows the size of that investment, expressed as a percentage of a country's total economic output (GDP).
-    - It measures how much a government spends on education at a specific level relative to the overall economy.
-    - The calculation divides government spending on education at this level by the country’s gross domestic product (GDP), then multiplies the result by 100 to express it as a percentage.
-    - A higher value means a larger share of national resources is allocated to education at this level, which may reflect political commitment, policy priorities, or national education strategies.
-    - This indicator includes spending by central, regional, and local governments, and accounts for both current and capital expenditures on education.
-    - It is particularly useful for understanding how education funding fits within the broader context of a country's public finances and economic capacity.
-    - However, a higher percentage does not necessarily mean higher spending in absolute terms or more effective education systems — it must be considered alongside enrolment data, per-student spending, and learning outcomes.
-    - The data comes from official government reports compiled by the UNESCO Institute for Statistics, and is mapped to internationally standardized education levels to ensure global comparability.
+   - This indicator shows the share of a country’s economic output (GDP) that is spent on education. It reflects how much of the national budget is directed toward education relative to the size of the economy.
+   - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
+   - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
+   - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
 
   # Enrollment and attendance descriptions
   desc_key_net_enr: &desc_key_net_enr
@@ -1299,7 +1353,7 @@ tables:
           grapher_config: *grapher_config_spending_total
         display:
           numDecimalPlaces: 0
-          name: Total
+          name: Total across all levels
 
       government_expenditure_on_education__pppdollar__millions:
         title: Government spending on education in purchasing power parity (PPP) dollars
@@ -1309,3 +1363,92 @@ tables:
         description_key: *desc_key_govt_expenditure_constant_ppp
         display:
           numDecimalPlaces: 0
+
+
+      # ========================================================================
+      # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
+      # ========================================================================
+
+      government_expenditure_on_pre_primary_education__per_student__constant_pppdollar:
+        title: Government spending on pre-primary education per student
+        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_processing: *description_processing_per_student
+        presentation:
+          title_public: Government spending on pre-primary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_preprimary
+        display:
+          numDecimalPlaces: 0
+          name: Pre-primary
+
+      government_expenditure_on_primary_education__per_student__constant_pppdollar:
+        title: Government spending on primary education per student
+        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_processing: *description_processing_per_student
+        presentation:
+          title_public: Government spending on primary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_primary
+        display:
+          numDecimalPlaces: 0
+          name: Primary
+
+      government_expenditure_on_lower_secondary_education__per_student__constant_pppdollar:
+        title: Government spending on lower secondary education per student
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_processing: *description_processing_per_student
+        presentation:
+          title_public: Government spending on lower secondary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_secondary
+        display:
+          numDecimalPlaces: 0
+          name: Lower secondary
+
+      government_expenditure_on_upper_secondary_education__per_student__constant_pppdollar:
+        title: Government spending on upper secondary education per student
+        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_processing: *description_processing_per_student
+        presentation:
+          title_public: Government spending on upper secondary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_secondary
+        display:
+          numDecimalPlaces: 0
+          name: Upper secondary
+
+      government_expenditure_on_tertiary_education__per_student__constant_pppdollar:
+        title: Government spending on tertiary education per student
+        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_processing: *description_processing_per_student
+        presentation:
+          title_public: Government spending on tertiary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_tertiary
+        display:
+          numDecimalPlaces: 0
+          name: Tertiary
+
+      government_expenditure_on_education_per_student__total_across_all_levels__constant_pppdollar:
+        title: Government spending on education per student across all levels
+        description_short: Total [general government](#dod:general-government) spending on education across all levels, including all types of spending, per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp
+        description_processing: *description_processing_per_student
+        presentation:
+          title_public: Government spending on education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_total
+        display:
+          numDecimalPlaces: 0
+          name: Total across all levels

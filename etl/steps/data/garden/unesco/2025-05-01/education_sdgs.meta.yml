@@ -34,7 +34,7 @@ definitions:
   enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
   tertiary_enrollment_bins: &tertiary_enrollment_bins [5,10,20,30,40,50,60,80]
   expenditure_bins: &expenditure_bins [1,2,3,4,5,6,7,8]
-  expenditure_total_bins: &expenditure_total_bins [5,10,15,20,25]
+  expenditure_total_bins: &expenditure_total_bins [0,4,8,12,16,20,24]
 
   # ============================================================================
   # ENROLLMENT CONFIGURATIONS (Primary, Secondary, Pre-primary)
@@ -134,14 +134,10 @@ definitions:
   # ============================================================================
 
   desc_key_govt_expenditure_gdp_share: &desc_key_govt_expenditure_gdp_share
-    - Governments invest part of their national income in education — this indicator shows the size of that investment, expressed as a percentage of a country's total economic output (GDP).
-    - It measures how much a government spends on education at a specific level relative to the overall economy.
-    - The calculation divides government spending on education at this level by the country’s gross domestic product (GDP), then multiplies the result by 100 to express it as a percentage.
-    - A higher value means a larger share of national resources is allocated to education at this level, which may reflect political commitment, policy priorities, or national education strategies.
-    - This indicator includes spending by central, regional, and local governments, and accounts for both current and capital expenditures on education.
-    - It is particularly useful for understanding how education funding fits within the broader context of a country's public finances and economic capacity.
-    - However, a higher percentage does not necessarily mean higher spending in absolute terms or more effective education systems — it must be considered alongside enrolment data, per-student spending, and learning outcomes.
-    - The data comes from official government reports compiled by the UNESCO Institute for Statistics, and is mapped to internationally standardized education levels to ensure global comparability.
+   - This indicator shows the share of a country’s economic output (GDP) that is spent on education. It reflects how much of the national budget is directed toward education relative to the size of the economy.
+   - It includes all government spending at the relevant education level — from central, regional, and local authorities — and covers both current and capital expenditures.
+   - A higher percentage means a larger share of national resources is allocated to education, which may indicate political commitment or policy prioritization. But it doesn’t necessarily mean higher spending per student or better outcomes. Countries with lower GDPs might have high percentages but limited resources in absolute terms.
+   - This indicator is useful for understanding how education fits within the broader picture of government spending and national development. It should be interpreted alongside measures like per-student spending and enrolment rates.
 
   desc_key_ger: &desc_key_ger
     - Not all students enrol in school at the same age. The gross enrolment ratio includes students enrolled in a certain level of education, regardless of whether they are within the expected age range for that level. It includes students who are younger or older than expected due to late entry, early entry, or grade repetition.
@@ -826,15 +822,10 @@ tables:
         unit: "%"
         short_unit: "%"
         description_key:
-          - Governments must make choices about where to invest public funds — this indicator shows how much priority is given to education compared to other sectors such as health, infrastructure, and social protection.
-          - It captures the share of total general government spending that is allocated to education, based on combined budgets from local, regional, and central authorities.
-          - The indicator is calculated by dividing total government expenditure on education (across all levels) by total government spending across all sectors, and expressing the result as a percentage.
-          - A higher percentage reflects stronger prioritization of education in national budgets, while a lower value may indicate limited fiscal space or competing priorities.
-          - The Education 2030 Framework for Action recommends allocating at least 15–20% of total government spending to education to support adequate funding for learning systems.
-          - Data is drawn from national budget documents, such as finance ministry reports and education sector plans, and from international sources like the IMF’s World Economic Outlook for government spending totals.
-          - The UNESCO Institute for Statistics compiles and validates this data through its Formal Education Survey and Dynamic Template, cross-referencing with IMF data to ensure consistency and accuracy.
-          - While this indicator supports international comparisons, differences in how countries structure budgets and classify spending, along with demographic factors, can affect comparability.
-          - For instance, countries with younger populations may naturally devote more to education, while those with older populations may spend more on pensions or healthcare — such context should be considered when interpreting the data.
+          - This indicator shows how much of a government’s overall budget is allocated to education. It reflects the priority given to education relative to other sectors such as health, infrastructure, defence, or social protection.
+          - It is calculated by dividing total government expenditure on education (across all education levels) by total general government expenditure, and expressing the result as a percentage. The spending figures include budgets from central, regional, and local authorities, where available.
+          - A higher percentage suggests that education is a higher fiscal priority within national budgets. Lower values may reflect limited resources, competing demands from other sectors, or different demographic and policy contexts.
+          - While this indicator enables useful cross-country comparisons, results should be interpreted with caution. National budget structures, spending classifications, and demographic differences can all affect the comparability of figures. For example, countries with younger populations may naturally devote more resources to education, while ageing populations may drive higher spending on healthcare or pensions.
         presentation:
           title_public: Expenditure on education as share of government spending
           grapher_config: *grapher_config_expenditure_total
@@ -851,8 +842,11 @@ tables:
         short_unit: "%"
         description_short: Total [general government](#dod:general-government) spending on education (all levels of government and all levels of education), given as a share of [GDP](#dod:gdp).
         description_key: *desc_key_govt_expenditure_gdp_share
+        presentation:
+          title_public: Government spending on education as share of GDP
         display:
           numDecimalPlaces: 1
+          name: ALl levels of education
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
@@ -873,3 +867,4 @@ tables:
           grapher_config: *grapher_config_expenditure
         display:
           numDecimalPlaces: 1
+          name: All levels of education

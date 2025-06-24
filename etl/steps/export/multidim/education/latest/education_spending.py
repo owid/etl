@@ -43,6 +43,14 @@ SPENDING_PATTERNS = {
     "total_government": [
         "expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf",
     ],
+    "per_student": [
+        "government_expenditure_on_pre_primary_education__per_student__constant_pppdollar",
+        "government_expenditure_on_primary_education__per_student__constant_pppdollar",
+        "government_expenditure_on_lower_secondary_education__per_student__constant_pppdollar",
+        "government_expenditure_on_upper_secondary_education__per_student__constant_pppdollar",
+        "government_expenditure_on_tertiary_education__per_student__constant_pppdollar",
+        "government_expenditure_on_education_per_student__total_across_all_levels__constant_pppdollar",
+    ],
 }
 
 
@@ -122,8 +130,9 @@ def adjust_dimensions(tb):
     SPENDING_TYPE_KEYWORDS = {
         "percentage_of_gdp": "gdp_share",
         "share_gdp": "gdp_share",
-        "constant_pppdollar": "constant_ppp",
+        "constant_pppdollar__millions": "constant_ppp",
         "total_government_expenditure": "total_government",
+        "per_student": "per_student",
     }
 
     # Process each column
@@ -147,7 +156,9 @@ def adjust_dimensions(tb):
 
         # Default spending type based on column patterns
         if spending_type is None:
-            if "percentage_of_gdp" in col or "__pct" in col:
+            if "per_student" in col:
+                spending_type = "per_student"
+            elif "percentage_of_gdp" in col or "__pct" in col:
                 spending_type = "gdp_share"
             elif "constant_pppdollar" in col:
                 spending_type = "constant_ppp"
@@ -215,11 +226,13 @@ SPENDING_TYPE_MAPPINGS = {
         "gdp_share": "as a share of GDP",
         "constant_ppp": "total spending",
         "total_government": "as a share of total spending",
+        "per_student": "per student",
     },
     "subtitle": {
         "gdp_share": "as a percentage of [gross domestic product (GDP)](#dod:gdp)",
         "constant_ppp": "in constant [international-$](#dod:int_dollar_abbreviation)",
         "total_government": "as a percentage of total government expenditure",
+        "per_student": "per student in constant [international-$](#dod:int_dollar_abbreviation)",
     },
 }
 
@@ -259,7 +272,9 @@ def generate_title_by_spending_type_and_level(view):
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
     if spending_term == "total spending":
-        return "Total government spending on education"
+        return f"Total government spending on {level_term}"
+    elif spending_term == "per student":
+        return f"Government spending on {level_term} per student"
 
     return f"Government spending on {level_term} {spending_term}"
 
@@ -291,6 +306,7 @@ def edit_indicator_displays(view):
         "lower_secondary": "Lower secondary",
         "upper_secondary": "Upper secondary",
         "tertiary": "Tertiary",
+        "all": "All levels",
     }
 
     for indicator in view.indicators.y:
