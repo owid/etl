@@ -27,9 +27,7 @@ STEP_VERSION_NEW = datetime.now().strftime("%Y-%m-%d")
 
 
 class StepUpdater:
-    def __init__(self, dry_run: bool = False, interactive: bool = True, steps: List[str] | None = None):
-        # If steps are provided, we can load a DAG subset and speed up version tracker.
-        self.steps = steps
+    def __init__(self, dry_run: bool = False, interactive: bool = True):
         # Initialize version tracker and load dataframe of all active steps.
         self._load_version_tracker()
         # If dry_run is True, then nothing will be written to the dag, and no files will be created.
@@ -43,7 +41,7 @@ class StepUpdater:
         # It can be used when initializing StepUpdater, but also to reload steps_df after making changes to the dag.
 
         # Initialize version tracker.
-        self.tracker = VersionTracker(ignore_archive=True, include_steps=self.steps)
+        self.tracker = VersionTracker(ignore_archive=True)
 
         # Update the temporary dag.
         _update_temporary_dag(dag_active=self.tracker.dag_active, dag_all_reverse=self.tracker.dag_all_reverse)
@@ -570,7 +568,7 @@ def cli(
         steps = list(steps)
 
     # Initialize step updater and run update.
-    StepUpdater(dry_run=dry_run, interactive=interactive, steps=steps).update_steps(
+    StepUpdater(dry_run=dry_run, interactive=interactive).update_steps(
         steps=steps,
         step_version_new=step_version_new,
         include_dependencies=include_dependencies,
