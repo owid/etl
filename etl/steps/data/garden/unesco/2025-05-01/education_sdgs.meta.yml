@@ -846,7 +846,7 @@ tables:
           title_public: Government spending on education as share of GDP
         display:
           numDecimalPlaces: 1
-          name: ALl levels of education
+          name: Total across all levels of education
 
       combined_expenditure_share_gdp:
         title: Public spending on education as a share of GDP (historical and recent)
@@ -867,4 +867,4 @@ tables:
           grapher_config: *grapher_config_expenditure
         display:
           numDecimalPlaces: 1
-          name: All levels of education
+          name: Total across all levels of education
