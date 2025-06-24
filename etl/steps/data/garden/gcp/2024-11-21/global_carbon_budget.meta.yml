@@ -128,7 +128,7 @@ tables:
           shortUnit: t
           tolerance: 3
         description_short: |
-          Carbon dioxide (CO₂) emissions from [fossil fuel combustion and industrial processes](#dod:fossilemissions) such as cement production. This includes emissions from transport, electricity generation, and heating, but not land-use change emissions.
+          Carbon dioxide (CO₂) emissions from [fossil fuel combustion and industrial processes](#dod:fossilemissions) such as cement production. This includes emissions from transport, electricity generation, and heating, but not [land-use change emissions](#dod:land-use-change-emissions).
         description_key:
           - The main source of carbon dioxide (CO₂) emissions is the burning of fossil fuels. It is the primary greenhouse gas causing climate change.
           - Globally, CO₂ emissions have remained at just below 5 tonnes per person for over a decade. Between countries, however, there are large differences, and while emissions are rapidly increasing in some countries, they are rapidly falling in others.
@@ -136,7 +136,7 @@ tables:
           - *production_emissions_description_key
           - *per_capita_description_key
           - *international_aviation_description_key
-          - This data does not include emissions from land-use change, such as deforestation or reforestation.
+          - This data does not include emissions from [land-use change](#dod:land-use-change-emissions), such as deforestation or reforestation.
         presentation:
           title_public: CO₂ emissions per capita
       ##################################################################################################################
