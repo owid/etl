@@ -15,6 +15,7 @@ from dataclasses import dataclass, fields
 from os import environ as env
 from pathlib import Path
 from typing import List, Literal, Optional, cast
+from urllib.parse import quote
 
 import git
 import pandas as pd
@@ -256,7 +257,7 @@ GITHUB_API_URL = f"{GITHUB_API_BASE}/pulls"
 TLS_VERIFY = bool(int(env.get("TLS_VERIFY", 1)))
 
 # Default schema for presentation.grapher_config in metadata. Try to keep it up to date with the latest schema.
-DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.007.json"
+DEFAULT_GRAPHER_SCHEMA = "https://files.ourworldindata.org/schemas/grapher-schema.008.json"
 
 # Google Cloud service account path (used for BigQuery)
 GOOGLE_APPLICATION_CREDENTIALS = env.get("GOOGLE_APPLICATION_CREDENTIALS")
@@ -543,6 +544,10 @@ class OWIDEnv:
     def data_page_preview(self, variable_id: str | int) -> str:
         """Get indicator admin url."""
         return f"{self.admin_site}/datapage-preview/{variable_id}/"
+
+    def collection_preview(self, catalog_path: str):
+        encoded_path = quote(catalog_path, safe="")
+        return f"{self.admin_site}/grapher/{encoded_path}/"
 
     def thumb_url(self, slug: str):
         """
