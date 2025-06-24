@@ -21,6 +21,7 @@ definitions:
         colorSchemeInvert: true
         baseColorScheme: RdYlBu
         customNumericValues:
+          - -100
           - -50
           - -20
           - -10
@@ -435,7 +436,6 @@ tables:
             map:
               colorScale:
                 <<: *color_scale_counts
-                customNumericMinValue: 0
                 customNumericValues:
                   - 0
                   - 100000

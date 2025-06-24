@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
+from etl.config import DEFAULT_GRAPHER_SCHEMA
 from etl.files import read_json_schema
 from etl.paths import SCHEMAS_DIR
 
@@ -336,7 +337,7 @@ def render_collection_view_config(level: int = 1) -> str:
     documentation = render_props_recursive(views_config, "view.config", level, "", render_top_as_scalar=False)
 
     # Add reference to full grapher schema
-    documentation += "\n\nFor the complete list of available configuration options, see the [Grapher schema](https://files.ourworldindata.org/schemas/grapher-schema.007.json).\n\n"
+    documentation += f"\n\nFor the complete list of available configuration options, see the [Grapher schema]({DEFAULT_GRAPHER_SCHEMA}).\n\n"
 
     return documentation
 

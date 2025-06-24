@@ -25,7 +25,7 @@ from utils import (
 )
 
 from etl.data_helpers import geo
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -40,33 +40,36 @@ COLUMNS_INDEX = [
     "year",
 ]
 
+# Known overlaps between historical and successor regions in the FAOSTAT land area dataset.
+KNOWN_OVERLAPS_IN_LAND_AREA_DATA = [{year: {"Netherlands Antilles", "Aruba"} for year in range(1961, 2011)}]
 
-def run(dest_dir: str) -> None:
-    """Run main code."""
+
+def run() -> None:
     #
     # Load inputs.
     #
     # Load UN WPP dataset.
     ds_un = paths.load_dataset("un_wpp")
-    tb_un = ds_un["population"].reset_index()
+    tb_un = ds_un.read("population")
     # Load HYDE dataset.
     ds_hyde = paths.load_dataset("all_indicators")
-    tb_hyde = ds_hyde["all_indicators"].reset_index()
+    tb_hyde = ds_hyde.read("all_indicators")
     # Load Gapminder dataset
     ds_gapminder = paths.load_dataset("population", namespace="gapminder")
-    tb_gapminder = ds_gapminder["population"].reset_index()
+    tb_gapminder = ds_gapminder.read("population")
     # Load Gapminder SG dataset
     ds_gapminder_sg = paths.load_dataset(short_name="gapminder__systema_globalis", channel="open_numbers")
-    tb_gapminder_sg = ds_gapminder_sg["total_population_with_projections"].reset_index()
+    tb_gapminder_sg = ds_gapminder_sg.read("total_population_with_projections")
 
-    # Load regions table
+    # Load auxiliary datasets:
+    # * Regions
     ds_regions = paths.load_dataset("regions")
-    tb_regions = ds_regions["regions"]
-    # Load income groups table
+    tb_regions = ds_regions.read("regions", reset_index=False)
+    # * Income groups
     ds_income_groups = paths.load_dataset("income_groups")
-    # Load FAO
-    ds_land_area = paths.load_dataset("faostat_rl")
-    tb_land_area = ds_land_area["faostat_rl_flat"].reset_index()
+    # * Land area (FAOSTAT RL)
+    ds_land_area = paths.load_dataset("faostat_rl_auxiliary")
+    tb_land_area = ds_land_area.read("faostat_rl_auxiliary")
 
     #
     # Process data.
@@ -112,9 +115,12 @@ def run(dest_dir: str) -> None:
     )
 
     # Add population density
+    # NOTE: The regions and income groups datasets are used to create region aggregates for land area data.
     tb_density = make_table_density(
         tb_population=tb,
         tb_land_area=tb_land_area,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
     )
 
     # Create auxiliary table
@@ -150,11 +156,7 @@ def run(dest_dir: str) -> None:
     ]
 
     # Create a new garden dataset with the same metadata as the meadow dataset.
-    ds_garden = create_dataset(
-        dest_dir,
-        tables=tables,
-        check_variables_metadata=True,
-    )
+    ds_garden = paths.create_dataset(tables=tables)
 
     # Save changes in the new garden dataset.
     ds_garden.save()
@@ -637,9 +639,23 @@ def generate_auxiliary_table(tb: Table) -> Table:
 ######################
 # Population density
 ######################
-def make_table_density(tb_population: Table, tb_land_area: Table) -> Table:
+def make_table_density(
+    tb_population: Table, tb_land_area: Table, ds_regions: Dataset, ds_income_groups: Dataset
+) -> Table:
     """Create a table with population density data."""
     paths.log.info("build population density table")
+
+    # Add region aggregates to land area data.
+    # NOTE: This wasn't done in the corresponding FAOSTAT RL auxiliary step to avoid circular dependencies.
+    tb_land_area = geo.add_regions_to_table(
+        tb=tb_land_area,
+        ds_regions=ds_regions,
+        ds_income_groups=ds_income_groups,
+        num_allowed_nans_per_year=None,
+        frac_allowed_nans_per_year=None,
+        accepted_overlaps=KNOWN_OVERLAPS_IN_LAND_AREA_DATA,
+    )
+
     # We use land area of countries as they are defined today (latest reported value)
     column_area = "land_area__00006601__area__005110__hectares"
     tb_land_area = (
