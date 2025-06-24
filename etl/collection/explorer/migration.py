@@ -3,7 +3,7 @@
 import re
 from collections import defaultdict
 from copy import deepcopy
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Tuple
 
 import pandas as pd
 from owid.catalog.utils import underscore
@@ -406,7 +406,7 @@ def reorder_dimensions(config: Dict[str, Any], dim_order: List[str]) -> Dict[str
     return config
 
 
-def migrate_csv_explorer(name: str, owid_env: Optional[OWIDEnv] = None):
+def migrate_csv_explorer(name: str, owid_env: OWIDEnv | None = None):
     """Migrate the TSV-based config of a CSV-based explorer to the new format.
 
     Note:

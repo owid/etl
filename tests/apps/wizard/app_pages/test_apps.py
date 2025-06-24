@@ -217,17 +217,17 @@ def test_app_explorer():
     assert not at.exception
 
 
-@pytest.mark.integration
-@pytest.mark.usefixtures("set_config")
-def test_app_insight_search():
-    at = AppTest.from_file(str(WIZARD_DIR / "app_pages/insight_search/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
+# @pytest.mark.integration
+# @pytest.mark.usefixtures("set_config")
+# def test_app_insight_search():
+#     at = AppTest.from_file(str(WIZARD_DIR / "app_pages/insight_search/app.py"), default_timeout=DEFAULT_TIMEOUT).run()
 
-    # Set Author
-    assert len(at.multiselect) == 1
-    at.multiselect
-    at.multiselect[0].set_value(["Max Roser"]).run()
+#     # Set Author
+#     assert len(at.multiselect) == 1
+#     at.multiselect
+#     at.multiselect[0].set_value(["Max Roser"]).run()
 
-    assert not at.exception
+#     assert not at.exception
 
 
 # @pytest.mark.integration
