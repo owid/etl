@@ -37,11 +37,7 @@ definitions:
   expenditure_bins_by_level: &expenditure_bins_by_level   [500000000, 1000000000, 5000000000, 10000000000, 50000000000, 100000000000]
 
   # Per-student spending bins (in international dollars per student)
-  per_student_spending_preprimary_bins: &per_student_spending_preprimary_bins [100, 500, 1000, 2000, 3000, 5000, 8000, 12000]
-  per_student_spending_primary_bins: &per_student_spending_primary_bins [200, 500, 1000, 2000, 4000, 6000, 10000, 15000]
-  per_student_spending_secondary_bins: &per_student_spending_secondary_bins [500, 1000, 2000, 4000, 6000, 10000, 15000, 20000]
-  per_student_spending_tertiary_bins: &per_student_spending_tertiary_bins [1000, 3000, 6000, 10000, 15000, 25000, 40000, 60000]
-  per_student_spending_total_bins: &per_student_spending_total_bins [500, 1000, 2000, 4000, 6000, 10000, 15000, 25000]
+  per_student_spending_bins: &per_student_spending_bins [100, 500, 1000, 5000, 10000 ]
 
   # Common enrollment and education indicator configurations
   grapher_config_enrolment_bugn: &grapher_config_enrolment_bugn
@@ -237,7 +233,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *per_student_spending_preprimary_bins
+        customNumericValues: *per_student_spending_bins
         baseColorScheme: Oranges
 
   grapher_config_per_student_spending_primary: &grapher_config_per_student_spending_primary
@@ -246,7 +242,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *per_student_spending_primary_bins
+        customNumericValues: *per_student_spending_bins
         baseColorScheme: Blues
 
   grapher_config_per_student_spending_secondary: &grapher_config_per_student_spending_secondary
@@ -255,7 +251,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *per_student_spending_secondary_bins
+        customNumericValues: *per_student_spending_bins
         baseColorScheme: Greens
 
   grapher_config_per_student_spending_tertiary: &grapher_config_per_student_spending_tertiary
@@ -264,7 +260,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *per_student_spending_tertiary_bins
+        customNumericValues: *per_student_spending_bins
         baseColorScheme: Reds
 
   grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
@@ -273,7 +269,7 @@ definitions:
       <<: *common_grapher_map_config
       colorScale:
         binningStrategy: manual
-        customNumericValues: *per_student_spending_total_bins
+        customNumericValues: *per_student_spending_bins
         baseColorScheme: YlOrRd
 
   grapher_config_spending_total: &grapher_config_spending_total
@@ -311,6 +307,8 @@ definitions:
   desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
    - This indicator shows how much a government spends per student at a particular level of education, expressed in constant international dollars.
    - It’s calculated by dividing total government spending by the number of enrolled students, and adjusted for inflation and differences in purchasing power between countries. This makes it possible to compare investment levels across education systems and over time.
+   - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
+   - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations. For example, data released in 2017 would typically be expressed in 2014 dollars.
    - Higher values suggest that more resources are available per student — which could support better infrastructure, teaching quality, and learning environments. But it doesn’t tell us how effectively the money is used, or whether outcomes are improving.
    - This is one of the most useful measures for understanding how governments fund education relative to the size of their student population. It’s especially helpful when comparing countries with different overall budgets or economic conditions.
 
