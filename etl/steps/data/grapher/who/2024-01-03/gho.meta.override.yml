@@ -68,8 +68,8 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30

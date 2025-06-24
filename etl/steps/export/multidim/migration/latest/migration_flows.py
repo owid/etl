@@ -13,8 +13,7 @@ MULTIDIM_CONFIG = {
         "colorScale": {
             "binningStrategy": "manual",
             "baseColorScheme": "YlGnBu",
-            "customNumericMinValue": 0,
-            "customNumericValues": [1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0],
+            "customNumericValues": [0, 1000, 3000, 10000, 30000, 100000, 300000, 1000000, 0],
             "customCategoryColors": {"Selected country": "#AF1629"},
             "customCategoryLabels": {"Selected country": "Selected country"},
         },

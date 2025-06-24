@@ -436,139 +436,132 @@ definitions:
 
   map_brackets_headcount_ratio: &map_brackets_headcount_ratio
     <% if poverty_line in ["190", "215"] %>
-    [3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    [0, 3, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- elif poverty_line in ["40% of the median"] %>
-    [2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
+    [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 1]
     <%- elif poverty_line in ["50% of the median"] %>
-    [3, 6, 9, 12, 15, 18, 21, 24, 1]
+    [0, 3, 6, 9, 12, 15, 18, 21, 24, 1]
     <%- elif poverty_line in ["60% of the median"] %>
-    [5, 10, 15, 20, 25, 30, 1]
+    [0, 5, 10, 15, 20, 25, 30, 1]
     <%- else %>
-    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
   map_brackets_headcount: &map_brackets_headcount
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    [100000, 300000, 1000000, 3000000, 10000000, 30000000, 1]
+    [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 1]
     <%- else %>
-    [100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
+    [0, 100000, 300000, 1000000, 3000000, 10000000, 30000000, 100000000, 300000000, 1]
     <%- endif %>
 
   map_brackets_total_shortfall: &map_brackets_total_shortfall
     <% if poverty_line in ["40% of the median", "50% of the median", "60% of the median"] %>
-    [100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1]
+    [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000, 1]
     <%- elif poverty_line in ["100"] %>
-    [1000000,3000000,10000000,30000000,100000000,300000000,1]
+    [0, 1000000,3000000,10000000,30000000,100000000,300000000,1]
     <%- elif poverty_line in ["190", "215"] %>
-    [1000000,3000000,10000000,30000000,100000000,300000000,1000000000,3000000000,1]
+    [0, 1000000,3000000,10000000,30000000,100000000,300000000,1000000000,3000000000,1]
     <%- elif poverty_line in ["320", "365"] %>
-    [10000000,30000000,100000000,300000000,1000000000,3000000000,10000000000,1]
+    [0, 10000000,30000000,100000000,300000000,1000000000,3000000000,10000000000,1]
     <%- elif poverty_line in ["550", "685"] %>
-    [100000000,300000000,1000000000,3000000000,10000000000,30000000000,100000000000,1]
+    [0, 100000000,300000000,1000000000,3000000000,10000000000,30000000000,100000000000,1]
     <%- elif poverty_line in ["1000"] %>
-    [1000000000,3000000000,10000000000,30000000000,100000000000,300000000000,1000000000000]
+    [0, 1000000000,3000000000,10000000000,30000000000,100000000000,300000000000,1000000000000]
     <%- elif poverty_line in ["2000"] %>
-    [10000000000,30000000000,100000000000,300000000000,1]
+    [0, 10000000000,30000000000,100000000000,300000000000,1]
     <%- elif poverty_line in ["3000"] %>
-    [10000000000,30000000000,100000000000,300000000000,1000000000000,1]
+    [0, 10000000000,30000000000,100000000000,300000000000,1000000000000,1]
     <%- elif poverty_line in ["4000"] %>
-    [10000000000,30000000000,100000000000,300000000000,1000000000000,3000000000000,10000000000000,1]
+    [0, 10000000000,30000000000,100000000000,300000000000,1000000000000,3000000000000,10000000000000,1]
     <%- endif %>
 
   map_brackets_avg_shortfall: &map_brackets_avg_shortfall
     <% if poverty_line in ["40% of the median"] %>
-    [1, 2, 3, 4, 5, 6, 1]
+    [0, 1, 2, 3, 4, 5, 6, 1]
     <%- elif poverty_line in ["50% of the median"] %>
-    [1, 2, 3, 4, 5, 6, 7, 1]
+    [0, 1, 2, 3, 4, 5, 6, 7, 1]
     <%- elif poverty_line in ["60% of the median"] %>
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
     <%- elif poverty_line in ["100"] %>
-    [0.2, 0.4, 0.6, 0.8, 1]
+    [0, 0.2, 0.4, 0.6, 0.8, 1]
     <%- elif poverty_line in ["190", "215"] %>
-    [0.3, 0.6, 0.9, 1.2, 1.5, 1.8, <<poverty_line|float/100>>]
+    [0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, <<poverty_line|float/100>>]
     <%- elif poverty_line in ["320", "365"] %>
-    [0.5, 1, 1.5, 2, 2.5, 3, <<poverty_line|float/100>>]
+    [0, 0.5, 1, 1.5, 2, 2.5, 3, <<poverty_line|float/100>>]
     <%- elif poverty_line in ["550", "685"] %>
-    [1, 2, 3, 4, 5, <<poverty_line|float/100>>]
+    [0, 1, 2, 3, 4, 5, <<poverty_line|float/100>>]
     <%- elif poverty_line in ["1000"] %>
-    [2, 4 ,6, 8, 10]
+    [0, 2, 4 ,6, 8, 10]
     <%- elif poverty_line in ["2000"] %>
-    [2, 4 ,6, 8, 10, 12, 14, 16, 18, 20]
+    [0, 2, 4 ,6, 8, 10, 12, 14, 16, 18, 20]
     <%- elif poverty_line in ["3000"] %>
-    [5, 10 , 15, 20, 25, 30]
+    [0, 5, 10 , 15, 20, 25, 30]
     <%- elif poverty_line in ["4000"] %>
-    [5, 10 , 15, 20, 25, 30, 35, 40]
+    [0, 5, 10 , 15, 20, 25, 30, 35, 40]
     <%- endif %>
 
   map_brackets_poverty_gap_index: &map_brackets_poverty_gap_index
     <% if poverty_line in ["40% of the median"] %>
-    [1, 2, 3, 4, 5, 6, 7, 8, 1]
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 1]
     <%- elif poverty_line in ["50% of the median"] %>
-    [2, 4, 6, 8, 10, 1]
+    [0, 2, 4, 6, 8, 10, 1]
     <%- elif poverty_line in ["60% of the median"] %>
-    [2, 4, 6, 8, 10, 12, 1]
+    [0, 2, 4, 6, 8, 10, 12, 1]
     <%- elif poverty_line in ["100"] %>
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 1]
     <%- elif poverty_line in ["190", "215"] %>
-    [5, 10, 15, 20, 25, 30, 35, 1]
+    [0, 5, 10, 15, 20, 25, 30, 35, 1]
     <%- elif poverty_line in ["320", "365"] %>
-    [5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
+    [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 1]
     <%- elif poverty_line in ["550", "685"] %>
-    [10, 20, 30, 40, 50, 60, 70, 1]
+    [0, 10, 20, 30, 40, 50, 60, 70, 1]
     <%- elif poverty_line in ["1000"] %>
-    [10, 20, 30, 40, 50, 60, 70, 80, 1]
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 1]
     <%- else %>
-    [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+    [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     <%- endif %>
 
   map_brackets_avg: &map_brackets_avg
     <% if decile in [1, 2, 3, 4] %>
-    [1, 2, 5, 10, 20, 1]
+    [0, 1, 2, 5, 10, 20, 1]
     <%- elif decile in [5, 6, 7, 8] %>
-    [1, 2, 5, 10, 20, 50, 1]
+    [0, 1, 2, 5, 10, 20, 50, 1]
     <%- elif decile in [9] %>
-    [1, 2, 5, 10, 20, 50, 100, 1]
+    [0, 1, 2, 5, 10, 20, 50, 100, 1]
     <%- elif decile in [10] %>
-    [1, 2, 5, 10, 20, 50, 100, 200, 1]
+    [0, 1, 2, 5, 10, 20, 50, 100, 200, 1]
     <%- endif %>
 
   map_brackets_share: &map_brackets_share
     <% if decile in [1] %>
-    [1, 2, 3, 4, 1]
+    [0, 1, 2, 3, 4, 1]
     <%- elif decile in [2] %>
-    [1, 2, 3, 4, 5, 1]
+    [0, 1, 2, 3, 4, 5, 1]
     <%- elif decile in [3] %>
-    [2, 3, 4, 5, 6, 1]
+    [100, 2, 3, 4, 5, 6, 1]
     <%- elif decile in [4] %>
-    [2, 3, 4, 5, 6, 7, 1]
+    [100, 2, 3, 4, 5, 6, 7, 1]
     <%- elif decile in [5] %>
-    [2, 3, 4, 5, 6, 7, 8, 9, 1]
+    [100, 2, 3, 4, 5, 6, 7, 8, 9, 1]
     <%- elif decile in [6] %>
-    [4, 5, 6, 7, 8, 9, 1]
+    [100, 4, 5, 6, 7, 8, 9, 1]
     <%- elif decile in [7] %>
-    [6, 7, 8, 9, 10, 11, 1]
+    [100, 6, 7, 8, 9, 10, 11, 1]
     <%- elif decile in [8] %>
-    [8, 9, 10, 11, 12, 13, 1]
+    [100, 8, 9, 10, 11, 12, 13, 1]
     <%- elif decile in [9] %>
-    [8, 10, 12, 14, 16, 1]
+    [100, 8, 10, 12, 14, 16, 1]
     <%- elif decile in [10] %>
-    [20, 25, 30, 35, 40, 45, 50, 1]
-    <%- endif %>
-
-  custom_numeric_min_value_share:
-    <% if decile in [1, 2] %>
-    0
-    <%- else %>
-    100
+    [100, 20, 25, 30, 35, 40, 45, 50, 1]
     <%- endif %>
 
   map_brackets_thr: &map_brackets_thr
     <% if decile in [1, 2, 3] %>
-    [1, 2, 5, 10, 20, 1]
+    [0, 1, 2, 5, 10, 20, 1]
     <% elif decile in [4, 5, 6, 7] %>
-    [1, 2, 5, 10, 20, 50, 1]
+    [0, 1, 2, 5, 10, 20, 50, 1]
     <% elif decile in [8, 9] %>
-    [1, 2, 5, 10, 20, 50, 100, 1]
+    [0, 1, 2, 5, 10, 20, 50, 100, 1]
     <%- endif %>
 
   entity_names_poverty: &entity_names_poverty
@@ -918,7 +911,7 @@ tables:
               colorScale:
                 baseColorScheme: "YlOrRd"
                 binningStrategy: "manual"
-                customNumericValues: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+                customNumericValues: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
             selectedEntityNames: *entity_names_poverty
 
       poverty_gap_index:
@@ -1105,7 +1098,7 @@ tables:
               colorScale:
                 baseColorScheme: "RdPu"
                 binningStrategy: "manual"
-                customNumericValues: [1, 2, 5, 10, 20, 1]
+                customNumericValues: [0, 1, 2, 5, 10, 20, 1]
             selectedEntityNames: *entity_names_prosperity_gap
 
       # INEQUALITY
@@ -1145,8 +1138,7 @@ tables:
               colorScale:
                 baseColorScheme: "Oranges"
                 binningStrategy: "manual"
-                customNumericMinValue: 1
-                customNumericValues: [0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.1]
+                customNumericValues: [1, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.1]
             selectedEntityNames: *entity_names_inequality
 
       palma_ratio:
@@ -1184,7 +1176,7 @@ tables:
               colorScale:
                 baseColorScheme: "YlOrBr"
                 binningStrategy: "manual"
-                customNumericValues: [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 1]
+                customNumericValues: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 1]
             selectedEntityNames: *entity_names_inequality
 
       s80_s20_ratio:
@@ -1314,7 +1306,7 @@ tables:
               colorScale:
                 baseColorScheme: "RdPu"
                 binningStrategy: "manual"
-                customNumericValues: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.1]
+                customNumericValues: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.1]
             selectedEntityNames: *entity_names_inequality
 
       polarization:
@@ -1378,7 +1370,7 @@ tables:
               colorScale:
                 baseColorScheme: "BuGn"
                 binningStrategy: "manual"
-                customNumericValues: [1, 2, 5, 10, 20, 50, 1]
+                customNumericValues: [0, 1, 2, 5, 10, 20, 50, 1]
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       median:
@@ -1418,7 +1410,7 @@ tables:
               colorScale:
                 baseColorScheme: "Blues"
                 binningStrategy: "manual"
-                customNumericValues: [1, 2, 5, 10, 20, 50, 1]
+                customNumericValues: [0, 1, 2, 5, 10, 20, 50, 1]
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       avg:
@@ -1495,7 +1487,6 @@ tables:
                 baseColorScheme: "OrRd"
                 binningStrategy: "manual"
                 customNumericValues: *map_brackets_share
-                customNumericMinValue: "{definitions.custom_numeric_min_value_share}"
             selectedEntityNames: *entity_names_incomes_across_distribution
 
       thr:
