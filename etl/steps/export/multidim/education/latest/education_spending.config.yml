@@ -27,7 +27,7 @@ dimensions:
     name: Education level
     choices:
       - slug: all
-        name: All levels
+        name: Total
         description: Government spending across all education levels combined.
       - slug: preprimary
         name: Pre-primary
@@ -45,7 +45,7 @@ dimensions:
         name: Tertiary
         description: Formal post-secondary learning, ranging from short vocational programs to university degrees.
       - slug: level_side_by_side
-        name: By education level
+        name: All levels
         description: Compare spending at different education levels.
 
 views: []

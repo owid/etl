@@ -291,7 +291,7 @@ def generate_subtitle_by_spending_type_and_level(view):
     if not level_term:
         raise ValueError(f"Unknown education level: {level}")
 
-    return f"Government expenditure on {level_term} {spending_term}."
+    return f"Total [general government](#dod:general-government) spending on {level_term} {spending_term}."
 
 
 def edit_indicator_displays(view):
