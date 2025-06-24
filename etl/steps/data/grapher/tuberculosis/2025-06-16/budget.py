@@ -8,12 +8,12 @@ paths = PathFinder(__file__)
 
 def run() -> None:
     #
-    # Load inputs. Lalola1234333eeededeeddeedede
+    # Load inputs.
     #
     # Load garden dataset.
     ds_garden = paths.load_dataset("budget")
 
-    # Read table from garden dataset.ss
+    # Read table from garden dataset
     tb = ds_garden["budget"]
 
     #
