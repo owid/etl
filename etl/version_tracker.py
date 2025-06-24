@@ -334,8 +334,8 @@ class VersionTracker:
         self.dag_active = load_dag(paths.DAG_FILE)
 
         # Filter DAG to speed it up
-        if include_steps:
-            self.dag_active = filter_to_subgraph(self.dag_active, includes=include_steps)
+        if include_steps and False:
+            self.dag_active = filter_to_subgraph(self.dag_active, includes=include_steps + [DAG_TEMP_STEP])
 
         if ignore_archive:
             # Fully ignore the archive dag (so that all steps are only active steps, and there are no archive steps).
