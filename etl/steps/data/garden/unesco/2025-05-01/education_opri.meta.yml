@@ -6,7 +6,7 @@ definitions:
         - Global Education
 
   # Common color scale values for different types of indicators
-  enrolment_rate_bins: &enrolment_rate_bins [10,20,30,40,50,60,70,80,90,100]
+  enrolment_rate_bins: &enrolment_rate_bins [0,10,20,30,40,50,60,70,80,90,100]
 
   desc_key_net_enr: &desc_key_net_enr
     - The net enrolment rate shows what percentage of children are enrolled at the education level intended for their age. Unlike gross enrolment, it only counts students who are within the official age range for that level.
@@ -984,7 +984,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [0.5,1,1.5,2,2.5,3,3.5,4]
+                customNumericValues: [0,0.5,1,1.5,2,2.5,3,3.5,4]
                 baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
@@ -1006,7 +1006,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [0.5,1,1.5,2,2.5,3,3.5,4]
+                customNumericValues: [0,0.5,1,1.5,2,2.5,3,3.5,4]
                 baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
@@ -1028,7 +1028,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [0.5,1,1.5,2,2.5,3,3.5,4]
+                customNumericValues: [0,0.5,1,1.5,2,2.5,3,3.5,4]
                 baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
@@ -1050,7 +1050,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [2,3,4,5,6,7,8,9]
+                customNumericValues: [0,2,3,4,5,6,7,8,9]
                 baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
@@ -1072,7 +1072,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [2,3,4,5,6,7,8,9]
+                customNumericValues: [0,2,3,4,5,6,7,8,9]
                 baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
@@ -1094,7 +1094,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [2,3,4,5,6,7,8,9]
+                customNumericValues: [0,2,3,4,5,6,7,8,9]
                 baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
@@ -1116,7 +1116,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1,2,3,4,5,6,7,8]
+                customNumericValues: [0,1,2,3,4,5,6,7,8]
                 baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
@@ -1138,7 +1138,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1,2,3,4,5,6,7,8]
+                customNumericValues: [0,1,2,3,4,5,6,7,8]
                 baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
@@ -1160,7 +1160,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [1,2,3,4,5,6,7,8]
+                customNumericValues: [0,1,2,3,4,5,6,7,8]
                 baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
@@ -1182,7 +1182,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [0.5,1,1.5,2,2.5,3,4,5]
+                customNumericValues: [0,0.5,1,1.5,2,2.5,3,4,5]
                 baseColorScheme: Blues
         display:
           numDecimalPlaces: 1
@@ -1204,7 +1204,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [0.5,1,1.5,2,2.5,3,4,5]
+                customNumericValues: [0,0.5,1,1.5,2,2.5,3,4,5]
                 baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
@@ -1226,7 +1226,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [0.5,1,1.5,2,2.5,3,4,5]
+                customNumericValues: [0,0.5,1,1.5,2,2.5,3,4,5]
                 baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1

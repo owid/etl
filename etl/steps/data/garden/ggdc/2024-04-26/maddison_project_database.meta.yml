@@ -78,6 +78,7 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10000000000
                   - 30000000000
                   - 100000000000
@@ -166,6 +167,7 @@ tables:
                 binningStrategy: manual
                 binningStrategyBinCount: 9
                 customNumericValues:
+                  - 0
                   - 1000
                   - 2000
                   - 5000
