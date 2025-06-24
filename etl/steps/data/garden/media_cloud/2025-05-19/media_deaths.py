@@ -164,3 +164,27 @@ def run() -> None:
         tb_s = tb_media_mentions[tb_media_mentions["source"] == source]
         tb_s = add_shares(tb_s, columns=["mentions", "deaths"])
         tb_media_mentions.update(tb_s)
+
+    # pivot table
+    tb_media_mentions = tb_media_mentions.pivot(
+        index=["cause", "year", "deaths", "deaths_share"], columns="source", values=["mentions", "mentions_share"]
+    ).reset_index()
+
+    tb_media_mentions.columns = [
+        "cause",
+        "year",
+        "deaths",
+        "deaths_share",
+        "fox_mentions",
+        "nyt_mentions",
+        "wapo_mentions",
+        "fox_share",
+        "nyt_share",
+        "wapo_share",
+    ]
+
+    # format table
+    tb = tb_media_mentions.format(["cause", "year"])
+
+    ds_garden = paths.create_dataset(tables=[tb], check_variables_metadata=True)
+    ds_garden.save()
