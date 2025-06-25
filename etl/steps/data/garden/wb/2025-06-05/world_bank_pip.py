@@ -30,8 +30,8 @@ log = get_logger()
 # NOTE: Modify if poverty lines are updated from source
 # TODO: Modify the lines in 2021 prices
 POVLINES_DICT = {
-    2011: ["100", "190", "320", "550", "1000", "2000", "3000", "4000"],
     2017: ["100", "215", "365", "685", "1000", "2000", "3000", "4000"],
+    2021: ["100", "300", "420", "830", "1000", "2000", "3000", "4000"],
 }
 
 # Define international poverty lines as the second value in each list in POVLINES_DICT
@@ -71,6 +71,7 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Haiti",
     "Hungary",
     "Kazakhstan",
+    "Kosovo",
     "Kyrgyzstan",
     "Latvia",
     "Lithuania",
@@ -91,6 +92,7 @@ COUNTRIES_WITH_INCOME_AND_CONSUMPTION = [
     "Slovenia",
     "Turkey",
     "Ukraine",
+    "Uzbekistan",
 ]
 
 # Set debug mode
@@ -185,6 +187,9 @@ def run() -> None:
     tb = make_relative_poverty_long(tb=tb)
 
     tb = make_poverty_line_null_for_non_dimensional_indicators(tb=tb)
+
+    # Drop ppp years for CPI
+    tb = make_cpi_not_depending_on_ppp(tb=tb)
 
     # Separate out consumption-only, income-only. Also, create a table with both income and consumption
     tb, tb_inc_or_cons_smooth = inc_or_cons_data(tb=tb)
@@ -999,24 +1004,34 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
             (tb_country["welfare_type"] != tb_country["welfare_type"].shift(1).fillna("")).astype(int).cumsum().max()
         )
 
-        # If there are only two welfare series, use both, except for countries where we have to choose one
+        # If there are only two welfare series, use one for these countries
         if number_of_welfare_series == 2:
             # assert if last_welfare type values are expected
-            if country in ["Armenia", "Belarus", "Kyrgyzstan", "North Macedonia", "Peru"]:
-                if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
-                    welfare_expected = ["consumption"]
-                    assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
-                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
-                    )
-
-                elif country in ["North Macedonia", "Peru"]:
-                    assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
-                        f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
-                    )
-
+            if country in ["Armenia", "Belarus", "Kyrgyzstan"]:
+                welfare_expected = ["consumption"]
+                assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
+                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
+                )
                 tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
 
-        # With Turkey I also want to keep both series, but there are duplicates for some years
+            elif country in ["Kosovo", "North Macedonia", "Peru", "Uzbekistan"]:
+                assert len(last_welfare_type) == 1 and last_welfare_type == ["income"], log.fatal(
+                    f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of ['income']"
+                )
+                tb_country = tb_country[tb_country["welfare_type"].isin(last_welfare_type)].reset_index(drop=True)
+
+            # Don't do anything for the rest
+            # [
+            #     "China",
+            #     "China (urban)",
+            #     "China (rural)",
+            #     "Kazakhstan",
+            #     "Namibia",
+            #     "Nepal",
+            #     "Seychelles",
+            # ]
+
+        # With Turkey I want to keep both series, but there are duplicates for some years
         elif country in ["Turkey"]:
             welfare_expected = ["income"]
             assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
@@ -1037,24 +1052,38 @@ def create_smooth_inc_cons_series(tb: Table) -> Table:
             tb_country = tb_country[tb_country["welfare_type"].isin(welfare_expected)].reset_index(drop=True)
 
         # These are countries with both income and consumption as the last welfare type, so I decide case by case
-        elif country in ["Haiti", "Philippines", "Romania", "Saint Lucia"]:
+        elif country in ["Haiti", "Philippines", "Saint Lucia"]:
             welfare_expected = ["consumption", "income"]
             assert len(last_welfare_type) == 2 and last_welfare_type == welfare_expected, log.fatal(
                 f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}"
             )
-            if country in ["Haiti", "Romania", "Saint Lucia"]:
+            if country in ["Haiti", "Saint Lucia"]:
                 tb_country = tb_country[tb_country["welfare_type"] == "income"].reset_index(drop=True)
-            else:
+            elif country in ["Philippines"]:
                 tb_country = tb_country[tb_country["welfare_type"] == "consumption"].reset_index(drop=True)
 
         else:
             # Here I keep the most recent welfare type
-            if country in ["Albania", "Ukraine"]:
+            if country in ["Albania", "Belize", "Ukraine"]:
                 welfare_expected = ["consumption"]
                 assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
                     f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
                 )
-            else:
+            elif country in [
+                "Bulgaria",
+                "Croatia",
+                "Estonia",
+                "Hungary",
+                "Latvia",
+                "Lithuania",
+                "Montenegro",
+                "Nicaragua",
+                "Poland",
+                "Romania",
+                "Serbia",
+                "Slovakia",
+                "Slovenia",
+            ]:
                 welfare_expected = ["income"]
                 assert len(last_welfare_type) == 1 and last_welfare_type == welfare_expected, log.fatal(
                     f"{country} has unexpected values of welfare_type: {last_welfare_type} instead of {welfare_expected}."
@@ -1238,10 +1267,7 @@ def drop_columns(tb: Table) -> Table:
     # Remove columns
     tb = tb.drop(
         columns=[
-            "reporting_pop",
             "is_interpolated",
-            "cpi",
-            "ppp",
             "reporting_pop",
             "reporting_gdp",
             "reporting_pce",
@@ -1357,6 +1383,7 @@ def make_distributional_indicators_long(tb: Table) -> Table:
         tb_distributional.groupby(
             index_columns + ["decile"],
             as_index=False,
+            dropna=False,
         )
         .agg(
             {
@@ -1458,6 +1485,22 @@ def make_poverty_line_null_for_non_dimensional_indicators(tb: Table) -> Table:
     tb = tb.drop(columns=INDICATORS_NOT_DEPENDENT_ON_POVLINES_NOR_DECILES, errors="raise")
 
     # Concatenate tb and tb_non_dimensional
-    tb = pr.merge(tb, tb_non_dimensional, on=index_columns + ["poverty_line", "decile"], how="outer")
+    tb = pr.merge(tb, tb_non_dimensional, on=index_columns, how="outer")
+
+    return tb
+
+
+def make_cpi_not_depending_on_ppp(tb: Table) -> Table:
+    """
+    Make the cpi not depending on ppp_version.
+    """
+
+    tb = tb.copy()
+
+    # Extract last key from POVLINES_DICT, so we can filter for the latest ppp year
+    current_ppp_year = list(POVLINES_DICT.keys())[-1]
+
+    # Make all the cpi values different from the current ppp year to None
+    tb.loc[tb["ppp_version"] != current_ppp_year, "cpi"] = pd.NA
 
     return tb

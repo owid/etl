@@ -14,12 +14,8 @@ paths = PathFinder(__file__)
 
 # Define PPP versions
 # NOTE: Change this in case of new PPP versions in the future
-# TODO: Change to 2021 prices
-PPP_VERSIONS = [2011, 2017]
-
-# NOTE: Change this in case of new PPP versions in the future
-PPP_YEAR_OLD = PPP_VERSIONS[0]
-PPP_YEAR_CURRENT = PPP_VERSIONS[1]
+PPP_YEAR_OLD = 2017
+PPP_YEAR_CURRENT = 2021
 
 
 def run() -> None:
