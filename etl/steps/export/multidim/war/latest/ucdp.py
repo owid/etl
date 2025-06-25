@@ -33,26 +33,39 @@ def run() -> None:
     # Load grapher dataset.
     ds = paths.load_dataset("ucdp")
     tb = ds.read("ucdp", load_data=False)
+    ds_pre = paths.load_dataset("ucdp_preview")
+    tb_pre = ds_pre.read("ucdp_preview", load_data=False)
 
     # Filter unnecessary columns
     tb = tb.filter(regex="^country|^year|^number_deaths_ongoing|^number_ongoing_conflicts__")
+    tb_pre = tb_pre.filter(regex="^country|^year|^number_deaths_ongoing|^number_ongoing_conflicts__")
 
     #
     # (optional) Adjust dimensions if needed
     #
     tb = adjust_dimensions(tb)
+    tb_pre = adjust_dimensions(tb_pre)
 
     #
     # Create collection object
     #
+    choices = {tb[col].m.dimensions["conflict_type"] for col in tb.columns if col not in {"country", "year"}} - {"all"}
+
     c = paths.create_collection(
         config=config,
         short_name="ucdp",
-        tb=tb,
+        tb=[tb, tb_pre],
         indicator_names=[
-            "deaths",
-            "death_rate",
-            "num_conflicts",
+            [
+                "deaths",
+                "death_rate",
+                "num_conflicts",
+            ],
+            ["deaths"],
+        ],
+        dimensions=[
+            {"conflict_type": list(choices), "estimate": "*", "people": "*"},
+            {"conflict_type": "all", "estimate": "*", "people": "*"},
         ],
         common_view_config=COMMON_CONFIG,
     )

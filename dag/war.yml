@@ -48,6 +48,7 @@ steps:
     - data://garden/war/2025-06-13/ucdp
   export://multidim/war/latest/ucdp:
     - data://grapher/war/2025-06-13/ucdp
+    - data://grapher/war/latest/ucdp_preview
 
   # UCDP (+preview)
   data://meadow/war/latest/ucdp_ced:
