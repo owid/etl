@@ -182,6 +182,14 @@ tables:
           It is a boolean indicator that indicates whether the country is a full democracy (score 7 in the `lexical_index_plus` indicator).
         unit: ""
 
+      is_democracy:
+        title: Country is a democracy
+        description_short: |-
+          Identifies if a country is a democracy using the extended Lexical Index of Electoral Democracy (LIED+).
+        description_processing: |-
+          It is a boolean indicator that indicates whether the country is a full democracy (score 6 or 7 in the `lexical_index_plus` indicator).
+        unit: ""
+
       is_electoral_democracy:
         title: Country is an electoral democracy
         description_short: |-
@@ -410,6 +418,17 @@ tables:
           <%- endif -%>
         # description_short:
         unit: "countries"
+      num_is_democracy:
+        title: |-
+          <%- if category == '-1' -%>
+          Number of countries with unknown regime (democracy)
+          <%- elif category == 'no' -%>
+          Number of countries that are NOT democracies
+          <%- else -%>
+          Number of countries that are democracies
+          <%- endif -%>
+        # description_short:
+        unit: "countries"
 
       num_turnover_event:
         title: |-
@@ -549,6 +568,17 @@ tables:
           People living in countries that are NOT full democracies
           <%- else -%>
           People living in countries that are full democracies
+          <%- endif -%>
+        # description_short:
+        unit: "people"
+      pop_is_democracy:
+        title: |-
+          <%- if category == '-1' -%>
+          People living in countries with unknown regime (democracy)
+          <%- elif category == 'no' -%>
+          People living in countries that are NOT democracies
+          <%- else -%>
+          People living in countries that are democracies
           <%- endif -%>
         # description_short:
         unit: "people"

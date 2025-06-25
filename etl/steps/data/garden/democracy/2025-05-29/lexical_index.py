@@ -233,11 +233,13 @@ def add_is_democracy(tb: Table) -> Table:
     - `democracy_lied`: distinguishing between democracies and autocracies.
     - `is_full_democracy`: distinguishing between full democracies and the rest.
     - `is_electoral_democracy`: distinguishing between electoral democracies and the rest.
+    - `is_democracy`: distinguishing between democracies and the rest.
 
     """
     tb["democracy_lied"] = tb["regime_redux_lied"].eq(6).astype("Int64")
     tb["is_full_democracy"] = tb["regime_lied"].eq(7).astype("Int64")
     tb["is_electoral_democracy"] = tb["regime_lied"].eq(6).astype("Int64")
+    tb["is_democracy"] = tb["is_full_democracy"] | tb["is_electoral_democracy"]
     return tb
 
 
@@ -347,6 +349,14 @@ def get_region_aggregates(
         },
         {
             "name": "is_electoral_democracy",
+            "values_expected": {
+                "0": "no",
+                "1": "yes",
+            },
+            "has_na": False,
+        },
+        {
+            "name": "is_democracy",
             "values_expected": {
                 "0": "no",
                 "1": "yes",
