@@ -972,6 +972,40 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     mask = (tb[COLUMN_COUNTRY_NAME] == "Morocco") & (tb["latitude"] < 27.66727)
     paths.log.info(f"{len(tb.loc[mask, COLUMN_COUNTRY_NAME])} datapoints in land contested by Morocco/W.Sahara")
     tb.loc[mask, COLUMN_COUNTRY_NAME] = "Western Sahara"
+    ## Rwanda -> DRC
+    relids = [
+        "DRC-2025-1-17740-16",
+        "DRC-2025-1-17740-17",
+        "DRC-2025-1-17740-21",
+        "DRC-2025-1-17740-23",
+        "DRC-2025-1-17740-24",
+        "DRC-2025-1-17740-25",
+        "DRC-2025-1-17740-26",
+        "DRC-2025-1-17740-29",
+        "DRC-2025-1-17740-60",
+        "DRC-2025-1-17740-63",
+        "DRC-2025-1-17740-69",
+        "DRC-2025-1-17740-81",
+        "DRC-2025-1-17740-98",
+        "DRC-2025-1-17740-89",
+        "DRC-2025-1-17740-99",
+        "DRC-2025-1-17740-109",
+        "DRC-2025-3-17706-1",
+        "DRC-2025-3-17741-1",
+        "DRC-2025-3-17741-10",
+        "DRC-2025-3-17741-11",
+        "DRC-2025-3-17741-13",
+        "DRC-2025-3-17741-36",
+        "DRC-2025-3-17741-16",
+        "DRC-2025-3-17741-14",
+        "DRC-2025-3-17741-20",
+        "DRC-2025-3-17741-23",
+        "DRC-2025-3-17741-24",
+        "DRC-2025-3-17741-27",
+        "DRC-2025-3-17741-28",
+        "DRC-2025-3-17741-30",
+    ]
+    tb.loc[tb["relid"].isin(relids), COLUMN_COUNTRY_NAME] = "Democratic Republic of Congo"
 
     # Add a flag column for points likely to have incorrect coordinates:
     # a) points where coordiantes are (0 0), or points where latitude and longitude are exactly the same
