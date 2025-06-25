@@ -210,7 +210,7 @@ views:
             name: "Below $3 a day"
             color: *color_0_to_300_simplified
     config:
-      title: Distribution of the population between different poverty thresholds
+      title: Distribution of the population between different poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
@@ -255,7 +255,7 @@ views:
           display:
             name: "Above $10 a day"
     config:
-      title: Distribution of the population between different poverty thresholds
+      title: Distribution of the population between different poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
@@ -373,7 +373,7 @@ views:
             name: "$Below $1 a day"
             color: *color_0_to_100
     config:
-      title: Distribution of the population between different poverty thresholds
+      title: Distribution of the population between different poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
@@ -430,7 +430,7 @@ views:
           display:
             name: "Above $40 a day"
     config:
-      title: Distribution of the population between different poverty thresholds
+      title: Distribution of the population between different poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
@@ -521,7 +521,7 @@ views:
             name: "Below $3 a day"
             color: *color_0_to_300_simplified
     config:
-      title: Distribution of the population between different poverty thresholds
+      title: Distribution of the population between different poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
@@ -566,7 +566,7 @@ views:
           display:
             name: "Above $10 a day"
     config:
-      title: Distribution of the population between different poverty thresholds
+      title: Distribution of the population between different poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
@@ -681,7 +681,7 @@ views:
             name: "$Below $1 a day"
             color: *color_0_to_100
     config:
-      title: Distribution of the population between different poverty thresholds
+      title: Distribution of the population between different poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
@@ -738,7 +738,7 @@ views:
           display:
             name: "Above $40 a day"
     config:
-      title: Distribution of the population between different poverty thresholds
+      title: Distribution of the population between different poverty lines
       subtitle: "{definitions.ppp_adjustment_subtitle}"
       note: "{definitions.ppp_adjustment_welfare_type_note}"
       hasMapTab: false
