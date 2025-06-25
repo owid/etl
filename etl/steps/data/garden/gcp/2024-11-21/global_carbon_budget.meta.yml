@@ -134,10 +134,10 @@ tables:
           - The main source of carbon dioxide (CO₂) emissions is the burning of fossil fuels. It is the primary greenhouse gas causing climate change.
           - Globally, CO₂ emissions have remained at just below 5 tonnes per person for over a decade. Between countries, however, there are large differences, and while emissions are rapidly increasing in some countries, they are rapidly falling in others.
           - *per_capita_description_key
-          - The source for this CO₂ data is the Global Carbon Budget, a dataset we update yearly as soon as it is published.
-          - *production_emissions_description_key
+          - This data includes [fossil CO₂ emissions](#dod:fossilemissions) from activities such as transport, electricity generation, and heating. It does not include [land-use change emissions](#dod:land-use-change-emissions), such as those from deforestation or reforestation.
           - *international_aviation_description_key
-          - This data does not include emissions from [land-use change](#dod:land-use-change-emissions), such as deforestation or reforestation.
+          - *production_emissions_description_key
+          - The source for this CO₂ data is the Global Carbon Budget, a dataset we update yearly as soon as it is published.
         presentation:
           title_public: CO₂ emissions per capita
       ##################################################################################################################
