@@ -22,7 +22,7 @@ import owid.catalog.processing as pr
 import structlog
 from owid.catalog.utils import underscore
 
-from etl.helpers import PathFinder, create_dataset
+from etl.helpers import PathFinder
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
@@ -61,7 +61,7 @@ if SUBSET:
     SUBSET += "," + ",".join(subset_list)
 
 
-def run(dest_dir: str) -> None:
+def run() -> None:
     #
     # Load inputs.
     #
@@ -138,9 +138,7 @@ def run(dest_dir: str) -> None:
     with warnings.catch_warnings():
         # Ignore warning about missing primary key, we set dimensions in garden step
         warnings.simplefilter("ignore", category=UserWarning)
-        ds_meadow = create_dataset(
-            dest_dir, tables=tables, check_variables_metadata=True, default_metadata=snap.metadata
-        )
+        ds_meadow = paths.create_dataset(tables=tables, check_variables_metadata=True, default_metadata=snap.metadata)
 
     # Save changes in the new meadow dataset.
     ds_meadow.save()
