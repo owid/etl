@@ -36,7 +36,7 @@ tables:
         # The following description was manually extracted from the excel file that can be downloaded from https://www.fao.org/faostat/en/#data/SDGB (by clicking on Related Documents -> Metadata).
         # NOTE: We currently don't have access to this important information in our faostat_metadat step. Maybe there's a way to programmatically extract it.
         description_from_producer: |-
-          # Sustainable Development Goals
+          ### Sustainable Development Goals
           Goal 2: End hunger, achieve food security and improved nutrition and promote sustainable agriculture.
 
           Target 2.1: By 2030, end hunger and ensure access by all people, in particular the poor and people in vulnerable situations, including infants, to safe, nutritious and sufficient food all year round.
