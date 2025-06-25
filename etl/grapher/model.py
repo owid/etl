@@ -352,12 +352,12 @@ class ChartRevisions(Base):
     updatedAt: Mapped[Optional[datetime]] = mapped_column(DateTime, init=False)
 
     @classmethod
-    def get_latest(cls, session: Session, chart_id: int, updatedAt=None) -> "ChartRevisions":
-        """query should be: SELECT * FROM chart_revisions WHERE chartId = {self.chart_id} AND updatedAt <= '{timestamp}' ORDER BY updatedAt DESC LIMIT 1 if timestamp is given!"""
+    def get_latest(cls, session: Session, chart_id: int, createdAt=None) -> "ChartRevisions":
+        """query should be: SELECT * FROM chart_revisions WHERE chartId = {self.chart_id} AND createdAt <= '{timestamp}' ORDER BY createdAt DESC LIMIT 1 if timestamp is given!"""
         revision = session.scalars(
             select(cls)
-            .where(and_(cls.chartId == chart_id, cls.updatedAt <= updatedAt) if updatedAt else cls.chartId == chart_id)
-            .order_by(cls.updatedAt.desc())
+            .where(and_(cls.chartId == chart_id, cls.createdAt <= createdAt) if createdAt else cls.chartId == chart_id)
+            .order_by(cls.createdAt.desc())
             .limit(1)
         ).one_or_none()
 
