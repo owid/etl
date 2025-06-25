@@ -5,6 +5,15 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+COLUMN_NAMES = {
+    "Reference area": "country",
+    "Measure": "measure",
+    "Unit of measure": "unit",
+    "TIME_PERIOD": "year",
+    "OBS_VALUE": "value",
+    "BASE_PER": "base_period",
+}
+
 
 def run() -> None:
     #
@@ -20,25 +29,9 @@ def run() -> None:
     tb = tb[tb["Frequency of observation"] == "Annual"]
 
     # only keep relevant columns
-    tb = tb[
-        [
-            "Reference area",
-            "Measure",
-            "Unit of measure",
-            "TIME_PERIOD",
-            "OBS_VALUE",
-        ]
-    ]
+    tb = tb[COLUMN_NAMES.keys()]
 
-    tb = tb.rename(
-        columns={
-            "Reference area": "country",
-            "Measure": "measure",
-            "Unit of measure": "unit",
-            "TIME_PERIOD": "year",
-            "OBS_VALUE": "value",
-        }
-    )
+    tb = tb.rename(columns=COLUMN_NAMES)
 
     # Process data.
     #

@@ -6,6 +6,16 @@ from etl.helpers import PathFinder
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
 
+COLUMNS_NAMES = {
+    "Nominal house price indices": "nom_house_price_idx",
+    "Price to income ratio": "price_to_income_ratio",
+    "Price to rent ratio": "price_to_rent_ratio",
+    "Real house price indices": "real_house_price_idx",
+    "Rent prices": "rent_prices",
+    "Standardised price-income ratio": "std_price_income_ratio",
+    "Standardised price-rent ratio": "std_price_rent_ratio",
+}
+
 
 def run() -> None:
     #
@@ -18,9 +28,11 @@ def run() -> None:
     tb = ds_meadow.read("housing_prices")
 
     # get units for each measure
-    units = {}
-    for measure in tb["measure"].unique():
-        units[measure] = tb[tb["measure"] == measure]["unit"].unique()[0]
+    units = dict(tb.drop_duplicates("measure")[["measure", "unit"]].values)
+
+    # assert base periods are the same for all measures
+    base_periods = tb.dropna(subset=["base_period"])["base_period"].unique().tolist()
+    assert base_periods == [2015], f"Base periods have changed from 2015 to {base_periods}"
 
     # Pivot table to have measures as columns.
     tb = tb.pivot(
@@ -31,6 +43,7 @@ def run() -> None:
 
     # set units for each measure
     for measure, unit in units.items():
+        assert measure in COLUMNS_NAMES.keys(), f"Unexpected indicator: {measure}"
         tb[measure].metadata.title = measure
         if unit == "Index":
             tb[measure].metadata.unit = "Index (2015=100)"
@@ -40,17 +53,7 @@ def run() -> None:
             tb[measure].metadata.short_unit = "%"
 
     # rename columns to slugs
-    tb = tb.rename(
-        columns={
-            "Nominal house price indices": "nom_house_price_idx",
-            "Price to income ratio": "price_to_income_ratio",
-            "Price to rent ratio": "price_to_rent_ratio",
-            "Real house price indices": "real_house_price_idx",
-            "Rent prices": "rent_prices",
-            "Standardised price-income ratio": "std_price_income_ratio",
-            "Standardised price-rent ratio": "std_price_rent_ratio",
-        }
-    )
+    tb = tb.rename(columns=COLUMNS_NAMES)
 
     #
     # Process data.
