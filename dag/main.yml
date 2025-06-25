@@ -721,6 +721,25 @@ steps:
   data://grapher/unodc/2025-05-28/homicide:
     - data://garden/unodc/2025-05-28/homicide
 
+
+  #
+  # Media deaths
+  #
+  data://meadow/media_cloud/2025-05-19/media_deaths:
+    - snapshot://media_cloud/2025-05-19/media_deaths.csv
+  data://garden/media_cloud/2025-05-19/media_deaths:
+     - data://meadow/media_cloud/2025-05-19/media_deaths
+     - data://meadow/cdc/2025-05-19/external_causes
+     - data://meadow/cdc/2025-05-19/leading_causes
+  #data://grapher/media_cloud/2025-05-19/media_deaths:
+  #  - data://garden/media_cloud/2025-05-19/media_deaths
+
+# CDC Wonder - Causes of Death
+  data://meadow/cdc/2025-05-19/leading_causes:
+    - snapshot://cdc/2025-05-19/leading_causes.csv
+  data://meadow/cdc/2025-05-19/external_causes:
+    - snapshot://cdc/2025-05-19/external_causes.csv
+
 include:
   - dag/open_numbers.yml
   - dag/faostat.yml

@@ -1,0 +1,25 @@
+# NOTE: To learn more about the fields, hover over their names.
+definitions:
+  common:
+    presentation:
+      topic_tags:
+        - Causes of Death
+
+
+# Learn more about the available fields:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+dataset:
+  update_period_days: 1826
+
+
+tables:
+  media_deaths:
+    variables:
+        deaths:
+          unit: "deaths"
+          short_unit: ""
+        deaths_share:
+          unit: "%"
+          short_unit: "%"
+
+
