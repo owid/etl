@@ -1,7 +1,7 @@
 from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -90,7 +90,7 @@ class Explorer(Collection):
             mapping[dim.slug] = dix
         return mapping
 
-    def sort_indicators(self, order: Union[List[str], Callable], indicators_slug: Optional[str] = None):
+    def sort_indicators(self, order: List[str] | Callable, indicators_slug: str | None = None):
         """Sort indicators in all views."""
         if indicators_slug is None:
             indicators_slug = INDICATORS_SLUG
@@ -232,7 +232,7 @@ def _extract_explorers_tables(
     return df_grapher, df_columns
 
 
-def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: Optional[OWIDEnv] = None) -> Dict[str, str]:
+def get_mapping_paths_to_id(catalog_paths: List[str], owid_env: OWIDEnv | None = None) -> Dict[str, str]:
     # Check if given path is actually an ID
     # Get ID, assuming given path is a catalog path
     if owid_env is None:
