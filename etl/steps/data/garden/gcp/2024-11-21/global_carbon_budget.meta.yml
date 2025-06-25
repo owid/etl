@@ -129,15 +129,16 @@ tables:
           tolerance: 3
           numSignificantFigures: 3
         description_short: |
-          Carbon dioxide (CO₂) emissions from [fossil fuel combustion and industrial processes](#dod:fossilemissions) such as cement production. This includes emissions from transport, electricity generation, and heating, but not [land-use change emissions](#dod:land-use-change-emissions).
+          Carbon dioxide (CO₂) emissions from [burning fossil fuels and industrial processes](#dod:fossilemissions) such as cement production. This includes emissions from transport, electricity generation, and heating, but not [land-use change](#dod:land-use-change-emissions).
         description_key:
-          - The main source of carbon dioxide (CO₂) emissions is the burning of fossil fuels. It is the primary greenhouse gas causing climate change.
-          - Globally, CO₂ emissions have remained at just below 5 tonnes per person for over a decade. Between countries, however, there are large differences, and while emissions are rapidly increasing in some countries, they are rapidly falling in others.
+          - Carbon dioxide (CO₂) is the primary [greenhouse gas](#dod:ghgemissions) causing climate change.
+          - Global CO₂ emissions have stayed just below 5 tonnes per person for over a decade. But across countries, emissions vary widely — rising in some, falling in others.
           - *per_capita_description_key
-          - This data includes [fossil CO₂ emissions](#dod:fossilemissions) from activities such as transport, electricity generation, and heating. It does not include [land-use change emissions](#dod:land-use-change-emissions), such as those from deforestation or reforestation.
+          - The main source of CO₂ emissions is the burning of fossil fuels. This data includes [fossil CO₂ emissions](#dod:fossilemissions) from activities such as transport, electricity generation, and heating.
+          - The data does not include [land-use change emissions](#dod:land-use-change-emissions), such as those from deforestation or reforestation.
           - *international_aviation_description_key
           - *production_emissions_description_key
-          - The source for this CO₂ data is the Global Carbon Budget, a dataset we update yearly as soon as it is published.
+          - The data comes from the Global Carbon Budget. Fossil CO₂ emissions are estimated using national statistics on energy use — such as coal, oil, and gas consumption — and industrial production, particularly cement. These figures are converted into CO₂ emissions using standardized emission factors. For more details, read [the original Global Carbon Budget paper](https://doi.org/10.5194/essd-15-5301-2023).
         presentation:
           title_public: CO₂ emissions per capita
       ##################################################################################################################
