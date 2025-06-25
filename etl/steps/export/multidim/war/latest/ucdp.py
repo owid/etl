@@ -146,7 +146,28 @@ def run() -> None:
             "hideRelativeToggle": lambda view: (view.dimensions["people"] != "all_stacked")
             and (view.dimensions["conflict_type"] != "all_stacked"),
             "hideFacetControl": lambda view: view.dimensions["estimate"] == "best_ci",
+            "yAxis": {
+                "facetDomain": lambda view: "independent" if view.d.conflict_type == "all" else "shared",
+            },
         },
+    )
+
+    c.edit_views(
+        edits=[
+            {
+                "dimensions": {
+                    "indicator": "deaths",
+                    "conflict_type": "all",
+                    "people": "all",
+                    "estimate": "best",
+                },
+                "config": {
+                    "yAxis": {
+                        "facetDomain": "independent",
+                    },
+                }
+            }
+        ]
     )
 
     #

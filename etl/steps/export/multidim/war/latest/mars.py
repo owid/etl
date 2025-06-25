@@ -128,28 +128,28 @@ def run() -> None:
             "timelineMinTime": 1800,
             "title": lambda view: _set_title(view),
             "subtitle": lambda view: _set_subtitle(view),
-            "hideRelativeToggle": lambda view: (view.dimensions["conflict_type"] != "all_stacked"),
-            "hideFacetControl": lambda view: view.dimensions["estimate"] == "low_high",
+            "hideRelativeToggle": lambda view: (view.d.conflict_type != "all_stacked"),
+            # "hideFacetControl": lambda view: view.dimensions["estimate"] == "low_high",
             "selectedFacetStrategy": "entity",
         }
     )
 
     for view in c.views:
-        if view.dimensions["estimate"] == "low_high":
+        if view.d.estimate == "low_high":
             assert view.indicators.y is not None
             for indicator in view.indicators.y:
                 assert indicator.display is not None
-                if view.dimensions["conflict_type"] == "civil war":
+                if view.d.conflict_type == "civil war":
                     color_low = "#5C1B04"
                     color_high = "#CF8063"
-                elif view.dimensions["conflict_type"] == "others (non-civil)":
+                elif view.d.conflict_type == "others (non-civil)":
                     color_low = "#12213C"
                     color_high = "#748AB0"
-                elif view.dimensions["conflict_type"] == "all":
+                elif view.d.conflict_type == "all":
                     color_low = "#2F1146"
                     color_high = "#B084D1"
                 else:
-                    raise ValueError(f"Unknown conflict type {view.dimensions['conflict_type']}")
+                    raise ValueError(f"Unknown conflict type {view.d.conflict_type}")
 
                 if "_low_" in indicator.catalogPath:
                     indicator.display = {
@@ -166,9 +166,9 @@ def run() -> None:
 
 
 def _set_description_key(view, tb):
-    if view.dimensions["indicator"] in ("deaths", "death_rate"):
+    if view.d.indicator in ("deaths", "death_rate"):
         column = "number_deaths_ongoing_conflicts_high__conflict_type_all"
-    elif view.dimensions["indicator"] in ("wars_ongoing", "wars_ongoing_country_rate"):
+    elif view.d.indicator in ("wars_ongoing", "wars_ongoing_country_rate"):
         column = "number_ongoing_conflicts__conflict_type_all"
     else:
         return []
@@ -212,31 +212,31 @@ def adjust_dimensions(tb):
 
 
 def _set_title(view):
-    conflict_type = get_conflict_type(view.dimensions["conflict_type"])
-    if view.dimensions["indicator"] == "deaths":
+    conflict_type = get_conflict_type(view.d.conflict_type)
+    if view.d.indicator == "deaths":
         return f"Deaths in {conflict_type}"
-    elif view.dimensions["indicator"] == "death_rate":
+    elif view.d.indicator == "death_rate":
         return f"Death rate in {conflict_type}"
-    elif view.dimensions["indicator"] == "wars_ongoing":
+    elif view.d.indicator == "wars_ongoing":
         return f"Number of {conflict_type}"
-    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+    elif view.d.indicator == "wars_ongoing_country_rate":
         return f"Rate of {conflict_type}"
     else:
-        raise ValueError(f"Unknown indicator {view.dimensions['indicator']}")
+        raise ValueError(f"Unknown indicator {view.d.indicator}")
 
 
 def _set_subtitle(view):
-    dods = get_dods(view.dimensions["conflict_type"])
-    if view.dimensions["indicator"] == "deaths":
+    dods = get_dods(view.d.conflict_type)
+    if view.d.indicator == "deaths":
         return f"Deaths of combatants due to fighting in {dods} wars that were ongoing that year. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
-    elif view.dimensions["indicator"] == "death_rate":
+    elif view.d.indicator == "death_rate":
         return f"Deaths of combatants due to fighting, per 100,000 people. Included are {dods} wars that were ongoing that year. Civilian deaths and deaths of combatants due to disease and starvation resulting from the war are not included."
-    elif view.dimensions["indicator"] == "wars_ongoing":
+    elif view.d.indicator == "wars_ongoing":
         return f"Included are {dods} wars that were ongoing that year."
-    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+    elif view.d.indicator == "wars_ongoing_country_rate":
         return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} wars that were ongoing that year."
     else:
-        raise ValueError(f"Unknown indicator {view.dimensions['indicator']}")
+        raise ValueError(f"Unknown indicator {view.d.indicator}")
 
 
 def get_conflict_type(ctype):
@@ -264,19 +264,19 @@ def get_dods(ctype):
 
 
 def _edit_indicator_display(view):
-    if view.dimensions["conflict_type"] == "civil war":
+    if view.d.conflict_type == "civil war":
         assert view.indicators.y is not None
         view.indicators.y[0].display = {
             "name": "Civil wars",
             "color": "#B13507",
         }
-    elif view.dimensions["conflict_type"] == "others (non-civil)":
+    elif view.d.conflict_type == "others (non-civil)":
         assert view.indicators.y is not None
         view.indicators.y[0].display = {
             "name": "Interstate wars",
             "color": "#4C6A9C",
         }
-    elif view.dimensions["conflict_type"] == "all":
+    elif view.d.conflict_type == "all":
         assert view.indicators.y is not None
         view.indicators.y[0].display = {
             "name": "All wars",
