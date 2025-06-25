@@ -125,7 +125,7 @@ def run() -> None:
     # Edit FAUST
     c.set_global_config(
         {
-            "timelineMinTime": 1900,
+            "timelineMinTime": 1800,
             "title": lambda view: _set_title(view),
             "subtitle": lambda view: _set_subtitle(view),
             "hideRelativeToggle": lambda view: (view.dimensions["conflict_type"] != "all_stacked"),
