@@ -94,6 +94,7 @@ tables:
                 baseColorScheme: GnBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 1000
                   - 2000
                   - 5000
@@ -101,7 +102,6 @@ tables:
                   - 20000
                   - 50000
                   - 1
-                customNumericMinValue: 0
             selectedEntityNames:
               - United States
               - Germany
@@ -156,6 +156,7 @@ tables:
                 baseColorScheme: PuBu
                 binningStrategy: manual
                 customNumericValues:
+                  - 0
                   - 10000000000
                   - 30000000000
                   - 100000000000
@@ -211,6 +212,7 @@ tables:
                 binningStrategy: manual
                 baseColorScheme: BuGn
                 customNumericValues:
+                  - 0
                   - 1000
                   - 2000
                   - 5000
@@ -292,6 +294,7 @@ tables:
               binningStrategy: manual
               baseColorScheme: GnBu
               customNumericValues:
+                - 0
                 - 1000
                 - 2000
                 - 5000
@@ -351,8 +354,8 @@ tables:
             colorScale:
               binningStrategy: manual
               baseColorScheme: PuBu
-              customNumericMinValue: 0
               customNumericValues:
+                - 0
                 - 10000000000
                 - 30000000000
                 - 100000000000
@@ -525,8 +528,8 @@ tables:
                 baseColorScheme: Blues
                 colorSchemeInvert: false
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -611,8 +614,8 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -700,8 +703,8 @@ tables:
               colorScale:
                 baseColorScheme: YlOrRd
                 binningStrategy: manual
-                customNumericMinValue: 0
                 customNumericValues:
+                  - 0
                   - 10
                   - 20
                   - 30
@@ -948,7 +951,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
                 baseColorScheme: BuGn
         display:
           numDecimalPlaces: 1
@@ -971,7 +974,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
                 baseColorScheme: Purples
         display:
           numDecimalPlaces: 1
@@ -994,7 +997,7 @@ tables:
               timeTolerance: 5
               colorScale:
                 binningStrategy: manual
-                customNumericValues: [10,20,30,40,50,60,70,80,90,100]
+                customNumericValues: [0, 10,20,30,40,50,60,70,80,90,100]
                 baseColorScheme: Blues
 
         display:

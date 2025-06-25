@@ -4,6 +4,7 @@
 #
 import graphlib
 import hashlib
+import importlib.util
 import inspect
 import json
 import os
@@ -20,6 +21,7 @@ from dataclasses import dataclass, field
 from glob import glob
 from importlib import import_module
 from pathlib import Path
+from types import ModuleType
 from typing import Any, Dict, Iterable, List, Optional, Protocol, Set, cast
 from urllib.parse import urlparse
 
@@ -1216,21 +1218,57 @@ def isolated_env(
 
     :param keep_modules: regex of modules to keep imported
     """
-    # add module dir to pythonpath
-    sys.path.append(working_dir.as_posix())
-
-    # remember modules that were imported before
+    # Remember original sys.path and modules
+    original_path = sys.path.copy()
     imported_modules = set(sys.modules.keys())
 
-    yield
+    # Create a temporary module registry for this context
+    context_modules: dict[str, ModuleType] = {}
 
-    # unimport modules imported during execution unless they match `keep_modules`
-    for module_name in set(sys.modules.keys()) - imported_modules:
-        if not re.search(keep_modules, module_name):
-            sys.modules.pop(module_name)
+    try:
+        # Insert working_dir at the beginning to give it highest priority
+        # This ensures this process's modules take precedence
+        sys.path.insert(0, working_dir.as_posix())
 
-    # remove module dir from pythonpath
-    sys.path.remove(working_dir.as_posix())
+        # Monkey-patch __import__ to handle relative imports more safely
+        original_import = __builtins__["__import__"]
+
+        def safe_import(name, globals=None, locals=None, fromlist=(), level=0):
+            # For relative imports or modules that might exist in working_dir,
+            # check working_dir first
+            if level == 0 and globals and hasattr(globals.get("__spec__"), "submodule_search_locations"):
+                # Try to load from working_dir first for potential conflicts
+                module_path = working_dir / f"{name}.py"
+                if module_path.exists() and name not in context_modules:
+                    spec = importlib.util.spec_from_file_location(name, module_path)
+                    if spec and spec.loader:
+                        module = importlib.util.module_from_spec(spec)
+                        context_modules[name] = module
+                        sys.modules[name] = module
+                        spec.loader.exec_module(module)
+                        return module
+
+            return original_import(name, globals, locals, fromlist, level)
+
+        __builtins__["__import__"] = safe_import
+
+        yield
+
+    finally:
+        # Restore original import function
+        __builtins__["__import__"] = original_import
+
+        # Restore original sys.path
+        sys.path[:] = original_path
+
+        # Unimport modules imported during execution unless they match `keep_modules`
+        for module_name in set(sys.modules.keys()) - imported_modules:
+            if not re.search(keep_modules, module_name):
+                sys.modules.pop(module_name, None)
+
+        # Clean up context modules
+        for module_name in context_modules:
+            sys.modules.pop(module_name, None)
 
 
 def _load_tables_metadata(ds: catalog.Dataset) -> Dict[str, Dict[str, Any]]:

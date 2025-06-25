@@ -179,9 +179,7 @@ def test_update_variable_metadata():
 
     # Create a presentation with grapher_config containing various fields that need conversion
     presentation = meta.VariablePresentationMeta(
-        grapher_config={
-            "map": {"colorScale": {"customNumericMinValue": "10.5", "customNumericValues": "1, 5, 10, 50, 100"}}
-        },
+        grapher_config={"map": {"colorScale": {"customNumericValues": "1, 5, 10, 50, 100"}}},
         faqs=[empty_faq, valid_faq],
     )
 
@@ -221,8 +219,6 @@ def test_update_variable_metadata():
 
     # Check numeric conversions in grapher_config
     color_scale = updated.presentation.grapher_config["map"]["colorScale"]
-    assert isinstance(color_scale["customNumericMinValue"], float)
-    assert color_scale["customNumericMinValue"] == 10.5
 
     # Check string was converted to list
     assert color_scale["customNumericValues"] == [1, 5, 10, 50, 100]
