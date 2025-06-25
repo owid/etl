@@ -384,17 +384,12 @@ def construct_subdag(
         excludes = []
 
     # Export steps
-    if export:
-        includes = ["export://.*" + include for include in includes]
-    else:
+    if not export:
         excludes.append("export://.*")
 
-    # Include grapher steps
-    if grapher:
-        includes = ["grapher://.*" + include for include in includes]
-    else:
-        if not export:
-            excludes.append("grapher://.*")
+    # Grapher steps
+    if not grapher and not export:
+        excludes.append("grapher://.*")
 
     # Exclude private steps
     if not private:

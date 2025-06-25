@@ -86,3 +86,106 @@ def test_construct_full_dag():
     # Check that original dependencies are preserved
     assert "data://garden/happiness/2023-01-01/happiness" in full_dag
     assert "data://meadow/happiness/2023-01-01/happiness" in full_dag["data://garden/happiness/2023-01-01/happiness"]
+
+
+def test_construct_subdag():
+    """Test construct_subdag function filtering logic."""
+    # Create a comprehensive DAG for testing
+    full_dag = {
+        "data://meadow/happiness/2023-01-01/happiness": {"snapshot://meadow/happiness/2023-01-01/happiness"},
+        "data://garden/happiness/2023-01-01/happiness": {"data://meadow/happiness/2023-01-01/happiness"},
+        "data://grapher/happiness/2023-01-01/happiness": {"data://garden/happiness/2023-01-01/happiness"},
+        "grapher://grapher/happiness/2023-01-01/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        "export://explorers/happiness": {"data://grapher/happiness/2023-01-01/happiness"},
+        "data-private://garden/secret/2023-01-01/secret": {"snapshot-private://meadow/secret/2023-01-01/secret"},
+        "private://test/private_step": {"data-private://garden/secret/2023-01-01/secret"},
+        "data://meadow/climate/2023-01-01/temperature": {"snapshot://meadow/climate/2023-01-01/temperature"},
+        "grapher://grapher/regions/latest/regions": {"data://grapher/regions/latest/regions"},
+    }
+
+    # Test basic include filtering
+    subdag = cmd.construct_subdag(full_dag, includes=["happiness"])
+    happiness_steps = [step for step in subdag.keys() if "happiness" in step]
+    assert len(happiness_steps) > 0
+    assert "data://garden/happiness/2023-01-01/happiness" in subdag
+
+    # Test exclude filtering
+    subdag = cmd.construct_subdag(full_dag, includes=[".*"], excludes=["happiness"])
+    happiness_steps = [step for step in subdag.keys() if "happiness" in step]
+    assert len(happiness_steps) == 0
+
+    # Test grapher step exclusion by default
+    subdag = cmd.construct_subdag(full_dag, includes=["happiness"], grapher=False)
+    grapher_steps = [step for step in subdag.keys() if step.startswith("grapher://")]
+    assert len(grapher_steps) == 0
+
+    # Test grapher step inclusion
+    subdag = cmd.construct_subdag(full_dag, includes=["happiness"], grapher=True)
+    grapher_steps = [step for step in subdag.keys() if step.startswith("grapher://")]
+    assert len(grapher_steps) > 0
+
+    # Test export step exclusion by default
+    subdag = cmd.construct_subdag(full_dag, includes=["happiness"], export=False)
+    export_steps = [step for step in subdag.keys() if step.startswith("export://")]
+    assert len(export_steps) == 0
+
+    # Test export step inclusion
+    subdag = cmd.construct_subdag(full_dag, includes=["happiness"], export=True)
+    export_steps = [step for step in subdag.keys() if step.startswith("export://")]
+    assert len(export_steps) > 0
+
+    # Test private step exclusion by default
+    subdag = cmd.construct_subdag(full_dag, includes=[".*"], private=False)
+    private_steps = [step for step in subdag.keys() if step.startswith("private://")]
+    assert len(private_steps) == 0
+
+    # Test private step inclusion
+    subdag = cmd.construct_subdag(full_dag, includes=[".*"], private=True)
+    private_steps = [step for step in subdag.keys() if step.startswith("private://")]
+    assert len(private_steps) > 0
+
+    # Test regions exclusion
+    subdag = cmd.construct_subdag(full_dag, includes=[".*"], grapher=True)
+    regions_step = "grapher://grapher/regions/latest/regions"
+    assert regions_step not in subdag
+
+    # Test exact match - should include dependencies by default
+    subdag = cmd.construct_subdag(full_dag, includes=["data://garden/happiness/2023-01-01/happiness"], exact_match=True)
+    assert "data://garden/happiness/2023-01-01/happiness" in subdag
+    # Dependencies are included by default unless only=True
+    assert "data://meadow/happiness/2023-01-01/happiness" in subdag
+    
+    # Test exact match with only=True - should not include dependencies
+    subdag = cmd.construct_subdag(full_dag, includes=["data://garden/happiness/2023-01-01/happiness"], exact_match=True, only=True)
+    assert "data://garden/happiness/2023-01-01/happiness" in subdag
+    assert "data://meadow/happiness/2023-01-01/happiness" not in subdag
+
+    # Test only mode with filter_to_subgraph mock behavior
+    # Note: This is a simplified test since only mode affects the filtering logic
+    subdag = cmd.construct_subdag(full_dag, includes=["happiness"], only=True)
+    # Should still include the step and its dependencies based on filter_to_subgraph behavior
+    assert len(subdag) > 0
+
+
+def test_construct_subdag_empty_includes():
+    """Test construct_subdag with empty includes defaults to include all."""
+    dag = {
+        "data://garden/test/2023-01-01/test": {"data://meadow/test/2023-01-01/test"},
+        "data://meadow/test/2023-01-01/test": {"snapshot://test/2023-01-01/test"},
+    }
+
+    subdag = cmd.construct_subdag(dag, includes=[])
+    # Should include all non-excluded steps
+    assert len(subdag) > 0
+
+
+def test_construct_subdag_no_matches():
+    """Test construct_subdag exits when no matches found."""
+    dag = {
+        "data://garden/test/2023-01-01/test": {"data://meadow/test/2023-01-01/test"},
+    }
+
+    # This should call sys.exit(1) since no steps match "nonexistent"
+    with pytest.raises(SystemExit) as exc_info:
+        cmd.construct_subdag(dag, includes=["nonexistent"])
+    assert exc_info.value.code == 1
