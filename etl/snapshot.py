@@ -410,6 +410,13 @@ class Snapshot:
             temp_dir.cleanup()
             self._unarchived_dir = None
 
+    @property
+    def path_unarchived(self) -> Path:
+        if not hasattr(self, "_unarchived_dir") or self._unarchived_dir is None:
+            raise RuntimeError("Archive is not unarchived. Use 'with snap.unarchived()' context manager.")
+
+        return self._unarchived_dir
+
     def read_from_archive(self, filename: str, force_extension: Optional[str] = None, *args, **kwargs) -> Table:
         """Read a file in an archive.
 
@@ -427,7 +434,7 @@ class Snapshot:
 
         tb = read_table_from_snapshot(
             *args,
-            path=self._unarchived_dir / filename,
+            path=self.path_unarchived / filename,
             table_metadata=self.to_table_metadata(),
             snapshot_origin=self.metadata.origin,
             file_extension=new_extension,
