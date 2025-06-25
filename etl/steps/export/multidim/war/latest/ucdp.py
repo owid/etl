@@ -65,9 +65,10 @@ def run() -> None:
         ],
         dimensions=[
             {"conflict_type": list(choices), "estimate": "*", "people": "*"},
-            {"conflict_type": "all", "estimate": "*", "people": "*"},
+            {"conflict_type": ["all"], "estimate": "*", "people": "*"},
         ],
         common_view_config=COMMON_CONFIG,
+        indicator_as_dimension=True,
     )
 
     # Edit indicator-level display settings
