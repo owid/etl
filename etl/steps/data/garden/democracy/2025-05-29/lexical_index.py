@@ -240,6 +240,7 @@ def add_is_democracy(tb: Table) -> Table:
     tb["is_full_democracy"] = tb["regime_lied"].eq(7).astype("Int64")
     tb["is_electoral_democracy"] = tb["regime_lied"].eq(6).astype("Int64")
     tb["is_democracy"] = tb["is_full_democracy"] | tb["is_electoral_democracy"]
+    tb["is_democracy"] = tb["is_democracy"].copy_metadata(tb["is_full_democracy"])
     return tb
 
 
