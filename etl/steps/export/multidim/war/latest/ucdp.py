@@ -165,7 +165,7 @@ def run() -> None:
                     "yAxis": {
                         "facetDomain": "independent",
                     },
-                }
+                },
             }
         ]
     )
