@@ -24,7 +24,7 @@ tables:
           title_public: Share of people that are undernourished
           grapher_config:
             note: |
-              "Values between 0% and 2.5% are reported as “2.5%” in the original data due to uncertainty."
+              Values shown as "2.5%" correspond to rates below 2.5%, reflecting uncertainty at very low levels in the original data.
         # The following description was manually extracted from the excel file that can be downloaded from https://www.fao.org/faostat/en/#data/SDGB (by clicking on Related Documents -> Metadata).
         # NOTE: We currently don't have access to this important information in our faostat_metadat step. Maybe there's a way to programmatically extract it.
         description_from_producer: |-
