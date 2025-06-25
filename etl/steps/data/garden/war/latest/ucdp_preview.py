@@ -89,13 +89,17 @@ def run() -> None:
     tb_codes = ds_gw.read("gleditsch_countries")
     tb_maps = ds_maps.read("nat_earth_110")
 
+    # Load candidate (preliminary) data
+    ds_ced = paths.load_dataset("ucdp_ced")
+    tb_ced = ds_ced.read("ucdp_ced")
+
     #
     # Adapt for with CED data
     #
     ## Extend codes to have data for latest years
     tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR_PREVIEW].set_index(["id", "year"])
     ## Add CED data
-    tb_ged = add_ced_data(tb_ged, LAST_YEAR, LAST_YEAR_PREVIEW)
+    tb_ged = add_ced_data(tb_ged, tb_ced, LAST_YEAR, LAST_YEAR_PREVIEW)
 
     #
     # Run main code
@@ -217,11 +221,7 @@ def extend_latest_years(tb: Table, since_year, to_year) -> Table:
     return tb
 
 
-def add_ced_data(tb_ged: Table, last_year_ged: int, last_year_ced: int):
-    # Read CED table
-    ds_ced = paths.load_dataset("ucdp_ced")
-    tb_ced = ds_ced.read("ucdp_ced")
-
+def add_ced_data(tb_ged: Table, tb_ced: Table, last_year_ged: int, last_year_ced: int):
     # Merge CED into GED
     assert (tb_ced.columns == tb_ged.columns).all(), "Columns are not the same!"
     assert tb_ged["year"].max() == last_year_ged, "GED data is not up to date!"
