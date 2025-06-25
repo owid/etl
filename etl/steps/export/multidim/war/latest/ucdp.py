@@ -338,7 +338,10 @@ def _set_subtitle(view):
 
         # Define subtitle
         if view.d.indicator == "deaths":
-            return subtitle_template.format(placeholder=f" in {dod}")
+            subtitle = subtitle_template.format(placeholder=f" in {dod}")
+            if view.d.conflict_type == "all":
+                subtitle += " The data for 2025 is preliminary and was last updated in June 2025."
+            return subtitle
         elif view.d.indicator == "death_rate":
             return subtitle_template.format(placeholder=f", per 100,000 people. Included are {dod}")
     elif view.d.indicator == "num_conflicts":
