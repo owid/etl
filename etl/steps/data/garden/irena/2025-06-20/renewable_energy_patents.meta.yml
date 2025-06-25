@@ -40,7 +40,7 @@ tables:
         display:
           name: Carbon capture and storage
         presentation:
-          title_public: Number of patents in carbon capture and storage
+          title_public: Annual patents filed for carbon capture and storage technologies
       cross_cutting_energy_tech:
         title: Number of patents in cross-cutting energy technology
         display:
@@ -184,4 +184,4 @@ tables:
         display:
           name: Total patents
         presentation:
-          title_public: Total number of patents in renewable energy technologies
+          title_public: Annual patents filed in sustainable energy
