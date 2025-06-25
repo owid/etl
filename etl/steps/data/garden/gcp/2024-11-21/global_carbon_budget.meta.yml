@@ -127,6 +127,7 @@ tables:
         display:
           shortUnit: t
           tolerance: 3
+          numSignificantFigures: 3
         description_short: |
           Carbon dioxide (CO₂) emissions from [fossil fuel combustion and industrial processes](#dod:fossilemissions) such as cement production. This includes emissions from transport, electricity generation, and heating, but not [land-use change emissions](#dod:land-use-change-emissions).
         description_key:
