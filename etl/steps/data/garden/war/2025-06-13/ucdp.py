@@ -102,15 +102,13 @@ def run() -> None:
     # Filter codes
     tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR].set_index(["id", "year"])
 
-    # TODO: Temporary fix (conflict type in "Conflict" table is not available, instead combine it with "Dyadic" table)
-    tb_conflict = _load_conflict_table(tb_conflict, tb_dyadic)
-
     #
     # Run main code
     #
     tables = run_pipeline(
         tb_ged=tb_ged,
         tb_conflict=tb_conflict,
+        tb_dyadic=tb_dyadic,
         tb_prio=tb_prio,
         tb_regions=tb_regions,
         tb_codes=tb_codes,
@@ -212,6 +210,7 @@ def _sanity_checks(ds: Dataset) -> None:
 def run_pipeline(
     tb_ged: Table,
     tb_conflict: Table,
+    tb_dyadic: Table,
     tb_prio: Table,
     tb_regions: Table,
     tb_codes: Table,
@@ -235,6 +234,9 @@ def run_pipeline(
     if short_name is None:
         short_name = paths.short_name
 
+    # TODO: Temporary fix (conflict type in "Conflict" table is not available, instead combine it with "Dyadic" table)
+    tb_conflict = _load_conflict_table(tb_conflict, tb_dyadic)
+
     # Keep only active conflicts
     paths.log.info("keep active conflicts")
     tb_ged = tb_ged.loc[tb_ged["active_year"] == 1]
@@ -244,7 +246,7 @@ def run_pipeline(
 
     # Create `conflict_type` column
     paths.log.info("add field `conflict_type`")
-    tb = add_conflict_type(tb_ged, tb_conflict, last_year)
+    tb = add_conflict_type(tb_ged, tb_conflict=tb_conflict, last_year=last_year)
 
     # Sanity-check that the number of 'unknown' types of some conflicts is controlled
     # NOTE: Export summary of conflicts that have no category assigned

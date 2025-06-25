@@ -84,6 +84,7 @@ def run() -> None:
     # Load tables
     tb_ged = ds_meadow.read("ucdp_ged")
     tb_conflict = ds_meadow.read("ucdp_battle_related_conflict")
+    tb_dyadic = ds_meadow.read("ucdp_battle_related_dyadic")
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw.read("gleditsch_countries")
@@ -107,6 +108,7 @@ def run() -> None:
     tables = module_ucdp.run_pipeline(
         tb_ged=tb_ged,
         tb_conflict=tb_conflict,
+        tb_dyadic=tb_dyadic,
         tb_prio=tb_prio,
         tb_regions=tb_regions,
         tb_codes=tb_codes,
