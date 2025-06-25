@@ -35,6 +35,7 @@ definitions:
   tertiary_enrollment_bins: &tertiary_enrollment_bins [5,10,20,30,40,50,60,80]
   expenditure_bins: &expenditure_bins [1,2,3,4,5,6,7,8]
   expenditure_total_bins: &expenditure_total_bins [0,4,8,12,16,20,24]
+  per_student_spending_bins: &per_student_spending_bins [500, 1000, 5000, 10000,15000,20000,25000]
 
   # ============================================================================
   # ENROLLMENT CONFIGURATIONS (Primary, Secondary, Pre-primary)
@@ -128,10 +129,54 @@ definitions:
         binningStrategy: manual
         customNumericValues: *expenditure_total_bins
         baseColorScheme: YlOrBr
+  # Per-student spending configurations (using per-student bins)
+  grapher_config_per_student_spending_preprimary: &grapher_config_per_student_spending_preprimary
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_bins
+        baseColorScheme: Oranges
+
+  grapher_config_per_student_spending_primary: &grapher_config_per_student_spending_primary
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_bins
+        baseColorScheme: Blues
+
+  grapher_config_per_student_spending_secondary: &grapher_config_per_student_spending_secondary
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_bins
+        baseColorScheme: Greens
+
+  grapher_config_per_student_spending_tertiary: &grapher_config_per_student_spending_tertiary
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_bins
+        baseColorScheme: Reds
+
 
   # ============================================================================
   # DESCRIPTION TEMPLATES
   # ============================================================================
+  desc_key_govt_expenditure_constant_ppp_per_student: &desc_key_govt_expenditure_constant_ppp_per_student
+   - This indicator shows how much a government spends per student at a particular level of education, expressed in constant international dollars.
+   - It’s calculated by dividing total government spending by the number of enrolled students, and adjusted for inflation and differences in purchasing power between countries. This makes it possible to compare investment levels across education systems and over time.
+   - It includes all forms of public education spending — from teacher salaries and textbooks to school maintenance, capital projects like building classrooms, and external funding from international donors that flows through government budgets.
+   - Figures are initially reported in local currency, then converted using purchasing power parity (PPP) exchange rates and adjusted to a constant base year. This ensures the numbers reflect real resource commitments rather than changes in local prices or currency fluctuations. For example, data released in 2017 would typically be expressed in 2014 dollars.
+   - Higher values suggest that more resources are available per student — which could support better infrastructure, teaching quality, and learning environments. But it doesn’t tell us how effectively the money is used, or whether outcomes are improving.
+   - This is one of the most useful measures for understanding how governments fund education relative to the size of their student population. It’s especially helpful when comparing countries with different overall budgets or economic conditions.
 
   desc_key_govt_expenditure_gdp_share: &desc_key_govt_expenditure_gdp_share
    - This indicator shows the share of a country’s economic output (GDP) that is spent on education. It reflects how much of the national budget is directed toward education relative to the size of the economy.
@@ -434,22 +479,6 @@ tables:
           - The data is typically collected through national school censuses or Education Management Information Systems (EMIS) and is reported by school officials.
           - Disaggregating this indicator by urban/rural location, region, or public/private management can help identify disparities in access to gender-sensitive school infrastructure.
           - Some limitations include potential discrepancies in how countries define or report "usable" or "functional" toilets, and whether cleanliness, maintenance, or disability access are accounted for.
-        display:
-          numDecimalPlaces: 1
-
-      initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
-        title: Initial government funding per primary student
-        description_short: Government funding for each student enrolled in [primary education](#dod:primary-education), expressed in constant [international-$](#dod:int_dollar_abbreviation).
-        unit: "international-$"
-        short_unit: "$"
-        description_key:
-          - This indicator shows how much governments are investing, on average, in each primary school student.
-          - It captures total general (local, regional, and central) government spending on [primary education](#dod:primary-education) — including current and capital spending and transfers paid (such as scholarships) — but excludes international transfers received by the government.
-          - To reflect purchasing power across countries and allow comparisons over time, the amount is expressed in constant international dollars, which adjust for price level differences and inflation.
-          - The value is calculated by subtracting any international transfers to government from total government spending on primary education, and dividing by the total number of students enrolled at the primary level.
-          - A higher value indicates greater government investment per child in primary school, which can support better infrastructure, teaching, and learning outcomes.
-          - The data comes from administrative financial records, including national education accounts, and are reported to international bodies like the UNESCO Institute for Statistics (UIS).
-          - It’s important to note that in some cases, spending data may only include spending from the Ministry of Education and exclude spending by other government bodies. Where international transfers cannot be separately identified, they may remain included, leading to slight overestimation.
         display:
           numDecimalPlaces: 1
 
@@ -868,3 +897,71 @@ tables:
         display:
           numDecimalPlaces: 1
           name: Total across all levels of education
+      # ========================================================================
+      # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
+      # ========================================================================
+
+      initial_government_funding_per_pre_primary_student__constant_pppdollar__xunit_pppconst_02_fsgov_ffntr:
+        title: Government spending on pre-primary education per student
+        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
+        presentation:
+          title_public: Government spending on pre-primary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_preprimary
+        display:
+          numDecimalPlaces: 0
+          name: Pre-primary
+
+      initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr:
+        title: Government spending on primary education per student
+        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
+        presentation:
+          title_public: Government spending on primary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_primary
+        display:
+          numDecimalPlaces: 0
+          name: Primary
+
+      initial_government_funding_per_lower_secondary_student__constant_pppdollar__xunit_pppconst_2_fsgov_ffntr:
+        title: Government spending on lower secondary education per student
+        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
+        presentation:
+          title_public: Government spending on lower secondary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_secondary
+        display:
+          numDecimalPlaces: 0
+          name: Lower secondary
+
+      initial_government_funding_per_upper_secondary_student__constant_pppdollar__xunit_pppconst_3_fsgov_ffntr:
+        title: Government spending on upper secondary education per student
+        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
+        presentation:
+          title_public: Government spending on upper secondary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_secondary
+        display:
+          numDecimalPlaces: 0
+          name: Upper secondary
+
+      initial_government_funding_per_tertiary_student__constant_pppdollar__xunit_pppconst_5t8_fsgov_ffntr:
+        title: Government spending on tertiary education per student
+        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
+        unit: "international-$"
+        short_unit: "$"
+        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
+        presentation:
+          title_public: Government spending on tertiary education per student (international-$)
+          grapher_config: *grapher_config_per_student_spending_tertiary
+        display:
+          numDecimalPlaces: 0
+          name: Tertiary

@@ -84,15 +84,12 @@ def run() -> None:
         "Government expenditure on tertiary education as a percentage of GDP (%)",
     ]
 
-    for indicator in outlier_indicators:
-        if indicator in tb_pivoted.columns:
-            mask = (tb_pivoted["country"] == "Sierra Leone") & (tb_pivoted["year"] == 2023)
-            tb_pivoted.loc[mask, indicator] = None
+    columns = tb_pivoted.columns.intersection(outlier_indicators)
+    mask = (tb_pivoted["country"] == "Sierra Leone") & (tb_pivoted["year"] == 2023)
+    tb_pivoted.loc[mask, columns] = None
 
-    for column in tb_pivoted.columns:
-        if "constant PPP$ (millions)" in column:
-            # Convert values from millions to individual units
-            tb_pivoted[column] = tb_pivoted[column] * 1000000
+    columns = [col for col in tb_pivoted.columns if "constant PPP$ (millions)" in col]
+    tb_pivoted[columns] = tb_pivoted[columns] * 1000000
     # Calculate government expenditure per student in current PPP dollars
     expenditure_enrollment_mapping = {
         "Government expenditure on pre-primary education, constant PPP$ (millions)": "Enrolment in pre-primary education, both sexes (number)",
@@ -101,14 +98,6 @@ def run() -> None:
         "Government expenditure on upper secondary education, constant PPP$ (millions)": "Enrolment in upper secondary education, both sexes (number)",
         "Government expenditure on tertiary education, constant PPP$ (millions)": "Enrolment in tertiary education, all programmes, both sexes (number)",
     }
-
-    for expenditure_col, enrollment_col in expenditure_enrollment_mapping.items():
-        if expenditure_col in tb_pivoted.columns and enrollment_col in tb_pivoted.columns:
-            # Create per-student expenditure column name
-            per_student_col = expenditure_col.replace("constant PPP$ (millions)", "per student (constant PPP$)")
-
-            # Calculate per-student expenditure (avoid division by zero)
-            tb_pivoted[per_student_col] = tb_pivoted[expenditure_col] / tb_pivoted[enrollment_col].replace(0, None)
 
     # Calculate total spending per student across all education levels
     expenditure_cols = [col for col in expenditure_enrollment_mapping.keys() if col in tb_pivoted.columns]

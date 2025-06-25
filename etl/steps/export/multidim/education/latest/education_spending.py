@@ -44,11 +44,11 @@ SPENDING_PATTERNS = {
         "expenditure_on_education_as_a_percentage_of_total_government_expenditure__pct__xgovexp_imf",
     ],
     "per_student": [
-        "government_expenditure_on_pre_primary_education__per_student__constant_pppdollar",
-        "government_expenditure_on_primary_education__per_student__constant_pppdollar",
-        "government_expenditure_on_lower_secondary_education__per_student__constant_pppdollar",
-        "government_expenditure_on_upper_secondary_education__per_student__constant_pppdollar",
-        "government_expenditure_on_tertiary_education__per_student__constant_pppdollar",
+        "initial_government_funding_per_pre_primary_student__constant_pppdollar__xunit_pppconst_02_fsgov_ffntr",
+        "initial_government_funding_per_primary_student__constant_pppdollar__xunit_pppconst_1_fsgov_ffntr",
+        "initial_government_funding_per_lower_secondary_student__constant_pppdollar__xunit_pppconst_2_fsgov_ffntr",
+        "initial_government_funding_per_upper_secondary_student__constant_pppdollar__xunit_pppconst_3_fsgov_ffntr",
+        "initial_government_funding_per_tertiary_student__constant_pppdollar__xunit_pppconst_5t8_fsgov_ffntr",
         "government_expenditure_on_education_per_student__total_across_all_levels__constant_pppdollar",
     ],
 }
@@ -121,7 +121,9 @@ def adjust_dimensions(tb):
     # Dimension mapping configurations
     LEVEL_KEYWORDS = {
         "expenditure_on_pre_primary": "preprimary",
+        "per_pre_primary_student": "preprimary",
         "expenditure_on_primary": "primary",
+        "per_primary_student": "primary",
         "lower_secondary": "lower_secondary",
         "upper_secondary": "upper_secondary",
         "tertiary": "tertiary",
@@ -133,6 +135,7 @@ def adjust_dimensions(tb):
         "constant_pppdollar__millions": "constant_ppp",
         "total_government_expenditure": "total_government",
         "per_student": "per_student",
+        "initial_government_funding": "per_student",
     }
 
     # Process each column
@@ -313,7 +316,7 @@ def edit_indicator_displays(view):
         display_name = None
 
         # Check for level-based display names
-        if view.dimensions.get("level") == "level_side_by_side":
+        if view.d.level == "level_side_by_side":
             for level_key, display_name in LEVEL_DISPLAY_NAMES.items():
                 if level_key in indicator.catalogPath:
                     indicator.display = {"name": display_name}

@@ -176,6 +176,14 @@ definitions:
         customNumericValues: *school_life_expectancy_tertiary_bins
         baseColorScheme: BuGn
 
+  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
+    <<: *common_grapher_config
+    map:
+      <<: *common_grapher_map_config
+      colorScale:
+        binningStrategy: manual
+        customNumericValues: *per_student_spending_bins
+        baseColorScheme: YlOrRd
   # ============================================================================
   # INDICATOR-SPECIFIC GRAPHER CONFIGURATIONS
   # ============================================================================
@@ -226,51 +234,6 @@ definitions:
         customNumericValues: *expenditure_bins_by_level
         baseColorScheme: Reds
 
-  # Per-student spending configurations (using per-student bins)
-  grapher_config_per_student_spending_preprimary: &grapher_config_per_student_spending_preprimary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Oranges
-
-  grapher_config_per_student_spending_primary: &grapher_config_per_student_spending_primary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Blues
-
-  grapher_config_per_student_spending_secondary: &grapher_config_per_student_spending_secondary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Greens
-
-  grapher_config_per_student_spending_tertiary: &grapher_config_per_student_spending_tertiary
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: Reds
-
-  grapher_config_per_student_spending_total: &grapher_config_per_student_spending_total
-    <<: *common_grapher_config
-    map:
-      <<: *common_grapher_map_config
-      colorScale:
-        binningStrategy: manual
-        customNumericValues: *per_student_spending_bins
-        baseColorScheme: YlOrRd
 
   grapher_config_spending_total: &grapher_config_spending_total
     <<: *common_grapher_config
@@ -1366,76 +1329,6 @@ tables:
       # ========================================================================
       # GOVERNMENT EXPENDITURE IN CONSTANT PPP DOLLARS PER STUDENT (by education level)
       # ========================================================================
-
-      government_expenditure_on_pre_primary_education__per_student__constant_pppdollar:
-        title: Government spending on pre-primary education per student
-        description_short: Total [general government](#dod:general-government) spending on [pre-primary education](#dod:pre-primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
-        unit: "international-$"
-        short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
-        description_processing: *description_processing_per_student
-        presentation:
-          title_public: Government spending on pre-primary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_preprimary
-        display:
-          numDecimalPlaces: 0
-          name: Pre-primary
-
-      government_expenditure_on_primary_education__per_student__constant_pppdollar:
-        title: Government spending on primary education per student
-        description_short: Total [general government](#dod:general-government) spending on [primary education](#dod:primary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
-        unit: "international-$"
-        short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
-        description_processing: *description_processing_per_student
-        presentation:
-          title_public: Government spending on primary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_primary
-        display:
-          numDecimalPlaces: 0
-          name: Primary
-
-      government_expenditure_on_lower_secondary_education__per_student__constant_pppdollar:
-        title: Government spending on lower secondary education per student
-        description_short: Total [general government](#dod:general-government) spending on [lower secondary education](#dod:lower-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
-        unit: "international-$"
-        short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
-        description_processing: *description_processing_per_student
-        presentation:
-          title_public: Government spending on lower secondary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_secondary
-        display:
-          numDecimalPlaces: 0
-          name: Lower secondary
-
-      government_expenditure_on_upper_secondary_education__per_student__constant_pppdollar:
-        title: Government spending on upper secondary education per student
-        description_short: Total [general government](#dod:general-government) spending on [upper secondary education](#dod:upper-secondary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
-        unit: "international-$"
-        short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
-        description_processing: *description_processing_per_student
-        presentation:
-          title_public: Government spending on upper secondary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_secondary
-        display:
-          numDecimalPlaces: 0
-          name: Upper secondary
-
-      government_expenditure_on_tertiary_education__per_student__constant_pppdollar:
-        title: Government spending on tertiary education per student
-        description_short: Total [general government](#dod:general-government) spending on [tertiary education](#dod:tertiary-education) per student, expressed in constant [international-$](#dod:int_dollar_abbreviation).
-        unit: "international-$"
-        short_unit: "$"
-        description_key: *desc_key_govt_expenditure_constant_ppp_per_student
-        description_processing: *description_processing_per_student
-        presentation:
-          title_public: Government spending on tertiary education per student (international-$)
-          grapher_config: *grapher_config_per_student_spending_tertiary
-        display:
-          numDecimalPlaces: 0
-          name: Tertiary
 
       government_expenditure_on_education_per_student__total_across_all_levels__constant_pppdollar:
         title: Government spending on education per student across all levels
