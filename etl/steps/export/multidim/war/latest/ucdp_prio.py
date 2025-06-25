@@ -30,7 +30,7 @@ def run() -> None:
     # load table using load_data=False which only loads metadata significantly speeds this up
     ## UCDP/PRIO
     ds_up = paths.load_dataset("ucdp_prio")
-    tb_up = ds_up.read("ucdp_prio", load_data=False)
+    tb_up = ds_up.read("ucdp_prio")
     ## UCDP
     ds_u = paths.load_dataset("ucdp")
     tb_ucdp = ds_u.read("ucdp", load_data=False)
@@ -69,7 +69,7 @@ def run() -> None:
     choice_names = c.get_choice_names("conflict_type")
     for view in c.views:
         for slug, name in choice_names.items():
-            if view.dimensions["conflict_type"] == slug:
+            if view.d.conflict_type == slug:
                 assert view.indicators.y is not None
                 view.indicators.y[0].display = {"name": name}
 
@@ -110,7 +110,8 @@ def run() -> None:
     )
 
     # Edit FAUST
-    edit_faust(c, tb_ucdp, tb_up)
+    region_names = tb_up.dropna(subset="number_deaths_ongoing_conflicts__conflict_type_all")["country"].unique()
+    edit_faust(c, tb_ucdp, tb_up, region_names)
 
     # Save & upload
     c.save()
@@ -206,7 +207,7 @@ def adjust_dimensions(tb, indicator_dim, fct_dims):  # -> Any:
     return tb
 
 
-def edit_faust(c, tb_ucdp, tb_up):
+def edit_faust(c, tb_ucdp, tb_up, region_names):
     """Edit FAUST of views: Chart and indicator-level."""
     choice_names = c.get_choice_names("conflict_type")
     for view in c.views:
@@ -219,18 +220,16 @@ def edit_faust(c, tb_ucdp, tb_up):
             "subtitle": lambda view: _set_subtitle(view),
             "timelineMinTime": 1946,
             "note": lambda view: _set_note(view),
-            "hideRelativeToggle": lambda view: view.dimensions["conflict_type"] != "state_based_stacked",
-            "hideFacetControl": lambda view: view.dimensions["estimate"] == "best_ci",
+            "hideRelativeToggle": lambda view: view.d.conflict_type != "state_based_stacked",
+            "hideFacetControl": lambda view: view.d.estimate == "best_ci",
+            "includedEntityNames": region_names,
         }
     )
     c.set_global_metadata(
         {
             "description_short": (
                 lambda view: _set_subtitle(view)
-                if (
-                    (view.dimensions["conflict_type"] == "state_based_stacked")
-                    or (view.dimensions["estimate"] == "best_ci")
-                )
+                if ((view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"))
                 else None
             ),
             "description_key": lambda view: _set_description_key(view, tb_ucdp=tb_ucdp, tb_up=tb_up),
@@ -239,22 +238,22 @@ def edit_faust(c, tb_ucdp, tb_up):
 
 
 def _set_description_key(view, tb_ucdp, tb_up):
-    if (view.dimensions["conflict_type"] == "state_based_stacked") or (view.dimensions["estimate"] == "best_ci"):
-        if view.dimensions["indicator"] == "deaths":
+    if (view.d.conflict_type == "state_based_stacked") or (view.d.estimate == "best_ci"):
+        if view.d.indicator == "deaths":
             keys = tb_up["number_deaths_ongoing_conflicts__conflict_type_state_based"].metadata.description_key
-        elif view.dimensions["indicator"] == "death_rate":
+        elif view.d.indicator == "death_rate":
             keys = tb_up[
                 "number_deaths_ongoing_conflicts_per_capita__conflict_type_state_based"
             ].metadata.description_key
-        elif view.dimensions["indicator"] == "wars_ongoing":
+        elif view.d.indicator == "wars_ongoing":
             keys = tb_ucdp["number_ongoing_conflicts__conflict_type_all"].metadata.description_key
-        elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+        elif view.d.indicator == "wars_ongoing_country_rate":
             keys = tb_ucdp["number_ongoing_conflicts_per_country__conflict_type_all"].metadata.description_key
         else:
-            raise ValueError(f"Unknown indicator: {view.dimensions['indicator']}")
+            raise ValueError(f"Unknown indicator: {view.d.indicator}")
 
         # return
-        if view.dimensions["estimate"] == "best_ci":
+        if view.d.estimate == "best_ci":
             assert keys[-1].startswith("'Best' death estimates")
             keys = keys[:-1]  # + [None]
         return keys
@@ -263,37 +262,37 @@ def _set_description_key(view, tb_ucdp, tb_up):
 
 def _set_title(view, choice_names):
     conflict_name = _set_title_ending(view, choice_names)
-    if view.dimensions["indicator"] == "deaths":
+    if view.d.indicator == "deaths":
         return f"Deaths in {conflict_name}"
-    elif view.dimensions["indicator"] == "death_rate":
+    elif view.d.indicator == "death_rate":
         return f"Death rate in {conflict_name}"
-    elif view.dimensions["indicator"] == "wars_ongoing":
+    elif view.d.indicator == "wars_ongoing":
         return f"Number of {conflict_name}"
-    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+    elif view.d.indicator == "wars_ongoing_country_rate":
         return f"Rate of {conflict_name}"
     else:
-        raise ValueError(f"Unknown indicator: {view.dimensions['indicator']}")
+        raise ValueError(f"Unknown indicator: {view.d.indicator}")
 
 
 def _set_subtitle(view):
     dods = _set_dods(view)
     subtitle_deaths = f"Reported deaths of combatants and civilians due to fighting{{placeholder}} {dods} conflicts that were ongoing that year. Deaths due to disease and starvation resulting from the conflict are not included."
 
-    if view.dimensions["indicator"] == "deaths":
+    if view.d.indicator == "deaths":
         return subtitle_deaths.format(placeholder=" in")
-    elif view.dimensions["indicator"] == "death_rate":
+    elif view.d.indicator == "death_rate":
         return subtitle_deaths.format(placeholder=", per 100,000 people. Included are")
-    elif view.dimensions["indicator"] == "wars_ongoing":
+    elif view.d.indicator == "wars_ongoing":
         return f"Included are {dods} conflicts that were ongoing that year."
-    elif view.dimensions["indicator"] == "wars_ongoing_country_rate":
+    elif view.d.indicator == "wars_ongoing_country_rate":
         return f"The number of conflicts divided by the number of all states. This accounts for the changing number of states over time. Included are {dods} conflicts that were ongoing that year."
     else:
-        raise ValueError(f"Unknown indicator: {view.dimensions['indicator']}")
+        raise ValueError(f"Unknown indicator: {view.d.indicator}")
 
 
 def edit_indicator_displays(view):
     """Edit FAUST estimates for confidence intervals."""
-    if view.dimensions["estimate"] == "best_ci":
+    if view.d.estimate == "best_ci":
         assert view.indicators.y is not None
         for indicator in view.indicators.y:
             if "_high_" in indicator.catalogPath:
@@ -315,36 +314,36 @@ def edit_indicator_displays(view):
 
 def _set_dods(view):
     # DoD
-    if view.dimensions["conflict_type"] in ("state-based", "state_based_stacked"):
+    if view.d.conflict_type in ("state-based", "state_based_stacked"):
         dods = (
             "[interstate](#dod:interstate-ucdp), [civil](#dod:intrastate-ucdp), and [colonial](#dod:extrasystemic-ucdp)"
         )
-    elif view.dimensions["conflict_type"] == "interstate":
+    elif view.d.conflict_type == "interstate":
         dods = "[interstate conflicts](#dod:interstate-ucdp)"
-    elif view.dimensions["conflict_type"] == "intrastate (internationalized)":
+    elif view.d.conflict_type == "intrastate (internationalized)":
         dods = "[foreign-backed civil conflicts](#dod:intrastate-ucdp)"
-    elif view.dimensions["conflict_type"] == "intrastate (non-internationalized)":
+    elif view.d.conflict_type == "intrastate (non-internationalized)":
         dods = "[domestic civil conflicts](#dod:intrastate-ucdp)"
-    elif view.dimensions["conflict_type"] == "extrasystemic":
+    elif view.d.conflict_type == "extrasystemic":
         dods = "[colonial conflicts](#dod:extrasystemic-ucdp)"
     else:
-        raise ValueError(f"Unknown conflict type: {view.dimensions['conflict_type']}")
+        raise ValueError(f"Unknown conflict type: {view.d.conflict_type}")
 
     return dods
 
 
 def _set_title_ending(view, choice_names):
     title = "all conflicts involving states"
-    if view.dimensions["conflict_type"] not in {"state-based", "state_based_stacked"}:
-        title = choice_names.get(view.dimensions["conflict_type"]).lower()
+    if view.d.conflict_type not in {"state-based", "state_based_stacked"}:
+        title = choice_names.get(view.d.conflict_type).lower()
 
-    if view.dimensions["conflict_type"] == "state_based_stacked":
+    if view.d.conflict_type == "state_based_stacked":
         title += " by type"
     return title
 
 
 def _set_note(view):
-    if view.dimensions["indicator"] in ("wars_ongoing", "wars_ongoing_country_rate"):
+    if view.d.indicator in ("wars_ongoing", "wars_ongoing_country_rate"):
         return "Some conflicts affect several regions. The sum across all regions can therefore be higher than the total number."
-    if view.dimensions["indicator"] in ("deaths", "death_rate") and (view.dimensions["estimate"] == "best_ci"):
+    if view.d.indicator in ("deaths", "death_rate") and (view.d.estimate == "best_ci"):
         return "'Best' estimates as identified by UCDP and PRIO."
