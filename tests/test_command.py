@@ -154,9 +154,11 @@ def test_construct_subdag():
     assert "data://garden/happiness/2023-01-01/happiness" in subdag
     # Dependencies are included by default unless only=True
     assert "data://meadow/happiness/2023-01-01/happiness" in subdag
-    
+
     # Test exact match with only=True - should not include dependencies
-    subdag = cmd.construct_subdag(full_dag, includes=["data://garden/happiness/2023-01-01/happiness"], exact_match=True, only=True)
+    subdag = cmd.construct_subdag(
+        full_dag, includes=["data://garden/happiness/2023-01-01/happiness"], exact_match=True, only=True
+    )
     assert "data://garden/happiness/2023-01-01/happiness" in subdag
     assert "data://meadow/happiness/2023-01-01/happiness" not in subdag
 
