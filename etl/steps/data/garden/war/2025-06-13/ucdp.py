@@ -84,7 +84,11 @@ def run() -> None:
     ds_meadow = paths.load_dataset("ucdp")  # UCDP
     ds_gw = paths.load_dataset("gleditsch")  # Gleditsch
     ds_maps = paths.load_dataset("nat_earth_110")  # Nat Earth
-    ds_population = paths.load_dataset("population")  # Population
+    ds_population = paths.load_dataset("population")
+    # WB
+    ds_wb = paths.load_dataset("wb_admin_boundaries")
+
+    # Population
 
     # Sanity checks (1)
     paths.log.info("sanity checks")
@@ -98,6 +102,7 @@ def run() -> None:
     tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw.read("gleditsch_countries")
     tb_maps = ds_maps.read("nat_earth_110")
+    tb_maps_wb = ds_wb.read("wb_admin_boundaries")
 
     # Filter codes
     tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR].set_index(["id", "year"])
@@ -927,17 +932,28 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     gdf = gpd.GeoDataFrame(gdf, crs="epsg:4326")
 
     # Format the map to be a GeoDataFrame with a gemoetry column
-    gdf_maps = gpd.GeoDataFrame(tb_maps)
-    gdf_maps["geometry"] = gdf_maps["geometry"].apply(wkt.loads)
-    gdf_maps = gdf_maps.set_geometry("geometry")
-    gdf_maps.crs = "epsg:4326"
+    gdf_maps_1 = gpd.GeoDataFrame(tb_maps)
+    gdf_maps_1["geometry"] = gdf_maps_1["geometry"].apply(wkt.loads)
+    gdf_maps_1 = gdf_maps_1.set_geometry("geometry")
+    gdf_maps_1.crs = "epsg:4326"
+
+    gdf_maps_2 = gpd.GeoDataFrame(tb_maps_wb)
+    gdf_maps_2["geometry"] = gdf_maps_2["geometry"].apply(wkt.loads)
+    gdf_maps_2 = gdf_maps_2.set_geometry("geometry")
+    gdf_maps_2.crs = "epsg:4326"
 
     # ALTERNATIVE: Use the overlay function to extract data from the world map that each point sits on top of. NOTE: This takes ~1 minute (M1 MAX). We used this method for some years, but it is very slow. We then switched to using the sjoin method.
     # gdf_match = gpd.overlay(gdf, gdf_maps, how="intersection")
 
     # Use spatial join instead of overlay - much faster for points
     # The 'within' predicate is faster than intersection for point-in-polygon
-    gdf_match = gpd.sjoin(gdf, gdf_maps, how="inner", predicate="within")
+    gdf_match_1 = gpd.sjoin(gdf, gdf_maps_1, how="inner", predicate="within")
+    gdf_match_2 = gpd.sjoin(gdf, gdf_maps_2, how="inner", predicate="within")
+
+    gdf_match_1 = gdf_match_1[["relid", "name"]]
+    gdf_match_2 = gdf_match_2[["relid", "name"]]
+
+    x = gdf_match_1.merge(gdf_match_2, how="outer", on="relid")
 
     # TODO: below code might be equivalent to how we estimate location for missing points!
     # if gdf_match2["name"].isna().any():
