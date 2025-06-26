@@ -86,9 +86,9 @@ def run() -> None:
                 "choice_new_slug": "all_stacked",
                 "view_config": COMMON_CONFIG
                 | {
+                    "selectedFacetStrategy": "entity",
                     "chartTypes": ["StackedBar"],
                     "hasMapTab": False,
-                    "selectedFacetStrategy": "entity",
                 },
                 "view_metadata": {
                     "description_short": lambda view: _set_subtitle(view),
@@ -131,7 +131,7 @@ def run() -> None:
             "subtitle": lambda view: _set_subtitle(view),
             "hideRelativeToggle": lambda view: (view.d.conflict_type != "all_stacked"),
             "hideFacetControl": False,
-            # "selectedFacetStrategy": "entity",
+            
         }
     )
 
