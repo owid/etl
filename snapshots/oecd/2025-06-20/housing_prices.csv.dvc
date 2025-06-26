@@ -1,0 +1,31 @@
+# Learn more at:
+# http://docs.owid.io/projects/etl/architecture/metadata/reference/
+meta:
+  origin:
+    # Data product / Snapshot
+    title: "Analytical house prices indicators"
+    description: |-
+      Residential Property Prices Indices (RPPIs) – also named House price indices (HPIs), are index numbers that measure the prices of residential properties over time. RPPIs are key statistics not only for citizens and households across the world, but also for economic and monetary policy makers. They can help, for example, to monitor potential macroeconomic imbalances and the risk exposure of the household and financial sectors.
+
+      This dataset covers the OECD member countries and some non-member countries. In addition to the nominal RPPIs it contains information on real house prices, rental prices, and the ratios of nominal prices to rents and to disposable household income per capita. This dataset contains quarterly and annual statistics for each country. Annual figures refer to the average of the year.
+    date_published: "2025-06-20"
+
+    # Citation
+    producer: OECD
+    citation_full: |-
+      OECD (2025), Analytical house prices indicators, http://data-explorer.oecd.org/s/295
+    attribution_short: OECD
+
+    # Files
+    url_main: http://data-explorer.oecd.org/s/295
+    url_download: https://sdmx.oecd.org/public/rest/data/OECD.ECO.MPD,DSD_AN_HOUSE_PRICES@DF_HOUSE_PRICES,1.0/all?dimensionAtObservation=AllDimensions&format=csvfilewithlabels
+    date_accessed: '2025-06-20'
+
+    # License
+    license:
+      name: OECD Terms and Conditions
+      url: https://www.oecd.org/en/about/terms-conditions.html
+outs:
+  - md5: a5d0bd5d0e8adc6e54d1634806aa39cc
+    size: 16108330
+    path: housing_prices.csv
