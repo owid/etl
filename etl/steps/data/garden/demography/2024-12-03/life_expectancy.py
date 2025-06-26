@@ -32,22 +32,26 @@ def run(dest_dir: str) -> None:
     #
     # Load inputs.
     #
-    ## Life tables
+    ## Life tables - a combination of HMD and UN WPP
     paths.log.info("reading dataset `life_tables`")
     ds_lt = paths.load_dataset("life_tables")
     tb_lt = ds_lt.read("life_tables")
+    tb_lt["source"] = "Life tables"
     ## zijdeman_et_al_2015
     paths.log.info("reading dataset `zijdeman_et_al_2015`")
     ds_zi = paths.load_dataset("zijdeman_et_al_2015")
     tb_zi = ds_zi.read("zijdeman_et_al_2015")
+    tb_zi["source"] = "Zijdeman et al."
     ## Riley
     paths.log.info("reading dataset `riley_2005`")
     ds_ri = paths.load_dataset("riley_2005")
     tb_ri = ds_ri.read("riley_2005")
+    tb_ri["source"] = "Riley"
     ## WPP
     paths.log.info("reading dataset `un_wpp`")
     ds_un = paths.load_dataset("un_wpp")
     tb_un = ds_un.read("life_expectancy")
+    tb_un["source"] = "UN WPP"
 
     #
     # Process data.
@@ -163,7 +167,7 @@ def process_un(tb: Table) -> Table:
     ## columns: country, year, value, sex, age
     tb = tb.loc[
         (tb["year"] > YEAR_ESTIMATE_LAST) & (tb["variant"] == "medium"),
-        ["country", "year", "sex", "age", "life_expectancy"],
+        ["country", "year", "sex", "age", "life_expectancy", "source"],
     ]
 
     # Rename column values
