@@ -17,6 +17,11 @@ Notes:
             3 = Asia (GWNo: 700-999)  [renamed to 'Asia and Oceania']
             4 = Africa (GWNo: 400-626)
             5 = Americas (GWNo: 2-199)
+
+
+
+NOTES ON GEO COORDINATES:
+    - Look below for the section dedicated to debugging geocoordinates
 """
 
 from typing import List, Optional, cast
@@ -27,6 +32,7 @@ import pandas as pd
 from owid.catalog import Dataset, Table
 from owid.catalog import processing as pr
 from shapely import wkt
+from shapely.strtree import STRtree
 from shared import (
     add_indicators_extra,
     aggregate_conflict_types,
@@ -71,7 +77,7 @@ REGIONS_EXPECTED = set(REGIONS_MAPPING.values())
 LAST_YEAR = 2024
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 2398
+NUM_MISSING_LOCATIONS = 1214
 
 
 def run() -> None:
@@ -83,10 +89,8 @@ def run() -> None:
     # Load datasets
     ds_meadow = paths.load_dataset("ucdp")  # UCDP
     ds_gw = paths.load_dataset("gleditsch")  # Gleditsch
-    ds_maps = paths.load_dataset("nat_earth_110")  # Nat Earth
     ds_population = paths.load_dataset("population")
-    # WB
-    ds_wb = paths.load_dataset("wb_admin_boundaries")
+    ds_gb = paths.load_dataset("geoboundaries_cgaz")
 
     # Population
 
@@ -101,8 +105,7 @@ def run() -> None:
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw.read("gleditsch_countries")
-    tb_maps = ds_maps.read("nat_earth_110")
-    tb_maps_wb = ds_wb.read("wb_admin_boundaries")
+    tb_maps = ds_gb.read("geoboundaries_cgaz")
 
     # Filter codes
     tb_codes = tb_codes.loc[tb_codes["year"] <= LAST_YEAR].set_index(["id", "year"])
@@ -932,39 +935,17 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
     gdf = gpd.GeoDataFrame(gdf, crs="epsg:4326")
 
     # Format the map to be a GeoDataFrame with a gemoetry column
-    gdf_maps_1 = gpd.GeoDataFrame(tb_maps)
-    gdf_maps_1["geometry"] = gdf_maps_1["geometry"].apply(wkt.loads)
-    gdf_maps_1 = gdf_maps_1.set_geometry("geometry")
-    gdf_maps_1.crs = "epsg:4326"
-
-    gdf_maps_2 = gpd.GeoDataFrame(tb_maps_wb)
-    gdf_maps_2["geometry"] = gdf_maps_2["geometry"].apply(wkt.loads)
-    gdf_maps_2 = gdf_maps_2.set_geometry("geometry")
-    gdf_maps_2.crs = "epsg:4326"
+    gdf_maps = gpd.GeoDataFrame(tb_maps)
+    gdf_maps["geometry"] = gdf_maps["geometry"].apply(wkt.loads)
+    gdf_maps = gdf_maps.set_geometry("geometry")
+    gdf_maps.crs = "epsg:4326"
 
     # ALTERNATIVE: Use the overlay function to extract data from the world map that each point sits on top of. NOTE: This takes ~1 minute (M1 MAX). We used this method for some years, but it is very slow. We then switched to using the sjoin method.
     # gdf_match = gpd.overlay(gdf, gdf_maps, how="intersection")
 
     # Use spatial join instead of overlay - much faster for points
     # The 'within' predicate is faster than intersection for point-in-polygon
-    gdf_match_1 = gpd.sjoin(gdf, gdf_maps_1, how="inner", predicate="within")
-    gdf_match_2 = gpd.sjoin(gdf, gdf_maps_2, how="inner", predicate="within")
-
-    gdf_match_1 = gdf_match_1[["relid", "name"]]
-    gdf_match_2 = gdf_match_2[["relid", "name"]]
-
-    x = gdf_match_1.merge(gdf_match_2, how="outer", on="relid")
-
-    # TODO: below code might be equivalent to how we estimate location for missing points!
-    # if gdf_match2["name"].isna().any():
-    #     missing_points = gdf[~gdf["relid"].isin(gdf_match2.dropna(subset=["name"])["relid"])]
-    #     if not missing_points.empty:
-    #         # Create spatial index for faster nearest computation
-    #         nearest_idx = gdf_maps.sindex.nearest(missing_points.geometry)
-    #         assert nearest_idx.shape == (2, len(missing_points)), "Expected result to be of shape (2, 1)!"
-
-    #         names = gdf_maps.iloc[nearest_idx[1, :]]["name"]
-    #         gdf_match2.loc[nearest_idx[0, :], "name"] = gdf_maps.iloc[nearest_idx]["name"]
+    gdf_match = gpd.sjoin(gdf, gdf_maps, how="inner", predicate="within")
 
     ###
     # Events not assigned to any country
@@ -1069,17 +1050,27 @@ def _add_missing_values(
     wec_crs = "+proj=eqc +lat_ts=0 +lat_0=0 +lon_0=0 +x_0=0 +y_0=0 +a=6371007 +b=6371007 +units=m +no_defs"
     gdf_missing_wec = gdf_missing.to_crs(wec_crs)
     gdf_maps_wec = gdf_maps.to_crs(wec_crs)
+
+    # Create spatial index for polygons
+    tree = STRtree(gdf_maps_wec.geometry)
+
     # For these points we can find the nearest country using the distance function
-    polygon_near = []
+    # NOTE: should take ~1 minute (takes long bc borders have quite some resolution)
+    polygon_near_name = []
     for _, row in gdf_missing_wec.iterrows():
-        polygon_index = gdf_maps_wec.distance(row["geometry"]).sort_values().index[0]
-        ne_country_name = gdf_maps_wec["name"][polygon_index]
-        polygon_near.append(ne_country_name)
+        nearest_idx = tree.nearest(row["geometry"])
+        country_row = gdf_maps_wec.iloc[nearest_idx]
+        polygon_near_name.append(country_row["country"])
+
     # Assign
-    gdf_missing["name"] = polygon_near
+    gdf_missing.loc[:, "name"] = polygon_near_name
+
+    # Plot re-assigned events
+    countries = gdf_missing.name.unique()
 
     # Combining and adding name to original table
-    gdf_country_names = pr.concat([Table(gdf_match[["relid", "name"]]), Table(gdf_missing[["relid", "name"]])])
+    columns = ["relid", "name"]
+    gdf_country_names = pr.concat([Table(gdf_match[columns]), Table(gdf_missing[columns])])
     tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
         columns={"name": column_country_name}
     )
@@ -1641,3 +1632,27 @@ def _fix_type_conflict(x):
         return 4
     else:
         raise ValueError("Unexpected number of different conflict types!")
+
+
+####################################################################
+# DEBUGGING GEO STUFF
+####################################################################
+def plot_events_not_classified(gdf, matches, maps):
+    """
+    gdf: original data with all events (all relid)
+    matches: after applying sjoin, some events are missing.
+    maps: map as per the source (geoBoundaries, Nat Earth, etc.)
+    """
+    ids_missing = set(gdf["relid"]) - set(matches["relid"])
+    gdf_missing = gdf.loc[gdf["relid"].isin(ids_missing)]
+    plot_map_and_events(maps, gdf_missing)
+
+
+def plot_map_and_events(maps, events):
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(6, 8), dpi=1000)  # larger dpi ⇒ more pixels
+    maps.boundary.plot(ax=ax, linewidth=0.25, edgecolor="k")
+    # gdf_maps.boundary.plot(ax=ax, linewidth=0.25, edgecolor="k")
+    if not events.empty:
+        events.plot(ax=ax, color="blue", markersize=0.5)
