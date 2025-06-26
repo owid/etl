@@ -731,8 +731,8 @@ steps:
      - data://meadow/media_cloud/2025-05-19/media_deaths
      - data://meadow/cdc/2025-05-19/external_causes
      - data://meadow/cdc/2025-05-19/leading_causes
-  #data://grapher/media_cloud/2025-05-19/media_deaths:
-  #  - data://garden/media_cloud/2025-05-19/media_deaths
+  data://grapher/media_cloud/2025-05-19/media_deaths:
+    - data://garden/media_cloud/2025-05-19/media_deaths
 
 # CDC Wonder - Causes of Death
   data://meadow/cdc/2025-05-19/leading_causes:

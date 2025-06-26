@@ -25,6 +25,6 @@ meta:
       name: CC BY 4.0
       url: https://www.mediacloud.org/legal/media-cloud-terms-of-use
 outs:
-  - md5: 9a1c37304a3237a7b7480c6f8aff26a4
-    size: 2030
+  - md5: 3a4ac53c48fdd8f9bd167a95b2a89c8f
+    size: 2034
     path: media_deaths.csv

@@ -14,7 +14,12 @@ def run() -> None:
     ds_garden = paths.load_dataset("media_deaths")
 
     # Read table from garden dataset.
-    tb = ds_garden.read("media_deaths", reset_index=False)
+    tb = ds_garden.read("media_deaths")
+
+    # rename cause to country for grapher
+    tb = tb.rename(columns={"cause": "country"})
+
+    tb = tb.format(["country", "year"])
 
     #
     # Save outputs.

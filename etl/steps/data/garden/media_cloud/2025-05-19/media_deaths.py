@@ -65,6 +65,7 @@ def add_shares(tb, columns=None):
     return tb
 
 
+# This function is not used in the garden step, but kept in for easy plotting & evaluation of results
 def plot_media_deaths(media_deaths_df, columns=None, bar_labels=None, title=None):
     fixed_colors = {
         "heart disease": "#1f77b4",  # Blue
@@ -113,7 +114,6 @@ def plot_media_deaths(media_deaths_df, columns=None, bar_labels=None, title=None
 
     ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
 
-    # mm_plot.plot(kind="bar", stacked=True, colormap="tab20")
     plt.ylabel("Share")
     plt.title(title)
     plt.legend(title="Cause of death", bbox_to_anchor=(1.05, 1), loc="upper left")

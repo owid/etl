@@ -66,7 +66,7 @@ def create_queries():
             "lymphoma",
             "melanoma",
             "oncology",
-            "oncology",
+            "oncologist",
             "chemotherapy",
             "radiation therapy",
             "immunotherapy",
@@ -119,6 +119,11 @@ def create_queries():
             "burn injury",
             "drowning",
             "drowned",
+            "house fire",
+            "blaze",
+            "burns",
+            "burning",
+            "burned",
         ],
         "combinations": [
             "accident accident ",
@@ -136,6 +141,10 @@ def create_queries():
             "electrocution electric",
             "burn burn",
             "drowning drown",
+            "fire fire died",
+            "fire fire dead",
+            "fire fire killed",
+            "fire fire burn injury",
         ],
         "exclude_terms": [],
     }
@@ -167,7 +176,7 @@ def create_queries():
             "brain ischemia",
             "stroke ischemia",
         ],
-        "exclude_terms": [],
+        "exclude_terms": ["golf", "golfing"],
     }
 
     query_respiratory_dict = {
@@ -226,9 +235,21 @@ def create_queries():
     }
 
     query_alzheimers_dict = {
-        "single_terms": ["Alzheimer", "dementia"],
+        "single_terms": [
+            "Alzheimer",
+            "Alzheimers",
+            "Alzheimer’s",
+            "Alzheimer's",
+            "dementia",
+        ],
         "combinations": [
             "Alzheimer Alzheimer",
+            "Alzheimer’s Alzheimer’s",
+            "Alzheimer's Alzheimer's",
+            "Alzheimers Alzheimers",
+            "Alzheimers dementia",
+            "Alzheimer’s dementia",
+            "Alzheimer's dementia",
             "dementia dementia",
             "Alzheimer dementia",
         ],
@@ -298,6 +319,7 @@ def create_queries():
             "liver hepatology",
             "liver hepatologist",
             "liver transplant",
+            "hepatitis hepatitis",
         ],
         "exclude_terms": [],
     }
