@@ -26,10 +26,14 @@ GROUPED_VIEW_CONFIG = MULTIDIM_CONFIG | {
 # Column filtering patterns
 LITERACY_RATE_PATTERNS = {
     "adult": ["adult_literacy_rate", "population_15plus_years", "both_sexes"],
+    "adult_male": ["adult_literacy_rate", "population_15plus_years", "years__male"],
+    "adult_female": ["adult_literacy_rate", "population_15plus_years", "years__female"],
     "youth_both": ["youth_literacy_rate", "population_15_24_years", "both_sexes"],
-    "youth_male": ["youth_literacy_rate", "population_15_24_years", "male"],
-    "youth_female": ["youth_literacy_rate", "population_15_24_years", "female"],
+    "youth_male": ["youth_literacy_rate", "population_15_24_years", "years__male"],
+    "youth_female": ["youth_literacy_rate", "population_15_24_years", "years__female"],
     "elderly": ["elderly_literacy_rate", "population_65plus_years", "both_sexes"],
+    "elderly_male": ["elderly_literacy_rate", "population_65plus_years", "years__male"],
+    "elderly_female": ["elderly_literacy_rate", "population_65plus_years", "years__female"],
 }
 
 
@@ -78,8 +82,20 @@ def get_literacy_rate_columns(tb):
     """Filter literacy rate columns by age and gender category."""
     literacy_cols = []
 
-    for category, patterns in LITERACY_RATE_PATTERNS.items():
+    # Exclusion patterns
+    exclusion_patterns = [
+        "urban",
+        "rural",
+        "the_global_age_specific_literacy_projections_model",
+        "poorest_quintile",
+        "richest_quintile",
+        "adjusted",
+    ]
+
+    for patterns in LITERACY_RATE_PATTERNS.values():
         cols = [col for col in tb.columns if all(pattern in col for pattern in patterns)]
+        # Filter out columns containing exclusion patterns
+        cols = [col for col in cols if not any(exclusion in col for exclusion in exclusion_patterns)]
         literacy_cols.extend(cols)
 
     return literacy_cols
@@ -108,7 +124,6 @@ def adjust_dimensions(tb):
         "population_15plus_years": "adult",
         "population_15_24_years": "youth",
         "population_65plus_years": "elderly",
-        "adjusted_gender_parity_index": "youth_gpia",
     }
 
     SEX_KEYWORDS = {"both_sexes": "both", "male": "male", "female": "female"}
@@ -123,11 +138,6 @@ def adjust_dimensions(tb):
 
         # Extract gender
         sex = _extract_gender(col, SEX_KEYWORDS)
-
-        # Handle special case for gender parity index
-        if "adjusted_gender_parity_index" in col:
-            sex = "gpia"
-            age_group = "youth"
 
         # Set indicator name
         tb[col].metadata.original_short_name = "literacy_rates"
@@ -192,31 +202,27 @@ GENDER_MAPPINGS = {
         "both": "adults",
         "male": "men",
         "female": "women",
-        "gpia": "gender parity in literacy rates",
         "sex_side_by_side": "men and women",
     },
     "subtitle": {
         "both": "adults",
         "male": "men",
         "female": "women",
-        "gpia": "gender parity",
         "sex_side_by_side": "men and women",
     },
 }
 
 AGE_GROUP_MAPPINGS = {
     "title": {
-        "adult": "adults (15+)",
-        "youth": "young people (15-24)",
-        "elderly": "older adults (65+)",
-        "youth_gpia": "young people (15-24)",
+        "adult": "adults",
+        "youth": "young people",
+        "elderly": "older adults",
         "age_side_by_side": "by age group",
     },
     "subtitle": {
         "adult": "adults aged 15 years and older",
         "youth": "young people aged 15 to 24 years",
         "elderly": "older adults aged 65 years and older",
-        "youth_gpia": "young people aged 15 to 24 years",
         "age_side_by_side": "adults (15+), young people (15-24), and older adults (65+)",
     },
 }
@@ -234,13 +240,12 @@ def generate_title_by_gender_and_age(view):
     if not age_term:
         raise ValueError(f"Unknown age group: {age_group}")
 
-    # Handle special cases
-    if sex == "gpia":
-        return f"Gender parity in literacy rates among {age_term}"
-    elif age_group == "age_side_by_side":
+    if age_group == "age_side_by_side":
         return f"Literacy rates {age_term}"
     elif sex == "sex_side_by_side":
-        return f"Literacy rates among {gender_term}, {age_term}"
+        return f"Literacy rates among {age_term}, by gender"
+    elif sex == "both":
+        return f"Literacy rates among {age_term}"
     else:
         return f"Literacy rates among {gender_term} {age_term}"
 
@@ -255,11 +260,14 @@ def generate_subtitle_by_age_and_gender(view):
     if not age_term:
         raise ValueError(f"Unknown age group: {age_group}")
 
-    # Handle special cases
-    if sex == "gpia":
-        return f"An adjusted gender parity index of 1 indicates equal literacy rates among {age_term}. Values below 1 favor men, and above 1 favor women."
+    # Handle different combinations properly
+    if sex == "sex_side_by_side":
+        return f"Share of {age_term} who can read and write a short, simple sentence with understanding, by gender."
+    elif sex == "both":
+        return f"Share of {age_term} who can read and write a short, simple sentence with understanding."
     else:
-        return f"Share of {gender_term} {age_term} who can read and write a short, simple sentence with understanding."
+        # For specific genders, place gender before age
+        return f"Share of {gender_term} among {age_term} who can read and write a short, simple sentence with understanding."
 
 
 def edit_indicator_displays(view):
@@ -276,8 +284,8 @@ def edit_indicator_displays(view):
 
     # Display name mappings for gender
     GENDER_DISPLAY_NAMES = {
-        "male": "Men",
-        "female": "Women",
+        "years__male": "Men",
+        "years__female": "Women",
         "both": "Both genders",
     }
 
