@@ -8,7 +8,7 @@ default_selection:
   - Mexico
   - Afghanistan
   - India
-  - South Korea
+  - Mali
 
 dimensions:
   - slug: age_group
