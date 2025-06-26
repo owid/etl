@@ -8,6 +8,7 @@ from fastmcp import FastMCP
 from owid import catalog
 
 from apps.pr.cli import cli as pr_cli
+from apps.step_update.cli import cli as step_update_cli
 
 
 @dataclass
@@ -33,6 +34,16 @@ class PRResult:
     pr_url: Optional[str]
     branch_name: Optional[str]
     message: str
+
+
+@dataclass
+class StepUpdateResult:
+    """Result of updating ETL steps."""
+
+    success: bool
+    updated_steps: List[str]
+    message: str
+    dry_run: bool
 
 
 mcp = FastMCP("Data Catalog 🚀")
@@ -99,7 +110,7 @@ def create_pr(
     category: Optional[str] = None,
     scope: Optional[str] = None,
     work_branch: Optional[str] = None,
-    base_branch: str = "master",
+    base_branch: Optional[str] = None,
     direct: bool = False,
     private: bool = False,
     no_llm: bool = False,
@@ -111,7 +122,7 @@ def create_pr(
         category: The category of the PR (data, bug, refactor, enhance, feature, docs, chore, style, wip, tests)
         scope: Scope of the PR (optional)
         work_branch: Name of the work branch to create (auto-generated if not provided)
-        base_branch: Name of the base branch to merge into (default: master)
+        base_branch: Name of the base branch to merge into (default: current branch)
         direct: Create PR from current branch instead of creating new branch
         private: Make staging server private
         no_llm: Disable LLM for branch name generation
@@ -120,6 +131,13 @@ def create_pr(
         PRResult with success status, PR URL, branch name, and message
     """
     try:
+        # Get current branch if base_branch not provided
+        if base_branch is None:
+            import subprocess
+            result = subprocess.run(['git', 'branch', '--show-current'], 
+                                  capture_output=True, text=True, check=True)
+            base_branch = result.stdout.strip()
+        
         # Capture stdout and stderr to get any output or errors
         stdout_buffer = io.StringIO()
         stderr_buffer = io.StringIO()
@@ -139,7 +157,7 @@ def create_pr(
             cli_args.extend(["--scope", scope])
         if work_branch:
             cli_args.extend(["--work-branch", work_branch])
-        if base_branch != "master":
+        if base_branch:
             cli_args.extend(["--base-branch", base_branch])
         if direct:
             cli_args.append("--direct")
@@ -186,6 +204,90 @@ def create_pr(
             pr_url=None,
             branch_name=work_branch,
             message=f"Error calling PR CLI: {str(e)}"
+        )
+
+
+@mcp.tool
+def update_step(
+    steps: List[str],
+    step_version_new: Optional[str] = None,
+    include_dependencies: bool = False,
+    include_usages: bool = False,
+    dry_run: bool = True,
+    non_interactive: bool = True,
+) -> StepUpdateResult:
+    """Update ETL steps to new versions.
+
+    Args:
+        steps: List of step URIs to update (e.g., ["data://garden/biodiversity/2025-04-07/cherry_blossom", "snapshot://biodiversity/2024-01-25/cherry_blossom.xls"])
+        step_version_new: New version for steps (default: current date)
+        include_dependencies: Update direct dependencies of given steps
+        include_usages: Update steps that directly use the given steps
+        dry_run: Preview changes without executing (default: True for safety)
+        non_interactive: Run without user prompts (default: True)
+
+    Returns:
+        StepUpdateResult with success status, list of updated steps, and message
+    """
+    try:
+        from click.testing import CliRunner
+        runner = CliRunner()
+        
+        # Build CLI arguments
+        cli_args = steps.copy()
+        
+        if step_version_new:
+            cli_args.extend(["--step-version-new", step_version_new])
+        if include_dependencies:
+            cli_args.append("--include-dependencies")
+        if include_usages:
+            cli_args.append("--include-usages")
+        if dry_run:
+            cli_args.append("--dry-run")
+        if non_interactive:
+            cli_args.append("--non-interactive")
+        
+        # Invoke the step update CLI
+        result = runner.invoke(step_update_cli, cli_args, catch_exceptions=False)
+        
+        if result.exit_code == 0:
+            # Parse output to extract updated steps
+            output_lines = result.output.split('\n')
+            updated_steps = []
+            
+            # Look for updated step information in the output
+            for line in output_lines:
+                if "Updating step:" in line or "Updated:" in line:
+                    # Extract step name from output
+                    import re
+                    step_match = re.search(r'(data://[^\s]+|snapshot://[^\s]+)', line)
+                    if step_match:
+                        updated_steps.append(step_match.group())
+            
+            # If no specific steps found, use the input steps as they were processed
+            if not updated_steps:
+                updated_steps = steps
+            
+            return StepUpdateResult(
+                success=True,
+                updated_steps=updated_steps,
+                message=f"Successfully {'previewed' if dry_run else 'updated'} {len(updated_steps)} step(s)",
+                dry_run=dry_run
+            )
+        else:
+            return StepUpdateResult(
+                success=False,
+                updated_steps=[],
+                message=f"Step update failed with exit code {result.exit_code}: {result.output}",
+                dry_run=dry_run
+            )
+            
+    except Exception as e:
+        return StepUpdateResult(
+            success=False,
+            updated_steps=[],
+            message=f"Error updating steps: {str(e)}",
+            dry_run=dry_run
         )
 
 
