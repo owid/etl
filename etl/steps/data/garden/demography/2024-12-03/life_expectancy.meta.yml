@@ -21,7 +21,7 @@ definitions:
     title_public: Life expectancy
     data_used: |-
       <%- if (age == 0) and (sex == 'total') -%>
-      Prior to 1950, we use HMD (2024) data combined with Zijdeman (2015). From 1950 onwards, we use UN WPP (2024) data. For old regional data, we use Riley (2005) estimates.
+      Prior to 1950, we used the Human Mortality Database (2024) data combined with Zijdeman (2015). For historical regional data, before 1950, we used Riley's (2005) estimates. From 1950 onwards, we used United Nations World Population Prospects (2024) data.
       <%- else -%>
       Prior to 1950, we use HMD (2024) data. From 1950 onwards, we use UN WPP (2024) data.
       <%- endif -%>
@@ -29,7 +29,7 @@ definitions:
       Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
     point_2: |-
       <%- if age == '0' -%>
-      For a given year, it represents the average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout their whole lives as the age-specific death rates seen in that particular year.
+      It shows how long the average baby born in that year would be expected to live if they experienced the same chances of dying at each age as people did in that year.
       <%- else -%>
       For a given year, it represents the remaining average lifespan for a hypothetical group of people, if they experienced the same age-specific death rates throughout the rest of their lives as the age-specific death rates seen in that particular year.
       <%- endif -%>
@@ -87,24 +87,35 @@ tables:
       life_expectancy:
         title: |-
           {definitions.global.title_base}
-        display: &display_hist
+        display:
           numDecimalPlaces: 1
           name: |-
             {definitions.global.title_public} at << 'birth' if (age == 0) else age >><< ', ' + sex + 's' if (sex != 'total') >>
         presentation:
-          title_variant: &title_variant_hist << sex + 's, ' if sex != 'total' >>period tables
+          title_variant: << sex + 's, ' if sex != 'total' >>period tables
 
       life_expectancy_0:
         title: |-
           {definitions.global.title_base} at birth
-        display: *display_hist
+        description_short: The [period life expectancy](#dod:period-life-expectancy) at birth, in a given year. Period life expectancy shows how long the average person born in a certain year would live if they experienced the same chances of dying at each age as people did in that year.
+        description_key:
+          - Across the world, people are living longer. In 1900, the global average life expectancy of a newborn was 32 years. By 2021, this had more than doubled to 71 years.
+          - Big improvements were achieved by countries [around the world](https://ourworldindata.org/#:~:text=achieved%20by%20countries-,around%20the%20world,-.%20The%20chart%20shows). The chart shows that life expectancy has more than doubled in every region of the world. This improvement is not only due to declining child mortality; life expectancy increased [at all ages](https://ourworldindata.org/#:~:text=life%20expectancy%20increased-,at%20all%20ages,-.).
+          - This visualization shows long-run estimates of life expectancy brought together by our team from several different data sources. It also shows that the [COVID-19 pandemic](https://ourworldindata.org/#:~:text=shows%20that%20the-,COVID%2D19%20pandemic,-led%20to%20reduced) led to reduced life expectancy worldwide.
+          - Period life expectancy is a metric that summarizes death rates across all age groups in one particular year.
+          - It shows how long the average baby born in that year would be expected to live if they experienced the same chances of dying at each age as people did in that year.
+          - Prior to 1950, we used the Human Mortality Database (2024) data combined with Zijdeman (2015). For historical regional data, before 1950, we used Riley's (2005) estimates. From 1950 onwards, we used United Nations World Population Prospects (2024) data.
+        display:
+          name: Life expectancy
+          numDecimalPlaces: 1
         presentation:
-          attribution_short: Various sources
-          title_variant: *title_variant_hist
+          title_public: Life expectancy
+          attribution_short: Riley (2005); Zijdeman et al. (2015); HMD (2024); UN WPP (2024)
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
-            UN WPP (2024); HMD (2024); Zijdeman et al. (2015); Riley (2005)
+            Riley (2005); Zijdeman et al. (2015); HMD (2024); UN WPP (2024)
+        processing_level: major
 
   # WITH PROJECTIONS
   life_expectancy_with_proj:
