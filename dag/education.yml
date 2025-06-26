@@ -104,7 +104,6 @@ steps:
   data://garden/unesco/2025-05-01/education_sdgs:
     - data://meadow/unesco/2025-05-01/education_sdgs
     - snapshot://wb/2024-06-18/edstats_metadata.xls
-    - data://garden/education/2018-04-18/literacy_rates
     - data://garden/education/2017-09-30/public_expenditure
   data://grapher/unesco/2025-05-01/education_sdgs:
     - data://garden/unesco/2025-05-01/education_sdgs
@@ -177,3 +176,11 @@ steps:
   #
   export://multidim/education/latest/completion_rates:
     - data://grapher/unesco/2025-05-01/education_sdgs
+
+
+  #
+  # Mdim for education spending
+  #
+  export://multidim/education/latest/education_spending:
+    - data://grapher/unesco/2025-05-01/education_sdgs
+    - data://grapher/unesco/2025-05-01/education_opri
