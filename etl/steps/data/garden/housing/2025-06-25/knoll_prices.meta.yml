@@ -15,7 +15,7 @@ dataset:
 tables:
   knoll_prices:
     variables:
-      hpnom:
+      hpreal:
         title: "Real house price index"
         unit: "Index (1990=100)"
         short_unit: ""
@@ -23,6 +23,6 @@ tables:
         description_key:
           - This long-run dataset consolidates house price data from a variety of sources. Some sources might only include urban areas while others cover the nation or some sources include only existing dwellings, while others include both new and existing dwellings. More details can be found in the [original source](https://www.aeaweb.org/articles?id=10.1257/aer.20150501).
           - House prices are deflated by the consumer price index (CPI) to account for inflation.
-          - The data is normalized to 1990=100.
+          - The data is normalized to 1990=100. A year with an index of 120 indicates that house prices were 20% higher than in 1990.
 
 
