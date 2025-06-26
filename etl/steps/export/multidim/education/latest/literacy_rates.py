@@ -67,6 +67,7 @@ def run() -> None:
     c.set_global_config(
         config={
             "title": lambda view: generate_title_by_gender_and_age(view),
+            "subtitle": lambda view: generate_subtitle_by_age_and_gender(view),
         }
     )
 
@@ -247,7 +248,15 @@ def generate_title_by_gender_and_age(view):
     elif sex == "both":
         return f"Literacy rates among {age_term}"
     else:
-        return f"Literacy rates among {gender_term} {age_term}"
+        # For specific genders, create better titles
+        if age_group == "youth":
+            return f"Literacy rates among young {gender_term}"
+        elif age_group == "elderly":
+            return f"Literacy rates among older {gender_term}"
+        elif age_group == "adult":
+            return f"Literacy rates among {gender_term}"
+        else:
+            return f"Literacy rates among {gender_term} {age_term}"
 
 
 def generate_subtitle_by_age_and_gender(view):
@@ -261,13 +270,27 @@ def generate_subtitle_by_age_and_gender(view):
         raise ValueError(f"Unknown age group: {age_group}")
 
     # Handle different combinations properly
-    if sex == "sex_side_by_side":
+    if age_group == "age_side_by_side":
+        if sex == "sex_side_by_side":
+            return f"Share of {age_term} who can read and write a short, simple sentence with understanding, by gender and age group."
+        elif sex == "both":
+            return f"Share of {age_term} who can read and write a short, simple sentence with understanding."
+        else:
+            return f"Share of {gender_term} across different age groups who can read and write a short, simple sentence with understanding."
+    elif sex == "sex_side_by_side":
         return f"Share of {age_term} who can read and write a short, simple sentence with understanding, by gender."
     elif sex == "both":
         return f"Share of {age_term} who can read and write a short, simple sentence with understanding."
     else:
-        # For specific genders, place gender before age
-        return f"Share of {gender_term} among {age_term} who can read and write a short, simple sentence with understanding."
+        # For specific genders, create age-specific phrasing
+        if age_group == "youth":
+            return f"Share of young {gender_term} aged 15 to 24 years who can read and write a short, simple sentence with understanding."
+        elif age_group == "elderly":
+            return f"Share of older {gender_term} aged 65 years and older who can read and write a short, simple sentence with understanding."
+        elif age_group == "adult":
+            return f"Share of {gender_term} aged 15 years and older who can read and write a short, simple sentence with understanding."
+        else:
+            return f"Share of {gender_term} among {age_term} who can read and write a short, simple sentence with understanding."
 
 
 def edit_indicator_displays(view):
