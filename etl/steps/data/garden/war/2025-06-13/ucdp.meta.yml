@@ -427,7 +427,7 @@ tables:
               colorScale:
                 binningStrategy: "manual"
                 customNumericValues: [0, 1, 2, 5, 10]
-          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); Natural Earth (2022)
+          attribution: Uppsala Conflict Data Program and Peace Research Institute Oslo (2025); geoBoundaries (2023)
 
       number_ongoing_conflicts_per_country:
         title: Number of ongoing conflicts per state
