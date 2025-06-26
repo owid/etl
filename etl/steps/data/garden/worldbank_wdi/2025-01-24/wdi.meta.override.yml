@@ -771,6 +771,7 @@ tables:
             - Energy
         processing_level: minor
         display:
+          numDecimalPlaces: 1
           tolerance: 5
       sn_itk_defc_zs:
         title: Prevalence of undernourishment (% of population)
