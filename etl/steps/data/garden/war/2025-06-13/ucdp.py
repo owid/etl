@@ -694,7 +694,10 @@ def estimate_metrics_locations(
 
     # Sanity check non-standard countries
     countries = ds_population["population"].reset_index().country.unique()
-    tb_locations_ns = tb_locations.loc[~tb_locations["country_name_location"].isin(countries), ["country_name_location", "year", "conflict_name", "where_description", "where_coordinates"]].sort_values(["country_name_location", "year"])
+    tb_locations_ns = tb_locations.loc[
+        ~tb_locations["country_name_location"].isin(countries),
+        ["country_name_location", "year", "conflict_name", "where_description", "where_coordinates"],
+    ].sort_values(["country_name_location", "year"])
     assert set(tb_locations_ns["country_name_location"].unique()) == {"Abyei"}
 
     ###################
@@ -1025,7 +1028,9 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
         tb.loc[mask, COLUMN_COUNTRY_NAME] = np.nan
 
     num_err_expected_max = 6
-    assert (num_err := tb[COLUMN_COUNTRY_NAME].isna().sum()) <= num_err_expected_max, f"{num_err_expected_max} missing values were expected at most! Found a different amount ({num_err})!"
+    assert (
+        (num_err := tb[COLUMN_COUNTRY_NAME].isna().sum()) <= num_err_expected_max
+    ), f"{num_err_expected_max} missing values were expected at most! Found a different amount ({num_err})!"
     tb = tb.dropna(subset=[COLUMN_COUNTRY_NAME])
 
     return tb
@@ -1074,9 +1079,10 @@ def _add_missing_values(
     # DEBUGGING: Plot re-assigned events
     # plot_missed_countries(gdf_missing, gdf_maps, max_countries=30)
 
-
     # Combining and adding name to original table
-    gdf_match = gdf_match.rename(columns={"country": "name"})  # Do this otherwise there is a collision with column from tb
+    gdf_match = gdf_match.rename(
+        columns={"country": "name"}
+    )  # Do this otherwise there is a collision with column from tb
     columns = ["relid", "name"]
     gdf_country_names = pr.concat([Table(gdf_match[columns]), Table(gdf_missing[columns])])
     tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
@@ -1671,15 +1677,16 @@ def plot_missed_countries(gdf_missing, gdf_maps, max_countries=10):
 
     This will generate a plot of the country borders where these events where assigned to + markers for the events."""
     import matplotlib.pyplot as plt
+
     countries = gdf_missing["name"].value_counts()
     print(f"{len(countries)} countries (plotting at most {max_countries})")
     countries = countries.iloc[:max_countries]
     for country, count in countries.items():
         print(f"{country}: {count} events")
-        events_markers = gdf_missing[gdf_missing["name"]==country]
-        country_map = gdf_maps[gdf_maps["country"]==country]
+        events_markers = gdf_missing[gdf_missing["name"] == country]
+        country_map = gdf_maps[gdf_maps["country"] == country]
         _, ax = plt.subplots(figsize=(6, 8), dpi=1000)  # larger dpi ⇒ more pixels
         country_map.boundary.plot(ax=ax, linewidth=0.25, edgecolor="k")
         if not events_markers.empty:
             events_markers.plot(ax=ax, color="red", markersize=0.5)
-        ax.set_title(f"{country}, {count} events", fontsize=12, loc='center', pad=10)
+        ax.set_title(f"{country}, {count} events", fontsize=12, loc="center", pad=10)
