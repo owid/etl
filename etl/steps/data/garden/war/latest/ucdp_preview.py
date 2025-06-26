@@ -53,7 +53,7 @@ LAST_YEAR = 2024
 LAST_YEAR_PREVIEW = 2025
 
 # Number of events with no location assigned (see function estimate_metrics_locations)
-NUM_MISSING_LOCATIONS = 2433
+NUM_MISSING_LOCATIONS = 1216
 
 # Catalog path of the main UCDP dataset. NOTE: Change this when there is a new UCDP stable (yearly) release.
 VERSION_UCDP_STABLE = "2025-06-13"
@@ -71,7 +71,7 @@ def run() -> None:
         short_name="ucdp", channel="meadow", namespace="war", version=VERSION_UCDP_STABLE
     )  # UCDP
     ds_gw = paths.load_dataset("gleditsch")  # Gleditsch
-    ds_maps = paths.load_dataset("nat_earth_110")  # Nat Earth
+    ds_maps = paths.load_dataset("geoboundaries_cgaz")  # GeoBoundaries
     ds_population = paths.load_dataset("population")  # Population
 
     # Import UCDP module
@@ -88,7 +88,7 @@ def run() -> None:
     tb_prio = ds_meadow.read("ucdp_prio_armed_conflict")
     tb_regions = ds_gw.read("gleditsch_regions")
     tb_codes = ds_gw.read("gleditsch_countries")
-    tb_maps = ds_maps.read("nat_earth_110")
+    tb_maps = ds_maps.read("geoboundaries_cgaz")
 
     # Load candidate (preliminary) data
     ds_ced = paths.load_dataset("ucdp_ced")
@@ -118,6 +118,7 @@ def run() -> None:
         last_year=LAST_YEAR,
         last_year_preview=LAST_YEAR_PREVIEW,
         short_name=paths.short_name,
+        tolerance_unk_ctype=0.01,
     )
 
     #
