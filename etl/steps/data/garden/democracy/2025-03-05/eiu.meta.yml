@@ -39,6 +39,12 @@ tables:
           - |-
             It is made up of five sub-indices: [electoral pluralism](https://ourworldindata.org/explorers/democracy?Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=Electoral+pluralism+index&country=ARG~AUS~BWA~CHN~OWID_WRL), [civil liberties](https://ourworldindata.org/explorers/democracy?Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=%C2%ADCivil+liberties+index&country=ARG~AUS~BWA~CHN~OWID_WRL), [political participation](https://ourworldindata.org/explorers/democracy?Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=%C2%ADPolitical+participation+index&country=ARG~AUS~BWA~CHN~OWID_WRL), [democratic culture](https://ourworldindata.org/explorers/democracy?Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=Democratic+culture+index&country=ARG~AUS~BWA~CHN~OWID_WRL), and [functioning government](https://ourworldindata.org/explorers/democracy?Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=Functioning+government+index&country=ARG~AUS~BWA~CHN~OWID_WRL).
           - The index is also available as a [classification](https://ourworldindata.org/explorers/democracy?Dataset=Economist+Intelligence+Unit&Metric=Electoral+democracy&Sub-metric=Political+regime&country=ARG~AUS~BWA~CHN~OWID_WRL) that groups countries into full democracies, flawed democracies, hybrid regimes, and authoritarian regimes.
+          - |-
+            **Why this matters:**
+
+            - Democracy shapes how we live, how we can express our ideas, and how governments respond to our needs. Where it thrives, people enjoy more freedom, dignity, and security. Where it breaks down, they often face oppression, injustice, and instability.
+            - A century ago, democracy existed in only a few countries. Today, most have built more open and accountable political systems. But progress is fragile: many still struggle to build stable democratic institutions.
+            - This data shows how countries compare: where democracy is strong, where it is weak, and where more progress is needed.
 
         presentation:
           title_public: Democracy index
