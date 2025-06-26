@@ -690,7 +690,12 @@ def estimate_metrics_locations(
     # these are mappable in OWID maps.
     # We map entry with id "53238" and relid "PAK-2003-1-345-88" from "Siachen Glacier" to "Pakistan" based on
     # the text in `where_description` field, which says: "Giang sector in Siachen, Pakistani Kashmir"
-    tb_locations.loc[tb_locations["country_name_location"] == "Siachen Glacier", "country_name_location"] = "Pakistan"
+    tb_locations.loc[tb_locations["country_name_location"] == "Siachen-Saltoro", "country_name_location"] = "Pakistan"
+
+    # Sanity check non-standard countries
+    countries = ds_population["population"].reset_index().country.unique()
+    tb_locations_ns = tb_locations.loc[~tb_locations["country_name_location"].isin(countries), ["country_name_location", "year", "conflict_name", "where_description", "where_coordinates"]].sort_values(["country_name_location", "year"])
+    assert set(tb_locations_ns["country_name_location"].unique()) == {"Abyei"}
 
     ###################
     # COUNTRY-LEVEL: Country in conflict or not (1 or 0)
@@ -795,10 +800,10 @@ def estimate_metrics_locations(
         fillna_method="zero",
     )
 
-    # Add origins from Natural Earth
+    # Add origins from geoBoundaries
     # cols = ["is_location_of_conflict"] + cols_num_deaths
     for col in cols_indicators:
-        tb_locations_country[col].origins += tb_maps["name"].m.origins
+        tb_locations_country[col].origins += tb_maps["country"].m.origins
 
     ###################
     # Add conflict type aggregates
@@ -1019,7 +1024,8 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
         tb.loc[error[0], "flag"] = error[1]
         tb.loc[mask, COLUMN_COUNTRY_NAME] = np.nan
 
-    assert tb[COLUMN_COUNTRY_NAME].isna().sum() == 6, "6 missing values were expected! Found a different amount!"
+    num_err_expected_max = 6
+    assert (num_err := tb[COLUMN_COUNTRY_NAME].isna().sum()) <= num_err_expected_max, f"{num_err_expected_max} missing values were expected at most! Found a different amount ({num_err})!"
     tb = tb.dropna(subset=[COLUMN_COUNTRY_NAME])
 
     return tb
