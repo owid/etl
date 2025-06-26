@@ -88,6 +88,7 @@ def run() -> None:
                 | {
                     "chartTypes": ["StackedBar"],
                     "hasMapTab": False,
+                    "selectedFacetStrategy": "entity",
                 },
                 "view_metadata": {
                     "description_short": lambda view: _set_subtitle(view),
@@ -129,7 +130,7 @@ def run() -> None:
             "title": lambda view: _set_title(view),
             "subtitle": lambda view: _set_subtitle(view),
             "hideRelativeToggle": lambda view: (view.d.conflict_type != "all_stacked"),
-            # "hideFacetControl": lambda view: view.dimensions["estimate"] == "low_high",
+            "hideFacetControl": False,
             "selectedFacetStrategy": "entity",
         }
     )
