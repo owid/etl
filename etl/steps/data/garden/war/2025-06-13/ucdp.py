@@ -956,7 +956,7 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
         gdf_match,
         gdf_maps,
         num_missing_location,
-        COLUMN_COUNTRY_NAME,
+        column_country_name=COLUMN_COUNTRY_NAME,
     )
 
     # SOME CORRECTIONS #
@@ -1055,7 +1055,7 @@ def _add_missing_values(
     tree = STRtree(gdf_maps_wec.geometry)
 
     # For these points we can find the nearest country using the distance function
-    # NOTE: should take ~1 minute (takes long bc borders have quite some resolution)
+    # NOTE: should take ~20 seconds (takes long bc borders have quite some resolution)
     polygon_near_name = []
     for _, row in gdf_missing_wec.iterrows():
         nearest_idx = tree.nearest(row["geometry"])
@@ -1063,16 +1063,17 @@ def _add_missing_values(
         polygon_near_name.append(country_row["country"])
 
     # Assign
-    gdf_missing.loc[:, "name"] = polygon_near_name
+    gdf_missing.loc[:, "country"] = polygon_near_name
 
-    # Plot re-assigned events
-    countries = gdf_missing.name.unique()
+    # DEBUGGING: Plot re-assigned events
+    # plot_missed_countries(gdf_missing, gdf_maps, max_countries=30)
+
 
     # Combining and adding name to original table
-    columns = ["relid", "name"]
+    columns = ["relid", "country"]
     gdf_country_names = pr.concat([Table(gdf_match[columns]), Table(gdf_missing[columns])])
     tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
-        columns={"name": column_country_name}
+        columns={"country": column_country_name}
     )
     # assert tb[column_country_name].notna().all(), "Some missing values found in `column_country_name`"
     return tb
@@ -1656,3 +1657,22 @@ def plot_map_and_events(maps, events):
     # gdf_maps.boundary.plot(ax=ax, linewidth=0.25, edgecolor="k")
     if not events.empty:
         events.plot(ax=ax, color="blue", markersize=0.5)
+
+
+def plot_missed_countries(gdf_missing, gdf_maps, max_countries=10):
+    """Execute this function to plot events that were not classified within no country.
+
+    This will generate a plot of the country borders where these events where assigned to + markers for the events."""
+    import matplotlib.pyplot as plt
+    countries = gdf_missing["name"].value_counts()
+    print(f"{len(countries)} countries (plotting at most {max_countries})")
+    countries = countries.iloc[:max_countries]
+    for country, count in countries.items():
+        print(f"{country}: {count} events")
+        events_markers = gdf_missing[gdf_missing["name"]==country]
+        country_map = gdf_maps[gdf_maps["country"]==country]
+        _, ax = plt.subplots(figsize=(6, 8), dpi=1000)  # larger dpi ⇒ more pixels
+        country_map.boundary.plot(ax=ax, linewidth=0.25, edgecolor="k")
+        if not events_markers.empty:
+            events_markers.plot(ax=ax, color="red", markersize=0.5)
+        ax.set_title(f"{country}, {count} events", fontsize=12, loc='center', pad=10)
