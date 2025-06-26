@@ -628,6 +628,123 @@ def test_collection_set(tmp_path: Path):
     assert loaded.short_name == "coll1"
 
 
+def test_grouped_view_validation_raises_exceptions():
+    """Test that grouped views without proper metadata raise exceptions during validation.
+
+    This test verifies the sanity_check_grouped_view functionality by:
+    1. Creating a collection with multiple views
+    2. Grouping views to create grouped views without metadata
+    3. Verifying that validate_grouped_views() raises ValueError for missing metadata
+    """
+    # Create collection with dimensions and views
+    collection = Collection(
+        dimensions=[
+            Dimension(
+                slug="sex",
+                name="Sex",
+                choices=[
+                    DimensionChoice(slug="male", name="Male"),
+                    DimensionChoice(slug="female", name="Female"),
+                ],
+            ),
+            Dimension(
+                slug="age",
+                name="Age",
+                choices=[
+                    DimensionChoice(slug="adults", name="Adults"),
+                    DimensionChoice(slug="children", name="Children"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"sex": "male", "age": "adults"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator1"}]}),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "adults"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator2"}]}),
+            ),
+            View(
+                dimensions={"sex": "male", "age": "children"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator3"}]}),
+            ),
+            View(
+                dimensions={"sex": "female", "age": "children"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator4"}]}),
+            ),
+        ],
+        catalog_path="test#collection",
+        title={"title": "Test Collection"},
+        default_selection=["test"],
+        _definitions=Definitions(common_views=None),
+    )
+
+    # Group views by sex dimension (creates grouped views without metadata)
+    collection.group_views([{"dimension": "sex", "choice_new_slug": "all_sexes", "choices": ["male", "female"]}])
+
+    # Verify that grouped views were created and marked as grouped
+    grouped_views = [view for view in collection.views if view.is_grouped]
+    assert len(grouped_views) == 2  # Should have 2 grouped views (one for each age group)
+
+    # This should raise ValueError for missing metadata
+    with pytest.raises(ValueError) as exc_info:
+        collection.validate_grouped_views()
+
+    # Verify error message mentions missing metadata and required fields
+    error_message = str(exc_info.value)
+    assert "missing 'metadata' attribute" in error_message
+    assert "title_public" in error_message
+    assert "description_key" in error_message
+    assert "description_short" in error_message
+    assert "all_sexes" in error_message  # Should mention the grouped choice
+
+
+def test_grouped_view_validation_skip_metadata_checks():
+    """Test that grouped views validation can be skipped with skip_metadata_checks flag."""
+    # Create collection with dimensions and views
+    collection = Collection(
+        dimensions=[
+            Dimension(
+                slug="sex",
+                name="Sex",
+                choices=[
+                    DimensionChoice(slug="male", name="Male"),
+                    DimensionChoice(slug="female", name="Female"),
+                ],
+            ),
+        ],
+        views=[
+            View(
+                dimensions={"sex": "male"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator1"}]}),
+            ),
+            View(
+                dimensions={"sex": "female"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator2"}]}),
+            ),
+        ],
+        catalog_path="test#collection",
+        title={"title": "Test Collection"},
+        default_selection=["test"],
+        _definitions=Definitions(common_views=None),
+    )
+
+    # Group views by sex dimension (creates grouped views without metadata)
+    collection.group_views([{"dimension": "sex", "choice_new_slug": "combined", "choices": ["male", "female"]}])
+
+    # Verify that grouped views were created
+    grouped_views = [view for view in collection.views if view.is_grouped]
+    assert len(grouped_views) == 1
+
+    # This should NOT raise an error when skip_metadata_checks is True
+    try:
+        collection.validate_grouped_views(skip_metadata_checks=True)
+        # If we get here, validation was skipped successfully
+    except ValueError:
+        pytest.fail("validate_grouped_views() raised ValueError even with skip_metadata_checks=True")
+
+
 def test_grouped_view_validation_warnings():
     """Test that grouped views without proper metadata generate warnings during save.
 
@@ -690,32 +807,28 @@ def test_grouped_view_validation_warnings():
 
     # Mock database validation to avoid DB dependency
     with patch("etl.collection.utils.validate_indicators_in_db"):
-        # Capture warnings during save
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always")  # Ensure all warnings are captured
+        # Test that save() with skip_metadata_checks=True works
+        try:
+            collection.save(skip_metadata_checks=True)
+            # This should succeed because we skip metadata validation
+        except ValueError as e:
+            if "missing" in str(e) and "metadata" in str(e):
+                pytest.fail(f"save() with skip_metadata_checks=True still raised metadata error: {e}")
+            else:
+                # Re-raise if it's a different kind of ValueError (DB connection, etc.)
+                raise
 
-            # This should trigger warnings for missing metadata
-            collection.validate_grouped_views()
+        # Test that save() without skip flag raises ValueError
+        with pytest.raises(ValueError) as exc_info:
+            collection.save(skip_metadata_checks=False)
 
-            # Verify warnings were raised
-            assert len(w) >= 2  # At least 2 warnings (one per grouped view)
-
-            # Check that warnings mention missing metadata
-            warning_messages = [str(warning.message) for warning in w]
-
-            # Should have warnings about missing metadata attribute
-            missing_metadata_warnings = [msg for msg in warning_messages if "missing 'metadata' attribute" in msg]
-            assert len(missing_metadata_warnings) >= 2
-
-            # Verify warning details
-            for warning_msg in missing_metadata_warnings:
-                assert "description_key" in warning_msg
-                assert "description_short" in warning_msg
-                assert "all_sexes" in warning_msg  # Should mention the grouped choice
+        # Verify error message mentions missing metadata
+        error_message = str(exc_info.value)
+        assert "missing" in error_message and "metadata" in error_message
 
 
 def test_grouped_view_validation_with_incomplete_metadata():
-    """Test warnings for grouped views with partial metadata."""
+    """Test exceptions for grouped views with partial metadata."""
     # Create a collection similar to above
     collection = Collection(
         dimensions=[
@@ -744,7 +857,7 @@ def test_grouped_view_validation_with_incomplete_metadata():
         _definitions=Definitions(common_views=None),
     )
 
-    # Group views with partial metadata (missing description_short)
+    # Group views with partial metadata (missing title_public and description_short)
     collection.group_views(
         [
             {
@@ -752,19 +865,74 @@ def test_grouped_view_validation_with_incomplete_metadata():
                 "choice_new_slug": "combined",
                 "choices": ["a", "b"],
                 "view_metadata": {
-                    "description_key": ["Some key info"]  # Missing description_short
+                    "description_key": ["Some key info"]  # Missing title_public and description_short
                 },
             }
         ]
     )
 
-    # Test validation
-    with warnings.catch_warnings(record=True) as w:
-        warnings.simplefilter("always")
-
+    # Test validation raises ValueError for incomplete metadata
+    with pytest.raises(ValueError) as exc_info:
         collection.validate_grouped_views()
 
-        # Should have warning about missing description_short
-        warning_messages = [str(warning.message) for warning in w]
-        missing_desc_short = [msg for msg in warning_messages if "missing 'description_short'" in msg]
-        assert len(missing_desc_short) >= 1
+    # Should raise exception about missing required fields
+    error_message = str(exc_info.value)
+    assert "missing required metadata fields" in error_message
+    assert "title_public" in error_message
+    assert "description_short" in error_message
+    # description_key should NOT be in the missing fields since it was provided
+    assert "description_key" not in error_message or "missing required metadata fields: ['title_public', 'description_short']" in error_message
+
+
+def test_grouped_view_validation_with_complete_metadata():
+    """Test that grouped views with complete metadata pass validation."""
+    # Create a collection
+    collection = Collection(
+        dimensions=[
+            Dimension(
+                slug="category",
+                name="Category",
+                choices=[
+                    DimensionChoice(slug="a", name="A"),
+                    DimensionChoice(slug="b", name="B"),
+                ],
+            )
+        ],
+        views=[
+            View(
+                dimensions={"category": "a"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator1"}]}),
+            ),
+            View(
+                dimensions={"category": "b"},
+                indicators=ViewIndicators.from_dict({"y": [{"catalogPath": "table#indicator2"}]}),
+            ),
+        ],
+        catalog_path="test#collection3",
+        title={"title": "Test Collection 3"},
+        default_selection=["test"],
+        _definitions=Definitions(common_views=None),
+    )
+
+    # Group views with complete metadata
+    collection.group_views(
+        [
+            {
+                "dimension": "category",
+                "choice_new_slug": "combined",
+                "choices": ["a", "b"],
+                "view_metadata": {
+                    "title_public": "Combined Data",
+                    "description_short": "Short description of combined data",
+                    "description_key": ["Key information about the data"]
+                },
+            }
+        ]
+    )
+
+    # Test validation passes with complete metadata
+    try:
+        collection.validate_grouped_views()
+        # If we get here, validation passed successfully
+    except ValueError as e:
+        pytest.fail(f"validate_grouped_views() raised ValueError with complete metadata: {e}")

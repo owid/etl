@@ -183,7 +183,18 @@ class Collection(MDIMBase):
         tolerate_extra_indicators: bool = False,
         prune_choices: bool = True,
         prune_dimensions: bool = True,
+        skip_metadata_checks: bool = False,
     ):
+        """Save the collection to the database.
+        
+        Args:
+            owid_env: OWID environment configuration
+            tolerate_extra_indicators: If True, allow extra indicators not used in charts
+            prune_choices: If True, remove unused dimension choices
+            prune_dimensions: If True, remove dimensions with only one choice
+            skip_metadata_checks: If True, skip validation of required metadata fields for grouped views.
+                                 Use this to allow collections with grouped views that don't have complete metadata.
+        """
         # Ensure we have an environment set
         if owid_env is None:
             owid_env = OWID_ENV
@@ -209,7 +220,7 @@ class Collection(MDIMBase):
         validate_indicators_in_db(indicators, owid_env.engine)
 
         # Run sanity checks on grouped views
-        self.validate_grouped_views()
+        self.validate_grouped_views(skip_metadata_checks=skip_metadata_checks)
 
         # Sort views based on dimension order
         self.sort_views_based_on_dimensions()
@@ -494,10 +505,15 @@ class Collection(MDIMBase):
             # Add slug to set
             slugs.add(dim.slug)
 
-    def validate_grouped_views(self):
+    def validate_grouped_views(self, skip_metadata_checks: bool = False):
+        """Validate grouped views.
+        
+        Args:
+            skip_metadata_checks: If True, skip metadata validation checks for grouped views
+        """
         for view in self.views:
             if view.is_grouped:
-                sanity_check_grouped_view(view)
+                sanity_check_grouped_view(view, skip_metadata_checks=skip_metadata_checks)
 
     def prune_dimensions(self):
         """Remove dimension if only one of its choice is in use."""
@@ -1075,30 +1091,37 @@ def run_callbacks(data, view):
     return data
 
 
-def sanity_check_grouped_view(view: View) -> None:
+def sanity_check_grouped_view(view: View, skip_metadata_checks: bool = False) -> None:
     """
     Perform sanity checks on grouped views.
 
     Validates that grouped views have proper metadata configuration,
-    specifically checking for required description fields.
+    specifically checking for required metadata fields.
 
     Args:
         view: The grouped view to validate
+        skip_metadata_checks: If True, skip metadata validation checks
 
-    Warns:
-        UserWarning: If required metadata fields are missing
+    Raises:
+        ValueError: If required metadata fields are missing and skip_metadata_checks is False
     """
     import warnings
 
+    # Skip all checks if requested
+    if skip_metadata_checks:
+        return
+
+    # Required metadata fields for grouped views
+    required_fields = ["title_public", "description_short", "description_key"]
+
     # Check if metadata is defined
     if view.metadata is None:
-        warnings.warn(
+        raise ValueError(
             f"Grouped view with dimensions {view.dimensions} is missing 'metadata' attribute. "
-            "Consider adding metadata with 'description_key' and 'description_short' fields.",
-            UserWarning,
-            stacklevel=2,
+            f"Please add metadata with the following required fields: {required_fields}. "
+            f"You can add metadata using view_metadata parameter in group_views() or via set_global_metadata(). "
+            f"To skip this validation, set skip_metadata_checks=True in the save() method."
         )
-        return
 
     # Convert to dict if it's a ViewMetadata object for easier checking
     metadata_dict = (
@@ -1109,20 +1132,15 @@ def sanity_check_grouped_view(view: View) -> None:
         else {}
     )
 
-    # Check for description_key
-    if "description_key" not in metadata_dict or metadata_dict["description_key"] is None:
-        warnings.warn(
-            f"Grouped view with dimensions {view.dimensions} is missing 'description_key' in metadata. "
-            "This field provides key information about the grouped view.",
-            UserWarning,
-            stacklevel=2,
-        )
+    # Check for required fields
+    missing_fields = []
+    for field in required_fields:
+        if field not in metadata_dict or metadata_dict[field] is None:
+            missing_fields.append(field)
 
-    # Check for description_short
-    if "description_short" not in metadata_dict or metadata_dict["description_short"] is None:
-        warnings.warn(
-            f"Grouped view with dimensions {view.dimensions} is missing 'description_short' in metadata. "
-            "This field provides a short description of the grouped view.",
-            UserWarning,
-            stacklevel=2,
+    if missing_fields:
+        raise ValueError(
+            f"Grouped view with dimensions {view.dimensions} is missing required metadata fields: {missing_fields}. "
+            f"Please add these fields using view_metadata parameter in group_views() or via set_global_metadata(). "
+            f"To skip this validation, set skip_metadata_checks=True in the save() method."
         )
