@@ -113,7 +113,7 @@ tables:
           numDecimalPlaces: 1
         presentation:
           title_public: Life expectancy
-          attribution_short: Riley (2005); Zijdeman et al. (2015); HMD (2024); UN WPP (2024)
+          attribution_short: Long run estimates - Riley; Zijdeman et al.; HMD; UN WPP
           grapher_config:
             selectedEntityNames: *sel_entities_americas
           attribution: |-
