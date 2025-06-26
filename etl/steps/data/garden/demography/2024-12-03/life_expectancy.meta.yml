@@ -106,7 +106,10 @@ tables:
           - It shows how long the average baby born in that year would be expected to live if they experienced the same chances of dying at each age as people did in that year.
           - Prior to 1950, we used the Human Mortality Database (2024) data combined with Zijdeman (2015). For historical regional data, before 1950, we used Riley's (2005) estimates. From 1950 onwards, we used United Nations World Population Prospects (2024) data.
         description_processing: |-
-          This chart is a combination of several data sources which we join together. For historical country-level data we use the Human Mortality Database (2024) data combined with Zijdeman et al. (2015). For historical regional data, before 1950, we use Riley's (2005) estimates. From 1950 onwards, we use United Nations World Population Prospects (2024) data.
+          This chart is a combination of several data sources which we join together. For historical country-level data we use the Human Mortality Database (2024) data combined with Zijdeman et al. (2015).
+
+          For historical regional data, before 1950, we use Riley's (2005) estimates. From 1950 onwards, we use United Nations World Population Prospects (2024) data. The countries included in the regions follow Riley (2005) until 1950 and UN WPP afterwards.
+
         # add a note on what is preferred out of HMD and Zijdeman where they overlap.
         display:
           name: Life expectancy
