@@ -1,8 +1,9 @@
 """Load a meadow dataset and create a garden dataset."""
 
+from shapely import wkt
+
 from etl.data_helpers import geo
 from etl.helpers import PathFinder
-from shapely import wkt
 
 # Get paths and naming conventions for current step.
 paths = PathFinder(__file__)
