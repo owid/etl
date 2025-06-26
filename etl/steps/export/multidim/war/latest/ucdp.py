@@ -157,9 +157,9 @@ def run() -> None:
             "title": lambda view: _set_title(view, choice_names),
             "subtitle": lambda view: _set_subtitle(view),
             "note": lambda view: _set_note(view),
-            "hideRelativeToggle": lambda view: (view.d.people != "all_stacked")
-            and (view.d.conflict_type != "all_stacked"),
-            "hideFacetControl": lambda view: view.d.estimate == "best_ci",
+            "hideRelativeToggle": lambda view: (view.dimensions["people"] != "all_stacked")
+            and (view.dimensions["conflict_type"] != "all_stacked"),
+            "hideFacetControl": False,
             "yAxis": {
                 "facetDomain": lambda view: "independent" if view.d.conflict_type == "all" else "shared",
             },
