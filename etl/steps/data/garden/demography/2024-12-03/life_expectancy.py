@@ -79,6 +79,9 @@ def run(dest_dir: str) -> None:
     # Create three tables: (i) only historical values, (ii) only future values, (iii) all values
     columns_index = ["country", "year", "sex", "age"]
 
+    ## Add source table for period life expectancy at birth
+    tb_source = tb[(tb["sex"] == "total") & (tb["age"] == 0)].copy()
+    tb_source = tb_source[["country", "year", "source"]]
     ## (i) Main table (historical values)
     tb_main = tb.loc[tb["year"] <= YEAR_ESTIMATE_LAST].copy()
 
@@ -100,6 +103,7 @@ def run(dest_dir: str) -> None:
 
     # Format
     tables = [
+        tb_source.format(["country", "year"], short_name="life_expectancy_source"),
         tb_main.format(columns_index, short_name=paths.short_name),
         tb_only_proj.format(columns_index, short_name=f"{paths.short_name}_only_proj"),
         tb_with_proj.format(columns_index, short_name=f"{paths.short_name}_with_proj"),
@@ -129,7 +133,7 @@ def process_lt(tb: Table) -> Table:
     """
     tb = tb.loc[
         (tb["age"].isin(["0", "10", "15", "25", "45", "65", "80"])) & (tb["type"] == "period"),
-        ["country", "year", "sex", "age", "life_expectancy"],
+        ["country", "year", "sex", "age", "life_expectancy", "source"],
     ]
 
     # Assign dtype
@@ -271,13 +275,18 @@ def combine_tables(tb_lt: Table, tb_un: Table, tb_zi: Table, tb_ri: Table) -> Ta
     ## Zijdeman: complement country data
     tb_0 = tb_0.merge(tb_zi, how="outer", on=["country", "year", "sex", "age"], suffixes=("", "_zij"))
     tb_0["life_expectancy"] = tb_0["life_expectancy"].fillna(tb_0["life_expectancy_zij"])
-    tb_0 = tb_0.drop(columns=["life_expectancy_zij"])
+    tb_0["source"] = tb_0["source"].fillna(tb_0["source_zij"])
+    tb_0 = tb_0.drop(columns=["life_expectancy_zij", "source_zij"])
     ## Riley: complement with continent data
     tb_0 = pr.concat([tb_0, tb_ri], ignore_index=True)
 
     # Combine tb_0 with tb
     tb = tb.merge(tb_0, on=["country", "year", "sex", "age"], how="outer", suffixes=("", "_0"))
-
+    # Fill NaN values in life_expectancy_0 with life_expectancy
+    tb["life_expectancy"] = tb["life_expectancy"].fillna(tb["life_expectancy_0"])
+    tb["source"] = tb["source"].fillna(tb["source_0"])
+    tb = tb.drop(columns=["life_expectancy_0", "source_0"])
+    assert all(tb["source"].isin(["Riley", "Zijdeman et al.", "UN WPP", "Life tables"])), "No source found in table!"
     # For some reason, 'sex' is assigned type object
     tb["sex"] = tb["sex"].astype("string")
 

@@ -181,3 +181,13 @@ tables:
           title_variant: *title_variant_o_proj
           grapher_config:
             selectedEntityNames: *sel_entities_americas
+    ### Source table
+  life_expectancy_source:
+    variables:
+      source:
+        title: Source of life expectancy at birth data
+        display:
+          name: Source
+          numDecimalPlaces: 0
+        presentation:
+          title_public: Source
