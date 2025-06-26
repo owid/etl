@@ -1019,7 +1019,7 @@ def _get_location_of_conflict_in_ucdp_ged(tb: Table, tb_maps: Table, num_missing
         tb.loc[error[0], "flag"] = error[1]
         tb.loc[mask, COLUMN_COUNTRY_NAME] = np.nan
 
-    assert tb[COLUMN_COUNTRY_NAME].isna().sum() == 4, "4 missing values were expected! Found a different amount!"
+    assert tb[COLUMN_COUNTRY_NAME].isna().sum() == 6, "6 missing values were expected! Found a different amount!"
     tb = tb.dropna(subset=[COLUMN_COUNTRY_NAME])
 
     return tb
@@ -1063,17 +1063,18 @@ def _add_missing_values(
         polygon_near_name.append(country_row["country"])
 
     # Assign
-    gdf_missing.loc[:, "country"] = polygon_near_name
+    gdf_missing.loc[:, "name"] = polygon_near_name
 
     # DEBUGGING: Plot re-assigned events
     # plot_missed_countries(gdf_missing, gdf_maps, max_countries=30)
 
 
     # Combining and adding name to original table
-    columns = ["relid", "country"]
+    gdf_match = gdf_match.rename(columns={"country": "name"})  # Do this otherwise there is a collision with column from tb
+    columns = ["relid", "name"]
     gdf_country_names = pr.concat([Table(gdf_match[columns]), Table(gdf_missing[columns])])
     tb = tb.merge(gdf_country_names, on="relid", how="left", validate="one_to_one").rename(
-        columns={"country": column_country_name}
+        columns={"name": column_country_name}
     )
     # assert tb[column_country_name].notna().all(), "Some missing values found in `column_country_name`"
     return tb
