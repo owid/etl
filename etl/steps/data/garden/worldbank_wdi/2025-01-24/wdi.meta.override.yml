@@ -1,3 +1,4 @@
+# WARNING: Use this file to manually curate WDI indicators. Do NOT use the wdi.meta.yml file (which is generated automatically).
 definitions:
   gdp: Gross domestic product (GDP) is a measure of the total value added from the production of goods and services in a country or region each year.
   gdp_per_capita: GDP per capita is GDP divided by population.
@@ -36,7 +37,7 @@ definitions:
 
     Trends in the proportion of the population using each fuel type are estimated using a single multivariate hierarchical model, with urban and rural disaggregation. Estimates for overall "polluting" fuels (unprocessed biomass, charcoal, coal, and kerosene) and "clean" fuels (gaseous fuels, electricity, as well as an aggregation of any other clean fuels like alcohol) are produced by aggregating estimates of relevant fuel types. The model was used to derive clean fuel use estimates for 191 countries (ref. Stoner, O., Shaddick, G., Economou, T., Gumy, S., Lewis, J., Lucio, I., Ruggeri, G. and Adair-Rohani, H. (2020), Global household energy model: a multivariate hierarchical approach to estimating trends in the use of polluting and clean fuels for cooking. J. R. Stat. Soc. C, 69: 815-839). Countries classified by the World Bank as high income (57 countries) in the 2022 fiscal year are assumed to have universal access to clean fuels and technologies for cooking.
   description_short_electricity: &description_short_electricity |-
-    Having access to electricity is defined in international statistics as having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
+    Having access to electricity means having an electricity source that can provide very basic lighting, and charge a phone or power a radio for 4 hours per day.
   description_from_producer_electricity: &description_from_producer_electricity |-
     Electrification data are collected from industry, national surveys and international sources.
 
@@ -762,6 +763,12 @@ tables:
         short_unit: '%'
         description_short: *description_short_electricity
         description_from_producer: *description_from_producer_electricity
+        description_key:
+          - "[Light at night](https://ourworldindata.org/light-at-night) makes it possible to get together after sunset; mobile phones allow us to stay in touch with those far away; the refrigeration of food reduces food waste; and household appliances free up time from household chores. Access to electricity improves people's living conditions in many ways."
+          - This data captures whether people have access to the most basic electricity supply — just enough to provide basic lighting and charge a phone or power a radio for 4 hours per day.
+          - It shows that, especially in several African countries, a large share of the population lacks the benefits that basic electricity offers. No radio and no light at night.
+          - "This data comes from the World Bank's World Development Indicators, which reports the official Sustainable Development Goal (SDG) 7.1.1 indicator on access to electricity. Estimates are based on national household surveys, census data, and reports from energy providers or government agencies. Where data is missing, values are estimated using a model based on country, region, and year. Some countries classified as developed by the United Nations are assumed to have universal access."
+          - "To learn more, read our article [Definitions: access to electricity](https://ourworldindata.org/definition-electricity-access)"
         presentation:
           title_public: Share of the population with access to electricity
           attribution: Data compiled from multiple sources by World Bank
@@ -770,7 +777,8 @@ tables:
             - Access to Energy
             - Energy
         processing_level: minor
-
+        display:
+          tolerance: 5
       sn_itk_defc_zs:
         title: Prevalence of undernourishment (% of population)
         unit: '% of population'
