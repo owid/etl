@@ -6,7 +6,7 @@ import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Union, cast
+from typing import Any, Callable, Dict, Iterator, Optional, Union, cast
 
 import owid.catalog.processing as pr
 import pandas as pd
@@ -717,6 +717,7 @@ def read_table_from_snapshot(
     snapshot_origin: Union[Origin, None],
     file_extension: str,
     safe_types: bool = True,
+    read_function: Callable | None = None,
     *args,
     **kwargs,
 ) -> Table:
@@ -732,24 +733,27 @@ def read_table_from_snapshot(
         "origin": snapshot_origin,
     }
     # Read table
-    if file_extension == "csv":
-        tb = pr.read_csv(*args, **kwargs)
-    elif file_extension == "feather":
-        tb = pr.read_feather(*args, **kwargs)
-    elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
-        tb = pr.read_excel(*args, **kwargs)
-    elif file_extension == "json":
-        tb = pr.read_json(*args, **kwargs)
-    elif file_extension == "dta":
-        tb = pr.read_stata(*args, **kwargs)
-    elif file_extension == "rds":
-        tb = pr.read_rds(*args, **kwargs)
-    elif file_extension == "rda":
-        tb = pr.read_rda(*args, **kwargs)
-    elif file_extension == "parquet":
-        tb = pr.read_parquet(*args, **kwargs)
+    if read_function is not None:
+        tb = pr.read_custom(read_function, *args, **kwargs)
     else:
-        raise ValueError(f"Unknown extension {file_extension}")
+        if file_extension == "csv":
+            tb = pr.read_csv(*args, **kwargs)
+        elif file_extension == "feather":
+            tb = pr.read_feather(*args, **kwargs)
+        elif file_extension in ["xlsx", "xls", "xlsm", "xlsb", "odf", "ods", "odt"]:
+            tb = pr.read_excel(*args, **kwargs)
+        elif file_extension == "json":
+            tb = pr.read_json(*args, **kwargs)
+        elif file_extension == "dta":
+            tb = pr.read_stata(*args, **kwargs)
+        elif file_extension == "rds":
+            tb = pr.read_rds(*args, **kwargs)
+        elif file_extension == "rda":
+            tb = pr.read_rda(*args, **kwargs)
+        elif file_extension == "parquet":
+            tb = pr.read_parquet(*args, **kwargs)
+        else:
+            raise ValueError(f"Unknown extension {file_extension}")
 
     if safe_types:
         tb = cast(Table, to_safe_types(tb))
