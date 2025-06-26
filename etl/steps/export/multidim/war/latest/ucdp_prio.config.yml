@@ -15,16 +15,18 @@ dimensions:
     choices:
       - slug: "deaths"
         name: "Deaths"
-        # description: People moving away from country
+        group: How deadly are conflicts?
       - slug: "death_rate"
         name: "Death rate"
         description: The number of deaths divided by the total population
+        group: How deadly are conflicts?
       - slug: "wars_ongoing"
         name: "Number of conflicts"
-        # description: People moving to country
+        group: How common are conflicts?
       - slug: "wars_ongoing_country_rate"
         name: "Conflict rate"
         description: The number of conflicts divided by the number of countries
+        group: How common are conflicts?
   - slug: conflict_type
     name: "Conflict type"
     choices:
@@ -33,24 +35,24 @@ dimensions:
         # description: All conflicts involving states
       - slug: "state_based_stacked"
         name: "All involving states (by type)"
-        # description: All conflicts involving states. Breakdown by conflict type
+        description: Breakdown by conflict type
       - slug: "interstate"
-        name: "Interstate"
+        name: "Interstate conflicts"
         description: Between states
       - slug: "intrastate (internationalized)"
-        name: "Foreign-backed civil"
+        name: "Foreign-backed civil conflicts"
         description: Between a state and another armed group, involving a foreign state
       - slug: "intrastate (non-internationalized)"
-        name: "Domestic civil"
+        name: "Domestic civil conflicts"
         description: Between a state and another armed group, not involving a foreign state
       - slug: "extrasystemic"
-        name: "Colonial"
+        name: "Colonial conflicts"
         description: Between a state and another armed group outside its territory
   - slug: estimate
     name: "Estimate"
     choices:
       - slug: best
-        name: Best estimate
+        name: Best estimate only
       - slug: best_ci
         name: Show high and low estimates
       - slug: low

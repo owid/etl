@@ -363,6 +363,7 @@
   name: "China"
   aliases:
     - "China, mainland"
+    - "China (People’s Republic of)"
   related:
     - "HKG"
     - "MAC"
