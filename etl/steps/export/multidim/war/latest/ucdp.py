@@ -145,7 +145,7 @@ def run() -> None:
             "note": lambda view: _set_note(view),
             "hideRelativeToggle": lambda view: (view.dimensions["people"] != "all_stacked")
             and (view.dimensions["conflict_type"] != "all_stacked"),
-            "hideFacetControl": lambda view: view.dimensions["estimate"] == "best_ci",
+            "hideFacetControl": False,
             "yAxis": {
                 "facetDomain": lambda view: "independent" if view.d.conflict_type == "all" else "shared",
             },
