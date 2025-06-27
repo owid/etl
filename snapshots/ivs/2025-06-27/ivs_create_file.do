@@ -17,7 +17,7 @@ INSTRUCTIONS
 */
 
 
-use Integrated_values_surveys_1981-2021, clear
+use Integrated_values_surveys_1981-2022, clear
 
 *List of confidence questions
 ds E069*
