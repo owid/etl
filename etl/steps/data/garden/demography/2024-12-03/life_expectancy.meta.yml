@@ -17,6 +17,8 @@ definitions:
         - Europe
         - Oceania
         - World
+    title_base: Period life expectancy
+    title_public: Life expectancy
     data_used: |-
       <%- if (age == 0) and (sex == 'total') -%>
       Prior to 1950, we used the Human Mortality Database (2024) data combined with Zijdeman (2015). For historical regional data, before 1950, we used Riley's (2005) estimates. From 1950 onwards, we used United Nations World Population Prospects (2024) data.
